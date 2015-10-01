@@ -1,0 +1,67 @@
+@import "../common_files/top.css" screen;
+@import "../common_files/foot.css" screen;
+@import "../common_files/authorize-no_rights.css" screen;
+#content {
+	text-align:center;
+	vertical-align:top;
+}
+button.edit-view {
+	margin: 5px;
+}
+#content-document-menu ul {
+  line-height: 1.2em;
+  padding: 0;
+  width: 100%;
+  margin: 0 auto;
+  background-color: rgb(212, 248, 131);
+}
+#content-document-menu {
+  margin: auto;
+  text-align: center;
+}
+#content-document-menu li {
+  display: inline;
+  padding: 0;
+}
+#content-document-menu li.selected a {
+  background-color: rgb(220, 255, 143);
+  text-shadow: none;
+}
+#content-document-menu li a {
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.5em 4em;
+  color: black;
+  cursor: pointer;
+  text-shadow: 1px 1px 1px rgb(170, 192, 154);
+}
+#content-document-menu li.disabled a {
+  background-color: rgb(212, 248, 131);
+  color: rgb(197, 189, 189);
+  text-shadow: none;
+}
+.field.selected {
+  display: block;
+}
+.field {
+  display: none;
+  padding: 1px 0;
+}
+.propertyName {
+	min-width: 140px;
+}
+.propertyValue {
+	padding: 0;
+	min-width: 170px;
+}
+.propertyValue input{
+	padding: 0;
+	width: 170px;
+}
+table.View {
+  margin: 5px auto 0;
+  width: 50%;
+}
+table.clientRequizitData, table.userLogin, table.userPassword, table.userMainData {
+	margin: 5px auto 0;
+}

@@ -1,0 +1,44 @@
+@import "../../common_files/top.css" screen;
+@import "../../common_files/foot.css" screen;
+@import "../../common_files/authorize-no_rights.css" screen;
+#content-point p {
+	font-style:italic;
+	margin:10px;
+}
+#button-submit {
+	width:67px;
+	margin:auto;
+	margin-top:10px;
+}
+#content-point {
+	padding:10px;
+	width:50%;
+	margin:auto;
+}
+#end-of-content {
+	width:100%;
+	clear:both;
+}
+.formElement {
+	margin:3px 10px;
+}
+.formElement select[name="dispatcher"]{
+	height:4.1em;
+}
+.formElement label{
+	width:90%;
+	vertical-align:top;
+}
+.formElement select, .formElement input[type="text"], .formElement input[type="password"]{
+	width:14.9em;
+}
+#mailIndex {
+	width:5em !important;
+}
+.formElement span{
+	width:40%;
+	text-align:right;
+	display:inline-block;
+	margin:0 5px 0 auto;
+	vertical-align: top;
+}

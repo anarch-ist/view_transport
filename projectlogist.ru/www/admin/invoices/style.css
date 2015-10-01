@@ -1,0 +1,93 @@
+@import "../../common_files/top.css" screen;
+@import "../../common_files/foot.css" screen;
+@import "../../common_files/authorize-no_rights.css" screen;
+#content-invoice p {
+	text-indent:12px;
+	color:red;
+} 
+#container {
+	margin:inherit;
+}
+#content-invoice hr{
+	width:90%;
+	margin:7px auto;
+}
+#content-invoice {
+	max-height: 400px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+#content li{
+	list-style-type:none;
+}
+#content {
+	padding-bottom:10px;
+}
+#content-invoice-point h3{
+	text-align:center;
+}
+fieldset.labels.one {
+	margin: 5px auto;
+	padding: 10px;
+	width: 60%;
+}
+div.end-of-content {
+	width:100%;
+	clear:both;
+}
+#content-body {
+	width:98%;
+	margin: 10px 10px 0 10px;
+}
+.content-invoice-point-time {
+	margin:5px;
+}
+.content-invoice-point-time div{
+	height:22px;
+	margin:inherit;
+}
+.content-invoice-point-time p{
+	vertical-align:top;
+	display:inline;
+}
+.content-invoice-point-time input{
+	float:right;
+	border-radius:2px;
+	border:1px solid #a1a1a1;
+}
+.content-invoice-point-button {
+	text-align:center;
+	margin-top:0px;
+}
+.and-text p{
+	margin:inherit;
+	font-size:0.75em;
+	color:#888;
+}
+#point-select {
+	margin:7px auto;
+	width:95%;
+}
+#point-select select {
+	width:100%;
+	height:21px;
+}
+#TextBox {
+	display: none;
+}
+#content-invoice a {
+	vertical-align: super;
+	text-shadow: none;
+	text-decoration: none;
+	font-size: 8pt;
+	border-bottom: dashed 1px blue;
+}
+#content-invoice h3 {
+	display: inline-block;
+	margin: 0 5px;
+}
+#invoiceTableDiv {
+	max-height: 16em;
+	overflow-x: hidden;
+	overflow-y: auto;
+}

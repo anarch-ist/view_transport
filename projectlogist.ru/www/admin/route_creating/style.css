@@ -1,0 +1,113 @@
+@import "../../common_files/top.css" screen;
+@import "../../common_files/foot.css" screen;
+@import "../../common_files/authorize-no_rights.css" screen;
+#content-route p {
+	text-indent:12px;
+	color:red;
+} 
+#container {
+	margin:inherit;
+}
+#content-route hr{
+	width:90%;
+	margin:7px auto;
+}
+#content li{
+	list-style-type:none;
+}
+#content {
+	padding-bottom:10px;
+}
+#content-route-point h3{
+	text-align:center;
+}
+fieldset.labels.one {
+	float: left;
+	padding: 10px;
+	width: 47%;
+	text-align: center;
+	max-height: 388px;
+}
+fieldset.labels.two {
+	float: right;
+	width: 47%;
+	padding: 10px;
+}
+div.end-of-content {
+	width:100%;
+	clear:both;
+}
+#content-body {
+	width:98%;
+	margin: 10px 10px 0 10px;
+}
+.content-route-point-time {
+	margin:5px;
+}
+.content-route-point-time div{
+	height:22px;
+	margin:inherit;
+	text-align: right;
+}
+.content-route-point-time p, .content-route-point-time span{
+	vertical-align:top;
+	text-align: right;
+	display:inline;
+}
+.content-route-point-time input{
+	float:right;
+	border-radius:2px;
+	border:1px solid #a1a1a1;
+}
+.content-route-point-button {
+	text-align:center;
+	margin-top:0px;
+}
+.and-text p{
+	margin:inherit;
+	font-size:0.75em;
+	color:#888;
+}
+#point-select {
+	margin:7px auto;
+	width:95%;
+}
+#point-select select {
+	width:100%;
+	height:21px;
+}
+#TextBox {
+	display: none;
+}
+#content-route a {
+	vertical-align: super;
+	text-shadow: none;
+	text-decoration: none;
+	font-size: 8pt;
+	border-bottom: dashed 1px blue;
+}
+#content-route h3 {
+	display: inline-block;
+	margin: 0 5px;
+}
+#routeTableDiv {
+	max-height: 16em;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+hr {
+	margin: 3px;
+	border: none;
+	border-bottom: solid 1px rgb(155, 136, 136);
+}
+table {
+  width: 100%;
+}
+button.actions {
+    padding: 2px;
+    margin: 4px;
+}
+button.actions img{
+	width: 14px;
+	height: 14px;
+}

@@ -1,0 +1,44 @@
+#authorize {
+	width:500px;
+	margin:auto;
+	padding:10px;
+}
+#authorize h2{
+	text-align:center;
+	padding:10px;
+}
+#form {
+	width:380px;
+	margin:10px auto;
+}
+#form-submit {
+	width:50px;
+	margin:5px auto;
+}
+.label {
+	display:block;
+	height:22px;
+	margin:5px;
+	text-align:right;
+}
+.label p{
+	display:inline;
+	margin:0 5px;
+}
+#form .label input[type="text"]{
+	float:right;
+	width:15em;
+}
+#form .label input[type="password"]{
+	float:right;
+	width:15em;
+}
+#norights h2{
+	padding: 30px 10px;
+	display: block;
+	text-align: center;
+	line-height: 1.2em;
+	font: 16px/19px Helvetica,Arial,Tahoma,sans-serif;
+	text-shadow: none;
+	color: rgb(19, 67, 31);
+}
