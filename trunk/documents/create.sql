@@ -21,6 +21,26 @@ CREATE TABLE `users` (  `UserID` varchar(16) COLLATE utf8_bin NOT NULL,  `InnerU
 CREATE TABLE `userstatus` (  `UserStatus` varchar(16) COLLATE utf8_bin NOT NULL,  `Description` varchar(64) COLLATE utf8_bin NOT NULL,  PRIMARY KEY (`UserStatus`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin
 CREATE TABLE `usertype` (  `UserTypeID` varchar(16) COLLATE utf8_bin NOT NULL,  `UserTypeText` varchar(64) COLLATE utf8_bin NOT NULL,  UNIQUE KEY `UserTypeID` (`UserTypeID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Enum of users'' types'
 
+insert into pointtype values(0101, 'Склад');
+insert into pointtype values(0102, 'Клиент');
+insert into pointtype values(0103, 'Представительство');
+
+insert into statuslist values(0301, 'Накладная создана');
+insert into statuslist values(0302, 'Накладная движется к пункту');
+insert into statuslist values(0303, 'Накладная прибыла в пункт');
+insert into statuslist values(0304, 'Ошибка. Возвращение в пункт');
+insert into statuslist values(0305, 'Товар получен');
+
+insert into users values(100000000, 0, 0001, 'ROOT', 'ROOT', 'ROOT', 'ROOTUSER', '', '+79151186753', NULL, '', ACTIVE);
+
+insert into userstatus values('ACTIVE', 'Активный');
+insert into userstatus values('DELETE', 'Удаленный');
+insert into userstatus values('REMOVE', 'Временно удаленный');
+
+insert into usertype values(0001, 'Администратор');
+insert into usertype values(0002, 'Диспетчер');
+insert into usertype values(0003, 'Торговый представитель');
+insert into usertype values(0004, 'Клиент');
 
 // table names
 SHOW CREATE TABLE dispatchersforpoint;
