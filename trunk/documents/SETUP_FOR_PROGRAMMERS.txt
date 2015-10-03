@@ -16,4 +16,46 @@
 3) скачиваем phpStorm
 4) 
 
+------------------
+domain name settings:
 
+C:\Windows\System32\drivers\etc\hosts
+127.0.0.1      projectlogist.ru
+
+uncomment this line in httpd.conf
+# Virtual hosts
+ Include conf/extra/httpd-vhosts.conf
+
+c:\wamp\bin\apache\apahce2.2.11\conf\extra\httpd-vhosts.conf
+в этот файл необходимо дописать несколько строк кода:
+
+NameVirtualHost 127.0.0.1
+# This line will make virtual host based on names not IPs
+<VirtualHost 127.0.0.1>
+DocumentRoot "c:/wamp/www"
+ #this is default root for websites in WAMP
+ServerName localhost
+#this is default localhost domain
+</VirtualHost>
+<VirtualHost 127.0.0.1>
+DocumentRoot "c:/wamp/www/mydomain.local"
+#WeТll create a folder inside /www/ folder for our domain files.
+#No restrictions in the folder name but weТll keep it same to make it
+#easily identifiable.
+ServerName mydomain.local
+ #this is our custom domain we added in the first step
+</VirtualHost>
+
+
+NameVirtualHost 127.0.0.1  
+
+<VirtualHost 127.0.0.1>
+DocumentRoot "c:/web/wamp/www"
+ServerName localhost
+</VirtualHost>
+
+<VirtualHost 127.0.0.1>
+DocumentRoot "c:/web/wamp/www/projectlogist.ru"
+ServerName projectlogist.ru
+</VirtualHost>
+http://blog.smriyaz.com/how-to-create-virtual-hosts-in-windows-wamp-server/
