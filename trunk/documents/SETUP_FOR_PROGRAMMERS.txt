@@ -1,0 +1,19 @@
+делаем svn checkout в путь без русских имен.
+
+0) устанавливаем notepad++
+1) устанавливаем wampserver
+2) для wampserver в wampmanager.conf ставим editor = "C:/Program Files (x86)/Notepad++/notepad++.exe"
+
+2) меняем rootDir wampserver на каталог ...\projectlogist.ru\www, который находится под управлением SVN для этого:
+	- из панели управления wampserver открываем файл httpd.conf и в нем 
+	
+    Change DocumentRoot "c:/wamp/www" to DocumentRoot ".../projectlogist.ru/www" (Note slash direction). This will change the location where files are served from (~Line 230).
+    Change <Directory "c:/wamp/www"> to <Directory ".../projectlogist.ru"> (Note slash direction). This applies permissions from the old directory to the new one (~Line 252).
+    Copy all content from c:\wamp\www to your new directory (.../projectlogist.ru), including index.php
+    Edit ...\projectlogist.ru\index.php and change line 40 $server_dir = "../"; to $server_dir = "C:/wamp/"; This changes the location where config files etc. for wamp are read from. Change $suppress_localhost = false; to correct projects links (~Line 30).
+
+
+3) скачиваем phpStorm
+4) 
+
+
