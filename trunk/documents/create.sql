@@ -3,7 +3,9 @@
 
 CREATE DATABASE `requestdb` CHARACTER SET utf8 COLLATE utf8_bin;
 USE `requestdb`;
-CREATE USER 'andy'@'localhost' IDENTIFIED BY 'andyandy';
+#CREATE USER 'andy'@'localhost' IDENTIFIED BY 'andyandy';
+#GRANT ALL PRIVILEGES ON `requestdb`.* TO 'andy'@'localhost' WITH GRANT OPTION;
+
 CREATE TABLE `usertype` (  `UserTypeID` varchar(16) COLLATE utf8_bin NOT NULL,  `UserTypeText` varchar(64) COLLATE utf8_bin NOT NULL,  UNIQUE KEY `UserTypeID` (`UserTypeID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Enum of users'' types';
 CREATE TABLE `userstatus` (  `UserStatus` varchar(16) COLLATE utf8_bin NOT NULL,  `Description` varchar(64) COLLATE utf8_bin NOT NULL,  PRIMARY KEY (`UserStatus`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 CREATE TABLE `users` (  `UserID` varchar(16) COLLATE utf8_bin NOT NULL,  `InnerUserID` varchar(16) COLLATE utf8_bin NOT NULL,  `UserTypeID` varchar(16) COLLATE utf8_bin NOT NULL,  `FirstName` varchar(64) COLLATE utf8_bin NOT NULL,  `LastName` varchar(64) COLLATE utf8_bin NOT NULL,  `Patronymic` varchar(64) COLLATE utf8_bin NOT NULL,  `NickName` varchar(128) COLLATE utf8_bin NOT NULL,  `PassMD5` varchar(64) COLLATE utf8_bin DEFAULT NULL,  `Telephone` varchar(16) COLLATE utf8_bin NOT NULL,  `Email` varchar(64) COLLATE utf8_bin DEFAULT NULL,  `LastModBy` varchar(16) COLLATE utf8_bin NOT NULL DEFAULT '',  `UserStatus` varchar(16) COLLATE utf8_bin NOT NULL,  PRIMARY KEY (`UserID`,`UserTypeID`,`LastModBy`,`UserStatus`),  UNIQUE KEY `UserID` (`UserID`),  UNIQUE KEY `UserID_2` (`UserID`),  UNIQUE KEY `UserID_3` (`UserID`,`InnerUserID`),  UNIQUE KEY `UserID_4` (`UserID`),  UNIQUE KEY `UserID_5` (`UserID`),  KEY `UserTypeID` (`UserTypeID`),  KEY `UserStatus` (`UserStatus`),  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`UserTypeID`) REFERENCES `usertype` (`UserTypeID`) ON DELETE CASCADE ON UPDATE CASCADE,  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`UserStatus`) REFERENCES `userstatus` (`UserStatus`) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -34,26 +36,26 @@ CREATE TABLE `routingsheetandinvoices` (  `RoutingSheetNumber` varchar(16) COLLA
 CREATE TABLE `statuslist` (  `StatusTypeID` varchar(16) COLLATE utf8_bin NOT NULL,  `Status` varchar(32) COLLATE utf8_bin NOT NULL,  PRIMARY KEY (`StatusTypeID`),  UNIQUE KEY `StatusID` (`StatusTypeID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 CREATE TABLE `statushistory` (  `StatusID` varchar(16) COLLATE utf8_bin NOT NULL,  `StatusTypeID` varchar(16) COLLATE utf8_bin NOT NULL,  `ObjectID` varchar(16) COLLATE utf8_bin NOT NULL,  `StatusStartDate` datetime NOT NULL,  `ExpectedStatusStartDate` datetime NOT NULL,  `ExpectedStatusEndDate` datetime NOT NULL,  `PointLeavingID` varchar(16) COLLATE utf8_bin DEFAULT NULL,  `PointDestinationID` varchar(16) COLLATE utf8_bin DEFAULT NULL,  `ModBy` varchar(16) COLLATE utf8_bin NOT NULL,  `PreviousStatusID` varchar(16) COLLATE utf8_bin DEFAULT NULL,  `IsEnabled` tinyint(1) NOT NULL DEFAULT '1',  PRIMARY KEY (`StatusID`,`StatusTypeID`,`ObjectID`,`ModBy`),  UNIQUE KEY `StatusID` (`StatusID`),  UNIQUE KEY `StatusID_2` (`StatusID`),  KEY `ObjectID` (`ObjectID`),  KEY `PointID` (`PointLeavingID`),  KEY `StatusTypeID` (`StatusTypeID`),  KEY `ModBy` (`ModBy`),  CONSTRAINT `statushistory_ibfk_1` FOREIGN KEY (`StatusTypeID`) REFERENCES `statuslist` (`StatusTypeID`) ON DELETE CASCADE ON UPDATE CASCADE,  CONSTRAINT `statushistory_ibfk_2` FOREIGN KEY (`ModBy`) REFERENCES `users` (`UserID`) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-insert into pointtype values(0101, 'Склад');
-insert into pointtype values(0102, 'Клиент');
-insert into pointtype values(0103, 'Представительство');
+insert into pointtype values('0101', 'Склад');
+insert into pointtype values('0102', 'Клиент');
+insert into pointtype values('0103', 'Представительство');
 
-insert into statuslist values(0301, 'Накладная создана');
-insert into statuslist values(0302, 'Накладная движется к пункту');
-insert into statuslist values(0303, 'Накладная прибыла в пункт');
-insert into statuslist values(0304, 'Ошибка. Возвращение в пункт');
-insert into statuslist values(0305, 'Товар получен');
+insert into statuslist values('0301', 'Накладная создана');
+insert into statuslist values('0302', 'Накладная движется к пункту');
+insert into statuslist values('0303', 'Накладная прибыла в пункт');
+insert into statuslist values('0304', 'Ошибка. Возвращение в пункт');
+insert into statuslist values('0305', 'Товар получен');
 
 insert into userstatus values('ACTIVE', 'Активный');
 insert into userstatus values('DELETE', 'Удаленный');
 insert into userstatus values('REMOVE', 'Временно удаленный');
 
-insert into usertype values(0001, 'Администратор');
-insert into usertype values(0002, 'Диспетчер');
-insert into usertype values(0003, 'Торговый представитель');
-insert into usertype values(0004, 'Клиент');
+insert into usertype values('0001', 'Администратор');
+insert into usertype values('0002', 'Диспетчер');
+insert into usertype values('0003', 'Торговый представитель');
+insert into usertype values('0004', 'Клиент');
 
-insert into users values(100000000, 0, 0001, 'ROOT', 'ROOT', 'ROOT', 'ROOTUSER', '', '+79151186753', NULL, '', 'ACTIVE');
+insert into users values('100000000', '0', '0001', 'ROOT', 'ROOT', 'ROOT', 'ROOTUSER', '', '+79151186753', NULL, '', 'ACTIVE');
 
 #table names
 /*
