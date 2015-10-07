@@ -4,78 +4,81 @@ define("EMAIL_REGEX_PATTERN", '/^(?!(?:(?:\\x22?\\x5C[\\x00-\\x7E]\\x22?)|(?:\\x
 define("DEFAULT_HTTP_PORT", 80);
 define("DEFAULT_HTTPS_PORT", 443);
 
+$startPage = siteName().'/auth/index.php';
+
+
 //return true if valid email
 function emailValidation($emailString) {
-	return (preg_match(EMAIL_REGEX_PATTERN, $emailString) === 1);
+    return (preg_match(EMAIL_REGEX_PATTERN, $emailString) === 1);
 }
 
 function getAccountType($num) {
-	switch($num) {
-		case 1: {
-			return 'администратор';
-		}
-		case 2: {
-			return 'торговый представитель';
-		}
-		case 3: {
-			return 'диспетчер';
-		}
-		case 4: {
-			return 'клиент';
-		}
-		default: {
-			return "ошибка";
-		}
-	}
+    switch($num) {
+        case 1: {
+            return 'администратор';
+        }
+        case 2: {
+            return 'торговый представитель';
+        }
+        case 3: {
+            return 'диспетчер';
+        }
+        case 4: {
+            return 'клиент';
+        }
+        default: {
+            return "ошибка";
+        }
+    }
 }
 
 function getConnection() {
-	return mysqli_connect($mysqlparams['server'],$mysqlparams['user'],$mysqlparams['password'], $mysqlparams['database']);
+    $mysqlparams = array('server' => '127.0.0.1', 'user' => 'andy', 'password' => 'andyandy', 'database' => 'requestdb');
+    return mysqli_connect($mysqlparams['server'], $mysqlparams['user'], $mysqlparams['password'], $mysqlparams['database']);
 }
 
 function request_url() {
-	$result = siteName();
-	// А порт у нас по-умолчанию?
-	$actualServerPort = $_SERVER["SERVER_PORT"];
-	if ($actualServerPort != DEFAULT_HTTP_PORT && $actualServerPort != DEFAULT_HTTPS_PORT) {
-		// Если нет, то добавим порт в URL
-		$result.= ":".$actualServerPort;
-	}
-	// Последняя часть запроса (путь и GET-параметры).
-	$result.= $_SERVER["REQUEST_URI"];
-	// Уфф, вроде получилось!
-	return $result;
+    $result = siteName();
+    // А порт у нас по-умолчанию?
+    $actualServerPort = $_SERVER["SERVER_PORT"];
+    if ($actualServerPort != DEFAULT_HTTP_PORT && $actualServerPort != DEFAULT_HTTPS_PORT) {
+        // Если нет, то добавим порт в URL
+        $result.= ":".$actualServerPort;
+    }
+    // Последняя часть запроса (путь и GET-параметры).
+    $result.= $_SERVER["REQUEST_URI"];
+    // Уфф, вроде получилось!
+    return $result;
 }
 
 function siteName() {
-	$result = ""; // Пока результат пуст
-	// А не в защищенном-ли мы соединении?
-	if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"]=="on")) {
-		// В защищенном! Добавим протокол...
-		$result.= "https://";
-	} else {
-		// Обычное соединение, обычный протокол
-		$result.= "http://";
-	}
-	// Имя сервера, напр. site.com или www.site.com
-	$result.= $_SERVER["SERVER_NAME"];
-	return $result;
+    $result = ""; // Пока результат пуст
+    // А не в защищенном-ли мы соединении?
+    if (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"]=="on")) {
+        // В защищенном! Добавим протокол...
+        $result.= "https://";
+    } else {
+        // Обычное соединение, обычный протокол
+        $result.= "http://";
+    }
+    // Имя сервера, напр. site.com или www.site.com
+    $result.= $_SERVER["SERVER_NAME"];
+    return $result;
 }
 
 function makeMD5Encode($UID, $UTID) {
-	return md5($UID.'4'.$UTID);
+    return md5($UID.'4'.$UTID);
 }
 function md5IsEqual() {
-	if (!isset($_COOKIE['authInfo'])||$_COOKIE['authInfo']!==makeMD5Encode($_COOKIE['UserID'],$_COOKIE['UserTypeID'])) {
-		return false;
-	}
-	return true;
+    if (!isset($_COOKIE['authInfo'])||$_COOKIE['authInfo']!==makeMD5Encode($_COOKIE['UserID'],$_COOKIE['UserTypeID'])) {
+        return false;
+    }
+    return true;
 }
 // $minIDs = array('UserID' => '100000000', 'PointID' => '110000000', 'RouteID' => '120000000', 'RoutePointID' => '130000000', 'InvoiceID' => '140000000', 'RequestID' => '150000000', 'InsideRequestID' => '160000000', 'StatusID' => '170000000');
 function getMinID($str) {
-	$minIDs = array('UserID' => '100000000', 'PointID' => '110000000', 'RouteID' => '120000000', 'RoutePointID' => '130000000', 'InvoiceID' => '140000000', 'RequestID' => '150000000', 'InsideRequestID' => '160000000', 'StatusID' => '170000000', 'RequizitID' => '180000000');
-	return $minIDs[$str];
+    $minIDs = array('UserID' => '100000000', 'PointID' => '110000000', 'RouteID' => '120000000', 'RoutePointID' => '130000000', 'InvoiceID' => '140000000', 'RequestID' => '150000000', 'InsideRequestID' => '160000000', 'StatusID' => '170000000', 'RequizitID' => '180000000');
+    return $minIDs[$str];
 }
-$startPage = siteName().'/auth/index.php';
-$mysqlparams = array('server' => '127.0.0.1', 'user' => 'andy', 'password' => 'andyandy', 'database' => 'requestdb');
+
 ?>
