@@ -1,61 +1,120 @@
-делаем svn checkout в путь без русских имен.
 
-0) устанавливаем notepad++
-1) устанавливаем wampserver
-2) дл€ wampserver в wampmanager.conf ставим editor = "C:/Program Files (x86)/Notepad++/notepad++.exe"
+1)  устанавливаем notepad++
 
-2) мен€ем rootDir wampserver на каталог ...\projectlogist.ru\www, который находитс€ под управлением SVN дл€ этого:
-	- из панели управлени€ wampserver открываем файл httpd.conf и в нем 
+2)  устанавливаем wampserver в каталог c:/web
+
+3)  дл€ wampserver в wampmanager.conf ставим editor = "C:/Program Files (x86)/Notepad++/notepad++.exe"
+
+4)  делаем checkout проекта по указанному URL и пути
+    svncheckout:
+    "http://svn.sbat.ru/svn/view_transport/trunk/projectlogist.ru/www"
+    "C:\web\wamp\www\projectlogist.ru"
+
+5)  делаем еще один checkout по URL "http://svn.sbat.ru/svn/view_transport/"
+    в любое удобное место на компьютере(дл€ работы с документами)
+
+
+6)  из панели управлени€ wampserver открываем файл httpd.conf и в нем убираем комментарий 
 	
-    Change DocumentRoot "c:/wamp/www" to DocumentRoot ".../projectlogist.ru/www" (Note slash direction). This will change the location where files are served from (~Line 230).
-    Change <Directory "c:/wamp/www"> to <Directory ".../projectlogist.ru"> (Note slash direction). This applies permissions from the old directory to the new one (~Line 252).
-    Copy all content from c:\wamp\www to your new directory (.../projectlogist.ru), including index.php
-    Edit ...\projectlogist.ru\index.php and change line 40 $server_dir = "../"; to $server_dir = "C:/wamp/"; This changes the location where config files etc. for wamp are read from. Change $suppress_localhost = false; to correct projects links (~Line 30).
+    # Virtual hosts
+    Include conf/extra/httpd-vhosts.conf
+
+7)  добавл€ем в файл C:\Windows\System32\drivers\etc\hosts следующее содержание:
+    
+    127.0.0.1      projectlogist.ru    
+
+8)  замен€ем содержание файла C:\web\wamp\bin\apache\apache2.4.9\conf\extra\httpd-vhosts.conf
+    следующим контентом:
+
+----FILE-CONTENT-INSIDE----
+
+# Virtual Hosts
+#
+# Required modules: mod_log_config
+
+# If you want to maintain multiple domains/hostnames on your
+# machine you can setup VirtualHost containers for them. Most configurations
+# use only name-based virtual hosts so the server doesn't need to worry about
+# IP addresses. This is indicated by the asterisks in the directives below.
+#
+# Please see the documentation at 
+# <URL:http://httpd.apache.org/docs/2.4/vhosts/>
+# for further details before you try to setup virtual hosts.
+#
+# You may use the command line option '-S' to verify your virtual host
+# configuration.
+
+#
+# Use name-based virtual hosting
+#
+NameVirtualHost *
 
 
-3) скачиваем phpStorm
-4) 
-
-------------------
-domain name settings:
-
-C:\Windows\System32\drivers\etc\hosts
-127.0.0.1      projectlogist.ru
-
-uncomment this line in httpd.conf
-# Virtual hosts
- Include conf/extra/httpd-vhosts.conf
-
-c:\wamp\bin\apache\apahce2.2.11\conf\extra\httpd-vhosts.conf
-в этот файл необходимо дописать несколько строк кода:
-
-NameVirtualHost 127.0.0.1
-# This line will make virtual host based on names not IPs
-<VirtualHost 127.0.0.1>
-DocumentRoot "c:/wamp/www"
- #this is default root for websites in WAMP
-ServerName localhost
-#this is default localhost domain
-</VirtualHost>
-<VirtualHost 127.0.0.1>
-DocumentRoot "c:/wamp/www/mydomain.local"
-#WeТll create a folder inside /www/ folder for our domain files.
-#No restrictions in the folder name but weТll keep it same to make it
-#easily identifiable.
-ServerName mydomain.local
- #this is our custom domain we added in the first step
-</VirtualHost>
-
-
-NameVirtualHost 127.0.0.1  
-
-<VirtualHost 127.0.0.1>
+#
+# VirtualHost example:
+# Almost any Apache directive may go into a VirtualHost container.
+# The first VirtualHost section is used for all requests that do not
+# match a ServerName or ServerAlias in any <VirtualHost> block.
+#
+<VirtualHost *:80>
 DocumentRoot "c:/web/wamp/www"
 ServerName localhost
 </VirtualHost>
 
-<VirtualHost 127.0.0.1>
+<VirtualHost *:80>
 DocumentRoot "c:/web/wamp/www/projectlogist.ru"
 ServerName projectlogist.ru
 </VirtualHost>
-http://blog.smriyaz.com/how-to-create-virtual-hosts-in-windows-wamp-server/
+
+----FILE-CONTENT-INSIDE-END----
+
+9)  скачиваем, устанавливаем phpStorm и создаем новый проект:
+Create New Project from Existing Files
+
+Web server is installed locally, source files are located under its document root.
+
+Project root is C:\web\wamp\www\projectlogist.ru
+
+use projlog Server with http://projectlogist URL. (сервер должен быть запущен)
+
+
+
+10) подключаем базу данных к проекту:
+
+заходим из браузера по адресу http://localhost/phpmyadmin/
+там выбираем вкладку SQL и копируем туда содержание скрипта ..\trunk\documents\create.sql
+нажимаем 'ок' и обновл€ем страницу, должна по€витс€ Ѕƒ 'requestdb'
+
+в phpStorm:
+нажимаем alt+Insert в окне Database
+скачиваем драйвера при помощи ссылки внизу
+host = localhost
+Database = requestdb
+User = andy
+Password = andyandy
+port = 3306
+
+нажимаем кнопку "TestConnection" соединение должно пройти успешно.
+
+11) создаем конфигурацию дл€ запуска:
+выбираем в правом верхнем углу "edit configurations"
+там во нажимаем зеленый плюс и добавл€ем PHP Web Application 
+добавл€ем сервер = projlog, debugger - XDebug, Port 80;
+start URl = /
+Browser = Chrome(должен быть установлен)
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
