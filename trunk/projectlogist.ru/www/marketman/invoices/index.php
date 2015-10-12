@@ -12,6 +12,16 @@
 	<script type="text/javascript" src="../../common_files/json.js"></script>
 	<script type="text/javascript" src="../../common_files/protoplasm.js"></script>
 <script type="text/javascript">
+	/* добавляет три типа данных
+	заявка
+	внутрення заявка
+	накладная
+
+
+
+	*/
+
+
 	//variables' block
 	var navigation;
 	var objectForClientsTable;

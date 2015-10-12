@@ -2,10 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="e681d8f7-6ef9-4c1d-9735-0ef12cf55f8e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/help/content.php" afterPath="$PROJECT_DIR$/help/content.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/profile/content.php" afterPath="$PROJECT_DIR$/profile/content.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/common_files/functions.php" afterPath="$PROJECT_DIR$/common_files/functions.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.php" afterPath="$PROJECT_DIR$/index.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common_files/dao" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common_files/dao/invoiceDao" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common_files/dao/userDao" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common_files/dao/newDB.sql" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/common_files/dao/invoiceDao/sss" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/marketman/invoices/index.php" afterPath="$PROJECT_DIR$/marketman/invoices/index.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="projectlogist.ru.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -47,118 +52,26 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="functions.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/common_files/functions.php">
+      <file leaf-file-name="newDB.sql" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/common_files/dao/newDB.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-17.0">
-              <caret line="26" column="28" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.50098234">
+              <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/profile/index.php">
+      <file leaf-file-name="create.sql" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common_files/dao/create.sql">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="-1.8214285">
+              <caret line="6" column="78" selection-start-line="5" selection-start-column="0" selection-end-line="6" selection-end-column="78" />
               <folding />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="documents.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/profile/documents.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="56.884617">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <marker date="1444218860909" expanded="true" signature="1894:2137" placeholder="SELECT `stat..." />
-                <marker date="1444218860909" expanded="true" signature="2423:2514" placeholder="SELECT `Rout..." />
-                <marker date="1444218860909" expanded="true" signature="5511:5554" placeholder="SELECT MAX(`..." />
-                <marker date="1444218860909" expanded="true" signature="5802:5934" placeholder="SELECT `stat..." />
-                <marker date="1444218860909" expanded="true" signature="6157:6496" placeholder="SELECT `rout..." />
-                <marker date="1444218860909" expanded="true" signature="7339:7834" placeholder="INSERT INTO ..." />
-                <marker date="1444218860909" expanded="true" signature="7932:8202" placeholder="SELECT `rout..." />
-                <marker date="1444218860909" expanded="true" signature="8335:8484" placeholder="SELECT T1.`P..." />
-                <marker date="1444218860909" expanded="true" signature="8643:8792" placeholder="SELECT T1.`P..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="content.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/marketman/invoices/content.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="162.8077">
-              <caret line="43" column="15" selection-start-line="43" selection-start-column="15" selection-end-line="43" selection-end-column="15" />
-              <folding>
-                <marker date="1444218860691" expanded="true" signature="1844:2049" placeholder="SELECT `user..." />
-                <marker date="1444218860691" expanded="true" signature="2241:2444" placeholder="SELECT `user..." />
-                <marker date="1444218860691" expanded="true" signature="8437:8562" placeholder="SELECT `poin..." />
-                <marker date="1444218860691" expanded="true" signature="11134:11222" placeholder="SELECT `rout..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="documents.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/invoice_history/documents.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <marker date="1444218861422" expanded="true" signature="992:1219" placeholder="SELECT DISTI..." />
-                <marker date="1444218861422" expanded="true" signature="1448:2157" placeholder="SELECT `invo..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="content.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/help/content.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.6153846">
-              <caret line="4" column="61" selection-start-line="4" selection-start-column="61" selection-end-line="4" selection-end-column="61" />
-              <folding>
-                <element signature="n#style#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="login.php" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/auth/login.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.18421052">
-              <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
-              <folding>
-                <marker date="1444218860929" expanded="true" signature="257:431" placeholder="SELECT `User..." />
-                <marker date="1444218860929" expanded="true" signature="810:982" placeholder="SELECT `User..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.6153846">
-              <caret line="4" column="2" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="documents.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/admin/point_creating/additing/documents.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.6153846">
-              <caret line="4" column="32" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="32" />
-              <folding>
-                <marker date="1444218860975" expanded="true" signature="198:232" placeholder="SELECT MAX(`..." />
-              </folding>
-            </state>
+          <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+            <state />
           </provider>
         </entry>
       </file>
@@ -172,6 +85,11 @@
         <option value="$PROJECT_DIR$/profile/content.php" />
         <option value="$PROJECT_DIR$/index.php" />
         <option value="$PROJECT_DIR$/help/content.php" />
+        <option value="$PROJECT_DIR$/marketman/invoices/index.php" />
+        <option value="$PROJECT_DIR$/common_files/dao/invoiceDao/sss" />
+        <option value="$PROJECT_DIR$/common_files/dao/usertype.sql" />
+        <option value="$PROJECT_DIR$/common_files/dao/userstatus.sql" />
+        <option value="$PROJECT_DIR$/common_files/dao/newDB.sql" />
       </list>
     </option>
   </component>
@@ -206,7 +124,7 @@
     <OptionsSetting value="true" id="Update" />
     <OptionsSetting value="true" id="Status" />
     <OptionsSetting value="true" id="Edit" />
-    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="2" id="Add" />
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
@@ -222,6 +140,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -236,7 +155,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="projectlogist.ru" />
+              <option name="myItemId" value="www" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -246,17 +165,48 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="projectlogist.ru" />
+              <option name="myItemId" value="www" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="auth" />
+              <option name="myItemId" value="common_files" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="projectlogist.ru" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common_files" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="dao" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="projectlogist.ru" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="www" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="admin" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -269,6 +219,7 @@
     <property name="restartRequiresConfirmation" value="true" />
     <property name="SearchEverywhereHistoryKey" value="content.php&#9;FILE&#9;file://C:/web/wamp/www/projectlogist.ru/auth/content.php" />
     <property name="FullScreen" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/common_files/dao" />
   </component>
   <component name="RunManager" selected="PHP Web Application.runProject">
     <configuration default="true" type="AppEnginePhpConfigurationType" factoryName="App Engine for PHP">
@@ -291,13 +242,19 @@
     <configuration default="true" type="PhpRemoteDebugRunConfigurationType" factoryName="PHP Remote Debug">
       <method />
     </configuration>
-    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server" server_id="7f5c8406-a3fe-4ead-a86f-6021c28401b1" server_name="projlog">
       <method />
     </configuration>
     <configuration default="true" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" browser="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" server_name="projlog">
       <method />
     </configuration>
     <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <pass-parent-envs>true</pass-parent-envs>
+      <envs />
       <method />
     </configuration>
     <configuration default="false" name="runProject" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" browser="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" server_name="projlog">
@@ -316,16 +273,16 @@
     <option name="myMappingRoots">
       <list>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="C:\web\wamp\www\projectlogist.ru" />
-          <option name="myCopyRoot" value="C:\web\wamp\www\projectlogist.ru" />
+          <option name="myVcsRoot" value="C:\Users\Сергей\Desktop\view_transport\trunk\projectlogist.ru\www" />
+          <option name="myCopyRoot" value="C:\Users\Сергей\Desktop\view_transport\trunk\projectlogist.ru\www" />
         </SvnCopyRootSimple>
       </list>
     </option>
     <option name="myMoreRealMappingRoots">
       <list>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="C:\web\wamp\www\projectlogist.ru" />
-          <option name="myCopyRoot" value="C:\web\wamp\www\projectlogist.ru" />
+          <option name="myVcsRoot" value="C:\Users\Сергей\Desktop\view_transport\trunk\projectlogist.ru\www" />
+          <option name="myCopyRoot" value="C:\Users\Сергей\Desktop\view_transport\trunk\projectlogist.ru\www" />
         </SvnCopyRootSimple>
       </list>
     </option>
@@ -340,25 +297,25 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="false" />
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="7" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12686567" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1663113" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33014354" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39961758" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.11353944" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1663113" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298279" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -381,6 +338,81 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/common_files/functions.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="26" column="28" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profile/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profile/documents.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/marketman/invoices/content.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="43" column="15" selection-start-line="43" selection-start-column="15" selection-end-line="43" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/invoice_history/documents.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1444212391119" expanded="true" signature="-1:-1" placeholder="SELECT DISTI..." />
+            <marker date="1444212391119" expanded="true" signature="-1:-1" placeholder="SELECT `invo..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/help/content.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="61" selection-start-line="4" selection-start-column="61" selection-end-line="4" selection-end-column="61" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/auth/login.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="2" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/admin/point_creating/additing/documents.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="32" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="uml://DATABASE/b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.dispatchersforpoint">
       <provider selected="true" editor-type-id="UmlEditorProvider">
         <state>
@@ -396,25 +428,13 @@
           </nodes>
           <notes />
           <edges />
-          <settings layout="Hierarchic Group" zoom="1.0" x="310.0" y="394.5" />
+          <settings layout="Hierarchic Group" zoom="1.0" x="310.0" y="395.0" />
           <SelectedNodes />
           <Categories>
-            <Category>Key columns</Category>
             <Category>Columns</Category>
+            <Category>Key columns</Category>
           </Categories>
-        </state>
-      </provider>
-    </entry>
-    <entry file="dbDummy://dbtable:/49b05659/b38ab19a-57fd-4dc1-acf9-7568f453f933/requestdb..goodsforinvoice">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <SCOPE>All</SCOPE>
         </state>
       </provider>
     </entry>
@@ -422,7 +442,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -430,39 +449,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.44095665">
           <caret line="217" column="41" selection-start-line="217" selection-start-column="41" selection-end-line="217" selection-end-column="41" />
-          <folding>
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT MAX(`..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT T0.*,..T0..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT `Mark..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT `Insi..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT `Invo..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT MAX(`..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT MAX(`..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT MAX(`..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="SELECT `rout..." />
-            <marker date="1444218860695" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="dbDummy://dbtable:/49b05659/b38ab19a-57fd-4dc1-acf9-7568f453f933/requestdb..dispatchersforpoint">
-      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
-        <state>
-          <filtering enabled="true" />
-        </state>
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -471,7 +457,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -487,12 +472,13 @@
           </nodes>
           <notes />
           <edges />
-          <settings layout="Hierarchic Group" zoom="1.0" x="209.0" y="229.5" />
+          <settings layout="Hierarchic Group" zoom="1.0" x="209.0" y="230.0" />
           <SelectedNodes />
           <Categories>
-            <Category>Key columns</Category>
             <Category>Columns</Category>
+            <Category>Key columns</Category>
           </Categories>
+          <SCOPE>All</SCOPE>
         </state>
       </provider>
     </entry>
@@ -500,23 +486,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/admin/point_creating/additing/documents.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.6153846">
+        <state vertical-scroll-proportion="0.0">
           <caret line="4" column="32" selection-start-line="4" selection-start-column="32" selection-end-line="4" selection-end-column="32" />
-          <folding>
-            <marker date="1444218860975" expanded="true" signature="198:232" placeholder="SELECT MAX(`..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.6153846">
+        <state vertical-scroll-proportion="0.0">
           <caret line="4" column="2" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="2" />
           <folding />
         </state>
@@ -524,16 +507,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/common_files/functions.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-17.0">
-          <caret line="26" column="28" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/profile/index.php">
-      <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <caret line="26" column="28" selection-start-line="26" selection-start-column="28" selection-end-line="26" selection-end-column="28" />
           <folding />
         </state>
       </provider>
@@ -542,28 +517,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.57894737">
           <caret line="294" column="27" selection-start-line="294" selection-start-column="27" selection-end-line="294" selection-end-column="27" />
-          <folding>
-            <marker date="1444228939212" expanded="true" signature="-1:-1" placeholder="SELECT `Last..." />
-            <marker date="1444228939212" expanded="true" signature="-1:-1" placeholder="SELECT `INN`..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/profile/documents.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="56.884617">
+        <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1444218860909" expanded="true" signature="1894:2137" placeholder="SELECT `stat..." />
-            <marker date="1444218860909" expanded="true" signature="2423:2514" placeholder="SELECT `Rout..." />
-            <marker date="1444218860909" expanded="true" signature="5511:5554" placeholder="SELECT MAX(`..." />
-            <marker date="1444218860909" expanded="true" signature="5802:5934" placeholder="SELECT `stat..." />
-            <marker date="1444218860909" expanded="true" signature="6157:6496" placeholder="SELECT `rout..." />
-            <marker date="1444218860909" expanded="true" signature="7339:7834" placeholder="INSERT INTO ..." />
-            <marker date="1444218860909" expanded="true" signature="7932:8202" placeholder="SELECT `rout..." />
-            <marker date="1444218860909" expanded="true" signature="8335:8484" placeholder="SELECT T1.`P..." />
-            <marker date="1444218860909" expanded="true" signature="8643:8792" placeholder="SELECT T1.`P..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -577,14 +539,9 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/marketman/invoices/content.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="162.8077">
+        <state vertical-scroll-proportion="0.0">
           <caret line="43" column="15" selection-start-line="43" selection-start-column="15" selection-end-line="43" selection-end-column="15" />
-          <folding>
-            <marker date="1444218860691" expanded="true" signature="1844:2049" placeholder="SELECT `user..." />
-            <marker date="1444218860691" expanded="true" signature="2241:2444" placeholder="SELECT `user..." />
-            <marker date="1444218860691" expanded="true" signature="8437:8562" placeholder="SELECT `poin..." />
-            <marker date="1444218860691" expanded="true" signature="11134:11222" placeholder="SELECT `rout..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -592,7 +549,125 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8947368">
           <caret line="34" column="22" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_files/top.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/help/content.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="4" column="61" selection-start-line="4" selection-start-column="61" selection-end-line="4" selection-end-column="61" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/auth/login.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.3461537">
+          <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/marketman/invoices/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="25.170732">
+          <caret line="210" column="58" selection-start-line="210" selection-start-column="58" selection-end-line="210" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/admin/invoices/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-19.615385">
+          <caret line="30" column="37" selection-start-line="30" selection-start-column="37" selection-end-line="30" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/profile/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="uml://DATABASE/b38ab19a-57fd-4dc1-acf9-7568f453f933">
+      <provider selected="true" editor-type-id="UmlEditorProvider">
+        <state>
+          <ID>DATABASE</ID>
+          <OriginalElement>b38ab19a-57fd-4dc1-acf9-7568f453f933</OriginalElement>
+          <nodes>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.userstatus</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.requizit</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.request</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.routeforinvoice</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.statushistory</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.routingsheet</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.invoicesforinsiderequest</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.insiderequest</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.routingsheetandinvoices</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.statuslist</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.point</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.users</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.goodsforinvoice</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.routeandroutepoints</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.dispatchersforpoint</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.routepoint</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.requestandinsiderequest</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.requizitsforuser</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.pointtype</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.usertype</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.route</node>
+            <node x="" y="">b38ab19a-57fd-4dc1-acf9-7568f453f933.table:requestdb.invoice</node>
+          </nodes>
+          <notes />
+          <edges />
+          <settings layout="Hierarchic Group" zoom="0.9584811923349893" x="376.7608293224732" y="503.9637171417994" />
+          <SelectedNodes />
+          <Categories>
+            <Category>Key columns</Category>
+          </Categories>
+        </state>
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbtable:/76ce076a/b38ab19a-57fd-4dc1-acf9-7568f453f933/requestdb..request">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true" />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_files/dao/invoiceDao/sss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.23379175">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/admin/new_user/documents.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.30846775">
+          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="4" />
+          <folding>
+            <marker date="1444212390664" expanded="true" signature="-1:-1" placeholder="INSERT INTO ..." />
+            <marker date="1444212390664" expanded="true" signature="-1:-1" placeholder="SELECT MAX(`..." />
+            <marker date="1444212390664" expanded="true" signature="-1:-1" placeholder="SELECT `Firs..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -601,38 +676,54 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1444218861422" expanded="true" signature="992:1219" placeholder="SELECT DISTI..." />
-            <marker date="1444218861422" expanded="true" signature="1448:2157" placeholder="SELECT `invo..." />
+            <marker date="1444212391119" expanded="true" signature="-1:-1" placeholder="SELECT DISTI..." />
+            <marker date="1444212391119" expanded="true" signature="-1:-1" placeholder="SELECT `invo..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/common_files/top.css">
-      <provider selected="true" editor-type-id="text-editor">
+    <entry file="dbDummy://dbtable:/76ce076a/b38ab19a-57fd-4dc1-acf9-7568f453f933/requestdb..usertype">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true" />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/help/content.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.6153846">
-          <caret line="4" column="61" selection-start-line="4" selection-start-column="61" selection-end-line="4" selection-end-column="61" />
-          <folding>
-            <element signature="n#style#0;n#div#1;n#div#0;n#!!top" expanded="true" />
-          </folding>
+    <entry file="dbDummy://dbtable:/76ce076a/b38ab19a-57fd-4dc1-acf9-7568f453f933/requestdb..users">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true" />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/auth/login.php">
+    <entry file="file://$PROJECT_DIR$/common_files/dao/create.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.18421052">
-          <caret line="7" column="15" selection-start-line="7" selection-start-column="15" selection-end-line="7" selection-end-column="15" />
-          <folding>
-            <marker date="1444218860929" expanded="true" signature="257:431" placeholder="SELECT `User..." />
-            <marker date="1444218860929" expanded="true" signature="810:982" placeholder="SELECT `User..." />
-          </folding>
+        <state vertical-scroll-proportion="-1.8214285">
+          <caret line="6" column="78" selection-start-line="5" selection-start-column="0" selection-end-line="6" selection-end-column="78" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common_files/dao/newDB.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.50098234">
+          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
