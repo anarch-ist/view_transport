@@ -89,12 +89,21 @@ use projlog Server with http://projectlogist URL. (сервер должен быть запущен)
 нажимаем alt+Insert в окне Database
 скачиваем драйвера при помощи ссылки внизу
 host = localhost
-Database = requestdb
-User = andy
-Password = andyandy
+Database = "" // emptyString
+User = root
+Password = "" // emptyString
 port = 3306
 
 нажимаем кнопку "TestConnection" соединение должно пройти успешно.
+запускаем скрипт createUsers
+в Datasource properties меняем пароль root user, на тот, что указан в скрипте и перезапускаем соединение
+
+запускаем скрипт create.sql - будет создана БД 'requestDB'
+запускаем скрипт newDB.sql - будет создана БД 'project_database'
+
+для того, чтобы эти БД отображались, необходимо зайти в Datasource properties -> Shemas&Tables и там поставить галки у этих схем.
+
+
 
 11) создаем конфигурацию для запуска:
 выбираем в правом верхнем углу "edit configurations"
