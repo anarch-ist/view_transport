@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/b38ab19a-57fd-4dc1-acf9-7568f453f933/console.sql" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common_files/dao/newDB.sql" charset="UTF-8" />
   </component>
 </project>

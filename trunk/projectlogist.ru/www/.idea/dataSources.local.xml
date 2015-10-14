@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal">
-    <data-source name="MySQL - requestdb@localhost" uuid="b38ab19a-57fd-4dc1-acf9-7568f453f933">
+    <data-source name="MySQL - @localhost" uuid="b38ab19a-57fd-4dc1-acf9-7568f453f933">
       <secret-storage>master_key</secret-storage>
-      <user-name>andy</user-name>
-      <schema-pattern>requestdb.*</schema-pattern>
-      <default-schemas>requestdb.*</default-schemas>
+      <user-name>root</user-name>
+      <schema-pattern>project_database.* requestdb.*</schema-pattern>
+      <default-schemas>project_database.* requestdb.*</default-schemas>
     </data-source>
   </component>
 </project>

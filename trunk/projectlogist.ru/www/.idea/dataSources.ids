@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="dataSourceStorage">
-  <data-source name="MySQL - requestdb@localhost" uuid="b38ab19a-57fd-4dc1-acf9-7568f453f933">
+  <data-source name="MySQL - @localhost" uuid="b38ab19a-57fd-4dc1-acf9-7568f453f933">
     <database-info product="MySQL" version="5.6.17" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.35 ( Revision: 5fb9c5849535c13917c2cf9baaece6ef9693ef27 )">
       <extra-name-characters>#@</extra-name-characters>
       <identifier-quote-string>`</identifier-quote-string>
     </database-info>
     <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower"/>
+    <schema name="" catalog="project_database"/>
     <schema name="" catalog="requestdb"/>
+    <table name="permissions" schema="" catalog="project_database" type="TABLE">
+      <column name="permissionID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="permissionName" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12"/>
+      <primary-key name="PRIMARY" columns="permissionID"/>
+      <exported-key name="permissions_for_roles_ibfk_1" table="permissions_for_roles" schema="" catalog="project_database" columns="permissionID"/>
+    </table>
+    <table name="permissions_for_roles" schema="" catalog="project_database" type="TABLE">
+      <column name="roleID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" def="MA=="/>
+      <column name="permissionID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" def="MA=="/>
+      <primary-key name="PRIMARY" columns="roleID,permissionID"/>
+      <foreign-key name="permissions_for_roles_ibfk_1" columns="permissionID" ref-table="permissions" ref-schema="" ref-catalog="project_database" ref-columns="permissionID" update-rule="0" delete-rule="0" deferrability="2"/>
+      <foreign-key name="permissions_for_roles_ibfk_2" columns="roleID" ref-table="user_roles" ref-schema="" ref-catalog="project_database" ref-columns="userRoleID" update-rule="0" delete-rule="0" deferrability="2"/>
+    </table>
+    <table name="user_roles" schema="" catalog="project_database" type="TABLE">
+      <column name="userRoleID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="userRoleName" sqlType="VARCHAR" precision="64" scale="0" nullable="false" jdbcType="12"/>
+      <primary-key name="PRIMARY" columns="userRoleID"/>
+      <exported-key name="permissions_for_roles_ibfk_2" table="permissions_for_roles" schema="" catalog="project_database" columns="roleID"/>
+      <exported-key name="users_ibfk_1" table="users" schema="" catalog="project_database" columns="userRoleID"/>
+    </table>
+    <table name="users" schema="" catalog="project_database" type="TABLE">
+      <column name="userID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="firstName" sqlType="VARCHAR" precision="64" scale="0" nullable="false" jdbcType="12"/>
+      <column name="lastName" sqlType="VARCHAR" precision="64" scale="0" nullable="false" jdbcType="12"/>
+      <column name="patronymic" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12"/>
+      <column name="login" sqlType="VARCHAR" precision="128" scale="0" nullable="false" jdbcType="12"/>
+      <column name="passMD5" sqlType="VARCHAR" precision="64" scale="0" nullable="false" jdbcType="12"/>
+      <column name="phoneNumber" sqlType="VARCHAR" precision="16" scale="0" nullable="false" jdbcType="12"/>
+      <column name="email" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12"/>
+      <column name="userRoleID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="userID"/>
+      <foreign-key name="users_ibfk_1" columns="userRoleID" ref-table="user_roles" ref-schema="" ref-catalog="project_database" ref-columns="userRoleID" update-rule="0" delete-rule="0" deferrability="2"/>
+    </table>
     <table name="dispatchersforpoint" schema="" catalog="requestdb" type="TABLE">
       <column name="PointID" sqlType="VARCHAR" precision="16" scale="0" nullable="false" jdbcType="12"/>
       <column name="UserID" sqlType="VARCHAR" precision="16" scale="0" nullable="false" jdbcType="12"/>

@@ -1,10 +1,9 @@
 #DROP not working in phpMyAdmin because of security restrictions, do it manually
-#DROP DATABASE IF EXIST `requestdb`; 
-
+DROP DATABASE IF EXISTS requestdb;
 CREATE DATABASE `requestdb` CHARACTER SET utf8 COLLATE utf8_bin;
 USE `requestdb`;
-CREATE USER 'andy'@'localhost' IDENTIFIED BY 'andyandy';
-GRANT ALL PRIVILEGES ON `requestdb`.* TO 'andy'@'localhost' WITH GRANT OPTION;
+# CREATE USER 'andy'@'localhost' IDENTIFIED BY 'andyandy';
+# GRANT ALL PRIVILEGES ON `requestdb`.* TO 'andy'@'localhost' WITH GRANT OPTION;
 
 CREATE TABLE `usertype` (  `UserTypeID` varchar(16) COLLATE utf8_bin NOT NULL,  `UserTypeText` varchar(64) COLLATE utf8_bin NOT NULL,  UNIQUE KEY `UserTypeID` (`UserTypeID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Enum of users'' types';
 CREATE TABLE `userstatus` (  `UserStatus` varchar(16) COLLATE utf8_bin NOT NULL,  `Description` varchar(64) COLLATE utf8_bin NOT NULL,  PRIMARY KEY (`UserStatus`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
