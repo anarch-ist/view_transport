@@ -297,5 +297,11 @@
       <exported-key name="users_ibfk_1" table="users" schema="" catalog="requestdb" columns="UserTypeID"/>
       <index name="UserTypeID" unique="true" columns="UserTypeID"/>
     </table>
+    <procedure name="inset_permission_for_role" schema="" catalog="project_database" type="1">
+      <prototype>
+        <parameter name="user_role_name" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12" type="1" index="1"/>
+        <parameter name="permission_name" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12" type="1" index="2"/>
+      </prototype>
+    </procedure>
   </data-source>
 </component>
