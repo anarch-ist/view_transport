@@ -22,6 +22,64 @@ INSERT INTO user_roles (userRoleName) VALUES ('MANAGER'); # торговый п�
 # что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
 INSERT INTO user_roles (userRoleName) VALUES ('TEMP_REMOVED');
 
+CREATE TABLE pointTypes (
+  pointTypeID INTEGER AUTO_INCREMENT,
+  pointTypeName VARCHAR(64) NOT NULL,
+  pointTypeRusName VARCHAR(64) NOT NULL,
+  PRIMARY KEY (pointTypeID)
+);
+INSERT INTO pointTypes (pointTypeName, pointTypeRusName) VALUES ('WAREHOUSE','Склад');
+INSERT INTO pointTypes (pointTypeName, pointTypeRusName) VALUES ('AGENCY','Представительство');
+
+CREATE TABLE points (
+  pointID INTEGER,
+  pointName VARCHAR(128) DEFAULT '' NOT NULL,
+  region VARCHAR(128),
+  district VARCHAR(64),
+  locality VARCHAR(64) NOT NULL,
+  mailIndex VARCHAR(6) NOT NULL,
+  address VARCHAR(256) NOT NULL,
+  email VARCHAR(64),
+  phoneNumber VARCHAR(16) NOT NULL,
+  pointTypeID INTEGER NOT NULL,
+  PRIMARY KEY (pointID),
+  FOREIGN KEY (pointTypeID) REFERENCES pointTypes (pointTypeID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+# this table content is a subset of points table
+CREATE TABLE warehouse_points (
+  warehousePointID INTEGER,
+  PRIMARY KEY (warehousePointID),
+  FOREIGN KEY (warehousePointID) REFERENCES points (pointID) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DELIMITER $$
+CREATE FUNCTION is_warehouse(pointTypeID INTEGER)
+  RETURNS BOOLEAN
+  BEGIN
+    RETURN pointTypeID IN(SELECT pointTypeName FROM pointTypes WHERE pointTypeName='Склад');
+  END;
+$$
+DELIMITER ;
+
+CREATE TRIGGER before_points_insert
+BEFORE INSERT ON points FOR EACH ROW
+  BEGIN
+    IF (is_warehouse(new.pointTypeID))
+    THEN
+      INSERT INTO warehouse_points VALUES (new.pointTypeID);
+    END IF;
+  END;
+
+CREATE TRIGGER before_points_delete
+BEFORE DELETE ON points FOR EACH ROW
+  BEGIN
+    IF (is_warehouse(old.pointTypeID))
+    THEN
+      DELETE FROM warehouse_points WHERE warehouse_points.warehousePointID = old.pointTypeID;
+    END IF;
+  END;
+
 
 CREATE TABLE users (
   userID INTEGER AUTO_INCREMENT,
@@ -38,6 +96,65 @@ CREATE TABLE users (
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+# helper table, contains only manager users. Every time when add or update new user this table sync with users
+CREATE TABLE manager_users (
+  managerUserID INTEGER NOT NULL,
+  PRIMARY KEY (managerUserID),
+  FOREIGN KEY (managerUserID) REFERENCES users (userID)
+);
+
+DELIMITER $$
+CREATE FUNCTION is_manager(userRoleID INTEGER)
+  RETURNS BOOLEAN
+  BEGIN
+    RETURN userRoleID IN(SELECT userRoleID FROM user_roles WHERE userRoleName='MANAGER');
+  END;
+$$
+DELIMITER ;
+
+CREATE TRIGGER before_users_insert
+BEFORE INSERT ON users FOR EACH ROW
+  BEGIN
+    IF (is_manager(new.userRoleID))
+    THEN
+      INSERT INTO manager_users VALUES (new.userRoleID);
+    END IF;
+  END;
+
+CREATE TRIGGER before_users_delete
+BEFORE DELETE ON users FOR EACH ROW
+  BEGIN
+    IF (is_manager(old.userRoleID))
+    THEN
+      DELETE FROM manager_users WHERE manager_users.managerUserID = old.userID;
+    END IF;
+  END;
+
+CREATE TRIGGER before_users_update
+BEFORE UPDATE ON users FOR EACH ROW
+  BEGIN
+
+    IF (new.userID != old.userID) THEN
+      UPDATE manager_users SET managerUserID=new.userID WHERE old.userID = manager_users.managerUserID;
+    END IF;
+
+    IF (new.userRoleID != old.userRoleID)
+    THEN
+      BEGIN
+        IF (is_manager(new.userRoleID))
+        THEN
+          INSERT INTO manager_users VALUES (new.userRoleID);
+        ELSE IF (is_manager(old.userRoleID))
+        THEN
+          DELETE FROM manager_users
+          WHERE manager_users.managerUserID = old.userID;
+        END IF;
+        END IF;
+      END;
+    END IF;
+  END;
+
 
 
 CREATE TABLE permissions (
@@ -101,8 +218,13 @@ CALL inset_permission_for_role('CLIENT', 'selectRoute');
 # add permissions to 'TEMP_REMOVED'
 
 
-CREATE TABLE requizit (
-  requizitID VARCHAR(16) PRIMARY KEY NOT NULL,
+# goodsForInvoice - не нужная таблица
+# количесвто коробок - атрибут накладной, количесвто паллет атрибут маршрутного листа
+# marketAgent == MANAGER должен присутвовать в каждой заявке пользователя, он её и утверждает
+# создать отдельную таблицу клиенты это фактически список ИННов. Клинетом может быть например пятерочка.
+
+CREATE TABLE clients (
+  clientID INTEGER AUTO_INCREMENT,
   INN VARCHAR(32) NOT NULL,
   KPP VARCHAR(64) NOT NULL,
   corAccount VARCHAR(64) NOT NULL,
@@ -113,76 +235,31 @@ CREATE TABLE requizit (
   dateOfSigning DATE,
   startContractDate DATE,
   endContractDate DATE,
-  isEnabled TINYINT DEFAULT 1 NOT NULL
-);
-CREATE UNIQUE INDEX RequizitID ON requizit (requizitID);
-
-CREATE TABLE requizitsforuser (
-  userID VARCHAR(16) NOT NULL,
-  requizitID VARCHAR(16) NOT NULL,
-  PRIMARY KEY (userID, requizitID),
-  FOREIGN KEY (userID) REFERENCES users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (requizitID) REFERENCES requizit (requizitID) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-
-
-
-CREATE TABLE pointTypes (
-  pointTypeID INTEGER AUTO_INCREMENT,
-  pointTypeText VARCHAR(64) NOT NULL,
-  PRIMARY KEY (pointTypeID)
-);
-INSERT INTO pointTypes (pointTypeText) VALUES ('Склад');
-INSERT INTO pointTypes (pointTypeText) VALUES ('Представительство');
-
-CREATE TABLE points (
-  pointID INTEGER,
-  pointName VARCHAR(128) DEFAULT '' NOT NULL,
-  pointTypeID VARCHAR(16) NOT NULL,
-  region VARCHAR(128),
-  district VARCHAR(64),
-  locality VARCHAR(64) NOT NULL,
-  mailIndex VARCHAR(6) NOT NULL,
-  address VARCHAR(256) NOT NULL,
-  email VARCHAR(64),
-  phoneNumber VARCHAR(16) NOT NULL,
-  PRIMARY KEY (pointID),
-  FOREIGN KEY (pointTypeID) REFERENCES pointtype (pointTypeID) ON DELETE CASCADE ON UPDATE CASCADE
-  );
-CREATE UNIQUE INDEX PointID ON point (PointID);
-CREATE UNIQUE INDEX PointID_2 ON point (PointID, PointName);
-
-
-# goodsForInvoice - не нужная таблица
-# количесвто коробок - атрибут накладной, количесвто паллет атрибут маршрутного листа
-# dispatchersforpoint - не нужная таблица
-# marketAgent == MANAGER должен присутвовать в каждой заявке пользователя, он её и утверждает
-# создать отдельную таблицу клиенты это фактически список ИННов. Клинетом может быть например пятерочка.
-
-CREATE TABLE clients (
-  clientID INTEGER AUTO_INCREMENT,
-  INN BIGINT,
   PRIMARY KEY (clientID)
 );
 
 
-CREATE VIEW manager_users AS SELECT users.userID FROM users WHERE users.userRoleID = 5; #TODO manager select
-
 CREATE TABLE requests (
-  requestID INTEGER NOT NULL,
+  requestID     INTEGER,
   requestNumber VARCHAR(16) NOT NULL,
-  date DATETIME NOT NULL,
-  pointID INTEGER,
-  managerUser INTEGER NOT NULL,
-  clientID INTEGER NOT NULL,
+  date          DATETIME    NOT NULL,
+  pointID       INTEGER     NOT NULL, # TODO ОТКУДА ЗДЕСЬ ССЫЛКА НА ПУНКТ?, зачем в заявке указывается пункт?
+  managerUserID INTEGER     NOT NULL,
+  clientID      INTEGER     NOT NULL,
   PRIMARY KEY (requestID),
-  FOREIGN KEY (managerUser) REFERENCES manager_users (userID) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (clientID) REFERENCES clients (clientID)  ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (pointID) REFERENCES points (pointID)  ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (managerUserID) REFERENCES manager_users (managerUserID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (clientID) REFERENCES clients (clientID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (pointID) REFERENCES points (pointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
-CREATE VIEW warehouse_points AS SELECT points.pointID FROM points WHERE points.pointTypeID = 1; #TODO select where 'Склад'
+
+
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
 CREATE TABLE invoices (
@@ -194,7 +271,7 @@ CREATE TABLE invoices (
   sales_invoice VARCHAR(16), # расходная накладная
   PRIMARY KEY (invoiceID),
   FOREIGN KEY (requestID) REFERENCES requests (requestID) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (warehousePoint) REFERENCES warehouse_points (pointID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (warehousePoint) REFERENCES warehouse_points (warehousePointID) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE(invoiceNumber)
 );
 
@@ -239,7 +316,7 @@ CREATE TABLE invoice_history (
 CREATE TABLE routes (
   routeID INTEGER NOT NULL,
   routeName VARCHAR(64) NOT NULL,
-  PRIMARY KEY (RouteID)
+  PRIMARY KEY (routeID)
 );
 
 
@@ -255,13 +332,13 @@ CREATE TABLE route_points (
   FOREIGN KEY (pointID) REFERENCES points (pointID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE routeforinvoice (
-  invoiceID VARCHAR(16) NOT NULL,
-  routeID VARCHAR(16) NOT NULL,
-  PRIMARY KEY (InvoiceID, RouteID),
-  FOREIGN KEY (InvoiceID) REFERENCES invoice (InvoiceID) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (RouteID) REFERENCES route (RouteID) ON DELETE CASCADE ON UPDATE CASCADE
-);
+# CREATE TABLE routeforinvoice (
+#   invoiceID VARCHAR(16) NOT NULL,
+#   routeID VARCHAR(16) NOT NULL,
+#   PRIMARY KEY (InvoiceID, RouteID),
+#   FOREIGN KEY (InvoiceID) REFERENCES invoice (InvoiceID) ON DELETE CASCADE ON UPDATE CASCADE,
+#   FOREIGN KEY (RouteID) REFERENCES route (RouteID) ON DELETE CASCADE ON UPDATE CASCADE
+# );
 
 
 
@@ -275,7 +352,7 @@ CREATE TABLE rout_list_history (
   routeID INTEGER,
   invoiceID INTEGER,
   PRIMARY KEY (routListHistoryID),
-  FOREIGN KEY (routeID) REFERENCES routes (routID),
+  FOREIGN KEY (routeID) REFERENCES routes (routeID),
   FOREIGN KEY (invoiceID) REFERENCES invoices (invoiceID)
 );
 
