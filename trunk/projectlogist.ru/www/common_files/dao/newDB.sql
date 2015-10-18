@@ -7,7 +7,7 @@ CREATE TABLE user_roles (
   userRoleName VARCHAR(64) NOT NULL,
   PRIMARY KEY (userRoleID)
 );
-# администратор, ему доступен полный графический интерфейс сайта, и самые высокие права на изменение в БД:
+# администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
 # имеет право изменить роль пользователя
 #
 INSERT INTO user_roles (userRoleName) VALUES ('ADMIN');
@@ -22,14 +22,14 @@ INSERT INTO user_roles (userRoleName) VALUES ('MANAGER'); # торговый п�
 # что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
 INSERT INTO user_roles (userRoleName) VALUES ('TEMP_REMOVED');
 
-CREATE TABLE pointTypes (
+CREATE TABLE point_types (
   pointTypeID INTEGER AUTO_INCREMENT,
   pointTypeName VARCHAR(64) NOT NULL,
   pointTypeRusName VARCHAR(64) NOT NULL,
   PRIMARY KEY (pointTypeID)
 );
-INSERT INTO pointTypes (pointTypeName, pointTypeRusName) VALUES ('WAREHOUSE','Склад');
-INSERT INTO pointTypes (pointTypeName, pointTypeRusName) VALUES ('AGENCY','Представительство');
+INSERT INTO point_types (pointTypeName, pointTypeRusName) VALUES ('WAREHOUSE','Склад');
+INSERT INTO point_types (pointTypeName, pointTypeRusName) VALUES ('AGENCY','Представительство');
 
 CREATE TABLE points (
   pointID INTEGER,
@@ -43,7 +43,7 @@ CREATE TABLE points (
   phoneNumber VARCHAR(16) NOT NULL,
   pointTypeID INTEGER NOT NULL,
   PRIMARY KEY (pointID),
-  FOREIGN KEY (pointTypeID) REFERENCES pointTypes (pointTypeID) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 # this table content is a subset of points table
@@ -57,7 +57,7 @@ DELIMITER $$
 CREATE FUNCTION is_warehouse(pointTypeID INTEGER)
   RETURNS BOOLEAN
   BEGIN
-    RETURN pointTypeID IN(SELECT pointTypeName FROM pointTypes WHERE pointTypeName='Склад');
+    RETURN pointTypeID IN(SELECT pointTypeName FROM point_types WHERE pointTypeName='Склад');
   END;
 $$
 DELIMITER ;
@@ -243,9 +243,9 @@ CREATE TABLE requests (
   requestID     INTEGER,
   requestNumber VARCHAR(16) NOT NULL,
   date          DATETIME    NOT NULL,
-  pointID       INTEGER     NOT NULL, # TODO ОТКУДА ЗДЕСЬ ССЫЛКА НА ПУНКТ?, зачем в заявке указывается пункт?
   managerUserID INTEGER     NOT NULL,
   clientID      INTEGER     NOT NULL,
+  destinationPointID INTEGER NOT NULL, # адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
   FOREIGN KEY (managerUserID) REFERENCES manager_users (managerUserID)
     ON DELETE CASCADE
@@ -253,7 +253,7 @@ CREATE TABLE requests (
   FOREIGN KEY (clientID) REFERENCES clients (clientID)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  FOREIGN KEY (pointID) REFERENCES points (pointID)
+  FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
@@ -269,48 +269,69 @@ CREATE TABLE invoices (
   requestID INTEGER,
   warehousePoint INTEGER,
   sales_invoice VARCHAR(16), # расходная накладная
+  routeListID INTEGER NULL , # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
   FOREIGN KEY (requestID) REFERENCES requests (requestID) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (warehousePoint) REFERENCES warehouse_points (warehousePointID) ON DELETE CASCADE ON UPDATE CASCADE,
   UNIQUE(invoiceNumber)
 );
+# после того, как в таблицу invoices добавлена новая запсиь, информация об этом добавляется в таблицу invoice_history
+CREATE TRIGGER after_invoice_insert
+AFTER INSERT ON invoices FOR EACH ROW
+  BEGIN
+    INSERT INTO invoice_history(timeMark, invoiceStatusID, boxQty, invoiceID) VALUES (now(), getInvoiceStatusIDByName('CREATED'), NULL , new.invoiceID);
+  END;
 
-
-CREATE TABLE status_list (
+CREATE TABLE invoice_statuses (
   invoiceStatusID INTEGER AUTO_INCREMENT,
   invoiceStatusName VARCHAR(32) NOT NULL,
   invoiceStatusRusName VARCHAR(128) NOT NULL,
   PRIMARY KEY (invoiceStatusID)
 );
+CREATE FUNCTION getInvoiceStatusIDByName(statusName VARCHAR(255))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT invoiceStatusID FROM invoice_statuses WHERE invoiceStatusName=statusName);
+    RETURN result;
+  END;
+
+
+# TODO сдклать запись этих статусов в таблицу истории на триггерах
+# служебные статусы
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CREATED', 'Внутренняя заявка добавлена в БД');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('SET_ROUTE_LIST', 'прикреплена к маршрутному листу');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CHANGED_ROUTE_LIST', 'изменен маршрутный лист');
+
 # insider request statuses
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('APPROVING', 'Выгружена на утверждение торговому представителю');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('RESERVED', 'Резерв');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('APPROVED', 'Утверждена к сборке');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('STOP_LIST', 'Стоп-лист');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('CREDIT_LIMIT', 'Кредитный лимит');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('RASH_CREATED', 'Создана расходная накладная');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('COLLECTING', 'Выдана на сборку');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('CHECK', 'На контроле');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('CHECK_PASSED', 'Контроль пройден');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('PACKAGING', 'Упаковано');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('READY', 'Проверка в зоне отгрузки/Готова к отправке');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('APPROVING', 'Выгружена на утверждение торговому представителю');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('RESERVED', 'Резерв');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('APPROVED', 'Утверждена к сборке');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('STOP_LIST', 'Стоп-лист');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CREDIT_LIMIT', 'Кредитный лимит');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('RASH_CREATED', 'Создана расходная накладная');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('COLLECTING', 'Выдана на сборку');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CHECK', 'На контроле');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CHECK_PASSED', 'Контроль пройден');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('PACKAGING', 'Упаковано');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('READY', 'Проверка в зоне отгрузки/Готова к отправке');
 # invoice statuses
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('DEPARTURE', 'Накладная убыла');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('ARRIVED', 'Накладная прибыла в пункт');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('ERROR', 'Ошибка. Возвращение в пункт');
-INSERT INTO status_list (invoiceStatusName, invoiceStatusRusName) VALUES ('DELIVERED', 'Доставлено');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('DEPARTURE', 'Накладная убыла');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('ARRIVED', 'Накладная прибыла в пункт');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('ERROR', 'Ошибка. Возвращение в пункт');
+INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('DELIVERED', 'Доставлено');
 
 
 CREATE TABLE invoice_history (
-  invoiceHistoryID BIGINT,
+  invoiceHistoryID BIGINT AUTO_INCREMENT,
   timeMark DATETIME, # устанавливается пользователем либо из 1с
   invoiceStatusID INTEGER,
   boxQty INTEGER,
+  invoiceID INTEGER NOT NULL, # ADDED добавлена ссылка
   PRIMARY KEY (invoiceHistoryID),
-  FOREIGN KEY (invoiceStatusID) REFERENCES status_list (invoiceStatusID)
+  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID),
+  FOREIGN KEY (invoiceID) REFERENCES invoices (invoiceID)
 );
-
-
 
 
 CREATE TABLE routes (
@@ -321,40 +342,50 @@ CREATE TABLE routes (
 
 
 CREATE TABLE route_points (
-  routePointID INTEGER NOT NULL,
-  pointID INTEGER NOT NULL,
-  sortOrder INTEGER,
+  routePointID INTEGER,
+  sortOrder INTEGER NOT NULL,
   tLoading INTEGER, # в минутах
   timeToNextPoint INTEGER, # в минутах
   distanceToNextPoint INTEGER, # в километрах
   arrivalTime TIME,
+  pointID INTEGER NOT NULL,
+  routeID INTEGER NOT NULL,
   PRIMARY KEY (routePointID),
-  FOREIGN KEY (pointID) REFERENCES points (pointID) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (pointID) REFERENCES points (pointID) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (routeID) REFERENCES routes (routeID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-# CREATE TABLE routeforinvoice (
-#   invoiceID VARCHAR(16) NOT NULL,
-#   routeID VARCHAR(16) NOT NULL,
-#   PRIMARY KEY (InvoiceID, RouteID),
-#   FOREIGN KEY (InvoiceID) REFERENCES invoice (InvoiceID) ON DELETE CASCADE ON UPDATE CASCADE,
-#   FOREIGN KEY (RouteID) REFERENCES route (RouteID) ON DELETE CASCADE ON UPDATE CASCADE
-# );
-
+CREATE TABLE route_lists (
+  routeListID INTEGER,
+  routListNumber VARCHAR(32),
+  palletsQty INTEGER,
+  driver VARCHAR(255),
+  licensePlate VARCHAR(9), # государственный номер автомобиля
+  creationTime DATETIME,
+  routeID INTEGER,
+  PRIMARY KEY (routeListID),
+  FOREIGN KEY (routeID) REFERENCES routes (routeID)
+);
 
 
 CREATE TABLE rout_list_history (
-  routListHistoryID BIGINT AUTO_INCREMENT,
-  routeListID INTEGER,
-  timeMark DATETIME,
-  routListNumber VARCHAR(32),
-  driver VARCHAR(255),
-  licensePlate VARCHAR(9), # государственный номер автомобиля
-  routeID INTEGER,
-  invoiceID INTEGER,
-  PRIMARY KEY (routListHistoryID),
-  FOREIGN KEY (routeID) REFERENCES routes (routeID),
-  FOREIGN KEY (invoiceID) REFERENCES invoices (invoiceID)
-);
+  #TODO доделать так, чтобы при обновлении route_lists в этоу таблицу записывалась история
+)
+
+
+# CREATE TABLE rout_list_history (
+#   routListHistoryID BIGINT AUTO_INCREMENT,
+#   routeListID INTEGER,
+#   timeMark DATETIME,
+#   routListNumber VARCHAR(32),
+#   driver VARCHAR(255),
+#   licensePlate VARCHAR(9), # государственный номер автомобиля
+#   routeID INTEGER,
+#   invoiceID INTEGER,
+#   PRIMARY KEY (routListHistoryID),
+#   FOREIGN KEY (routeID) REFERENCES routes (routeID),
+#   FOREIGN KEY (invoiceID) REFERENCES invoices (invoiceID)
+# );
 
 
 
