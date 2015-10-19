@@ -24,12 +24,14 @@
       <exported-key name="requests_ibfk_2" table="requests" schema="" catalog="project_database" columns="clientID"/>
     </table>
     <table name="invoice_history" schema="" catalog="project_database" type="TABLE">
-      <column name="invoiceHistoryID" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5" def="MA=="/>
+      <column name="invoiceHistoryID" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5" autoIncrement="true"/>
       <column name="timeMark" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
       <column name="invoiceStatusID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="boxQty" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="invoiceID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="invoiceHistoryID"/>
       <foreign-key name="invoice_history_ibfk_1" columns="invoiceStatusID" ref-table="invoice_statuses" ref-schema="" ref-catalog="project_database" ref-columns="invoiceStatusID" update-rule="3" delete-rule="3" deferrability="2"/>
+      <foreign-key name="invoice_history_ibfk_2" columns="invoiceID" ref-table="invoices" ref-schema="" ref-catalog="project_database" ref-columns="invoiceID" update-rule="3" delete-rule="3" deferrability="2"/>
     </table>
     <table name="invoice_statuses" schema="" catalog="project_database" type="TABLE">
       <column name="invoiceStatusID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
@@ -37,18 +39,24 @@
       <column name="invoiceStatusRusName" sqlType="VARCHAR" precision="128" scale="0" nullable="false" jdbcType="12"/>
       <primary-key name="PRIMARY" columns="invoiceStatusID"/>
       <exported-key name="invoice_history_ibfk_1" table="invoice_history" schema="" catalog="project_database" columns="invoiceStatusID"/>
+      <exported-key name="invoices_ibfk_1" table="invoices" schema="" catalog="project_database" columns="invoiceStatusID"/>
     </table>
     <table name="invoices" schema="" catalog="project_database" type="TABLE">
       <column name="invoiceID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" def="MA=="/>
       <column name="invoiceNumber" sqlType="VARCHAR" precision="16" scale="0" nullable="false" jdbcType="12"/>
       <column name="date" sqlType="DATETIME" precision="19" scale="0" nullable="false" jdbcType="93"/>
-      <column name="requestID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="warehousePoint" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="boxQty" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="sales_invoice" sqlType="VARCHAR" precision="16" scale="0" nullable="true" jdbcType="12"/>
+      <column name="invoiceStatusID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="requestID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="warehousePointID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="routeListID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <primary-key name="PRIMARY" columns="invoiceID"/>
-      <foreign-key name="invoices_ibfk_1" columns="requestID" ref-table="requests" ref-schema="" ref-catalog="project_database" ref-columns="requestID" update-rule="0" delete-rule="0" deferrability="2"/>
-      <foreign-key name="invoices_ibfk_2" columns="warehousePoint" ref-table="warehouse_points" ref-schema="" ref-catalog="project_database" ref-columns="warehousePointID" update-rule="0" delete-rule="0" deferrability="2"/>
-      <exported-key name="rout_list_history_ibfk_2" table="rout_list_history" schema="" catalog="project_database" columns="invoiceID"/>
+      <foreign-key name="invoices_ibfk_1" columns="invoiceStatusID" ref-table="invoice_statuses" ref-schema="" ref-catalog="project_database" ref-columns="invoiceStatusID" update-rule="0" delete-rule="0" deferrability="2"/>
+      <foreign-key name="invoices_ibfk_2" columns="requestID" ref-table="requests" ref-schema="" ref-catalog="project_database" ref-columns="requestID" update-rule="0" delete-rule="0" deferrability="2"/>
+      <foreign-key name="invoices_ibfk_3" columns="warehousePointID" ref-table="warehouse_points" ref-schema="" ref-catalog="project_database" ref-columns="warehousePointID" update-rule="0" delete-rule="0" deferrability="2"/>
+      <foreign-key name="invoices_ibfk_4" columns="routeListID" ref-table="route_lists" ref-schema="" ref-catalog="project_database" ref-columns="routeListID" update-rule="0" delete-rule="0" deferrability="2"/>
+      <exported-key name="invoice_history_ibfk_2" table="invoice_history" schema="" catalog="project_database" columns="invoiceID"/>
       <index name="invoiceNumber" unique="true" columns="invoiceNumber"/>
     </table>
     <table name="manager_users" schema="" catalog="project_database" type="TABLE">
@@ -106,20 +114,34 @@
       <foreign-key name="requests_ibfk_1" columns="managerUserID" ref-table="manager_users" ref-schema="" ref-catalog="project_database" ref-columns="managerUserID" update-rule="0" delete-rule="0" deferrability="2"/>
       <foreign-key name="requests_ibfk_2" columns="clientID" ref-table="clients" ref-schema="" ref-catalog="project_database" ref-columns="clientID" update-rule="0" delete-rule="0" deferrability="2"/>
       <foreign-key name="requests_ibfk_3" columns="destinationPointID" ref-table="points" ref-schema="" ref-catalog="project_database" ref-columns="pointID" update-rule="0" delete-rule="0" deferrability="2"/>
-      <exported-key name="invoices_ibfk_1" table="invoices" schema="" catalog="project_database" columns="requestID"/>
+      <exported-key name="invoices_ibfk_2" table="invoices" schema="" catalog="project_database" columns="requestID"/>
     </table>
     <table name="rout_list_history" schema="" catalog="project_database" type="TABLE">
-      <column name="routListHistoryID" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5" autoIncrement="true"/>
-      <column name="routeListID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="routeListHistoryID" sqlType="BIGINT" precision="19" scale="0" nullable="false" jdbcType="-5" autoIncrement="true"/>
       <column name="timeMark" sqlType="DATETIME" precision="19" scale="0" nullable="true" jdbcType="93"/>
+      <column name="routeListID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <column name="routeListStatusID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
+      <primary-key name="PRIMARY" columns="routeListHistoryID"/>
+      <foreign-key name="rout_list_history_ibfk_1" columns="routeListID" ref-table="route_lists" ref-schema="" ref-catalog="project_database" ref-columns="routeListID" update-rule="3" delete-rule="3" deferrability="2"/>
+      <foreign-key name="rout_list_history_ibfk_2" columns="routeListStatusID" ref-table="route_list_statuses" ref-schema="" ref-catalog="project_database" ref-columns="routeListStatusID" update-rule="3" delete-rule="3" deferrability="2"/>
+    </table>
+    <table name="route_list_statuses" schema="" catalog="project_database" type="TABLE">
+      <column name="routeListStatusID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" autoIncrement="true"/>
+      <column name="routeListStatusName" sqlType="VARCHAR" precision="16" scale="0" nullable="true" jdbcType="12"/>
+      <primary-key name="PRIMARY" columns="routeListStatusID"/>
+      <exported-key name="rout_list_history_ibfk_2" table="rout_list_history" schema="" catalog="project_database" columns="routeListStatusID"/>
+    </table>
+    <table name="route_lists" schema="" catalog="project_database" type="TABLE">
+      <column name="routeListID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" def="MA=="/>
       <column name="routListNumber" sqlType="VARCHAR" precision="32" scale="0" nullable="true" jdbcType="12"/>
+      <column name="palletsQty" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
       <column name="driver" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12"/>
       <column name="licensePlate" sqlType="VARCHAR" precision="9" scale="0" nullable="true" jdbcType="12"/>
       <column name="routeID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <column name="invoiceID" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4"/>
-      <primary-key name="PRIMARY" columns="routListHistoryID"/>
-      <foreign-key name="rout_list_history_ibfk_1" columns="routeID" ref-table="routes" ref-schema="" ref-catalog="project_database" ref-columns="routeID" update-rule="3" delete-rule="3" deferrability="2"/>
-      <foreign-key name="rout_list_history_ibfk_2" columns="invoiceID" ref-table="invoices" ref-schema="" ref-catalog="project_database" ref-columns="invoiceID" update-rule="3" delete-rule="3" deferrability="2"/>
+      <primary-key name="PRIMARY" columns="routeListID"/>
+      <foreign-key name="route_lists_ibfk_1" columns="routeID" ref-table="routes" ref-schema="" ref-catalog="project_database" ref-columns="routeID" update-rule="3" delete-rule="3" deferrability="2"/>
+      <exported-key name="invoices_ibfk_4" table="invoices" schema="" catalog="project_database" columns="routeListID"/>
+      <exported-key name="rout_list_history_ibfk_1" table="rout_list_history" schema="" catalog="project_database" columns="routeListID"/>
     </table>
     <table name="route_points" schema="" catalog="project_database" type="TABLE">
       <column name="routePointID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" def="MA=="/>
@@ -138,7 +160,7 @@
       <column name="routeID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4"/>
       <column name="routeName" sqlType="VARCHAR" precision="64" scale="0" nullable="false" jdbcType="12"/>
       <primary-key name="PRIMARY" columns="routeID"/>
-      <exported-key name="rout_list_history_ibfk_1" table="rout_list_history" schema="" catalog="project_database" columns="routeID"/>
+      <exported-key name="route_lists_ibfk_1" table="route_lists" schema="" catalog="project_database" columns="routeID"/>
       <exported-key name="route_points_ibfk_2" table="route_points" schema="" catalog="project_database" columns="routeID"/>
     </table>
     <table name="user_roles" schema="" catalog="project_database" type="TABLE">
@@ -168,7 +190,7 @@
       <column name="warehousePointID" sqlType="INT" precision="10" scale="0" nullable="false" jdbcType="4" def="MA=="/>
       <primary-key name="PRIMARY" columns="warehousePointID"/>
       <foreign-key name="warehouse_points_ibfk_1" columns="warehousePointID" ref-table="points" ref-schema="" ref-catalog="project_database" ref-columns="pointID" update-rule="0" delete-rule="0" deferrability="2"/>
-      <exported-key name="invoices_ibfk_2" table="invoices" schema="" catalog="project_database" columns="warehousePoint"/>
+      <exported-key name="invoices_ibfk_3" table="invoices" schema="" catalog="project_database" columns="warehousePointID"/>
     </table>
     <table name="dispatchersforpoint" schema="" catalog="requestdb" type="TABLE">
       <column name="PointID" sqlType="VARCHAR" precision="16" scale="0" nullable="false" jdbcType="12"/>
@@ -426,7 +448,13 @@
       <exported-key name="users_ibfk_1" table="users" schema="" catalog="requestdb" columns="UserTypeID"/>
       <index name="UserTypeID" unique="true" columns="UserTypeID"/>
     </table>
-    <procedure name="inset_permission_for_role" schema="" catalog="project_database" type="1">
+    <procedure name="get_route_list_status_id_by_name" schema="" catalog="project_database" type="2">
+      <prototype>
+        <parameter name="statusName" sqlType="VARCHAR" precision="255" scale="0" nullable="true" jdbcType="12" type="1" index="1"/>
+        <parameter name="" sqlType="INT" precision="10" scale="0" nullable="true" jdbcType="4" type="5" index="0"/>
+      </prototype>
+    </procedure>
+    <procedure name="insert_permission_for_role" schema="" catalog="project_database" type="1">
       <prototype>
         <parameter name="user_role_name" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12" type="1" index="1"/>
         <parameter name="permission_name" sqlType="VARCHAR" precision="64" scale="0" nullable="true" jdbcType="12" type="1" index="2"/>
