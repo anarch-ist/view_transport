@@ -42,13 +42,13 @@ INSERT INTO point_types (pointTypeName, pointTypeRusName) VALUES ('AGENCY', 'П�
 CREATE TABLE points (
   pointID     INTEGER,
   pointName   VARCHAR(128) DEFAULT '' NOT NULL,
-  region      VARCHAR(128),
-  district    VARCHAR(64),
-  locality    VARCHAR(64)             NOT NULL,
-  mailIndex   VARCHAR(6)              NOT NULL,
+  region      VARCHAR(128) NULL, 
+  district    VARCHAR(64) NULL,
+  locality    VARCHAR(64)  NULL,
+  mailIndex   VARCHAR(6)   NULL,
   address     VARCHAR(256)            NOT NULL,
-  email       VARCHAR(64),
-  phoneNumber VARCHAR(16)             NOT NULL,
+  email       VARCHAR(64) NULL,
+  phoneNumber VARCHAR(16)     NULL,
   pointTypeID INTEGER                 NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
@@ -94,13 +94,13 @@ BEFORE DELETE ON points FOR EACH ROW
 
 CREATE TABLE users (
   userID      INTEGER AUTO_INCREMENT,
-  firstName   VARCHAR(64)  NOT NULL,
-  lastName    VARCHAR(64)  NOT NULL,
-  patronymic  VARCHAR(64),
+  firstName   VARCHAR(64)  NULL,
+  lastName    VARCHAR(64)  NULL,
+  patronymic  VARCHAR(64) NULL,
   login       VARCHAR(128) NOT NULL,
   passMD5     VARCHAR(64)  NOT NULL,
-  phoneNumber VARCHAR(16)  NOT NULL,
-  email       VARCHAR(64),
+  phoneNumber VARCHAR(16)  NULL,
+  email       VARCHAR(64) NULL,
   userRoleID  INTEGER      NOT NULL,
   pointID     INTEGER      NOT NULL,
   PRIMARY KEY (userID),
@@ -252,15 +252,15 @@ CREATE TABLE user_action_history (
 CREATE TABLE clients (
   clientID          INTEGER AUTO_INCREMENT,
   INN               VARCHAR(32)  NOT NULL,
-  KPP               VARCHAR(64)  NOT NULL,
-  corAccount        VARCHAR(64)  NOT NULL,
-  curAccount        VARCHAR(64)  NOT NULL,
-  BIK               VARCHAR(64)  NOT NULL,
-  bankName          VARCHAR(128) NOT NULL,
-  contractNumber    VARCHAR(64),
-  dateOfSigning     DATE,
-  startContractDate DATE,
-  endContractDate   DATE,
+  KPP               VARCHAR(64)  NULL,
+  corAccount        VARCHAR(64)  NULL,
+  curAccount        VARCHAR(64)  NULL,
+  BIK               VARCHAR(64)  NULL,
+  bankName          VARCHAR(128) NULL,
+  contractNumber    VARCHAR(64) NULL,
+  dateOfSigning     DATE NULL,
+  startContractDate DATE NULL,
+  endContractDate   DATE NULL,
   PRIMARY KEY (clientID)
 );
 
@@ -297,10 +297,10 @@ CREATE TABLE routes (
 
 CREATE TABLE route_lists (
   routeListID    INTEGER,
-  routListNumber VARCHAR(32),
-  palletsQty     INTEGER,
-  driver         VARCHAR(255),
-  licensePlate   VARCHAR(9), # государственный номер автомобиля
+  routListNumber VARCHAR(32) NOT NULL,
+  palletsQty     INTEGER NULL,
+  driver         VARCHAR(255) NULL,
+  licensePlate   VARCHAR(9) NULL, # государственный номер автомобиля
   routeID        INTEGER,
   PRIMARY KEY (routeListID),
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
@@ -309,10 +309,10 @@ CREATE TABLE route_lists (
 CREATE TABLE route_points (
   routePointID        INTEGER,
   sortOrder           INTEGER NOT NULL,
-  tLoading            INTEGER, # в минутах
-  timeToNextPoint     INTEGER, # в минутах
-  distanceToNextPoint INTEGER, # в километрах
-  arrivalTime         TIME,
+  tLoading            INTEGER NOT NULL, # в минутах
+  timeToNextPoint     INTEGER NOT NULL, # в минутах
+  distanceToNextPoint INTEGER NOT NULL, # в километрах
+  arrivalTime         TIME NOT NULL,
   pointID             INTEGER NOT NULL,
   routeID             INTEGER NOT NULL,
   PRIMARY KEY (routePointID),
@@ -425,8 +425,8 @@ CREATE TABLE invoices (
   invoiceNumber    VARCHAR(16) NOT NULL,
   creationDate     DATETIME    NULL,
   deliveryDate     DATETIME    NULL,
-  boxQty           INTEGER,
-  sales_invoice    VARCHAR(16), # расходная накладная
+  boxQty           INTEGER NULL,
+  sales_invoice    VARCHAR(16) NULL, # расходная накладная
   invoiceStatusID  INTEGER     NOT NULL,
   requestID        INTEGER     NOT NULL,
   warehousePointID INTEGER     NOT NULL,
@@ -463,7 +463,7 @@ CREATE TABLE invoice_history (
   invoiceHistoryID BIGINT AUTO_INCREMENT,
   timeMark         DATETIME, # устанавливается пользователем либо из 1с
   invoiceStatusID  INTEGER,
-  boxQty           INTEGER,
+  boxQty           INTEGER NULL,
   invoiceID        INTEGER NOT NULL,
   PRIMARY KEY (invoiceHistoryID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID),
