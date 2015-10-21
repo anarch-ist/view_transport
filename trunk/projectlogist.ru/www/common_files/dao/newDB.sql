@@ -232,6 +232,17 @@ CALL insert_permission_for_role('CLIENT', 'selectUser');
 CALL insert_permission_for_role('CLIENT', 'selectPoint');
 CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
+#TODO определить, какие таблицы должны хранить информацию об изменении пользователями
+CREATE TABLE user_action_history (
+  userActionHistoryID BIGINT AUTO_INCREMENT,
+  userID INTEGER,
+  tableName VARCHAR(255),
+  timeMark DATETIME,
+  PRIMARY KEY (userActionHistoryID),
+  FOREIGN KEY (userID) REFERENCES users(userID),
+  FOREIGN KEY (tableName) REFERENCES information_schema.TABLES (TABLE_NAME)
+);
+
 
 #######################################################################################################################
 #                                                 CLIENTS AND REQUESTS                                                #
@@ -321,6 +332,7 @@ CREATE TABLE route_list_statuses (
 
 INSERT INTO route_list_statuses (routeListStatusName) VALUE ('CREATED');
 INSERT INTO route_list_statuses (routeListStatusName) VALUE ('UPDATED');
+INSERT INTO route_list_statuses (routeListStatusName) VALUE ('DELETED');
 
 CREATE FUNCTION get_route_list_status_id_by_name(statusName VARCHAR(255))
   RETURNS INTEGER
@@ -335,15 +347,25 @@ CREATE FUNCTION get_route_list_status_id_by_name(statusName VARCHAR(255))
 CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
-    INSERT INTO rout_list_history (timeMark, routeListID, routeListStatusID)
-    VALUES (NOW(), NEW.routeListID, get_route_list_status_id_by_name('CREATED'));
+    INSERT INTO rout_list_history (timeMark, routeListID, routeListStatusID, driver, licensePlate, palletsQty, routListNumber)
+    VALUES (NOW(), NEW.routeListID, get_route_list_status_id_by_name('CREATED'), NEW.driver, NEW.licensePlate,
+            NEW.palletsQty, NEW.routListNumber);
   END;
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
-    INSERT INTO rout_list_history (timeMark, routeListID, routeListStatusID)
-    VALUES (NOW(), NEW.routeListID, get_route_list_status_id_by_name('UPDATED'));
+    INSERT INTO rout_list_history (timeMark, routeListID, routeListStatusID, driver, licensePlate, palletsQty, routListNumber)
+    VALUES (NOW(), NEW.routeListID, get_route_list_status_id_by_name('UPDATED'), NEW.driver, NEW.licensePlate,
+            NEW.palletsQty, NEW.routListNumber);
+  END;
+
+CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
+FOR EACH ROW
+  BEGIN
+    INSERT INTO rout_list_history (timeMark, routeListID, routeListStatusID, driver, licensePlate, palletsQty, routListNumber)
+    VALUES (NOW(), NEW.routeListID, get_route_list_status_id_by_name('DELETED'), NEW.driver, NEW.licensePlate,
+            NEW.palletsQty, NEW.routListNumber);
   END;
 
 # TODO внести только те поля, которые могут меняться у маршрутного листа
@@ -352,8 +374,11 @@ CREATE TABLE rout_list_history (
   timeMark           DATETIME,
   routeListID        INTEGER,
   routeListStatusID  INTEGER,
+  driver VARCHAR(255),
+  licensePlate VARCHAR(9),
+  palletsQty INTEGER,
+  routListNumber VARCHAR(32),
   PRIMARY KEY (routeListHistoryID),
-  FOREIGN KEY (routeListID) REFERENCES route_lists (routeListID),
   FOREIGN KEY (routeListStatusID) REFERENCES route_list_statuses (routeListStatusID)
 );
 
@@ -398,7 +423,8 @@ INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('
 CREATE TABLE invoices (
   invoiceID        INTEGER,
   invoiceNumber    VARCHAR(16) NOT NULL,
-  date             DATETIME    NOT NULL,
+  creationDate     DATETIME    NULL,
+  deliveryDate     DATETIME    NULL,
   boxQty           INTEGER,
   sales_invoice    VARCHAR(16), # расходная накладная
   invoiceStatusID  INTEGER     NOT NULL,

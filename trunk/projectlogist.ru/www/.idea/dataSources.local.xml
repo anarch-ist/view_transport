@@ -4,7 +4,7 @@
     <data-source name="MySQL - @localhost" uuid="b38ab19a-57fd-4dc1-acf9-7568f453f933">
       <secret-storage>master_key</secret-storage>
       <user-name>root</user-name>
-      <schema-pattern>project_database.* requestdb.*</schema-pattern>
+      <schema-pattern>information_schema.* project_database.* requestdb.*</schema-pattern>
       <default-schemas>information_schema.* project_database.* requestdb.*</default-schemas>
     </data-source>
   </component>
