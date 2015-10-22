@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" ><![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="en" ><!--<![endif]-->
+  <head>
+    <link href="//dab1nmslvvntp.cloudfront.net" ref="dns-prefetch">
+    <link href="//d2sis3lil8ndrq.cloudfront.net" ref="dns-prefetch">
+    <link href="//sitepoint.com" ref="dns-prefetch">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta property="og:image" content="http://www.sitepoint.com/wp-content/themes/sitepoint/assets/images/icon.php.png">
+        
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <link rel="apple-touch-icon-precomposed" href="/wp-content/themes/sitepoint/assets/images/apple-touch-icon-57x57-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/wp-content/themes/sitepoint/assets/images/apple-touch-icon-72x72-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/wp-content/themes/sitepoint/assets/images/apple-touch-icon-114x114-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/wp-content/themes/sitepoint/assets/images/apple-touch-icon-144x144-precomposed.png" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed for SitePoint.com" href="http://www.sitepoint.com/feed/" />
+
+        <link href="https://plus.google.com/113214561650167033983" rel="publisher" />
+        <meta property="twitter:account_id" content="15743570" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+    <script type="text/javascript">
+    function r(f){/in/.test(document.readyState)?setTimeout(r,9,f):f()}
+    </script>
+
+    
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-30131-1', '.sitepoint.com');
+
+  ga('set', 'dimension1', 'post');
+ga('set', 'dimension2', 'php');
+ga('set', 'dimension3', 'Security');
+ga('set', 'dimension4', '2012-03-12');
+ga('set', 'dimension5', 'Martin Psinas');
+
+  ga('set', 'contentGroup5', 'php');  //Integration with Kaizen
+  try { kzs("activateUniversalAnalytics"); } catch(e) {}
+
+  // Cross Domain Tracking to Learnable
+  ga('require', 'linker');
+  // command, domains, useAnchor, enableForms
+  ga('linker:autoLink', ['learnable.com'], false, true);
+
+  ga('send', 'pageview');
+</script>
+    <script type="text/javascript">
+      var googletag = googletag || {};
+      googletag.cmd = googletag.cmd || [];
+      (function() {
+      var gads = document.createElement('script');
+      gads.async = true;
+      gads.type = 'text/javascript';
+      var useSSL = 'https:' == document.location.protocol;
+      gads.src = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js';
+      var node = document.getElementsByTagName('script')[0];
+      node.parentNode.insertBefore(gads, node);
+      })();
+    </script>
+    <script data-kz-key="b421ba44cb0c0e6e" data-kz-namespace="kzs" src="//cdn.kaizenplatform.net/s/b4/21ba44cb0c0e6e.js"></script>
+    <!-- RocketFuel Code for SitePoint -->
+    <script src="http://ads.yahoo.com/pixel?id=2557776&t=1" type="text/javascript"></script>
+    <!-- End of RocketFuel Code -->
+    
+<!-- This site is optimized with the Yoast WordPress SEO plugin v2.2.1 - https://yoast.com/wordpress/plugins/seo/ -->
+<title>Role Based Access Control in PHP</title>
+<link rel="canonical" href="http://www.sitepoint.com/role-based-access-control-in-php/" />
+<link rel="publisher" href="https://plus.google.com/+sitepoint/"/>
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Role Based Access Control in PHP" />
+<meta property="og:description" content="Role Based Access Control is a model in which roles are created for various job functions and permissions to perform operations are then tied to them. A user can be assigned to one or multiple roles which restricts their system access to the permissions for which they have been authorized. In this article you&#039;ll learn more about RBAC, and how to enhance your existing authentication system with it." />
+<meta property="og:url" content="http://www.sitepoint.com/role-based-access-control-in-php/" />
+<meta property="og:site_name" content="SitePoint" />
+<meta property="article:publisher" content="https://www.facebook.com/sitepoint" />
+<meta property="article:tag" content="Intermediate" />
+<meta property="article:section" content="Patterns and Practices" />
+<meta property="article:published_time" content="2012-03-12T09:30:15+00:00" />
+<meta property="article:modified_time" content="2013-09-11T18:34:58+00:00" />
+<meta property="og:updated_time" content="2013-09-11T18:34:58+00:00" />
+<meta property="fb:admins" content="121300382" />
+<meta property="og:image" content="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2012/01/rbac_01.png" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:description" content="Role Based Access Control is a model in which roles are created for various job functions and permissions to perform operations are then tied to them. A user can be assigned to one or multiple roles which restricts their system access to the permissions for which they have been authorized. In this article you&#039;ll learn more about RBAC, and how to enhance your existing authentication system with it."/>
+<meta name="twitter:title" content="Role Based Access Control in PHP"/>
+<meta name="twitter:site" content="@sitepointdotcom"/>
+<meta name="twitter:domain" content="SitePoint"/>
+<meta name="twitter:image:src" content="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2012/01/rbac_01.png"/>
+<meta name="twitter:creator" content="@sitepointdotcom"/>
+<!-- / Yoast WordPress SEO plugin. -->
+
+<link rel="alternate" type="application/rss+xml" title="SitePoint &raquo; Role Based Access Control in PHP Comments Feed" href="http://www.sitepoint.com/role-based-access-control-in-php/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"http:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/www.sitepoint.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.2.2"}};
+			!function(a,b,c){function d(a){var c=b.createElement("canvas"),d=c.getContext&&c.getContext("2d");return d&&d.fillText?(d.textBaseline="top",d.font="600 32px Arial","flag"===a?(d.fillText(String.fromCharCode(55356,56812,55356,56807),0,0),c.toDataURL().length>3e3):(d.fillText(String.fromCharCode(55357,56835),0,0),0!==d.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='wp-postratings-css'  href='http://www.sitepoint.com/wp-content/plugins/wp-postratings/postratings-css.css?ver=1.82' type='text/css' media='all' />
+<link rel='stylesheet' id='sitepoint-styles-css'  href='//www.sitepoint.com/wp-content/themes/sitepoint/assets/stylesheets/styles-68ff3b320efc981cc0bfea828361c6fb.css?ver=4.2.2' type='text/css' media='all' />
+<script type='text/javascript' src='//www.sitepoint.com/wp-content/themes/sitepoint/assets/javascripts/scripts-head-e4a2be27db699092d2993e42901cedf6.js?ver=4.2.2'></script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.sitepoint.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.sitepoint.com/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 4.2.2" />
+<link rel='shortlink' href='http://www.sitepoint.com/?p=1950' />
+<!-- BEGIN wp-parsely Plugin Version 1.7 -->
+<meta name='wp-parsely_version' id='wp-parsely_version' content='1.7' />
+   <script type="application/ld+json">
+   {"@context":"http:\/\/schema.org","@type":"NewsArticle","headline":"Role Based Access Control in PHP","url":"http:\/\/www.sitepoint.com\/role-based-access-control-in-php\/","thumbnailUrl":null,"articleId":"1950","dateCreated":"2012-03-12T16:30:15Z","articleSection":"PHP","creator":["Martin Psinas"],"keywords":["intermediate"]}   </script>
+<!-- END wp-parsely Plugin Version 1.7 -->
+    <script type="text/javascript">
+      googletag.cmd.push(function() {
+        		googletag.defineSlot("/7448792/SP2013_Articles_300x250_1", [300,250], "div-gpt-ad-1392428092543-0").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP2013_Articles_728x90_1", [728,90], "div-gpt-ad-article-header").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP2013_Articles_300x600_1", [[300, 600], [300, 250], [160, 600]], "div-gpt-ad-1392428092543-4").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Articles_200x125_1", [200,125], "div-gpt-ad-1436815711585-0").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Articles_200x125_2", [200,125], "div-gpt-ad-1436815711585-1").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Articles_200x125_3", [200,125], "div-gpt-ad-1436815711585-2").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Articles_200x125_4", [200,125], "div-gpt-ad-1436815711585-3").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Articles_728x90_Bottom", [728,90], "div-gpt-ad-1438136496246-0").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Deals_728x90", [728,90], "div-gpt-ad-div-gpt-ad-1441228258214-0").addService(googletag.pubads());
+		googletag.defineSlot("/7448792/SP_Deals_300x250", [300,250], "div-gpt-ad-div-gpt-ad-1441228258214-1").addService(googletag.pubads());
+		googletag.pubads().setTargeting("channel", "php");
+		googletag.pubads().setTargeting("post_id", "1950");
+		googletag.pubads().setTargeting("OpenX",["true", "false"]);
+		googletag.pubads().setTargeting("Tribal",["true", "false"]);
+		googletag.pubads().enableSingleRequest();
+        googletag.pubads().setTargeting("tags", ["Intermediate"]);
+        googletag.pubads().collapseEmptyDivs();
+        googletag.enableServices();
+    });
+    </script>
+    <!--[if lt IE 9]>
+      <script src="/wp-content/themes/sitepoint/assets/javascripts/vendor/respond.custom.min.js"></script>
+    <![endif]-->
+    <style>
+  .t-color { color: #666699 }
+  a.t-color:hover,
+  button.t-color:hover { color: #565681 }
+
+  .t-bg { background-color: #666699 }
+  a.t-bg:hover,
+  button.t-bg:hover { background-color: #565681}
+
+  .t-border { border-color: #666699 }
+  a.t-border:hover,
+  button.t-border:hover { border-color: #565681 }
+
+  .t-bg-tint { background-color: #D0D0E0 }
+  .t-bg-dark { background-color: #565681 }
+  .t-border-tint { border-color: #D0D0E0 }
+
+  .t-fill path, .t-fill ellipse, .t-fill rect { fill: #666699; }
+
+  .t-list li:before { background-color: #666699; }
+  .t-p-teal-color { color: #1a9b9e }
+  a.t-p-teal-color:hover,
+  button.t-p-teal-color:hover { color: #018285 }
+
+  .t-p-teal-bg { background-color: #1a9b9e }
+  a.t-p-teal-bg:hover,
+  button.t-p-teal-bg:hover { background-color: #018285}
+
+  .t-p-teal-border { border-color: #1a9b9e }
+  a.t-p-teal-border:hover,
+  button.t-p-teal-border:hover { border-color: #018285 }
+
+  .t-p-teal-bg-tint { background-color: #5EB9BB }
+  .t-p-teal-bg-dark { background-color: #018285 }
+  .t-p-teal-border-tint { border-color: #5EB9BB }
+
+  .t-p-teal-fill path, .t-p-teal-fill ellipse, .t-p-teal-fill rect { fill: #1a9b9e; }
+
+  .t-p-teal-list li:before { background-color: #1a9b9e; }
+
+  .t-p-watermelon-color { color: #FF8480 }
+  a.t-p-watermelon-color:hover,
+  button.t-p-watermelon-color:hover { color: #E66B67 }
+
+  .t-p-watermelon-bg { background-color: #FF8480 }
+  a.t-p-watermelon-bg:hover,
+  button.t-p-watermelon-bg:hover { background-color: #E66B67}
+
+  .t-p-watermelon-border { border-color: #FF8480 }
+  a.t-p-watermelon-border:hover,
+  button.t-p-watermelon-border:hover { border-color: #E66B67 }
+
+  .t-p-watermelon-bg-tint { background-color: #FFA9A6 }
+  .t-p-watermelon-bg-dark { background-color: #E66B67 }
+  .t-p-watermelon-border-tint { border-color: #FFA9A6 }
+
+  .t-p-watermelon-fill path, .t-p-watermelon-fill ellipse, .t-p-watermelon-fill rect { fill: #FF8480; }
+
+  .t-p-watermelon-list li:before { background-color: #FF8480; }
+
+  .t-p-pop-bg { background-color: #1a9b9e }
+  a.t-p-pop-bg:hover,
+  button.t-p-pop-bg:hover { background-color: #018285}
+</style>
+    <script>
+  try {
+    var kzs = window.kzs || function() { var _ = window.kzs; return (_.q || (_.q = [])).push(arguments); };
+    kzs("setCustomVariable", "pageType", "article");
+  } catch(e) {}
+</script>
+    <!-- Start Alexa Certify Javascript -->
+<script type="text/javascript">
+_atrk_opts = { atrk_acct:"3/2Rk1ao6C526C", domain:"sitepoint.com",dynamic: true};
+(function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://d31qbv1cthcecs.cloudfront.net/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+</script>
+<noscript><img src="https://d5nxst8fruw4z.cloudfront.net/atrk.gif?account=3/2Rk1ao6C526C" style="display:none" height="1" width="1" alt="" /></noscript>
+<!-- End Alexa Certify Javascript -->
+  </head>
+
+  <body>
+
+    
+    <!-- Google Tag Manager -->
+    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-PFTWN4"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-PFTWN4');</script>
+    <!-- End Google Tag Manager -->
+
+    <header class="main-header" role="banner">
+      <nav uni-nav="small">
+        <section uni-nav-section="left">
+          <a uni-nav-item="logo" href="/">
+            <svg class="sp-logo" viewBox="0 0 136 27">
+  <g fill-rule="evenodd">
+    <g id="sitepoint" class="logo-text"><path d="M30.213 16.645c.234.37.538.664.915.884.38.22.807.376 1.282.467.473.096.963.143 1.468.143.388 0 .796-.027 1.22-.084.43-.06.82-.162 1.18-.313.36-.152.655-.375.887-.67.233-.293.35-.667.35-1.124 0-.628-.244-1.102-.727-1.426-.485-.322-1.092-.582-1.82-.783-.726-.197-1.518-.38-2.37-.54-.853-.16-1.644-.39-2.37-.682-.727-.296-1.335-.708-1.82-1.24-.483-.53-.726-1.27-.726-2.22 0-.74.17-1.377.508-1.907.34-.53.777-.962 1.31-1.295.532-.332 1.134-.58 1.803-.74.67-.162 1.335-.244 1.994-.244.852 0 1.638.073 2.356.216.716.14 1.354.39 1.906.74.55.35.992.826 1.323 1.425.33.597.524 1.345.58 2.235h-2.47c-.042-.473-.167-.87-.38-1.18-.214-.315-.484-.566-.815-.758-.33-.186-.694-.327-1.09-.41-.4-.088-.802-.13-1.208-.13-.37 0-.742.03-1.12.085-.378.06-.724.16-1.032.3-.313.142-.563.332-.758.57-.193.237-.29.545-.29.925 0 .417.15.764.45 1.04.3.275.684.503 1.147.683.47.18.992.332 1.573.454.584.125 1.166.253 1.746.386.62.132 1.226.294 1.82.484.59.19 1.114.44 1.57.755.456.31.824.708 1.104 1.18.283.475.422 1.065.422 1.767 0 .89-.19 1.63-.567 2.22-.378.588-.873 1.065-1.483 1.423-.61.36-1.3.613-2.066.754-.766.143-1.527.213-2.283.213-.834 0-1.63-.084-2.385-.255-.758-.17-1.426-.45-2.007-.84-.582-.388-1.048-.9-1.396-1.537-.35-.637-.543-1.41-.584-2.32h2.476c.018.53.144.982.377 1.35" id="Path"/><path d="M45.69 2.208c0 .782-.646 1.414-1.44 1.414-.796 0-1.44-.632-1.44-1.414 0-.776.644-1.407 1.44-1.407.794 0 1.44.632 1.44 1.408zm-2.676 3.005h2.47v14.724h-2.47V5.213z" id="Path"/><path d="M55.673 5.213V7.35h-2.996v9.14c0 .284.023.512.072.683.047.17.14.306.276.4.136.094.325.156.567.184.242.027.556.043.945.043h1.135v2.137h-1.89c-.64 0-1.188-.044-1.645-.13-.456-.085-.824-.242-1.106-.468-.28-.23-.49-.554-.626-.97-.134-.417-.204-.97-.204-1.652V7.35h-2.557V5.214h2.557V.8h2.475v4.413h2.996" id="Fill-21"/><path d="M69.137 18.995c-1.124.836-2.542 1.252-4.247 1.252-1.204 0-2.245-.188-3.128-.568-.882-.38-1.625-.913-2.225-1.596-.602-.683-1.052-1.498-1.354-2.447-.3-.95-.47-1.985-.508-3.105 0-1.118.174-2.144.524-3.075.347-.932.836-1.738 1.47-2.42.63-.683 1.374-1.216 2.238-1.596.863-.377 1.808-.57 2.837-.57 1.337 0 2.447.273 3.33.812.883.542 1.59 1.23 2.123 2.065.533.836.902 1.748 1.107 2.734.203.99.286 1.93.248 2.82h-11.26c-.02.646.057 1.26.234 1.837.173.58.454 1.093.842 1.537.388.45.882.805 1.483 1.07.6.264 1.31.396 2.124.396 1.047 0 1.906-.234 2.573-.713.67-.47 1.112-1.193 1.325-2.16h2.443c-.33 1.65-1.057 2.893-2.18 3.728zm-.597-9.453c-.22-.512-.522-.953-.902-1.324-.378-.37-.824-.665-1.338-.882-.514-.218-1.08-.33-1.704-.33-.637 0-1.215.112-1.73.33-.513.217-.953.516-1.32.895-.37.38-.663.824-.876 1.328-.212.5-.338 1.036-.376 1.605h8.638c-.04-.57-.17-1.108-.392-1.62z" id="Fill-22"/><path d="M76.67 5.213v1.993h.06c.407-.815 1.047-1.41 1.92-1.78.874-.37 1.832-.555 2.88-.555 1.162 0 2.177.212 3.04.63.863.415 1.58.98 2.152 1.692.574.712 1.004 1.533 1.296 2.465.29.93.435 1.916.435 2.96 0 1.045-.14 2.032-.42 2.96-.283.93-.71 1.743-1.28 2.436-.573.693-1.292 1.24-2.153 1.637-.863.4-1.868.597-3.01.597-.372 0-.784-.037-1.24-.113-.454-.075-.906-.197-1.352-.37-.445-.17-.868-.403-1.266-.698-.395-.294-.732-.658-1.002-1.094h-.06v7.573H74.2V5.213h2.47zm8.89 5.226c-.184-.657-.467-1.24-.845-1.753-.38-.512-.863-.92-1.456-1.224-.59-.303-1.284-.456-2.08-.456-.833 0-1.54.162-2.123.485-.583.324-1.057.747-1.424 1.267-.37.52-.637 1.115-.802 1.778-.163.665-.247 1.338-.247 2.023 0 .723.088 1.42.264 2.092.174.676.45 1.27.83 1.78.377.514.865.927 1.467 1.238.6.315 1.328.47 2.182.47.853 0 1.565-.16 2.14-.483.57-.322 1.03-.748 1.38-1.28.35-.532.6-1.14.756-1.824.154-.682.234-1.385.234-2.106 0-.685-.09-1.353-.277-2.008z" id="Fill-23"/><path d="M90.874 9.558c.31-.942.774-1.758 1.395-2.45.62-.694 1.386-1.24 2.3-1.64.91-.396 1.957-.597 3.14-.597 1.202 0 2.256.202 3.156.6.904.4 1.663.944 2.285 1.638.62.692 1.085 1.508 1.397 2.45.31.938.465 1.947.465 3.03 0 1.082-.155 2.09-.465 3.02-.312.928-.776 1.74-1.396 2.433-.62.694-1.38 1.236-2.284 1.626-.9.39-1.954.58-3.155.58-1.183 0-2.23-.19-3.14-.58-.914-.39-1.68-.932-2.3-1.625-.622-.693-1.087-1.504-1.396-2.432-.312-.93-.465-1.938-.465-3.02 0-1.083.152-2.092.464-3.03zm2.516 5.41c.24.692.576 1.27 1.003 1.737.428.464.926.82 1.5 1.065.57.248 1.178.37 1.818.37.64 0 1.246-.122 1.82-.37.572-.246 1.07-.6 1.497-1.065.426-.467.76-1.045 1.003-1.738.244-.694.364-1.486.364-2.38 0-.89-.12-1.683-.364-2.376-.244-.693-.577-1.276-1.003-1.75-.428-.475-.925-.836-1.498-1.082-.574-.246-1.18-.37-1.82-.37-.64 0-1.246.124-1.818.37-.573.246-1.07.607-1.5 1.082-.426.474-.76 1.057-1.002 1.75-.242.694-.366 1.487-.366 2.377 0 .894.124 1.686.366 2.38z" id="Fill-24"/><path d="M109.73 2.176c0 .782-.644 1.414-1.44 1.414-.795 0-1.44-.632-1.44-1.414 0-.776.645-1.407 1.44-1.407.796 0 1.44.63 1.44 1.406zm-2.677 3.006h2.473v14.723h-2.473V5.182z" id="Path"/><path d="M115.118 5.213v2.334h.057c1.027-1.784 2.66-2.676 4.89-2.676.988 0 1.814.134 2.47.4.66.267 1.195.635 1.602 1.11.408.476.694 1.04.86 1.695.162.653.246 1.382.246 2.18v9.682h-2.474v-9.97c0-.91-.272-1.63-.816-2.16-.543-.533-1.288-.8-2.24-.8-.757 0-1.408.114-1.964.344-.552.23-1.014.55-1.38.967-.368.417-.647.908-.83 1.466-.183.56-.276 1.173-.276 1.838v8.317h-2.474V5.213h2.328" id="Path"/><path d="M135.31 5.213V7.35h-2.996v9.14c0 .284.023.512.072.683.05.17.14.306.277.4.134.094.325.156.568.184.24.027.558.043.944.043h1.137v2.137h-1.89c-.64 0-1.19-.044-1.646-.13-.454-.085-.823-.242-1.105-.468-.282-.23-.492-.554-.625-.97-.137-.417-.204-.97-.204-1.652V7.35h-2.56V5.214h2.56V.8h2.474v4.413h2.997" id="Fill-28"/></g>
+    <g id="&lt;&gt;">
+      <path class="logo-1" d="M1.2 11.814l1.904 1.815 6.018 5.527 2.593-2.463c.236-.32.22-.758-.05-1.06l-2.37-2.045.01-.004-2.554-2.434c-.296-.334-.29-.832.026-1.153l6.87-6.53L10.524.49l-9.32 8.857c-.717.68-.717 1.785-.003 2.467" id="Path"/>
+      <path class="logo-2" d="M21.69 14.97l-1.903-1.817-6.016-5.527-2.593 2.463c-.237.32-.22.756.05 1.06l2.368 2.043-.007.002 2.552 2.436c.3.336.292.832-.025 1.155l-6.87 6.528 3.122 2.98 9.32-8.857c.716-.68.718-1.784.003-2.466" id="Path"/>
+    </g>
+  </g>
+</svg>
+          </a>
+        </section>
+        <section uni-nav-section="right">
+          <a uni-nav-item="button" href="/premium">Premium</a>
+          <div uni-nav-dropdown>
+            <a uni-nav-item>
+              <i class="fa fa-navicon"></i>
+            </a>
+            <div uni-nav-dropdown-inner="medium">
+              <a uni-nav-item href="/store">Store</a>
+              <a uni-nav-item href="/deals">Deals</a>
+              <a uni-nav-item href="/versioning">Versioning</a>
+              <a uni-nav-item href="/reference">Reference</a>
+              <a uni-nav-item href="http://community.sitepoint.com">Forums</a>
+              <div uni-nav-item="dropdown-search">
+                <form method="get" action="http://www.sitepoint.com/">
+                  <input autocomplete="off" class="small" name="s" placeholder="Search&hellip;" type="text">
+                  <button><i class="fa fa-search"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </nav>
+
+      <nav uni-nav="medium">
+        <section uni-nav-section="left">
+          <a uni-nav-item="logo" href="/">
+            <svg class="sp-logo" viewBox="0 0 136 27">
+  <g fill-rule="evenodd">
+    <g id="sitepoint" class="logo-text"><path d="M30.213 16.645c.234.37.538.664.915.884.38.22.807.376 1.282.467.473.096.963.143 1.468.143.388 0 .796-.027 1.22-.084.43-.06.82-.162 1.18-.313.36-.152.655-.375.887-.67.233-.293.35-.667.35-1.124 0-.628-.244-1.102-.727-1.426-.485-.322-1.092-.582-1.82-.783-.726-.197-1.518-.38-2.37-.54-.853-.16-1.644-.39-2.37-.682-.727-.296-1.335-.708-1.82-1.24-.483-.53-.726-1.27-.726-2.22 0-.74.17-1.377.508-1.907.34-.53.777-.962 1.31-1.295.532-.332 1.134-.58 1.803-.74.67-.162 1.335-.244 1.994-.244.852 0 1.638.073 2.356.216.716.14 1.354.39 1.906.74.55.35.992.826 1.323 1.425.33.597.524 1.345.58 2.235h-2.47c-.042-.473-.167-.87-.38-1.18-.214-.315-.484-.566-.815-.758-.33-.186-.694-.327-1.09-.41-.4-.088-.802-.13-1.208-.13-.37 0-.742.03-1.12.085-.378.06-.724.16-1.032.3-.313.142-.563.332-.758.57-.193.237-.29.545-.29.925 0 .417.15.764.45 1.04.3.275.684.503 1.147.683.47.18.992.332 1.573.454.584.125 1.166.253 1.746.386.62.132 1.226.294 1.82.484.59.19 1.114.44 1.57.755.456.31.824.708 1.104 1.18.283.475.422 1.065.422 1.767 0 .89-.19 1.63-.567 2.22-.378.588-.873 1.065-1.483 1.423-.61.36-1.3.613-2.066.754-.766.143-1.527.213-2.283.213-.834 0-1.63-.084-2.385-.255-.758-.17-1.426-.45-2.007-.84-.582-.388-1.048-.9-1.396-1.537-.35-.637-.543-1.41-.584-2.32h2.476c.018.53.144.982.377 1.35" id="Path"/><path d="M45.69 2.208c0 .782-.646 1.414-1.44 1.414-.796 0-1.44-.632-1.44-1.414 0-.776.644-1.407 1.44-1.407.794 0 1.44.632 1.44 1.408zm-2.676 3.005h2.47v14.724h-2.47V5.213z" id="Path"/><path d="M55.673 5.213V7.35h-2.996v9.14c0 .284.023.512.072.683.047.17.14.306.276.4.136.094.325.156.567.184.242.027.556.043.945.043h1.135v2.137h-1.89c-.64 0-1.188-.044-1.645-.13-.456-.085-.824-.242-1.106-.468-.28-.23-.49-.554-.626-.97-.134-.417-.204-.97-.204-1.652V7.35h-2.557V5.214h2.557V.8h2.475v4.413h2.996" id="Fill-21"/><path d="M69.137 18.995c-1.124.836-2.542 1.252-4.247 1.252-1.204 0-2.245-.188-3.128-.568-.882-.38-1.625-.913-2.225-1.596-.602-.683-1.052-1.498-1.354-2.447-.3-.95-.47-1.985-.508-3.105 0-1.118.174-2.144.524-3.075.347-.932.836-1.738 1.47-2.42.63-.683 1.374-1.216 2.238-1.596.863-.377 1.808-.57 2.837-.57 1.337 0 2.447.273 3.33.812.883.542 1.59 1.23 2.123 2.065.533.836.902 1.748 1.107 2.734.203.99.286 1.93.248 2.82h-11.26c-.02.646.057 1.26.234 1.837.173.58.454 1.093.842 1.537.388.45.882.805 1.483 1.07.6.264 1.31.396 2.124.396 1.047 0 1.906-.234 2.573-.713.67-.47 1.112-1.193 1.325-2.16h2.443c-.33 1.65-1.057 2.893-2.18 3.728zm-.597-9.453c-.22-.512-.522-.953-.902-1.324-.378-.37-.824-.665-1.338-.882-.514-.218-1.08-.33-1.704-.33-.637 0-1.215.112-1.73.33-.513.217-.953.516-1.32.895-.37.38-.663.824-.876 1.328-.212.5-.338 1.036-.376 1.605h8.638c-.04-.57-.17-1.108-.392-1.62z" id="Fill-22"/><path d="M76.67 5.213v1.993h.06c.407-.815 1.047-1.41 1.92-1.78.874-.37 1.832-.555 2.88-.555 1.162 0 2.177.212 3.04.63.863.415 1.58.98 2.152 1.692.574.712 1.004 1.533 1.296 2.465.29.93.435 1.916.435 2.96 0 1.045-.14 2.032-.42 2.96-.283.93-.71 1.743-1.28 2.436-.573.693-1.292 1.24-2.153 1.637-.863.4-1.868.597-3.01.597-.372 0-.784-.037-1.24-.113-.454-.075-.906-.197-1.352-.37-.445-.17-.868-.403-1.266-.698-.395-.294-.732-.658-1.002-1.094h-.06v7.573H74.2V5.213h2.47zm8.89 5.226c-.184-.657-.467-1.24-.845-1.753-.38-.512-.863-.92-1.456-1.224-.59-.303-1.284-.456-2.08-.456-.833 0-1.54.162-2.123.485-.583.324-1.057.747-1.424 1.267-.37.52-.637 1.115-.802 1.778-.163.665-.247 1.338-.247 2.023 0 .723.088 1.42.264 2.092.174.676.45 1.27.83 1.78.377.514.865.927 1.467 1.238.6.315 1.328.47 2.182.47.853 0 1.565-.16 2.14-.483.57-.322 1.03-.748 1.38-1.28.35-.532.6-1.14.756-1.824.154-.682.234-1.385.234-2.106 0-.685-.09-1.353-.277-2.008z" id="Fill-23"/><path d="M90.874 9.558c.31-.942.774-1.758 1.395-2.45.62-.694 1.386-1.24 2.3-1.64.91-.396 1.957-.597 3.14-.597 1.202 0 2.256.202 3.156.6.904.4 1.663.944 2.285 1.638.62.692 1.085 1.508 1.397 2.45.31.938.465 1.947.465 3.03 0 1.082-.155 2.09-.465 3.02-.312.928-.776 1.74-1.396 2.433-.62.694-1.38 1.236-2.284 1.626-.9.39-1.954.58-3.155.58-1.183 0-2.23-.19-3.14-.58-.914-.39-1.68-.932-2.3-1.625-.622-.693-1.087-1.504-1.396-2.432-.312-.93-.465-1.938-.465-3.02 0-1.083.152-2.092.464-3.03zm2.516 5.41c.24.692.576 1.27 1.003 1.737.428.464.926.82 1.5 1.065.57.248 1.178.37 1.818.37.64 0 1.246-.122 1.82-.37.572-.246 1.07-.6 1.497-1.065.426-.467.76-1.045 1.003-1.738.244-.694.364-1.486.364-2.38 0-.89-.12-1.683-.364-2.376-.244-.693-.577-1.276-1.003-1.75-.428-.475-.925-.836-1.498-1.082-.574-.246-1.18-.37-1.82-.37-.64 0-1.246.124-1.818.37-.573.246-1.07.607-1.5 1.082-.426.474-.76 1.057-1.002 1.75-.242.694-.366 1.487-.366 2.377 0 .894.124 1.686.366 2.38z" id="Fill-24"/><path d="M109.73 2.176c0 .782-.644 1.414-1.44 1.414-.795 0-1.44-.632-1.44-1.414 0-.776.645-1.407 1.44-1.407.796 0 1.44.63 1.44 1.406zm-2.677 3.006h2.473v14.723h-2.473V5.182z" id="Path"/><path d="M115.118 5.213v2.334h.057c1.027-1.784 2.66-2.676 4.89-2.676.988 0 1.814.134 2.47.4.66.267 1.195.635 1.602 1.11.408.476.694 1.04.86 1.695.162.653.246 1.382.246 2.18v9.682h-2.474v-9.97c0-.91-.272-1.63-.816-2.16-.543-.533-1.288-.8-2.24-.8-.757 0-1.408.114-1.964.344-.552.23-1.014.55-1.38.967-.368.417-.647.908-.83 1.466-.183.56-.276 1.173-.276 1.838v8.317h-2.474V5.213h2.328" id="Path"/><path d="M135.31 5.213V7.35h-2.996v9.14c0 .284.023.512.072.683.05.17.14.306.277.4.134.094.325.156.568.184.24.027.558.043.944.043h1.137v2.137h-1.89c-.64 0-1.19-.044-1.646-.13-.454-.085-.823-.242-1.105-.468-.282-.23-.492-.554-.625-.97-.137-.417-.204-.97-.204-1.652V7.35h-2.56V5.214h2.56V.8h2.474v4.413h2.997" id="Fill-28"/></g>
+    <g id="&lt;&gt;">
+      <path class="logo-1" d="M1.2 11.814l1.904 1.815 6.018 5.527 2.593-2.463c.236-.32.22-.758-.05-1.06l-2.37-2.045.01-.004-2.554-2.434c-.296-.334-.29-.832.026-1.153l6.87-6.53L10.524.49l-9.32 8.857c-.717.68-.717 1.785-.003 2.467" id="Path"/>
+      <path class="logo-2" d="M21.69 14.97l-1.903-1.817-6.016-5.527-2.593 2.463c-.237.32-.22.756.05 1.06l2.368 2.043-.007.002 2.552 2.436c.3.336.292.832-.025 1.155l-6.87 6.528 3.122 2.98 9.32-8.857c.716-.68.718-1.784.003-2.466" id="Path"/>
+    </g>
+  </g>
+</svg>
+          </a>
+        </section>
+        <section uni-nav-section="right">
+          <a uni-nav-item href="/store">Store</a>
+          <a uni-nav-item="button" href="/premium">Premium</a>
+          <div uni-nav-dropdown>
+            <a uni-nav-item>
+              <i class="fa fa-navicon"></i>
+            </a>
+            <div uni-nav-dropdown-inner="medium">
+              <a uni-nav-item href="/deals">Deals</a>
+              <a uni-nav-item href="/versioning">Versioning</a>
+              <a uni-nav-item href="/reference">Reference</a>
+              <a uni-nav-item href="http://community.sitepoint.com">Forums</a>
+              <div uni-nav-item="dropdown-search">
+                <form method="get" action="http://www.sitepoint.com/">
+                  <input autocomplete="off" class="small" name="s" placeholder="Search&hellip;" type="text">
+                  <button><i class="fa fa-search"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </nav>
+
+      <nav uni-nav="large">
+        <section uni-nav-section="left">
+          <a uni-nav-item="logo" href="/">
+            <svg class="sp-logo" viewBox="0 0 136 27">
+  <g fill-rule="evenodd">
+    <g id="sitepoint" class="logo-text"><path d="M30.213 16.645c.234.37.538.664.915.884.38.22.807.376 1.282.467.473.096.963.143 1.468.143.388 0 .796-.027 1.22-.084.43-.06.82-.162 1.18-.313.36-.152.655-.375.887-.67.233-.293.35-.667.35-1.124 0-.628-.244-1.102-.727-1.426-.485-.322-1.092-.582-1.82-.783-.726-.197-1.518-.38-2.37-.54-.853-.16-1.644-.39-2.37-.682-.727-.296-1.335-.708-1.82-1.24-.483-.53-.726-1.27-.726-2.22 0-.74.17-1.377.508-1.907.34-.53.777-.962 1.31-1.295.532-.332 1.134-.58 1.803-.74.67-.162 1.335-.244 1.994-.244.852 0 1.638.073 2.356.216.716.14 1.354.39 1.906.74.55.35.992.826 1.323 1.425.33.597.524 1.345.58 2.235h-2.47c-.042-.473-.167-.87-.38-1.18-.214-.315-.484-.566-.815-.758-.33-.186-.694-.327-1.09-.41-.4-.088-.802-.13-1.208-.13-.37 0-.742.03-1.12.085-.378.06-.724.16-1.032.3-.313.142-.563.332-.758.57-.193.237-.29.545-.29.925 0 .417.15.764.45 1.04.3.275.684.503 1.147.683.47.18.992.332 1.573.454.584.125 1.166.253 1.746.386.62.132 1.226.294 1.82.484.59.19 1.114.44 1.57.755.456.31.824.708 1.104 1.18.283.475.422 1.065.422 1.767 0 .89-.19 1.63-.567 2.22-.378.588-.873 1.065-1.483 1.423-.61.36-1.3.613-2.066.754-.766.143-1.527.213-2.283.213-.834 0-1.63-.084-2.385-.255-.758-.17-1.426-.45-2.007-.84-.582-.388-1.048-.9-1.396-1.537-.35-.637-.543-1.41-.584-2.32h2.476c.018.53.144.982.377 1.35" id="Path"/><path d="M45.69 2.208c0 .782-.646 1.414-1.44 1.414-.796 0-1.44-.632-1.44-1.414 0-.776.644-1.407 1.44-1.407.794 0 1.44.632 1.44 1.408zm-2.676 3.005h2.47v14.724h-2.47V5.213z" id="Path"/><path d="M55.673 5.213V7.35h-2.996v9.14c0 .284.023.512.072.683.047.17.14.306.276.4.136.094.325.156.567.184.242.027.556.043.945.043h1.135v2.137h-1.89c-.64 0-1.188-.044-1.645-.13-.456-.085-.824-.242-1.106-.468-.28-.23-.49-.554-.626-.97-.134-.417-.204-.97-.204-1.652V7.35h-2.557V5.214h2.557V.8h2.475v4.413h2.996" id="Fill-21"/><path d="M69.137 18.995c-1.124.836-2.542 1.252-4.247 1.252-1.204 0-2.245-.188-3.128-.568-.882-.38-1.625-.913-2.225-1.596-.602-.683-1.052-1.498-1.354-2.447-.3-.95-.47-1.985-.508-3.105 0-1.118.174-2.144.524-3.075.347-.932.836-1.738 1.47-2.42.63-.683 1.374-1.216 2.238-1.596.863-.377 1.808-.57 2.837-.57 1.337 0 2.447.273 3.33.812.883.542 1.59 1.23 2.123 2.065.533.836.902 1.748 1.107 2.734.203.99.286 1.93.248 2.82h-11.26c-.02.646.057 1.26.234 1.837.173.58.454 1.093.842 1.537.388.45.882.805 1.483 1.07.6.264 1.31.396 2.124.396 1.047 0 1.906-.234 2.573-.713.67-.47 1.112-1.193 1.325-2.16h2.443c-.33 1.65-1.057 2.893-2.18 3.728zm-.597-9.453c-.22-.512-.522-.953-.902-1.324-.378-.37-.824-.665-1.338-.882-.514-.218-1.08-.33-1.704-.33-.637 0-1.215.112-1.73.33-.513.217-.953.516-1.32.895-.37.38-.663.824-.876 1.328-.212.5-.338 1.036-.376 1.605h8.638c-.04-.57-.17-1.108-.392-1.62z" id="Fill-22"/><path d="M76.67 5.213v1.993h.06c.407-.815 1.047-1.41 1.92-1.78.874-.37 1.832-.555 2.88-.555 1.162 0 2.177.212 3.04.63.863.415 1.58.98 2.152 1.692.574.712 1.004 1.533 1.296 2.465.29.93.435 1.916.435 2.96 0 1.045-.14 2.032-.42 2.96-.283.93-.71 1.743-1.28 2.436-.573.693-1.292 1.24-2.153 1.637-.863.4-1.868.597-3.01.597-.372 0-.784-.037-1.24-.113-.454-.075-.906-.197-1.352-.37-.445-.17-.868-.403-1.266-.698-.395-.294-.732-.658-1.002-1.094h-.06v7.573H74.2V5.213h2.47zm8.89 5.226c-.184-.657-.467-1.24-.845-1.753-.38-.512-.863-.92-1.456-1.224-.59-.303-1.284-.456-2.08-.456-.833 0-1.54.162-2.123.485-.583.324-1.057.747-1.424 1.267-.37.52-.637 1.115-.802 1.778-.163.665-.247 1.338-.247 2.023 0 .723.088 1.42.264 2.092.174.676.45 1.27.83 1.78.377.514.865.927 1.467 1.238.6.315 1.328.47 2.182.47.853 0 1.565-.16 2.14-.483.57-.322 1.03-.748 1.38-1.28.35-.532.6-1.14.756-1.824.154-.682.234-1.385.234-2.106 0-.685-.09-1.353-.277-2.008z" id="Fill-23"/><path d="M90.874 9.558c.31-.942.774-1.758 1.395-2.45.62-.694 1.386-1.24 2.3-1.64.91-.396 1.957-.597 3.14-.597 1.202 0 2.256.202 3.156.6.904.4 1.663.944 2.285 1.638.62.692 1.085 1.508 1.397 2.45.31.938.465 1.947.465 3.03 0 1.082-.155 2.09-.465 3.02-.312.928-.776 1.74-1.396 2.433-.62.694-1.38 1.236-2.284 1.626-.9.39-1.954.58-3.155.58-1.183 0-2.23-.19-3.14-.58-.914-.39-1.68-.932-2.3-1.625-.622-.693-1.087-1.504-1.396-2.432-.312-.93-.465-1.938-.465-3.02 0-1.083.152-2.092.464-3.03zm2.516 5.41c.24.692.576 1.27 1.003 1.737.428.464.926.82 1.5 1.065.57.248 1.178.37 1.818.37.64 0 1.246-.122 1.82-.37.572-.246 1.07-.6 1.497-1.065.426-.467.76-1.045 1.003-1.738.244-.694.364-1.486.364-2.38 0-.89-.12-1.683-.364-2.376-.244-.693-.577-1.276-1.003-1.75-.428-.475-.925-.836-1.498-1.082-.574-.246-1.18-.37-1.82-.37-.64 0-1.246.124-1.818.37-.573.246-1.07.607-1.5 1.082-.426.474-.76 1.057-1.002 1.75-.242.694-.366 1.487-.366 2.377 0 .894.124 1.686.366 2.38z" id="Fill-24"/><path d="M109.73 2.176c0 .782-.644 1.414-1.44 1.414-.795 0-1.44-.632-1.44-1.414 0-.776.645-1.407 1.44-1.407.796 0 1.44.63 1.44 1.406zm-2.677 3.006h2.473v14.723h-2.473V5.182z" id="Path"/><path d="M115.118 5.213v2.334h.057c1.027-1.784 2.66-2.676 4.89-2.676.988 0 1.814.134 2.47.4.66.267 1.195.635 1.602 1.11.408.476.694 1.04.86 1.695.162.653.246 1.382.246 2.18v9.682h-2.474v-9.97c0-.91-.272-1.63-.816-2.16-.543-.533-1.288-.8-2.24-.8-.757 0-1.408.114-1.964.344-.552.23-1.014.55-1.38.967-.368.417-.647.908-.83 1.466-.183.56-.276 1.173-.276 1.838v8.317h-2.474V5.213h2.328" id="Path"/><path d="M135.31 5.213V7.35h-2.996v9.14c0 .284.023.512.072.683.05.17.14.306.277.4.134.094.325.156.568.184.24.027.558.043.944.043h1.137v2.137h-1.89c-.64 0-1.19-.044-1.646-.13-.454-.085-.823-.242-1.105-.468-.282-.23-.492-.554-.625-.97-.137-.417-.204-.97-.204-1.652V7.35h-2.56V5.214h2.56V.8h2.474v4.413h2.997" id="Fill-28"/></g>
+    <g id="&lt;&gt;">
+      <path class="logo-1" d="M1.2 11.814l1.904 1.815 6.018 5.527 2.593-2.463c.236-.32.22-.758-.05-1.06l-2.37-2.045.01-.004-2.554-2.434c-.296-.334-.29-.832.026-1.153l6.87-6.53L10.524.49l-9.32 8.857c-.717.68-.717 1.785-.003 2.467" id="Path"/>
+      <path class="logo-2" d="M21.69 14.97l-1.903-1.817-6.016-5.527-2.593 2.463c-.237.32-.22.756.05 1.06l2.368 2.043-.007.002 2.552 2.436c.3.336.292.832-.025 1.155l-6.87 6.528 3.122 2.98 9.32-8.857c.716-.68.718-1.784.003-2.466" id="Path"/>
+    </g>
+  </g>
+</svg>
+          </a>
+        </section>
+        <section uni-nav-section="right">
+          <a uni-nav-item href="/store">Store</a>
+          <a uni-nav-item href="/deals">Deals</a>
+          <a uni-nav-item href="/versioning">Versioning</a>
+          <a uni-nav-item href="/reference">Reference</a>
+          <a uni-nav-item href="http://community.sitepoint.com">Forums</a>
+          <a uni-nav-item="button" href="/premium">Premium</a>
+          <div uni-nav-item="search">
+            <form method="get" action="http://www.sitepoint.com/">
+              <input autocomplete="off"  id="search-box" name="s" placeholder="Search&hellip;" type="text">
+              <button><i class="fa fa-search"></i></button>
+            </form>
+          </div>
+        </section>
+      </nav>
+
+    </header>
+
+    
+<div class="ChannelsNav">
+  <ul>
+    <li class="ChannelsNav_link u-html-css"><a href="http://www.sitepoint.com/html-css/" data-channel="html-css" onClick="sitepoint.ChannelsNav_select(event)">HTML &amp; CSS</a></li>    <li class="ChannelsNav_link u-javascript"><a href="http://www.sitepoint.com/javascript/" data-channel="javascript" onClick="sitepoint.ChannelsNav_select(event)">JS</a></li>    <li class="ChannelsNav_link u-php u-active"><a href="http://www.sitepoint.com/php/" data-channel="php" onClick="sitepoint.ChannelsNav_select(event)">PHP</a></li>    <li class="ChannelsNav_link u-ruby"><a href="http://www.sitepoint.com/ruby/" data-channel="ruby" onClick="sitepoint.ChannelsNav_select(event)">Ruby</a></li>    <li class="ChannelsNav_link u-mobile"><a href="http://www.sitepoint.com/mobile/" data-channel="mobile" onClick="sitepoint.ChannelsNav_select(event)">Mobile</a></li>    <li class="ChannelsNav_link u-design-ux"><a href="http://www.sitepoint.com/design-ux/" data-channel="design-ux" onClick="sitepoint.ChannelsNav_select(event)">Design &amp; UX</a></li>    <li class="ChannelsNav_link u-entrepreneur"><a href="http://www.sitepoint.com/entrepreneur/" data-channel="entrepreneur" onClick="sitepoint.ChannelsNav_select(event)">Entrepreneur</a></li>    <li class="ChannelsNav_link u-web"><a href="http://www.sitepoint.com/web/" data-channel="web" onClick="sitepoint.ChannelsNav_select(event)">Web</a></li>    <li class="ChannelsNav_link u-wordpress"><a href="http://www.sitepoint.com/wordpress/" data-channel="wordpress" onClick="sitepoint.ChannelsNav_select(event)">WP</a></li>    <li class="ChannelsNav_link u-developer-center"><a href="http://www.sitepoint.com/developer-center/" data-channel="developer-center" onClick="sitepoint.ChannelsNav_select(event)">Web Dev <br />@ Microsoft</a></li>  </ul>
+  <div class="ChannelSubNavs u-closed">
+    <div class="ChannelSubNav u-html-css"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/html-css/"><strong>All</strong></a><a href="http://www.sitepoint.com/html-css/css/animation-css/">Animation</a><a href="http://www.sitepoint.com/html-css/html/audio-video/">Audio &amp; Video</a><a href="http://www.sitepoint.com/html-css/css/bootstrap/">Bootstrap</a><a href="http://www.sitepoint.com/html-css/html/canvas-svg/">Canvas &amp; SVG</a><a href="http://www.sitepoint.com/html-css/css/">CSS</a><a href="http://www.sitepoint.com/html-css/css/foundation/">Foundation</a><a href="http://www.sitepoint.com/html-css/css/frameworks-css/">Frameworks</a><a href="http://www.sitepoint.com/html-css/html/">HTML</a><a href="http://www.sitepoint.com/html-css/css/sass-css/">Sass</a><a href="http://www.sitepoint.com/html-css/css/web-fonts/">Web Fonts</a></div></div>    <div class="ChannelSubNav u-javascript"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/javascript/"><strong>All</strong></a><a href="http://www.sitepoint.com/javascript/ajax-javascript/">Ajax</a><a href="http://www.sitepoint.com/javascript/angularjs/">AngularJS</a><a href="http://www.sitepoint.com/javascript/coffeescript/">CoffeeScript</a><a href="http://www.sitepoint.com/javascript/ember/">Ember.js</a><a href="http://www.sitepoint.com/javascript/engines/">Engines</a><a href="http://www.sitepoint.com/javascript/jquery/">jQuery</a><a href="http://www.sitepoint.com/javascript/nodejs-javascript/">Node.js</a><a href="http://www.sitepoint.com/javascript/raw-javascript/">Raw Javascript</a><a href="http://www.sitepoint.com/javascript/toolsandlibraries/">Tools and Libraries</a><a href="http://www.sitepoint.com/javascript/webgl/">WebGL</a></div></div>    <div class="ChannelSubNav u-php"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/php/"><strong>All</strong></a><a href="http://www.sitepoint.com/php/cloud-php/">Cloud</a><a href="http://www.sitepoint.com/php/cms-and-frameworks/">CMS &amp; Frameworks</a><a href="http://www.sitepoint.com/php/database/">Database</a><a href="http://www.sitepoint.com/php/debugging-and-deployment/">Debugging &amp; Deployment</a><a href="http://www.sitepoint.com/php/development-environment-php/">Development Environment</a><a href="http://www.sitepoint.com/php/meta-php/">Meta</a><a href="http://www.sitepoint.com/php/miscellaneous-php/">Miscellaneous</a><a href="http://www.sitepoint.com/php/news-and-opinion/">News &amp; Opinion</a><a href="http://www.sitepoint.com/php/patterns-and-practices/">Patterns and Practices</a><a href="http://www.sitepoint.com/php/review-php/">Review</a><a href="http://www.sitepoint.com/php/security/">Security</a></div></div>    <div class="ChannelSubNav u-ruby"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/ruby/"><strong>All</strong></a><a href="http://www.sitepoint.com/ruby/best-practices/">Best Practices</a><a href="http://www.sitepoint.com/ruby/gems/">Gems</a><a href="http://www.sitepoint.com/ruby/getting-started/">Getting Started</a><a href="http://www.sitepoint.com/ruby/heroku/">Heroku</a><a href="http://www.sitepoint.com/ruby/jruby/">JRuby</a><a href="http://www.sitepoint.com/ruby/ruby-news-opinion/">News &amp; Opinion</a><a href="http://www.sitepoint.com/ruby/ruby-deployment/">Ruby Deployment</a><a href="http://www.sitepoint.com/ruby/ruby-on-rails/">Ruby on Rails</a><a href="http://www.sitepoint.com/ruby/rubymotion/">RubyMotion</a><a href="http://www.sitepoint.com/ruby/security-ruby/">Security</a><a href="http://www.sitepoint.com/ruby/sinatra/">Sinatra</a></div></div>    <div class="ChannelSubNav u-mobile"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/mobile/"><strong>All</strong></a><a href="http://www.sitepoint.com/mobile/android/">Android</a><a href="http://www.sitepoint.com/mobile/app-development/">App Development</a><a href="http://www.sitepoint.com/mobile/app-reviews/">App Reviews</a><a href="http://www.sitepoint.com/mobile/firefox-os-mobile/">Firefox OS</a><a href="http://www.sitepoint.com/mobile/internet-of-things-mobile/">Internet Of Things</a><a href="http://www.sitepoint.com/mobile/ios/">iOS</a><a href="http://www.sitepoint.com/mobile/web-mobile/">Mobile Web Development</a><a href="http://www.sitepoint.com/mobile/responsive-web-design/">Responsive Web Design</a><a href="http://www.sitepoint.com/mobile/ux-mobile/">UX</a><a href="http://www.sitepoint.com/mobile/wearables-mobile/">Wearables</a><a href="http://www.sitepoint.com/mobile/windows-phone/">Windows Phone</a></div></div>    <div class="ChannelSubNav u-design-ux"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/design-ux/"><strong>All</strong></a><a href="http://www.sitepoint.com/design-ux/accessibility-2/">Accessibility</a><a href="http://www.sitepoint.com/design-ux/color-2/">Color</a><a href="http://www.sitepoint.com/design-ux/design/">Design</a><a href="http://www.sitepoint.com/design-ux/illustration/">Illustration</a><a href="http://www.sitepoint.com/design-ux/logo-design/">Logo Design</a><a href="http://www.sitepoint.com/design-ux/mobile-design/">Mobile Design</a><a href="http://www.sitepoint.com/design-ux/photography-and-imagery/">Photography and Imagery</a><a href="http://www.sitepoint.com/design-ux/photoshop-2/">Photoshop</a><a href="http://www.sitepoint.com/design-ux/review-2/">Review</a><a href="http://www.sitepoint.com/design-ux/software-design/">Software</a><a href="http://www.sitepoint.com/design-ux/technology-2/">Technology</a><a href="http://www.sitepoint.com/design-ux/ux/">UX</a></div></div>    <div class="ChannelSubNav u-entrepreneur"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/entrepreneur/"><strong>All</strong></a><a href="http://www.sitepoint.com/entrepreneur/business/agile-development-business/">Agile Development</a><a href="http://www.sitepoint.com/entrepreneur/business/">Business</a><a href="http://www.sitepoint.com/entrepreneur/marketing/seo-and-sem/">SEO and SEM</a><a href="http://www.sitepoint.com/entrepreneur/marketing/content-marketing/">Content Marketing</a><a href="http://www.sitepoint.com/entrepreneur/marketing/email-marketing-marketing/">Email Marketing</a><a href="http://www.sitepoint.com/entrepreneur/business/entrepreneurship-business/">Entrepreneurship</a><a href="http://www.sitepoint.com/entrepreneur/business/finance-business/">Finance</a><a href="http://www.sitepoint.com/entrepreneur/business/freelancing-2/">Freelancing</a><a href="http://www.sitepoint.com/entrepreneur/business/legal-2/">Legal</a><a href="http://www.sitepoint.com/entrepreneur/business/management-business/">Management</a><a href="http://www.sitepoint.com/entrepreneur/marketing/">Marketing</a><a href="http://www.sitepoint.com/entrepreneur/business/revenue-2/">Revenue</a></div></div>    <div class="ChannelSubNav u-web"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/web/"><strong>All</strong></a><a href="http://www.sitepoint.com/web/apis/">APIs</a><a href="http://www.sitepoint.com/web/browsers-2/">Browsers</a><a href="http://www.sitepoint.com/web/cloud/">Cloud</a><a href="http://www.sitepoint.com/web/cms-web/">CMS</a><a href="http://www.sitepoint.com/web/community-web/">Community</a><a href="http://www.sitepoint.com/web/email-web/">Email</a><a href="http://www.sitepoint.com/web/news/">News</a><a href="http://www.sitepoint.com/web/open-source/">Open Source</a><a href="http://www.sitepoint.com/web/operating-systems/">Operating Systems</a><a href="http://www.sitepoint.com/web/web-security/">Web Security</a><a href="http://www.sitepoint.com/web/software-2/">Software</a><a href="http://www.sitepoint.com/web/web-hosting-and-domains/">Web Hosting &amp; Domains</a></div></div>    <div class="ChannelSubNav u-wordpress"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/wordpress/"><strong>All</strong></a><a href="http://www.sitepoint.com/wordpress/performance-wordpress-3/">Performance</a><a href="http://www.sitepoint.com/wordpress/plugins-wordpress-3/">Plugins</a><a href="http://www.sitepoint.com/wordpress/security-wordpress-3/">Security</a><a href="http://www.sitepoint.com/wordpress/themes/">Themes</a></div></div>    <div class="ChannelSubNav u-developer-center"><div class="ChannelSubNav_inner"><a class="ChannelSubNav_close" href="#" onClick="sitepoint.ChannelsNav_select(event)"><span>&times;</span></a><a href="http://www.sitepoint.com/developer-center/"><strong>All</strong></a><a href="http://www.sitepoint.com/developer-center/browsers-developer-center/">Browsers</a><a href="http://www.sitepoint.com/developer-center/business-developer-center/">Business</a><a href="http://www.sitepoint.com/developer-center/html-css-developer-center/">HTML &amp; CSS</a><a href="http://www.sitepoint.com/developer-center/javascript-developer-center/">JavaScript</a><a href="http://www.sitepoint.com/developer-center/mobile-developer-center/">Mobile</a><a href="http://www.sitepoint.com/developer-center/php-developer-center/">PHP</a><a href="http://www.sitepoint.com/developer-center/programming-developer-center/">Programming</a><a href="http://www.sitepoint.com/developer-center/web-developer-center/">Web</a><a href="http://www.sitepoint.com/developer-center/wordpress-developer-center/">WordPress</a><a href="http://www.sitepoint.com/developer-center/web-summit/">Web Summit</a></div></div>  </div>
+</div>
+<div class="random-hello-bar-wrapper"></div>
+<div class="Article u-leaderboardoffset">
+  
+  <div class="ArticleHead t-bg">
+
+        <a href="http://www.sitepoint.com/php/" class="ArticleHead_icon">
+      <span class="ArticleIcon t-border t-fill">
+        <svg viewBox="0 0 90 90">
+  <g fill-rule="evenodd">
+    <path d="M20.3838696,61.9238537 L21.8840874,54.1602265 L21.9590983,54.1602265 C22.5966909,54.5352809 23.871876,54.9103354 25.3720938,54.9103354 C31.7480196,54.9103354 35.986135,49.0594858 35.986135,42.6835601 C35.986135,38.9330155 34.0733572,35.7450526 30.09778,35.7450526 C27.8849587,35.7450526 25.7096428,36.8327106 24.209425,38.8204992 L24.1344141,38.8204992 L24.4719631,36.1576125 L19.6337606,36.1576125 C19.408728,38.0328848 18.9586626,41.0708259 18.5461027,43.2461418 L15.0205908,61.9238537 L20.3838696,61.9238537 L20.3838696,61.9238537 Z M23.3843052,45.9840393 C24.0594032,42.3835165 25.9346755,40.0956843 27.9599696,40.0956843 C29.7227255,40.0956843 30.3228127,41.6334076 30.3228127,43.09612 C30.3228127,46.6966428 28.0724859,50.8222418 25.1845666,50.8222418 C24.1344141,50.8222418 23.3092943,50.4846928 22.7092072,49.9221111 L23.3843052,45.9840393 L23.3843052,45.9840393 Z M41.3650694,54.4977755 L42.9402981,46.0965556 C43.6529016,42.3835165 45.5656793,40.0956843 47.4409516,40.0956843 C48.7911477,40.0956843 49.3162239,40.9583096 49.3162239,42.1584838 C49.3162239,42.9460982 49.2037076,43.7337126 49.0536858,44.446316 L47.1784135,54.4977755 L52.5791977,54.4977755 L54.5669863,43.9962507 C54.7545135,42.9460982 54.9045353,41.5583967 54.9045353,40.6957715 C54.9045353,37.545314 53.1417794,35.7450526 50.2913655,35.7450526 C47.8535115,35.7450526 45.9407338,36.8327106 44.440516,38.5204556 L44.3655051,38.4829502 L46.3907991,27.868909 L40.990015,27.868909 L35.9642852,54.4977755 L41.3650694,54.4977755 L41.3650694,54.4977755 Z M59.3833391,61.9238537 L60.8835569,54.1602265 L60.9585678,54.1602265 C61.5961604,54.5352809 62.8713455,54.9103354 64.3715633,54.9103354 C70.7474891,54.9103354 74.9856045,49.0594858 74.9856045,42.6835601 C74.9856045,38.9330155 73.0728267,35.7450526 69.0972495,35.7450526 C66.8844282,35.7450526 64.7091124,36.8327106 63.2088945,38.8204992 L63.1338836,38.8204992 L63.4714327,36.1576125 L58.6332302,36.1576125 C58.4081975,38.0328848 57.9581321,41.0708259 57.5455722,43.2461418 L54.0200603,61.9238537 L59.3833391,61.9238537 L59.3833391,61.9238537 Z M62.3837747,45.9840393 C63.0588727,42.3835165 64.934145,40.0956843 66.9594391,40.0956843 C68.722195,40.0956843 69.3222822,41.6334076 69.3222822,43.09612 C69.3222822,46.6966428 67.0719554,50.8222418 64.1840361,50.8222418 C63.1338836,50.8222418 62.3087638,50.4846928 61.7086767,49.9221111 L62.3837747,45.9840393 L62.3837747,45.9840393 Z"></path>
+  </g>
+</svg>
+      </span>
+    </a>
+    
+    <div class="ArticleHead_content">
+
+            <h1 class="ArticleHead_title">Role Based Access Control in PHP</h1>
+      
+      
+      <div class="ArticleHead_metas">
+
+          <a href="http://www.sitepoint.com/author/mpsinas/" class="ArticleHead_meta">
+      <span class="ArticleHead_metaIcon">
+        <img src="http://0.gravatar.com/avatar/3c26551f8a950ccf5f648b7676464404?s=96&#038;d=mm&#038;r=g" width="96" height="96" alt="" class="avatar avatar-96 wp-user-avatar wp-user-avatar-96 photo avatar-default" />      </span>
+      Martin Psinas  </a>
+
+        <div class="ArticleHead_meta">
+                    <div class="ArticleHead_metaIcon">
+            <svg viewBox="0 0 33 35" xmlns="http://www.w3.org/2000/svg">
+  <path d="M31.522 5.9c-.49-.487-1.07-.73-1.742-.73h-2.477V3.32c0-.848-.304-1.574-.91-2.178-.607-.604-1.336-.906-2.187-.906h-1.24c-.85 0-1.58.302-2.186.906-.607.604-.91 1.33-.91 2.177v1.85h-7.432V3.32c0-.848-.303-1.574-.91-2.178C10.922.538 10.193.236 9.34.236H8.104c-.852 0-1.58.302-2.188.906-.606.604-.91 1.33-.91 2.177v1.85H2.53c-.67 0-1.25.24-1.742.73S.05 6.96.05 7.63V32.3c0 .666.246 1.244.736 1.733.49.488 1.07.732 1.742.732h27.25c.672 0 1.253-.244 1.743-.732.49-.49.74-1.067.74-1.734V7.63c0-.668-.24-1.246-.73-1.734zm-9.174-2.58c0-.18.057-.328.173-.444.12-.115.27-.173.45-.173h1.24c.18 0 .33.058.45.173.117.116.175.264.175.443v5.54c0 .18-.06.325-.173.44-.116.116-.264.174-.445.174h-1.24c-.18 0-.33-.058-.444-.174-.114-.112-.17-.26-.17-.44V3.32zm-14.865 0c0-.18.058-.328.174-.444.117-.115.265-.173.446-.173H9.34c.182 0 .33.058.446.173.116.116.175.264.175.443v5.54c0 .18-.05.325-.17.44-.11.116-.26.174-.44.174H8.11c-.18 0-.33-.058-.446-.174-.116-.112-.174-.26-.174-.44V3.32zM29.78 32.296H2.527v-19.73h27.25v19.73z" fill-rule="evenodd"/>
+</svg>
+          </div>
+          <time datetime="2012-03-12" pubdate>March 12, 2012</time>
+                  </div>
+        <div class="ArticleHead_meta">
+                  </div>
+        <div class="ArticleHead_meta">
+                    <thumbvoter-heading id="1950" rating="6" />
+        </div>
+      </div>
+    </div>
+    <div class="ArticleHead_supplemental">
+      <channel-subscribe data-slug="php"></channel-subscribe>
+    </div>
+  </div>
+
+
+  <div class="ArticleBody" data-hellobar="content">
+    <div class="ArticleContent u-showseries">
+      <article-sharer data-url="http%3A%2F%2Fwww.sitepoint.com%2Frole-based-access-control-in-php%2F" data-title="Role Based Access Control in PHP"></article-sharer>
+      <div class="ThumbVoter_container">
+                <thumbvoter-buttons id="1950"
+          url="https://www.sitepoint.com/wp-admin/admin-ajax.php"
+          user_rating="0"
+          nonce="30479cf073"
+        />
+      </div>
+      
+      
+  <div class="ArticleLeaderboard u-leaderboard">
+    <hr />
+    <div class="ArticleLeaderboard_ad">
+      <div class="widget maestro maestro-content-type-html hide-for-mobile-SP" id="maestro-product-66"><adblock-msg  data-message="Microsoft - helping keep SitePoint free"></adblock-msg></div><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-37"><!-- SP2013_Articles_728x90_1 -->
+<div id="div-gpt-ad-article-header" style="width:728px; height:90px;" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-article-header"); });</script>
+ </div></div>    </div>
+    <hr />
+  </div>
+
+      
+  <div class="ArticleCopy language-">
+    <p>There are several different approaches when it comes to managing user permissions, and each have their own positives and negatives. For example, using bit masking is extremely efficient but also limits you to 32 or 64 permissions (the number of bits in a 32- or 64-bit integer). Another approach is to use an access control list (ACL), however you can only assign permissions to objects rather than to specific or meaningful operations.</p>
+<p>In this article I will discuss my personal favorite approach: role based access control (RBAC). RBAC is a model in which roles are created for various job functions, and permissions to perform certain operations are then tied to roles. A user can be assigned one or multiple roles which restricts their system access to the permissions for which they have been authorized.</p>
+<p>The downside to using RBAC is that if not properly managed, your roles and permissions can easily become a chaotic mess. In a rapidly changing business environment, it can be a job in itself to keep track of assigning appropriate roles to new employees and removing them in a timely manner from former employees or those switching positions. Additionally, identifying new roles for unique job duties and revising or removing requires regular review. Failure to properly manage your roles can open the door to many security risks.</p>
+<p>I will begin by discussing the necessary database tables, then I&#8217;ll create two class files: (<code>Role.php</code>) which will perform a few tasks specific to roles, and (<code>PrivilegedUser.php</code>) that will extend your existing user class. Finally I&#8217;ll walk through some examples of how you might integrate the code into your application. Role management and user management go hand in hand, and so in this article I&#8217;ll assume that you already have some type of user authentication system in place. </p>
+<h2>Database</h2>
+<p>You need four tables to store role and permission information: the <code>roles</code> table stores a role ID and role name, the <code>permissions</code> table stores a permission ID and description, the <code>role_perm</code> table associates which permissions belong to which roles, and the <code>user_role</code> table associates which roles are assigned to which users.</p>
+<p>Using this schema, you can have an unlimited number of roles and permissions and each user can be assigned multiple roles.</p>
+<p>These are the <code>CREATE TABLE</code> statements for the database:</p>
+<pre><code class='language-sql'>CREATE TABLE roles (
+  role_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  role_name VARCHAR(50) NOT NULL,
+
+  PRIMARY KEY (role_id)
+);
+
+CREATE TABLE permissions (
+  perm_id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+  perm_desc VARCHAR(50) NOT NULL,
+
+  PRIMARY KEY (perm_id)
+);
+
+CREATE TABLE role_perm (
+  role_id INTEGER UNSIGNED NOT NULL,
+  perm_id INTEGER UNSIGNED NOT NULL,
+
+  FOREIGN KEY (role_id) REFERENCES roles(role_id),
+  FOREIGN KEY (perm_id) REFERENCES permissions(perm_id)
+);
+
+CREATE TABLE user_role (
+  user_id INTEGER UNSIGNED NOT NULL,
+  role_id INTEGER UNSIGNED NOT NULL,
+
+  FOREIGN KEY (user_id) REFERENCES users(user_id),
+  FOREIGN KEY (role_id) REFERENCES roles(role_id)
+);</code></pre>
+<p>Note the final table, <code>user_role</code>, references a <code>users</code> table which I have not defined here. This assumes that <code>user_id</code> is the primary key of your <code>users</code> table.</p>
+<p>You don&#8217;t need to make any modifications to your <code>users</code> table to store role information as that information is stored separately in these new tables. Contrary to some other RBAC systems, a user here is not required to have a role by default; instead, the user simply won&#8217;t have any privileges until a role has been specifically assigned. Alternatively, it would be possible in the <code>PrivilegedUser</code> class to detect an empty role and respond with a default unprivileged role when required, or you could opt to write a short SQL script to copy over user IDs and initialize them by assigning a default unprivileged role.</p>
+<h2>Role Class</h2>
+<p>The primary focus of the <code>Role</code> class is to return a role object that is populated with each roles corresponding permissions. This will allow you to easily check whether a permission is available without having to perform redundant SQL queries with every request.</p>
+<p>Use the following code to create <code>Role.php</code>:</p>
+<pre><code class='language-php'>&lt;?php
+class Role
+{
+    protected $permissions;
+
+    protected function __construct() {
+        $this-&gt;permissions = array();
+    }
+
+    // return a role object with associated permissions
+    public static function getRolePerms($role_id) {
+        $role = new Role();
+        $sql = &quot;SELECT t2.perm_desc FROM role_perm as t1
+                JOIN permissions as t2 ON t1.perm_id = t2.perm_id
+                WHERE t1.role_id = :role_id&quot;;
+        $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+        $sth-&gt;execute(array(&quot;:role_id&quot; =&gt; $role_id));
+
+        while($row = $sth-&gt;fetch(PDO::FETCH_ASSOC)) {
+            $role-&gt;permissions[$row[&quot;perm_desc&quot;]] = true;
+        }
+        return $role;
+    }
+
+    // check if a permission is set
+    public function hasPerm($permission) {
+        return isset($this-&gt;permissions[$permission]);
+    }
+}</code></pre>
+<p>The <code>getRolePerms()</code> method creates a new <code>Role</code> object based on a specific role ID, and then uses a <code>JOIN</code> clause to combine the <code>role_perm</code> and <code>perm_desc</code> tables. For each permission associated with the given role, the description is stored as the key and its value is set to true. The <code>hasPerm()</code> method accepts a permission description and returns the value based on the current object.</p>
+<h2>Privileged User Class</h2>
+<p>By creating a new class that extends your existing user class, you can reuse your existing code logic for managing users and then add some additional methods on top of those which are geared specifically towards working with privileges.</p>
+<p>Use the following code to create the file <code>PrivilegedUser.php</code>:</p>
+<pre><code class='language-php'>&lt;?php
+class PrivilegedUser extends User
+{
+    private $roles;
+
+    public function __construct() {
+        parent::__construct();
+    }
+
+    // override User method
+    public static function getByUsername($username) {
+        $sql = &quot;SELECT * FROM users WHERE username = :username&quot;;
+        $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+        $sth-&gt;execute(array(&quot;:username&quot; =&gt; $username));
+        $result = $sth-&gt;fetchAll();
+
+        if (!empty($result)) {
+            $privUser = new PrivilegedUser();
+            $privUser-&gt;user_id = $result[0][&quot;user_id&quot;];
+            $privUser-&gt;username = $username;
+            $privUser-&gt;password = $result[0][&quot;password&quot;];
+            $privUser-&gt;email_addr = $result[0][&quot;email_addr&quot;];
+            $privUser-&gt;initRoles();
+            return $privUser;
+        } else {
+            return false;
+        }
+    }
+
+    // populate roles with their associated permissions
+    protected function initRoles() {
+        $this-&gt;roles = array();
+        $sql = &quot;SELECT t1.role_id, t2.role_name FROM user_role as t1
+                JOIN roles as t2 ON t1.role_id = t2.role_id
+                WHERE t1.user_id = :user_id&quot;;
+        $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+        $sth-&gt;execute(array(&quot;:user_id&quot; =&gt; $this-&gt;user_id));
+
+        while($row = $sth-&gt;fetch(PDO::FETCH_ASSOC)) {
+            $this-&gt;roles[$row[&quot;role_name&quot;]] = Role::getRolePerms($row[&quot;role_id&quot;]);
+        }
+    }
+
+    // check if user has a specific privilege
+    public function hasPrivilege($perm) {
+        foreach ($this-&gt;roles as $role) {
+            if ($role-&gt;hasPerm($perm)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}</code></pre>
+<p>The first method, <code>getByUsername()</code>, returns an object populated with information about a specific user. A method almost identical to this will likely already exist in your user class, but you need to override it here so that the <code>PrivilegedUser</code>&#8216;s methods can be called with the appropriate object. If you try to invoke a <code>PrivilegedUser</code> method on a <code>User</code> object, you will get an error stating that the method doesn&#8217;t exist.</p>
+<p>The second method, <code>initRoles()</code>, uses a <code>JOIN</code> to combine the <code>user_role</code> and <code>roles</code> tables to collect the roles associated with the current user&#8217;s ID. Each role is then populated with its corresponding permissions with a call to the <code>Role</code> class method previously created, <code>Role::getRolePerms()</code>.</p>
+<p>The final method, <code>hasPrivilege()</code>, accepts a permission description and returns true of the user has the permission or false otherwise.</p>
+<p>With the preceding two classes in place, checking if a user has a specific privilege is as simple as follows:</p>
+<pre><code class='language-php'>&lt;?php
+require_once &quot;Role.php&quot;;
+require_once &quot;PrivilegedUser.php&quot;;
+
+// connect to database...
+// ...
+
+session_start();
+
+if (isset($_SESSION[&quot;loggedin&quot;])) {
+    $u = PrivilegedUser::getByUsername($_SESSION[&quot;loggedin&quot;]);
+}
+
+if ($u-&gt;hasPrivilege(&quot;thisPermission&quot;)) {
+    // do something
+}</code></pre>
+<p>Here the username is stored in the active session and a new <code>PrivilegedUser</code> object is created for that user on which the <code>hasPrivilege()</code> method can be called. Depending on the information in your database, your object output will look similar to the following:</p>
+<pre>object(PrivilegedUser)#3 (2) {
+  ["roles":"PrivilegedUser":private]=&gt;
+  array(1) {
+    ["Admin"]=&gt;
+    object(Role)#5 (1) {
+      ["permissions":protected]=&gt;
+      array(4) {
+        ["addUser"]=&gt;bool(true)
+        ["editUser"]=&gt;bool(true)
+        ["deleteUser"]=&gt;bool(true)
+        ["editRoles"]=&gt;bool(true)
+      }
+    }
+  }
+  ["fields":"User":private]=&gt;
+  array(4) {
+    ["user_id"]=&gt;string(1) "2"
+    ["username"]=&gt;string(7) "mpsinas"
+    ["password"]=&gt;bool(false)
+    ["email_addr"]=&gt;string(0) ""
+  }
+}</pre>
+<h2>Keeping Things Organized</h2>
+<p>One of the many benefits of using an OOP approach with RBAC is that it allows you to separate code logic and validation from object specific tasks. For example, you could add the following methods to your <code>Role</code> class to help manage role specific operations such as inserting new roles, deleting roles and so on:</p>
+<pre><code class='language-php'>// insert a new role
+public static function insertRole($role_name) {
+    $sql = &quot;INSERT INTO roles (role_name) VALUES (:role_name)&quot;;
+    $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+    return $sth-&gt;execute(array(&quot;:role_name&quot; =&gt; $role_name));
+}
+
+// insert array of roles for specified user id
+public static function insertUserRoles($user_id, $roles) {
+    $sql = &quot;INSERT INTO user_role (user_id, role_id) VALUES (:user_id, :role_id)&quot;;
+    $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+    $sth-&gt;bindParam(&quot;:user_id&quot;, $user_id, PDO::PARAM_STR);
+    $sth-&gt;bindParam(&quot;:role_id&quot;, $role_id, PDO::PARAM_INT);
+    foreach ($roles as $role_id) {
+        $sth-&gt;execute();
+    }
+    return true;
+}
+
+// delete array of roles, and all associations
+public static function deleteRoles($roles) {
+    $sql = &quot;DELETE t1, t2, t3 FROM roles as t1
+            JOIN user_role as t2 on t1.role_id = t2.role_id
+            JOIN role_perm as t3 on t1.role_id = t3.role_id
+            WHERE t1.role_id = :role_id&quot;;
+    $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+    $sth-&gt;bindParam(&quot;:role_id&quot;, $role_id, PDO::PARAM_INT);
+    foreach ($roles as $role_id) {
+        $sth-&gt;execute();
+    }
+    return true;
+}
+
+// delete ALL roles for specified user id
+public static function deleteUserRoles($user_id) {
+    $sql = &quot;DELETE FROM user_role WHERE user_id = :user_id&quot;;
+    $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+    return $sth-&gt;execute(array(&quot;:user_id&quot; =&gt; $user_id));
+}</code></pre>
+<p>Likewise, you could add onto your <code>PrivilegedUser</code> class with similar methods:</p>
+<pre><code class='language-php'>// check if a user has a specific role
+public function hasRole($role_name) {
+    return isset($this-&gt;roles[$role_name]);
+}
+
+// insert a new role permission association
+public static function insertPerm($role_id, $perm_id) {
+    $sql = &quot;INSERT INTO role_perm (role_id, perm_id) VALUES (:role_id, :perm_id)&quot;;
+    $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+    return $sth-&gt;execute(array(&quot;:role_id&quot; =&gt; $role_id, &quot;:perm_id&quot; =&gt; $perm_id));
+}
+
+// delete ALL role permissions
+public static function deletePerms() {
+    $sql = &quot;TRUNCATE role_perm&quot;;
+    $sth = $GLOBALS[&quot;DB&quot;]-&gt;prepare($sql);
+    return $sth-&gt;execute();
+}</code></pre>
+<p>Because permissions are tied directly to the application&#8217;s underlying code logic, new permissions should be manually inserted into or deleted from the database as required. Roles on the other hand can be easily created, modified or deleted via an administration interface.</p>
+<p><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2012/01/rbac_01.png" alt="" title="possible interface for role management" width="546" height="224" class="aligncenter size-full wp-image-1951" style="float:none !important; margin-left: auto; margin-right: auto;"/></p>
+<p>The more roles and permissions you have the more difficult things will be to manage; keeping the lists minimal is important, but sometimes the contrary is unavoidable. I can only advise that you use your best judgement and try not to get carried away.</p>
+<h2>Summary</h2>
+<p>You now have an understanding of role based access control and how to implement roles and permissions into an existing application. Furthermore, you&#8217;ve learned some tips to help manage your roles and to keep things well organized. As always, I encourage you to experiment and ask questions if you get stuck. We&#8217;re all here to learn from each other and I am happy to help when I can!</p>
+<p><small>Image via <a href="http://www.shutterstock.com/gallery-494302p1.html">PILart</a> / <a href="http://shutterstock.com">Shutterstock</a></small></p>
+  </div>
+
+  <div>
+        <thumbvoter-buttons id="1950"
+      url="https://www.sitepoint.com/wp-admin/admin-ajax.php"
+      user_rating="0"
+    />
+  </div>
+
+      
+    <div class="Author t-border">
+      <div class="Author_header">
+        <a href="http://www.sitepoint.com/author/mpsinas/">
+          <img src="http://0.gravatar.com/avatar/3c26551f8a950ccf5f648b7676464404?s=96&#038;d=mm&#038;r=g" width="96" height="96" alt="" class="avatar avatar-96 wp-user-avatar wp-user-avatar-96 photo avatar-default" />          <span class="Author_name t-color">
+            Martin Psinas          </span>
+                  </a>
+        <div class="Author_social">
+                  </div>
+      </div>
+      <div class="Author_bio">Martin E. Psinas is a self-taught web developer, published author, and is currently studying Japanese. For more information, visit his website.</div>
+    </div>
+
+        
+  <div class="ArticleContent_endcap">
+    <div class="widget maestro maestro-content-type-product " id="maestro-product-38"><div class="promo-panel_media-object"><img src="http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2015/05/1432700451Go_Book_Cover_AB.png" /></div>
+<div class="promo-panel_content">
+  <h1 class="promo-panel_title">
+    Get your <strong>free chapter</strong> of <em>Level Up Your Web Apps with Go</em>
+  </h1>
+  <p>Get a <strong>free chapter</strong> of <em>Level Up Your Web Apps with Go</em>, plus updates and exclusive offers from SitePoint.</p>
+  <form class="promo-panel_action"><input type="email" name="email" class="promo-panel_email" placeholder="email address" /><input type="hidden" name="content" value="38" /><button class="button radius">Yes please!</button></form>
+</div></div>  </div>
+
+      
+  <div class="ArticleLeaderboard">
+    <div class="ArticleLeaderboard_ad">
+      <div class="widget maestro maestro-content-type-html hide-for-mobile-SP" id="maestro-product-68"><adblock-msg  data-message="Microsoft - helping keep SitePoint free"></adblock-msg></div><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-181"><!-- SP_Articles_728x90_Bottom -->
+<div id="div-gpt-ad-1438136496246-0" style="" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1438136496246-0"); });</script>
+ </div></div>    </div>
+    <hr />
+  </div>
+
+
+      <a id="comments"></a>
+      
+<div id="disqus_thread">
+            <div id="dsq-content">
+
+
+            <ul id="dsq-comments">
+                    <li class="comment even thread-even depth-1" id="dsq-comment-17190">
+        <div id="dsq-comment-header-17190" class="dsq-comment-header">
+            <cite id="dsq-cite-17190">
+                <span id="dsq-author-user-17190">ellisgl</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17190" class="dsq-comment-body">
+            <div id="dsq-comment-message-17190" class="dsq-comment-message"><p>&#8220;$GLOBALS&#8221;, really?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-mpsinas bypostauthor odd alt depth-2" id="dsq-comment-17191">
+        <div id="dsq-comment-header-17191" class="dsq-comment-header">
+            <cite id="dsq-cite-17191">
+http://www.psinas.com                <span id="dsq-author-user-17191">Martin Psinas</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17191" class="dsq-comment-body">
+            <div id="dsq-comment-message-17191" class="dsq-comment-message"><p>Yeah, really. It&#8217;s just an example, and you know, it would be much more helpful if you were to offer useful criticism in the form of an alternative method rather than an unhelpful snide remark. I have no problem using GLOBALS in this context; why do you?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-3" id="dsq-comment-17192">
+        <div id="dsq-comment-header-17192" class="dsq-comment-header">
+            <cite id="dsq-cite-17192">
+http://www.rebuy.de                <span id="dsq-author-user-17192">Daniel Freudenberger</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17192" class="dsq-comment-body">
+            <div id="dsq-comment-message-17192" class="dsq-comment-message"><p>The dependencies of your class should be visible from the outside. I don&#8217;t want to open your file and read through the source to find which objects i have to write to the registry ($GLOBALS) before I can use your class. IoC should be the way to go &#8211; inject the dependencies through setter or constructor injection into your class. __construct(DbAdapterInterface $adapter) { } would be much more elegant.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-mpsinas bypostauthor odd alt depth-4" id="dsq-comment-17193">
+        <div id="dsq-comment-header-17193" class="dsq-comment-header">
+            <cite id="dsq-cite-17193">
+http://www.psinas.com                <span id="dsq-author-user-17193">Martin Psinas</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17193" class="dsq-comment-body">
+            <div id="dsq-comment-message-17193" class="dsq-comment-message"><p>Thanks for that. I agree with your explanation and won&#8217;t try making excuses for myself.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even depth-3" id="dsq-comment-17194">
+        <div id="dsq-comment-header-17194" class="dsq-comment-header">
+            <cite id="dsq-cite-17194">
+                <span id="dsq-author-user-17194">ellisgl</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17194" class="dsq-comment-body">
+            <div id="dsq-comment-message-17194" class="dsq-comment-message"><p>While my comment was less filling and &#8220;snidish&#8221;, but it got the response I wanted. Why did you use &#8220;$GLOBALS&#8221; in the first place and then to have others chime in with suggestions and comments.</p>
+<p>I still need to look over the code and compare it to what I have and see if I throw some suggestions out there.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt depth-2" id="dsq-comment-17196">
+        <div id="dsq-comment-header-17196" class="dsq-comment-header">
+            <cite id="dsq-cite-17196">
+http://logansbailey.com                <span id="dsq-author-user-17196">Logan Bailey</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17196" class="dsq-comment-body">
+            <div id="dsq-comment-message-17196" class="dsq-comment-message"><p>Perfectly fine comment, a phpmaster knows why they shouldn&#8217;t use $GLOBALS. I&#8217;m disappointed by sitepoint and phpmasters.com. This is the second example of poor coding I&#8217;ve seen on this site in the past couple days. I&#8217;d imagine fewer oversites from a site proclaiming to be masters. I think posting articles with easily fixed issues like this leads to the questioning of the credibility of other posts. It endangers the site of becoming another phpclasses.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-3" id="dsq-comment-17197">
+        <div id="dsq-comment-header-17197" class="dsq-comment-header">
+            <cite id="dsq-cite-17197">
+                <span id="dsq-author-user-17197">ellisgl</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17197" class="dsq-comment-body">
+            <div id="dsq-comment-message-17197" class="dsq-comment-message"><p>As readers, we should exercise our fingers to point out issues and offer suggestion so we don&#8217;t end up with coders releasing code that is not sound. If the issues are corrected with a note about the correction within the article, I think we can forgive the authors, unlike some site where you have to dig through pages of comments to find fixes and stuff. *coughnetttus+cough*</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-17195">
+        <div id="dsq-comment-header-17195" class="dsq-comment-header">
+            <cite id="dsq-cite-17195">
+                <span id="dsq-author-user-17195">ellisgl</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17195" class="dsq-comment-body">
+            <div id="dsq-comment-message-17195" class="dsq-comment-message"><p>Here are my suggestions.<br />
+Add an `updated` column as a timestamp. &#8220;`updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP&#8221;. This will allow for simple &#8216;auditing&#8217; and also will jive better with some DB classes so they can tell if something has been updated.</p>
+<p>Permissions table: Add a &#8220;perm_key&#8221; as a varchar(30) w/ an index so you can do something like &#8220;$user-&gt;hasPermission(&#8216;Open Door&#8217;);&#8221;; instead of having to look it up by id.</p>
+<p>role_perm and user_perm tables: Add a `value` column that as a boolean (tinyint(1)). You can use this to be more &#8220;fine grained&#8221; in permission setting.</p>
+<p>Add a table called &#8216;user_perm&#8217; to links to users to individual permissions allowing for more &#8220;fine grained&#8221; permissions.</p>
+<p>If you are looking for speed in a larger system, you could create another table that could be called `user_compiled_perm`. This would link user ids to permission ids that the user would have, which is what it looks like you are doing now.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-even depth-1" id="dsq-comment-17198">
+        <div id="dsq-comment-header-17198" class="dsq-comment-header">
+            <cite id="dsq-cite-17198">
+http://jsmag.com                <span id="dsq-author-user-17198">Michael Kimsal</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17198" class="dsq-comment-body">
+            <div id="dsq-comment-message-17198" class="dsq-comment-message"><p>I&#8217;m a little perplexed by the fetchAll(), then explicitly only grabbing the $result[0].<br />
+If you&#8217;re only expecting one row, use fetch().  If you actually have more than one result row, it&#8217;s probably an error condition that should be dealt with, as it likely violates some logical constraint that your app relies on.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-mpsinas bypostauthor odd alt depth-2" id="dsq-comment-17199">
+        <div id="dsq-comment-header-17199" class="dsq-comment-header">
+            <cite id="dsq-cite-17199">
+http://www.psinas.com                <span id="dsq-author-user-17199">Martin Psinas</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17199" class="dsq-comment-body">
+            <div id="dsq-comment-message-17199" class="dsq-comment-message"><p>Good catch, thanks for pointing that out.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17200">
+        <div id="dsq-comment-header-17200" class="dsq-comment-header">
+            <cite id="dsq-cite-17200">
+http://zaemis.blogspot.com                <span id="dsq-author-user-17200">Timothy Boronczyk</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17200" class="dsq-comment-body">
+            <div id="dsq-comment-message-17200" class="dsq-comment-message"><p>The point of this article is to introduce someone who may not have been acquainted with RBAC before, and to highlight some of the things he/she would need to consider when adding it to an existing non-framework-based application. I don&#8217;t want to detract from the original intent of the article.</p>
+<p>With that said, I&#8217;ve always viewed PHPMaster as a site not exclusively for “masters,” but also for beginners starting on their journey to “masterhood.” I think there is merit in having articles that target all skill levels. Perhaps what may be missing is a better identification/organization scheme, which I and the other editors will need to discuss.</p>
+<p>I do appreciate everyone who has taken the time to point out problems with this and other articles. The authors and I do our best, but occasionally mistakes happen. Sometimes it&#8217;s a typo or a missing image, other times it&#8217;s $GLOBALS. We&#8217;re not perfect, and it&#8217;s good to see the community helping keep us all honest! The important thing is that we all remain polite when such situations arise. Regardless of who it comes from, snark/arrogance begets defensiveness which degrades the conversation rather quickly instead of creating an opportunity to learn and share with each other.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17201">
+        <div id="dsq-comment-header-17201" class="dsq-comment-header">
+            <cite id="dsq-cite-17201">
+http://www.developmentwall.com                <span id="dsq-author-user-17201">Mhabub</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17201" class="dsq-comment-body">
+            <div id="dsq-comment-message-17201" class="dsq-comment-message"><p>I had a custom acl for codeigniter framework.<br />
+Hope to try this in next  codeigniter application</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-2" id="dsq-comment-17215">
+        <div id="dsq-comment-header-17215" class="dsq-comment-header">
+            <cite id="dsq-cite-17215">
+http://phpcamponline.com                <span id="dsq-author-user-17215">Joel Kumwenda</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17215" class="dsq-comment-body">
+            <div id="dsq-comment-message-17215" class="dsq-comment-message"><p>I like the post, for someone beginning programming this will probably be a very good catch, however for the &#8220;MASTERS&#8221; there is still more that can be done to improve the code.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-17202">
+        <div id="dsq-comment-header-17202" class="dsq-comment-header">
+            <cite id="dsq-cite-17202">
+                <span id="dsq-author-user-17202">Hai Dang</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17202" class="dsq-comment-body">
+            <div id="dsq-comment-message-17202" class="dsq-comment-message"><p>I agree with Timothy. The main purpose of this article is to introduce about Role Based Access Control, how to organize the data. To organize a Role Based Access Control, we will have 4 main tables : Role, Permission, RolePermission and RoleUser. And we should create a class PriviledgeUser extend from User to have a better structure in code. And depending on each framework, we will have our own implementation. </p>
+<p>Thanks Martin Psinas for your article</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-2" id="dsq-comment-17221">
+        <div id="dsq-comment-header-17221" class="dsq-comment-header">
+            <cite id="dsq-cite-17221">
+                <span id="dsq-author-user-17221">Oreo</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17221" class="dsq-comment-body">
+            <div id="dsq-comment-message-17221" class="dsq-comment-message"><p>Hi, i&#8217;m still reading comments about this example and I have created these tables and php files but I don&#8217;t know which structure should have user class to accomplish a right execution of this security module. Thanks for your help!!</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17203">
+        <div id="dsq-comment-header-17203" class="dsq-comment-header">
+            <cite id="dsq-cite-17203">
+                <span id="dsq-author-user-17203">Kikloo</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17203" class="dsq-comment-body">
+            <div id="dsq-comment-message-17203" class="dsq-comment-message"><p>hi,</p>
+<p>i am new to php, can you please post an article on classes, how to use them how to create them etc. ? i have tried many step by step tutorials but failed to understand the oop.<br />
+please post.</p>
+<p>thanks.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-mpsinas bypostauthor even depth-2" id="dsq-comment-17205">
+        <div id="dsq-comment-header-17205" class="dsq-comment-header">
+            <cite id="dsq-cite-17205">
+http://www.psinas.com                <span id="dsq-author-user-17205">Martin Psinas</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17205" class="dsq-comment-body">
+            <div id="dsq-comment-message-17205" class="dsq-comment-message"><p>Kikloo, this article was actually supposed to be published AFTER an introduction to classes, but the author of that article got delayed. It&#8217;s unfortunate because I wrote the article with an introduction in mind (I was expecting to make a few revisions), and as a result I can imagine it is more difficult to follow.</p>
+<p>I agree with you completely, somebody should write an introduction to classes. I don&#8217;t feel confident enough in my OOP knowledge to be the person to do so, however. I&#8217;m getting ripped apart for using GLOBALS here, but trying to do it &#8220;the right way&#8221; just gave me a big headache (neither $this-&gt;db or self::$db can be used in static methods, and passing the $db as a parameter feels more ugly than just using GLOBALS to me). I do it this way because it&#8217;s easy and it works, but then people will tell you it&#8217;s wrong. I wish I could help you more and I hope somebody else will step up to the challenge.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt depth-2" id="dsq-comment-17208">
+        <div id="dsq-comment-header-17208" class="dsq-comment-header">
+            <cite id="dsq-cite-17208">
+                <span id="dsq-author-user-17208">Riyaz</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17208" class="dsq-comment-body">
+            <div id="dsq-comment-message-17208" class="dsq-comment-message"><p>I agree with Kikloo. There are many basic tutorials on OO PHP but they are so brief and the typical &#8220;Hello World&#8221; style that it does not give one a true explanation of how to use OO PHP in a real world example. I do hope that the authors here would consider putting together a usable tutorial.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17204">
+        <div id="dsq-comment-header-17204" class="dsq-comment-header">
+            <cite id="dsq-cite-17204">
+http://www.tropotek.com.ai/                <span id="dsq-author-user-17204">Mick</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17204" class="dsq-comment-body">
+            <div id="dsq-comment-message-17204" class="dsq-comment-message"><p>This article was great, a good overview of using RBAC in PHP. I was looking into ACL lists and as you point out, it was not very elegent to control user access permission. I have implemented the RBAC based on your article into my new framework and having the ability to create new roles and assign them to users and permissions gives the webmaster a lot more fine grained control.<br />
+Cheers ;-)</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17206">
+        <div id="dsq-comment-header-17206" class="dsq-comment-header">
+            <cite id="dsq-cite-17206">
+                <span id="dsq-author-user-17206">Eliezer E. Vargas</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17206" class="dsq-comment-body">
+            <div id="dsq-comment-message-17206" class="dsq-comment-message"><p>Hi everyone:<br />
+I might sound ignorant, but&#8230; Why use a static method to create a instant of the class? Why don&#8217;t you put the code to the constructor and create a instant of the class like $u = new class($param); instead? It is just your preference or there is any performance gain or maybe a security issue? Enlightens me please, just a rookie!</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17207">
+        <div id="dsq-comment-header-17207" class="dsq-comment-header">
+            <cite id="dsq-cite-17207">
+                <span id="dsq-author-user-17207">Stacy</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17207" class="dsq-comment-body">
+            <div id="dsq-comment-message-17207" class="dsq-comment-message"><p>Cheers. I really appreciate this article and the discussion.  I&#8217;m an introductory php/mysql coder and this will be saved for reference.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17209">
+        <div id="dsq-comment-header-17209" class="dsq-comment-header">
+            <cite id="dsq-cite-17209">
+                <span id="dsq-author-user-17209">kalyan</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17209" class="dsq-comment-body">
+            <div id="dsq-comment-message-17209" class="dsq-comment-message"><p>hello your tutorial is good but why dont you give download file</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17210">
+        <div id="dsq-comment-header-17210" class="dsq-comment-header">
+            <cite id="dsq-cite-17210">
+http://www.fugitz.com                <span id="dsq-author-user-17210">Sovello</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17210" class="dsq-comment-body">
+            <div id="dsq-comment-message-17210" class="dsq-comment-message"><p>Thanks for the great tutorial Psinas.<br />
+I&#8217;m a newbie in some concepts, I have found this one cool.<br />
+What is more important to me is the concept and not the code snippets, cos I have my own way of getting things done the OO &#8211; way.<br />
+Karibu</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17211">
+        <div id="dsq-comment-header-17211" class="dsq-comment-header">
+            <cite id="dsq-cite-17211">
+                <span id="dsq-author-user-17211">Bobby Sinnott</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17211" class="dsq-comment-body">
+            <div id="dsq-comment-message-17211" class="dsq-comment-message"><p>I note in your brief bio that you are self-taught. You really should take some time to study software development patterns, as you have grossly over-complicated what should be a perfunctory, low-overhead task.<br />
+   I know this is only an example&#8230; But it is a really, really bad one.<br />
+   Since you wanted specifics from another gentleman, here&#8217;s one to think about: It&#8217;s silly to use joins in an RBAC table when you can accomplish the exact same role multiplicity by using to parameters per user: roles (a text word) and values (a scalar quantity).<br />
+   Database joins slow things down right when you don&#8217;t want to slow things down: at page load.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17212">
+        <div id="dsq-comment-header-17212" class="dsq-comment-header">
+            <cite id="dsq-cite-17212">
+http://www.icomefromthenet.net                <span id="dsq-author-user-17212">Lewis Dyer</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17212" class="dsq-comment-body">
+            <div id="dsq-comment-message-17212" class="dsq-comment-message"><p>If you know the roles that your application will need to support (and its a reasonable number) save yourself alot of work and use the Zend_Acl (<a href="http://framework.zend.com/manual/en/zend.acl.html" rel="nofollow">http://framework.zend.com/manual/en/zend.acl.html</a>), Hard code your roles as objects (e.g user, admin,customer) and just use a placeholder table, with numeric key id (class name as a primay key). </p>
+<p>I can&#8217;t recommend it enough to avoid a many to many relation between user and role, use a role hierarchy instead and keep the relation sane, zend acl can help with that.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17213">
+        <div id="dsq-comment-header-17213" class="dsq-comment-header">
+            <cite id="dsq-cite-17213">
+                <span id="dsq-author-user-17213">jay</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17213" class="dsq-comment-body">
+            <div id="dsq-comment-message-17213" class="dsq-comment-message"><p>Thanks for the article .Hope to see an articele on advanced oops concepts in the future.Thank you</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17214">
+        <div id="dsq-comment-header-17214" class="dsq-comment-header">
+            <cite id="dsq-cite-17214">
+                <span id="dsq-author-user-17214">Oliverdejohnson</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17214" class="dsq-comment-body">
+            <div id="dsq-comment-message-17214" class="dsq-comment-message"><p>Thanks dude&#8230;all d criticisms notwithstanding, d article is still one of the simplest to understand on the topic.I dont imagine anybody using the code verbatim.only d concept.I definitely love it!</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17216">
+        <div id="dsq-comment-header-17216" class="dsq-comment-header">
+            <cite id="dsq-cite-17216">
+                <span id="dsq-author-user-17216">Alex.Barylski</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17216" class="dsq-comment-body">
+            <div id="dsq-comment-message-17216" class="dsq-comment-message"><p>I suppose being pedantic is what being a programmer is all about. That being said, I am surprised by the number of negative comments received. The author (in all fairness) indicated:</p>
+<p>1. role-based-access-control in the title &#8211; nothing about best practices, patterns or OO principles, which really would do little for the audience of the article, except convolute and complicate the content for beginners.</p>
+<p>2. Intermediate is the target audience.</p>
+<p>I think some of you have focused on the wrong details. Nothing wrong with playing devils advocate, but a little humility, appreciation and common sense would help. :)</p>
+<p>Regards,<br />
+Alex</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17217">
+        <div id="dsq-comment-header-17217" class="dsq-comment-header">
+            <cite id="dsq-cite-17217">
+                <span id="dsq-author-user-17217">silaco gilpansa</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17217" class="dsq-comment-body">
+            <div id="dsq-comment-message-17217" class="dsq-comment-message"><p>Very Useful. Thanks a lot!</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17218">
+        <div id="dsq-comment-header-17218" class="dsq-comment-header">
+            <cite id="dsq-cite-17218">
+                <span id="dsq-author-user-17218">Sanny</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17218" class="dsq-comment-body">
+            <div id="dsq-comment-message-17218" class="dsq-comment-message"><p>What will be the permission value will be ,, array or string</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17219">
+        <div id="dsq-comment-header-17219" class="dsq-comment-header">
+            <cite id="dsq-cite-17219">
+                <span id="dsq-author-user-17219">Muneeb</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17219" class="dsq-comment-body">
+            <div id="dsq-comment-message-17219" class="dsq-comment-message"><p>Wish i could be that sort of programmer&#8230; :( tried&#8230; tried&#8230; i can code in php&#8230; but things just dont seem to advance&#8230; you see&#8230; i cannot even figure out how to convert to SQL commands to mySQL ones&#8230; so this is who i am :(</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-17220">
+        <div id="dsq-comment-header-17220" class="dsq-comment-header">
+            <cite id="dsq-cite-17220">
+                <span id="dsq-author-user-17220">Oreo</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17220" class="dsq-comment-body">
+            <div id="dsq-comment-message-17220" class="dsq-comment-message"><p>Hi, actually I want to implement this code as a security module into my system and I have already a BD with role an permissions tables, also a users table that it&#8217;s working now on production. But I have a question about a php file that I need to implement this solution. I read that I can copy this two files: Role.php and PrivilegedUser.php but this last extends its class of another class called users. I don&#8217;t have this class created into my system, and finally i just want to know what should be content of this class so to this example work for me. Thanks</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-17222">
+        <div id="dsq-comment-header-17222" class="dsq-comment-header">
+            <cite id="dsq-cite-17222">
+https://github.com/silvioprog                <span id="dsq-author-user-17222">Silvio Clécio</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-17222" class="dsq-comment-body">
+            <div id="dsq-comment-message-17222" class="dsq-comment-message"><p>Seems a good idea to be implemented in Brook framework: <a href="http://brookframework.org" rel="nofollow">http://brookframework.org</a>. I&#8217;ll try your article soon. Thank you buddy! ;)</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+            </ul>
+
+
+        </div>
+
+    </div>
+
+<script type="text/javascript">
+var disqus_url = 'http://www.sitepoint.com/role-based-access-control-in-php/';
+var disqus_identifier = '1950 http://www.sitepoint.com/?p=1950';
+var disqus_container_id = 'disqus_thread';
+var disqus_shortname = 'sitepointproduction';
+var disqus_title = "Role Based Access Control in PHP";
+var disqus_config_custom = window.disqus_config;
+var disqus_config = function () {
+    /*
+    All currently supported events:
+    onReady: fires when everything is ready,
+    onNewComment: fires when a new comment is posted,
+    onIdentify: fires when user is authenticated
+    */
+    
+    
+    this.language = '';
+        this.callbacks.onReady.push(function () {
+
+        // sync comments in the background so we don't block the page
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '?cf_action=sync_comments&post_id=1950';
+
+        var firstScript = document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(script, firstScript);
+    });
+    
+    if (disqus_config_custom) {
+        disqus_config_custom.call(this);
+    }
+};
+
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+
+
+    </div>
+    
+  <div class="ArticleAside">
+    <div class="ArticleAside_row">
+      <div class="widget maestro maestro-content-type-html hide-for-mobile-SP" id="maestro-product-67"><adblock-msg data-sidebar="true"  data-message="Microsoft - helping keep SitePoint free"></adblock-msg></div><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-1"><!-- SP2013_Articles_300x250_1 -->
+<div id="div-gpt-ad-1392428092543-0" style="width:300px; height:250px;" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1392428092543-0"); });</script>
+ </div></div>    </div>
+        <div class="ArticleBox" data-kaizen="related">
+      <h3 class="ArticleBox_header t-bg">
+        <i class="ArticleBox_icon fa fa-coffee"></i> Recommended for you
+      </h3>
+      <div class="ArticleBox_content">
+        <ul class="ArticleBox_list t-list">
+                  <li><a href="http://www.sitepoint.com/sitepoint-smackdown-php-vs-node-js/?utm_source=sitepoint&utm_medium=relatedsidebar&utm_term=php" data-kz-track-on-click="2470">SitePoint Smackdown: PHP vs Node.js</a></li>
+                  <li><a href="http://www.sitepoint.com/php-channels-3rd-2015-trimester-update/?utm_source=sitepoint&utm_medium=relatedsidebar&utm_term=php" data-kz-track-on-click="2470">PHP Channel's 3rd 2015 Trimester Update</a></li>
+                  <li><a href="http://www.sitepoint.com/php-vs-node-js-smackdown-right-of-reply/?utm_source=sitepoint&utm_medium=relatedsidebar&utm_term=php" data-kz-track-on-click="2470">PHP vs Node.js Smackdown: Right of Reply</a></li>
+                  <li><a href="http://www.sitepoint.com/mastering-composer-tips-tricks/?utm_source=sitepoint&utm_medium=relatedsidebar&utm_term=php" data-kz-track-on-click="2470">Mastering Composer - Tips and Tricks</a></li>
+                  <li><a href="http://www.sitepoint.com/caching-hat-trick-varnish-memcached-and-php-libraries/?utm_source=sitepoint&utm_medium=relatedsidebar&utm_term=php" data-kz-track-on-click="2470">Caching Hat-trick: Varnish, Memcached and PHP libraries</a></li>
+                </ul>
+      </div>
+    </div>
+      <div class="ArticleBox u-premium-preview"><div class="widget maestro maestro-content-type-spad " id="maestro-product-4"><div class="SPAdPanel u-halfCta u-image">
+  <div class="ArticleBox_header">
+    <i class="ArticleBox_icon fa fa-rocket"></i> Related books & courses
+  </div>
+  <div class="ArticleBox_content">
+    <div class="SPAdPanel_content">
+      <div class="SPAdPanel_tagline">Jump Start MySQL</div>
+      <p class="SPAdPanel_creative">Available on SitePoint Premium. Check it out now!</p>
+    </div>
+    <div class="SPAdPanel_image" style="background-image: url(https://d2sis3lil8ndrq.cloudfront.net/books/2f0b2b59-4255-42f4-a98e-e7940ea4da2b.png)"></div>
+    <div class="SPAdPanel_cta">
+      <a class="SPAdPanel_ctaButton button" href=https://www.sitepoint.com/premium/books/jump-start-mysql?utm_source=sitepoint&utm_medium=relatedpremiumsidebar&utm_term=php&utm_campaign=jumpmysql>Read Ebook</a>
+    </div>
+  </div>
+</div></div></div>
+    <div class="ArticleAside_row ArticleAside_newboxads"><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-177"><!-- SP_Articles_200x125_1 -->
+<div id="div-gpt-ad-1436815711585-0" style="" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1436815711585-0"); });</script>
+ </div></div><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-178"><!-- SP_Articles_200x125_2 -->
+<div id="div-gpt-ad-1436815711585-1" style="" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1436815711585-1"); });</script>
+ </div></div><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-179"><!-- SP_Articles_200x125_3 -->
+<div id="div-gpt-ad-1436815711585-2" style="" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1436815711585-2"); });</script>
+ </div></div><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-180"><!-- SP_Articles_200x125_4 -->
+<div id="div-gpt-ad-1436815711585-3" style="" class="adspot ">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1436815711585-3"); });</script>
+ </div></div></div>
+    <div class="ArticleAside_row"><div class="widget maestro maestro-content-type-ad hide-for-mobile-SP" id="maestro-product-49"><!-- SP2013_Articles_300x600_1 -->
+<div id="div-gpt-ad-1392428092543-4" style="" class="adspot Sticky">
+    <script type="text/javascript">googletag.cmd.push(function() { googletag.display("div-gpt-ad-1392428092543-4"); });</script>
+ </div></div></div>
+  </div>
+
+  </div>
+
+  <div class="u-accordion-end"></div>
+      <div class="ChannelPanel t-bg">
+      <strong class="ChannelPanel_context">Next Article</strong>
+
+      <a class="ChannelPanel_heading" href="http://www.sitepoint.com/caching-hat-trick-varnish-memcached-and-php-libraries/?utm_source=sitepoint&utm_medium=nextpost&utm_term=php" data-kz-track-on-click="2470">
+        <span class="ChannelPanel_underline">Caching Hat-trick: Varnish, Memcached and PHP libraries</span>
+        <i class="fa fa-arrow-right"></i>
+      </a>
+
+          </div>
+
+</div>
+
+ <div className="ArticleRecapture"><js-recapture type="php" title="SitePoint Smackdown: PHP vs Node.js" href="http://www.sitepoint.com/?p=108139" /></div>
+
+    <footer class="Footer" role="contentinfo">
+      <div class="Footer-inner">
+        <ul class="FooterList">
+          <li class="FooterList_item">
+            <h3>About</h3>
+          </li>
+          <li class="FooterList_item">
+            <a href="/about-us">Our Story</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/advertising">Advertise</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/press">Press Room</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="http://reference.sitepoint.com/css" target="_blank">Reference</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/legals">Terms of Use</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/legals/#privacy">Privacy Policy</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="https://sitepoint.zendesk.com/hc/en-us" target="_blank">FAQ</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="mailto:feedback@sitepoint.com">Contact Us</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/write-for-us">Contribute</a>
+          </li>
+        </ul>
+
+        <ul class="FooterList">
+          <li class="FooterList_item">
+            <h3>Visit</h3>
+          </li>
+          <li class="FooterList_item">
+            <a href="/">SitePoint Home</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="http://community.sitepoint.com">Forums</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/newsletter">Newsletters</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/premium">Premium</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/sass-reference">References</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/store">Store</a>
+          </li>
+          <li class="FooterList_item">
+            <a href="/versioning">Versioning</a>
+          </li>
+        </ul>
+
+        <ul class="FooterList">
+          <li class="FooterList_item">
+            <h3>Connect</h3>
+          </li>
+          <li class="FooterList_item FooterList_item--icons">
+            <a href="http://www.sitepoint.com/feed/">
+              <i class="fa fa-rss-square"></i>
+            </a>
+            <a href="/newsletter/">
+              <i class="fa fa-envelope-square"></i>
+            </a>
+            <a href="https://www.facebook.com/sitepoint" target="_blank">
+              <i class="fa fa-facebook-square"></i>
+            </a>
+            <a href="http://twitter.com/sitepointdotcom" target="_blank">
+              <i class="fa fa-twitter-square"></i>
+            </a>
+            <a href="https://plus.google.com/+sitepoint" target="_blank">
+              <i class="fa fa-google-plus-square"></i>
+            </a>
+          </li>
+        </ul>
+
+        <p class="Footer_copyright">
+          &copy; 2000 &ndash; 2015 SitePoint Pty. Ltd.
+        </p>
+      </div>
+    </footer>
+
+    <div id="search-dropdown">
+      <div data-role="search-for">
+        <a class="search-link" href="#">Search for...</a>
+      </div>
+      <ul data-role="results"></ul>
+    </div>
+    <script type="text/javascript">var sp_canSeeAds;</script>
+    <script type="text/javascript" src="http://www.sitepoint.com/wp-content/themes/sitepoint/assets/javascripts/ad-server.js"></script>
+    				<script type='text/javascript'><!--
+			var seriesdropdown = document.getElementById("orgseries_dropdown");
+			if (seriesdropdown) {
+			 function onSeriesChange() {
+					if ( seriesdropdown.options[seriesdropdown.selectedIndex].value != ( 0 || -1 ) ) {
+						location.href = "http://www.sitepoint.com/series/"+seriesdropdown.options[seriesdropdown.selectedIndex].value;
+					}
+				}
+				seriesdropdown.onchange = onSeriesChange;
+			}
+			--></script>
+			        <script type="text/javascript">
+        // <![CDATA[
+        var disqus_shortname = 'sitepointproduction';
+        (function () {
+            var nodes = document.getElementsByTagName('span');
+            for (var i = 0, url; i < nodes.length; i++) {
+                if (nodes[i].className.indexOf('dsq-postid') != -1) {
+                    nodes[i].parentNode.setAttribute('data-disqus-identifier', nodes[i].getAttribute('data-dsqidentifier'));
+                    url = nodes[i].parentNode.href.split('#', 1);
+                    if (url.length == 1) { url = url[0]; }
+                    else { url = url[1]; }
+                    nodes[i].parentNode.href = url + '#disqus_thread';
+                }
+            }
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+        // ]]>
+        </script>
+        
+<!-- START Parse.ly Include: Standard -->
+<div id="parsely-root" style="display: none">
+  <div id="parsely-cfg" data-parsely-site="sitepoint.com"></div>
+</div>
+<script>
+(function(s, p, d) {
+  var h=d.location.protocol, i=p+"-"+s,
+      e=d.getElementById(i), r=d.getElementById(p+"-root"),
+      u=h==="https:"?"d1z2jf7jlzjs58.cloudfront.net"
+      :"static."+p+".com";
+  if (e) return;
+  e = d.createElement(s); e.id = i; e.async = true;
+  e.src = h+"//"+u+"/p.js"; r.appendChild(e);
+})("script", "parsely", document);
+</script>
+<!-- END Parse.ly Include: Standard -->
+<script type='text/javascript' src='//www.sitepoint.com/wp-content/themes/sitepoint/assets/javascripts/scripts-foot-d5fe70217433d0934bd7903e53324360.js?ver=4.2.2'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var ratingsL10n = {"plugin_url":"http:\/\/www.sitepoint.com\/wp-content\/plugins\/wp-postratings","ajax_url":"https:\/\/www.sitepoint.com\/wp-admin\/admin-ajax.php","text_wait":"Please rate only 1 post at a time.","image":"thumbs","image_ext":"gif","max":"2","show_loading":"1","show_fading":"1","custom":"1"};
+var ratings_1_mouseover_image=new Image();ratings_1_mouseover_image.src=ratingsL10n.plugin_url+"/images/"+ratingsL10n.image+"/rating_1_over."+ratingsL10n.image_ext;var ratings_2_mouseover_image=new Image();ratings_2_mouseover_image.src=ratingsL10n.plugin_url+"/images/"+ratingsL10n.image+"/rating_2_over."+ratingsL10n.image_ext;;
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://www.sitepoint.com/wp-content/plugins/wp-postratings/postratings-js.js?ver=1.82'></script>
+
+  </body>
+</html>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/
+
+Page Caching using memcached (Requested URI is rejected)
+Object Caching 2082/2124 objects using memcached
+Content Delivery Network via Amazon Web Services: CloudFront: dab1nmslvvntp.cloudfront.net
+
+ Served from: www.sitepoint.com @ 2015-10-12 04:25:57 by W3 Total Cache -->

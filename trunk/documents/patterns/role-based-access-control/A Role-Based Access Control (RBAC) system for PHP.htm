@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head>
+<title>A Role-Based Access Control (RBAC) system for PHP</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="author" content="Tony Marston" lang="EN">
+	<meta name="description" content="title">
+	<meta name="keywords" content="PHP, rbac, role based access control">
+<link rel="stylesheet" type="text/css" href="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/document.css">
+<style type="text/css">
+	<!--
+    
+	-->
+	</style>
+<link href="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/floatingPanel.css" type="text/css" rel="stylesheet"><link href="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/popup.css" type="text/css" rel="stylesheet"></head>
+<body>
+
+<div id="radicoreheader">
+  <div id="radicorelogo">
+  	<a href="http://www.radicore.org/" title="Radicore homepage">
+      <img src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/radicore-logo.gif" alt="Radicore" border="0">
+    </a>
+  </div>
+  <div id="radicoretitle">
+  	<h2>Rapid Application Development toolkit for building Administrative Web Applications</h2>
+  </div>
+</div>
+
+<h1>A Role-Based Access Control (RBAC) system for PHP</h1>
+
+<h2>By Tony Marston</h2>
+
+<p>13th May 2004<br>Amended 1st May 2014</p>
+
+<p class="announce">As of 10th April 2006 the software discussed in this article can be downloaded from <a href="http://www.radicore.org/">www.radicore.org</a></p>
+
+<dl id="index">
+<dt><a href="#introduction">Introduction</a></dt>
+<dt><a href="#access-control">What is 'access control'?</a></dt>
+<dt><a href="#role-based">What is 'role based'?</a></dt>
+<dt><a href="#level-based">- Level based</a></dt>
+<dt><a href="#user-based">- User based</a></dt>
+<dt><a href="#group-based">- Group based</a></dt>
+<dt><a href="#responsibility-based">- Responsibility based</a></dt>
+<dt><a href="#menu-system">What is a 'menu system'?</a></dt>
+<dt><a href="#current-design">My current design</a></dt>
+<dt><a href="#conclusion">Conclusion</a></dt>
+<dt><a href="#other-types">Other types of Access Control</a></dt>
+<dt><a href="#references">References</a></dt>
+<dt><a href="#history">Amendment History</a></dt>
+
+</dl>
+
+<h2><a name="introduction">Introduction</a></h2>
+
+<p>An 'access control' system is just another name for a 'security 
+system' or a 'permissions' system, and in my long career I have been 
+involved in the design and development of several of these systems:</p>
+
+<ul>
+<li>In the 1980s I designed and wrote a <a href="http://www.tonymarston.net/cobol/menu-func.html">Menu and Security System</a> in a quaint language called <a href="http://www.tonymarston.net/cobol/index.html">COBOL</a>.</li>
+<li>In the 1990s I rewrote this <a href="http://www.tonymarston.net/uniface/menuguide/index.html">Menu and Security system</a> in a little-known 4th generation language called <a href="http://www.tonymarston.net/uniface/uniface%28bb%29.html">UNIFACE</a>.</li>
+<li>In 2003 I rebuilt the entire <a href="http://www.tonymarston.net/php-mysql/menuguide/index.html">Menu and Security System</a> in PHP+MySQL to manage the security requirements of web-based applications.</li>
+</ul>
+
+<p>This article will document the features of some of the early systems I worked on and explain the features of my current design.</p>
+
+<h2><a name="access-control">What is 'access control'?</a></h2>
+
+<p>In a single-user application which is typically found on a desktop 
+computer there is no need for any access control - the user has access 
+to every function within the application. However, in a multi-user 
+application which is deployed over numerous devices which are linked 
+together in a network it is more than likely that not all functionality 
+will be available to all users. In this situation a method is required 
+whereby functions within the application can only be accessed by persons
+ to whom permission has been granted. This will typically require the 
+maintenance of the following details:</p>
+
+<ul>
+<li>A list of all the functions that are available within the system. 
+These 'functions' are sometimes referred to as 'transactions' or 
+'tasks'.</li>
+<li>A list of all the persons who are allowed to access the application 
+as a whole. These 'persons' are sometimes referred to as 'users'. 
+Typically this information is used in a logon process through which 
+every user must pass before gaining access to any part of the 
+application.</li>
+<li>A list of permissions which identifies which functions are accessible by which users.</li>
+</ul>
+
+<p>Each of these lists is normally maintained as a table within a database.</p>
+
+<h2><a name="role-based">What is 'role based'?</a></h2>
+
+<p>There is more than one way to give different permissions to different
+ users, but each method has its own set of advantages and disadvantages.
+ Here are some that I have encountered:</p>
+
+<h3><a name="level-based"></a>Level based</h3>
+
+<p>This is a simple system as it only requires two database tables - 
+USERS and TASKS - without any relationship between them, as shown in 
+Figure 1:</p>
+
+<div class="center">
+<p>Figure 1 - a level-based permission system</p>
+<img alt="rbac-01 (1K)" src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/rbac-01.png" height="71" width="268">
+</div>
+
+<p>In this system each TASK is given a security level number in the 
+range 1 to 99, with 1 being the lowest level and 99 the highest. Each 
+USER is then given a security level number and is allowed to access only
+ those TASKs which have a security level which is the same or lower. 
+Thus a USER with a security level of 5 can access a TASK which has a 
+security level in the range 1-5.</p>
+
+<p>The problem with this system is that it is totally cumulative - by 
+raising the level number you can add more tasks, and you can only remove
+ tasks by reducing the level number. Groups of tasks that share the same
+ level number are either included or excluded as a group, there is no 
+possibility to mix'n'match. For example, take a simple setup with two 
+users, 'A' and 'B', and two tasks, 'A' and 'B'. Now try to give user 'A'
+ access to task 'A' but not task 'B', and user 'B' access to task 'B' 
+but not task 'A'. You will find that it cannot be done:</p>
+
+<ul>
+<li>If both tasks have the same security level then access can be granted to both or neither.</li>
+<li>If one task has a lower security level than the other then access 
+can be granted to the lower level on its own, or to both levels. It is 
+not possible to grant access to the higher level and exclude tasks at a 
+lower level.</li>
+</ul>
+
+<h3><a name="user-based"></a>User based</h3>
+
+<p>In this system permissions are defined for individual users. This involves a <a href="http://www.tonymarston.net/php-mysql/many-to-many.html">many-to-many</a> relationship between USERS and TASKS with PERMISSIONS being the link or intersection table, as shown in Figure 2.</p>
+
+<div class="center">
+<p>Figure 2 - a user-based permission system</p>
+<img alt="rbac-02 (1K)" src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/rbac-02.png" height="158" width="268">
+</div>
+
+<p>I have seen several different implementations of this design:</p>
+
+<ul>
+<li>In a system with complex tasks - where a single tasks can operate in
+ create, read, update and delete mode - access to a task will include 
+all of those modes.</li>
+<li>Where access to individual modes within a task is required then the 
+PERMISSIONS record needs to have a YES/NO switch against each one of 
+those modes. This is often referred to as a <a name="crud-matrix">CRUD matrix</a> (where 'CRUD' stands for <b>C</b>reate, <b>R</b>ead, <b>U</b>pdate and <b>D</b>elete) as the arrangement of tasks rows and permission columns resembles a matrix.</li>
+<li>In a system with simple tasks - where each of the modes is handled 
+by a totally separate task - then a CRUD matrix is not required.</li>
+</ul>
+
+<p>My personal preference is for a system to be comprised of <a href="http://www.tonymarston.net/uniface/largevssmall.html">small and simple</a>
+ tasks. This may increase the number of tasks, but each one is simple, 
+easer to design, easier to specify, easier to develop and easier to use.</p>
+
+<p>This disadvantage of this design is that where several users share 
+the same permissions any change to those permissions needs to be 
+repeated for each user.</p>
+
+<h3><a name="group-based"></a>Group based</h3>
+
+<p>In this design the users are split into groups and permissions are 
+assigned to the group, not the individual user, as shown in Figure 3.</p>
+
+<div class="center">
+<p>Figure 3 - a group-based permission system</p>
+<img alt="rbac-03 (2K)" src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/rbac-03.png" height="245" width="322">
+</div>
+
+<p>This design has the following advantages:</p>
+
+<ul>
+<li>Once the user has been identified the USER record will supply the 
+USER-GROUP identity which is all that is needed to access the 
+PERMISSIONS table.</li>
+<li>Any change made to a group's permissions will automatically be inherited by all members of that group</li>
+<li>Changes to a group's permissions can be made very easily as there is only one table, the PERMISSIONS table, to maintain.</li>
+<li>If an individual user is switched to another group this will sever 
+all connections to the permissions of the previous group and replace 
+them with those of the new group.</li>
+</ul>
+
+<p>In this design the USER-GROUP table is sometimes known as SECURITY-CLASS or ROLE.</p>
+
+<h3><a name="responsibility-based"></a>Responsibility based</h3>
+
+<p>In this design it is possible for a user to belong to more than one 
+group at the same time. This involves two many-to-many relationships, as
+ shown in Figure 4.</p>
+
+<div class="center">
+<p>Figure 4 - a responsibility-based permission system (simple)</p>
+<img alt="rbac-04 (2K)" src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/rbac-04.png" height="245" width="339">
+</div>
+
+<p> The USER-GROUP table is sometimes referred to as 
+AREA-OF-RESPONSIBILITY because an individual user may have 
+responsibilities in more than one area.</p>
+
+<p>This design has the following disadvantages:</p>
+
+<ul>
+<li>It is only possible to add permissions by linking a user to another 
+user group. It is not possible for the addition of another group to undo
+ any permissions granted by an existing group.</li>
+<li>There are now two tables to maintain in order to give a user access 
+to a task - the USER-USER-GROUP table and the TASK-USER-GROUP table.</li>
+</ul>
+
+<p>A more complex version of this design is shown in Figure 5.</p>
+
+<div class="center">
+<p>Figure 5 - a responsibility-based permission system (complex)</p>
+<img alt="rbac-05 (4K)" src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/rbac-05.png" height="426" width="504">
+</div>
+
+<p>In this design there are now five many-to-many relationships which 
+enables a far wider range of customisation. In the implementation I saw 
+the tasks were complex (a single task could operate in Create, Read, 
+Update and Delete mode) which meant that each of the link/intersection 
+tables was a <a href="#crud-matrix">CRUD matrix</a>. As these tables 
+were read in a strict sequence and the task permissions on one table 
+could be replaced by the task permissions on another table. It was 
+therefore possible for a record with a permission checked ON to be 
+superseded by a record from another table with that permission checked 
+OFF.</p>
+
+<p>Even though in theory this design appears to be much more flexible, 
+in practice this created a problem with usability. As permissions can 
+exist on five tables, and the permission granted on one table can be 
+taken away by the contents of another table it becomes a more difficult 
+process to track down which user has access to which task.</p>
+
+<h2><a name="menu-system">What is a 'menu system'?</a></h2>
+
+<p>Within an application that may contain dozens or even hundreds of 
+functions a method is required whereby the user can quickly activate the
+ function that will allow him to perform the desired task. In some of 
+the first systems I worked on in the 1970s this 'list' was actually 
+nothing more than a written list, and each part of the system had to be 
+activated manually from the command line. A later innovation was to have
+ this list presented on the computer screen with a mechanism so that 
+simply selecting an item would cause it to be activated. With large 
+systems it was cumbersome to have this list presented in a single unit, 
+so it was split into smaller units or pages. These pages were arranged 
+in a hierarchical structure, and links on one page could activate other 
+pages at a lower level. This was the birth of the menu system.</p>
+
+<p>In the first systems I worked on the menu pages were always 
+hard-coded in a fixed and rigid structure. This method had the following
+ disadvantages:</p>
+
+<ul class="compress">
+<li>The menu pages had to be designed and constructed before development could start.</li>
+<li>The menu pages could not be altered without changing and recompiling a piece of program code.</li>
+<li>Every user always started at the same menu page after logging on, 
+even if the only options which they were permitted to access existed on a
+ sub-menu.</li>
+<li>Options which were not accessible to a user were still visible on the menu screens.</li>
+<li>Context could not be passed from one screen to another. This meant 
+that if the user found a record on one screen and wanted to go to 
+another screen to see more details the record identity had to be entered
+ manually into the second screen. This was slow and frustrating work, 
+especially if a mistake was made when keying in the record identity.</li>
+</ul>
+
+<p>In the mid-1980s I was asked to design a menu system which did not include these disadvantages, so I came up with the following:</p>
+
+<ul class="compress">
+<li>I added a 'menu' table to the security database so that menu screens
+ could be constructed dynamically from the contents of the database. As 
+the database already contained a list of transactions for security 
+purposes I could use the same data in the definition and construction of
+ menu screens.</li>
+<li>This meant that menu pages could be constructed and modified without
+ the need for programmer intervention. There was no need to define the 
+entire menu structure at the start of the project as it could be 
+modified 'on the fly'.</li>
+<li>Where a user only had permission to access functions which existed 
+on a sub-menu I allowed that sub-menu to appear immediately after the 
+logon screen, thus bypassing all unnecessary menu screens.</li>
+<li>As the menu screens were constructed from the database, and as the 
+database also contained the user permissions, it was a simple matter to 
+filter out all those options to which the user did not have permission 
+to access. Instead of having to build a separate set of menu screens for
+ each user I could build a single set which could be shared by all 
+users, and each user would only see those options which he was permitted
+ to access.</li>
+<li>I created a mechanism whereby context could be passed from one 
+screen to another, thus removing the need to enter record identities 
+manually.</li>
+</ul>
+
+<p>As you can see a security system and a menu system share a lot of 
+common data, so it makes sense (to me at least) to combine them into a 
+single system.</p>
+
+<h2><a name="current-design">My current design</a></h2>
+
+<p>My current design has evolved over 20 years and has been written in 
+three different languages. It has been used as the basis for many 
+different systems for many different clients and has proved to be 
+effective and robust. As it is driven by the contents of the database 
+then changes can be made easily and quickly. Due to the modular design 
+any changes in functionality can be made easily either by changing an 
+existing module or by adding in a new module.</p>
+
+<p>I originally chose to implement <a href="#group-based">group based</a>
+ security around the USER&lt;==ROLE==&gt;ROLE TASK&lt;==TASK tables as 
+this gave sufficient flexibility with a simple set of options:</p>
+<ul class="compress">
+<li>Permissions for each Role and Task can be maintained on a single screen.</li>
+<li>A User's single Role can be maintained on the 'Update User' screen.</li>
+<li>At run-time permission can be verified with a single lookup on the ROLE-TASK table using a ROLE_ID and a TASK_ID.</li>
+</ul>
+
+<p>In 2014 I decided to upgrade this to implement <a href="#responsibility-based">responsibility based</a>
+ security around the USER==&gt;USER ROLE&lt;==ROLE==&gt;ROLE 
+TASK&lt;==TASK tables as this provides the ability to link a User to 
+more than one Role with only a slight increase in complexity:</p>
+<ul class="compress">
+<li>Permissions for each Role and Task can continue to be maintained on a single screen.</li>
+<li>A User's list of Roles needs to be maintained on a separate 
+USER-ROLE table. One of these Roles must be marked as the primary Role 
+for that User.</li>
+<li>At run-time permission can still be verified with a single lookup on
+ the ROLE-TASK table, but using a list of the User's ROLE_IDs (instead 
+of just a single ID) and a TASK_ID.</li>
+</ul>
+
+<div class="center">
+<p><a name="figure6">Figure 6</a> - my current design</p>
+<img alt="rbac-06 (5K)" src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/rbac-06.png" height="426" width="512">
+</div>
+
+<p>Here is an explanation of the other tables in my database:</p>
+
+<ul>
+<li>PATTERN - Each task conforms to one of the patterns in <a href="http://www.tonymarston.net/php-mysql/dialog-types.html">Transaction Patterns for Web Applications</a>,
+ and I have found it very useful to have this as an identifier on each 
+TASK record. For example, when selecting entries for the ROLE-TASK 
+(PERMISSIONS) table I can very quickly isolate all the tasks of any 
+particular type.</li>
+<li>SUBSYSTEM - Each application or system can often be broken down into
+ discrete parts (or subsystems) which can be regarded as separate 
+collections of components. For example, 'Menu and Security' is separate 
+from 'Workflow' which is separate from 'Product' which is separate from 
+'Customer'. It is quite often that a user will have responsibility in 
+only one of these areas, therefore it is useful to have this as part of 
+the selection criteria when maintaining access permissions.</li>
+<li>MENU - Entries on the TASK table which are of type 'MENU' require to
+ have their contents maintained on the MENU table. When a user selects a
+ menu the contents of the MENU table can be retrieved and displayed. By 
+using the entries on the ROLE-TASK table any MENU option which is not 
+accessible to the user can be filtered out, thus restricting the display
+ to only those options which the user is actually allowed to access. The
+ contents of the MENU table is displayed in the <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#menu-bar">menu bar</a> area of my web pages.</li>
+<li>NAVIGATION BUTTON - There are some tasks which can be accessed 
+without the need for any context being supplied, and these can be made 
+available on any MENU screen. However, in my infrastructure I have <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#form-families">forms families</a>
+ which are comprised of a parent form and several child forms. While the
+ parent form may appear on any MENU, the child forms cannot be made 
+available until the parent form is active. This is because the child 
+forms require context, and context is supplied by the parent form. For 
+example, you must select one or more entries in a <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#list">LIST</a> form before you can pass control to an <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#update">UPDATE</a>, <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#enquire">ENQUIRE</a> or a <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#delete">DELETE</a> form. These child tasks are defined on their own database table, and are displayed in their own <a href="http://www.tonymarston.net/php-mysql/dialog-types.html#navigation-bar">navigation bar</a> area on the web page.</li>
+<li>TASK-FIELD and ROLE-TASK-FIELD - I have sometimes been asked to 
+provide a version of a screen which has access to individual fields 
+downgraded to 'read-only' or even 'invisible'. In some languages it may 
+not be possible to dynamically change the way a field is painted on the 
+screen, in which case it is usually necessary to create a completely 
+different version of the screen. However, as each web page is an HTML 
+document which is built from an XSL transformation I have devised a 
+mechanism whereby I can pass instructions to the transformation process 
+to alter the way that individual fields are to be handled. By default 
+each user has FULL access to every field on the screen, but this can be 
+altered by first defining the 'special case' fields on the TASK-FIELD 
+table, then by altering the field permissions on the ROLE-TASK-FIELD 
+table. This means that a single screen can be viewed by different users 
+with different capabilities and the field definitions will be altered 
+dynamically.</li>
+<li>HELP-TEXT - Within the screen for each task is a hyperlink which 
+will bring up a separate page of help text for the current task. This is
+ retrieved from the database and made available to the user through a 
+standard 'help' function. This help text may contain hyperlinks to other
+ documents.</li>
+</ul>
+
+<h2><a name="conclusion">Conclusion</a></h2>
+
+<p>Some people may say that having to maintain such a complex database 
+is overkill for such a 'simple' requirement, but in my long experience 
+the customer is always dreaming up 'little additions' to his 
+requirements that cannot be satisfied with a primitive design. How easy 
+would it be for you to change your current system to incorporate the 
+following 'little requirements':</p>
+
+<ul>
+<li>Can I have dynamic menus which I can easily modify instead of ones that can only be changed by modifying program code?</li>
+<li>When a menu is displayed I only want to see the options that I can actually access.</li>
+<li>Within a single screen I want to change access to certain fields for certain users.</li>
+</ul>
+
+<p>I have also found over the years that by having such a database I can
+ easily extend it to incorporate new requirements or features. For 
+example, because of the TASK table I am able to include extra pieces of 
+information which can be used by the task at run-time and which can be 
+changed without going near any source code, such as the initial sort 
+order for LIST screens.</p>
+
+<p>All the maintenance screens for the PHP+MySQL version of my Menu and Security system are documented in <a href="http://www.tonymarston.net/php-mysql/menuguide/index.html" target="_top">User Guide to the Menu and Security (RBAC) System</a>.</p>
+
+<h2><a name="other-types">Other types of Access Control</a></h2>
+
+<p>The system described in this document grants or denies permission to use particular <b>tasks</b>
+ within an application, and if a user is granted access to a particular 
+task then he has automatic access to all the data which can be handled 
+by that task. For example, permission to use the "Update Customer 
+Details" task means that the user can update the details of any 
+customer.</p>
+
+<p>Some users may require a level of permissions which goes beyond the individual <b>task</b> and is applied at the <b>data</b> level, such as the following:</p>
+
+<ul>
+<li>An application database usually holds the data for a single 
+organisation, and all the users belong to that organisation, so all the 
+users have access to all the data (subject to the tasks to which they 
+have permission). In some cases the database may deal with several 
+organisations, but each user can only access the data for the 
+organisation to which he belongs. For example, a user of organisation #1
+ has access to the "Update Customer Details" task, but can only use it 
+to access the data for organisation #1. The data for all other 
+organisations is totally invisible to him.
+<p>This requirement, which is sometimes known as a Virtual Private 
+Database (VPD) or Row Level Security (RLS), can be implemented in the 
+Radicore framework by following the instructions contained within <a href="http://www.tonymarston.net/php-mysql/virtual-private-database.html">Implementing Virtual Private Databases</a>.</p></li>
+
+<li>A variation of the above is where a user can access the data for any
+ organisation, but has different permissions within each organisation. 
+For example, he may have permission to use the "Update Customer Details"
+ task within organisation #1, but not for organisation #2.
+<p>This variation could be implemented within the existing framework by 
+each user having a separate logon for each account/organisation.</p>
+<p>If having a separate logon for each account/organisation is not 
+acceptable, this would require a change to the framework so that each 
+user could have a different set of permissions for each 
+account/organisation, and to modify the <a href="http://www.tonymarston.net/php-mysql/menuguide/mnu_logon.html">LOGON</a> screen to include a field to identify which account/organisation is going to be accessed.</p></li>
+</ul>
+
+<h2><a name="references">References</a></h2>
+
+<ul class="compress">
+<li><a href="http://www.tonymarston.net/php-mysql/menuguide/index.html">User Guide to the Menu and Security system for PHP Applications</a></li>
+<li><a href="http://www.tonymarston.net/php-mysql/radicore-security.html">The RADICORE Security Model</a></li>
+</ul>
+
+<hr>
+<p>© <span class="sig">Tony Marston</span><br>
+13th May 2004<br>
+<br><a href="http://www.tonymarston.net/">http://www.tonymarston.net</a>
+<br><a href="http://www.radicore.org/">http://www.radicore.org</a></p>
+
+<p><a name="history">Amendment history:</a></p>
+<div style="margin-left: 1em; margin-right: 1em; ">
+
+<table>
+<colgroup valign="top">
+  <col width="150">
+	<col>
+</colgroup>
+
+<tbody><tr>
+ <td><a name="2014-05-01">01 May 2014</a></td>
+	<td>Amended <a href="#current-design">My Current Design</a> to allow each User to belong to more than one Role.</td>
+</tr>
+
+<tr>
+ <td><a name="2008-03-09">09 Mar 2008</a></td>
+	<td>Added <a href="#other-types">Other types of Access Control</a>.</td>
+</tr>
+
+</tbody></table>
+</div>
+
+<p><img src="A%20Role-Based%20Access%20Control%20%28RBAC%29%20system%20for%20PHP_files/counter.png" alt="counter" border="0"></p>
+
+
+
+<div style="bottom: auto; left: 22px; right: auto; top: 619px; display: none;" class="translator-theme-default" id="translator-floating-panel"><div title="Нажмите для перевода" id="translator-floating-panel-button"></div></div><div style="top: auto; max-width: 400px; max-height: 530px; bottom: 0px; left: auto; right: 0px; display: none;" class="translator-theme-default" id="translator-popup"><div id="translator-popup-toolbar"><div id="translator-popup-title"><div id="translator-popup-source-languages-wrapper"><ul style="margin-top: -18px;" id="translator-popup-source-languages"><li id="translator-popup-source-language-auto" code="auto">Английский - определен</li><li code="en">Английский</li><li code="ru">Русский</li></ul><div id="translator-popup-source-languages-scroller"></div></div><div id="translator-popup-languages-direction"></div><div id="translator-popup-target-languages-wrapper"><ul style="margin-top: -18px;" id="translator-popup-target-languages"><li code="en">Английский</li><li code="ru">Русский</li></ul><div id="translator-popup-target-languages-scroller"></div></div></div><div class="translator-popup-toolbar-spring"></div><a title="Скопировать перевод в буфер обмена" href="javascript:void(0);" id="translator-popup-button-copy"></a><a href="#" id="translator-popup-button-update"></a></div><div style="max-height: 480px; opacity: 1;" class="translator-message-type-normal" id="translator-popup-message"></div><div style="display: none;" id="translator-popup-notice"></div><textarea style="display: none;" id="translator-popup-textarea"></textarea></div><div style="bottom: 0px; left: auto; right: 0px; top: auto; display: none;" title="Переводится..." class="translator-theme-default" id="translator-popup-loading"></div></body></html>
