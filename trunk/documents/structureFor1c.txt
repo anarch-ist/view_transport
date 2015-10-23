@@ -1,4 +1,6 @@
 ﻿структура данных для обновления БД
+
+На первое прремя пользователи не будут парсится из 1с а будут добавляться вручную.
 0. пользователи
 {
 	0.0 добавление нового пользователя
@@ -51,10 +53,13 @@ action - перечисляемый тип, имеющий 3 значения:
 	REMOVE - временно удалить
 	ACTIVE - восстановить
 	DELETE - удалить насовсем
+
+
 	
 итоговое примерное содержимое файла:
 [{"userIdentificator":"100000099","firstName":"Имя","lastName":"Фамилия","patronymic":"Отчество","UserType":"CLIENT","pass":"password","telephone":"+79201690412","email":"login@snail.con","lastModBy":"100000999"},{"firstName":"Алексей","lastName":"Баронов","patronymic":"Валентинович","userIdentificator":"100000099","lastModBy":"100000999"},{"userIdentificator":"100000099","action":"REMOVE","lastModBy":"100000999"},{"userIdentificator":"100000099","action":"REPAIR","lastModBy":"100000999"},{"userIdentificator":"100000099","pass":"1234567890","lastModBy":"100000999"},{"userIdentificator":"100000099","action":"DELETE","lastModBy":"100000999"}]
 }
+На первое прремя пункты не будут парсится из 1с а будут добавляться вручную.
 1. пункты
 {
 	1.0 добавление нового пункта:
