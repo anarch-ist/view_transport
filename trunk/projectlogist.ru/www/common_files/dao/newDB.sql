@@ -122,7 +122,7 @@ CREATE TABLE users (
 
 # helper table, contains only manager users. Every time when add or update new user this table sync with users
 CREATE TABLE manager_users (
-  managerUserID INTEGER NOT NULL,
+  managerUserID INTEGER,
   PRIMARY KEY (managerUserID),
   FOREIGN KEY (managerUserID) REFERENCES users (userID)
     ON DELETE CASCADE
@@ -263,16 +263,17 @@ CREATE TABLE clients (
   dateOfSigning     DATE         NULL,
   startContractDate DATE         NULL,
   endContractDate   DATE         NULL,
-  PRIMARY KEY (clientID)
+  PRIMARY KEY (clientID),
+  UNIQUE (INN)
 );
 
 CREATE TABLE requests (
   requestID          INTEGER,
   requestNumber      VARCHAR(16) NOT NULL,
   date               DATETIME    NOT NULL,
-  managerUserID      INTEGER     NOT NULL,
-  clientID           INTEGER     NOT NULL,
-  destinationPointID INTEGER     NOT NULL, # адрес, куда должны быть доставлены все товары
+  managerUserID      INTEGER     NULL,
+  clientID           INTEGER     NULL,
+  destinationPointID INTEGER     NULL, # адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
   FOREIGN KEY (managerUserID) REFERENCES manager_users (managerUserID)
     ON DELETE SET NULL
@@ -316,7 +317,7 @@ CREATE TABLE route_lists (
   palletsQty     INTEGER      NULL,
   driver         VARCHAR(255) NULL,
   licensePlate   VARCHAR(9)   NULL, # государственный номер автомобиля
-  routeID        INTEGER      NOT NULL,
+  routeID        INTEGER      NULL,
   PRIMARY KEY (routeListID),
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE SET NULL
@@ -331,7 +332,7 @@ CREATE TABLE route_points (
   distanceToNextPoint INTEGER NOT NULL, # в километрах
   arrivalTime         TIME    NOT NULL,
   pointID             INTEGER NOT NULL,
-  routeID             INTEGER NOT NULL,
+  routeID             INTEGER NULL,
   PRIMARY KEY (routePointID),
   FOREIGN KEY (pointID) REFERENCES points (pointID)
     ON DELETE NO ACTION
