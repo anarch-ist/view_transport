@@ -1,3 +1,4 @@
+SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES';
 DROP DATABASE IF EXISTS project_database;
 CREATE DATABASE `project_database`
   CHARACTER SET utf8
@@ -14,20 +15,23 @@ CREATE TABLE user_roles (
   PRIMARY KEY (userRoleID)
 );
 
-# администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
-# имеет право изменить роль пользователя
-INSERT INTO user_roles (userRoleName) VALUES ('ADMIN');
-# диспетчер склада, доступна часть GUI для выбора маршрута и соответсвующие права на изменения в БД
-INSERT INTO user_roles (userRoleName) VALUES ('W_DISPATCHER');
-# диспетчер, доступен GUI для установки статуса накладных и соответсвующие права на изменения в БД
-INSERT INTO user_roles (userRoleName) VALUES ('DISPATCHER');
-# клиент, доступен GUI для для просмотра данных своих ЗН(описание_проекта.odt) и права только на SELECT с его заявкой
-INSERT INTO user_roles (userRoleName) VALUES ('CLIENT');
-# торговый представитель, доступ только на чтение
-INSERT INTO user_roles (userRoleName) VALUES ('MARKET_AGENT');
-# временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
-# что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
-INSERT INTO user_roles (userRoleName) VALUES ('TEMP_REMOVED');
+
+INSERT INTO user_roles (userRoleName)
+  VALUES
+    # администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
+    # имеет право изменить роль пользователя
+    ('ADMIN'),
+    # диспетчер склада, доступна часть GUI для выбора маршрута и соответсвующие права на изменения в БД
+    ('W_DISPATCHER'),
+    # диспетчер, доступен GUI для установки статуса накладных и соответсвующие права на изменения в БД
+    ('DISPATCHER'),
+    # клиент, доступен GUI для для просмотра данных своих ЗН(описание_проекта.odt) и права только на SELECT с его заявкой
+    ('CLIENT'),
+    # торговый представитель, доступ только на чтение
+    ('MARKET_AGENT'),
+    # временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
+    # что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
+    ('TEMP_REMOVED');
 
 CREATE TABLE point_types (
   pointTypeID      INTEGER AUTO_INCREMENT,
@@ -36,8 +40,10 @@ CREATE TABLE point_types (
   PRIMARY KEY (pointTypeID)
 );
 
-INSERT INTO point_types (pointTypeName, pointTypeRusName) VALUES ('WAREHOUSE', 'Склад');
-INSERT INTO point_types (pointTypeName, pointTypeRusName) VALUES ('AGENCY', 'Представительство');
+INSERT INTO point_types (pointTypeName, pointTypeRusName)
+  VALUES
+    ('WAREHOUSE', 'Склад'),
+    ('AGENCY', 'Представительство');
 
 CREATE TABLE points (
   pointID     INTEGER,
@@ -179,22 +185,24 @@ CREATE TABLE permissions (
   PRIMARY KEY (permissionID)
 );
 
-INSERT INTO permissions (permissionName) VALUES ('updateUserRole');
-INSERT INTO permissions (permissionName) VALUES ('updateUserAttributes');
-INSERT INTO permissions (permissionName) VALUES ('insertUser');
-INSERT INTO permissions (permissionName) VALUES ('deleteUser');
-INSERT INTO permissions (permissionName) VALUES ('selectUser');
-INSERT INTO permissions (permissionName) VALUES ('insertPoint');
-INSERT INTO permissions (permissionName) VALUES ('updatePoint');
-INSERT INTO permissions (permissionName) VALUES ('deletePoint');
-INSERT INTO permissions (permissionName) VALUES ('selectPoint');
-INSERT INTO permissions (permissionName) VALUES ('insertRoute');
-INSERT INTO permissions (permissionName) VALUES ('updateRoute');
-INSERT INTO permissions (permissionName) VALUES ('deleteRoute');
-INSERT INTO permissions (permissionName) VALUES ('selectRoute');
-INSERT INTO permissions (permissionName) VALUES ('updateInvoiceStatus');
-INSERT INTO permissions (permissionName) VALUES ('updateRouteListStatus');
-INSERT INTO permissions (permissionName) VALUES ('selectOwnHistory');
+INSERT INTO permissions (permissionName)
+VALUES
+  ('updateUserRole'),
+  ('updateUserAttributes'),
+  ('insertUser'),
+  ('deleteUser'),
+  ('selectUser'),
+  ('insertPoint'),
+  ('updatePoint'),
+  ('deletePoint'),
+  ('selectPoint'),
+  ('insertRoute'),
+  ('updateRoute'),
+  ('deleteRoute'),
+  ('selectRoute'),
+  ('updateInvoiceStatus'),
+  ('updateRouteListStatus'),
+  ('selectOwnHistory');
 
 CREATE TABLE permissions_for_roles (
   roleID       INTEGER,
@@ -291,9 +299,11 @@ CREATE TABLE route_list_statuses (
   PRIMARY KEY (routeListStatusID)
 );
 
-INSERT INTO route_list_statuses (routeListStatusName) VALUE ('CREATED');
-INSERT INTO route_list_statuses (routeListStatusName) VALUE ('UPDATED');
-INSERT INTO route_list_statuses (routeListStatusName) VALUE ('DELETED');
+INSERT INTO route_list_statuses (routeListStatusName)
+VALUES
+  ('CREATED'),
+  ('UPDATED'),
+  ('DELETED');
 
 CREATE TABLE route_lists (
   routeListID    INTEGER,
@@ -398,31 +408,30 @@ CREATE TABLE invoice_statuses (
   PRIMARY KEY (invoiceStatusID)
 );
 
-# duty statuses
+
 INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-VALUES ('CREATED', 'Внутренняя заявка добавлена в БД');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-VALUES ('DELETED', 'Внутренняя заявка добавлена в БД');
-# insider request statuses
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-VALUES ('APPROVING', 'Выгружена на утверждение торговому представителю');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('RESERVED', 'Резерв');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('APPROVED', 'Утверждена к сборке');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('STOP_LIST', 'Стоп-лист');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CREDIT_LIMIT', 'Кредитный лимит');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-VALUES ('RASH_CREATED', 'Создана расходная накладная');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('COLLECTING', 'Выдана на сборку');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CHECK', 'На контроле');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('CHECK_PASSED', 'Контроль пройден');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('PACKAGING', 'Упаковано');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-VALUES ('READY', 'Проверка в зоне отгрузки/Готова к отправке');
-# invoice statuses
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('DEPARTURE', 'Накладная убыла');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('ARRIVED', 'Накладная прибыла в пункт');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('ERROR', 'Ошибка. Возвращение в пункт');
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName) VALUES ('DELIVERED', 'Доставлено');
+VALUES
+  # duty statuses
+  ('CREATED', 'Внутренняя заявка добавлена в БД'),
+  ('DELETED', 'Внутренняя заявка добавлена в БД'),
+  # insider request statuses
+  ('APPROVING', 'Выгружена на утверждение торговому представителю'),
+  ('RESERVED', 'Резерв'),
+  ('APPROVED', 'Утверждена к сборке'),
+  ('STOP_LIST', 'Стоп-лист'),
+  ('CREDIT_LIMIT', 'Кредитный лимит'),
+  ('RASH_CREATED', 'Создана расходная накладная'),
+  ('COLLECTING', 'Выдана на сборку'),
+  ('CHECK', 'На контроле'),
+  ('CHECK_PASSED', 'Контроль пройден'),
+  ('PACKAGING', 'Упаковано'),
+  ('READY', 'Проверка в зоне отгрузки/Готова к отправке'),
+  # invoice statuses
+  ('DEPARTURE', 'Накладная убыла'),
+  ('ARRIVED', 'Накладная прибыла в пункт'),
+  ('ERROR', 'Ошибка. Возвращение в пункт'),
+  ('DELIVERED', 'Доставлено');
+
 
 CREATE FUNCTION get_invoice_status_ID_by_name(statusName VARCHAR(255))
   RETURNS INTEGER
@@ -529,7 +538,7 @@ CREATE TABLE tables (
   PRIMARY KEY (tableID)
 );
 
-INSERT INTO tables (tableName) SELECT TABLE_NAME
+INSERT INTO tables (tableName) SELECT information_schema.TABLES.TABLE_NAME
                                FROM information_schema.TABLES
                                WHERE TABLE_SCHEMA = 'project_database';
 
