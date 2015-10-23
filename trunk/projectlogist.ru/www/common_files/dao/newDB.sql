@@ -21,12 +21,14 @@ INSERT INTO user_roles (userRoleName)
     # администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
     # имеет право изменить роль пользователя
     ('ADMIN'),
-    # диспетчер склада, доступна часть GUI для выбора маршрута и соответсвующие права на изменения в БД
+    # диспетчер склада, доступна часть GUI для выбора маршрута и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа заносить кол-во паллет и статус убыл
     ('W_DISPATCHER'),
-    # диспетчер, доступен GUI для установки статуса накладных и соответсвующие права на изменения в БД
+    # диспетчер, доступен GUI для установки статуса накладных и соответсвующие права на изменения в БД, статус прибыл, и статус убыл.
     ('DISPATCHER'),
-    # клиент, доступен GUI для для просмотра данных своих ЗН(описание_проекта.odt) и права только на SELECT с его заявкой
-    ('CLIENT'),
+    # пользователь клиента, доступен GUI для просмотра данных заявок клиента, которые проходят через пункт к которому привязан пользователь с ролью CLIENT_USER
+    ('CLIENT_USER'),
+    # пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
+    ('CLIENT_MANAGER'),
     # торговый представитель, доступ только на чтение
     ('MARKET_AGENT'),
     # временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
@@ -58,7 +60,7 @@ CREATE TABLE points (
   pointTypeID INTEGER                 NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
-    ON DELETE CASCADE
+    ON DELETE NO ACTION
     ON UPDATE CASCADE
 );
 
@@ -111,10 +113,10 @@ CREATE TABLE users (
   pointID     INTEGER      NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
-    ON DELETE CASCADE
+    ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
-    ON DELETE CASCADE
+    ON DELETE NO ACTION
     ON UPDATE CASCADE
 );
 
@@ -123,6 +125,8 @@ CREATE TABLE manager_users (
   managerUserID INTEGER NOT NULL,
   PRIMARY KEY (managerUserID),
   FOREIGN KEY (managerUserID) REFERENCES users (userID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE FUNCTION is_manager(userRoleID INTEGER)
@@ -209,11 +213,11 @@ CREATE TABLE permissions_for_roles (
   permissionID INTEGER,
   PRIMARY KEY (roleID, permissionID),
   FOREIGN KEY (permissionID) REFERENCES permissions (permissionID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   FOREIGN KEY (roleID) REFERENCES user_roles (userRoleID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 CREATE PROCEDURE insert_permission_for_role(IN user_role_name VARCHAR(64), IN permission_name VARCHAR(64))
@@ -271,13 +275,13 @@ CREATE TABLE requests (
   destinationPointID INTEGER     NOT NULL, # адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
   FOREIGN KEY (managerUserID) REFERENCES manager_users (managerUserID)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY (clientID) REFERENCES clients (clientID)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE CASCADE
 );
 
@@ -288,8 +292,9 @@ CREATE TABLE requests (
 
 
 CREATE TABLE routes (
-  routeID   INTEGER     NOT NULL,
-  routeName VARCHAR(64) NOT NULL,
+  routeID       INTEGER,
+  routeName     VARCHAR(64)  NOT NULL,
+  directionName VARCHAR(255) NULL, # имя направления из предметной области 1С, каждому направлению соответствует один маршрут
   PRIMARY KEY (routeID)
 );
 
@@ -314,6 +319,8 @@ CREATE TABLE route_lists (
   routeID        INTEGER      NOT NULL,
   PRIMARY KEY (routeListID),
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE route_points (
@@ -327,7 +334,7 @@ CREATE TABLE route_points (
   routeID             INTEGER NOT NULL,
   PRIMARY KEY (routePointID),
   FOREIGN KEY (pointID) REFERENCES points (pointID)
-    ON DELETE CASCADE
+    ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE CASCADE
@@ -393,6 +400,8 @@ CREATE TABLE rout_list_history (
   routeListStatusID  INTEGER      NOT NULL,
   PRIMARY KEY (routeListHistoryID),
   FOREIGN KEY (routeListStatusID) REFERENCES route_list_statuses (routeListStatusID)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 
@@ -458,16 +467,16 @@ CREATE TABLE invoices (
   routeListID      INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   FOREIGN KEY (requestID) REFERENCES requests (requestID)
     ON DELETE CASCADE
-    ON UPDATE CASCADE,
+    ON UPDATE NO ACTION,
   FOREIGN KEY (warehousePointID) REFERENCES warehouse_points (warehousePointID)
-    ON DELETE CASCADE
+    ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (routeListID) REFERENCES route_lists (routeListID)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE CASCADE,
   UNIQUE (invoiceNumber)
 );
@@ -524,6 +533,8 @@ CREATE TABLE invoice_history (
   routeListID      INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceHistoryID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 
@@ -550,6 +561,6 @@ CREATE TABLE user_action_history (
   tableID             INTEGER,
   PRIMARY KEY (userActionHistoryID),
   FOREIGN KEY (tableID) REFERENCES tables (tableID)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
-
-#TODO продумать политику ссылочной целостности и расставить соответствующие атрибуты у внешних ключей
