@@ -5,9 +5,11 @@ CREATE DATABASE `project_database`
   COLLATE utf8_bin;
 USE `project_database`;
 
+
 #######################################################################################################################
 #                                        USERS ROLES PERMISSIONS AND POINTS                                           #
 #######################################################################################################################
+
 
 CREATE TABLE user_roles (
   userRoleID   INTEGER AUTO_INCREMENT,
@@ -48,20 +50,21 @@ INSERT INTO point_types (pointTypeName, pointTypeRusName)
     ('AGENCY', 'Представительство');
 
 CREATE TABLE points (
-  pointID     INTEGER,
-  pointName   VARCHAR(128) DEFAULT '' NOT NULL,
-  region      VARCHAR(128)            NULL,
-  district    VARCHAR(64)             NULL,
-  locality    VARCHAR(64)             NULL,
-  mailIndex   VARCHAR(6)              NULL,
-  address     VARCHAR(256)            NOT NULL,
-  email       VARCHAR(64)             NULL,
-  phoneNumber VARCHAR(16)             NULL,
-  pointTypeID INTEGER                 NOT NULL,
+  pointID     INTEGER AUTO_INCREMENT,
+  pointName   VARCHAR(128) NOT NULL,
+  region      VARCHAR(128) NULL,
+  district    VARCHAR(64)  NULL,
+  locality    VARCHAR(64)  NULL,
+  mailIndex   VARCHAR(6)   NULL,
+  address     VARCHAR(256) NOT NULL,
+  email       VARCHAR(64)  NULL,
+  phoneNumber VARCHAR(16)  NULL,
+  pointTypeID INTEGER      NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE (pointName)
 );
 
 # this table content is a subset of points table
@@ -117,7 +120,8 @@ CREATE TABLE users (
     ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE (login)
 );
 
 # helper table, contains only manager users. Every time when add or update new user this table sync with users
@@ -245,7 +249,6 @@ CALL insert_permission_for_role('CLIENT', 'selectPoint');
 CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
 
-
 #######################################################################################################################
 #                                                 CLIENTS AND REQUESTS                                                #
 #######################################################################################################################
@@ -293,7 +296,7 @@ CREATE TABLE requests (
 
 
 CREATE TABLE routes (
-  routeID       INTEGER,
+  routeID       INTEGER AUTO_INCREMENT,
   routeName     VARCHAR(64)  NOT NULL,
   directionName VARCHAR(255) NULL, # имя направления из предметной области 1С, каждому направлению соответствует один маршрут
   PRIMARY KEY (routeID)
@@ -312,7 +315,7 @@ VALUES
   ('DELETED');
 
 CREATE TABLE route_lists (
-  routeListID    INTEGER,
+  routeListID    INTEGER AUTO_INCREMENT,
   routListNumber VARCHAR(32)  NOT NULL,
   palletsQty     INTEGER      NULL,
   driver         VARCHAR(255) NULL,
@@ -321,11 +324,12 @@ CREATE TABLE route_lists (
   PRIMARY KEY (routeListID),
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE SET NULL
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE (routListNumber)
 );
 
 CREATE TABLE route_points (
-  routePointID        INTEGER,
+  routePointID        INTEGER AUTO_INCREMENT,
   sortOrder           INTEGER NOT NULL,
   tLoading            INTEGER NOT NULL, # в минутах
   timeToNextPoint     INTEGER NOT NULL, # в минутах
@@ -418,29 +422,28 @@ CREATE TABLE invoice_statuses (
   PRIMARY KEY (invoiceStatusID)
 );
 
-
 INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-VALUES
-  # duty statuses
-  ('CREATED', 'Внутренняя заявка добавлена в БД'),
-  ('DELETED', 'Внутренняя заявка добавлена в БД'),
-  # insider request statuses
-  ('APPROVING', 'Выгружена на утверждение торговому представителю'),
-  ('RESERVED', 'Резерв'),
-  ('APPROVED', 'Утверждена к сборке'),
-  ('STOP_LIST', 'Стоп-лист'),
-  ('CREDIT_LIMIT', 'Кредитный лимит'),
-  ('RASH_CREATED', 'Создана расходная накладная'),
-  ('COLLECTING', 'Выдана на сборку'),
-  ('CHECK', 'На контроле'),
-  ('CHECK_PASSED', 'Контроль пройден'),
-  ('PACKAGING', 'Упаковано'),
-  ('READY', 'Проверка в зоне отгрузки/Готова к отправке'),
-  # invoice statuses
-  ('DEPARTURE', 'Накладная убыла'),
-  ('ARRIVED', 'Накладная прибыла в пункт'),
-  ('ERROR', 'Ошибка. Возвращение в пункт'),
-  ('DELIVERED', 'Доставлено');
+  VALUES
+    # duty statuses
+    ('CREATED', 'Внутренняя заявка добавлена в БД'),
+    ('DELETED', 'Внутренняя заявка удалена из БД'),
+    # insider request statuses
+    ('APPROVING', 'Выгружена на утверждение торговому представителю'),
+    ('RESERVED', 'Резерв'),
+    ('APPROVED', 'Утверждена к сборке'),
+    ('STOP_LIST', 'Стоп-лист'),
+    ('CREDIT_LIMIT', 'Кредитный лимит'),
+    ('RASH_CREATED', 'Создана расходная накладная'),
+    ('COLLECTING', 'Выдана на сборку'),
+    ('CHECK', 'На контроле'),
+    ('CHECK_PASSED', 'Контроль пройден'),
+    ('PACKAGING', 'Упаковано'),
+    ('READY', 'Проверка в зоне отгрузки/Готова к отправке'),
+    # invoice statuses
+    ('DEPARTURE', 'Накладная убыла'),
+    ('ARRIVED', 'Накладная прибыла в пункт'),
+    ('ERROR', 'Ошибка. Возвращение в пункт'),
+    ('DELIVERED', 'Доставлено');
 
 
 CREATE FUNCTION get_invoice_status_ID_by_name(statusName VARCHAR(255))
@@ -456,7 +459,7 @@ CREATE FUNCTION get_invoice_status_ID_by_name(statusName VARCHAR(255))
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
 CREATE TABLE invoices (
-  invoiceID        INTEGER,
+  invoiceID        INTEGER AUTO_INCREMENT,
   invoiceNumber    VARCHAR(16) NOT NULL,
   creationDate     DATETIME    NULL,
   deliveryDate     DATETIME    NULL,
