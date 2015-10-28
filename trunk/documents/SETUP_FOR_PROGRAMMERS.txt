@@ -21,7 +21,9 @@
 
 7)  добавляем в файл C:\Windows\System32\drivers\etc\hosts следующее содержание:
     
-    127.0.0.1      projectlogist.ru    
+    127.0.0.1      projectlogist.ru
+    127.0.0.1      sbat.logist.ru
+	    
 
 8)  заменяем содержание файла C:\web\wamp\bin\apache\apache2.4.9\conf\extra\httpd-vhosts.conf
     следующим контентом:
@@ -66,17 +68,23 @@ DocumentRoot "c:/web/wamp/www/projectlogist.ru"
 ServerName projectlogist.ru
 </VirtualHost>
 
+<VirtualHost *:80>
+DocumentRoot "c:/web/wamp/www/sbat.logist.ru"
+ServerName sbat.logist.ru
+</VirtualHost>
+
 ----FILE-CONTENT-INSIDE-END----
 
-9)  скачиваем, устанавливаем phpStorm и создаем новый проект:
+9)  скачиваем, устанавливаем phpStorm и создаем 2 проекта:
 Create New Project from Existing Files
 
 Web server is installed locally, source files are located under its document root.
 
 Project root is C:\web\wamp\www\projectlogist.ru
-
 use projlog Server with http://projectlogist URL. (сервер должен быть запущен)
 
+Project root is C:\web\wamp\www\sbat.logist.ru
+use sbat Server with http://sbat.logist.ru URL. (сервер должен быть запущен)
 
 
 10) подключаем базу данных к проекту:
