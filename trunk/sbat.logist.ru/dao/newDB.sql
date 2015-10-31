@@ -12,42 +12,49 @@ USE `project_database`;
 
 
 CREATE TABLE user_roles (
-  userRoleID   INTEGER AUTO_INCREMENT,
-  userRoleName VARCHAR(64) NOT NULL,
+  userRoleID VARCHAR(32),
   PRIMARY KEY (userRoleID)
 );
 
-
-INSERT INTO user_roles (userRoleName)
-  VALUES
-    # администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
-    # имеет право изменить роль пользователя
-    ('ADMIN'),
-    # диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
-    ('W_DISPATCHER'),
-    # диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
-    ('DISPATCHER'),
-    # пользователь клиента, доступен GUI для просмотра данных заявок клиента, которые проходят через пункт к которому привязан пользователь с ролью CLIENT_USER, возможность проставлять статус "доставлен"
-    ('CLIENT_USER'),
-    # пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
-    ('CLIENT_MANAGER'),
-    # торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
-    ('MARKET_AGENT'),
-    # временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
-    # что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
-    ('TEMP_REMOVED');
+INSERT INTO user_roles (userRoleID)
+VALUES
+  # администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
+  # имеет право изменить роль пользователя
+  ('ADMIN'),
+  # диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
+  ('W_DISPATCHER'),
+  # диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
+  ('DISPATCHER'),
+  # пользователь клиента, доступен GUI для просмотра данных заявок клиента, которые проходят через пункт к которому привязан пользователь с ролью CLIENT_USER, возможность проставлять статус "доставлен"
+  ('CLIENT_USER'),
+  # пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
+  ('CLIENT_MANAGER'),
+  # торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
+  ('MARKET_AGENT'),
+  # временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
+  # что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
+  ('TEMP_REMOVED');
 
 CREATE TABLE point_types (
-  pointTypeID      INTEGER AUTO_INCREMENT,
-  pointTypeName    VARCHAR(64) NOT NULL,
-  pointTypeRusName VARCHAR(64) NOT NULL,
+  pointTypeID      VARCHAR(32),
+  pointTypeRusName VARCHAR(32) NOT NULL,
   PRIMARY KEY (pointTypeID)
 );
 
-INSERT INTO point_types (pointTypeName, pointTypeRusName)
-  VALUES
-    ('WAREHOUSE', 'Склад'),
-    ('AGENCY', 'Представительство');
+INSERT INTO point_types
+VALUES
+  ('WAREHOUSE', 'Склад'),
+  ('AGENCY', 'Представительство');
+
+CREATE FUNCTION getPointIDByName(name VARCHAR(128))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT pointID
+                  FROM points
+                  WHERE name = pointName);
+    RETURN result;
+  END;
 
 CREATE TABLE points (
   pointID     INTEGER AUTO_INCREMENT,
@@ -59,7 +66,7 @@ CREATE TABLE points (
   address     VARCHAR(256) NOT NULL,
   email       VARCHAR(64)  NULL,
   phoneNumber VARCHAR(16)  NULL,
-  pointTypeID INTEGER      NOT NULL,
+  pointTypeID VARCHAR(32)  NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
     ON DELETE NO ACTION
@@ -67,40 +74,14 @@ CREATE TABLE points (
   UNIQUE (pointName)
 );
 
-# this table content is a subset of points table
-CREATE TABLE warehouse_points (
-  warehousePointID INTEGER,
-  PRIMARY KEY (warehousePointID),
-  FOREIGN KEY (warehousePointID) REFERENCES points (pointID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
-
-CREATE FUNCTION is_warehouse(pointTypeID INTEGER)
-  RETURNS BOOLEAN
+CREATE FUNCTION getUserIDByLogin(_login VARCHAR(128))
+  RETURNS INTEGER
   BEGIN
-    RETURN pointTypeID IN (SELECT pointTypeName
-                           FROM point_types
-                           WHERE pointTypeName = 'Склад');
-  END;
-
-CREATE TRIGGER before_points_insert
-BEFORE INSERT ON points FOR EACH ROW
-  BEGIN
-    IF (is_warehouse(NEW.pointTypeID))
-    THEN
-      INSERT INTO warehouse_points VALUES (NEW.pointTypeID);
-    END IF;
-  END;
-
-CREATE TRIGGER before_points_delete
-BEFORE DELETE ON points FOR EACH ROW
-  BEGIN
-    IF (is_warehouse(old.pointTypeID))
-    THEN
-      DELETE FROM warehouse_points
-      WHERE warehouse_points.warehousePointID = old.pointTypeID;
-    END IF;
+    DECLARE result INTEGER;
+    SET result = (SELECT userID
+                  FROM users
+                  WHERE login = _login);
+    RETURN result;
   END;
 
 CREATE TABLE users (
@@ -112,7 +93,7 @@ CREATE TABLE users (
   passMD5     VARCHAR(64)  NOT NULL,
   phoneNumber VARCHAR(16)  NULL,
   email       VARCHAR(64)  NULL,
-  userRoleID  INTEGER      NOT NULL,
+  userRoleID  VARCHAR(32)  NOT NULL,
   pointID     INTEGER      NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
@@ -124,76 +105,12 @@ CREATE TABLE users (
   UNIQUE (login)
 );
 
-# helper table, contains only manager users. Every time when add or update new user this table sync with users
-CREATE TABLE manager_users (
-  managerUserID INTEGER,
-  PRIMARY KEY (managerUserID),
-  FOREIGN KEY (managerUserID) REFERENCES users (userID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
-
-CREATE FUNCTION is_manager(userRoleID INTEGER)
-  RETURNS BOOLEAN
-  BEGIN
-    RETURN userRoleID IN (SELECT userRoleID
-                          FROM user_roles
-                          WHERE userRoleName = 'MARKET_AGENT');
-  END;
-
-CREATE TRIGGER before_users_insert
-BEFORE INSERT ON users FOR EACH ROW
-  BEGIN
-    IF (is_manager(NEW.userRoleID))
-    THEN
-      INSERT INTO manager_users VALUES (NEW.userRoleID);
-    END IF;
-  END;
-
-CREATE TRIGGER before_users_delete
-BEFORE DELETE ON users FOR EACH ROW
-  BEGIN
-    IF (is_manager(old.userRoleID))
-    THEN
-      DELETE FROM manager_users
-      WHERE manager_users.managerUserID = old.userID;
-    END IF;
-  END;
-
-CREATE TRIGGER before_users_update
-BEFORE UPDATE ON users FOR EACH ROW
-  BEGIN
-
-    IF (NEW.userID != old.userID)
-    THEN
-      UPDATE manager_users
-      SET managerUserID = NEW.userID
-      WHERE old.userID = manager_users.managerUserID;
-    END IF;
-
-    IF (NEW.userRoleID != old.userRoleID)
-    THEN
-      BEGIN
-        IF (is_manager(NEW.userRoleID))
-        THEN
-          INSERT INTO manager_users VALUES (NEW.userRoleID);
-        ELSE IF (is_manager(old.userRoleID))
-        THEN
-          DELETE FROM manager_users
-          WHERE manager_users.managerUserID = old.userID;
-        END IF;
-        END IF;
-      END;
-    END IF;
-  END;
-
 CREATE TABLE permissions (
-  permissionID   INTEGER AUTO_INCREMENT,
-  permissionName VARCHAR(64),
+  permissionID VARCHAR(32),
   PRIMARY KEY (permissionID)
 );
 
-INSERT INTO permissions (permissionName)
+INSERT INTO permissions (permissionID)
 VALUES
   ('updateUserRole'),
   ('updateUserAttributes'),
@@ -213,34 +130,34 @@ VALUES
   ('selectOwnHistory');
 
 CREATE TABLE permissions_for_roles (
-  roleID       INTEGER,
-  permissionID INTEGER,
-  PRIMARY KEY (roleID, permissionID),
+  userRoleID   VARCHAR(32),
+  permissionID VARCHAR(32),
+  PRIMARY KEY (userRoleID, permissionID),
   FOREIGN KEY (permissionID) REFERENCES permissions (permissionID)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  FOREIGN KEY (roleID) REFERENCES user_roles (userRoleID)
+  FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
 
-CREATE PROCEDURE insert_permission_for_role(IN user_role_name VARCHAR(64), IN permission_name VARCHAR(64))
+CREATE PROCEDURE insert_permission_for_role(IN user_role_name VARCHAR(32), IN permission_name VARCHAR(32))
   BEGIN
-    INSERT INTO permissions_for_roles (roleID, permissionID) SELECT
-                                                               user_roles.userRoleID,
-                                                               permissions.permissionID
-                                                             FROM user_roles, permissions
-                                                             WHERE user_roles.userRoleName = user_role_name AND
-                                                                   permissions.permissionName = permission_name;
+    INSERT INTO permissions_for_roles (userRoleID, permissionID) SELECT
+                                                                   user_roles.userRoleID,
+                                                                   permissions.permissionID
+                                                                 FROM user_roles, permissions
+                                                                 WHERE user_roles.userRoleID = user_role_name AND
+                                                                       permissions.permissionID = permission_name;
   END;
 
 # add all permissions to 'ADMIN'
-INSERT INTO permissions_for_roles (roleID, permissionID)
+INSERT INTO permissions_for_roles (userRoleID, permissionID)
   SELECT *
   FROM (SELECT userRoleID
         FROM user_roles
-        WHERE userRoleName = 'ADMIN') AS qwe1, (SELECT permissionID
-                                                FROM permissions) AS qwe;
+        WHERE userRoleID = 'ADMIN') AS qwe1, (SELECT permissionID
+                                              FROM permissions) AS qwe;
 # TODO add permissions to 'WAREHOUSE_MANAGER'
 # TODO add permissions to 'MANAGER'
 # TODO add permissions to 'TEMP_REMOVED'
@@ -253,6 +170,14 @@ CALL insert_permission_for_role('CLIENT', 'selectRoute');
 #                                                 CLIENTS AND REQUESTS                                                #
 #######################################################################################################################
 
+
+CREATE FUNCTION getClientIDByINN(_INN VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT clientID FROM clients WHERE INN = _INN);
+    RETURN result;
+  END;
 
 CREATE TABLE clients (
   clientID          INTEGER AUTO_INCREMENT,
@@ -270,15 +195,24 @@ CREATE TABLE clients (
   UNIQUE (INN)
 );
 
+CREATE FUNCTION getRequestIDByNumber(_requestNumber VARCHAR(16))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT requestID FROM requests WHERE requestNumber = _requestNumber);
+    RETURN result;
+  END;
+
+# insert only manager users
 CREATE TABLE requests (
-  requestID          INTEGER,
+  requestID          INTEGER AUTO_INCREMENT,
   requestNumber      VARCHAR(16) NOT NULL,
   date               DATETIME    NOT NULL,
-  managerUserID      INTEGER     NULL,
+  marketAgentUserID  INTEGER     NULL,
   clientID           INTEGER     NULL,
   destinationPointID INTEGER     NULL, # адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
-  FOREIGN KEY (managerUserID) REFERENCES manager_users (managerUserID)
+  FOREIGN KEY (marketAgentUserID) REFERENCES users (userID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY (clientID) REFERENCES clients (clientID)
@@ -289,11 +223,36 @@ CREATE TABLE requests (
     ON UPDATE CASCADE
 );
 
+CREATE FUNCTION is_market_agent(_userID INTEGER)
+  RETURNS BOOLEAN
+  BEGIN
+    DECLARE userRole VARCHAR(32);
+    SET userRole = (SELECT userRoleID FROM users WHERE userID = _userID);
+    RETURN (userRole = 'MARKET_AGENT');
+  END;
+
+CREATE TRIGGER before_request_insert
+BEFORE INSERT ON requests FOR EACH ROW
+  BEGIN
+    IF NOT (is_market_agent(NEW.marketAgentUserID))
+    THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot insert row: only manager users allowed';
+    END IF;
+  END;
+
 
 #######################################################################################################################
 #                                          ROUTE AND ROUTE LISTS                                                      #
 #######################################################################################################################
 
+CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routeID FROM routes WHERE routeName = _routName);
+    RETURN result;
+  END;
 
 CREATE TABLE routes (
   routeID       INTEGER AUTO_INCREMENT,
@@ -303,16 +262,23 @@ CREATE TABLE routes (
 );
 
 CREATE TABLE route_list_statuses (
-  routeListStatusID   INTEGER AUTO_INCREMENT,
-  routeListStatusName VARCHAR(16),
+  routeListStatusID VARCHAR(32),
   PRIMARY KEY (routeListStatusID)
 );
 
-INSERT INTO route_list_statuses (routeListStatusName)
+INSERT INTO route_list_statuses
 VALUES
   ('CREATED'),
   ('UPDATED'),
   ('DELETED');
+
+CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routeListID FROM route_lists WHERE routListNumber = _routListNumber);
+    RETURN result;
+  END;
 
 CREATE TABLE route_lists (
   routeListID    INTEGER AUTO_INCREMENT,
@@ -346,16 +312,6 @@ CREATE TABLE route_points (
     ON UPDATE CASCADE
 );
 
-CREATE FUNCTION get_route_list_status_id_by_name(statusName VARCHAR(255))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routeListStatusID
-                  FROM route_list_statuses
-                  WHERE routeListStatusID = statusName);
-    RETURN result;
-  END;
-
 CREATE PROCEDURE insert_into_rout_list_history(
   routeListID       INTEGER,
   routListNumber    VARCHAR(32),
@@ -363,7 +319,7 @@ CREATE PROCEDURE insert_into_rout_list_history(
   driver            VARCHAR(255),
   licensePlate      VARCHAR(9),
   routeID           INTEGER,
-  routeListStatusID INTEGER
+  routeListStatusID VARCHAR(32)
 )
   BEGIN
     INSERT INTO rout_list_history (timeMark, routeListID, routListNumber, palletsQty, driver, licensePlate, routeID, routeListStatusID)
@@ -376,21 +332,21 @@ CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
-                                       NEW.licensePlate, NEW.routeID, get_route_list_status_id_by_name('CREATED'));
+                                       NEW.licensePlate, NEW.routeID, 'CREATED');
   END;
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
-                                       NEW.licensePlate, NEW.routeID, get_route_list_status_id_by_name('UPDATED'));
+                                       NEW.licensePlate, NEW.routeID, 'UPDATED');
   END;
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(OLD.routeListID, OLD.routListNumber, OLD.palletsQty, OLD.driver,
-                                       OLD.licensePlate, OLD.routeID, get_route_list_status_id_by_name('DELETED'));
+                                       OLD.licensePlate, OLD.routeID, 'DELETED');
   END;
 
 CREATE TABLE rout_list_history (
@@ -402,7 +358,7 @@ CREATE TABLE rout_list_history (
   driver             VARCHAR(255) NULL,
   licensePlate       VARCHAR(9)   NULL, # государственный номер автомобиля
   routeID            INTEGER      NOT NULL,
-  routeListStatusID  INTEGER      NOT NULL,
+  routeListStatusID  VARCHAR(32)  NOT NULL,
   PRIMARY KEY (routeListHistoryID),
   FOREIGN KEY (routeListStatusID) REFERENCES route_list_statuses (routeListStatusID)
     ON DELETE NO ACTION
@@ -416,45 +372,34 @@ CREATE TABLE rout_list_history (
 
 
 CREATE TABLE invoice_statuses (
-  invoiceStatusID      INTEGER AUTO_INCREMENT,
-  invoiceStatusName    VARCHAR(32)  NOT NULL,
+  invoiceStatusID      VARCHAR(32),
   invoiceStatusRusName VARCHAR(128) NOT NULL,
   PRIMARY KEY (invoiceStatusID)
 );
 
-INSERT INTO invoice_statuses (invoiceStatusName, invoiceStatusRusName)
-  VALUES
-    # duty statuses
-    ('CREATED', 'Внутренняя заявка добавлена в БД'),
-    ('DELETED', 'Внутренняя заявка удалена из БД'),
-    # insider request statuses
-    ('APPROVING', 'Выгружена на утверждение торговому представителю'),
-    ('RESERVED', 'Резерв'),
-    ('APPROVED', 'Утверждена к сборке'),
-    ('STOP_LIST', 'Стоп-лист'),
-    ('CREDIT_LIMIT', 'Кредитный лимит'),
-    ('RASH_CREATED', 'Создана расходная накладная'),
-    ('COLLECTING', 'Выдана на сборку'),
-    ('CHECK', 'На контроле'),
-    ('CHECK_PASSED', 'Контроль пройден'),
-    ('PACKAGING', 'Упаковано'),
-    ('READY', 'Проверка в зоне отгрузки/Готова к отправке'),
-    # invoice statuses
-    ('DEPARTURE', 'Накладная убыла'),
-    ('ARRIVED', 'Накладная прибыла в пункт'),
-    ('ERROR', 'Ошибка. Возвращение в пункт'),
-    ('DELIVERED', 'Доставлено');
+INSERT INTO invoice_statuses
+VALUES
+  # duty statuses
+  ('CREATED', 'Внутренняя заявка добавлена в БД'),
+  ('DELETED', 'Внутренняя заявка удалена из БД'),
+  # insider request statuses
+  ('APPROVING', 'Выгружена на утверждение торговому представителю'),
+  ('RESERVED', 'Резерв'),
+  ('APPROVED', 'Утверждена к сборке'),
+  ('STOP_LIST', 'Стоп-лист'),
+  ('CREDIT_LIMIT', 'Кредитный лимит'),
+  ('RASH_CREATED', 'Создана расходная накладная'),
+  ('COLLECTING', 'Выдана на сборку'),
+  ('CHECK', 'На контроле'),
+  ('CHECK_PASSED', 'Контроль пройден'),
+  ('PACKAGING', 'Упаковано'),
+  ('READY', 'Проверка в зоне отгрузки/Готова к отправке'),
+  # invoice statuses
+  ('DEPARTURE', 'Накладная убыла'),
+  ('ARRIVED', 'Накладная прибыла в пункт'),
+  ('ERROR', 'Ошибка. Возвращение в пункт'),
+  ('DELIVERED', 'Доставлено');
 
-
-CREATE FUNCTION get_invoice_status_ID_by_name(statusName VARCHAR(255))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT invoiceStatusID
-                  FROM invoice_statuses
-                  WHERE invoiceStatusName = statusName);
-    RETURN result;
-  END;
 
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
@@ -465,7 +410,7 @@ CREATE TABLE invoices (
   deliveryDate     DATETIME    NULL,
   boxQty           INTEGER     NULL,
   sales_invoice    VARCHAR(16) NULL, # расходная накладная
-  invoiceStatusID  INTEGER     NOT NULL,
+  invoiceStatusID  VARCHAR(32) NOT NULL,
   requestID        INTEGER     NOT NULL,
   warehousePointID INTEGER     NOT NULL,
   routeListID      INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
@@ -476,7 +421,7 @@ CREATE TABLE invoices (
   FOREIGN KEY (requestID) REFERENCES requests (requestID)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
-  FOREIGN KEY (warehousePointID) REFERENCES warehouse_points (warehousePointID)
+  FOREIGN KEY (warehousePointID) REFERENCES points (pointID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (routeListID) REFERENCES route_lists (routeListID)
@@ -485,6 +430,25 @@ CREATE TABLE invoices (
   UNIQUE (invoiceNumber)
 );
 
+CREATE FUNCTION is_warehouse(_pointID INTEGER)
+  RETURNS BOOLEAN
+  BEGIN
+    DECLARE pointType VARCHAR(32);
+    SET pointType = (SELECT pointTypeID FROM points WHERE pointID = _pointID);
+    RETURN (pointType = 'WAREHOUSE');
+  END;
+
+CREATE TRIGGER before_invoice_insert
+BEFORE INSERT ON invoices FOR EACH ROW
+  BEGIN
+    IF NOT (is_warehouse(NEW.warehousePointID))
+    THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Cannot insert row: only warehouse points allowed';
+    END IF;
+  END;
+
+
 CREATE PROCEDURE insert_into_invoice_history(
   invoiceID        INTEGER,
   invoiceNumber    VARCHAR(16),
@@ -492,7 +456,7 @@ CREATE PROCEDURE insert_into_invoice_history(
   deliveryDate     DATETIME,
   boxQty           INTEGER,
   sales_invoice    VARCHAR(16),
-  invoiceStatusID  INTEGER,
+  invoiceStatusID  VARCHAR(32),
   requestID        INTEGER,
   warehousePointID INTEGER,
   routeListID      INTEGER
@@ -508,7 +472,7 @@ CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
       NEW.invoiceID, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
-      get_invoice_status_ID_by_name('CREATED'), NEW.requestID, NEW.warehousePointID, NEW.routeListID);
+      'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID);
 
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
@@ -520,7 +484,7 @@ CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
       OLD.invoiceID, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.sales_invoice,
-      get_invoice_status_ID_by_name('DELETED'), OLD.requestID, OLD.warehousePointID, OLD.routeListID);
+      'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID);
 
 CREATE TABLE invoice_history (
   invoiceHistoryID BIGINT AUTO_INCREMENT,
@@ -531,7 +495,7 @@ CREATE TABLE invoice_history (
   deliveryDate     DATETIME    NULL,
   boxQty           INTEGER     NULL,
   sales_invoice    VARCHAR(16) NULL, # расходная накладная
-  invoiceStatusID  INTEGER     NOT NULL,
+  invoiceStatusID  VARCHAR(32) NOT NULL,
   requestID        INTEGER     NOT NULL,
   warehousePointID INTEGER     NOT NULL,
   routeListID      INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
@@ -568,3 +532,5 @@ CREATE TABLE user_action_history (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
+
+
