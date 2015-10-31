@@ -175,7 +175,9 @@ CREATE FUNCTION getClientIDByINN(_INN VARCHAR(32))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
-    SET result = (SELECT clientID FROM clients WHERE INN = _INN);
+    SET result = (SELECT clientID
+                  FROM clients
+                  WHERE INN = _INN);
     RETURN result;
   END;
 
@@ -199,7 +201,9 @@ CREATE FUNCTION getRequestIDByNumber(_requestNumber VARCHAR(16))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
-    SET result = (SELECT requestID FROM requests WHERE requestNumber = _requestNumber);
+    SET result = (SELECT requestID
+                  FROM requests
+                  WHERE requestNumber = _requestNumber);
     RETURN result;
   END;
 
@@ -227,7 +231,9 @@ CREATE FUNCTION is_market_agent(_userID INTEGER)
   RETURNS BOOLEAN
   BEGIN
     DECLARE userRole VARCHAR(32);
-    SET userRole = (SELECT userRoleID FROM users WHERE userID = _userID);
+    SET userRole = (SELECT userRoleID
+                    FROM users
+                    WHERE userID = _userID);
     RETURN (userRole = 'MARKET_AGENT');
   END;
 
@@ -250,7 +256,9 @@ CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
-    SET result = (SELECT routeID FROM routes WHERE routeName = _routName);
+    SET result = (SELECT routeID
+                  FROM routes
+                  WHERE routeName = _routName);
     RETURN result;
   END;
 
@@ -276,7 +284,9 @@ CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
-    SET result = (SELECT routeListID FROM route_lists WHERE routListNumber = _routListNumber);
+    SET result = (SELECT routeListID
+                  FROM route_lists
+                  WHERE routListNumber = _routListNumber);
     RETURN result;
   END;
 
@@ -404,16 +414,17 @@ VALUES
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
 CREATE TABLE invoices (
-  invoiceID        INTEGER AUTO_INCREMENT,
-  invoiceNumber    VARCHAR(16) NOT NULL,
-  creationDate     DATETIME    NULL,
-  deliveryDate     DATETIME    NULL,
-  boxQty           INTEGER     NULL,
-  sales_invoice    VARCHAR(16) NULL, # расходная накладная
-  invoiceStatusID  VARCHAR(32) NOT NULL,
-  requestID        INTEGER     NOT NULL,
-  warehousePointID INTEGER     NOT NULL,
-  routeListID      INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
+  invoiceID            INTEGER AUTO_INCREMENT,
+  insiderRequestNumber VARCHAR(16) NOT NULL,
+  invoiceNumber        VARCHAR(16) NOT NULL,
+  creationDate         DATETIME    NULL,
+  deliveryDate         DATETIME    NULL,
+  boxQty               INTEGER     NULL,
+  sales_invoice        VARCHAR(16) NULL, # расходная накладная
+  invoiceStatusID      VARCHAR(32) NOT NULL,
+  requestID            INTEGER     NOT NULL,
+  warehousePointID     INTEGER     NOT NULL,
+  routeListID          INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
     ON DELETE NO ACTION
@@ -427,6 +438,7 @@ CREATE TABLE invoices (
   FOREIGN KEY (routeListID) REFERENCES route_lists (routeListID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
+  UNIQUE (insiderRequestNumber),
   UNIQUE (invoiceNumber)
 );
 
@@ -434,7 +446,9 @@ CREATE FUNCTION is_warehouse(_pointID INTEGER)
   RETURNS BOOLEAN
   BEGIN
     DECLARE pointType VARCHAR(32);
-    SET pointType = (SELECT pointTypeID FROM points WHERE pointID = _pointID);
+    SET pointType = (SELECT pointTypeID
+                     FROM points
+                     WHERE pointID = _pointID);
     RETURN (pointType = 'WAREHOUSE');
   END;
 
@@ -450,55 +464,58 @@ BEFORE INSERT ON invoices FOR EACH ROW
 
 
 CREATE PROCEDURE insert_into_invoice_history(
-  invoiceID        INTEGER,
-  invoiceNumber    VARCHAR(16),
-  creationDate     DATETIME,
-  deliveryDate     DATETIME,
-  boxQty           INTEGER,
-  sales_invoice    VARCHAR(16),
-  invoiceStatusID  VARCHAR(32),
-  requestID        INTEGER,
-  warehousePointID INTEGER,
-  routeListID      INTEGER
+  invoiceID            INTEGER,
+  insiderRequestNumber VARCHAR(16),
+  invoiceNumber        VARCHAR(16),
+  creationDate         DATETIME,
+  deliveryDate         DATETIME,
+  boxQty               INTEGER,
+  sales_invoice        VARCHAR(16),
+  invoiceStatusID      VARCHAR(32),
+  requestID            INTEGER,
+  warehousePointID     INTEGER,
+  routeListID          INTEGER
 )
   BEGIN
-    INSERT INTO invoice_history (timeMark, invoiceID, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID)
+    INSERT INTO invoice_history (timeMark, invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID)
     VALUES
-      (NOW(), invoiceID, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID,
+      (NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice,
+       invoiceStatusID, requestID,
        warehousePointID, routeListID);
   END;
 
 CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
-      NEW.invoiceID, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
+      NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
       'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID);
 
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
-      NEW.invoiceID, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
+      NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
       NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID);
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
-      OLD.invoiceID, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.sales_invoice,
+      OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.sales_invoice,
       'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID);
 
 CREATE TABLE invoice_history (
-  invoiceHistoryID BIGINT AUTO_INCREMENT,
-  timeMark         DATETIME,
-  invoiceID        INTEGER,
-  invoiceNumber    VARCHAR(16) NOT NULL,
-  creationDate     DATETIME    NULL,
-  deliveryDate     DATETIME    NULL,
-  boxQty           INTEGER     NULL,
-  sales_invoice    VARCHAR(16) NULL, # расходная накладная
-  invoiceStatusID  VARCHAR(32) NOT NULL,
-  requestID        INTEGER     NOT NULL,
-  warehousePointID INTEGER     NOT NULL,
-  routeListID      INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
+  invoiceHistoryID     BIGINT AUTO_INCREMENT,
+  timeMark             DATETIME,
+  invoiceID            INTEGER,
+  insiderRequestNumber VARCHAR(16) NOT NULL,
+  invoiceNumber        VARCHAR(16) NOT NULL,
+  creationDate         DATETIME    NULL,
+  deliveryDate         DATETIME    NULL,
+  boxQty               INTEGER     NULL,
+  sales_invoice        VARCHAR(16) NULL, # расходная накладная
+  invoiceStatusID      VARCHAR(32) NOT NULL,
+  requestID            INTEGER     NOT NULL,
+  warehousePointID     INTEGER     NOT NULL,
+  routeListID          INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceHistoryID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
     ON DELETE NO ACTION

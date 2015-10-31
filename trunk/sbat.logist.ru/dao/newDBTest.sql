@@ -47,9 +47,10 @@ INSERT INTO route_lists(routListNumber, palletsQty, driver, licensePlate, routeI
 VALUES
   ('1455668', 3, 'Dmitriy', 'екх123', getRoutIDByRoutName('rout1'));
 
-INSERT INTO invoices(invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID)
+INSERT INTO invoices(insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID)
 VALUES
-  ('qwd22345', now(), now(), 4, 'oweieih213423', 'CREATED', getRequestIDByNumber('123356'), getPointIDByName('point1'), getRouteListIDByNumber('1455668'));
+  ('ogeghei2243', 'qwd22345', now(), now(), 4, 'oweieih213423', 'CREATED', getRequestIDByNumber('123356'), getPointIDByName('point1'), getRouteListIDByNumber('1455668')),
+  ('ogeghei2244', 'qwd22334', now(), now(), 2, 'oweieih2ewf23', 'CREATED', getRequestIDByNumber('123356'), getPointIDByName('point1'), getRouteListIDByNumber('1455668'));
 
 
 
