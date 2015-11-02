@@ -43,13 +43,14 @@ VALUES
   (1, 20, 40, 200, '01:02:03', getPointIDByName('point1'), getRoutIDByRoutName('rout1')),
   (2, 20, 40, 200, '01:02:06', getPointIDByName('point3'), getRoutIDByRoutName('rout1'));
 
-INSERT INTO route_lists(routListNumber, palletsQty, driver, licensePlate, routeID)
+INSERT INTO route_lists(routListNumber, palletsQty, driver, licensePlate, lastVisitedRoutePointID)
 VALUES
-  ('1455668', 3, 'Dmitriy', 'екх123', getRoutIDByRoutName('rout1'));
+  ('1455668', 3, 'Dmitriy', 'екх123', getRoutPointIDByRoutNameAndSortOrder('rout1', 1));
 
 INSERT INTO invoices(insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID)
 VALUES
   ('ogeghei2243', 'qwd22345', now(), now(), 4, 'oweieih213423', 'CREATED', getRequestIDByNumber('123356'), getPointIDByName('point1'), getRouteListIDByNumber('1455668')),
+  ('ogeghei2245', 'qwd22346', now(), now(), 10, 'oweiretg213423', 'CREATED', getRequestIDByNumber('123356'), getPointIDByName('point1'), NULL ),
   ('ogeghei2244', 'qwd22334', now(), now(), 2, 'oweieih2ewf23', 'CREATED', getRequestIDByNumber('123356'), getPointIDByName('point1'), getRouteListIDByNumber('1455668'));
 
 

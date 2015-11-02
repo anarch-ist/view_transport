@@ -280,6 +280,24 @@ VALUES
   ('UPDATED'),
   ('DELETED');
 
+CREATE TABLE route_points (
+  routePointID        INTEGER AUTO_INCREMENT,
+  sortOrder           INTEGER NOT NULL,
+  tLoading            INTEGER NOT NULL, # в минутах
+  timeToNextPoint     INTEGER NOT NULL, # в минутах
+  distanceToNextPoint INTEGER NOT NULL, # в километрах
+  arrivalTime         TIME    NOT NULL,
+  pointID             INTEGER NOT NULL,
+  routeID             INTEGER NULL, #TODO почему тут NULL? как точка маршрута может существовать без ссылки на маршрут?
+  PRIMARY KEY (routePointID),
+  FOREIGN KEY (pointID) REFERENCES points (pointID)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE,
+  FOREIGN KEY (routeID) REFERENCES routes (routeID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
 CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
   RETURNS INTEGER
   BEGIN
@@ -290,51 +308,46 @@ CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
     RETURN result;
   END;
 
+CREATE FUNCTION getRoutPointIDByRoutNameAndSortOrder(_routName VARCHAR(64), _sortOrder INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routePointID
+                  FROM route_points
+                  WHERE routeID = getRoutIDByRoutName(_routName) AND sortOrder = _sortOrder);
+    RETURN result;
+  END;
+
 CREATE TABLE route_lists (
-  routeListID    INTEGER AUTO_INCREMENT,
-  routListNumber VARCHAR(32)  NOT NULL,
-  palletsQty     INTEGER      NULL,
-  driver         VARCHAR(255) NULL,
-  licensePlate   VARCHAR(9)   NULL, # государственный номер автомобиля
-  routeID        INTEGER      NULL,
+  routeListID             INTEGER AUTO_INCREMENT,
+  routListNumber          VARCHAR(32)  NOT NULL,
+  palletsQty              INTEGER      NULL,
+  driver                  VARCHAR(255) NULL,
+  licensePlate            VARCHAR(9)   NULL, # государственный номер автомобиля
+  #TODO обсудить
+  #TODO как мы остлеживаем изменение статуса маршрутного листа(должно быть поле - последний посещенный пункт)?
+  lastVisitedRoutePointID INTEGER      NOT NULL, # значение в этом поле выставляет диспетчер вручную
   PRIMARY KEY (routeListID),
-  FOREIGN KEY (routeID) REFERENCES routes (routeID)
-    ON DELETE SET NULL
+  FOREIGN KEY (lastVisitedRoutePointID) REFERENCES route_points (routePointID)
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
   UNIQUE (routListNumber)
 );
- #TODO как мы остлеживаем изменение статуса маршрутного листа(должно быть поле - последний посещенный пункт)?
-CREATE TABLE route_points (
-  routePointID        INTEGER AUTO_INCREMENT,
-  sortOrder           INTEGER NOT NULL,
-  tLoading            INTEGER NOT NULL, # в минутах
-  timeToNextPoint     INTEGER NOT NULL, # в минутах
-  distanceToNextPoint INTEGER NOT NULL, # в километрах
-  arrivalTime         TIME    NOT NULL,
-  pointID             INTEGER NOT NULL,
-  routeID             INTEGER NULL,
-  PRIMARY KEY (routePointID),
-  FOREIGN KEY (pointID) REFERENCES points (pointID)
-    ON DELETE NO ACTION
-    ON UPDATE CASCADE,
-  FOREIGN KEY (routeID) REFERENCES routes (routeID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
 
 CREATE PROCEDURE insert_into_rout_list_history(
-  routeListID       INTEGER,
-  routListNumber    VARCHAR(32),
-  palletsQty        INTEGER,
-  driver            VARCHAR(255),
-  licensePlate      VARCHAR(9),
-  routeID           INTEGER,
-  routeListStatusID VARCHAR(32)
+  routeListID             INTEGER,
+  routListNumber          VARCHAR(32),
+  palletsQty              INTEGER,
+  driver                  VARCHAR(255),
+  licensePlate            VARCHAR(9),
+  lastVisitedRoutePointID INTEGER,
+  routeListStatusID       VARCHAR(32)
 )
   BEGIN
-    INSERT INTO rout_list_history (timeMark, routeListID, routListNumber, palletsQty, driver, licensePlate, routeID, routeListStatusID)
+    INSERT INTO rout_list_history (timeMark, routeListID, routListNumber, palletsQty, driver, licensePlate, lastVisitedRoutePointID, routeListStatusID)
     VALUES
-      (NOW(), routeListID, routListNumber, palletsQty, driver, licensePlate, routeID, routeListStatusID);
+      (NOW(), routeListID, routListNumber, palletsQty, driver, licensePlate, lastVisitedRoutePointID,
+       routeListStatusID);
   END;
 
 
@@ -342,33 +355,33 @@ CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
-                                       NEW.licensePlate, NEW.routeID, 'CREATED');
+                                       NEW.licensePlate, NEW.lastVisitedRoutePointID, 'CREATED');
   END;
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
-                                       NEW.licensePlate, NEW.routeID, 'UPDATED');
+                                       NEW.licensePlate, NEW.lastVisitedRoutePointID, 'UPDATED');
   END;
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(OLD.routeListID, OLD.routListNumber, OLD.palletsQty, OLD.driver,
-                                       OLD.licensePlate, OLD.routeID, 'DELETED');
+                                       OLD.licensePlate, OLD.lastVisitedRoutePointID, 'DELETED');
   END;
 
 CREATE TABLE rout_list_history (
-  routeListHistoryID BIGINT AUTO_INCREMENT,
-  timeMark           DATETIME,
-  routeListID        INTEGER,
-  routListNumber     VARCHAR(32)  NOT NULL,
-  palletsQty         INTEGER      NULL,
-  driver             VARCHAR(255) NULL,
-  licensePlate       VARCHAR(9)   NULL, # государственный номер автомобиля
-  routeID            INTEGER      NOT NULL,
-  routeListStatusID  VARCHAR(32)  NOT NULL,
+  routeListHistoryID      BIGINT AUTO_INCREMENT,
+  timeMark                DATETIME,
+  routeListID             INTEGER,
+  routListNumber          VARCHAR(32)  NOT NULL,
+  palletsQty              INTEGER      NULL,
+  driver                  VARCHAR(255) NULL,
+  licensePlate            VARCHAR(9)   NULL, # государственный номер автомобиля
+  lastVisitedRoutePointID INTEGER      NOT NULL,
+  routeListStatusID       VARCHAR(32)  NOT NULL,
   PRIMARY KEY (routeListHistoryID),
   FOREIGN KEY (routeListStatusID) REFERENCES route_list_statuses (routeListStatusID)
     ON DELETE NO ACTION
