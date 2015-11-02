@@ -303,7 +303,7 @@ CREATE TABLE route_lists (
     ON UPDATE CASCADE,
   UNIQUE (routListNumber)
 );
-
+ #TODO как мы остлеживаем изменение статуса маршрутного листа(должно быть поле - последний посещенный пункт)?
 CREATE TABLE route_points (
   routePointID        INTEGER AUTO_INCREMENT,
   sortOrder           INTEGER NOT NULL,
