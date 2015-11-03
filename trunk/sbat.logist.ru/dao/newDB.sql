@@ -58,15 +58,20 @@ CREATE FUNCTION getPointIDByName(name VARCHAR(128))
 
 CREATE TABLE points (
   pointID     INTEGER AUTO_INCREMENT,
-  pointName   VARCHAR(128) NOT NULL,
-  region      VARCHAR(128) NULL,
-  district    VARCHAR(64)  NULL,
-  locality    VARCHAR(64)  NULL,
-  mailIndex   VARCHAR(6)   NULL,
-  address     VARCHAR(256) NOT NULL,
-  email       VARCHAR(64)  NULL,
-  phoneNumber VARCHAR(16)  NULL,
-  pointTypeID VARCHAR(32)  NOT NULL,
+  pointName   VARCHAR(128)   NOT NULL,
+  region      VARCHAR(128)   NULL,
+  timeZone    TINYINT SIGNED NULL, # сдвиг времени по гринвичу GMT + value
+  docs        TINYINT SIGNED NULL, # количество окон разгрузки
+  comments    LONGTEXT NULL,
+  #TODO временной интервал работы
+  #workTimeInterval
+  district    VARCHAR(64)    NULL,
+  locality    VARCHAR(64)    NULL,
+  mailIndex   VARCHAR(6)     NULL,
+  address     VARCHAR(256)   NOT NULL,
+  email       VARCHAR(64)    NULL,
+  phoneNumber VARCHAR(16)    NULL,
+  pointTypeID VARCHAR(32)    NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
     ON DELETE NO ACTION
@@ -89,6 +94,7 @@ CREATE TABLE users (
   firstName   VARCHAR(64)  NULL,
   lastName    VARCHAR(64)  NULL,
   patronymic  VARCHAR(64)  NULL,
+  position    VARCHAR(64)  NULL, # должность
   login       VARCHAR(128) NOT NULL,
   passMD5     VARCHAR(64)  NOT NULL,
   phoneNumber VARCHAR(16)  NULL,
@@ -252,6 +258,7 @@ BEFORE INSERT ON requests FOR EACH ROW
 #                                          ROUTE AND ROUTE LISTS                                                      #
 #######################################################################################################################
 
+
 CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
   RETURNS INTEGER
   BEGIN
@@ -262,11 +269,23 @@ CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
     RETURN result;
   END;
 
+CREATE TABLE tariffs (
+  tariffID INTEGER,
+  cost     DECIMAL(10, 2) NULL, # цена доставки
+  capacity DECIMAL(2, 2)  NULL, # грузоподъёмность в тоннах
+  carrier  VARCHAR(64), # перевозчик
+  PRIMARY KEY (tariffID)
+);
+
 CREATE TABLE routes (
   routeID       INTEGER AUTO_INCREMENT,
-  routeName     VARCHAR(64)  NOT NULL,
-  directionName VARCHAR(255) NULL, # имя направления из предметной области 1С, каждому направлению соответствует один маршрут
-  PRIMARY KEY (routeID)
+  routeName     VARCHAR(64)    NOT NULL,
+  directionName VARCHAR(255)   NULL, # имя направления из предметной области 1С, каждому направлению соответствует один маршрут
+  tariffID INTEGER NULL,
+  PRIMARY KEY (routeID),
+  FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE route_list_statuses (
@@ -286,9 +305,9 @@ CREATE TABLE route_points (
   tLoading            INTEGER NOT NULL, # в минутах
   timeToNextPoint     INTEGER NOT NULL, # в минутах
   distanceToNextPoint INTEGER NOT NULL, # в километрах
-  arrivalTime         TIME    NOT NULL,
+  arrivalTime         TIME    NOT NULL, # время прибытия в данный пункт
   pointID             INTEGER NOT NULL,
-  routeID             INTEGER NULL, #TODO почему тут NULL? как точка маршрута может существовать без ссылки на маршрут?
+  routeID             INTEGER NOT NULL,
   PRIMARY KEY (routePointID),
   FOREIGN KEY (pointID) REFERENCES points (pointID)
     ON DELETE NO ACTION
@@ -319,35 +338,34 @@ CREATE FUNCTION getRoutPointIDByRoutNameAndSortOrder(_routName VARCHAR(64), _sor
   END;
 
 CREATE TABLE route_lists (
-  routeListID             INTEGER AUTO_INCREMENT,
-  routListNumber          VARCHAR(32)  NOT NULL,
-  palletsQty              INTEGER      NULL,
-  driver                  VARCHAR(255) NULL,
-  licensePlate            VARCHAR(9)   NULL, # государственный номер автомобиля
-  #TODO обсудить
-  #TODO как мы остлеживаем изменение статуса маршрутного листа(должно быть поле - последний посещенный пункт)?
-  lastVisitedRoutePointID INTEGER      NOT NULL, # значение в этом поле выставляет диспетчер вручную
+  routeListID       INTEGER AUTO_INCREMENT,
+  routListNumber    VARCHAR(32)  NOT NULL,
+  palletsQty        INTEGER      NULL,
+  driver            VARCHAR(255) NULL,
+  driverPhoneNumber VARCHAR(12)  NULL,
+  licensePlate      VARCHAR(9)   NULL, # государственный номер автомобиля
+  routeID           INTEGER      NOT NULL,
   PRIMARY KEY (routeListID),
-  FOREIGN KEY (lastVisitedRoutePointID) REFERENCES route_points (routePointID)
-    ON DELETE CASCADE
+  FOREIGN KEY (routeID) REFERENCES routes (routeID)
+    ON DELETE NO ACTION
     ON UPDATE CASCADE,
   UNIQUE (routListNumber)
 );
 
 CREATE PROCEDURE insert_into_rout_list_history(
-  routeListID             INTEGER,
-  routListNumber          VARCHAR(32),
-  palletsQty              INTEGER,
-  driver                  VARCHAR(255),
-  licensePlate            VARCHAR(9),
-  lastVisitedRoutePointID INTEGER,
-  routeListStatusID       VARCHAR(32)
+  routeListID       INTEGER,
+  routListNumber    VARCHAR(32),
+  palletsQty        INTEGER,
+  driver            VARCHAR(255),
+  driverPhoneNumber VARCHAR(12),
+  licensePlate      VARCHAR(9),
+  routeID           INTEGER,
+  routeListStatusID VARCHAR(32)
 )
   BEGIN
-    INSERT INTO rout_list_history (timeMark, routeListID, routListNumber, palletsQty, driver, licensePlate, lastVisitedRoutePointID, routeListStatusID)
+    INSERT INTO rout_list_history (timeMark, routeListID, routListNumber, palletsQty, driver, driverPhoneNumber, licensePlate, routeID, routeListStatusID)
     VALUES
-      (NOW(), routeListID, routListNumber, palletsQty, driver, licensePlate, lastVisitedRoutePointID,
-       routeListStatusID);
+      (NOW(), routeListID, routListNumber, palletsQty, driver, driverPhoneNumber, licensePlate, routeID, routeListStatusID);
   END;
 
 
@@ -355,33 +373,37 @@ CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
-                                       NEW.licensePlate, NEW.lastVisitedRoutePointID, 'CREATED');
+                                       NEW.driverPhoneNumber,
+                                       NEW.licensePlate, NEW.routeID, 'CREATED');
   END;
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
-                                       NEW.licensePlate, NEW.lastVisitedRoutePointID, 'UPDATED');
+                                       NEW.driverPhoneNumber,
+                                       NEW.licensePlate, NEW.routeID, 'UPDATED');
   END;
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_rout_list_history(OLD.routeListID, OLD.routListNumber, OLD.palletsQty, OLD.driver,
-                                       OLD.licensePlate, OLD.lastVisitedRoutePointID, 'DELETED');
+                                       OLD.driverPhoneNumber,
+                                       OLD.licensePlate, OLD.routeID, 'DELETED');
   END;
 
 CREATE TABLE rout_list_history (
-  routeListHistoryID      BIGINT AUTO_INCREMENT,
-  timeMark                DATETIME,
-  routeListID             INTEGER,
-  routListNumber          VARCHAR(32)  NOT NULL,
-  palletsQty              INTEGER      NULL,
-  driver                  VARCHAR(255) NULL,
-  licensePlate            VARCHAR(9)   NULL, # государственный номер автомобиля
-  lastVisitedRoutePointID INTEGER      NOT NULL,
-  routeListStatusID       VARCHAR(32)  NOT NULL,
+  routeListHistoryID BIGINT AUTO_INCREMENT,
+  timeMark           DATETIME,
+  routeListID        INTEGER,
+  routListNumber     VARCHAR(32)  NOT NULL,
+  palletsQty         INTEGER      NULL,
+  driver             VARCHAR(255) NULL,
+  driverPhoneNumber  VARCHAR(12)  NULL,
+  licensePlate       VARCHAR(9)   NULL, # государственный номер автомобиля
+  routeID            INTEGER      NOT NULL,
+  routeListStatusID  VARCHAR(32)  NOT NULL,
   PRIMARY KEY (routeListHistoryID),
   FOREIGN KEY (routeListStatusID) REFERENCES route_list_statuses (routeListStatusID)
     ON DELETE NO ACTION
@@ -399,7 +421,7 @@ CREATE TABLE invoice_statuses (
   invoiceStatusRusName VARCHAR(128) NOT NULL,
   PRIMARY KEY (invoiceStatusID)
 );
-
+# TODO хранить все статусы без русского перевода. Перевод осуществлять на фронт энде.
 INSERT INTO invoice_statuses
 VALUES
   # duty statuses
@@ -427,17 +449,21 @@ VALUES
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
 CREATE TABLE invoices (
-  invoiceID            INTEGER AUTO_INCREMENT,
-  insiderRequestNumber VARCHAR(16) NOT NULL,
-  invoiceNumber        VARCHAR(16) NOT NULL,
-  creationDate         DATETIME    NULL,
-  deliveryDate         DATETIME    NULL,
-  boxQty               INTEGER     NULL,
-  sales_invoice        VARCHAR(16) NULL, # расходная накладная
-  invoiceStatusID      VARCHAR(32) NOT NULL,
-  requestID            INTEGER     NOT NULL,
-  warehousePointID     INTEGER     NOT NULL,
-  routeListID          INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
+  invoiceID              INTEGER AUTO_INCREMENT,
+  insiderRequestNumber   VARCHAR(16)    NOT NULL,
+  invoiceNumber          VARCHAR(16)    NOT NULL,
+  creationDate           DATETIME       NULL,
+  deliveryDate           DATETIME       NULL,
+  boxQty                 INTEGER        NULL,
+  weight                 INTEGER        NULL, # масса в граммах
+  volume                 INTEGER        NULL, # в кубических сантиметрах
+  goodsCost              DECIMAL(10, 2) NULL, # цена всех товаров в накладной
+  sales_invoice          VARCHAR(16)    NULL, # расходная накладная
+  invoiceStatusID        VARCHAR(32)    NOT NULL,
+  requestID              INTEGER        NOT NULL,
+  warehousePointID       INTEGER        NOT NULL,
+  routeListID            INTEGER        NULL, # может быть NULL до тех пор пока не создан маршрутный лист
+  lastVisitedUserPointID INTEGER        NULL, # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
     ON DELETE NO ACTION
@@ -450,6 +476,9 @@ CREATE TABLE invoices (
     ON UPDATE CASCADE,
   FOREIGN KEY (routeListID) REFERENCES route_lists (routeListID)
     ON DELETE SET NULL
+    ON UPDATE CASCADE,
+  FOREIGN KEY (lastVisitedUserPointID) REFERENCES points (pointID)
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
   UNIQUE (insiderRequestNumber),
   UNIQUE (invoiceNumber)
@@ -477,58 +506,76 @@ BEFORE INSERT ON invoices FOR EACH ROW
 
 
 CREATE PROCEDURE insert_into_invoice_history(
-  invoiceID            INTEGER,
-  insiderRequestNumber VARCHAR(16),
-  invoiceNumber        VARCHAR(16),
-  creationDate         DATETIME,
-  deliveryDate         DATETIME,
-  boxQty               INTEGER,
-  sales_invoice        VARCHAR(16),
-  invoiceStatusID      VARCHAR(32),
-  requestID            INTEGER,
-  warehousePointID     INTEGER,
-  routeListID          INTEGER
+  invoiceID              INTEGER,
+  insiderRequestNumber   VARCHAR(16),
+  invoiceNumber          VARCHAR(16),
+  creationDate           DATETIME,
+  deliveryDate           DATETIME,
+  boxQty                 INTEGER,
+  weight                 INTEGER,
+  volume                 INTEGER,
+  goodsCost              DECIMAL(10, 2),
+  sales_invoice          VARCHAR(16),
+  invoiceStatusID        VARCHAR(32),
+  requestID              INTEGER,
+  warehousePointID       INTEGER,
+  routeListID            INTEGER,
+  lastVisitedUserPointID INTEGER
 )
   BEGIN
-    INSERT INTO invoice_history (timeMark, invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID)
+    INSERT INTO invoice_history (timeMark, invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID)
     VALUES
-      (NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, sales_invoice,
+      (NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume,
+       goodsCost, sales_invoice,
        invoiceStatusID, requestID,
-       warehousePointID, routeListID);
+       warehousePointID, routeListID, lastVisitedUserPointID);
   END;
 
 CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
-      NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
-      'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID);
+      NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
+      NEW.weight, NEW.volume, NEW.goodsCost, NEW.sales_invoice,
+      'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
-  CALL insert_into_invoice_history(
-      NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.sales_invoice,
-      NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID);
+  BEGIN
+    # TODO надо брать пользователя, который изменил статус на один из # invoice statuses, затем находить его пункт, и этот
+    # пункт записывать в таблицу invoices в поле lastVisitedUserPointID
+
+    CALL insert_into_invoice_history(
+        NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
+        NEW.weight, NEW.volume, NEW.goodsCost, NEW.sales_invoice,
+        NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+
+  END;
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
-      OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.sales_invoice,
-      'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID);
+      OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
+      OLD.weight, OLD.volume, OLD.goodsCost, OLD.sales_invoice,
+      'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
 
 CREATE TABLE invoice_history (
-  invoiceHistoryID     BIGINT AUTO_INCREMENT,
-  timeMark             DATETIME,
-  invoiceID            INTEGER,
-  insiderRequestNumber VARCHAR(16) NOT NULL,
-  invoiceNumber        VARCHAR(16) NOT NULL,
-  creationDate         DATETIME    NULL,
-  deliveryDate         DATETIME    NULL,
-  boxQty               INTEGER     NULL,
-  sales_invoice        VARCHAR(16) NULL, # расходная накладная
-  invoiceStatusID      VARCHAR(32) NOT NULL,
-  requestID            INTEGER     NOT NULL,
-  warehousePointID     INTEGER     NOT NULL,
-  routeListID          INTEGER     NULL, # может быть NULL до тех пор пока не создан маршрутный лист
+  invoiceHistoryID       BIGINT AUTO_INCREMENT,
+  timeMark               DATETIME,
+  invoiceID              INTEGER,
+  insiderRequestNumber   VARCHAR(16)    NOT NULL,
+  invoiceNumber          VARCHAR(16)    NOT NULL,
+  creationDate           DATETIME       NULL,
+  deliveryDate           DATETIME       NULL,
+  boxQty                 INTEGER        NULL,
+  weight                 INTEGER        NULL, # масса в граммах
+  volume                 INTEGER        NULL, # в кубических сантиметрах
+  goodsCost              DECIMAL(10, 2) NULL, # цена всех товаров в накладной
+  sales_invoice          VARCHAR(16)    NULL, # расходная накладная
+  invoiceStatusID        VARCHAR(32)    NOT NULL,
+  requestID              INTEGER        NOT NULL,
+  warehousePointID       INTEGER        NOT NULL,
+  routeListID            INTEGER        NULL, # может быть NULL до тех пор пока не создан маршрутный лист
+  lastVisitedUserPointID INTEGER        NULL, # может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceHistoryID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
     ON DELETE NO ACTION
