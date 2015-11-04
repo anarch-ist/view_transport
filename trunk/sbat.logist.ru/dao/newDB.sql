@@ -36,25 +36,14 @@ VALUES
   ('TEMP_REMOVED');
 
 CREATE TABLE point_types (
-  pointTypeID      VARCHAR(32),
-  pointTypeRusName VARCHAR(32) NOT NULL,
+  pointTypeID VARCHAR(32),
   PRIMARY KEY (pointTypeID)
 );
 
 INSERT INTO point_types
 VALUES
-  ('WAREHOUSE', 'Склад'),
-  ('AGENCY', 'Представительство');
-
-CREATE FUNCTION getPointIDByName(name VARCHAR(128))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT pointID
-                  FROM points
-                  WHERE name = pointName);
-    RETURN result;
-  END;
+  ('WAREHOUSE'),
+  ('AGENCY');
 
 CREATE TABLE points (
   pointID     INTEGER AUTO_INCREMENT,
@@ -62,9 +51,9 @@ CREATE TABLE points (
   region      VARCHAR(128)   NULL,
   timeZone    TINYINT SIGNED NULL, # сдвиг времени по гринвичу GMT + value
   docs        TINYINT SIGNED NULL, # количество окон разгрузки
-  comments    LONGTEXT NULL,
-  #TODO временной интервал работы
-  #workTimeInterval
+  comments    LONGTEXT       NULL,
+  openTime    TIME           NULL, # например 9:00
+  closeTime   TIME           NULL, # например 17:00
   district    VARCHAR(64)    NULL,
   locality    VARCHAR(64)    NULL,
   mailIndex   VARCHAR(6)     NULL,
@@ -79,15 +68,6 @@ CREATE TABLE points (
   UNIQUE (pointName)
 );
 
-CREATE FUNCTION getUserIDByLogin(_login VARCHAR(128))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT userID
-                  FROM users
-                  WHERE login = _login);
-    RETURN result;
-  END;
 
 CREATE TABLE users (
   userID      INTEGER AUTO_INCREMENT,
@@ -177,16 +157,6 @@ CALL insert_permission_for_role('CLIENT', 'selectRoute');
 #######################################################################################################################
 
 
-CREATE FUNCTION getClientIDByINN(_INN VARCHAR(32))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT clientID
-                  FROM clients
-                  WHERE INN = _INN);
-    RETURN result;
-  END;
-
 CREATE TABLE clients (
   clientID          INTEGER AUTO_INCREMENT,
   INN               VARCHAR(32)  NOT NULL,
@@ -202,16 +172,6 @@ CREATE TABLE clients (
   PRIMARY KEY (clientID),
   UNIQUE (INN)
 );
-
-CREATE FUNCTION getRequestIDByNumber(_requestNumber VARCHAR(16))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT requestID
-                  FROM requests
-                  WHERE requestNumber = _requestNumber);
-    RETURN result;
-  END;
 
 # insert only manager users
 CREATE TABLE requests (
@@ -249,7 +209,7 @@ BEFORE INSERT ON requests FOR EACH ROW
     IF NOT (is_market_agent(NEW.marketAgentUserID))
     THEN
       SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Cannot insert row: only manager users allowed';
+      SET MESSAGE_TEXT = 'Can\'t insert row: only manager users allowed';
     END IF;
   END;
 
@@ -259,20 +219,10 @@ BEFORE INSERT ON requests FOR EACH ROW
 #######################################################################################################################
 
 
-CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routeID
-                  FROM routes
-                  WHERE routeName = _routName);
-    RETURN result;
-  END;
-
 CREATE TABLE tariffs (
-  tariffID INTEGER,
-  cost     DECIMAL(10, 2) NULL, # цена доставки
-  capacity DECIMAL(2, 2)  NULL, # грузоподъёмность в тоннах
+  tariffID INTEGER AUTO_INCREMENT,
+  cost     DECIMAL(12, 2) NULL, # цена доставки
+  capacity DECIMAL(4, 2)  NULL, # грузоподъёмность в тоннах
   carrier  VARCHAR(64), # перевозчик
   PRIMARY KEY (tariffID)
 );
@@ -316,26 +266,6 @@ CREATE TABLE route_points (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
-
-CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routeListID
-                  FROM route_lists
-                  WHERE routListNumber = _routListNumber);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getRoutPointIDByRoutNameAndSortOrder(_routName VARCHAR(64), _sortOrder INTEGER)
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routePointID
-                  FROM route_points
-                  WHERE routeID = getRoutIDByRoutName(_routName) AND sortOrder = _sortOrder);
-    RETURN result;
-  END;
 
 CREATE TABLE route_lists (
   routeListID       INTEGER AUTO_INCREMENT,
@@ -418,33 +348,31 @@ CREATE TABLE rout_list_history (
 
 CREATE TABLE invoice_statuses (
   invoiceStatusID      VARCHAR(32),
-  invoiceStatusRusName VARCHAR(128) NOT NULL,
   PRIMARY KEY (invoiceStatusID)
 );
-# TODO хранить все статусы без русского перевода. Перевод осуществлять на фронт энде.
+
 INSERT INTO invoice_statuses
 VALUES
   # duty statuses
-  ('CREATED', 'Внутренняя заявка добавлена в БД'),
-  ('DELETED', 'Внутренняя заявка удалена из БД'),
+  ('CREATED'),
+  ('DELETED'),
   # insider request statuses
-  ('APPROVING', 'Выгружена на утверждение торговому представителю'),
-  ('RESERVED', 'Резерв'),
-  ('APPROVED', 'Утверждена к сборке'),
-  ('STOP_LIST', 'Стоп-лист'),
-  ('CREDIT_LIMIT', 'Кредитный лимит'),
-  ('RASH_CREATED', 'Создана расходная накладная'),
-  ('COLLECTING', 'Выдана на сборку'),
-  ('CHECK', 'На контроле'),
-  ('CHECK_PASSED', 'Контроль пройден'),
-  ('PACKAGING', 'Упаковано'),
-  ('READY', 'Проверка в зоне отгрузки/Готова к отправке'),
+  ('APPROVING'),
+  ('RESERVED'),
+  ('APPROVED'),
+  ('STOP_LIST'),
+  ('CREDIT_LIMIT'),
+  ('RASH_CREATED'),
+  ('COLLECTING'),
+  ('CHECK'),
+  ('CHECK_PASSED'),
+  ('PACKAGING'),
+  ('READY'),
   # invoice statuses
-  ('DEPARTURE', 'Накладная убыла'),
-  ('ARRIVED', 'Накладная прибыла в пункт'),
-  ('ERROR', 'Ошибка. Возвращение в пункт'),
-  ('DELIVERED', 'Доставлено');
-
+  ('DEPARTURE'),
+  ('ARRIVED'),
+  ('ERROR'),
+  ('DELIVERED');
 
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
@@ -457,7 +385,7 @@ CREATE TABLE invoices (
   boxQty                 INTEGER        NULL,
   weight                 INTEGER        NULL, # масса в граммах
   volume                 INTEGER        NULL, # в кубических сантиметрах
-  goodsCost              DECIMAL(10, 2) NULL, # цена всех товаров в накладной
+  goodsCost              DECIMAL(12, 2) NULL, # цена всех товаров в накладной
   sales_invoice          VARCHAR(16)    NULL, # расходная накладная
   invoiceStatusID        VARCHAR(32)    NOT NULL,
   requestID              INTEGER        NOT NULL,
@@ -500,7 +428,7 @@ BEFORE INSERT ON invoices FOR EACH ROW
     IF NOT (is_warehouse(NEW.warehousePointID))
     THEN
       SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'Cannot insert row: only warehouse points allowed';
+      SET MESSAGE_TEXT = 'Can\'t insert row: only warehouse points allowed';
     END IF;
   END;
 
@@ -514,7 +442,7 @@ CREATE PROCEDURE insert_into_invoice_history(
   boxQty                 INTEGER,
   weight                 INTEGER,
   volume                 INTEGER,
-  goodsCost              DECIMAL(10, 2),
+  goodsCost              DECIMAL(12, 2),
   sales_invoice          VARCHAR(16),
   invoiceStatusID        VARCHAR(32),
   requestID              INTEGER,
@@ -538,17 +466,31 @@ FOR EACH ROW
       NEW.weight, NEW.volume, NEW.goodsCost, NEW.sales_invoice,
       'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
+
+CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
+FOR EACH ROW
+  BEGIN
+    # берем пользователя, который изменил статус на один из # invoice statuses, затем находим его пункт, и этот
+    # пункт записываем в таблицу invoices в поле lastVisitedUserPointID
+    IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR NEW.invoiceStatusID = 'DELIVERED')
+    # LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
+    THEN
+      BEGIN
+        DECLARE _userID INTEGER;
+        SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
+        SET NEW.lastVisitedUserPointID = (SELECT pointID FROM users WHERE userID = _userID);
+      END;
+    END IF ;
+
+  END ;
+
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
   BEGIN
-    # TODO надо брать пользователя, который изменил статус на один из # invoice statuses, затем находить его пункт, и этот
-    # пункт записывать в таблицу invoices в поле lastVisitedUserPointID
-
     CALL insert_into_invoice_history(
         NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
         NEW.weight, NEW.volume, NEW.goodsCost, NEW.sales_invoice,
         NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
-
   END;
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
@@ -569,7 +511,7 @@ CREATE TABLE invoice_history (
   boxQty                 INTEGER        NULL,
   weight                 INTEGER        NULL, # масса в граммах
   volume                 INTEGER        NULL, # в кубических сантиметрах
-  goodsCost              DECIMAL(10, 2) NULL, # цена всех товаров в накладной
+  goodsCost              DECIMAL(12, 2) NULL, # цена всех товаров в накладной
   sales_invoice          VARCHAR(16)    NULL, # расходная накладная
   invoiceStatusID        VARCHAR(32)    NOT NULL,
   requestID              INTEGER        NOT NULL,
@@ -589,25 +531,146 @@ CREATE TABLE invoice_history (
 
 
 CREATE TABLE tables (
-  tableID   INTEGER AUTO_INCREMENT,
-  tableName VARCHAR(64) NOT NULL,
+  tableID VARCHAR(64),
   PRIMARY KEY (tableID)
 );
 
-INSERT INTO tables (tableName) SELECT information_schema.TABLES.TABLE_NAME
+INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
                                FROM information_schema.TABLES
                                WHERE TABLE_SCHEMA = 'project_database';
 
-#TODO определить, какие таблицы должны хранить информацию об изменении пользователями
+# invoices - диспетчер меняет статус
+# информация о том. какой пользователь какую таблицу изменил есть на уровне сессии приложения
+# на уровне приложения, во время установки нового статуса накладной - сначала идет запись в таблицу user_action_history а затем изменение статуса
 CREATE TABLE user_action_history (
   userActionHistoryID BIGINT AUTO_INCREMENT,
   timeMark            DATETIME,
   userID              INTEGER,
-  tableID             INTEGER,
+  tableID             VARCHAR(64),
   PRIMARY KEY (userActionHistoryID),
   FOREIGN KEY (tableID) REFERENCES tables (tableID)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
 
+
+#######################################################################################################################
+#                                                   GETTERS                                                           #
+#######################################################################################################################
+
+
+CREATE FUNCTION getPointIDByName(name VARCHAR(128))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT pointID
+                  FROM points
+                  WHERE name = pointName);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getUserIDByLogin(_login VARCHAR(128))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT userID
+                  FROM users
+                  WHERE login = _login);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getClientIDByINN(_INN VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT clientID
+                  FROM clients
+                  WHERE INN = _INN);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getRequestIDByNumber(_requestNumber VARCHAR(16))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT requestID
+                  FROM requests
+                  WHERE requestNumber = _requestNumber);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routeID
+                  FROM routes
+                  WHERE routeName = _routName);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routeListID
+                  FROM route_lists
+                  WHERE routListNumber = _routListNumber);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getRoutPointIDByRoutNameAndSortOrder(_routName VARCHAR(64), _sortOrder INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routePointID
+                  FROM route_points
+                  WHERE routeID = getRoutIDByRoutName(_routName) AND sortOrder = _sortOrder);
+    RETURN result;
+  END;
+
+# this function returns pointID for the next routePoint or NULL if it is already the last point
+CREATE FUNCTION getNextPointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    DECLARE currentSortOrder INTEGER;
+    DECLARE nextSortOrder INTEGER;
+
+    SET currentSortOrder = (SELECT sortOrder FROM route_points WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
+
+    IF (currentSortOrder IS NULL ) THEN
+      BEGIN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Current sort order does not exist.';
+      END;
+    END IF;
+
+    SET nextSortOrder = currentSortOrder + 1;
+    SET result = (SELECT pointID FROM route_points WHERE routeID = _routeID AND sortOrder = nextSortOrder);
+
+    RETURN result;
+  END;
+
+CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    DECLARE currentSortOrder INTEGER;
+    DECLARE nextSortOrder INTEGER;
+
+    SET currentSortOrder = (SELECT sortOrder FROM route_points WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
+
+    IF (currentSortOrder IS NULL ) THEN
+      BEGIN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Current sort order does not exist.';
+      END;
+    END IF;
+
+    SET nextSortOrder = currentSortOrder + 1;
+    SET result = (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = nextSortOrder);
+
+    RETURN result;
+  END;
 
