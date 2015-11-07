@@ -1,6 +1,6 @@
 <?php
-/*DATA to recieve from server   */
 
+include 'Db.php';
 /* Database connection start */
 $servername = "localhost";
 $username = "andy";
@@ -9,12 +9,53 @@ $dbname = "project_database";
 
 $conn = mysqli_connect($servername, $username, $password, $dbname) or die("Connection failed: " . mysqli_connect_error());
 
+$db = new Db();
+
+$rows = $db->select("SELECT * from `employee`");
+
+foreach($rows as $row) {
+    echo $row[0];
+}
+
+
+
+
+
+//$conn->query("CALL selectData");
+//$result = mysqli_use_result($conn);
+
+//if ($result === false) {
+//    // Handle failure - log the error, notify administrator, etc.
+//} else {
+//    // Fetch all the rows in an array
+//    $rows = array();
+//    while ($row = mysqli_fetch_assoc($result)) {
+//        $rows[] = $row;
+//    }
+//}
+
+
+
+
+//while ($row = $result->mysqli_fetch_assoc()) {
+//    printf("%d\n", $row['номер заявки']);
+//}
+//mysqli_free_result($result);
+
+
+
+//if ($conn->query("CALL selectData"))
+//    echo "CALL failed: (" . $conn->errno . ") " . $conn->error;
+
+
+
+
+
 /* Database connection end */
 
 
 // storing  request (ie, get/post) global array to a variable  
 $requestData = $_REQUEST; // contains data that was in get or post request from datatables
-
 
 $columns = array(
 // datatable column index  => database column name

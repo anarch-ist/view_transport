@@ -27,3 +27,25 @@ point_types
   ('WAREHOUSE', 'Склад'),
   ('AGENCY', 'Представительство');
 
+
+selectNames
+      requests.requestNumber          AS 'номер заявки',
+      invoices.insiderRequestNumber   AS 'номер внутренней заявки',
+      invoices.invoiceNumber          AS 'номер накладной',
+      clients.INN                     AS 'ИНН клиента',
+      delivery_points.pointName       AS 'пункт доставки',
+      w_points.pointName              AS 'склад отправки',
+      users.lastName                  AS 'торговый представитель',
+      invoices.invoiceStatusID        AS 'статус накладной',
+      invoices.boxQty                 AS 'количество коробок',
+
+      route_lists.driver              AS 'водитель',
+      route_lists.licensePlate        AS 'номер ТС',
+      route_lists.palletsQty          AS 'количество паллет',
+      route_lists.routListNumber      AS 'номер маршрутного листа',
+      routes.directionName            AS 'направление',
+
+      last_visited_points.pointName   AS 'последний посещенный пункт',
+
+      next_route_points.pointName     AS 'следующий пункт маршрута',
+      route_points.arrivalTime        AS 'время прибытия в следующий пункт'
