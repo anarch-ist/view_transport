@@ -7,10 +7,10 @@
 
 4)  делаем checkout проекта по указанному URL и пути
     svncheckout:
-    "http://svn.sbat.ru/svn/view_transport/trunk/projectlogist.ru/www"
+    "http://svn.sbat.ru/svn/view_transport/web_viewer/trunk/projectlogist.ru/www"
     "C:\web\wamp\www\projectlogist.ru"
  
-    "http://svn.sbat.ru/svn/view_transport/trunk/sbat.logist.ru"
+    "http://svn.sbat.ru/svn/view_transport/web_viewer/trunk/sbat.logist.ru"
     "C:\web\wamp\www\sbat.logist.ru"
 
 5)  делаем еще один checkout по URL "http://svn.sbat.ru/svn/view_transport/"
