@@ -9,13 +9,13 @@ $dbname = "project_database";
 
 $conn = mysqli_connect($servername, $username, $password, $dbname) or die("Connection failed: " . mysqli_connect_error());
 
-$db = new Db();
-
-$rows = $db->select("SELECT * from `employee`");
-
-foreach($rows as $row) {
-    echo $row[0];
-}
+//$db = new Db();
+//
+//$rows = $db->select("SELECT * from `employee`");
+//
+//foreach($rows as $row) {
+//    echo $row[0];
+//}
 
 
 
