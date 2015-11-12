@@ -29,6 +29,27 @@ interface IEntitySelect
      */
     function getSelectQuery();
 }
+interface IEntityUpdate
+{
+    /**
+     * @return string
+     */
+    function getUpdateQuery();
+}
+interface IEntityInsert
+{
+    /**
+     * @return string
+     */
+    function getInsertQuery();
+}
+interface IEntityDelete
+{
+    /**
+     * @return string
+     */
+    function getDeleteQuery();
+}
 
 /**
  * Interface IEntityDataCheck
@@ -36,7 +57,7 @@ interface IEntitySelect
 interface IEntityDataCheck
 {
     /**
-     * @param $string
+     * @param string
      * @return string
      */
     function prepareSafeString($string);

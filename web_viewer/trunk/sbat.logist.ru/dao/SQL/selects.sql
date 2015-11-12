@@ -15,8 +15,8 @@ CREATE PROCEDURE selectData()
       invoices.insiderRequestNumber,
       invoices.invoiceNumber,
       clients.INN,
-      delivery_points.pointName,
-      w_points.pointName,
+      delivery_points.pointName as `deliveryPoint`,
+      w_points.pointName as `warehousePoint`,
       users.lastName,
       invoices.invoiceStatusID,
       invoices.boxQty,
@@ -27,9 +27,8 @@ CREATE PROCEDURE selectData()
       route_lists.routListNumber,
       routes.directionName,
 
-      last_visited_points.pointName,
-
-      next_route_points.pointName,
+      last_visited_points.pointName as `currentPoint`,
+      next_route_points.pointName as `nextPoint`,
       route_points.arrivalTime
 
 

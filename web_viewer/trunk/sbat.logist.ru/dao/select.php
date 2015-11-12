@@ -3,8 +3,8 @@
 </head>
 <body>
 <?php
-include_once('./userDao/UserDAO.php');
-$userDAO = UserDAO::getInstance();
+include_once './userDao/UserDAOEntity.php';
+$userDAO = InvoicesForUserDAO::getInstance();
 $users = $userDAO->selectUsers();
 foreach ($users as $user) {
     echo $user . '<br>' . PHP_EOL;

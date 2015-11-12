@@ -7,16 +7,17 @@
 		<script type="text/javascript" language="javascript" src="media/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" language="javascript" >
 			$(document).ready(function() {
-				var dataTable = $('#employee-grid').DataTable( {
+				var dataTable = $('#user-grid').DataTable( {
 					"processing": true,
 					"serverSide": true,
 					"ajax":{
-						url :"employee-grid-data.php", // json datasource
+//						url :"employee-grid-data.php", // json datasource
+						url :"AJAX.php", // json datasource
 						type: "post",  // method  , by default get
 						error: function(){  // error handling
-							$(".employee-grid-error").html("");
-							$("#employee-grid").append('<tbody class="employee-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-							$("#employee-grid_processing").css("display","none");
+							$(".user-grid-error").html("");
+							$("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+							$("#user-grid_processing").css("display","none");
 							
 						}
 					}
@@ -43,12 +44,26 @@
 	<body>
 		<div class="header"><h1>DataTable demo (Server side) in Php,Mysql and Ajax </h1></div>
 		<div class="container">
-			<table id="employee-grid"  cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
+			<table id="user-grid"  cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
 					<thead>
 						<tr>
-							<th>Employee name</th>
-							<th>Salary</th>
-							<th>Age</th>
+							<th>номер заявки</th>
+							<th>номер вн. заявки</th>
+							<th>номер накладной</th>
+							<th>инн</th>
+							<th>пункт прибытия</th>
+							<th>пункт отправки</th>
+							<th>фамилия</th>
+							<th>статус накладной</th>
+							<th>кол-во коробок</th>
+							<th>водитель</th>
+							<th>лицензия?</th>
+							<th>палеты</th>
+							<th>номер марш. листа</th>
+							<th>направление</th>
+                            <th>пункт текущий</th>
+                            <th>пункт следующий</th>
+							<th>прибытие</th>
 						</tr>
 					</thead>
 			</table>

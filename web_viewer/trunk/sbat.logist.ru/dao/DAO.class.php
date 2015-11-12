@@ -1,5 +1,5 @@
 <?php
-require_once('IDAO.php');
+require_once 'IDAO.php';
 
 abstract class DAO implements IDAO
 {
@@ -88,11 +88,6 @@ abstract class EntityDataObject implements IEntityDataCheck
     {
         return $string;
     }
-}
-
-abstract class EntitySelect extends EntityDataObject implements IEntitySelect
-{
-    abstract function getSelectQuery();
 }
 
 ?>
