@@ -1,63 +1,83 @@
-
-
 {
   "dataFrom1C": {
-    "period": 30, // период обновления в минутах
+    "server": "MOS",
+    "packageNumber": 51,
+    "created": "2015-11-20 12:05:30 GMT+0", // время создания файла
 
-    // данная запись означает. что за последние пол часа в системе 1С появилось два новых пункта
-    "insertPoints": [
+    "packageData": {
+      // данная запись означает, что в системе 1С появилось два новых пункта
+      "insertPoints": [
+        {
+          "pointName": "склад на алексеевской",
+          "region": "московская область",
+          "city": "москва",
+          "index": "141600",
+          "email": "bla@bla.com",
+          "phoneNumber": "+7901567892",
+          "pointType": "WAREHOUSE"
+        },
+        {
+          "pointName": "торговый представитель в твери",
+          "region": "тверская область",
+          "city": "тверь",
+          "index": "123456",
+          "email": "bla1@bla.com",
+          "phoneNumber": "+7904567892",
+          "pointType": "AGENCY"
+        }
+      ],
+
+      // данная запись означает. в системе никакие пункты не изменились
+      "updatePoints": [],
+
+      // данная запись означает, из БД 1С был удален один пункт.
+      "deletePoints": [
+        {"pointName": "склад10"}
+      ],
+
+      // далее по образцу тажке идут данные в виде массивов для других сущностей
+      "insertUsers":[...],
+      "updateUsers":[...],
+      "deleteUsers":[...],
+
+      "insertClients":[...],
+      "updateClients":[...],
+      "deleteClients":[...],
+
+      "insertRequests":[...],
+      "updateRequests":[...],
+      "deleteRequests":[...],
+
+      "insertDirections":[...],
+      "updateDirections":[...],
+      "deleteDirections":[...],
+
+      "insertRouteLists":[...],
+      "updateRouteLists":[...],
+      "deleteRouteLists":[...],
+
+      "insertInvoices":[...],
+      "updateInvoices":[...],
+      "deleteInvoices":[...]
+    }
+
+    // в стандартной ситуации этот массив пустой, но если парсер по каким-то причинам не сработал, то этот массив заполняется данными
+    "previousPackages":[
       {
-        "pointName": "склад на алексеевской",
-        "region": "московская область",
-        "city": "москва",
-        "index": "141600",
-        "email": "bla@bla.com",
-        "phoneNumber": "+7901567892",
-        "pointType": "WAREHOUSE"
+        "server": "MOS",
+        "packageNumber": 50,
+        "created": null,
+        "packageData":{...}
       },
       {
-        "pointName": "торговый представитель в твери",
-        "region": "тверская область",
-        "city": "тверь",
-        "index": "123456",
-        "email": "bla1@bla.com",
-        "phoneNumber": "+7904567892",
-        "pointType": "AGENCY"
+        "server": "MOS",
+        "packageNumber": 49,
+        "created": null,
+        "packageData":{...}
       }
-    ],
+    ]
 
-    // данная запись означает. что за последние пол часа в системе никакие пункты не изменились
-    "updatePoints": [],
 
-    // данная запись означает, что за последние пол часа из БД 1С был удален один пункт.
-    "deletePoints": [
-      {"pointName": "склад10"}
-    ],
-
-    // далее по образцу тажке идут данные в виде массивов для других сущностей
-    "insertUsers":[...],
-    "updateUsers":[...],
-    "deleteUsers":[...],
-
-    "insertClients":[...],
-    "updateClients":[...],
-    "deleteClients":[...],
-
-    "insertRequests":[...],
-    "updateRequests":[...],
-    "deleteRequests":[...],
-
-    "insertDirections":[...],
-    "updateDirections":[...],
-    "deleteDirections":[...],
-
-    "insertRouteLists":[...],
-    "updateRouteLists":[...],
-    "deleteRouteLists":[...],
-
-    "insertInvoices":[...],
-    "updateInvoices":[...],
-    "deleteInvoices":[...]
   }
 }
 
