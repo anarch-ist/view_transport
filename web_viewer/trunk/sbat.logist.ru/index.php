@@ -2,9 +2,9 @@
 <html>
 	<title>Datatable Demo1 | CoderExample</title>
 	<head>
-		<link rel="stylesheet" type="text/css" href="media/css/jquery.dataTables.min.css">
-		<script type="text/javascript" language="javascript" src="media/js/jquery.js"></script>
-		<script type="text/javascript" language="javascript" src="media/js/jquery.dataTables.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="common_files/media/css/jquery.dataTables.min.css">
+		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery.js"></script>
+		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery.dataTables.min.js"></script>
 		<script type="text/javascript" language="javascript" >
 			$(document).ready(function() {
 				var dataTable = $('#user-grid').DataTable( {
@@ -12,7 +12,7 @@
 					"serverSide": true,
 					"ajax":{
 //						url :"employee-grid-data.php", // json datasource
-						url :"AJAX.php", // json datasource
+						url :"AJAX.php?login=gfds@&md5=54321", // json datasource
 						type: "post",  // method  , by default get
 						error: function(){  // error handling
 							$(".user-grid-error").html("");
