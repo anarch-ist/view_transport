@@ -1,6 +1,6 @@
 <?php
 include_once 'IUserDAO.php';
-include_once '/../DAO.class.php';
+include_once '/../DAO.php';
 
 
 class UserDAO extends DAO implements IUserDAO
@@ -241,7 +241,9 @@ class User extends EntityDataObject
             $this->pointID = '';
         }
     }
-    function toArray() {
+
+    function toArray()
+    {
         return get_object_vars($this);
     }
 
@@ -330,9 +332,9 @@ class UserUpdateEntity implements IEntityUpdate
     {
         $query = "insert into `users` values(";
         $isFirst = true;
-        foreach($this->obj as $elem) {
+        foreach ($this->obj as $elem) {
             if ($isFirst) {
-                $isFirst=false;
+                $isFirst = false;
                 $query .= "0";
             } else {
                 $query .= ", '$elem'";

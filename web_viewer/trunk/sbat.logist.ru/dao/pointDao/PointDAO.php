@@ -1,6 +1,6 @@
 <?php
 require_once('IPointDAO.php');
-require_once('DAO.class.php');
+require_once('DAO.php');
 
 class PointDAO extends DAO implements IPointDAO
 {
@@ -58,14 +58,189 @@ class PointDAO extends DAO implements IPointDAO
 
 class Point extends EntityDataObject
 {
-    private $pointID, $firstName, $lastName, $patronymic, $login, $passMD5, $phoneNumber, $email, $pointRoleID;
+    private $pointID = '';
+    private $pointName = '';
+    private $region = '';
+    private $timeZone = '';
+    private $docs = '';
+    private $comments = '';
+    private $openTime = '';
+    private $closeTime = '';
+    private $district = '';
+    private $locality = '';
+    private $mailIndex = '';
+    private $address = '';
+    private $email = '';
 
     /**
      * @return mixed
      */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCloseTime()
+    {
+        return $this->closeTime;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDistrict()
+    {
+        return $this->district;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDocs()
+    {
+        return $this->docs;
+    }
+
+    /**
+     * @return string
+     */
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocality()
+    {
+        return $this->locality;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOpenTime()
+    {
+        return $this->openTime;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMailIndex()
+    {
+        return $this->mailIndex;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhoneNumber()
+    {
+        return $this->phoneNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPointID()
+    {
+        return $this->pointID;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPointName()
+    {
+        return $this->pointName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPointTypeID()
+    {
+        return $this->pointTypeID;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTimeZone()
+    {
+        return $this->timeZone;
+    }
+
+    private $phoneNumber;
+    private $pointTypeID;
+
+    /**
+     * @param mixed $pointRoleID
+     */
+    public function setPointRoleID($pointRoleID)
+    {
+        $this->pointRoleID = $this->prepareSafeString($pointRoleID);
+    }
+
+    /**
+     * @param mixed $address
+     */
+    public function setAddress($address)
+    {
+        $this->address = $this->prepareSafeString($address);
+    }
+
+    /**
+     * @param mixed $closeTime
+     */
+    public function setCloseTime($closeTime)
+    {
+        $this->closeTime = $this->prepareSafeString($closeTime);
+    }
+
+    /**
+     * @param mixed $comments
+     */
+    public function setComments($comments)
+    {
+        $this->comments = $this->prepareSafeString($comments);
+    }
+
+    /**
+     * @param mixed $district
+     */
+    public function setDistrict($district)
+    {
+        $this->district = $this->prepareSafeString($district);
+    }
+
+    /**
+     * @param mixed $docs
+     */
+    public function setDocs($docs)
+    {
+        $this->docs = $this->prepareSafeString($docs);
     }
 
     /**
@@ -77,91 +252,27 @@ class Point extends EntityDataObject
     }
 
     /**
-     * @return mixed
+     * @param mixed $locality
      */
-    public function getFirstName()
+    public function setLocality($locality)
     {
-        return $this->firstName;
+        $this->locality = $this->prepareSafeString($locality);
     }
 
     /**
-     * @param mixed $firstName
+     * @param mixed $mailIndex
      */
-    public function setFirstName($firstName)
+    public function setMailIndex($mailIndex)
     {
-        $this->firstName = $this->prepareSafeString($firstName);
+        $this->mailIndex = $this->prepareSafeString($mailIndex);
     }
 
     /**
-     * @return mixed
+     * @param mixed $openTime
      */
-    public function getLastName()
+    public function setOpenTime($openTime)
     {
-        return $this->lastName;
-    }
-
-    /**
-     * @param mixed $lastName
-     */
-    public function setLastName($lastName)
-    {
-        $this->lastName = $this->prepareSafeString($lastName);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLogin()
-    {
-        return $this->login;
-    }
-
-    /**
-     * @param mixed $login
-     */
-    public function setLogin($login)
-    {
-        $this->login = $this->prepareSafeString($login);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPassMD5()
-    {
-        return $this->passMD5;
-    }
-
-    /**
-     * @param mixed $passMD5
-     */
-    public function setPassMD5($passMD5)
-    {
-        $this->passMD5 = $this->prepareSafeString($passMD5);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPatronymic()
-    {
-        return $this->patronymic;
-    }
-
-    /**
-     * @param mixed $patronymic
-     */
-    public function setPatronymic($patronymic)
-    {
-        $this->patronymic = $this->prepareSafeString($patronymic);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPhoneNumber()
-    {
-        return $this->phoneNumber;
+        $this->openTime = $this->prepareSafeString($openTime);
     }
 
     /**
@@ -173,59 +284,53 @@ class Point extends EntityDataObject
     }
 
     /**
-     * @return mixed
+     * @param mixed $pointName
      */
-    public function getPointID()
+    public function setPointName($pointName)
     {
-        return $this->pointID;
+        $this->pointName = $this->prepareSafeString($this->prepareSafeString($pointName));
     }
 
     /**
-     * @param mixed $pointID
+     * @param mixed $pointTypeID
      */
-    public function setPointID($pointID)
+    public function setPointTypeID($pointTypeID)
     {
-        $this->pointID = $this->prepareSafeString($pointID);
+        $this->pointTypeID = $this->prepareSafeString($pointTypeID);
     }
 
     /**
-     * @return mixed
+     * @param mixed $region
      */
-    public function getPointRoleID()
+    public function setRegion($region)
     {
-        return $this->pointRoleID;
+        $this->region = $this->prepareSafeString($region);
     }
 
     /**
-     * @param mixed $pointRoleID
+     * @param mixed $timeZone
      */
-    public function setPointRoleID($pointRoleID)
+    public function setTimeZone($timeZone)
     {
-        $this->pointRoleID = $this->prepareSafeString($pointRoleID);
+        $this->timeZone = $this->prepareSafeString($timeZone);
     }
 
     function __construct($array = null)
     {
         if (!is_null($array)) {
-            $this->email = $array['email'];
-            $this->firstName = $array['firstName'];
-            $this->lastName = $array['lastName'];
-            $this->login = $array['login'];
-            $this->passMD5 = $array['passMD5'];
-            $this->patronymic = $array['patronymic'];
-            $this->phoneNumber = $array['phoneNumber'];
             $this->pointID = $array['pointID'];
-            $this->pointRoleID = $array['pointRoleID'];
-        } else {
-            $this->email = '';
-            $this->firstName = '';
-            $this->lastName = '';
-            $this->login = '';
-            $this->passMD5 = '';
-            $this->patronymic = '';
-            $this->phoneNumber = '';
-            $this->pointID = '';
-            $this->pointRoleID = '';
+            $this->pointName = $array['pointName'];
+            $this->region = $array['region'];
+            $this->timeZone = $array['timeZone'];
+            $this->docs = $array['docs'];
+            $this->comments = $array['comments'];
+            $this->openTime = $array['openTime'];
+            $this->closeTime = $array['closeTime'];
+            $this->district = $array['district'];
+            $this->locality = $array['locality'];
+            $this->mailIndex = $array['mailIndex'];
+            $this->address = $array['address'];
+            $this->email = $array['email'];
         }
     }
 

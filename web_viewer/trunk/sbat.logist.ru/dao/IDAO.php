@@ -13,22 +13,40 @@ interface IDAO
     static function closeConnection();
 
     // Function for checking string for correct format
+    /**
+     * @param $selectObj
+     * @return string
+     */
     function select($selectObj);
 
+    /**
+     * @param $newObj
+     * @return string
+     */
     function update($newObj);
 
+    /**
+     * @param $obj
+     * @return string
+     */
     function insert($obj);
 
+    /**
+     * @param $obj
+     * @return string
+     */
     function delete($obj);
 }
 
 interface IEntitySelect
 {
     /**
+     * this function contains query text
      * @return string
      */
     function getSelectQuery();
 }
+
 interface IEntityUpdate
 {
     /**
@@ -36,6 +54,7 @@ interface IEntityUpdate
      */
     function getUpdateQuery();
 }
+
 interface IEntityInsert
 {
     /**
@@ -43,6 +62,7 @@ interface IEntityInsert
      */
     function getInsertQuery();
 }
+
 interface IEntityDelete
 {
     /**

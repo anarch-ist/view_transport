@@ -1,6 +1,7 @@
 <?php
 require_once 'IInvoicesForUserDAO.php';
-include_once '/../DAO.class.php';
+include_once '/../DAO.php';
+
 
 class InvoicesForUserDAO extends DAO implements IInvoicesForUserDAO
 {
@@ -18,10 +19,18 @@ class InvoicesForUserDAO extends DAO implements IInvoicesForUserDAO
         return self::$instance;
     }
 
-    function selectAllData() {
+    /**
+     * @return array
+     */
+    function selectAllData()
+    {
         return parent::select(new EntitySelectAllData());
     }
 
+    /**
+     * @param $keyword
+     * @return array
+     */
     function selectDataByKey($keyword)
     {
         // TODO: Implement selectDataByKey() method.

@@ -15,18 +15,18 @@ interface IPointDAO
 
 
 
-pointID
-pointName
-region
-timeZone
-docs
-comments
-openTime
-closeTime
-district
-locality
-mailIndex
-address
-email
-phoneNumber
-pointTypeID
+//pointID
+//pointName
+//region
+//timeZone
+//docs
+//comments
+//openTime
+//closeTime
+//district
+//locality
+//mailIndex
+//address
+//email
+//phoneNumber
+//pointTypeID

@@ -5,15 +5,22 @@ abstract class DAO implements IDAO
 {
     const AUTO_START_TRANSACTION = true;
     private static $connection;
+    private static $countConnectings = 0;
 
     protected function __construct()
     {
         if (is_null(self::$connection)) {
             self::startConnection();
         }
-//            if (self::AUTO_START_TRANSACTION) {
-//                self::startTransaction();
-//            }
+        if (!self::$countConnectings && self::AUTO_START_TRANSACTION) {
+            self::startTransaction();
+        }
+        self::$countConnectings++;
+    }
+
+    static function getConnection()
+    {
+        return self::$connection;
     }
 
     private static function query($sql)
@@ -25,7 +32,7 @@ abstract class DAO implements IDAO
     {
         self::$connection = new mysqli('localhost', 'andy', 'andyandy', 'project_database');
         if (mysqli_connect_errno())
-            die('Ошибка соединения: ' . mysqli_connect_error());
+            throw new Exception('Ошибка соединения: ' . mysqli_connect_error());
     }
 
     static function closeConnection()
@@ -50,8 +57,11 @@ abstract class DAO implements IDAO
 
     function __destruct()
     {
-        self::commit();
-        self::closeConnection();
+        self::$countConnectings--;
+        if (!self::$countConnectings) {
+            self::commit();
+            self::closeConnection();
+        }
     }
 
     function select($selectObj)
@@ -68,17 +78,20 @@ abstract class DAO implements IDAO
 
     function update($newObj)
     {
-        //return $this->query($newObj->getSelectQuery());
+        // TODO: Check update() method.
+        return $this->query($newObj->getUpdateQuery());
     }
 
     function insert($obj)
     {
-        // TODO: Implement insert() method.
+        // TODO: Check insert() method.
+        return $this->query($obj->getInsertQuery());
     }
 
     function delete($obj)
     {
-        // TODO: Implement delete() method.
+        // TODO: Check delete() method.
+        return $this->query($obj->getDeleteQuery());
     }
 }
 
@@ -86,7 +99,7 @@ abstract class EntityDataObject implements IEntityDataCheck
 {
     function prepareSafeString($string)
     {
-        return $string;
+        return DAO::getConnection()->real_escape_string($string);
     }
 }
 
