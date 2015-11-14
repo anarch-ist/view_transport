@@ -1,0 +1,7 @@
+ehbruygbwruebg34574
+
+port: 5432
+
+local: russian, russia
+
+user: postgres
