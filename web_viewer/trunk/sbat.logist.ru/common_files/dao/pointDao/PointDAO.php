@@ -1,6 +1,7 @@
 <?php
-require_once('IPointDAO.php');
-require_once('DAO.php');
+namespace DAO;
+include_once 'IPointDAO.php';
+include_once '/../DAO.php';
 
 class PointDAO extends DAO implements IPointDAO
 {
@@ -344,7 +345,7 @@ class Point extends EntityDataObject
     }
 }
 
-class EntitySelectAllPoints extends EntitySelect
+class EntitySelectAllPoints extends EntityDataObject implements IEntitySelect
 {
     function __construct()
     {
@@ -356,7 +357,7 @@ class EntitySelectAllPoints extends EntitySelect
     }
 }
 
-class PointSelectEntityByID extends EntitySelect
+class PointSelectEntityByID extends EntityDataObject implements IEntitySelect
 {
     private $id;
 

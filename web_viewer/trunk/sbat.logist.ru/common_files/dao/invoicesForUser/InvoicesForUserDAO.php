@@ -1,4 +1,5 @@
 <?php
+namespace DAO;
 require_once 'IInvoicesForUserDAO.php';
 include_once '/../DAO.php';
 

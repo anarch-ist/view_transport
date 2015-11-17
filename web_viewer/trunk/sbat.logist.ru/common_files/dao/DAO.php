@@ -1,21 +1,24 @@
 <?php
-require_once 'IDAO.php';
+namespace DAO;
+use mysqli;
+use Exception;
+include_once 'IDAO.php';
 
 abstract class DAO implements IDAO
 {
     const AUTO_START_TRANSACTION = true;
     private static $connection;
-    private static $countConnectings = 0;
+    private static $connectionCount = 0;
 
     protected function __construct()
     {
         if (is_null(self::$connection)) {
             self::startConnection();
         }
-        if (!self::$countConnectings && self::AUTO_START_TRANSACTION) {
+        if (!self::$connectionCount && self::AUTO_START_TRANSACTION) {
             self::startTransaction();
         }
-        self::$countConnectings++;
+        self::$connectionCount++;
     }
 
     static function getConnection()
@@ -30,9 +33,15 @@ abstract class DAO implements IDAO
 
     static function startConnection()
     {
-        self::$connection = new mysqli('localhost', 'andy', 'andyandy', 'project_database');
-        if (mysqli_connect_errno())
-            throw new Exception('Ошибка соединения: ' . mysqli_connect_error());
+        try {
+            self::$connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
+            if (self::$connection->connect_errno) {
+                throw new Exception('Connection error - '.self::$connection->connect_error);
+            }
+        }
+        catch(Exception $ex) {
+            throw new Exception('Ошибка соединения с БД');
+        }
     }
 
     static function closeConnection()
@@ -57,8 +66,8 @@ abstract class DAO implements IDAO
 
     function __destruct()
     {
-        self::$countConnectings--;
-        if (!self::$countConnectings) {
+        self::$connectionCount--;
+        if (!self::$connectionCount) {
             self::commit();
             self::closeConnection();
         }
@@ -67,6 +76,9 @@ abstract class DAO implements IDAO
     function select($selectObj)
     {
         $result = self::query($selectObj->getSelectQuery());
+        if (!$result) {
+            throw new Exception('ошибка в выборочном запросе - '.self::$connection->error);
+        }
         $array = array();
         $count = 0;
         while ($row = $result->fetch_assoc()) {
@@ -102,5 +114,4 @@ abstract class EntityDataObject implements IEntityDataCheck
         return DAO::getConnection()->real_escape_string($string);
     }
 }
-
 ?>

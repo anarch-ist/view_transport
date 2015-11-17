@@ -1,4 +1,5 @@
 <?php
+namespace DAO;
 
 interface IPointDAO
 {

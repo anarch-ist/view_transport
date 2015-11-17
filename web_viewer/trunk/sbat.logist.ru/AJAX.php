@@ -1,13 +1,7 @@
 <?php
-//include_once 'common_files\dao\invoicesForUser\InvoicesForUserDAO.php';
 include_once '.\common_files\privilegedUser\PrivilegedUser.php';
-//include_once 'common_files\dao\userDao\UserDAOEntity.php';
-$privUser = null;
 try {
     $privUser = PrivilegedUser::getInstance();
-    if (is_null($privUser)) {
-        throw new Exception('жопа');
-    }
     $dataArray = $privUser->getInvoicesForUser()->selectAllData();
     $totalData = count($dataArray);
     $totalFiltered = $totalData;

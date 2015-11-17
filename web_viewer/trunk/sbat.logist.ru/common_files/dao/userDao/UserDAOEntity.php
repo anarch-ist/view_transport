@@ -1,4 +1,5 @@
 <?php
+namespace DAO;
 include_once 'IUserDAO.php';
 include_once '/../DAO.php';
 
@@ -53,6 +54,7 @@ class UserDAO extends DAO implements IUserDAO
 
     function addUser($user)
     {
+
         // TODO: Implement addUser() method.
     }
 }

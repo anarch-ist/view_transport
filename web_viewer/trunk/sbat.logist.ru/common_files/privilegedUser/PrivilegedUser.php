@@ -1,7 +1,12 @@
 <?php
 include_once '\..\dao\userDao\UserDAOEntity.php';
+include_once '\..\dao\pointDao\PointDAO.php';
 include_once '\..\dao\invoicesForUser\InvoicesForUserDAO.php';
 include_once '\..\dao\DAO.php';
+use DAO\DAO as DAO;
+use DAO\UserDAO as UserDAO;
+use DAO\PointDAO as PointDAO;
+use DAO\InvoicesForUserDAO as InvoicesForUserDAO;
 class AuthUser extends DAO {
     private static $instance;
     private $user;
@@ -51,26 +56,13 @@ class PrivilegedUser extends DAO {
         $this->user = $user;
     }
 
-    /**
-     * @param $userID - for user who wants authorize. field from client
-     * @param $md5 - field from client
-     */
-    private function checkAuth($userID, $md5) {
-        $user = $this->getUserEntity()->selectUserByID($userID);
-        return ($user->getPassMD5() === $md5);
-    }
     public static function getInstance() {
         if (is_null(self::$instance)) {
-            try {
-                if(!AuthUser::getInstance()->isValid()) {
-                    throw new Exception('Ошибка авторизации');
-                }
-                self::$instance = new PrivilegedUser(AuthUser::getInstance()->getUserInfo());
-            }
-            catch(Exception $ex) {
-                echo $ex->getMessage();
+            if(!AuthUser::getInstance()->isValid()) {
                 self::$instance = null;
+                throw new Exception('Ошибка авторизации');
             }
+            self::$instance = new PrivilegedUser(AuthUser::getInstance()->getUserInfo());
         }
         return self::$instance;
     }
@@ -80,4 +72,4 @@ class PrivilegedUser extends DAO {
     public function getInvoicesForUser() {
         return InvoicesForUserDAO::getInstance();
     }
-} 
+}
