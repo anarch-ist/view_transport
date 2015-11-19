@@ -123,6 +123,15 @@ port = 3306
 start URl = /
 Browser = Chrome(должен быть установлен)
 
+12) для того, чтобы не было проблем с кодировками нужно добавить в файл httpd.conf строку
+AddDefaultCharset UTF-8
+а также возможно в файл .htaccess
+IndexOptions +Charset=UTF-8
+
+в файле php.ini раскомментировать строку 
+default_charset = "UTF-8"
+
+
 
 
 
