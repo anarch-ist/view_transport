@@ -12,7 +12,7 @@
 					"serverSide": true,
 					"ajax":{
 //						url :"employee-grid-data.php", // json datasource
-						url :"AJAX.php?login=gfds@&md5=54321", // json datasource
+						url :"AJAX.php?login=egrt@irtj.ru&md5=esrhgruht", // json datasource
 						type: "post",  // method  , by default get
 						error: function(){  // error handling
 							$(".user-grid-error").html("");
