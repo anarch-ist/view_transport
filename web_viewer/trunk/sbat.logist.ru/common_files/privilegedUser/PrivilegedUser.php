@@ -20,12 +20,12 @@ class AuthUser extends DAO {
     private function checkAuth($userID, $md5) {
         if (!isset($userID) || !isset($md5)) return false;
         $this->user = UserDAO::getInstance()->selectUserByID($userID);
-        return ($this->user->getPassMD5() === $md5);
+        return (!is_null($this->user) && $this->user->getPassMD5() === $md5);
     }
     private function authorize($login, $md5) {
         if (!isset($login) || !isset($md5)) return false;
         $this->user = UserDAO::getInstance()->selectUserByEmail($login);
-        return ($this->user->getPassMD5() === $md5);
+        return (!is_null($this->user) && $this->user->getPassMD5() === $md5);
     }
     public function isValid() {
         $isAuth = false;

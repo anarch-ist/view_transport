@@ -33,12 +33,16 @@ class UserDAO extends DAO implements IUserDAO
     function selectUserByID($id)
     {
         $array = parent::select(new UserSelectByID($id));
+        if (!isset($array[0]))
+            return null;
         return new User($array[0]);
     }
 
     function selectUserByEmail($email)
     {
         $array = parent::select(new UserSelectByLogin($email));
+        if (!isset($array[0]))
+            return null;
         return new User($array[0]);
     }
 
