@@ -3,6 +3,7 @@ include_once '.\common_files\privilegedUser\PrivilegedUser.php';
 try {
     $privUser = PrivilegedUser::getInstance();
     $dataArray = $privUser->getInvoicesForUser()->selectAllData();
+    //echo(print_r($dataArray));
     $totalData = count($dataArray);
     $totalFiltered = $totalData;
     $data = array();

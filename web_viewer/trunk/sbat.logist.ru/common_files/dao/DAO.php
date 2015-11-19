@@ -35,6 +35,7 @@ abstract class DAO implements IDAO
     {
         try {
             self::$connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
+            mysqli_set_charset(self::$connection,"utf8"); // fixed encoding error
             if (self::$connection->connect_errno) {
                 throw new Exception('Connection error - '.self::$connection->connect_error);
             }
