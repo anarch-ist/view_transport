@@ -1,10 +1,30 @@
+<!--http://www.formget.com/jquery-login-form/-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Введите логин и пароль</title>
+    <link rel="stylesheet" href="../css/style.css"/>
+    <script type="text/javascript" src="../common_files/media/js/jquery.js"></script>
+    <script type="text/javascript" src="login.js"></script>
 </head>
 <body>
+<div class="container">
+    <div class="main">
+        <form class="form" method="post" action="#">
 
+            <h2>Авторизуйтесь для начала работы с системой</h2>
+
+            <label for="email">Логин :</label>
+            <input type="text" name="demail" id="email">
+
+            <label for="password">Пароль :</label>
+            <input type="password" name="password" id="password">
+            <div id="loginErrorContainer"></div>
+
+            <input type="button" name="login" id="login" value="Войти">
+        </form>
+    </div>
+</div>
 </body>
 </html>
