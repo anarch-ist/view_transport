@@ -46,6 +46,15 @@ class UserDAO extends DAO implements IUserDAO
         return new User($array[0]);
     }
 
+    // контракт метода следующий - в случае, если по указанному логину и паролю - был получен экземпляр класса, то метод возвращает его.
+    // в случае неудачи метод должен бросить одно из двух исключений:
+    // NoSuchLoginException или IllegalPasswordException
+    function selectUserByLoginAndPassword($login, $password)
+    {
+        // TODO: Implement selectUserByLoginAndPassword() method.
+        // throw new Exception('no user found');
+    }
+
     function updateUser($newUser)
     {
         // TODO: Implement updateUser() method.
@@ -61,6 +70,8 @@ class UserDAO extends DAO implements IUserDAO
 
         // TODO: Implement addUser() method.
     }
+
+
 }
 
 class User extends EntityDataObject

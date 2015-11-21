@@ -1,24 +1,19 @@
 $(document).ready(function () {
-    $("#login").click(function () {
-        var email = $("#email").val();
-        var password = $("#password").val();
+    $("#loginButton").click(function () {
+        var $loginInput = $("#loginInput");
+        var login = $loginInput.val();
+        var $passwordInput = $("#passwordInput");
+        var password = $passwordInput.val();
 
         // Checking for blank fields.
-        if (email == "" || password == "") {
-            //var $inputs = $('input[type="text"], input[type="password"]'); // get array of inputs
-            var $inputs = $('input[type=text], input[type=password]'); // get array of inputs
-            console.log("inputs = " + $inputs.length);
+        if (login == "" || password == "") {
+            var $inputs = $($loginInput, $passwordInput); // get array of inputs
             $inputs.addClass("login_error");
-            //$inputs.each(function() {
-            //    console.log($(this));
-            //    $(this).addClass("login_error");
-            //});
             $("#loginErrorContainer").text("Пожалуйста заполните все поля");
-
         } else {
-            $.post("login.php", {email1: email, password1: password},
+            $.post("login.php", {login: login, password: password},
                 function (data) {
-                    if (data == 'Invalid Email.......') {
+                    if (data == 'invalid_login') {
                         $('input[type="text"]').css({"border": "2px solid red", "box-shadow": "0 0 3px red"});
                         $('input[type="password"]').css({
                             "border": "2px solid #00F5FF",

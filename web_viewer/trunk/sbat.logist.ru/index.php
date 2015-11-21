@@ -1,49 +1,54 @@
 <!DOCTYPE html>
 <html>
-	<title>Datatable Demo1 | CoderExample</title>
+	<title>логистика</title>
 	<head>
 		<link rel="stylesheet" type="text/css" href="common_files/media/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" type="text/css" href="common_files/media/css/jquery-ui.min.css">
+		<link rel="stylesheet" type="text/css" href="/css/style.css">
+
 		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery.js"></script>
 		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery.dataTables.min.js"></script>
-		<script type="text/javascript" language="javascript" >
-			$(document).ready(function() {
-				var dataTable = $('#user-grid').DataTable( {
-					"processing": true,
-					"serverSide": true,
-					"ajax":{
-//						url :"employee-grid-data.php", // json datasource
-						url :"AJAX.php?login=egrt@irtj.ru&md5=esrhgruht", // json datasource
-						type: "post",  // method  , by default get
-						error: function(){  // error handling
-							$(".user-grid-error").html("");
-							$("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-							$("#user-grid_processing").css("display","none");
-							
-						}
-					}
-				} );
-			} );
-		</script>
-		<style>
-			div.container {
-			    margin: 0 auto;
-			    max-width:760px;
-			}
-			div.header {
-			    margin: 100px auto;
-			    line-height:30px;
-			    max-width:760px;
-			}
-			body {
-			    background: #f7f7f7;
-			    color: #333;
-			    font: 90%/1.45em "Helvetica Neue",HelveticaNeue,Verdana,Arial,Helvetica,sans-serif;
-			}
-		</style>
+		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery-ui.min.js"></script>
+
+		<script type="text/javascript" language="javascript" src="/js/datatables.init.js"></script>
+		<script type="text/javascript" language="javascript" src="/js/index.js"></script>
+
+
 	</head>
 	<body>
-		<div class="header"><h1>DataTable demo (Server side) in Php,Mysql and Ajax </h1></div>
+
 		<div class="container">
+            <div id="menu">
+
+
+
+                <label for="tableTypeSelect">Выберите таблицу:</label>
+                <select name="tableType" id="tableTypeSelect">
+                    <option selected="selected">Текущие статусы</option>
+                    <option>История статусов</option>
+                    <option>Маршрутные листы</option>
+                </select>
+
+                <div id="buttonsContainer" style="display: inline-block">
+                    <button id="selectColumnsControl">
+                        выбрать колонки
+                    </button>
+                    <button>
+                        Изменить статус накладной
+                    </button>
+                    <button>
+                        Изменить статус МЛ
+                    </button>
+                    <button>
+                        Сброс фильтров
+                    </button>
+                </div>
+
+
+
+
+
+            </div>
 			<table id="user-grid"  cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
 					<thead>
 						<tr>

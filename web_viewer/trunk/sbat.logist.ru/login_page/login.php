@@ -1,24 +1,18 @@
 <?php
+//get instance of userDAO
+$userDao = \DAO\UserDAO::getInstance();
 
+$login = $_POST['login']; // Fetching Values from URL.
+$password = sha1($_POST['password']); // Password Encryption, If you like you can also leave sha1.
 
-$connection = mysql_connect("localhost", "root", ""); // Establishing connection with server..
-$db = mysql_select_db("college", $connection); // Selecting Database.
-$email = $_POST['email1']; // Fetching Values from URL.
-$password = sha1($_POST['password1']); // Password Encryption, If you like you can also leave sha1.
-// check if e-mail address syntax is valid or not
-$email = filter_var($email, FILTER_SANITIZE_EMAIL); // sanitizing email(Remove unexpected symbol like <,>,?,#,!, etc.)
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo "Invalid Email.......";
-} else {
-// Matching user input email and password with stored email and password in database.
-    $result = mysql_query("SELECT * FROM registration WHERE email='$email' AND password='$password'");
-    $data = mysql_num_rows($result);
-    if ($data == 1) {
-        echo "Successfully Logged in...";
-    } else {
-        echo "Email or Password is wrong...!!!!";
-    }
+try {
+    $result = $userDao->selectUserByLoginAndPassword($login, $password);
+    // User class instances must contain session data. read session data from database inside user DAO
+
+    // redirect to page like http://sbat.logist.ru/user?login=ivan&role=warehouse_manager
+    header('Location: /user?login=ivan&role=warehouse_manager', true, 303);
+} catch (NoSuchLoginException $logEx) {
+    echo $logEx->getMessage();
+} catch (IllegalPasswordException $passEx) {
+    echo $passEx->getMessage();
 }
-mysql_close($connection); // Connection Closed.
-?>
-

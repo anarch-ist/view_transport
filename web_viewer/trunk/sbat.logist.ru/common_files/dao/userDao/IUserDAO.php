@@ -9,6 +9,8 @@ interface IUserDAO
 
     function selectUserByEmail($email);
 
+    function selectUserByLoginAndPassword($login, $password);
+
     function updateUser($newUser);
 
     function deleteUser($user);
