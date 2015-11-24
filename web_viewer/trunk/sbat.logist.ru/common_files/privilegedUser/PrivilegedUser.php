@@ -1,75 +1,70 @@
 <?php
-include_once '\..\dao\userDao\UserDAOEntity.php';
-include_once '\..\dao\pointDao\PointDAO.php';
-include_once '\..\dao\invoicesForUser\InvoicesForUserDAO.php';
+include_once '\..\dao\userDao\User.php';
+//include_once '\..\dao\pointDao\Point.php';
+include_once '\..\dao\invoicesForUser\InvoicesForUser.php';
 include_once '\..\dao\DAO.php';
-use DAO\DAO as DAO;
-use DAO\UserDAO as UserDAO;
-use DAO\PointDAO as PointDAO;
-use DAO\InvoicesForUserDAO as InvoicesForUserDAO;
-class AuthUser extends DAO {
-    private static $instance;
+use DAO\UserEntity as UserEntity;
+//use DAO\PointEntity as PointEntity;
+use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
+use DAO\AuthException as AuthException;
+abstract class AuthUser {
     private $user;
     protected function __construct() {
+        if(!$this->isValid()) {
+            throw new AuthException('Ошибка авторизации');
+        }
     }
 
     /**
      * @param $userID - for user who wants authorize. field from client
      * @param $md5 - field from client
+     * @return boolean
      */
     private function checkAuth($userID, $md5) {
-        if (!isset($userID) || !isset($md5)) return false;
-        $this->user = UserDAO::getInstance()->selectUserByID($userID);
-        return (!is_null($this->user) && $this->user->getPassMD5() === $md5);
+//        if (!isset($userID) || !isset($md5)) return false;
+        $this->user = UserEntity::getInstance()->selectUserByID($userID);
+        return ($this->user->getData('passMD5') === $md5);
     }
-    private function authorize($login, $md5) {
-        if (!isset($login) || !isset($md5)) return false;
-        $this->user = UserDAO::getInstance()->selectUserByEmail($login);
-        return (!is_null($this->user) && $this->user->getPassMD5() === $md5);
+    private function authorize($email, $md5) {
+//        if (!isset($email) || !isset($md5)) return false;
+        $this->user = UserEntity::getInstance()->selectUserByEmail($email);
+        if ($this->user->getData('passMD5') === $md5) {
+            setcookie('UserID',$this->user->getData('userID'),0);
+            setcookie('md5',$this->user->getData('passMD5'),0);
+            return true;
+        }
+        return false;
     }
     public function isValid() {
-        $isAuth = false;
-        if (isset($_COOKIE['UserID'])&& isset($_COOKIE['md5'])) {
-            $isAuth = $this->checkAuth($_COOKIE['UserID'],$_COOKIE['md5']);
+        if (isset($_COOKIE['UserID'])&& isset($_COOKIE['md5']) && $this->checkAuth($_COOKIE['UserID'],$_COOKIE['md5'])) {
+            return true;
         }
         //TODO: change GET to POST
-        if (isset($_GET['login'])&& isset($_GET['md5'])) {
-            $isAuth = $isAuth || $this->authorize($_GET['login'],$_GET['md5']);
+        if (isset($_GET['login'])&& isset($_GET['md5']) && $this->authorize($_GET['login'],$_GET['md5'])) {
+            return true;
         }
-        return $isAuth;
+        return false;
     }
     public function getUserInfo() {
         return $this->user;
     }
-    public static function getInstance() {
-        if (is_null(self::$instance)) {
-            self::$instance = new AuthUser();
-        }
-        return self::$instance;
-    }
 }
-class PrivilegedUser extends DAO {
+class PrivilegedUser extends AuthUser {
     private static $instance;
     private $permissions;
-    private $user;
-    protected function __construct($user) {
-        $this->user = $user;
+    protected function __construct() {
     }
 
     public static function getInstance() {
         if (is_null(self::$instance)) {
-            if(!AuthUser::getInstance()->isValid()) {
-                self::$instance = null;
-                throw new Exception('Ошибка авторизации');
-            }
-            self::$instance = new PrivilegedUser(AuthUser::getInstance()->getUserInfo());
+            self::$instance = new PrivilegedUser();
         }
         return self::$instance;
     }
     public function getUserEntity() {
-        return UserDAO::getInstance();
+        return UserEntity::getInstance();
     }
     public function getInvoicesForUser() {
-        return InvoicesForUserDAO::getInstance();
+        return InvoicesForUserEntity::getInstance();
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
 
-interface IPointDAO
+interface IPointEntity
 {
     function selectPoints();
 

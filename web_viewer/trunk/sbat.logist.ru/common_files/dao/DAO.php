@@ -1,84 +1,89 @@
 <?php
 namespace DAO;
+
+define('PHP_NEWLINE','<br>'.PHP_EOL);
+
 use mysqli;
 use Exception;
-include_once 'IDAO.php';
 
-abstract class DAO implements IDAO
+include_once 'IDAO.php';
+include_once 'Exceptions.php';
+
+class DAO implements IDAO
 {
     const AUTO_START_TRANSACTION = true;
-    private static $connection;
-    private static $connectionCount = 0;
+    private static $_instance;
+    private $_connection;
 
-    protected function __construct()
+    public static function getInstance()
     {
-        if (is_null(self::$connection)) {
-            self::startConnection();
+        if (is_null(self::$_instance)) {
+            self::$_instance = new DAO();
         }
-        if (!self::$connectionCount && self::AUTO_START_TRANSACTION) {
-            self::startTransaction();
-        }
-        self::$connectionCount++;
+        return self::$_instance;
     }
 
-    static function getConnection()
+    private function __construct()
     {
-        return self::$connection;
-    }
-
-    private static function query($sql)
-    {
-        return self::$connection->query($sql);
-    }
-
-    static function startConnection()
-    {
-        try {
-            self::$connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
-            mysqli_set_charset(self::$connection, "utf8"); // fixed encoding error
-            if (self::$connection->connect_errno) {
-                throw new Exception('Connection error - '.self::$connection->connect_error);
-            }
+        $this->_connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
+        if ($this->_connection->connect_errno) {
+            throw new MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
-        catch(Exception $ex) {
-            throw new Exception('Ошибка соединения с БД');
+        if ($this::AUTO_START_TRANSACTION) {
+            $this->startTransaction();
         }
     }
 
-    static function closeConnection()
+    public function checkString($str)
     {
-        return self::$connection->close();
+        return $this->_connection->real_escape_string($str);
     }
 
-    private static function startTransaction()
+
+    function query($sql)
     {
-        return self::$connection->begin_transaction();
+        return $this->_connection->query($sql);
     }
 
-    private static function commit()
+    function startConnection()
     {
-        return self::$connection->commit();
+        $this->_connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
+        if ($this->_connection->connect_errno) {
+            throw new MysqlException('Connection error - ' . $this->_connection->connect_error);
+        }
     }
 
-    private static function rollback()
+    function closeConnection()
     {
-        return self::$connection->rollback();
+        return $this->_connection->close();
+    }
+
+    public function startTransaction()
+    {
+        return $this->_connection->begin_transaction();
+    }
+
+    public function commit()
+    {
+        return $this->_connection->commit();
+    }
+
+    public function rollback()
+    {
+        return $this->_connection->rollback();
     }
 
     function __destruct()
     {
-        self::$connectionCount--;
-        if (!self::$connectionCount) {
-            self::commit();
-            self::closeConnection();
-        }
+        $this->commit();
+        $this->closeConnection();
     }
 
-    function select($selectObj)
+    function select(IEntitySelect $selectObj)
     {
         $result = self::query($selectObj->getSelectQuery());
         if (!$result) {
-            throw new Exception('ошибка в выборочном запросе - '.self::$connection->error);
+            throw new Exception('ошибка в выборочном запросе - ' . $this->_connection->error);
         }
         $array = array();
         $count = 0;
@@ -89,30 +94,23 @@ abstract class DAO implements IDAO
         return $array;
     }
 
-    function update($newObj)
+    function update(IEntityUpdate $newObj)
     {
         // TODO: Check update() method.
         return $this->query($newObj->getUpdateQuery());
     }
 
-    function insert($obj)
+    function insert(IEntityInsert $obj)
     {
         // TODO: Check insert() method.
         return $this->query($obj->getInsertQuery());
     }
 
-    function delete($obj)
+    function delete(IEntityDelete $obj)
     {
         // TODO: Check delete() method.
         return $this->query($obj->getDeleteQuery());
     }
 }
 
-abstract class EntityDataObject implements IEntityDataCheck
-{
-    function prepareSafeString($string)
-    {
-        return DAO::getConnection()->real_escape_string($string);
-    }
-}
 ?>

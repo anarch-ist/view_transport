@@ -1,15 +1,13 @@
 <?php
 namespace DAO;
 
-interface IUserDAO
+interface IUserEntity
 {
     function selectUsers();
 
     function selectUserByID($id);
 
     function selectUserByEmail($email);
-
-    function selectUserByLoginAndPassword($login, $password);
 
     function updateUser($newUser);
 

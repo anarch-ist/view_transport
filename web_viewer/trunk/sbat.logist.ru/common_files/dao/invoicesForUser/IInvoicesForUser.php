@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
 
-interface IInvoicesForUserDAO
+interface IInvoicesForUserEntity
 {
     function selectAllData();
 

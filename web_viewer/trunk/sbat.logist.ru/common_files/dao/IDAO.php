@@ -3,40 +3,30 @@ namespace DAO;
 
 interface IDAO
 {
-    // This is the root interface for realizing DAO-pattern
-    // Static functions for interaction with data source
-    // Function for starting connection with data source
-    static function startConnection();
-
-    /**
-     * @return bool
-     */
-    static function closeConnection();
-
     // Function for checking string for correct format
     /**
      * @param $selectObj
      * @return string
      */
-    function select($selectObj);
+    function select(IEntitySelect $selectObj);
 
     /**
      * @param $newObj
      * @return string
      */
-    function update($newObj);
+    function update(IEntityUpdate $newObj);
 
     /**
      * @param $obj
      * @return string
      */
-    function insert($obj);
+    function insert(IEntityInsert $obj);
 
     /**
-     * @param $obj
+     * @param IEntityDelete $obj
      * @return string
      */
-    function delete($obj);
+    function delete(IEntityDelete $obj);
 }
 
 interface IEntitySelect
@@ -72,16 +62,8 @@ interface IEntityDelete
     function getDeleteQuery();
 }
 
-/**
- * Interface IEntityDataCheck
- */
-interface IEntityDataCheck
-{
-    /**
-     * @param string
-     * @return string
-     */
-    function prepareSafeString($string);
+interface IEntityData {
+    function getData($field);
+    function toArray();
 }
-
 ?>

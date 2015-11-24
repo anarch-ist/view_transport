@@ -1,31 +1,31 @@
 <?php
 namespace DAO;
-require_once 'IInvoicesForUserDAO.php';
+require_once 'IInvoicesForUser.php';
 include_once '/../DAO.php';
 
 
-class InvoicesForUserDAO extends DAO implements IInvoicesForUserDAO
+class InvoicesForUserEntity implements IInvoicesForUserEntity
 {
-    private static $instance;
+    private static $_instance;
+    private $_DAO;
 
     protected function __construct()
     {
-        parent::__construct();
-        self::$instance = $this;
+        $this->_DAO = DAO::getInstance();
+        self::$_instance = $this;
     }
 
     public static function getInstance()
     {
-        if (is_null(self::$instance)) return new InvoicesForUserDAO();
-        return self::$instance;
+        if (is_null(self::$_instance)) return new InvoicesForUserEntity();
+        return self::$_instance;
     }
-
     /**
      * @return array
      */
     function selectAllData()
     {
-        return parent::select(new EntitySelectAllData());
+        return $this->_DAO->select(new EntitySelectAllData());
     }
 
     /**
@@ -35,11 +35,11 @@ class InvoicesForUserDAO extends DAO implements IInvoicesForUserDAO
     function selectDataByKey($keyword)
     {
         // TODO: Implement selectDataByKey() method.
-        return parent::select(new EntitySelectAllData());
+        return $this->_DAO->select(new EntitySelectAllData());
     }
 }
 
-class EntitySelectAllData extends EntityDataObject implements IEntitySelect
+class EntitySelectAllData implements IEntitySelect
 {
     function __construct()
     {
