@@ -6,7 +6,6 @@ include_once '\..\dao\DAO.php';
 use DAO\UserEntity as UserEntity;
 //use DAO\PointEntity as PointEntity;
 use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
-use DAO\AuthException as AuthException;
 abstract class AuthUser {
     private $user;
     protected function __construct() {
@@ -23,12 +22,12 @@ abstract class AuthUser {
     private function checkAuth($userID, $md5) {
 //        if (!isset($userID) || !isset($md5)) return false;
         $this->user = UserEntity::getInstance()->selectUserByID($userID);
-        return ($this->user->getData('passMD5') === $md5);
+        return (!is_null($this->user) && $this->user->getData('passMD5') === $md5);
     }
     private function authorize($email, $md5) {
 //        if (!isset($email) || !isset($md5)) return false;
         $this->user = UserEntity::getInstance()->selectUserByEmail($email);
-        if ($this->user->getData('passMD5') === $md5) {
+        if (!is_null($this->user) && $this->user->getData('passMD5') === $md5) {
             setcookie('UserID',$this->user->getData('userID'),0);
             setcookie('md5',$this->user->getData('passMD5'),0);
             return true;
@@ -53,6 +52,7 @@ class PrivilegedUser extends AuthUser {
     private static $instance;
     private $permissions;
     protected function __construct() {
+        parent::__construct();
     }
 
     public static function getInstance() {

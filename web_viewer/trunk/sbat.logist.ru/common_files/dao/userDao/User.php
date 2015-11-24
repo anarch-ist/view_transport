@@ -28,8 +28,11 @@ class UserEntity implements IUserEntity
         switch(func_num_args()) {
             case 2:
                 $start = func_get_arg(1);
+                $count = func_get_arg(0);
+                break;
             case 1:
                 $count = func_get_arg(0);
+                break;
         }
         $array = $this->_DAO->select(new SelectAllUsers($start, $count));
         $users = array();
@@ -48,6 +51,9 @@ class UserEntity implements IUserEntity
     function selectUserByEmail($email)
     {
         $array = $this->_DAO->select(new SelectUserByEmail($email));
+        if (!count($array)) {
+            return null;
+        }
         return new UserData($array[0]);
     }
 
@@ -80,7 +86,7 @@ class UserData implements IEntityData
     public function getData($index)
     {
         if (!isset($this->array[$index])) {
-            throw new DataEntityException('Field doesn`t exist: '.$index.' - in '.get_class($this));
+            throw new \DataEntityException('Field doesn`t exist: '.$index.' - in '.get_class($this));
         } else {
             return $this->array[$index];
         }

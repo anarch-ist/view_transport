@@ -27,7 +27,7 @@ class DAO implements IDAO
     {
         $this->_connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
         if ($this->_connection->connect_errno) {
-            throw new MysqlException('Connection error - ' . $this->_connection->connect_error);
+            throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
         if ($this::AUTO_START_TRANSACTION) {
             $this->startTransaction();
@@ -49,7 +49,7 @@ class DAO implements IDAO
     {
         $this->_connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
         if ($this->_connection->connect_errno) {
-            throw new MysqlException('Connection error - ' . $this->_connection->connect_error);
+            throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
     }
 

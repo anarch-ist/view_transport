@@ -1,8 +1,6 @@
 <?php
 
-namespace DAO;
-
-class DataEntityException extends \Exception
+class DataEntityException extends Exception
 {
     function __construct($string)
     {
@@ -10,18 +8,17 @@ class DataEntityException extends \Exception
     }
 }
 
-class MysqlException extends \Exception
+class MysqlException extends Exception
 {
     public function __construct($str)
     {
         parent::__construct('Ошибка базы данных');
     }
 }
-class AuthException extends \Exception
+class AuthException extends Exception
 {
     public function __construct($str)
     {
-        parent::__construct('Ошибка авторизации');
-
+        parent::__construct('Ошибка авторизации - неверные имя пользователя или пароль');
     }
 }

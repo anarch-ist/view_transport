@@ -63,9 +63,11 @@ class Point implements IEntityData
 
     public function getData($index)
     {
-        if (isset($this->array[$index])) {
+        if (!isset($this->array[$index])) {
+            throw new \DataEntityException('Field doesn`t exist: '.$index.' - in '.get_class($this));
+        } else {
             return $this->array[$index];
-        } else throw new \Exception('Обращение к несуществующему полю');
+        }
     }
 
     public function toArray()
