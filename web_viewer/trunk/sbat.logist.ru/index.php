@@ -2,17 +2,29 @@
 <html>
 	<title>логистика</title>
 	<head>
-		<link rel="stylesheet" type="text/css" href="common_files/media/css/jquery.dataTables.min.css">
-		<link rel="stylesheet" type="text/css" href="common_files/media/css/jquery-ui.min.css">
-		<link rel="stylesheet" type="text/css" href="/css/style.css">
 
-		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery.js"></script>
-		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery.dataTables.min.js"></script>
-		<script type="text/javascript" language="javascript" src="common_files/media/js/jquery-ui.min.js"></script>
+        <!--jquery-->
+        <script type="text/javascript" language="javascript" src="common_files/media/js/jquery.js"></script>
+        <!--jquery-ui-->
+        <link rel="stylesheet" type="text/css" href="common_files/media/css/jquery-ui.min.css">
+        <script type="text/javascript" language="javascript" src="common_files/media/js/jquery-ui.min.js"></script>
 
-		<script type="text/javascript" language="javascript" src="/js/datatables.init.js"></script>
+        <!--dataTables with plugins libs-->
+        <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.css"/>
+        <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.1.0/css/buttons.jqueryui.css"/>
+        <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.1.0/css/select.jqueryui.css"/>
+
+        <script type="text/javascript" src="common_files/media/DataTables-1.10.10/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" src="common_files/media/DataTables-1.10.10/js/dataTables.jqueryui.js"></script>
+        <script type="text/javascript" src="common_files/media/Buttons-1.1.0/js/dataTables.buttons.js"></script>
+        <script type="text/javascript" src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
+        <script type="text/javascript" src="common_files/media/Select-1.1.0/js/dataTables.select.js"></script>
+
+        <!--custom styles-->
+		
+        <!--custom js-->
+        <script type="text/javascript" language="javascript" src="/js/datatables.init.js"></script>
 		<script type="text/javascript" language="javascript" src="/js/index.js"></script>
-
 
 	</head>
 	<body>
@@ -43,9 +55,6 @@
                         Сброс фильтров
                     </button>
                 </div>
-
-
-
 
 
             </div>

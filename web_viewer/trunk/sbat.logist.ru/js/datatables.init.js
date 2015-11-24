@@ -2,6 +2,9 @@ $(document).ready(function() {
     var dataTable = $('#user-grid').DataTable( {
         "processing": true,
         "serverSide": true,
+        select: {
+            style: 'single'
+        },
         "ajax":{
 //						url :"employee-grid-data.php", // json datasource
             url :"AJAX.php?login=egrt@irtj.ru&md5=esrhgruht", // json datasource
