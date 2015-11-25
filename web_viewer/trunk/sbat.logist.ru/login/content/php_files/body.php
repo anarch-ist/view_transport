@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="content/css/style.css"/>
     <script type="text/javascript" src="../common_files/media/js/jquery.js"></script>
     <script type="text/javascript" src="content/js/login.js"></script>
+    <script type="text/javascript" src="content/js/md5.js"></script>
 </head>
 <body>
 <div class="container">

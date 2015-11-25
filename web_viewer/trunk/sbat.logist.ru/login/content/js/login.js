@@ -3,7 +3,8 @@ $(document).ready(function () {
         var $loginInput = $("#loginInput");
         var login = $loginInput.val();
         var $passwordInput = $("#passwordInput");
-        var password = $passwordInput.val();
+        var password = calcMD5($passwordInput.val());
+        console.log(password);
 
         // Checking for blank fields.
         if (login == "" || password == "") {

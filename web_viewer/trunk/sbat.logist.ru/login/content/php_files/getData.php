@@ -2,7 +2,7 @@
 include_once '\..\common_files\privilegedUser\PrivilegedUser.php';
 
 $login = $_POST['login']; // Fetching Values from URL.
-$password = sha1($_POST['password']); // Password Encryption, If you like you can also leave sha1.
+$password = $_POST['password']; // Password Encryption, If you like you can also leave sha1.
 $_GET['login'] = $login;
 $_GET['md5'] = $password;
 try {
