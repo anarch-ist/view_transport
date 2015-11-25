@@ -7,7 +7,7 @@ $(document).ready(function() {
         },
         "ajax":{
 //						url :"employee-grid-data.php", // json datasource
-            url :"AJAX.php?login=egrt@irtj.ru&md5=esrhgruht", // json datasource
+            url :"content/getData.php", // json datasource
             type: "post",  // method  , by default get
             error: function(){  // error handling
                 $(".user-grid-error").html("");

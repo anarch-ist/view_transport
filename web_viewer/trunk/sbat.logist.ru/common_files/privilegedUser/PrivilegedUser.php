@@ -28,8 +28,8 @@ abstract class AuthUser {
 //        if (!isset($email) || !isset($md5)) return false;
         $this->user = UserEntity::getInstance()->selectUserByEmail($email);
         if (!is_null($this->user) && $this->user->getData('passMD5') === $md5) {
-            setcookie('UserID',$this->user->getData('userID'),0);
-            setcookie('md5',$this->user->getData('passMD5'),0);
+            setcookie('UserID',$this->user->getData('userID'),0,'/');
+            setcookie('md5',$this->user->getData('passMD5'),0,'/');
             return true;
         }
         return false;
