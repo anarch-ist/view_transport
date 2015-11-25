@@ -29,6 +29,7 @@ class DAO implements IDAO
         if ($this->_connection->connect_errno) {
             throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
+        mysqli_set_charset($this->_connection, "utf8"); // fixed encoding error
         if ($this::AUTO_START_TRANSACTION) {
             $this->startTransaction();
         }
@@ -51,6 +52,7 @@ class DAO implements IDAO
         if ($this->_connection->connect_errno) {
             throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
+
     }
 
     function closeConnection()

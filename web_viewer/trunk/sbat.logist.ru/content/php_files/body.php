@@ -1,22 +1,33 @@
 <title>логистика</title>
 <head>
-    <link rel="stylesheet" type="text/css" href="/common_files/media/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="/common_files/media/css/jquery-ui.min.css">
-    <link rel="stylesheet" type="text/css" href="/content/css/style.css">
+    <!--jquery-->
+    <script type="text/javascript" language="javascript" src="common_files/media/js/jquery.js"></script>
+    <!--jquery-ui-->
+    <link rel="stylesheet" type="text/css" href="common_files/media/css/jquery-ui.min.css">
+    <script type="text/javascript" language="javascript" src="common_files/media/js/jquery-ui.min.js"></script>
 
-    <script type="text/javascript" language="javascript" src="/common_files/media/js/jquery.js"></script>
-    <script type="text/javascript" language="javascript" src="/common_files/media/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" language="javascript" src="/common_files/media/js/jquery-ui.min.js"></script>
+    <!--dataTables with plugins libs-->
+    <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.1.0/css/buttons.jqueryui.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.1.0/css/select.jqueryui.css"/>
 
-    <script type="text/javascript" language="javascript" src="/content/js/datatables.init.js"></script>
-    <script type="text/javascript" language="javascript" src="/content/js/index.js"></script>
+    <script type="text/javascript" src="common_files/media/DataTables-1.10.10/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="common_files/media/DataTables-1.10.10/js/dataTables.jqueryui.js"></script>
+    <script type="text/javascript" src="common_files/media/Buttons-1.1.0/js/dataTables.buttons.js"></script>
+    <script type="text/javascript" src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
+    <script type="text/javascript" src="common_files/media/Select-1.1.0/js/dataTables.select.js"></script>
+
+    <!--custom styles-->
+
+    <!--custom js-->
+    <script type="text/javascript" language="javascript" src="content/js/datatables.init.js"></script>
+    <script type="text/javascript" language="javascript" src="content/js/index.js"></script>
 
 
 </head>
 <body>
 <div class="container">
     <div id="menu">
-
 
 
         <label for="tableTypeSelect">Выберите таблицу:</label>
@@ -42,11 +53,8 @@
         </div>
 
 
-
-
-
     </div>
-    <table id="user-grid"  cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
+    <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
         <thead>
         <tr>
             <th>ID заявки</th>
