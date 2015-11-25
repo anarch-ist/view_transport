@@ -27,12 +27,13 @@ $(document).ready(function () {
                         });
                         alert(data);
                     } else if (data == 'Successfully Logged in...') {
-                        $("form")[0].reset();
-                        $('input[type="text"],input[type="password"]').css({
-                            "border": "2px solid #00F5FF",
-                            "box-shadow": "0 0 5px #00F5FF"
-                        });
-                        alert(data);
+                        document.location = '/';
+                        //$("form")[0].reset();
+                        //$('input[type="text"],input[type="password"]').css({
+                        //    "border": "2px solid #00F5FF",
+                        //    "box-shadow": "0 0 5px #00F5FF"
+                        //});
+                        //alert(data);
                     } else {
                         alert(data);
                     }

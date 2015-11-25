@@ -11,6 +11,7 @@ try {
     //$pUser->getUserInfo()->
     // redirect to page like http://sbat.logist.ru/user?login=ivan&role=warehouse_manager
     //header("Location: /?login=ivan&role=warehouse_manager", true, 303);
+    echo 'Successfully Logged in...';
 } catch (Exception $logEx) {
-    echo $logEx->getMessage();
+    echo 'Email or Password is wrong...!!!!';
 }
