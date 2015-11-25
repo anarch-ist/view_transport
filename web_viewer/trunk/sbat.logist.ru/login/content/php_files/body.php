@@ -1,12 +1,9 @@
-<!--http://www.formget.com/jquery-login-form/-->
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Введите логин и пароль</title>
-    <link rel="stylesheet" href="../css/style.css"/>
+    <link rel="stylesheet" href="content/css/style.css"/>
     <script type="text/javascript" src="../common_files/media/js/jquery.js"></script>
-    <script type="text/javascript" src="login.js"></script>
+    <script type="text/javascript" src="content/js/login.js"></script>
 </head>
 <body>
 <div class="container">
@@ -28,4 +25,3 @@
     </div>
 </div>
 </body>
-</html>
