@@ -17,18 +17,22 @@
     <script type="text/javascript" src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
     <script type="text/javascript" src="common_files/media/Select-1.1.0/js/dataTables.select.js"></script>
 
+    <!--dateTimePicker-->
+    <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>
+    <script type="text/javascript" src="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.js"></script>
+
     <!--custom styles-->
 
     <!--custom js-->
     <script type="text/javascript" language="javascript" src="content/js/datatables.init.js"></script>
-    <script type="text/javascript" language="javascript" src="content/js/index.js"></script>
+    <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
 
 
 </head>
 <body>
+
 <div class="container">
     <div id="menu">
-
 
         <label for="tableTypeSelect">Выберите таблицу:</label>
         <select name="tableType" id="tableTypeSelect">
@@ -41,10 +45,10 @@
             <button id="selectColumnsControl">
                 выбрать колонки
             </button>
-            <button>
+            <button id="changeInvoiceStatusButton">
                 Изменить статус накладной
             </button>
-            <button>
+            <button id="changeRouteListStatusButton">
                 Изменить статус МЛ
             </button>
             <button>
@@ -52,8 +56,8 @@
             </button>
         </div>
 
-
     </div>
+
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
         <thead>
         <tr>

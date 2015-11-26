@@ -4,7 +4,6 @@ $(document).ready(function () {
         var login = $loginInput.val();
         var $passwordInput = $("#passwordInput");
         var password = calcMD5($passwordInput.val());
-        console.log(password);
 
         // Checking for blank fields.
         if (login == "" || password == "") {
@@ -14,6 +13,8 @@ $(document).ready(function () {
         } else {
             $.post("login.php", {login: login, password: password},
                 function (data) {
+
+
                     if (data == 'invalid_login') {
                         $('input[type="text"]').css({"border": "2px solid red", "box-shadow": "0 0 3px red"});
                         $('input[type="password"]').css({
@@ -35,6 +36,9 @@ $(document).ready(function () {
                         });
                         //alert(data);
                         document.location = '/';
+
+                        // TODO send request for INVOICE_STATUSES_FOR_USER
+                        //$.getJSON("")
                     } else {
                         alert(data);
                     }
