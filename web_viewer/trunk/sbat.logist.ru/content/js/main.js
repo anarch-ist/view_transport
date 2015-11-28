@@ -1,3 +1,4 @@
+
 $(document).ready(function () {
 
     $("#tableTypeSelect").selectmenu();
@@ -7,6 +8,14 @@ $(document).ready(function () {
         // create dialog here with selection content
     });
 
+    $("#logout").on("click", function() {
+        // delete auth cookies
+        $.cookie('UserID', null);
+        $.cookie('md5', null);
+        // make redirect to login page
+        window.location = "/login";
+        //location.reload(true);
+    });
 
     // create div that will be dialog container
     $("body").append(
@@ -21,8 +30,6 @@ $(document).ready(function () {
     createDateTimePickerLocalization();
     var $dateTimePicker = $( "#dateTimePicker" );
     $dateTimePicker.datetimepicker();
-    //$dateTimePicker.datepicker('setDate', new Date());
-    $("#statusSelect").selectmenu();
 
     var $statusChangeDialog = $("#statusChangeDialog");
     $statusChangeDialog.dialog({
@@ -41,12 +48,19 @@ $(document).ready(function () {
         }
     });
 
-    $("#changeInvoiceStatusButton").on("click", function () {
-        // TODO считывать список всех статусов для соотвествующей роли, список доступных статусов должен загружаться в момент логирования пользователя
-        //INVOICE_STATUSES_FOR_USER
 
+    function showSelectInvoiceStatusDialog() {
         $statusChangeDialog.dialog("open");
-    });
+
+        var options = [];
+        var storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
+        for (var i = 0; i < storedStatuses.length; i++) {
+            options.push("<option value='" + storedStatuses[i] + "'>" + storedStatuses[i] + "</option>");
+        }
+        //append after populating all options
+        var $statusSelect = $("#statusSelect");
+        $statusSelect.html(options.join("")).selectmenu();
+    }
 
     function createDateTimePickerLocalization() {
         $.datepicker.regional['ru'] = {
@@ -84,4 +98,64 @@ $(document).ready(function () {
         };
         $.timepicker.setDefaults($.timepicker.regional['ru']);
     }
+
+    // --------DATATABLE INIT--------------
+
+    var dataTable = $('#user-grid').DataTable( {
+        "processing": true,
+        "serverSide": true,
+        select: {
+            style: 'single'
+        },
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                extend: 'selectedSingle',
+                text: 'изменить статус накладной',
+                action: function ( e, dt, node, config ) {
+                    showSelectInvoiceStatusDialog();
+                }
+            },
+            {
+                extend: 'selectedSingle',
+                text: 'изменить статус МЛ',
+                action: function ( e, dt, node, config ) {
+                    alert( 'изм статус маршр листа' );
+                }
+            }
+        ],
+        "ajax":{
+//						url :"employee-grid-data.php", // json datasource
+            url :"content/getData.php", // json datasource
+            type: "post",  // method  , by default get
+            error: function(){  // error handling
+                $(".user-grid-error").html("");
+                $("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+                $("#user-grid_processing").css("display","none");
+
+            }
+        },
+        "language": {
+            "processing": "Подождите...",
+            "search": "Поиск:",
+            "lengthMenu": "Показать _MENU_ записей",
+            "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+            "infoEmpty": "Записи с 0 до 0 из 0 записей",
+            "infoFiltered": "(отфильтровано из _MAX_ записей)",
+            "infoPostFix": "",
+            "loadingRecords": "Загрузка записей...",
+            "zeroRecords": "Записи отсутствуют.",
+            "emptyTable": "В таблице отсутствуют данные",
+            "paginate": {
+                "first": "Первая",
+                "previous": "Предыдущая",
+                "next": "Следующая",
+                "last": "Последняя"
+            },
+            "aria": {
+                "sortAscending": ": активировать для сортировки столбца по возрастанию",
+                "sortDescending": ": активировать для сортировки столбца по убыванию"
+            }
+        }
+    } );
 });

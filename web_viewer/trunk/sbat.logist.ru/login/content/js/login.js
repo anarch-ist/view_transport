@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     $("#loginButton").click(function () {
         var $loginInput = $("#loginInput");
         var login = $loginInput.val();
@@ -13,32 +14,32 @@ $(document).ready(function () {
         } else {
             $.post("login.php", {login: login, password: password},
                 function (data) {
+                    console.log(data);
+                    var result = JSON.parse(data);
 
-
-                    if (data == 'invalid_login') {
+                    function handleInvalidLogin() {
                         $('input[type="text"]').css({"border": "2px solid red", "box-shadow": "0 0 3px red"});
                         $('input[type="password"]').css({
                             "border": "2px solid #00F5FF",
                             "box-shadow": "0 0 5px #00F5FF"
                         });
                         alert(data);
-                    } else if (data == 'Ошибка авторизации - неверные имя пользователя или пароль') {
-                        $('input[type="text"],input[type="password"]').css({
-                            "border": "2px solid red",
-                            "box-shadow": "0 0 3px red"
-                        });
-                        alert(data);
-                    } else if (data == 'Successfully Logged in...') {
+                    }
+
+                    function handleValidLogin() {
                         $("form")[0].reset();
                         $('input[type="text"],input[type="password"]').css({
                             "border": "2px solid #00F5FF",
                             "box-shadow": "0 0 5px #00F5FF"
                         });
-                        //alert(data);
+                        window.sessionStorage.setItem("USER_STATUSES", JSON.stringify(result.statuses));
                         document.location = '/';
+                    }
 
-                        // TODO send request for INVOICE_STATUSES_FOR_USER
-                        //$.getJSON("")
+                    if (result.responseCode === "Ошибка авторизации - неверные имя пользователя или пароль") {
+                        handleInvalidLogin();
+                    } else if (result.responseCode === "") {
+                        handleValidLogin();
                     } else {
                         alert(data);
                     }

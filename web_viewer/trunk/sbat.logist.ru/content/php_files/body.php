@@ -21,10 +21,11 @@
     <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>
     <script type="text/javascript" src="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.js"></script>
 
+    <script src="common_files/media/jqueryCookie-1.4.1/jquery.cookie.js"></script>
+
     <!--custom styles-->
 
     <!--custom js-->
-    <script type="text/javascript" language="javascript" src="content/js/datatables.init.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
 
 
@@ -42,18 +43,10 @@
         </select>
 
         <div id="buttonsContainer" style="display: inline-block">
-            <button id="selectColumnsControl">
-                выбрать колонки
-            </button>
-            <button id="changeInvoiceStatusButton">
-                Изменить статус накладной
-            </button>
-            <button id="changeRouteListStatusButton">
-                Изменить статус МЛ
-            </button>
             <button>
                 Сброс фильтров
             </button>
+            <button id="logout">выйти</button>
         </div>
 
     </div>

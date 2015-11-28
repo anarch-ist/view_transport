@@ -374,6 +374,30 @@ VALUES
   ('ERROR'),
   ('DELIVERED');
 
+CREATE TABLE invoice_statuses_for_user_role (
+  userRoleID VARCHAR(32),
+  invoiceStatusID VARCHAR(32),
+  PRIMARY KEY (userRoleID, invoiceStatusID),
+  FOREIGN KEY (userRoleID) REFERENCES user_roles(userRoleID),
+  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses(invoiceStatusID)
+);
+
+-- TODO fill this list
+INSERT INTO invoice_statuses_for_user_role
+VALUES
+  ('W_DISPATCHER', 'APPROVING'),
+  ('W_DISPATCHER', 'RESERVED'),
+  ('W_DISPATCHER', 'APPROVED'),
+  ('W_DISPATCHER', 'STOP_LIST'),
+  ('W_DISPATCHER', 'READY'),
+  ('W_DISPATCHER', 'DEPARTURE'),
+  ('W_DISPATCHER', 'ERROR'),
+  ('DISPATCHER', 'DEPARTURE'),
+  ('DISPATCHER', 'ARRIVED'),
+  ('DISPATCHER', 'ERROR'),
+  ('DISPATCHER', 'DELIVERED');
+
+
 # invoice объеденяет в себе внутреннюю заявку и накладную,
 # при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
 CREATE TABLE invoices (
