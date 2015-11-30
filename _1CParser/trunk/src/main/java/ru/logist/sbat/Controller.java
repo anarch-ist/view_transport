@@ -68,13 +68,7 @@ public class Controller extends BorderPane implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        this.getScene().getWindow().setOnCloseRequest(event -> {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+
 
         startStopButton.selectedProperty().addListener((observable, oldValue, isSelected) -> {
             if (isSelected) {
