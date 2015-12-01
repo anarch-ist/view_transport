@@ -12,7 +12,7 @@ $(document).ready(function () {
             $inputs.addClass("login_error");
             $("#loginErrorContainer").text("Пожалуйста заполните все поля");
         } else {
-            $.post("login.php", {login: login, password: password},
+            $.post("content/getData.php", {login: login, password: password},
                 function (data) {
                     console.log(data);
                     var result = JSON.parse(data);

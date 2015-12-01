@@ -2,10 +2,12 @@
 include_once '\..\dao\userDao\User.php';
 //include_once '\..\dao\pointDao\Point.php';
 include_once '\..\dao\invoicesForUser\InvoicesForUser.php';
+include_once '\..\dao\invoiceDao\Invoice.php';
 include_once '\..\dao\DAO.php';
 use DAO\UserEntity as UserEntity;
 //use DAO\PointEntity as PointEntity;
 use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
+use DAO\InvoiceEntity as InvoiceEntity;
 abstract class AuthUser {
     private $user;
     protected function __construct() {
@@ -66,5 +68,8 @@ class PrivilegedUser extends AuthUser {
     }
     public function getInvoicesForUser() {
         return InvoicesForUserEntity::getInstance();
+    }
+    public function getInvoiceEntity() {
+        return InvoiceEntity::getInstance();
     }
 }

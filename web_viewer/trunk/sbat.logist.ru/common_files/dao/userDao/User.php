@@ -45,6 +45,9 @@ class UserEntity implements IUserEntity
     function selectUserByID($id)
     {
         $array = $this->_DAO->select(new SelectUserByID($id));
+        if (!count($array)) {
+            return null;
+        }
         return new UserData($array[0]);
     }
 

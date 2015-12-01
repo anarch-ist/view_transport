@@ -1,5 +1,5 @@
 <?php
-include_once '\..\common_files\privilegedUser\PrivilegedUser.php';
+include_once '\..\..\common_files\privilegedUser\PrivilegedUser.php';
 
 $login = $_POST['login'];
 $password = $_POST['password'];
@@ -18,12 +18,16 @@ try {
     //header("Location: /?login=ivan&role=warehouse_manager", true, 303);
 
     // TODO connect with database
-    //$possibleStatuses = $pUser.getPossibleStatuses();
-    $possibleStatuses = [
-        "NOT_REAL1",
-        "NOT_REAL2",
-        "NOT_REAL3"
-    ];
+    $possibleStatuses = array();
+    $possibleStatusesTmp = $pUser->getInvoiceEntity()->getInvoiceStatuses();
+    for($i=0;$i<count($possibleStatusesTmp);$i++) {
+        $possibleStatuses[] = $possibleStatusesTmp[$i]['invoiceStatusID'];
+    }
+//    $possibleStatuses = [
+//        "NOT_REAL1",
+//        "NOT_REAL2",
+//        "NOT_REAL3"
+//    ];
     $dataToSend['responseCode'] = '';
     $dataToSend['statuses'] = $possibleStatuses;
 

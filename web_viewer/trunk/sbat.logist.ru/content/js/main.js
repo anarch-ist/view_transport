@@ -13,7 +13,7 @@ $(document).ready(function () {
         $.cookie('UserID', null);
         $.cookie('md5', null);
         // make redirect to login page
-        window.location = "/login";
+        window.location.reload();
         //location.reload(true);
     });
 
