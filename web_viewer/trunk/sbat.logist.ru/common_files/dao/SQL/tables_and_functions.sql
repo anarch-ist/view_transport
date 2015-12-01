@@ -571,6 +571,7 @@ CREATE TABLE user_action_history (
   timeMark            DATETIME,
   userID              INTEGER,
   tableID             VARCHAR(64),
+  action              ENUM('insert', 'update', 'delete'),
   PRIMARY KEY (userActionHistoryID),
   FOREIGN KEY (tableID) REFERENCES tables (tableID)
     ON DELETE NO ACTION
@@ -708,8 +709,8 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGE
 # нужно уметь ограничивать количество результирующих записей
 
 # Each SELECT statement that does not insert into a table or a variable will produce a result set.
-
-CREATE PROCEDURE selectData()
+-- can be null
+CREATE PROCEDURE selectData(userPointID INTEGER)
   BEGIN
 
     SELECT
@@ -761,5 +762,6 @@ CREATE PROCEDURE selectData()
         route_points.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedUserPointID) AND
         next_route_points.pointID = route_points.pointID
         );
-
+    -- TODO
+    -- WHERE userPointID =
   END;

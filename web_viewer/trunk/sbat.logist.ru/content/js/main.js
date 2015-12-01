@@ -40,6 +40,7 @@ $(document).ready(function () {
         modal: true,
         buttons: {
             "Сохранить": function () {
+                //TODO get request and response for update invoice status
                 $(this).dialog("close");
             },
             "Отмена": function () {
