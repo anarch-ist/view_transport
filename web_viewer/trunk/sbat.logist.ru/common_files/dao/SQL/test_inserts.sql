@@ -1,15 +1,16 @@
 USE project_database;
 
 SET FOREIGN_KEY_CHECKS = 0;
-DELETE FROM points;
-DELETE FROM users;
-DELETE FROM clients;
-DELETE FROM requests;
-DELETE FROM tariffs;
-DELETE FROM routes;
-DELETE FROM route_points;
-DELETE FROM route_lists;
-DELETE FROM invoices;
+-- truncate drop and create table instead of deleting rows one by one
+TRUNCATE points;
+TRUNCATE users;
+TRUNCATE clients;
+TRUNCATE requests;
+TRUNCATE tariffs;
+TRUNCATE routes;
+TRUNCATE route_points;
+TRUNCATE route_lists;
+TRUNCATE invoices;
 SET FOREIGN_KEY_CHECKS = 1;
 
 # insert some test data
@@ -20,7 +21,10 @@ VALUES
   ('point2', 'ekb', 5, 1, 'some_comment2', '9:00:00', '17:00:00', 'erhjeerghig', 'erhefregrthr', '123456',
    'ergherersghrth', 'sf@ewuf.ru', '89032343556', 'WAREHOUSE'),
   ('point3', 'chel', 5, 1, 'some_comment3', '9:00:00', '17:00:00', 'erhjeig', 'efregrthr', '123456', 'ergersghrth',
+   'srgf@ewuf.ru', '89032343556', 'AGENCY'),
+  ('point4', 'chel', 5, 1, 'some_comment3', '9:00:00', '17:00:00', 'erhjeig', 'efregrthr', '123456', 'ergersghrth',
    'srgf@ewuf.ru', '89032343556', 'AGENCY');
+
 
 
 INSERT INTO users (firstName, lastName, patronymic, position, login, passMD5, phoneNumber, email, userRoleID, pointID)
@@ -28,8 +32,9 @@ VALUES
   ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login1', md5('test'), '904534356', 'test@test.ru', 'MARKET_AGENT',
    getPointIDByName('point1')),
   ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login2', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'MARKET_AGENT',
-   getPointIDByName('point2'));
-
+   getPointIDByName('point2')),
+  ('erir', 'dddddd', 'ewreruiii', 'erfergg', 'login3', md5('wefwgrege'), '904534356', 'ey@irtj.ru', 'MARKET_AGENT',
+   getPointIDByName('point4'));
 
 
 INSERT INTO clients (INN, KPP, corAccount, curAccount, BIK, bankName, contractNumber, dateOfSigning, startContractDate, endContractDate)

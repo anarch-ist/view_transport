@@ -742,14 +742,43 @@ CREATE FUNCTION userFilter(_userID INTEGER, _routeID INTEGER)
     END IF;
   END;
 
-# Each SELECT statement that does not insert into a table or a variable will produce a result set.
--- can be null
 -- startEntry - number of record to start from(0 is first record)
 -- length - Number of records that the table can display in the current draw
 
--- 1) get from userID - user Role and user Point
--- 2) if user Role is ADMIN then show all DATA, if another role then find user point
--- 3) show only those records that contains user point as warehouse point or as route point
+-- if user Role is ADMIN then show all DATA, if another role then find user point
+-- show only those records that contains user point as warehouse point or as route point
+-- startEntry index begin with 0;
+-- max amount of rows that will be returned
+
+-- send request params from datatable
+/*
+draw:"1"                            порядковый номер, в ответе клиенту именно этот номер должен быть
+columns[0][data]:"0"                устанавливает источник данных для колонки из объекта с данными, по умолчанию это просто порядковый номер столбца
+columns[0][name]:""                 имя колонки, используется для удобного доступа к колонкам из datatables API
+columns[0][searchable]:"true"       нужно ли использовать фильтр по этой колонке
+columns[0][orderable]:"true"        запрещает или разрешает пользователю нажимать на кнопки сортировки, при этом из апи можно сортировать
+columns[0][search][value]:""        Search value to apply to this specific column. в datatables можно делать не только глобальный поиск, но также и по отдельным колонкам.
+columns[0][search][regex]:"false"   Flag to indicate if the search term for this column should be treated as regular expression (true) or not (false)
+columns[1][data]:"1"
+columns[1][name]:""
+columns[1][searchable]:"true"
+columns[1][orderable]:"true"
+columns[1][search][value]:""
+columns[1][search][regex]:"false"
+...
+columns[16][data]:"16"
+columns[16][name]:""
+columns[16][searchable]:"true"
+columns[16][orderable]:"true"
+columns[16][search][value]:""
+columns[16][search][regex]:"false"
+order[0][column]:"0"                индекс колонки к которой должен быть прменен ORDER BY
+order[0][dir]:"asc"                 направление сортировки для этой колонки "asc" либо "desc"
+start:"0"                           индекс первой записи из resulSet(startEntry)
+length:"10"                         максимальное количесвто получаемых записей из БД(length)
+search[value]:""                    Global search value. To be applied to all columns which have searchable as true.
+search[regex]:"false"               true if the global filter should be treated as a regular expression for advanced searching, false otherwise
+*/
 
 CREATE PROCEDURE selectData(_userID INTEGER, startEntry INTEGER, length INTEGER)
   BEGIN
@@ -804,6 +833,12 @@ CREATE PROCEDURE selectData(_userID INTEGER, startEntry INTEGER, length INTEGER)
         next_route_points.pointID = route_points.pointID
         )
 
-    WHERE ((getRoleIDByUserID(_userID) = 'ADMIN') OR (route_lists.routeID IS NULL ) OR (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID)));
+    WHERE (
+      (getRoleIDByUserID(_userID) = 'ADMIN') OR
+      (getPointIDByUserID(_userID) = w_points.pointID) OR
+      (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
+    )
+
+    LIMIT startEntry, length;
 
   END;
