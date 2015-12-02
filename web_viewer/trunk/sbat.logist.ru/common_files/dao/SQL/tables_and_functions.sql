@@ -708,9 +708,50 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGE
 # запрос на выборку всех записей, которые должны быть в интерфейсе
 # нужно уметь ограничивать количество результирующих записей
 
+CREATE FUNCTION getRoleIDByUserID(_userID INTEGER)
+  RETURNS VARCHAR(32)
+  BEGIN
+    DECLARE result VARCHAR(32);
+    SET result = (SELECT userRoleID
+                  FROM users
+                  WHERE userID = _userID);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT pointID
+                  FROM users
+                  WHERE userID = _userID);
+    RETURN result;
+  END;
+
+-- if user role is 'ADMIN' then return true
+-- if user point inside route then return true
+CREATE FUNCTION userFilter(_userID INTEGER, _routeID INTEGER)
+  RETURNS BOOLEAN
+  BEGIN
+    IF (getRoleIDByUserID(_userID) = 'ADMIN')
+    THEN
+      RETURN FALSE ;
+    ELSE
+      -- get all points from _routeID
+      RETURN getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE _routeID = routeID);
+    END IF;
+  END;
+
 # Each SELECT statement that does not insert into a table or a variable will produce a result set.
 -- can be null
-CREATE PROCEDURE selectData(userPointID INTEGER)
+-- startEntry - number of record to start from(0 is first record)
+-- length - Number of records that the table can display in the current draw
+
+-- 1) get from userID - user Role and user Point
+-- 2) if user Role is ADMIN then show all DATA, if another role then find user point
+-- 3) show only those records that contains user point as warehouse point or as route point
+
+CREATE PROCEDURE selectData(_userID INTEGER, startEntry INTEGER, length INTEGER)
   BEGIN
 
     SELECT
@@ -761,7 +802,8 @@ CREATE PROCEDURE selectData(userPointID INTEGER)
         routes.routeID = route_points.routeID AND
         route_points.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedUserPointID) AND
         next_route_points.pointID = route_points.pointID
-        );
-    -- TODO
-    -- WHERE userPointID =
+        )
+
+    WHERE ((getRoleIDByUserID(_userID) = 'ADMIN') OR (route_lists.routeID IS NULL ) OR (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID)));
+
   END;
