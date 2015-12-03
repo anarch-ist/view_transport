@@ -40,9 +40,15 @@ $(document).ready(function () {
         buttons: {
             "Сохранить": function () {
                 //TODO get new invoice status ID for request
+                // возможно это пригодится для
+                // $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value
                 newStatusID = 'ARRIVED';
-                invoiceID = dataTable.row(selectedRow).data()[2];
-                $.post("content/getData.php", {status: "changeStatus", invoiceID: invoiceID, newStatusID: newStatusID},
+                // получение ИД выделенной в таблице накладной
+                // можно еще так - $('#user-grid .selected td')[2].textContent
+                invoiceID = $('#user-grid .selected td')[2].textContent;
+                //invoiceID = dataTable.row(selectedRow).data()[2];
+                date = $('#dateTimePicker')[0].value;
+                $.post("content/getData.php", {status: "changeStatus", invoiceID: invoiceID, newStatusID: newStatusID, date: date},
                     function (data) {
                         alert(data);
                     });
@@ -167,9 +173,9 @@ $(document).ready(function () {
     });
     // таким образом я определяю текушую выделенную строку. Возможно есть способ лучше
     // это нужно для составления запроса на обновление статуса накладной
-    var selectedRow;
-    $('#user-grid tbody').on( 'click', 'tr', function () {
-        selectedRow = this;
-        //console.log(dataTable.row(selectedRow).data()[2]);    // выведет ID выделенной накладной
-    } );
+    //var selectedRow;
+    //$('#user-grid tbody').on( 'click', 'tr', function () {
+    //    selectedRow = this;
+    //    //console.log(dataTable.row(selectedRow).data()[2]);    // выведет ID выделенной накладной
+    //} );
 });
