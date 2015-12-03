@@ -26,6 +26,12 @@ $(document).ready(function () {
         '</div>'
     );
 
+    var lastSelectedStatus;
+    //$("#statusSelect").change(function() {
+    //    lastSelectedStatus = $(this).find(":selected").text();
+    //    console.log(lastSelectedStatus);
+    //});
+
     createDateTimePickerLocalization();
     var $dateTimePicker = $("#dateTimePicker");
     $dateTimePicker.datetimepicker();
@@ -41,8 +47,10 @@ $(document).ready(function () {
             "Сохранить": function () {
                 //TODO get new invoice status ID for request
                 // возможно это пригодится для
-                // $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value
-                newStatusID = 'ARRIVED';
+                //var table = $('#user-grid').DataTable();
+                //table.rows( { selected: true } ).data();
+                newStatusID =  $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
+                //console.log(lastSelectedStatus);
                 // получение ИД выделенной в таблице накладной
                 // можно еще так - $('#user-grid .selected td')[2].textContent
                 invoiceID = $('#user-grid .selected td')[2].textContent;
@@ -113,6 +121,10 @@ $(document).ready(function () {
     }
 
     // --------DATATABLE INIT--------------
+    $('#user-grid tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    } );
 
     var dataTable = $('#user-grid').DataTable({
         "processing": true,
@@ -148,6 +160,25 @@ $(document).ready(function () {
 
             }
         },
+        "columnDefs": [
+            { "name": "requestID", "searchable": true, "targets": 0 },
+            { "name": "insiderRequestID", "searchable": true, "targets": 1 },
+            { "name": "invoiceNumber", "searchable": true, "targets": 2 },
+            { "name": "INN", "searchable": true, "targets": 3 },
+            { "name": "deliveryPoint", "searchable": true,   "targets": 4 },
+            { "name": "warehousPoint", "searchable": true,   "targets": 5 },
+            { "name": "manager", "searchable": true,   "targets": 6 },
+            { "name": "invoiceStatus", "searchable": true,   "targets": 7 },
+            { "name": "boxqty", "searchable": true,   "targets": 8 },
+            { "name": "driver", "searchable": true,   "targets": 9 },
+            { "name": "licensePlate", "searchable": true,   "targets": 10},
+            { "name": "palletsQty", "searchable": true,   "targets": 11},
+            { "name": "routeList", "searchable": true,   "targets": 12},
+            { "name": "direction", "searchable": true,   "targets": 13},
+            { "name": "currentPoint", "searchable": true,   "targets": 14},
+            { "name": "nextPoint", "searchable": true,   "targets": 15},
+            { "name": "timeToNextPoint", "searchable": true,   "targets": 16},
+        ],
         "language": {
             "processing": "Подождите...",
             "search": "Поиск:",
@@ -171,11 +202,20 @@ $(document).ready(function () {
             }
         }
     });
+
+    // Apply the search
+    dataTable.columns().every( function () {
+        var that = this;
+
+        $( 'input', this.footer() ).on( 'keyup change', function () {
+            if ( that.search() !== this.value ) {
+                that
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
     // таким образом я определяю текушую выделенную строку. Возможно есть способ лучше
     // это нужно для составления запроса на обновление статуса накладной
-    //var selectedRow;
-    //$('#user-grid tbody').on( 'click', 'tr', function () {
-    //    selectedRow = this;
-    //    //console.log(dataTable.row(selectedRow).data()[2]);    // выведет ID выделенной накладной
-    //} );
+
 });

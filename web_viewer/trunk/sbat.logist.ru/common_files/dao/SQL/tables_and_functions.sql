@@ -33,7 +33,10 @@ VALUES
   ('MARKET_AGENT'),
   # временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
   # что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
-  ('TEMP_REMOVED');
+  ('TEMP_REMOVED'),
+
+  ('VIEW_LAST_TEN')
+;
 
 CREATE TABLE point_types (
   pointTypeID VARCHAR(32),
@@ -784,7 +787,12 @@ search[value]:""                    Global search value. To be applied to all co
 search[regex]:"false"               true if the global filter should be treated as a regular expression for advanced searching, false otherwise
 */
 
-CREATE PROCEDURE selectData(_userID INTEGER, startEntry INTEGER, length INTEGER)
+-- _search - array of strings
+-- _orderby 'asc_ <id>'  <> - название колонки из файла main.js
+-- _search - передача \'apple\',\'banana\'
+CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER
+#   , _orderby VARCHAR(255), _search TEXT
+)
   BEGIN
 
     SELECT
@@ -838,10 +846,27 @@ CREATE PROCEDURE selectData(_userID INTEGER, startEntry INTEGER, length INTEGER)
         )
 
     WHERE (
-      (getRoleIDByUserID(_userID) = 'ADMIN') OR
-      (getPointIDByUserID(_userID) = w_points.pointID) OR
-      (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
+      (
+        (getRoleIDByUserID(_userID) = 'ADMIN') OR
+        (getPointIDByUserID(_userID) = w_points.pointID) OR
+        (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
+      ) -- AND ()
     )
+
+
+#     ORDER BY
+#     -- numeric columns
+#     CASE _orderby WHEN 'asc_ id' THEN id END ASC,
+#     CASE _orderby WHEN 'desc_ id' THEN id END DESC,
+#
+#
+#
+#     -- string columns
+#     CASE _orderby WHEN 'first_name' THEN first_name WHEN 'last_name' THEN last_name END ASC,
+#     CASE _orderby WHEN 'desc_first_name' THEN first_name WHEN 'desc_last_name' THEN last_name END DESC,
+#     -- datetime columns
+#     CASE _orderby WHEN 'birthday' THEN birthday END ASC,
+#     CASE _orderby WHEN 'desc_ birthday' THEN birthday END DESC
 
     LIMIT startEntry, length;
 
