@@ -1,4 +1,3 @@
-
 $(document).ready(function () {
 
     $("#tableTypeSelect").selectmenu();
@@ -8,7 +7,7 @@ $(document).ready(function () {
         // create dialog here with selection content
     });
 
-    $("#logout").on("click", function() {
+    $("#logout").on("click", function () {
         // delete auth cookies
         $.cookie('UserID', null);
         $.cookie('md5', null);
@@ -20,15 +19,15 @@ $(document).ready(function () {
     // create div that will be dialog container
     $("body").append(
         '<div id="statusChangeDialog" title="Выбор нового статуса">' +
-            '<label for="statusSelect">Новый статус: </label>' +
-            '<select id="statusSelect"></select>' +'<br><br><br>'+
-            '<label for="dateTimePickerInput">Дата и время: </label>' +
-            '<input id="dateTimePicker" type="text">' +
+        '<label for="statusSelect">Новый статус: </label>' +
+        '<select id="statusSelect"></select>' + '<br><br><br>' +
+        '<label for="dateTimePickerInput">Дата и время: </label>' +
+        '<input id="dateTimePicker" type="text">' +
         '</div>'
     );
 
     createDateTimePickerLocalization();
-    var $dateTimePicker = $( "#dateTimePicker" );
+    var $dateTimePicker = $("#dateTimePicker");
     $dateTimePicker.datetimepicker();
 
     var $statusChangeDialog = $("#statusChangeDialog");
@@ -40,7 +39,14 @@ $(document).ready(function () {
         modal: true,
         buttons: {
             "Сохранить": function () {
-                //TODO get request and response for update invoice status
+                //TODO get new invoice status ID for request
+                newStatusID = 'ARRIVED';
+                invoiceID = dataTable.row(selectedRow).data()[2];
+                $.post("content/getData.php", {status: "changeStatus", invoiceID: invoiceID, newStatusID: newStatusID},
+                    function (data) {
+                        alert(data);
+                    });
+
                 $(this).dialog("close");
             },
             "Отмена": function () {
@@ -55,8 +61,8 @@ $(document).ready(function () {
 
         var options = [];
         var storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
-        for (var i = 0; i < storedStatuses.length; i++) {
-            options.push("<option value='" + storedStatuses[i] + "'>" + storedStatuses[i] + "</option>");
+        for (var i in storedStatuses) {
+            options.push("<option value='" + i + "'>" + storedStatuses[i] + "</option>");
         }
         //append after populating all options
         var $statusSelect = $("#statusSelect");
@@ -102,7 +108,7 @@ $(document).ready(function () {
 
     // --------DATATABLE INIT--------------
 
-    var dataTable = $('#user-grid').DataTable( {
+    var dataTable = $('#user-grid').DataTable({
         "processing": true,
         "serverSide": true,
         select: {
@@ -113,26 +119,26 @@ $(document).ready(function () {
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус накладной',
-                action: function ( e, dt, node, config ) {
+                action: function (e, dt, node, config) {
                     showSelectInvoiceStatusDialog();
                 }
             },
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
-                action: function ( e, dt, node, config ) {
-                    alert( 'изм статус маршр листа' );
+                action: function (e, dt, node, config) {
+                    alert('изм статус маршр листа');
                 }
             }
         ],
-        "ajax":{
-//						url :"employee-grid-data.php", // json datasource
-            url :"content/getData.php", // json datasource
+        "ajax": {
+            url: "content/getData.php", // json datasource
             type: "post",  // method  , by default get
-            error: function(){  // error handling
+            data: {"status": "getInvoicesForUser"},    // post-parameter for determining type of query
+            error: function () {  // error handling
                 $(".user-grid-error").html("");
                 $("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                $("#user-grid_processing").css("display","none");
+                $("#user-grid_processing").css("display", "none");
 
             }
         },
@@ -158,5 +164,12 @@ $(document).ready(function () {
                 "sortDescending": ": активировать для сортировки столбца по убыванию"
             }
         }
+    });
+    // таким образом я определяю текушую выделенную строку. Возможно есть способ лучше
+    // это нужно для составления запроса на обновление статуса накладной
+    var selectedRow;
+    $('#user-grid tbody').on( 'click', 'tr', function () {
+        selectedRow = this;
+        //console.log(dataTable.row(selectedRow).data()[2]);    // выведет ID выделенной накладной
     } );
 });

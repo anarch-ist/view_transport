@@ -395,7 +395,11 @@ VALUES
   ('DISPATCHER', 'DEPARTURE'),
   ('DISPATCHER', 'ARRIVED'),
   ('DISPATCHER', 'ERROR'),
-  ('DISPATCHER', 'DELIVERED');
+  ('DISPATCHER', 'DELIVERED'),
+  ('MARKET_AGENT', 'DEPARTURE'),
+  ('MARKET_AGENT', 'ARRIVED'),
+  ('MARKET_AGENT', 'ERROR'),
+  ('MARKET_AGENT', 'DELIVERED');
 
 
 # invoice объеденяет в себе внутреннюю заявку и накладную,

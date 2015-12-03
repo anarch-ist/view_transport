@@ -13,5 +13,5 @@ interface IInvoiceEntity
 
     function addInvoice($Invoice);
 
-    function getInvoiceStatuses();
+    function getInvoiceStatuses(\PrivilegedUser $pUser);
 }

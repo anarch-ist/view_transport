@@ -1,10 +1,10 @@
 <?php
 namespace DAO;
 
-define('PHP_NEWLINE','<br>'.PHP_EOL);
+define('PHP_NEWLINE', '<br>' . PHP_EOL);
 
-use mysqli;
 use Exception;
+use mysqli;
 
 include_once 'IDAO.php';
 include_once 'Exceptions.php';
@@ -14,14 +14,6 @@ class DAO implements IDAO
     const AUTO_START_TRANSACTION = true;
     private static $_instance;
     private $_connection;
-
-    public static function getInstance()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new DAO();
-        }
-        return self::$_instance;
-    }
 
     private function __construct()
     {
@@ -35,15 +27,22 @@ class DAO implements IDAO
         }
     }
 
+    public function startTransaction()
+    {
+        return $this->_connection->begin_transaction();
+    }
+
+    public static function getInstance()
+    {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new DAO();
+        }
+        return self::$_instance;
+    }
+
     public function checkString($str)
     {
         return $this->_connection->real_escape_string($str);
-    }
-
-
-    function query($sql)
-    {
-        return $this->_connection->query($sql);
     }
 
     function startConnection()
@@ -53,21 +52,6 @@ class DAO implements IDAO
             throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
 
-    }
-
-    function closeConnection()
-    {
-        return $this->_connection->close();
-    }
-
-    public function startTransaction()
-    {
-        return $this->_connection->begin_transaction();
-    }
-
-    public function commit()
-    {
-        return $this->_connection->commit();
     }
 
     public function rollback()
@@ -81,9 +65,19 @@ class DAO implements IDAO
         $this->closeConnection();
     }
 
+    public function commit()
+    {
+        return $this->_connection->commit();
+    }
+
+    function closeConnection()
+    {
+        return $this->_connection->close();
+    }
+
     function select(IEntitySelect $selectObj)
     {
-        $result = self::query($selectObj->getSelectQuery());
+        $result = @self::query($selectObj->getSelectQuery());
         if (!$result) {
             throw new Exception('ошибка в выборочном запросе - ' . $this->_connection->error);
         }
@@ -94,6 +88,11 @@ class DAO implements IDAO
             $count++;
         }
         return $array;
+    }
+
+    function query($sql)
+    {
+        return $this->_connection->query($sql);
     }
 
     function update(IEntityUpdate $newObj)

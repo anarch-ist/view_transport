@@ -25,7 +25,7 @@ class UserEntity implements IUserEntity
     {
         $count = 25;
         $start = 0;
-        switch(func_num_args()) {
+        switch (func_num_args()) {
             case 2:
                 $start = func_get_arg(1);
                 $count = func_get_arg(0);
@@ -89,7 +89,7 @@ class UserData implements IEntityData
     public function getData($index)
     {
         if (!isset($this->array[$index])) {
-            throw new \DataEntityException('Field doesn`t exist: '.$index.' - in '.get_class($this));
+            throw new \DataEntityException('Field doesn`t exist: ' . $index . ' - in ' . get_class($this));
         } else {
             return $this->array[$index];
         }
@@ -105,6 +105,7 @@ class SelectAllUsers implements IEntitySelect
 {
     private $start;
     private $count;
+
     function __construct($start, $count)
     {
         $this->start = $start;

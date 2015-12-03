@@ -62,8 +62,11 @@ interface IEntityDelete
     function getDeleteQuery();
 }
 
-interface IEntityData {
+interface IEntityData
+{
     function getData($field);
+
     function toArray();
 }
+
 ?>

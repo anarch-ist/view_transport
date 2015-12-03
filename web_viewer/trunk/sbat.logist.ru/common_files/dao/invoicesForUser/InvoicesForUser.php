@@ -20,12 +20,24 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
         if (is_null(self::$_instance)) return new InvoicesForUserEntity();
         return self::$_instance;
     }
+
     /**
      * @return array
      */
     function selectAllData()
     {
-        return $this->_DAO->select(new EntitySelectAllData());
+        $count = 25;
+        $start = 0;
+        switch (func_num_args()) {
+            case 2:
+                $start = func_get_arg(1);
+                $count = func_get_arg(0);
+                break;
+            case 1:
+                $count = func_get_arg(0);
+                break;
+        }
+        return $this->_DAO->select(new EntitySelectAllData($start,$count));
     }
 
     /**
@@ -34,19 +46,31 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
      */
     function selectDataByKey($keyword)
     {
-        // TODO: Implement selectDataByKey() method.
-        return $this->_DAO->select(new EntitySelectAllData());
+        $count = 25;
+        $start = 0;
+        switch (func_num_args()) {
+            case 2:
+                $start = func_get_arg(1);
+                $count = func_get_arg(0);
+                break;
+            case 1:
+                $count = func_get_arg(0);
+                break;
+        }
+        return $this->_DAO->select(new EntitySelectAllData($start,$count));
     }
 }
 
 class EntitySelectAllData implements IEntitySelect
 {
-    function __construct()
-    {
+    private $start, $count;
+    function __construct($start, $count) {
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
     }
-
     function getSelectQuery()
     {
-        return "CALL selectData();";
+        $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
+        return "CALL selectData($userID,$this->start,$this->count);";
     }
 }

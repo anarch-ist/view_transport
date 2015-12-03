@@ -8,8 +8,7 @@ include_once 'common_files\privilegedUser\PrivilegedUser.php';
 try {
     $pUser = PrivilegedUser::getInstance();
     include_once 'body.php';
-}
-catch (Exception $ex) {
+} catch (Exception $ex) {
     header("Location: login/", true, 303);
 }
 ?>
