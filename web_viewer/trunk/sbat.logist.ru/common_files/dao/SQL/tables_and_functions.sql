@@ -575,7 +575,7 @@ INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
 # на уровне приложения, во время установки нового статуса накладной - сначала идет запись в таблицу user_action_history а затем изменение статуса
 CREATE TABLE user_action_history (
   userActionHistoryID BIGINT AUTO_INCREMENT,
-  timeMark            DATETIME,
+  timeMark            DATETIME DEFAULT CURRENT_DATE,
   userID              INTEGER,
   tableID             VARCHAR(64),
   action              ENUM('insert', 'update', 'delete'),
@@ -674,7 +674,7 @@ CREATE FUNCTION getNextPointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
     IF (currentSortOrder IS NULL ) THEN
       BEGIN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Current sort order does not exist.';
+        SET MESSAGE_TEXT = 'SERGEY ERROR: Current sortOrder for route_points does not exist.';
       END;
     END IF;
 
@@ -733,20 +733,6 @@ CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
                   FROM users
                   WHERE userID = _userID);
     RETURN result;
-  END;
-
--- if user role is 'ADMIN' then return true
--- if user point inside route then return true
-CREATE FUNCTION userFilter(_userID INTEGER, _routeID INTEGER)
-  RETURNS BOOLEAN
-  BEGIN
-    IF (getRoleIDByUserID(_userID) = 'ADMIN')
-    THEN
-      RETURN FALSE ;
-    ELSE
-      -- get all points from _routeID
-      RETURN getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE _routeID = routeID);
-    END IF;
   END;
 
 -- startEntry - number of record to start from(0 is first record)
@@ -852,7 +838,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
         (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
       ) -- AND ()
     )
-
+    ORDER BY invoices.invoiceNumber
 
 #     ORDER BY
 #     -- numeric columns
@@ -868,6 +854,6 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 #     CASE _orderby WHEN 'birthday' THEN birthday END ASC,
 #     CASE _orderby WHEN 'desc_ birthday' THEN birthday END DESC
 
-    LIMIT startEntry, length;
+    LIMIT _startEntry, _length;
 
   END;

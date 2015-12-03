@@ -185,6 +185,6 @@ class UpdateInvoiceStatus implements IEntityUpdate
     function getUpdateQuery()
     {
         // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `invoiceID` = $this->invoiceID;";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `invoiceNumber` = '$this->invoiceID';";
     }
 }
