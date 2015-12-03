@@ -575,7 +575,7 @@ INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
 # на уровне приложения, во время установки нового статуса накладной - сначала идет запись в таблицу user_action_history а затем изменение статуса
 CREATE TABLE user_action_history (
   userActionHistoryID BIGINT AUTO_INCREMENT,
-  timeMark            DATETIME DEFAULT CURRENT_DATE,
+  timeMark            DATETIME DEFAULT CURRENT_TIMESTAMP,
   userID              INTEGER,
   tableID             VARCHAR(64),
   action              ENUM('insert', 'update', 'delete'),
@@ -773,15 +773,48 @@ search[value]:""                    Global search value. To be applied to all co
 search[regex]:"false"               true if the global filter should be treated as a regular expression for advanced searching, false otherwise
 */
 
--- _search - array of strings
--- _orderby 'asc_ <id>'  <> - название колонки из файла main.js
--- _search - передача \'apple\',\'banana\'
-CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER
-#   , _orderby VARCHAR(255), _search TEXT
-)
+CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
+  RETURNS TEXT
+  RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(stringSpl, delim, pos),
+                           LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos -1)) + 1),
+                 delim, '');
+
+CREATE FUNCTION generateWhere(map TEXT)
+  RETURNS TEXT
   BEGIN
 
-    SELECT
+    DECLARE i INT DEFAULT 0;
+    DECLARE pair VARCHAR(255) DEFAULT '----';
+    DECLARE result TEXT DEFAULT '';
+
+    if (map = '') THEN RETURN 'TRUE';
+    END IF ;
+
+    wloop: WHILE (TRUE) DO
+      SET i = i + 1;
+      SET pair = splitString(map, ';', i);
+      IF pair = '' THEN LEAVE wloop;
+      END IF ;
+      SET @columnName = splitString(pair, ',', 1);
+      SET @searchString = splitString(pair, ',', 2);
+
+      SET result = CONCAT(result, @columnName, ' LIKE ', '\'', @searchString, '\'', ' AND ');
+    END WHILE;
+
+    -- remove redundant END
+    SET result = SUBSTR(result, 1, LENGTH(result) - 4);
+    SET result = CONCAT('(', result, ')');
+    RETURN result;
+  END;
+
+-- _search - array of strings
+-- _orderby 'asc_ <id>'  <> - название колонки из файла main.js
+-- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
+
+CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
+  BEGIN
+    SET @mainPart =
+     'SELECT
       requests.requestNumber,
       invoices.insiderRequestNumber,
       invoices.invoiceNumber,
@@ -829,31 +862,28 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
         routes.routeID = route_points.routeID AND
         route_points.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedUserPointID) AND
         next_route_points.pointID = route_points.pointID
-        )
+        ) ';
 
-    WHERE (
-      (
-        (getRoleIDByUserID(_userID) = 'ADMIN') OR
-        (getPointIDByUserID(_userID) = w_points.pointID) OR
-        (getPointIDByUserID(_userID) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
-      ) -- AND ()
-    )
-    ORDER BY invoices.invoiceNumber
+#     SET @wherePart = CONCAT(
+#         'WHERE ((getRoleIDByUserID(?) = \'ADMIN\') OR (getPointIDByUserID(?) = w_points.pointID) OR (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))'
+#         ' AND ', generateWhere(_search));
+    SET @wherePart = CONCAT('WHERE ((getRoleIDByUserID(?) = \'ADMIN\') OR (getPointIDByUserID(?) = w_points.pointID) OR (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID)))', ' AND ', generateWhere(_search));
 
-#     ORDER BY
-#     -- numeric columns
-#     CASE _orderby WHEN 'asc_ id' THEN id END ASC,
-#     CASE _orderby WHEN 'desc_ id' THEN id END DESC,
-#
-#
-#
-#     -- string columns
-#     CASE _orderby WHEN 'first_name' THEN first_name WHEN 'last_name' THEN last_name END ASC,
-#     CASE _orderby WHEN 'desc_first_name' THEN first_name WHEN 'desc_last_name' THEN last_name END DESC,
-#     -- datetime columns
-#     CASE _orderby WHEN 'birthday' THEN birthday END ASC,
-#     CASE _orderby WHEN 'desc_ birthday' THEN birthday END DESC
+    IF _isDesc THEN
+      SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
+    ELSE
+      SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
+    END IF ;
 
-    LIMIT _startEntry, _length;
+    SET @limitPart = ' LIMIT ?, ? ';
+    SET @sqlString = CONCAT(@mainPart, @wherePart, @orderByPart, @limitPart);
 
+    PREPARE statement FROM @sqlString;
+
+    SET @_userID = _userID;
+    SET @_startEntry = _startEntry;
+    SET @_length = _length;
+
+  EXECUTE statement USING @_userID, @_userID, @_userID, @_startEntry, @_length;
+  DEALLOCATE  PREPARE statement;
   END;

@@ -114,3 +114,12 @@ BEFORE DELETE ON points FOR EACH ROW
       WHERE warehouse_points.warehousePointID = OLD.pointTypeID;
     END IF;
   END;
+
+CREATE PROCEDURE examplePrStatement(id VARCHAR(255), _orderBy VARCHAR(255))
+  BEGIN
+    SET @s = CONCAT('SELECT * FROM points WHERE pointID <> ? ORDER BY ', _orderBy);
+    PREPARE statement FROM @s;
+    SET @_id = id;
+    EXECUTE statement USING @_id;
+    DEALLOCATE PREPARE statement;
+  END;
