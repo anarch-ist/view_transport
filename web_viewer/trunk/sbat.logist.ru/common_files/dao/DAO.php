@@ -95,23 +95,51 @@ class DAO implements IDAO
         return $this->_connection->query($sql);
     }
 
-    function update(IEntityUpdate $newObj)
+    function update(IEntityUpdate $newObj, IEntityInsert $updateTable=null)
     {
         // TODO: Check update() method.
+        if (!is_null($updateTable)) {
+            $this->query($updateTable->getInsertQuery());
+        }
         return $this->query($newObj->getUpdateQuery());
     }
 
-    function insert(IEntityInsert $obj)
+    function insert(IEntityInsert $obj, IEntityInsert $updateTable=null)
     {
         // TODO: Check insert() method.
+        if (!is_null($updateTable)) {
+            $this->query($updateTable->getInsertQuery());
+        }
         return $this->query($obj->getInsertQuery());
     }
 
-    function delete(IEntityDelete $obj)
+    function delete(IEntityDelete $obj, IEntityInsert $updateTable=null)
     {
         // TODO: Check delete() method.
+        if (!is_null($updateTable)) {
+            $this->query($updateTable->getInsertQuery());
+        }
         return $this->query($obj->getDeleteQuery());
     }
 }
+class UserAction implements IEntityInsert
+{
+    private $table;
+    private $action;
 
-?>
+    function __construct($table, $action)
+    {
+        $this->table = DAO::getInstance()->checkString($table);
+        $this->action = DAO::getInstance()->checkString($action);
+    }
+
+    /**
+     * @return string
+     */
+    function getInsertQuery()
+    {
+        $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
+        // TODO: Implement getUpdateQuery() method.
+        return "INSERT INTO `user_action_history` VALUES (0,0,$userID,'$this->table','$this->action');";
+    }
+}

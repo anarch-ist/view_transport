@@ -38,5 +38,6 @@ function changeStatus(PrivilegedUser $privUser)
 {
     $invoiceID = $_POST['invoiceID'];
     $newStatusID = $_POST['newStatusID'];
-    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($invoiceID, $newStatusID);
+    $datetime = $_POST['date'];
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($invoiceID, $newStatusID,$datetime);
 }

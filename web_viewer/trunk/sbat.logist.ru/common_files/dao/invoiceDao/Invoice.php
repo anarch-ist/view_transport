@@ -52,9 +52,9 @@ class InvoiceEntity implements IInvoiceEntity
         // TODO: Implement updateInvoice() method.
     }
 
-    function updateInvoiceStatus($invoiceID, $newInvoiceStatus)
+    function updateInvoiceStatus($invoiceID, $newInvoiceStatus, $datetime)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatus($invoiceID, $newInvoiceStatus));
+        return $this->_DAO->update(new UpdateInvoiceStatus($invoiceID, $newInvoiceStatus,$datetime),new UserAction('invoices','update'));
     }
 
     function deleteInvoice($Invoice)
@@ -171,12 +171,15 @@ class SelectInvoiceStatuses implements IEntitySelect
 }
 class UpdateInvoiceStatus implements IEntityUpdate
 {
-    private $invoiceID;
+    private $invoiceNumber;
+    private $newInvoiceStatus;
+    private $datetime;
 
-    function __construct($invoiceID,$newInvoiceStatus)
+    function __construct($invoiceNumber,$newInvoiceStatus,$datetime)
     {
-        $this->invoiceID = DAO::getInstance()->checkString($invoiceID);
+        $this->invoiceNumber = DAO::getInstance()->checkString($invoiceNumber);
         $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
+        $this->datetime = DAO::getInstance()->checkString($datetime);
     }
 
     /**
@@ -185,6 +188,6 @@ class UpdateInvoiceStatus implements IEntityUpdate
     function getUpdateQuery()
     {
         // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `invoiceNumber` = '$this->invoiceID';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `creationDate` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i') WHERE `invoiceNumber` = '$this->invoiceNumber';";
     }
 }
