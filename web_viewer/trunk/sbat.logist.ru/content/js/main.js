@@ -36,6 +36,36 @@ $(document).ready(function () {
     var $dateTimePicker = $("#dateTimePicker");
     $dateTimePicker.datetimepicker();
 
+    var $statusRoutePointDialog = $("#statusChangeDialog");
+    $statusRoutePointDialog.dialog({
+        autoOpen: false,
+        resizable: true,
+        height: 300,
+        width: 400,
+        modal: true,
+        buttons: {
+            "Сохранить": function () {
+                //TODO get new invoice status ID for request
+                // возможно это пригодится для
+                // $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value
+                //newStatusID = 'ARRIVED';
+                newStatusID = $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
+                // получение ИД выделенной в таблице накладной
+                routeList = $('#user-grid .selected td')[12].textContent;
+                date = $('#dateTimePicker')[0].value;
+                $.post("content/getData.php", {status: "changeStatusForSeveralInvoices", routeList: routeList, newStatusID: newStatusID, date: date},
+                    function (data) {
+                        alert(data);
+                    });
+
+                $(this).dialog("close");
+            },
+            "Отмена": function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+
     var $statusChangeDialog = $("#statusChangeDialog");
     $statusChangeDialog.dialog({
         autoOpen: false,
@@ -52,9 +82,7 @@ $(document).ready(function () {
                 newStatusID =  $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
                 //console.log(lastSelectedStatus);
                 // получение ИД выделенной в таблице накладной
-                // можно еще так - $('#user-grid .selected td')[2].textContent
                 invoiceID = $('#user-grid .selected td')[2].textContent;
-                //invoiceID = dataTable.row(selectedRow).data()[2];
                 date = $('#dateTimePicker')[0].value;
                 $.post("content/getData.php", {status: "changeStatus", invoiceID: invoiceID, newStatusID: newStatusID, date: date},
                     function (data) {
@@ -72,6 +100,18 @@ $(document).ready(function () {
 
     function showSelectInvoiceStatusDialog() {
         $statusChangeDialog.dialog("open");
+
+        var options = [];
+        var storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
+        for (var i in storedStatuses) {
+            options.push("<option value='" + i + "'>" + storedStatuses[i] + "</option>");
+        }
+        //append after populating all options
+        var $statusSelect = $("#statusSelect");
+        $statusSelect.html(options.join("")).selectmenu();
+    }
+    function showUpdateRoutePointStatusDialog() {
+        $statusRoutePointDialog.dialog("open");
 
         var options = [];
         var storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
@@ -145,7 +185,7 @@ $(document).ready(function () {
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
-                    alert('изм статус маршр листа');
+                    showUpdateRoutePointStatusDialog();
                 }
             }
         ],
@@ -215,7 +255,4 @@ $(document).ready(function () {
             }
         } );
     } );
-    // таким образом я определяю текушую выделенную строку. Возможно есть способ лучше
-    // это нужно для составления запроса на обновление статуса накладной
-
 });
