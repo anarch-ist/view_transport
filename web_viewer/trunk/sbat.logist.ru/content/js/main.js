@@ -55,7 +55,9 @@ $(document).ready(function () {
                 date = $('#dateTimePicker')[0].value;
                 $.post("content/getData.php", {status: "changeStatusForSeveralInvoices", routeList: routeList, newStatusID: newStatusID, date: date},
                     function (data) {
-                        alert(data);
+                        if (data==='1') {
+                            document.location.reload();
+                        }
                     });
 
                 $(this).dialog("close");
@@ -64,6 +66,7 @@ $(document).ready(function () {
                 $(this).dialog("close");
             }
         }
+
     });
 
     var $statusChangeDialog = $("#statusChangeDialog");
@@ -80,14 +83,22 @@ $(document).ready(function () {
                 //var table = $('#user-grid').DataTable();
                 //table.rows( { selected: true } ).data();
                 newStatusID =  $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
-                //console.log(lastSelectedStatus);
-                // получение ИД выделенной в таблице накладной
-                invoiceID = $('#user-grid .selected td')[2].textContent;
-                date = $('#dateTimePicker')[0].value;
-                $.post("content/getData.php", {status: "changeStatus", invoiceID: invoiceID, newStatusID: newStatusID, date: date},
-                    function (data) {
-                        alert(data);
-                    });
+
+                var action = $('#statusSelect').attr("action");
+                if (action === "changeStatusForInvoice") {
+                    // получение ИД выделенной в таблице накладной
+                    invoiceID = $('#user-grid .selected td')[2].textContent;
+                    date = $('#dateTimePicker')[0].value;
+                    $.post("content/getData.php", {status: action, invoiceID: invoiceID, newStatusID: newStatusID, date: date},
+                        function (data) {
+                            if (data==='1') {
+                                document.location.reload();
+                            }
+                        });
+                } else if (action === "changeStatusForSeveralInvoices") {
+                    //TODO
+                    alert("TODO change several stauses");
+                }
 
                 $(this).dialog("close");
             },
@@ -98,7 +109,7 @@ $(document).ready(function () {
     });
 
 
-    function showSelectInvoiceStatusDialog() {
+    function showSelectInvoiceStatusDialog(action) {
         $statusChangeDialog.dialog("open");
 
         var options = [];
@@ -108,18 +119,7 @@ $(document).ready(function () {
         }
         //append after populating all options
         var $statusSelect = $("#statusSelect");
-        $statusSelect.html(options.join("")).selectmenu();
-    }
-    function showUpdateRoutePointStatusDialog() {
-        $statusRoutePointDialog.dialog("open");
-
-        var options = [];
-        var storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
-        for (var i in storedStatuses) {
-            options.push("<option value='" + i + "'>" + storedStatuses[i] + "</option>");
-        }
-        //append after populating all options
-        var $statusSelect = $("#statusSelect");
+        $statusSelect.attr("action", action);
         $statusSelect.html(options.join("")).selectmenu();
     }
 
@@ -178,14 +178,15 @@ $(document).ready(function () {
                 extend: 'selectedSingle',
                 text: 'изменить статус накладной',
                 action: function (e, dt, node, config) {
-                    showSelectInvoiceStatusDialog();
+
+                    showSelectInvoiceStatusDialog("changeStatusForInvoice");
                 }
             },
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
-                    showUpdateRoutePointStatusDialog();
+                    showSelectInvoiceStatusDialog("changeStatusForSeveralInvoices");
                 }
             }
         ],

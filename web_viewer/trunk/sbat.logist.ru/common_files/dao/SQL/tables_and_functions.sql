@@ -1,9 +1,9 @@
-SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES';
-DROP DATABASE IF EXISTS project_database;
-CREATE DATABASE `project_database`
-  CHARACTER SET utf8
-  COLLATE utf8_bin;
-USE `project_database`;
+# SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES';
+# DROP DATABASE IF EXISTS project_database;
+# CREATE DATABASE `project_database`
+#   CHARACTER SET utf8
+#   COLLATE utf8_bin;
+USE `transmaster_transport_db`;
 
 
 #######################################################################################################################
@@ -797,6 +797,7 @@ CREATE FUNCTION generateWhere(map TEXT)
       END IF ;
       SET @columnName = splitString(pair, ',', 1);
       SET @searchString = splitString(pair, ',', 2);
+      SET @searchString = CONCAT('%', @searchString, '%');
 
       SET result = CONCAT(result, @columnName, ' LIKE ', '\'', @searchString, '\'', ' AND ');
     END WHILE;
@@ -808,7 +809,7 @@ CREATE FUNCTION generateWhere(map TEXT)
   END;
 
 -- _search - array of strings
--- _orderby 'asc_ <id>'  <> - название колонки из файла main.js
+-- _orderby 'id'  <> - название колонки из файла main.js
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
 
 CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
@@ -864,19 +865,21 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
         next_route_points.pointID = route_points.pointID
         ) ';
 
-#     SET @wherePart = CONCAT(
-#         'WHERE ((getRoleIDByUserID(?) = \'ADMIN\') OR (getPointIDByUserID(?) = w_points.pointID) OR (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))'
-#         ' AND ', generateWhere(_search));
-    SET @wherePart = CONCAT('WHERE ((getRoleIDByUserID(?) = \'ADMIN\') OR (getPointIDByUserID(?) = w_points.pointID) OR (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID)))', ' AND ', generateWhere(_search));
+    SET @wherePart = 'WHERE ((getRoleIDByUserID(?) = \'ADMIN\') OR (getPointIDByUserID(?) = w_points.pointID) OR (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID)))';
+    SET @havingPart = CONCAT(' HAVING ', generateWhere(_search));
 
-    IF _isDesc THEN
-      SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
+    IF _orderby <> '' THEN
+      IF _isDesc THEN
+        SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
+      ELSE
+        SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
+      END IF ;
     ELSE
-      SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
+      SET @orderByPart = '';
     END IF ;
 
     SET @limitPart = ' LIMIT ?, ? ';
-    SET @sqlString = CONCAT(@mainPart, @wherePart, @orderByPart, @limitPart);
+    SET @sqlString = CONCAT(@mainPart, @wherePart, @havingPart, @orderByPart, @limitPart);
 
     PREPARE statement FROM @sqlString;
 

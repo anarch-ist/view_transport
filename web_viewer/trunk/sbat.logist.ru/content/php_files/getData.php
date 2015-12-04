@@ -1,13 +1,15 @@
 <?php
-include_once '..\common_files\privilegedUser\PrivilegedUser.php';
+include_once '../common_files/privilegedUser/PrivilegedUser.php';
 try {
     $privUser = PrivilegedUser::getInstance();
     if (!isset($_POST['status'])) {
         throw new NoStatusException('');
     } else if ($_POST['status'] === 'getInvoicesForUser') {
         getInvoicesForUser($privUser);
-    } else if ($_POST['status'] === 'changeStatus') {
-        changeStatus($privUser);
+    } else if ($_POST['status'] === 'changeStatusForInvoice') {
+        changeStatusForInvoice($privUser);
+    } else if ($_POST['status'] === 'changeStatusForSeveralInvoices') {
+        changeStatusForSeveralInvoices($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
@@ -34,7 +36,14 @@ function getInvoicesForUser(PrivilegedUser $privUser)
     echo json_encode($json_data);
 }
 
-function changeStatus(PrivilegedUser $privUser)
+function changeStatusForInvoice(PrivilegedUser $privUser)
+{
+    $invoiceID = $_POST['invoiceID'];
+    $newStatusID = $_POST['newStatusID'];
+    $datetime = $_POST['date'];
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($invoiceID, $newStatusID,$datetime);
+}
+function changeStatusForSeveralInvoices(PrivilegedUser $privUser)
 {
     $invoiceID = $_POST['invoiceID'];
     $newStatusID = $_POST['newStatusID'];

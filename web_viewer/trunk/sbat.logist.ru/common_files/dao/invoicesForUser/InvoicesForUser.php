@@ -63,14 +63,25 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
 
 class EntitySelectAllData implements IEntitySelect
 {
-    private $start, $count;
+    private $start, $count,$orderByColumn, $isDesc,$searchString;
     function __construct($start, $count) {
         $this->start = DAO::getInstance()->checkString($start);
         $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString='';
+        $searchArray = $_POST['columns'];
+        for ($i=0;$i<count($searchArray);$i++) {
+            if ($searchArray[$i]['search']['value']!=='') {
+                $this->searchString.=$searchArray[$i]['name'].','.$searchArray[$i]['search']['value'].';';
+            }
+        }
+        $columnNumber = $_POST['order'][0]['column'];
+        $this->orderByColumn = $searchArray[$columnNumber]['name'];
     }
     function getSelectQuery()
     {
         $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
-        return "CALL selectData($userID,$this->start,$this->count);";
+        //echo "CALL selectData($userID,$this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        return "CALL selectData($userID,$this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
     }
 }

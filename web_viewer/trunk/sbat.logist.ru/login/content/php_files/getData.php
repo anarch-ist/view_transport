@@ -1,5 +1,5 @@
 <?php
-include_once '\..\..\common_files\privilegedUser\PrivilegedUser.php';
+include_once '/../../common_files/privilegedUser/PrivilegedUser.php';
 
 $login = $_POST['login'];
 $password = $_POST['password'];

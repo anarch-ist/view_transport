@@ -1,2 +1,2 @@
 <?php
-include_once 'php_files\getData.php';
+include_once 'php_files/getData.php';

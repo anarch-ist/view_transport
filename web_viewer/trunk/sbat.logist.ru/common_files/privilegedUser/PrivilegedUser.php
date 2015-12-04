@@ -1,12 +1,14 @@
 <?php
-include_once '\..\dao\userDao\User.php';
-//include_once '\..\dao\pointDao\Point.php';
-include_once '\..\dao\invoicesForUser\InvoicesForUser.php';
-include_once '\..\dao\invoiceDao\Invoice.php';
-include_once '\..\dao\DAO.php';
+include_once '../dao/userDao/User.php';
+//include_once '/../dao/pointDao/Point.php';
+include_once '../dao/invoicesForUser/InvoicesForUser.php';
+include_once '../dao/invoiceDao/Invoice.php';
+include_once '../dao/DAO.php';
+
 use DAO\InvoiceEntity as InvoiceEntity;
 use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
 use DAO\UserEntity as UserEntity;
+use DAO\UserData as UserData;
 
 //use DAO\PointEntity as PointEntity;
 
@@ -16,7 +18,7 @@ abstract class AuthUser
 
     protected function __construct()
     {
-        $this->user = new \DAO\UserData(array());
+        $this->user = new UserData(array());
         if (!$this->isValid()) {
             throw new AuthException('Ошибка авторизации');
         }
