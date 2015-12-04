@@ -134,6 +134,93 @@ default_charset = "UTF-8"
 
 
 
+-- DEPLOYMENT SETTINGS
+https://confluence.jetbrains.com/display/PhpStorm/Deploying+PHP+applications+with+PhpStorm
+
+ Tools | Deployment | Configuration
+ name: productionServer
+ type: FTP
+
+ftp host: 185.75.182.92
+Port: 21
+root path: /web/transport.sbat.ru/public_html/
+userName: transmaster
+password: CXSKNJaVKV
+web server root URL: http://transport.sbat.ru
+advanced options: set encoding UTF-8
+
+
+MAPPINGS:
+Local Path: C:\web\wamp\www\sbat.logist.ru
+Deployment path on server: /
+Web path on server: /
+
+EXCLUDED:
+/common_filed/dao/SQL/
+/_examples/
+
+Tools | Deployment | Browse Remote Hosts : view server content\
+
+DEPLOYING:
+
+Deployment | Upload to <server name> (or Deployment | Upload to...
+if you want to download from server make right ckick on folder inside remote host panel;
+
+SERVER DATATASE Configuration
+create new datasource: MySQL - production
+host: transport.sbat.ru
+user: transmaster_ttt
+pass: ddTH4sxgON
+
+
+connection to database with phpStorm;
+http://185.75.182.92/phpmyadmin/
+
+user: transmaster_ttt
+pass: ddTH4sxgON
+
+databaseName: transmaster_transport_db
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
