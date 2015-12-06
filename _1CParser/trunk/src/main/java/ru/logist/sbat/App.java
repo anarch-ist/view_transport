@@ -1,35 +1,20 @@
 package ru.logist.sbat;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import java.util.Scanner;
 
-import java.sql.SQLException;
-
-public class App extends Application{
+public class App {
 
     public static void main(String[] args) {
-        launch(args);
-    }
-
-    @Override
-    public void start(Stage stage) throws Exception {
-        // create GUI
-        Parent root = FXMLLoader.load(getClass().getResource("gui.fxml"));
-
-        stage.setOnCloseRequest(event -> {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+        Controller controller = new Controller();
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String nextLine = scanner.nextLine();
+            if (nextLine.equals("exit")) {
+                controller.close();
+                System.exit(0);
+            } else if (nextLine.equals("start")) {
+                controller.startGeneration();
             }
-        });
-
-        Scene scene = new Scene(root, 500, 300);
-        stage.setTitle("Генератор данных");
-        stage.setScene(scene);
-        stage.show();
+        }
     }
 }

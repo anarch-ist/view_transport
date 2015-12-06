@@ -1,25 +1,45 @@
 package ru.logist.sbat;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.BorderPane;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class Controller extends BorderPane implements Initializable {
+public class Controller {
     private Properties properties;
-    private Connection connection;
+    private final DataBase dataBase;
+    private Timer timer;
+
+
+    public Controller() {
+
+        // get All properties
+        try {
+            properties = handleProperties();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // create database connection
+        dataBase = new DataBase(
+                properties.getProperty("url"),
+                properties.getProperty("dbName"),
+                properties.getProperty("user"),
+                properties.getProperty("password")
+        );
+
+    }
 
     private Properties handleProperties() throws IOException {
         Path userDir = Paths.get(System.getProperty("user.dir"));
@@ -37,53 +57,53 @@ public class Controller extends BorderPane implements Initializable {
         }
     }
 
-    public Controller() {
 
-        try {
-            properties = handleProperties();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void startGeneration() {
+        timer = new Timer("insert timer", true);
+        String pattern = "#######.##";
+        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+        DecimalFormat df = (DecimalFormat)nf;
+        df.applyPattern(pattern);
+        TimerTask insertIntoTariffs = new TimerTask() {
+            @Override
+            public void run() {
 
-        // create connection to database
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(
-                    properties.getProperty("url"),
-                    properties.getProperty("user"),
-                    properties.getProperty("password")
-            );
+                String sql = String.format("INSERT INTO tariffs (cost, capacity, carrier) VALUES (%s, %s, '%s')",
+                        df.format(RandomUtils.nextDouble(1_000.0, 10_000.0)),
+                        df.format(RandomUtils.nextDouble(10.0, 20.0)),
+                        RandomStringUtils.randomAlphabetic(10)
+                );
 
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+                try {
+                    dataBase.generateInsertIntoRequestTable();
+                    dataBase.generateInsertIntoRouteListsTable();
 
-
-
-    }
-
-    @FXML
-    private ToggleButton startStopButton;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-
-
-        startStopButton.selectedProperty().addListener((observable, oldValue, isSelected) -> {
-            if (isSelected) {
-                // start new Thread(timer)
-                //startInserts();
-
-
-            } else {
-                // interrupt timer thread
-                //stopInserts();
-
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    close();
+                    timer.cancel();
+                    System.out.println("connection closed");
+                    System.exit(-1);
+                }
             }
+        };
 
-        });
+        timer.schedule(insertIntoTariffs, 1_000, 5_000);
 
 
     }
+
+
+
+    public void close() {
+        try {
+            dataBase.closeConnection();
+            if (timer != null)
+                timer.cancel();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
