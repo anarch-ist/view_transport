@@ -1,9 +1,11 @@
 <?php
-include_once '../dao/userDao/User.php';
+//include_once dirname(__FILE__)."/../dao/userDao/User.php";
+//include_once "/../dao/userDao/User.php";
+include_once "/../dao/userDao/User.php";
 //include_once '/../dao/pointDao/Point.php';
-include_once '../dao/invoicesForUser/InvoicesForUser.php';
-include_once '../dao/invoiceDao/Invoice.php';
-include_once '../dao/DAO.php';
+include_once '/../dao/invoicesForUser/InvoicesForUser.php';
+include_once '/../dao/invoiceDao/Invoice.php';
+include_once '/../dao/DAO.php';
 
 use DAO\InvoiceEntity as InvoiceEntity;
 use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
