@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once 'IUser.php';
-include_once '/../DAO.php';
+include_once __DIR__.'/IUser.php';
+include_once __DIR__.'/../DAO.php';
 
 
 class UserEntity implements IUserEntity

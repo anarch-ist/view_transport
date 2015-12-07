@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once 'IInvoice.php';
-include_once '/../DAO.php';
+include_once __DIR__.'/IInvoice.php';
+include_once __DIR__.'/../DAO.php';
 
 class InvoiceEntity implements IInvoiceEntity
 {

@@ -1,5 +1,5 @@
 <?php
-include_once '/../../common_files/privilegedUser/PrivilegedUser.php';
+include_once __DIR__.'/../../../common_files/privilegedUser/PrivilegedUser.php';
 
 $login = $_POST['login'];
 $password = $_POST['password'];
@@ -21,10 +21,12 @@ try {
     $possibleStatuses = $pUser->getInvoiceEntity()->getInvoiceStatuses($pUser);
     $dataToSend['responseCode'] = '';
     $dataToSend['statuses'] = $possibleStatuses;
+    echo(json_encode($dataToSend));
 
 } catch (Exception $ex) {
     $dataToSend['responseCode'] = $ex->getMessage();
     $dataToSend['statuses'] = '';
-} finally {
     echo(json_encode($dataToSend));
-}
+} // finally {
+//
+//}

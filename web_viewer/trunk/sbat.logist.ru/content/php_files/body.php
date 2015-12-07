@@ -1,5 +1,6 @@
 <title>логистика</title>
 <head>
+    <meta charset="UTF-8"/>
     <!--jquery-->
     <script type="text/javascript" language="javascript" src="common_files/media/js/jquery.js"></script>
     <!--jquery-ui-->

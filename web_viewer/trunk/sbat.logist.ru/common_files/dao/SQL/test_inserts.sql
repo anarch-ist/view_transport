@@ -1,5 +1,5 @@
-USE project_database;
-
+# USE project_database;
+USE transmaster_transport_db;
 SET FOREIGN_KEY_CHECKS = 0;
 -- truncate drop and create table instead of deleting rows one by one
 TRUNCATE points;

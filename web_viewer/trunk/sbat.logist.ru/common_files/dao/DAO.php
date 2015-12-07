@@ -6,8 +6,8 @@ define('PHP_NEWLINE', '<br>' . PHP_EOL);
 use Exception;
 use mysqli;
 
-include_once 'IDAO.php';
-include_once 'Exceptions.php';
+include_once __DIR__.'/IDAO.php';
+include_once __DIR__.'/Exceptions.php';
 
 class DAO implements IDAO
 {
@@ -17,7 +17,8 @@ class DAO implements IDAO
 
     private function __construct()
     {
-        $this->_connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
+        $config = parse_ini_file('db_connection.ini');
+        $this->_connection = @new mysqli('localhost', $config['username'], $config['password'], $config['dbname']);
         if ($this->_connection->connect_errno) {
             throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
         }
@@ -29,7 +30,7 @@ class DAO implements IDAO
 
     public function startTransaction()
     {
-        return $this->_connection->begin_transaction();
+        return $this->_connection->query('START TRANSACTION;');
     }
 
     public static function getInstance()
@@ -56,7 +57,8 @@ class DAO implements IDAO
 
     public function rollback()
     {
-        return $this->_connection->rollback();
+        return $this->_connection->query('ROLLBACK;');
+
     }
 
     function __destruct()
@@ -67,7 +69,7 @@ class DAO implements IDAO
 
     public function commit()
     {
-        return $this->_connection->commit();
+        return $this->_connection->query('COMMIT;');
     }
 
     function closeConnection()
@@ -140,6 +142,6 @@ class UserAction implements IEntityInsert
     {
         $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
         // TODO: Implement getUpdateQuery() method.
-        return "INSERT INTO `user_action_history` VALUES (0,0,$userID,'$this->table','$this->action');";
+        return "INSERT INTO `user_action_history`(`userID`, `tableID`, `action`) VALUES ($userID,'$this->table','$this->action');";
     }
 }

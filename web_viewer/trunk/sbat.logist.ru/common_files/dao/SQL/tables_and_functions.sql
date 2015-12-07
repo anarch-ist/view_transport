@@ -3,7 +3,30 @@
 # CREATE DATABASE `project_database`
 #   CHARACTER SET utf8
 #   COLLATE utf8_bin;
-USE `transmaster_transport_db`;
+# USE `project_database`;
+
+
+-- Production
+USE transmaster_transport_db;
+
+# SET FOREIGN_KEY_CHECKS = 0;
+# SET @tables = NULL;
+# SELECT GROUP_CONCAT(table_schema, '.', table_name)
+# INTO @tables
+# FROM information_schema.tables
+# WHERE table_schema = 'transmaster_transport_db';
+# -- specify DB name here.
+#
+# SET @tables = CONCAT('DROP TABLE ', @tables);
+# PREPARE stmt FROM @tables;
+# EXECUTE stmt;
+# DEALLOCATE PREPARE stmt;
+# SET FOREIGN_KEY_CHECKS = 1;
+#
+# SELECT CONCAT("DROP PROCEDURE IF EXISTS ",transmaster_transport_db) AS StorePrecedure
+# FROM information_schema.ROUTINES R
+# WHERE R.ROUTINE_TYPE = "PROCEDURE"
+#       AND R.ROUTINE_SCHEMA = DATABASE();
 
 
 #######################################################################################################################
@@ -25,8 +48,6 @@ VALUES
   ('W_DISPATCHER'),
   # диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
   ('DISPATCHER'),
-  # пользователь клиента, доступен GUI для просмотра данных заявок клиента, которые проходят через пункт к которому привязан пользователь с ролью CLIENT_USER, возможность проставлять статус "доставлен"
-  ('CLIENT_USER'),
   # пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
   ('CLIENT_MANAGER'),
   # торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
@@ -579,7 +600,7 @@ INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
 # на уровне приложения, во время установки нового статуса накладной - сначала идет запись в таблицу user_action_history а затем изменение статуса
 CREATE TABLE user_action_history (
   userActionHistoryID BIGINT AUTO_INCREMENT,
-  timeMark            DATETIME DEFAULT CURRENT_TIMESTAMP,
+  timeMark            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   userID              INTEGER,
   tableID             VARCHAR(64),
   action              ENUM('insert', 'update', 'delete'),
@@ -700,7 +721,7 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGE
     IF (currentSortOrder IS NULL ) THEN
       BEGIN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Current sort order does not exist.';
+        SET MESSAGE_TEXT = 'SERGEY ERROR: Current sortOrder for route_points does not exist.';
       END;
     END IF;
 

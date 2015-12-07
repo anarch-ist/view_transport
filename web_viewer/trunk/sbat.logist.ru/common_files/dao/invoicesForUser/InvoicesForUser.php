@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
 require_once 'IInvoicesForUser.php';
-include_once '/../DAO.php';
+include_once __DIR__.'/../DAO.php';
 
 
 class InvoicesForUserEntity implements IInvoicesForUserEntity
