@@ -1,13 +1,13 @@
-# SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES';
-# DROP DATABASE IF EXISTS project_database;
-# CREATE DATABASE `project_database`
-#   CHARACTER SET utf8
-#   COLLATE utf8_bin;
-# USE `project_database`;
-
+-- Production
+SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES';
+DROP DATABASE IF EXISTS project_database;
+CREATE DATABASE `project_database`
+  CHARACTER SET utf8
+  COLLATE utf8_bin;
+USE `project_database`;
 
 -- Production
-USE transmaster_transport_db;
+# USE transmaster_transport_db;
 
 # SET FOREIGN_KEY_CHECKS = 0;
 # SET @tables = NULL;
@@ -371,32 +371,33 @@ CREATE TABLE rout_list_history (
 
 
 CREATE TABLE invoice_statuses (
-  invoiceStatusID      VARCHAR(32),
+  invoiceStatusID VARCHAR(32),
+  sequence        TINYINT,
   PRIMARY KEY (invoiceStatusID)
 );
 
 INSERT INTO invoice_statuses
 VALUES
   # duty statuses
-  ('CREATED'),
-  ('DELETED'),
+  ('CREATED', 0),
+  ('DELETED', -1),
   # insider request statuses
-  ('APPROVING'),
-  ('RESERVED'),
-  ('APPROVED'),
-  ('STOP_LIST'),
-  ('CREDIT_LIMIT'),
-  ('RASH_CREATED'),
-  ('COLLECTING'),
-  ('CHECK'),
-  ('CHECK_PASSED'),
-  ('PACKAGING'),
-  ('READY'),
+  ('APPROVING', 1),
+  ('RESERVED', 2),
+  ('APPROVED', 3),
+  ('STOP_LIST', -2),
+  ('CREDIT_LIMIT', -3),
+  ('RASH_CREATED', 6),
+  ('COLLECTING', 7),
+  ('CHECK', 8),
+  ('CHECK_PASSED', 9),
+  ('PACKAGING', 10),
+  ('READY', 11),
   # invoice statuses
-  ('DEPARTURE'),
-  ('ARRIVED'),
-  ('ERROR'),
-  ('DELIVERED');
+  ('DEPARTURE', 12),
+  ('ARRIVED', 13),
+  ('ERROR', -4),
+  ('DELIVERED', 14);
 
 CREATE TABLE invoice_statuses_for_user_role (
   userRoleID VARCHAR(32),
@@ -442,7 +443,6 @@ CREATE TABLE invoices (
   weight                 INTEGER        NULL, # масса в граммах
   volume                 INTEGER        NULL, # в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, # цена всех товаров в накладной
-  sales_invoice          VARCHAR(16)    NULL, # расходная накладная
   invoiceStatusID        VARCHAR(32)    NOT NULL,
   requestID              INTEGER        NOT NULL,
   warehousePointID       INTEGER        NOT NULL,
@@ -499,7 +499,6 @@ CREATE PROCEDURE insert_into_invoice_history(
   weight                 INTEGER,
   volume                 INTEGER,
   goodsCost              DECIMAL(12, 2),
-  sales_invoice          VARCHAR(16),
   invoiceStatusID        VARCHAR(32),
   requestID              INTEGER,
   warehousePointID       INTEGER,
@@ -507,10 +506,10 @@ CREATE PROCEDURE insert_into_invoice_history(
   lastVisitedUserPointID INTEGER
 )
   BEGIN
-    INSERT INTO invoice_history (timeMark, invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost, sales_invoice, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID)
+    INSERT INTO invoice_history (timeMark, invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID)
     VALUES
       (NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume,
-       goodsCost, sales_invoice,
+       goodsCost,
        invoiceStatusID, requestID,
        warehousePointID, routeListID, lastVisitedUserPointID);
   END;
@@ -519,7 +518,7 @@ CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
       NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-      NEW.weight, NEW.volume, NEW.goodsCost, NEW.sales_invoice,
+      NEW.weight, NEW.volume, NEW.goodsCost,
       'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 
@@ -545,7 +544,7 @@ FOR EACH ROW
   BEGIN
     CALL insert_into_invoice_history(
         NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-        NEW.weight, NEW.volume, NEW.goodsCost, NEW.sales_invoice,
+        NEW.weight, NEW.volume, NEW.goodsCost,
         NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
   END;
 
@@ -553,7 +552,7 @@ CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
       OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
-      OLD.weight, OLD.volume, OLD.goodsCost, OLD.sales_invoice,
+      OLD.weight, OLD.volume, OLD.goodsCost,
       'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
 
 CREATE TABLE invoice_history (
@@ -568,7 +567,6 @@ CREATE TABLE invoice_history (
   weight                 INTEGER        NULL, # масса в граммах
   volume                 INTEGER        NULL, # в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, # цена всех товаров в накладной
-  sales_invoice          VARCHAR(16)    NULL, # расходная накладная
   invoiceStatusID        VARCHAR(32)    NOT NULL,
   requestID              INTEGER        NOT NULL,
   warehousePointID       INTEGER        NOT NULL,
@@ -686,51 +684,37 @@ CREATE FUNCTION getRoutPointIDByRoutNameAndSortOrder(_routName VARCHAR(64), _sor
     RETURN result;
   END;
 
+
+CREATE FUNCTION getNextSortOrder(_routeID INTEGER, _lastVisitedPointID INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    DECLARE currentSortOrder INTEGER;
+    DECLARE nextSortOrder INTEGER;
+
+    SET currentSortOrder = (SELECT sortOrder
+                            FROM route_points
+                            WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
+
+    IF (currentSortOrder IS NULL)
+    THEN
+      BEGIN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'SERGEY ERROR: Current sortOrder for route_points does not exist.';
+      END;
+    END IF;
+    SET nextSortOrder = currentSortOrder + 1;
+    RETURN nextSortOrder;
+  END;
+
 # this function returns pointID for the next routePoint or NULL if it is already the last point
 CREATE FUNCTION getNextPointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    DECLARE currentSortOrder INTEGER;
-    DECLARE nextSortOrder INTEGER;
-
-    SET currentSortOrder = (SELECT sortOrder FROM route_points WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
-
-    IF (currentSortOrder IS NULL ) THEN
-      BEGIN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'SERGEY ERROR: Current sortOrder for route_points does not exist.';
-      END;
-    END IF;
-
-    SET nextSortOrder = currentSortOrder + 1;
-    SET result = (SELECT pointID FROM route_points WHERE routeID = _routeID AND sortOrder = nextSortOrder);
-
-    RETURN result;
-  END;
+    RETURN (SELECT pointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
 
 CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    DECLARE currentSortOrder INTEGER;
-    DECLARE nextSortOrder INTEGER;
-
-    SET currentSortOrder = (SELECT sortOrder FROM route_points WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
-
-    IF (currentSortOrder IS NULL ) THEN
-      BEGIN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'SERGEY ERROR: Current sortOrder for route_points does not exist.';
-      END;
-    END IF;
-
-    SET nextSortOrder = currentSortOrder + 1;
-    SET result = (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = nextSortOrder);
-
-    RETURN result;
-  END;
-
+    RETURN (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
 
 
 #######################################################################################################################
