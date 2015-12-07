@@ -388,13 +388,17 @@ CREATE TABLE invoice_statuses_for_user_role (
 -- TODO fill this list
 INSERT INTO invoice_statuses_for_user_role
 VALUES
-  ('W_DISPATCHER', 'APPROVING'),
-  ('W_DISPATCHER', 'RESERVED'),
-  ('W_DISPATCHER', 'APPROVED'),
-  ('W_DISPATCHER', 'STOP_LIST'),
-  ('W_DISPATCHER', 'READY'),
+  ('ADMIN', 'APPROVING'),
+  ('ADMIN', 'RESERVED'),
+  ('ADMIN', 'APPROVED'),
+  ('ADMIN', 'STOP_LIST'),
+  ('ADMIN', 'READY'),
+  ('ADMIN', 'DEPARTURE'),
+  ('ADMIN', 'ERROR'),
   ('W_DISPATCHER', 'DEPARTURE'),
+  ('W_DISPATCHER', 'ARRIVED'),
   ('W_DISPATCHER', 'ERROR'),
+  ('W_DISPATCHER', 'DELIVERED'),
   ('DISPATCHER', 'DEPARTURE'),
   ('DISPATCHER', 'ARRIVED'),
   ('DISPATCHER', 'ERROR'),
