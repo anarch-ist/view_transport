@@ -67,17 +67,11 @@ public class Controller {
         TimerTask insertIntoTariffs = new TimerTask() {
             @Override
             public void run() {
-
-                String sql = String.format("INSERT INTO tariffs (cost, capacity, carrier) VALUES (%s, %s, '%s')",
-                        df.format(RandomUtils.nextDouble(1_000.0, 10_000.0)),
-                        df.format(RandomUtils.nextDouble(10.0, 20.0)),
-                        RandomStringUtils.randomAlphabetic(10)
-                );
-
                 try {
                     dataBase.generateInsertIntoRequestTable();
                     dataBase.generateInsertIntoRouteListsTable();
-
+                    dataBase.generateInsertIntoInvoicesTable();
+                    System.out.println(dataBase.getInvoiceStatuses());
                 } catch (SQLException e) {
                     e.printStackTrace();
                     close();
@@ -87,13 +81,8 @@ public class Controller {
                 }
             }
         };
-
         timer.schedule(insertIntoTariffs, 1_000, 5_000);
-
-
     }
-
-
 
     public void close() {
         try {
@@ -104,6 +93,4 @@ public class Controller {
             e.printStackTrace();
         }
     }
-
-
 }

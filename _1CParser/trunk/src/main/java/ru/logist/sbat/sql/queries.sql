@@ -19,3 +19,13 @@ INSERT INTO route_lists
   FROM routes
   ORDER BY RAND()
   LIMIT 1;
+
+
+INSERT INTO invoices
+  SELECT NULL, 'ins_req_n', 'inv_n', now(), now(), 10, 20, 3000, 12000.00, 'CREATED', requestID, pointID as warehousePointID, NULL , NULL
+  FROM requests
+    INNER JOIN (points)
+  WHERE points.pointTypeID = 'WAREHOUSE'
+  ORDER BY RAND()
+  LIMIT 1;
+
