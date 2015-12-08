@@ -156,8 +156,10 @@ Deployment path on server: /
 Web path on server: /
 
 EXCLUDED:
+/common_files/dao/db_connection.ini
 /common_filed/dao/SQL/
 /_examples/
+/common_files/dao/templateDao1
 
 Tools | Deployment | Browse Remote Hosts : view server content\
 
@@ -182,7 +184,8 @@ pass: ddTH4sxgON
 databaseName: transmaster_transport_db
 
 
-
+important - add this file " /common_files/dao/db_connection.ini" in excluded list
+important - add this directory "/common_files/dao/templateDao1" in excluded list
 
 
 

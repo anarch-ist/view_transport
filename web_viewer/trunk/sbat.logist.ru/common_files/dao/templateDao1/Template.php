@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once 'ITemplate.php';
-include_once '/../DAO.php';
+include_once __DIR__.'/ITemplate.php';
+include_once __DIR__.'/../DAO.php';
 
 class TemplateEntity implements ITemplateEntity
 {
