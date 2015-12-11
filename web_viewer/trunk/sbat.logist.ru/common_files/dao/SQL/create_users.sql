@@ -4,5 +4,5 @@
 DROP USER 'andy'@'localhost';
 CREATE USER 'andy'@'localhost'
   IDENTIFIED BY 'andyandy';
-GRANT SELECT, UPDATE, INSERT, DELETE, EXECUTE ON `project_database`.* TO 'andy'@'localhost'
+GRANT SELECT, UPDATE, INSERT, DELETE, EXECUTE ON `transmaster_transport_db`.* TO 'andy'@'localhost'
 WITH GRANT OPTION;

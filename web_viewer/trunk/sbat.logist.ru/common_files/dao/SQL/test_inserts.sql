@@ -1,5 +1,4 @@
-USE project_database;
-# USE transmaster_transport_db;
+USE transmaster_transport_db;
 SET FOREIGN_KEY_CHECKS = 0;
 -- truncate drop and create table instead of deleting rows one by one
 TRUNCATE points;
@@ -11,6 +10,8 @@ TRUNCATE routes;
 TRUNCATE route_points;
 TRUNCATE route_lists;
 TRUNCATE invoices;
+TRUNCATE invoice_history;
+TRUNCATE rout_list_history;
 SET FOREIGN_KEY_CHECKS = 1;
 
 # insert some test data
@@ -28,24 +29,26 @@ VALUES
 
 INSERT INTO users (firstName, lastName, patronymic, position, login, passMD5, phoneNumber, email, userRoleID, pointID)
 VALUES
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login1', md5('test'), '904534356', 'test@test.ru', 'MARKET_AGENT',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login1', md5('test'), '904534356', 'test@test.ru', 'DISPATCHER',
    getPointIDByName('point1')),
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login2', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'MARKET_AGENT',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login2', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
    getPointIDByName('point2')),
-  ('erir', 'dddddd', 'ewreruiii', 'erfergg', 'login3', md5('wefwgrege'), '904534356', 'ey@irtj.ru', 'MARKET_AGENT',
-   getPointIDByName('point4'));
-
+  ('erir', 'dddddd', 'ewreruiii', 'erfergg', 'login3', md5('wefwgrege'), '904534356', 'ey@irtj.ru', 'DISPATCHER',
+   getPointIDByName('point4')),
+  ('degg', 'rtgrgg', 'rtrtbtybv', 'ergrtgr', 'market_agent', md5('wertgrege'), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
+   getPointIDByName('point3'));
 
 INSERT INTO clients (INN, KPP, corAccount, curAccount, BIK, bankName, contractNumber, dateOfSigning, startContractDate, endContractDate)
 VALUES
-  ('1234567890', '23674529375734562', 'corAcccc', 'curAxccccc', '34896208375', 'moscowBank', 'erguheru', now(), now(),
-   now()),
-  ('8947537893', '37549783469587934', 'corAcccc2', 'curAxccccc2', '3324234375', 'moscowBank1', '34guheru', now(), now(),
-   now());
+  ('1234567890', '23674529375734562', 'corAcccc', 'curAxccccc', '34896208375', 'moscowBank', 'erguheru', now(), now(), now()),
+  ('8947537893', '37549783469587934', 'corAcccc2', 'curAxccccc2', '3324234375', 'moscowBank1', '34guheru', now(), now(), now());
 
 
 INSERT INTO requests (requestNumber, date, marketAgentUserID, clientID, destinationPointID)
-VALUES ('123356', now(), getUserIDByLogin('login1'), getClientIDByINN('1234567890'), getPointIDByName('point2'));
+VALUES
+  ('123356', now(), getUserIDByLogin('market_agent'), getClientIDByINN('1234567890'), getPointIDByName('point2')),
+  ('859458', now(), getUserIDByLogin('market_agent'), getClientIDByINN('8947537893'), getPointIDByName('point1')),
+  ('er9458', now(), getUserIDByLogin('market_agent'), getClientIDByINN('8947537893'), getPointIDByName('point4'));
 
 
 INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carrier');
@@ -71,14 +74,14 @@ VALUES
 
 INSERT INTO invoices (
   insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,
-  invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
+  invoiceStatusID, lastStatusUpdated, requestID, warehousePointID, routeListID, lastVisitedUserPointID
 )
 VALUES
-  ('ogeghei2243', 'qwd22345', now(), now(), 4, 20, 3000, 21000.00, 'ARRIVED', getRequestIDByNumber('123356'),
+  ('ogeghei2243', 'qwd22345', now(), now(), 4 , 20, 3000, 21000.00, 'CREATED', NULL , getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point1')),
-  ('ogeghei2244', 'qwd22334', now(), now(), 2, 20, 3000, 26000.00, 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2244', 'qwd22334', now(), now(), 2 , 20, 3000, 26000.00, 'CREATED', NULL , getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point3')),
-  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, 'CREATED', NULL , getRequestIDByNumber('123356'),
    getPointIDByName('point1'), NULL, NULL);
 
 
