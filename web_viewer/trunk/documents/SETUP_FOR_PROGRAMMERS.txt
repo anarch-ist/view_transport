@@ -110,7 +110,7 @@ port = 3306
 в Datasource properties меняем пароль root user, на тот, что указан в скрипте и перезапускаем соединение
 
 запускаем скрипт create.sql - будет создана БД 'requestDB'
-запускаем скрипт newDB.sql - будет создана БД 'project_database'
+запускаем скрипт newDB.sql - будет создана БД 'transmaster_transport_db'
 
 для того, чтобы эти БД отображались, необходимо зайти в Datasource properties -> Shemas&Tables и там поставить галки у этих схем.
 
@@ -163,31 +163,26 @@ EXCLUDED:
 
 Tools | Deployment | Browse Remote Hosts : view server content\
 
-DEPLOYING:
+-- DEPLOYING:
 
 Deployment | Upload to <server name> (or Deployment | Upload to...
-if you want to download from server make right ckick on folder inside remote host panel;
+if you want to download from server make right click on folder inside remote host panel;
 
-SERVER DATATASE Configuration
+
+-- SERVER DATATASE Configuration
+
 create new datasource: MySQL - production
+
 host: transport.sbat.ru
 user: transmaster_ttt
 pass: ddTH4sxgON
+databaseName: ""
 
+Shemas&Tables :
+information_shema should be selected
 
 connection to database with phpStorm;
 http://185.75.182.92/phpmyadmin/
-
-user: transmaster_ttt
-pass: ddTH4sxgON
-
-databaseName: transmaster_transport_db
-
-
-important - add this file " /common_files/dao/db_connection.ini" in excluded list
-important - add this directory "/common_files/dao/templateDao1" in excluded list
-
-
 
 
 
