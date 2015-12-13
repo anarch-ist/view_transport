@@ -1,7 +1,7 @@
 package ru.logist.sbat;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,18 +9,19 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
-    private Properties properties;
+    private static final Logger logger = LogManager.getLogger(Controller.class);
     private final DataBase dataBase;
+    private Properties properties;
     private Timer timer;
-
+    volatile private boolean isGenerateInsertIntoRequestTable = false;
+    volatile private boolean isGenerateInsertIntoRouteListsTable = false;
+    volatile private boolean isGenerateInsertIntoInvoicesTable = false;
+    volatile private boolean isGenerateUpdateInvoiceStatuses = false;
 
     public Controller() {
 
@@ -39,6 +40,22 @@ public class Controller {
                 properties.getProperty("password")
         );
 
+    }
+
+    public void setGenerateInsertIntoRequestTable(boolean generateInsertIntoRequestTable) {
+        isGenerateInsertIntoRequestTable = generateInsertIntoRequestTable;
+    }
+
+    public void setGenerateInsertIntoRouteListsTable(boolean generateInsertIntoRouteListsTable) {
+        isGenerateInsertIntoRouteListsTable = generateInsertIntoRouteListsTable;
+    }
+
+    public void setGenerateInsertIntoInvoicesTable(boolean generateInsertIntoInvoicesTable) {
+        isGenerateInsertIntoInvoicesTable = generateInsertIntoInvoicesTable;
+    }
+
+    public void setGenerateUpdateInvoiceStatuses(boolean generateUpdateInvoiceStatuses) {
+        isGenerateUpdateInvoiceStatuses = generateUpdateInvoiceStatuses;
     }
 
     private Properties handleProperties() throws IOException {
@@ -60,37 +77,33 @@ public class Controller {
 
     public void startGeneration() {
         timer = new Timer("insert timer", true);
-        String pattern = "#######.##";
-        NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
-        DecimalFormat df = (DecimalFormat)nf;
-        df.applyPattern(pattern);
-        TimerTask insertIntoTariffs = new TimerTask() {
+        TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 try {
-                    dataBase.generateInsertIntoRequestTable();
-                    dataBase.generateInsertIntoRouteListsTable();
-                    dataBase.generateInsertIntoInvoicesTable();
-                    System.out.println(dataBase.getInvoiceStatuses());
+                    if (isGenerateInsertIntoRequestTable)
+                        dataBase.generateInsertIntoRequestTable();
+                    if (isGenerateInsertIntoRouteListsTable)
+                        dataBase.generateInsertIntoRouteListsTable();
+                    if (isGenerateInsertIntoInvoicesTable)
+                        dataBase.generateInsertIntoInvoicesTable();
+                    if (isGenerateUpdateInvoiceStatuses)
+                        dataBase.generateUpdateInvoiceStatuses();
                 } catch (SQLException e) {
                     e.printStackTrace();
                     close();
                     timer.cancel();
-                    System.out.println("connection closed");
+                    logger.info("connection closed");
                     System.exit(-1);
                 }
             }
         };
-        timer.schedule(insertIntoTariffs, 1_000, 5_000);
+        timer.schedule(timerTask, 1_000, Integer.parseInt(properties.getProperty("generatePeriod")) * 1_000);
     }
 
     public void close() {
-        try {
-            dataBase.closeConnection();
-            if (timer != null)
-                timer.cancel();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        dataBase.closeConnectionQuietly();
+        if (timer != null)
+            timer.cancel();
     }
 }

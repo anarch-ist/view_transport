@@ -2,11 +2,14 @@ package ru.logist.sbat;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.*;
 
 public class DataBase {
+    private static final Logger logger = LogManager.getLogger(DataBase.class);
     private Connection connection;
     private List<String> invoiceStatuses;
 
@@ -15,36 +18,16 @@ public class DataBase {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    url+dbName,
+                    url + dbName,
                     user,
                     password
             );
             connection.setAutoCommit(true);
             invoiceStatuses = getInvoiceStatuses();
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                closeConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            logger.debug(e);
+            closeConnectionQuietly();
         }
-
-
-    }
-
-    /**
-     * @desc Method to insert data to a table
-     * @param insertQuery String The Insert query
-     * @return inserted number of rows
-     * @throws SQLException
-     */
-    public int insert(String insertQuery) throws SQLException {
-        Statement statement = connection.createStatement();
-        int result = statement.executeUpdate(insertQuery);
-        statement.close();
-        return result;
     }
 
     public List<String> getInvoiceStatuses() throws SQLException {
@@ -64,24 +47,12 @@ public class DataBase {
         return result;
     }
 
-    public String getRandomInvoiceID() throws SQLException {
-        String result = "";
-        Statement statement = null;
+    public void closeConnectionQuietly() {
         try {
-            statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT invoiceID FROM invoices WHERE invoiceStatusID <> 'DELIVERED' ORDER BY RAND() LIMIT 1;");
-            rs.next();
-            result = rs.getString(1);
-        } finally {
-            if (statement != null) {
-                statement.close();
-            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return result;
-    }
-
-    public void closeConnection() throws SQLException {
-        connection.close();
     }
 
     public void generateInsertIntoRequestTable() throws SQLException {
@@ -105,7 +76,7 @@ public class DataBase {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, RandomStringUtils.randomAlphanumeric(12));
             preparedStatement.executeUpdate();
-            System.out.println("insert into requests successfully executed!");
+            logger.trace("random insert into requests");
         } finally {
             if (preparedStatement != null) {
                 preparedStatement.close();
@@ -130,7 +101,7 @@ public class DataBase {
             preparedStatement.setString(4, RandomStringUtils.randomNumeric(10));
             preparedStatement.setString(5, RandomStringUtils.randomAlphanumeric(6));
             preparedStatement.executeUpdate();
-            System.out.println("insert into route_lists successfully executed!");
+            logger.trace("random insert into route lists");
         } finally {
             if (preparedStatement != null) {
                 preparedStatement.close();
@@ -144,7 +115,7 @@ public class DataBase {
         try {
             String sql =
                     "INSERT INTO invoices\n" +
-                            "  SELECT NULL, ?, ?, now(), now(), ?, ?, ?, ?, 'CREATED', requestID, pointID as warehousePointID, NULL , NULL\n" +
+                            "  SELECT NULL, ?, ?, now(), now(), ?, ?, ?, ?, 'CREATED', NULL, requestID, pointID as warehousePointID, NULL , NULL\n" +
                             "  FROM requests\n" +
                             "    INNER JOIN (points)\n" +
                             "  WHERE points.pointTypeID = 'WAREHOUSE'\n" +
@@ -160,7 +131,7 @@ public class DataBase {
             preparedStatement.setDouble(6, RandomUtils.nextDouble(4000.0, 50_000.0));
 
             preparedStatement.executeUpdate();
-            System.out.println("insert into invoices successfully executed!");
+            logger.trace("random insert into invoices");
         } finally {
             if (preparedStatement != null) {
                 preparedStatement.close();
@@ -168,26 +139,32 @@ public class DataBase {
         }
     }
 
-    public void updateInvoiceStatuses() {
-        PreparedStatement preparedStatement = null;
+    public void generateUpdateInvoiceStatuses() throws SQLException {
+        Statement getCurrentStatusStm = null;
+        Statement updateStatusStm = null;
         try {
-            String sql = "";
+            getCurrentStatusStm = connection.createStatement();
+            ResultSet rs = getCurrentStatusStm.executeQuery("SELECT invoiceID, invoiceStatusID FROM invoices ORDER BY RAND() LIMIT 1;");
+            rs.next();
+            int randId = rs.getInt("invoiceID");
+            String currentStatus = rs.getString("invoiceStatusID");
+            int currentIndex = invoiceStatuses.indexOf(currentStatus);
+            int nextStatusIndex = currentIndex + 1;
+            if (currentIndex == -1 || (nextStatusIndex > invoiceStatuses.size() - 1)) return;
+            String nextStatus = invoiceStatuses.get(nextStatusIndex);
 
-            preparedStatement = connection.prepareStatement(sql);
+            updateStatusStm = connection.createStatement();
+            updateStatusStm.executeUpdate("UPDATE invoices SET invoiceStatusID = " + "'" +nextStatus+"'" + " WHERE invoiceID = " + randId);
 
-            invoiceStatuses;
-
-            getRandomInvoiceID();
-            preparedStatement.executeUpdate("UPDATE invoices SET invoiceStatusID = ");
-            System.out.println("insert into invoices successfully executed!");
+            logger.trace("invoiceID = " + randId + "lastStatus = " + currentStatus + "newStatus = " + nextStatus);
         } finally {
-            if (preparedStatement != null) {
-                preparedStatement.close();
+            if (getCurrentStatusStm != null) {
+                getCurrentStatusStm.close();
+            }
+            if (updateStatusStm != null) {
+                updateStatusStm.close();
             }
         }
 
-        // get several random invoices
-        // update status by order
-        // if status is delivered then do nothing
     }
 }
