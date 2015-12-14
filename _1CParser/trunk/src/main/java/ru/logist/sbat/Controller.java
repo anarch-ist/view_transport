@@ -40,6 +40,7 @@ public class Controller {
                 properties.getProperty("password")
         );
 
+
     }
 
     public void setGenerateInsertIntoRequestTable(boolean generateInsertIntoRequestTable) {

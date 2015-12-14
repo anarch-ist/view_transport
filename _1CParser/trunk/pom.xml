@@ -58,6 +58,7 @@
                         </goals>
                         <configuration>
                             <mainClass>ru.logist.sbat.App</mainClass>
+                            <capsuleVersion>0.10.0</capsuleVersion>
                         </configuration>
                     </execution>
                 </executions>

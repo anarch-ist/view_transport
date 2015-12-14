@@ -24,6 +24,7 @@ public class DataBase {
             );
             connection.setAutoCommit(true);
             invoiceStatuses = getInvoiceStatuses();
+            logger.info("database connection succefully recieved, URL: [" + url + dbName + "] ");
         } catch (ClassNotFoundException | SQLException e) {
             logger.debug(e);
             closeConnectionQuietly();

@@ -1,0 +1,1 @@
+java -jar parser1c-0.1-SNAPSHOT-capsule.jar
