@@ -23,7 +23,8 @@ $(document).ready(function () {
                             "border": "2px solid #00F5FF",
                             "box-shadow": "0 0 5px #00F5FF"
                         });
-                        alert(data);
+                        data = JSON.parse(data);
+                        alert(data.responseCode);
                     }
 
                     function handleValidLogin() {

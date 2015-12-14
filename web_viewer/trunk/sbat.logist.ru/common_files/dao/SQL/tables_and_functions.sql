@@ -815,6 +815,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       route_lists.licensePlate,
       route_lists.palletsQty,
       route_lists.routListNumber,
+      route_lists.routeListID,
       routes.directionName,
 
       last_visited_points.pointName AS `currentPoint`,

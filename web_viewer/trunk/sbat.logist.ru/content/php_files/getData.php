@@ -19,14 +19,15 @@ function getInvoicesForUser(PrivilegedUser $privUser)
     $dataArray = $privUser->getInvoicesForUser()->selectAllData();
     $totalData = count($dataArray);
     $totalFiltered = $totalData;
-    $data = array();
-    foreach ($dataArray as $dataElement) {
-        $tmp = array();
-        foreach ($dataElement as $field) {
-            $tmp[] = $field;
-        }
-        $data[] = $tmp;
-    }
+//    $data = array();
+//    foreach ($dataArray as $dataElement) {
+//        $tmp = array();
+//        foreach ($dataElement as $field) {
+//            $tmp[] = $field;
+//        }
+//        $data[] = $tmp;
+//    }
+    $data = $dataArray;
     $json_data = array(
         "draw" => intval($_REQUEST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($totalData),  // total number of records
@@ -45,8 +46,8 @@ function changeStatusForInvoice(PrivilegedUser $privUser)
 }
 function changeStatusForSeveralInvoices(PrivilegedUser $privUser)
 {
-    $invoiceID = $_POST['invoiceID'];
+    $routeListID = $_POST['routeListID'];
     $newStatusID = $_POST['newStatusID'];
     $datetime = $_POST['date'];
-    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($invoiceID, $newStatusID,$datetime);
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatuses($routeListID, $newStatusID,$datetime);
 }

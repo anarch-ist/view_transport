@@ -83,21 +83,30 @@ $(document).ready(function () {
                 //var table = $('#user-grid').DataTable();
                 //table.rows( { selected: true } ).data();
                 newStatusID =  $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
-
+				date = $('#dateTimePicker')[0].value;
                 var action = $('#statusSelect').attr("action");
                 if (action === "changeStatusForInvoice") {
                     // получение ИД выделенной в таблице накладной
-                    invoiceID = $('#user-grid .selected td')[2].textContent;
-                    date = $('#dateTimePicker')[0].value;
-                    $.post("content/getData.php", {status: action, invoiceID: invoiceID, newStatusID: newStatusID, date: date},
+                    invoiceNumber = dataTable.row( $('#user-grid .selected') ).data().invoiceNumber;
+                    $.post("content/getData.php", {status: action, invoiceID: invoiceNumber, newStatusID: newStatusID, date: date},
                         function (data) {
                             if (data==='1') {
                                 document.location.reload();
                             }
                         });
                 } else if (action === "changeStatusForSeveralInvoices") {
-                    //TODO
-                    alert("TODO change several stauses");
+                    // получение ИД маршрутного листа
+                    routeListID = dataTable.row( $('#user-grid .selected') ).data().routeListID;
+                    console.log(routeListID);
+                    $.post(
+						"content/getData.php",
+						{status: action, routeListID: routeListID, newStatusID: newStatusID, date: date},
+                        function (data) {
+                            if (data==='1') {
+                                document.location.reload();
+                            }
+                        }
+					);
                 }
 
                 $(this).dialog("close");
@@ -167,8 +176,8 @@ $(document).ready(function () {
     } );
 
     var dataTable = $('#user-grid').DataTable({
-        "processing": true,
-        "serverSide": true,
+        processing: true,
+        serverSide: true,
         select: {
             style: 'single'
         },
@@ -190,7 +199,7 @@ $(document).ready(function () {
                 }
             }
         ],
-        "ajax": {
+        ajax: {
             url: "content/getData.php", // json datasource
             type: "post",  // method  , by default get
             data: {"status": "getInvoicesForUser"},    // post-parameter for determining type of query
@@ -201,7 +210,27 @@ $(document).ready(function () {
 
             }
         },
-        "columnDefs": [
+        columns: [
+            { "data": "requestNumber"},
+            { "data": "insiderRequestNumber"},
+            { "data": "invoiceNumber"},
+            { "data": "INN"},
+            { "data": "deliveryPoint"},
+            { "data": "warehousePoint"},
+            { "data": "lastName"},
+            { "data": "invoiceStatusID"},
+            { "data": "boxQty"},
+            { "data": "driver"},
+            { "data": "licensePlate"},
+            { "data": "palletsQty"},
+            { "data": "routListNumber"},
+            { "data": "directionName"},
+            { "data": "currentPoint"},
+            { "data": "nextPoint"},
+            { "data": "arrivalTime"},
+            { "data": "routeListID"}
+        ],
+        columnDefs: [
             { "name": "requestNumber", "searchable": true, "targets": 0 },
             { "name": "insiderRequestNumber", "searchable": true, "targets": 1 },
             { "name": "invoiceNumber", "searchable": true, "targets": 2 },
@@ -214,13 +243,14 @@ $(document).ready(function () {
             { "name": "driver", "searchable": true,   "targets": 9 },
             { "name": "licensePlate", "searchable": true,   "targets": 10},
             { "name": "palletsQty", "searchable": true,   "targets": 11},
-            { "name": "routeListNumber", "searchable": true,   "targets": 12},
+            { "name": "routListNumber", "searchable": true,   "targets": 12},
             { "name": "directionName", "searchable": true,   "targets": 13},
             { "name": "currentPoint", "searchable": true,   "targets": 14},
             { "name": "nextPoint", "searchable": true,   "targets": 15},
-            { "name": "arrivalTime", "searchable": true,   "targets": 16}
+            { "name": "arrivalTime", "searchable": true,   "targets": 16},
+            { "name": "routeListID", "searchable": false, "visible": false, "targets": 17}
         ],
-        "language": {
+        language: {
             "processing": "Подождите...",
             "search": "Поиск:",
             "lengthMenu": "Показать _MENU_ записей",
@@ -237,7 +267,7 @@ $(document).ready(function () {
                 "next": "Следующая",
                 "last": "Последняя"
             },
-            "aria": {
+            aria: {
                 "sortAscending": ": активировать для сортировки столбца по возрастанию",
                 "sortDescending": ": активировать для сортировки столбца по убыванию"
             }

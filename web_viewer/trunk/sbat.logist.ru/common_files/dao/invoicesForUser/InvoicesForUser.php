@@ -6,6 +6,27 @@ include_once __DIR__.'/../DAO.php';
 
 class InvoicesForUserEntity implements IInvoicesForUserEntity
 {
+    private static $invoiceStatusRusNames = array(
+        'CREATED' => 'Внутренняя заявка добавлена',
+        'DELETED' => 'Внутренняя заявка удалена',
+        # insider request statuses
+        'APPROVING' => 'Выгружена на утверждение торговому представителю',
+        'RESERVED' => 'Резерв',
+        'APPROVED' => 'Утверждена к сборке',
+        'STOP_LIST' => 'Стоп-лист',
+        'CREDIT_LIMIT' => 'Кредитный лимит',
+        'RASH_CREATED' => 'Создана расходная накладная',
+        'COLLECTING' => 'Выдана на сборку',
+        'CHECK' => 'На контроле',
+        'CHECK_PASSED' => 'Контроль пройден',
+        'PACKAGING' => 'Упаковано',
+        'READY' => 'Готова к отправке',
+        # invoice statuses
+        'DEPARTURE' => 'Убытие',
+        'ARRIVED' => 'Прибытие в пункт',
+        'ERROR' => 'Ошибка',
+        'DELIVERED' => 'Доставлено'
+    );
     private static $_instance;
     private $_DAO;
 
@@ -37,28 +58,17 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
                 $count = func_get_arg(0);
                 break;
         }
-        return $this->_DAO->select(new EntitySelectAllData($start,$count));
+        $array = $this->_DAO->select(new EntitySelectAllData($start,$count));
+        for($i=0;$i<count($array);$i++) {
+            $array[$i]['invoiceStatusID'] = self::$invoiceStatusRusNames[$array[$i]['invoiceStatusID']];
+        }
+        return $array;
     }
 
     /**
      * @param $keyword
      * @return array
      */
-    function selectDataByKey($keyword)
-    {
-        $count = 25;
-        $start = 0;
-        switch (func_num_args()) {
-            case 2:
-                $start = func_get_arg(1);
-                $count = func_get_arg(0);
-                break;
-            case 1:
-                $count = func_get_arg(0);
-                break;
-        }
-        return $this->_DAO->select(new EntitySelectAllData($start,$count));
-    }
 }
 
 class EntitySelectAllData implements IEntitySelect
@@ -81,7 +91,6 @@ class EntitySelectAllData implements IEntitySelect
     function getSelectQuery()
     {
         $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
-        //echo "CALL selectData($userID,$this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
         return "CALL selectData($userID,$this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
     }
 }

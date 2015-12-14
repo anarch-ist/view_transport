@@ -57,6 +57,11 @@ class InvoiceEntity implements IInvoiceEntity
         return $this->_DAO->update(new UpdateInvoiceStatus($invoiceID, $newInvoiceStatus,$datetime),new UserAction('invoices','update'));
     }
 
+    function updateInvoiceStatuses($routeListID, $newInvoiceStatus, $datetime)
+    {
+        return $this->_DAO->update(new UpdateInvoiceStatuses($routeListID, $newInvoiceStatus,$datetime),new UserAction('invoices','update'));
+    }
+
     function deleteInvoice($Invoice)
     {
         // TODO: Implement deleteInvoice() method.
@@ -169,6 +174,7 @@ class SelectInvoiceStatuses implements IEntitySelect
         return "select `invoiceStatusID` from `invoice_statuses_for_user_role` where userRoleID = '$this->role'";
     }
 }
+
 class UpdateInvoiceStatus implements IEntityUpdate
 {
     private $invoiceNumber;
@@ -188,6 +194,31 @@ class UpdateInvoiceStatus implements IEntityUpdate
     function getUpdateQuery()
     {
         // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `creationDate` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i') WHERE `invoiceNumber` = '$this->invoiceNumber';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `invoiceNumber` = '$this->invoiceNumber';";
+//        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `invoiceNumber` = '$this->invoiceNumber';";
+    }
+}
+
+class UpdateInvoiceStatuses implements IEntityUpdate
+{
+    private $routeListID;
+    private $newInvoiceStatus;
+    private $datetime;
+
+    function __construct($routeListID,$newInvoiceStatus,$datetime)
+    {
+        $this->routeListID = DAO::getInstance()->checkString($routeListID);
+        $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
+        $this->datetime = DAO::getInstance()->checkString($datetime);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        // TODO: Implement getUpdateQuery() method.
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
+//        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `routeListID` = '$this->routeListID';";
     }
 }
