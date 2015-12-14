@@ -47,18 +47,18 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
      */
     function selectAllData()
     {
-        $count = 25;
+        $count = 20;
         $start = 0;
         switch (func_num_args()) {
             case 2:
-                $start = func_get_arg(1);
-                $count = func_get_arg(0);
+                $start = func_get_arg(0);
+                $count = func_get_arg(1);
                 break;
             case 1:
-                $count = func_get_arg(0);
+                $start = func_get_arg(0);
                 break;
         }
-        $array = $this->_DAO->select(new EntitySelectAllData($start,$count));
+        $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start,$count));
         for($i=0;$i<count($array);$i++) {
             $array[$i]['invoiceStatusID'] = self::$invoiceStatusRusNames[$array[$i]['invoiceStatusID']];
         }
@@ -71,7 +71,7 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
      */
 }
 
-class EntitySelectAllData implements IEntitySelect
+class EntitySelectAllInvoicesForUser implements IEntitySelect
 {
     private $start, $count,$orderByColumn, $isDesc,$searchString;
     function __construct($start, $count) {
@@ -85,8 +85,7 @@ class EntitySelectAllData implements IEntitySelect
                 $this->searchString.=$searchArray[$i]['name'].','.$searchArray[$i]['search']['value'].';';
             }
         }
-        $columnNumber = $_POST['order'][0]['column'];
-        $this->orderByColumn = $searchArray[$columnNumber]['name'];
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
     }
     function getSelectQuery()
     {

@@ -1,7 +1,7 @@
 <?php
 include_once __DIR__.'/../dao/userDao/User.php';
 //include_once __DIR__.'/../dao/pointDao/Point.php';
-include_once __DIR__.'/../dao/invoicesForUser/InvoicesForUser.php';
+include_once __DIR__ . '/../dao/invoicesForUser/InvoicesForUser.php';
 include_once __DIR__.'/../dao/invoiceDao/Invoice.php';
 include_once __DIR__.'/../dao/DAO.php';
 
@@ -16,24 +16,23 @@ abstract class AuthUser
 {
     private $user;
 
-    protected function __construct()
+    protected function __construct($authVariant)
     {
         $this->user = new UserData(array());
-        if (!$this->isValid()) {
+        if (!$this->isValid($authVariant)) {
             throw new AuthException('Ошибка авторизации');
         }
     }
 
-    public function isValid()
+    public function isValid($authVariant)
     {
-        if (isset($_COOKIE['UserID']) && isset($_COOKIE['md5']) && $this->checkAuth($_COOKIE['UserID'], $_COOKIE['md5'])) {
-            return true;
+        if ($authVariant === 'check') {
+            return ($this->checkAuth());
+        } else if ($authVariant === 'auth') {
+            return (isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password']));
+        } else {
+            throw new AuthException('Передан неверный параметр: '.$authVariant);
         }
-        //TODO: change GET to POST
-        if (isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password'])) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -41,20 +40,26 @@ abstract class AuthUser
      * @param $md5 - field from client
      * @return boolean
      */
-    private function checkAuth($userID, $md5)
+    private function checkAuth()
     {
-//        if (!isset($userID) || !isset($md5)) return false;
-        $this->user = UserEntity::getInstance()->selectUserByID($userID);
-        return (!is_null($this->user) && $this->user->getData('passMD5') === $md5);
+        session_start();
+        if (!isset($_COOKIE['SESSION_CHECK_STRING']) || $_COOKIE['SESSION_CHECK_STRING'] !== md5($_SESSION['UserID'].session_id().$_SESSION['md5'])) {
+            setcookie('SESSION_CHECK_STRING');
+            session_destroy();
+            return false;
+        }
+        $this->user = UserEntity::getInstance()->selectUserByID($_SESSION['UserID']);
+        return (!is_null($this->user) && $this->user->getData('passMD5') === $_SESSION['md5']);
     }
 
     private function authorize($email, $md5)
     {
-//        if (!isset($email) || !isset($md5)) return false;
         $this->user = UserEntity::getInstance()->selectUserByEmail($email);
         if (!is_null($this->user) && $this->user->getData('passMD5') === $md5) {
-            setcookie('UserID', $this->user->getData('userID'), 0, '/');
-            setcookie('md5', $this->user->getData('passMD5'), 0, '/');
+            session_start();
+            $_SESSION['UserID'] = $this->user->getData('userID');
+            $_SESSION['md5'] = $this->user->getData('passMD5');
+            setcookie('SESSION_CHECK_STRING',md5($_SESSION['UserID'].session_id().$_SESSION['md5']),0,'/');
             return true;
         }
         return false;
@@ -71,15 +76,20 @@ class PrivilegedUser extends AuthUser
     private static $instance;
     private $permissions;
 
-    protected function __construct()
+    protected function __construct($authVariant)
     {
-        parent::__construct();
+        parent::__construct($authVariant);
     }
 
     public static function getInstance()
     {
+
+        $authVariant = 'check';
+        if (func_num_args() === 1) {
+            $authVariant = func_get_arg(0);
+        }
         if (is_null(self::$instance)) {
-            self::$instance = new PrivilegedUser();
+            self::$instance = new PrivilegedUser($authVariant);
         }
         return self::$instance;
     }

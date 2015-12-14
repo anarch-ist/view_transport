@@ -1,6 +1,10 @@
 $(document).ready(function () {
 
-    $("#tableTypeSelect").selectmenu();
+    $( "#tableTypeSelect" ).selectmenu({
+        change: function( event, ui ) {
+            //  ui.item.index;
+        }
+    });
 
     // create selectColumnsControl
     $("#selectColumnsControl").on("click", function () {
@@ -9,8 +13,7 @@ $(document).ready(function () {
 
     $("#logout").on("click", function () {
         // delete auth cookies
-        $.cookie('UserID', null);
-        $.cookie('md5', null);
+        $.cookie('SESSION_CHECK_STRING',null,-1,'/');
         // make redirect to login page
         window.location.reload();
         //location.reload(true);
@@ -176,6 +179,7 @@ $(document).ready(function () {
     } );
 
     var dataTable = $('#user-grid').DataTable({
+        //bFilter: false,
         processing: true,
         serverSide: true,
         select: {

@@ -22,15 +22,15 @@ class InvoiceEntity implements IInvoiceEntity
 
     function selectInvoices()
     {
-        $count = 25;
+        $count = 20;
         $start = 0;
         switch (func_num_args()) {
             case 2:
-                $start = func_get_arg(1);
-                $count = func_get_arg(0);
+                $start = func_get_arg(0);
+                $count = func_get_arg(1);
                 break;
             case 1:
-                $count = func_get_arg(0);
+                $start = func_get_arg(0);
                 break;
         }
         $array = $this->_DAO->select(new SelectAllInvoices($start, $count));

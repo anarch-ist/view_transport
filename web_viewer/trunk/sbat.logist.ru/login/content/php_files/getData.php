@@ -1,15 +1,11 @@
 <?php
 include_once __DIR__.'/../../../common_files/privilegedUser/PrivilegedUser.php';
 
-$login = $_POST['login'];
-$password = $_POST['password'];
-$_GET['login'] = $login;
-$_GET['md5'] = $password;
 $dataToSend = ['responseCode'=>'', 'statuses'=>''];
 try {
 
     // FIXME бросает ошибку если после logout производится повторная авторизация
-    $pUser = PrivilegedUser::getInstance();
+    $pUser = PrivilegedUser::getInstance('auth');
 
     // User class instances must contain session data. read session data from database inside user DAO
     //$pUser->getUserInfo()->
