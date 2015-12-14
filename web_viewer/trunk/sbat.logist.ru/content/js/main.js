@@ -179,13 +179,12 @@ $(document).ready(function () {
     } );
 
     var dataTable = $('#user-grid').DataTable({
-        //bFilter: false,
         processing: true,
         serverSide: true,
         select: {
             style: 'single'
         },
-        dom: 'Bfrtip',
+        dom: 'Brtip',
         buttons: [
             {
                 extend: 'selectedSingle',
@@ -291,3 +290,4 @@ $(document).ready(function () {
         } );
     } );
 });
+
