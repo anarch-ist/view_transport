@@ -60,7 +60,12 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
         }
         $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start,$count));
         for($i=0;$i<count($array);$i++) {
-            $array[$i]['invoiceStatusID'] = self::$invoiceStatusRusNames[$array[$i]['invoiceStatusID']];
+            $invoiceStatusID = $array[$i]['invoiceStatusID'];
+            $array[$i]['invoiceStatusID'] = '';
+            $wrfeinvoiceStatusID = $array[$i]['invoiceStatusID'];
+            if (!is_null($invoiceStatusID) && $invoiceStatusID !== '') {
+                $array[$i]['invoiceStatusID'] = self::$invoiceStatusRusNames[$invoiceStatusID];
+            }
         }
         return $array;
     }

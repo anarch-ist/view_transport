@@ -59,7 +59,7 @@ $(document).ready(function () {
                 $.post("content/getData.php", {status: "changeStatusForSeveralInvoices", routeList: routeList, newStatusID: newStatusID, date: date},
                     function (data) {
                         if (data==='1') {
-                            document.location.reload();
+                            document.location.reload(); //FIXME redo this stuff
                         }
                     });
 
@@ -67,6 +67,7 @@ $(document).ready(function () {
             },
             "Отмена": function () {
                 $(this).dialog("close");
+                document.location.reload(); //FIXME redo this stuff
             }
         }
 

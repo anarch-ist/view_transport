@@ -393,17 +393,13 @@ VALUES
   ('ADMIN', 'DEPARTURE'),
   ('ADMIN', 'ERROR'),
   ('W_DISPATCHER', 'DEPARTURE'),
-  ('W_DISPATCHER', 'ARRIVED'),
-  ('W_DISPATCHER', 'ERROR'),
-  ('W_DISPATCHER', 'DELIVERED'),
   ('DISPATCHER', 'DEPARTURE'),
   ('DISPATCHER', 'ARRIVED'),
   ('DISPATCHER', 'ERROR'),
   ('DISPATCHER', 'DELIVERED'),
-  ('MARKET_AGENT', 'DEPARTURE'),
-  ('MARKET_AGENT', 'ARRIVED'),
   ('MARKET_AGENT', 'ERROR'),
   ('MARKET_AGENT', 'DELIVERED');
+
 
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
@@ -788,8 +784,9 @@ CREATE FUNCTION generateHaving(map TEXT)
     END WHILE;
 
     -- remove redundant END
-    SET result = SUBSTR(result, 1, LENGTH(result) - 4);
-    SET result = CONCAT('(', result, ')');
+    -- SET result = SUBSTR(result, 1, LENGTH(result) - 4);
+
+    SET result = CONCAT('(', result, 'TRUE', ')');
     RETURN result;
   END;
 

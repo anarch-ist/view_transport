@@ -40,7 +40,6 @@
         <select name="tableType" id="tableTypeSelect">
             <option selected="selected">Текущие статусы</option>
             <option>История статусов</option>
-            <option>Маршрутные листы</option>
         </select>
 
         <div id="buttonsContainer" style="display: inline-block">

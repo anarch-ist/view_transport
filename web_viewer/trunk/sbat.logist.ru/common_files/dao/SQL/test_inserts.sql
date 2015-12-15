@@ -29,7 +29,7 @@ VALUES
 
 INSERT INTO users (firstName, lastName, patronymic, position, login, passMD5, phoneNumber, email, userRoleID, pointID)
 VALUES
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login1', md5('test'), '904534356', 'test@test.ru', 'DISPATCHER',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login1', md5('test'), '904534356', 'test@test.ru', 'ADMIN',
    getPointIDByName('point1')),
   ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login2', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
    getPointIDByName('point2')),
@@ -37,6 +37,7 @@ VALUES
    getPointIDByName('point4')),
   ('degg', 'rtgrgg', 'rtrtbtybv', 'ergrtgr', 'market_agent', md5('wertgrege'), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
    getPointIDByName('point3'));
+
 
 INSERT INTO clients (INN, KPP, corAccount, curAccount, BIK, bankName, contractNumber, dateOfSigning, startContractDate, endContractDate)
 VALUES
