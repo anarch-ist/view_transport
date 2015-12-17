@@ -346,33 +346,34 @@ CREATE TABLE rout_list_history (
 
 
 CREATE TABLE invoice_statuses (
-  invoiceStatusID VARCHAR(32),
-  sequence        TINYINT,
+  invoiceStatusID      VARCHAR(32),
+  invoiceStatusRusName VARCHAR(128),
+  sequence             TINYINT,
   PRIMARY KEY (invoiceStatusID)
 );
 
 INSERT INTO invoice_statuses
 VALUES
   -- duty statuses
-  ('CREATED', 0),
-  ('DELETED', -1),
+  ('CREATED', 'Внутренняя заявка добавлена в БД', 0),
+  ('DELETED', 'Внутренняя заявка удалена из БД', -1),
   -- insider request statuses
-  ('APPROVING', 1),
-  ('RESERVED', 2),
-  ('APPROVED', 3),
-  ('STOP_LIST', -2),
-  ('CREDIT_LIMIT', -3),
-  ('RASH_CREATED', 6),
-  ('COLLECTING', 7),
-  ('CHECK', 8),
-  ('CHECK_PASSED', 9),
-  ('PACKAGING', 10),
-  ('READY', 11),
+  ('APPROVING', 'Выгружена на утверждение торговому представителю', 1),
+  ('RESERVED', 'Резерв', 2),
+  ('APPROVED', 'Утверждена к сборке', 3),
+  ('STOP_LIST', 'Стоп-лист', -2),
+  ('CREDIT_LIMIT', 'Кредитный лимит', -3),
+  ('RASH_CREATED', 'Создана расходная накладная', 6),
+  ('COLLECTING', 'Выдана на сборку', 7),
+  ('CHECK', 'На контроле', 8),
+  ('CHECK_PASSED', 'Контроль пройден', 9),
+  ('PACKAGING', 'Упаковано', 10),
+  ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 11),
   -- invoice statuses
-  ('DEPARTURE', 12),
-  ('ARRIVED', 13),
-  ('ERROR', -4),
-  ('DELIVERED', 14);
+  ('DEPARTURE', 'Накладная убыла', 12),
+  ('ARRIVED', 'Накладная прибыла в пункт', 13),
+  ('ERROR', 'Ошибка. Возвращение в пункт', -4),
+  ('DELIVERED', 'Доставлено', 14);
 
 CREATE TABLE invoice_statuses_for_user_role (
   userRoleID VARCHAR(32),
@@ -414,13 +415,17 @@ CREATE TABLE invoices (
   weight                 INTEGER        NULL, -- масса в граммах
   volume                 INTEGER        NULL, -- в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
-  invoiceStatusID        VARCHAR(32)    NOT NULL,
   lastStatusUpdated      DATETIME       NULL, -- date and time when status was updated by any user
+  lastModifiedBy         INTEGER        NULL,
+  invoiceStatusID        VARCHAR(32)    NOT NULL,
   requestID              INTEGER        NOT NULL,
   warehousePointID       INTEGER        NOT NULL,
   routeListID            INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedUserPointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
+  FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
@@ -471,18 +476,19 @@ CREATE PROCEDURE insert_into_invoice_history(
   weight                 INTEGER,
   volume                 INTEGER,
   goodsCost              DECIMAL(12, 2),
-  invoiceStatusID        VARCHAR(32),
   lastStatusUpdated      DATETIME,
+  lastModifiedBy         INTEGER,
+  invoiceStatusID        VARCHAR(32),
   requestID              INTEGER,
   warehousePointID       INTEGER,
   routeListID            INTEGER,
   lastVisitedUserPointID INTEGER
 )
   BEGIN
-    INSERT INTO invoice_history (invoiceHistoryID, autoTimeMark, invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost, invoiceStatusID, lastStatusUpdated, requestID, warehousePointID, routeListID, lastVisitedUserPointID)
+    INSERT INTO invoice_history
     VALUES
       (NULL, NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate,
-       boxQty, weight, volume, goodsCost, invoiceStatusID, lastStatusUpdated, requestID, warehousePointID, routeListID, lastVisitedUserPointID
+       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
       );
   END;
 
@@ -490,8 +496,8 @@ CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
       NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-      NEW.weight, NEW.volume, NEW.goodsCost,
-      'CREATED', NEW.lastStatusUpdated, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+      NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
+      'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
@@ -500,12 +506,12 @@ FOR EACH ROW
     -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт, и этот
     -- пункт записываем в таблицу invoices в поле lastVisitedUserPointID
     IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR NEW.invoiceStatusID = 'DELIVERED')
-    -- LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
     THEN
       BEGIN
-        DECLARE _userID INTEGER;
-        SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
-        SET NEW.lastVisitedUserPointID = (SELECT pointID FROM users WHERE userID = _userID);
+        -- LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
+        -- DECLARE _userID INTEGER;
+        -- SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
+        SET NEW.lastVisitedUserPointID = (SELECT pointID FROM users WHERE userID = NEW.lastModifiedBy);
       END;
     END IF ;
   END ;
@@ -515,16 +521,16 @@ FOR EACH ROW
   BEGIN
     CALL insert_into_invoice_history(
         NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-        NEW.weight, NEW.volume, NEW.goodsCost,
-        NEW.invoiceStatusID, NEW.lastStatusUpdated, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+        NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
+        NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
   END;
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
 FOR EACH ROW
   CALL insert_into_invoice_history(
       OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
-      OLD.weight, OLD.volume, OLD.goodsCost,
-      'DELETED', OLD.lastStatusUpdated, OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
+      OLD.weight, OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy,
+      'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
 
 CREATE TABLE invoice_history (
   invoiceHistoryID       BIGINT AUTO_INCREMENT,
@@ -538,8 +544,9 @@ CREATE TABLE invoice_history (
   weight                 INTEGER        NULL, -- масса в граммах
   volume                 INTEGER        NULL, -- в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
-  invoiceStatusID        VARCHAR(32)    NOT NULL,
   lastStatusUpdated      DATETIME       NULL,
+  lastModifiedBy         INTEGER        NULL,
+  invoiceStatusID        VARCHAR(32)    NOT NULL,
   requestID              INTEGER        NOT NULL,
   warehousePointID       INTEGER        NOT NULL,
   routeListID            INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
@@ -757,7 +764,7 @@ search[regex]:"false"               true if the global filter should be treated 
 CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
   RETURNS TEXT
   RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(stringSpl, delim, pos),
-                           LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos -1)) + 1),
+                           CHAR_LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos -1)) + 1),
                  delim, '');
 
 CREATE FUNCTION generateHaving(map TEXT)
@@ -784,9 +791,9 @@ CREATE FUNCTION generateHaving(map TEXT)
     END WHILE;
 
     -- remove redundant END
-    -- SET result = SUBSTR(result, 1, LENGTH(result) - 4);
+    SET result = SUBSTR(result, 1, CHAR_LENGTH(result) - 4);
+    SET result = CONCAT('(', result, ')');
 
-    SET result = CONCAT('(', result, 'TRUE', ')');
     RETURN result;
   END;
 
@@ -884,3 +891,48 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
   EXECUTE statement USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
   DEALLOCATE  PREPARE statement;
   END;
+
+
+CREATE PROCEDURE selectInvoiceStatusHistory(_invoiceID INTEGER)
+  BEGIN
+    SELECT
+      pointName, firstName, lastName, patronymic, invoiceStatusRusName, lastStatusUpdated, routListNumber, palletsQty, boxQty
+    FROM invoice_history
+      INNER JOIN (route_lists, users, points, invoice_statuses)
+        ON (
+        invoice_history.invoiceID = _invoiceID AND
+        invoice_history.lastModifiedBy = users.userID AND
+        invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
+        users.pointID = points.pointID
+        )
+    ORDER BY lastStatusUpdated;
+  END;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

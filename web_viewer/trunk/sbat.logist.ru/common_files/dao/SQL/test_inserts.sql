@@ -75,14 +75,14 @@ VALUES
 
 INSERT INTO invoices (
   insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,
-  invoiceStatusID, lastStatusUpdated, requestID, warehousePointID, routeListID, lastVisitedUserPointID
+  lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
 )
 VALUES
-  ('ogeghei2243', 'qwd22345', now(), now(), 4 , 20, 3000, 21000.00, 'CREATED', NULL , getRequestIDByNumber('123356'),
+  ('ogeghei2243', 'qwd22345', now(), now(), 4 , 20, 3000, 21000.00, NULL , getUserIDByLogin('login1'), 'CREATED', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point1')),
-  ('ogeghei2244', 'qwd22334', now(), now(), 2 , 20, 3000, 26000.00, 'CREATED', NULL , getRequestIDByNumber('123356'),
+  ('ogeghei2244', 'qwd22334', now(), now(), 2 , 20, 3000, 26000.00, NULL , getUserIDByLogin('login1'), 'CREATED', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point3')),
-  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, 'CREATED', NULL , getRequestIDByNumber('123356'),
+  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, NULL , getUserIDByLogin('login1'), 'CREATED', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), NULL, NULL);
 
 
