@@ -405,6 +405,7 @@ VALUES
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
 -- при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
+-- TODO this table should be normalized split one-to -one
 CREATE TABLE invoices (
   invoiceID              INTEGER AUTO_INCREMENT,
   insiderRequestNumber   VARCHAR(16)    NOT NULL,
@@ -442,8 +443,19 @@ CREATE TABLE invoices (
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   UNIQUE (insiderRequestNumber),
-  UNIQUE (invoiceNumber)
+  UNIQUE (invoiceNumber),
+--   UNIQUE (lastModifiedBy, lastStatusUpdated) -- it is impossible that
 );
+
+# CREATE TABLE invoice_status_comments (
+#   invoiceID INTEGER,
+#   userID INTEGER,
+#   invoiceStatusID VARCHAR(32),
+#   invoiceUpdateStatusComment TEXT,
+#   PRIMARY KEY (invoiceID, userID)
+#
+# );
+
 
 CREATE FUNCTION is_warehouse(_pointID INTEGER)
   RETURNS BOOLEAN
