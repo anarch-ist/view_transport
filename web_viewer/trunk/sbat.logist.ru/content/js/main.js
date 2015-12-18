@@ -1,17 +1,10 @@
 $(document).ready(function () {
 
-    $( "#tableTypeSelect" ).selectmenu({
-        change: function( event, ui ) {
-            //  ui.item.index;
-        }
-    });
-
     // create selectColumnsControl
     $("#selectColumnsControl").on("click", function () {
         // create dialog here with selection content
     });
-
-    $("#logout").on("click", function () {
+    $("#logout").button().on("click", function () {
         // delete auth cookies
         $.cookie('SESSION_CHECK_STRING',null,-1,'/');
         // make redirect to login page
@@ -21,6 +14,7 @@ $(document).ready(function () {
 
     // create div that will be dialog container
     $("body").append(
+        '<div id="invoiceHistory" title="История накладной"><div>' +
         '<div id="statusChangeDialog" title="Выбор нового статуса">' +
         '<label for="statusSelect">Новый статус: </label>' +
         '<select id="statusSelect"></select>' + '<br><br><br>' +
@@ -39,39 +33,18 @@ $(document).ready(function () {
     var $dateTimePicker = $("#dateTimePicker");
     $dateTimePicker.datetimepicker();
 
-    var $statusRoutePointDialog = $("#statusChangeDialog");
-    $statusRoutePointDialog.dialog({
+    var $invoiceHistory = $("#invoiceHistory");
+    $invoiceHistory.dialog({
         autoOpen: false,
         resizable: true,
         height: 300,
         width: 400,
         modal: true,
-        buttons: {
-            "Сохранить": function () {
-                //TODO get new invoice status ID for request
-                // возможно это пригодится для
-                // $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value
-                //newStatusID = 'ARRIVED';
-                newStatusID = $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
-                // получение ИД выделенной в таблице накладной
-                routeList = $('#user-grid .selected td')[12].textContent;
-                date = $('#dateTimePicker')[0].value;
-                $.post("content/getData.php", {status: "changeStatusForSeveralInvoices", routeList: routeList, newStatusID: newStatusID, date: date},
-                    function (data) {
-                        if (data==='1') {
-                            document.location.reload(); //FIXME redo this stuff
-                        }
-                    });
-
-                $(this).dialog("close");
-            },
-            "Отмена": function () {
-                $(this).dialog("close");
-                document.location.reload(); //FIXME redo this stuff
-            }
+        close: function( event, ui ) {
         }
-
     });
+
+
 
     var $statusChangeDialog = $("#statusChangeDialog");
     $statusChangeDialog.dialog({
@@ -80,6 +53,9 @@ $(document).ready(function () {
         height: 300,
         width: 400,
         modal: true,
+        close: function( event, ui ) {
+            document.location.reload();
+        },
         buttons: {
             "Сохранить": function () {
                 //TODO get new invoice status ID for request
@@ -92,12 +68,13 @@ $(document).ready(function () {
                 if (action === "changeStatusForInvoice") {
                     // получение ИД выделенной в таблице накладной
                     invoiceNumber = dataTable.row( $('#user-grid .selected') ).data().invoiceNumber;
-                    $.post("content/getData.php", {status: action, invoiceID: invoiceNumber, newStatusID: newStatusID, date: date},
+                    $.post("content/getData.php", {status: action, invoiceNumber: invoiceNumber, newStatusID: newStatusID, date: date},
                         function (data) {
                             if (data==='1') {
                                 document.location.reload();
                             }
-                        });
+                        }
+                    );
                 } else if (action === "changeStatusForSeveralInvoices") {
                     // получение ИД маршрутного листа
                     routeListID = dataTable.row( $('#user-grid .selected') ).data().routeListID;
@@ -107,13 +84,12 @@ $(document).ready(function () {
 						{status: action, routeListID: routeListID, newStatusID: newStatusID, date: date},
                         function (data) {
                             if (data==='1') {
-                                document.location.reload();
+                                dataTable.columns().draw();
+                                $(this).dialog("close");
                             }
                         }
 					);
                 }
-
-                $(this).dialog("close");
             },
             "Отмена": function () {
                 $(this).dialog("close");
@@ -122,18 +98,38 @@ $(document).ready(function () {
     });
 
 
-    function showSelectInvoiceStatusDialog(action) {
+    function showInvoiceStatusDialog(action) {
         $statusChangeDialog.dialog("open");
 
         var options = [];
-        var storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
-        for (var i in storedStatuses) {
-            options.push("<option value='" + i + "'>" + storedStatuses[i] + "</option>");
+        var storedStatuses='';
+        if (window.sessionStorage["USER_STATUSES"]) {
+            storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
+        }
+        for (var i=0;i<storedStatuses.length;i++) {
+            console.log(storedStatuses[i]);
+            options.push("<option value='" + storedStatuses[i].invoiceStatusID + "'>" + storedStatuses[i].invoiceStatusRusName + "</option>");
         }
         //append after populating all options
         var $statusSelect = $("#statusSelect");
         $statusSelect.attr("action", action);
         $statusSelect.html(options.join("")).selectmenu();
+    }
+    function showInvoiceHistoryDialog(data) {   //TODO remake thie method
+        $invoiceHistory.dialog("open");
+
+        data = JSON.parse(data);
+        var elements = [];
+        for (var i=0;i<data.length;i++) {
+            string='';
+            for( var dataElem in data[i]) {
+                string += data[i][dataElem]+' ';
+            }
+            elements.push("<div>" + string + "</div>");
+        }
+
+        //append after populating all divs
+        $invoiceHistory.html(elements.join(""));
     }
 
     function createDateTimePickerLocalization() {
@@ -192,14 +188,36 @@ $(document).ready(function () {
                 text: 'изменить статус накладной',
                 action: function (e, dt, node, config) {
 
-                    showSelectInvoiceStatusDialog("changeStatusForInvoice");
+                    showInvoiceStatusDialog("changeStatusForInvoice");
                 }
             },
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
-                    showSelectInvoiceStatusDialog("changeStatusForSeveralInvoices");
+                    showInvoiceStatusDialog("changeStatusForSeveralInvoices");
+                }
+            },
+            {
+                extend: 'selectedSingle',
+                text: 'история статусов',
+                action: function (e, dt, node, config) {
+                    // TODO: status history
+                    $.post("content/getData.php", {status: 'getStatusHistory', invoiceNumber: dataTable.row( $('#user-grid .selected') ).data().invoiceNumber},
+                        function (data) {
+                            showInvoiceHistoryDialog(data);
+                        }
+                    );
+                }
+            },
+            {
+                text: 'сброс фильтров',
+                action: function (e, dt, node, config) {
+                    dataTable.columns().every( function () {
+                        $( 'input', this.footer())[0].value = '';
+                        this.search('');
+                        dataTable.columns().draw();
+                    } );
                 }
             }
         ],
@@ -222,7 +240,7 @@ $(document).ready(function () {
             { "data": "deliveryPoint"},
             { "data": "warehousePoint"},
             { "data": "lastName"},
-            { "data": "invoiceStatusID"},
+            { "data": "invoiceStatusRusName"},
             { "data": "boxQty"},
             { "data": "driver"},
             { "data": "licensePlate"},
@@ -232,6 +250,7 @@ $(document).ready(function () {
             { "data": "currentPoint"},
             { "data": "nextPoint"},
             { "data": "arrivalTime"},
+            { "data": "invoiceStatusID"},
             { "data": "routeListID"}
         ],
         columnDefs: [
@@ -242,7 +261,7 @@ $(document).ready(function () {
             { "name": "deliveryPoint", "searchable": true,   "targets": 4 },
             { "name": "warehousePoint", "searchable": true,   "targets": 5 },
             { "name": "lastName", "searchable": true,   "targets": 6 },
-            { "name": "invoiceStatusID", "searchable": true,   "targets": 7 },
+            { "name": "invoiceStatusRusName", "searchable": true,   "targets": 7 },
             { "name": "boxQty", "searchable": true,   "targets": 8 },
             { "name": "driver", "searchable": true,   "targets": 9 },
             { "name": "licensePlate", "searchable": true,   "targets": 10},
@@ -252,9 +271,16 @@ $(document).ready(function () {
             { "name": "currentPoint", "searchable": true,   "targets": 14},
             { "name": "nextPoint", "searchable": true,   "targets": 15},
             { "name": "arrivalTime", "searchable": true,   "targets": 16},
-            { "name": "routeListID", "searchable": false, "visible": false, "targets": 17}
+            { "name": "invoiceStatusID", "searchable": false, "visible": false,   "targets": 17 },
+            { "name": "routeListID", "searchable": false, "visible": false, "targets": 18}
         ],
         language: {
+            select: {
+                rows: {
+                    0: "Выделите запись",
+                    1: ""
+                }
+            },
             "processing": "Подождите...",
             "search": "Поиск:",
             "lengthMenu": "Показать _MENU_ записей",
@@ -277,6 +303,8 @@ $(document).ready(function () {
             }
         }
     });
+    // set padding for dataTable
+    $('#user-grid_wrapper').css('padding-top','40px');
 
     // Apply the search
     dataTable.columns().every( function () {

@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once __DIR__.'/IInvoice.php';
-include_once __DIR__.'/../DAO.php';
+include_once __DIR__ . '/IInvoice.php';
+include_once __DIR__ . '/../DAO.php';
 
 class InvoiceEntity implements IInvoiceEntity
 {
@@ -54,12 +54,12 @@ class InvoiceEntity implements IInvoiceEntity
 
     function updateInvoiceStatus($invoiceID, $newInvoiceStatus, $datetime)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatus($invoiceID, $newInvoiceStatus,$datetime),new UserAction('invoices','update'));
+        return $this->_DAO->update(new UpdateInvoiceStatus($invoiceID, $newInvoiceStatus, $datetime), new UserAction('invoices', 'update'));
     }
 
     function updateInvoiceStatuses($routeListID, $newInvoiceStatus, $datetime)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatuses($routeListID, $newInvoiceStatus,$datetime),new UserAction('invoices','update'));
+        return $this->_DAO->update(new UpdateInvoiceStatuses($routeListID, $newInvoiceStatus, $datetime), new UserAction('invoices', 'update'));
     }
 
     function deleteInvoice($Invoice)
@@ -74,33 +74,12 @@ class InvoiceEntity implements IInvoiceEntity
 
     function getInvoiceStatuses(\PrivilegedUser $pUser)
     {
-        $invoiceStatusRusNames = array(
-            'CREATED' => 'Внутренняя заявка добавлена в БД',
-            'DELETED' => 'Внутренняя заявка удалена из БД',
-            # insider request statuses
-            'APPROVING' => 'Выгружена на утверждение торговому представителю',
-            'RESERVED' => 'Резерв',
-            'APPROVED' => 'Утверждена к сборке',
-            'STOP_LIST' => 'Стоп-лист',
-            'CREDIT_LIMIT' => 'Кредитный лимит',
-            'RASH_CREATED' => 'Создана расходная накладная',
-            'COLLECTING' => 'Выдана на сборку',
-            'CHECK' => 'На контроле',
-            'CHECK_PASSED' => 'Контроль пройден',
-            'PACKAGING' => 'Упаковано',
-            'READY' => 'Проверка в зоне отгрузки/Готова к отправке',
-            # invoice statuses
-            'DEPARTURE' => 'Накладная убыла',
-            'ARRIVED' => 'Накладная прибыла в пункт',
-            'ERROR' => 'Ошибка. Возвращение в пункт',
-            'DELIVERED' => 'Доставлено'
-        );
-        $possibleStatuses = array();
-        $possibleStatusesTmp = $this->_DAO->select(new SelectInvoiceStatuses($pUser->getUserInfo()->getData('userRoleID')));
-        for ($i = 0; $i < count($possibleStatusesTmp); $i++) {
-            $possibleStatuses[$possibleStatusesTmp[$i]['invoiceStatusID']] = $invoiceStatusRusNames[$possibleStatusesTmp[$i]['invoiceStatusID']];
-        }
-        return $possibleStatuses;
+        return $possibleStatuses = $this->_DAO->select(new SelectInvoiceStatuses($pUser->getUserInfo()->getData('userRoleID')));
+    }
+
+    function getInvoiceHistoryByID($invoiceID)
+    {
+        return $possibleStatuses = $this->_DAO->select(new SelectInvoiceHistory($invoiceID));
     }
 }
 
@@ -171,7 +150,21 @@ class SelectInvoiceStatuses implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select `invoiceStatusID` from `invoice_statuses_for_user_role` where userRoleID = '$this->role'";
+        return "select `invoice_statuses`.`invoiceStatusID`, `invoiceStatusRusName` from `invoice_statuses`, `invoice_statuses_for_user_role` where `invoice_statuses`.`invoiceStatusID` = `invoice_statuses_for_user_role`.`invoiceStatusID` AND userRoleID = '$this->role'";
+    }
+}
+class SelectInvoiceHistory implements IEntitySelect
+{
+    private $id;
+
+    function __construct($id)
+    {
+        $this->id = $id;
+    }
+
+    function getSelectQuery()
+    {
+        return "CALL selectInvoiceStatusHistory('$this->id')";
     }
 }
 
@@ -181,7 +174,7 @@ class UpdateInvoiceStatus implements IEntityUpdate
     private $newInvoiceStatus;
     private $datetime;
 
-    function __construct($invoiceNumber,$newInvoiceStatus,$datetime)
+    function __construct($invoiceNumber, $newInvoiceStatus, $datetime)
     {
         $this->invoiceNumber = DAO::getInstance()->checkString($invoiceNumber);
         $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
@@ -205,7 +198,7 @@ class UpdateInvoiceStatuses implements IEntityUpdate
     private $newInvoiceStatus;
     private $datetime;
 
-    function __construct($routeListID,$newInvoiceStatus,$datetime)
+    function __construct($routeListID, $newInvoiceStatus, $datetime)
     {
         $this->routeListID = DAO::getInstance()->checkString($routeListID);
         $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);

@@ -21,6 +21,10 @@ class UserEntity implements IUserEntity
         return self::$_instance;
     }
 
+    function getUserRole($userID) {
+        return $this->_DAO->select(new SelectUserRole($userID))[0]['userRoleRusName'];
+    }
+
     function selectUsers()
     {
         $count = 20;
@@ -148,6 +152,20 @@ class SelectUserByID implements IEntitySelect
         return "select * from `users` where `userID` = '$this->id'";
     }
 }
+class SelectUserRole implements IEntitySelect
+{
+    private $id;
+
+    function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    function getSelectQuery()
+    {
+        return "select `userRoleRusName` from `user_roles`, `users` where `userID` = '$this->id' AND `user_roles`.userRoleID = `users`.userRoleID";
+    }
+}
 
 class UserUpdateEntity implements IEntityUpdate
 {
@@ -163,7 +181,7 @@ class UserUpdateEntity implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        $query = "insert into `users` values(";
+        $query='';
         $isFirst = true;
         foreach ($this->obj as $elem) {
             if ($isFirst) {
@@ -173,7 +191,7 @@ class UserUpdateEntity implements IEntityUpdate
                 $query .= ", '$elem'";
             }
         }
-        $query .= ")";
+        $query = "insert into `users` values($query)";
         return $query;
     }
 }

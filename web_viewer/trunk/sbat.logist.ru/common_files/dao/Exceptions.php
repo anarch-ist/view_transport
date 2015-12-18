@@ -24,10 +24,10 @@ class AuthException extends Exception
     }
 }
 
-class NoStatusException extends Exception
+class DataTransferException extends Exception
 {
     public function __construct($str)
     {
-        parent::__construct('Не задан параметр "статус"');
+        parent::__construct($str);
     }
 }

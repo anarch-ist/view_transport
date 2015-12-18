@@ -1,6 +1,6 @@
 <?php
 include_once __DIR__.'/../dao/userDao/User.php';
-//include_once __DIR__.'/../dao/pointDao/Point.php';
+include_once __DIR__.'/../dao/pointDao/Point.php';
 include_once __DIR__ . '/../dao/invoicesForUser/InvoicesForUser.php';
 include_once __DIR__.'/../dao/invoiceDao/Invoice.php';
 include_once __DIR__.'/../dao/DAO.php';
@@ -8,6 +8,7 @@ include_once __DIR__.'/../dao/DAO.php';
 use DAO\InvoiceEntity as InvoiceEntity;
 use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
 use DAO\UserEntity as UserEntity;
+use DAO\PointEntity as PointEntity;
 use DAO\UserData as UserData;
 
 //use DAO\PointEntity as PointEntity;
@@ -24,6 +25,11 @@ abstract class AuthUser
         }
     }
 
+    /**
+     * @param $authVariant
+     * @throws AuthException
+     * @return boolean
+     */
     public function isValid($authVariant)
     {
         if ($authVariant === 'check') {
@@ -74,7 +80,7 @@ abstract class AuthUser
 class PrivilegedUser extends AuthUser
 {
     private static $instance;
-    private $permissions;
+    //private $permissions;
 
     protected function __construct($authVariant)
     {
@@ -107,5 +113,9 @@ class PrivilegedUser extends AuthUser
     public function getInvoiceEntity()
     {
         return InvoiceEntity::getInstance();
+    }
+    public function getPointEntity()
+    {
+        return PointEntity::getInstance();
     }
 }

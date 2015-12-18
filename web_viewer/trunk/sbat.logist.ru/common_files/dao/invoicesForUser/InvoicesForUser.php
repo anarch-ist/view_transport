@@ -6,27 +6,6 @@ include_once __DIR__.'/../DAO.php';
 
 class InvoicesForUserEntity implements IInvoicesForUserEntity
 {
-    private static $invoiceStatusRusNames = array(
-        'CREATED' => 'Внутренняя заявка добавлена',
-        'DELETED' => 'Внутренняя заявка удалена',
-        # insider request statuses
-        'APPROVING' => 'Выгружена на утверждение торговому представителю',
-        'RESERVED' => 'Резерв',
-        'APPROVED' => 'Утверждена к сборке',
-        'STOP_LIST' => 'Стоп-лист',
-        'CREDIT_LIMIT' => 'Кредитный лимит',
-        'RASH_CREATED' => 'Создана расходная накладная',
-        'COLLECTING' => 'Выдана на сборку',
-        'CHECK' => 'На контроле',
-        'CHECK_PASSED' => 'Контроль пройден',
-        'PACKAGING' => 'Упаковано',
-        'READY' => 'Готова к отправке',
-        # invoice statuses
-        'DEPARTURE' => 'Убытие',
-        'ARRIVED' => 'Прибытие в пункт',
-        'ERROR' => 'Ошибка',
-        'DELIVERED' => 'Доставлено'
-    );
     private static $_instance;
     private $_DAO;
 
@@ -59,14 +38,6 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
                 break;
         }
         $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start,$count));
-        for($i=0;$i<count($array);$i++) {
-            $invoiceStatusID = $array[$i]['invoiceStatusID'];
-            $array[$i]['invoiceStatusID'] = '';
-            $wrfeinvoiceStatusID = $array[$i]['invoiceStatusID'];
-            if (!is_null($invoiceStatusID) && $invoiceStatusID !== '') {
-                $array[$i]['invoiceStatusID'] = self::$invoiceStatusRusNames[$invoiceStatusID];
-            }
-        }
         return $array;
     }
 

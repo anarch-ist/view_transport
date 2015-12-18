@@ -12,6 +12,7 @@ interface IPointEntity
     function deletePoint($Point);
 
     function addPoint($Point);
+    function selectPointByUserID($userID);
 }
 
 

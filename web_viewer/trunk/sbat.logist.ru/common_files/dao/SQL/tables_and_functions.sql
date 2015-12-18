@@ -9,29 +9,31 @@ USE `transmaster_transport_db`;
 --                                        USERS ROLES PERMISSIONS AND POINTS
 -- -------------------------------------------------------------------------------------------------------------------
 
+# added field userRoleRusName
 CREATE TABLE user_roles (
   userRoleID VARCHAR(32),
+  userRoleRusName VARCHAR(128),
   PRIMARY KEY (userRoleID)
 );
 
-INSERT INTO user_roles (userRoleID)
+INSERT INTO user_roles (userRoleID, userRoleRusName)
 VALUES
-  -- администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
-  -- имеет право изменить роль пользователя
-  ('ADMIN'),
-  -- диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
-  ('W_DISPATCHER'),
-  -- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
-  ('DISPATCHER'),
-  -- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
-  ('CLIENT_MANAGER'),
-  -- торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
-  ('MARKET_AGENT'),
-  -- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
-  -- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
-  ('TEMP_REMOVED'),
+-- администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
+-- имеет право изменить роль пользователя
+  ('ADMIN', 'ADMIN'),
+-- диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
+  ('W_DISPATCHER', 'W_DISPATCHER'),
+-- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
+  ('DISPATCHER', 'DISPATCHER'),
+-- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
+  ('CLIENT_MANAGER', 'CLIENT_MANAGER'),
+-- торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
+  ('MARKET_AGENT', 'MARKET_AGENT'),
+-- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
+-- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
+  ('TEMP_REMOVED', 'TEMP_REMOVED'),
 
-  ('VIEW_LAST_TEN')
+  ('VIEW_LAST_TEN', 'VIEW_LAST_TEN')
 ;
 
 CREATE TABLE point_types (
@@ -67,14 +69,13 @@ CREATE TABLE points (
   UNIQUE (pointName)
 );
 
-
+# deleted login because we don't need in it
 CREATE TABLE users (
   userID      INTEGER AUTO_INCREMENT,
   firstName   VARCHAR(64)  NULL,
   lastName    VARCHAR(64)  NULL,
   patronymic  VARCHAR(64)  NULL,
   position    VARCHAR(64)  NULL, -- должность
-  login       VARCHAR(128) NOT NULL,
   passMD5     VARCHAR(64)  NOT NULL,
   phoneNumber VARCHAR(16)  NULL,
   email       VARCHAR(64)  NULL,
@@ -86,8 +87,7 @@ CREATE TABLE users (
     ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE,
-  UNIQUE (login)
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE permissions (
@@ -354,10 +354,10 @@ CREATE TABLE invoice_statuses (
 
 INSERT INTO invoice_statuses
 VALUES
-  -- duty statuses
+-- duty statuses
   ('CREATED', 'Внутренняя заявка добавлена в БД', 0),
   ('DELETED', 'Внутренняя заявка удалена из БД', -1),
-  -- insider request statuses
+-- insider request statuses
   ('APPROVING', 'Выгружена на утверждение торговому представителю', 1),
   ('RESERVED', 'Резерв', 2),
   ('APPROVED', 'Утверждена к сборке', 3),
@@ -369,7 +369,7 @@ VALUES
   ('CHECK_PASSED', 'Контроль пройден', 9),
   ('PACKAGING', 'Упаковано', 10),
   ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 11),
-  -- invoice statuses
+-- invoice statuses
   ('DEPARTURE', 'Накладная убыла', 12),
   ('ARRIVED', 'Накладная прибыла в пункт', 13),
   ('ERROR', 'Ошибка. Возвращение в пункт', -4),
@@ -515,14 +515,14 @@ FOR EACH ROW
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
 FOR EACH ROW
   BEGIN
-    -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт, и этот
-    -- пункт записываем в таблицу invoices в поле lastVisitedUserPointID
+-- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт, и этот
+-- пункт записываем в таблицу invoices в поле lastVisitedUserPointID
     IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR NEW.invoiceStatusID = 'DELIVERED')
     THEN
       BEGIN
-        -- LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
-        -- DECLARE _userID INTEGER;
-        -- SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
+-- LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
+-- DECLARE _userID INTEGER;
+-- SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
         SET NEW.lastVisitedUserPointID = (SELECT pointID FROM users WHERE userID = NEW.lastModifiedBy);
       END;
     END IF ;
@@ -581,8 +581,8 @@ CREATE TABLE tables (
 );
 
 INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
-                               FROM information_schema.TABLES
-                               WHERE TABLE_SCHEMA = 'transmaster_transport_db';
+                             FROM information_schema.TABLES
+                             WHERE TABLE_SCHEMA = 'transmaster_transport_db';
 
 -- invoices - диспетчер меняет статус
 -- информация о том. какой пользователь какую таблицу изменил есть на уровне сессии приложения
@@ -615,13 +615,13 @@ CREATE FUNCTION getPointIDByName(name VARCHAR(128))
     RETURN result;
   END;
 
-CREATE FUNCTION getUserIDByLogin(_login VARCHAR(128))
-  RETURNS INTEGER
+# changed `getUserIDByLogin` function to `getUserIDByEmail` for working with email instead of login
+CREATE FUNCTION `getUserIDByEmail`(_email VARCHAR(64)) RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT userID
                   FROM users
-                  WHERE login = _login);
+                  WHERE email = _email);
     RETURN result;
   END;
 
@@ -701,11 +701,11 @@ CREATE FUNCTION getNextSortOrder(_routeID INTEGER, _lastVisitedPointID INTEGER)
 -- this function returns pointID for the next routePoint or NULL if it is already the last point
 CREATE FUNCTION getNextPointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER
-    RETURN (SELECT pointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
+  RETURN (SELECT pointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
 
 CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER
-    RETURN (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
+  RETURN (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
 
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -779,6 +779,7 @@ CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
                            CHAR_LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos -1)) + 1),
                  delim, '');
 
+
 CREATE FUNCTION generateHaving(map TEXT)
   RETURNS TEXT
   BEGIN
@@ -802,7 +803,7 @@ CREATE FUNCTION generateHaving(map TEXT)
       SET result = CONCAT(result, @columnName, ' LIKE ', '\'', @searchString, '\'', ' AND ');
     END WHILE;
 
-    -- remove redundant END
+-- remove redundant END
     SET result = SUBSTR(result, 1, CHAR_LENGTH(result) - 4);
     SET result = CONCAT('(', result, ')');
 
@@ -813,6 +814,7 @@ CREATE FUNCTION generateHaving(map TEXT)
 -- _orderby 'id'  <> - название колонки из файла main.js
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
 
+# added `invoiceStatusRusName` field for showing it in page
 CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
   BEGIN
     SET @mainPart =
@@ -825,6 +827,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       w_points.pointName            AS `warehousePoint`,
       users.lastName,
       invoices.invoiceStatusID,
+      invoice_statuses.invoiceStatusRusName,
       invoices.boxQty,
 
       route_lists.driver,
@@ -848,6 +851,10 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
         requests.destinationPointID = delivery_points.pointID AND
         requests.marketAgentUserID = users.userID
         )
+      LEFT JOIN (invoice_statuses)
+        ON (
+          invoices.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
+        )
       -- because routeList in invoices table can be null, we use left join.
       LEFT JOIN (route_lists, routes)
         ON (
@@ -867,10 +874,10 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
         ) ';
 
 
-    -- 1) если у пользователя роль админ, то показываем все записи из БД
-    -- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил. TODO ОБСУДИТЬ!! -- user из destinationPoint должен видеть складские статусы по своей заявке
-    -- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
-    -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
+-- 1) если у пользователя роль админ, то показываем все записи из БД
+-- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил. TODO ОБСУДИТЬ!! -- user из destinationPoint должен видеть складские статусы по своей заявке
+-- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
+-- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
 
     SET @wherePart =
     'WHERE (
@@ -900,25 +907,41 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @_startEntry = _startEntry;
     SET @_length = _length;
 
-  EXECUTE statement USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
-  DEALLOCATE  PREPARE statement;
+    EXECUTE statement USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
+    DEALLOCATE  PREPARE statement;
   END;
 
-
-CREATE PROCEDURE selectInvoiceStatusHistory(_invoiceID INTEGER)
+# changed this `selectInvoiceStatusHistory` procedure because it couldn't work with invoise number. But i don't know this info
+CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
     SELECT
-      pointName, firstName, lastName, patronymic, invoiceStatusRusName, lastStatusUpdated, routListNumber, palletsQty, boxQty
+      pointName, firstName, lastName, patronymic, invoiceStatusRusName, invoice_history.lastStatusUpdated, routListNumber, palletsQty, invoice_history.boxQty
     FROM invoice_history
-      INNER JOIN (route_lists, users, points, invoice_statuses)
+      INNER JOIN (route_lists, users, points, invoice_statuses, invoices)
         ON (
-        invoice_history.invoiceID = _invoiceID AND
+        invoices.invoiceNumber = _invoiceNumber AND
+        invoice_history.invoiceID = invoices.invoiceID AND
         invoice_history.lastModifiedBy = users.userID AND
         invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
         users.pointID = points.pointID
         )
     ORDER BY lastStatusUpdated;
   END;
+
+# CREATE PROCEDURE selectInvoiceStatusHistory(_invoiceID INTEGER)
+#   BEGIN
+#     SELECT
+#       pointName, firstName, lastName, patronymic, invoiceStatusRusName, lastStatusUpdated, routListNumber, palletsQty, boxQty
+#     FROM invoice_history
+#       INNER JOIN (route_lists, users, points, invoice_statuses)
+#         ON (
+#         invoice_history.invoiceID = _invoiceID AND
+#         invoice_history.lastModifiedBy = users.userID AND
+#         invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
+#         users.pointID = points.pointID
+#         )
+#     ORDER BY lastStatusUpdated;
+#   END;
 
 
 

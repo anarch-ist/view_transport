@@ -50,6 +50,9 @@ class PointEntity implements IPointEntity
     {
         // TODO: Implement addPoint() method.
     }
+    function selectPointByUserID($userID) {
+        return $this->_DAO->select(new SelectPointByUserID($userID))[0]['pointName'];
+    }
 }
 
 class Point implements IEntityData
@@ -100,5 +103,19 @@ class SelectPointByID implements IEntitySelect
     function getSelectQuery()
     {
         return "select * from `points` where `pointID` = '$this->id'";
+    }
+}
+class SelectPointByUserID implements IEntitySelect
+{
+    private $id;
+
+    function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    function getSelectQuery()
+    {
+        return "select `points`.`pointName` from `points`, `users` where `users`.`UserID` = '$this->id' AND `points`.`pointID` = `users`.`pointID`";
     }
 }

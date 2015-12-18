@@ -34,68 +34,66 @@
 <body>
 
 <div class="container">
-    <div id="menu">
 
-        <label for="tableTypeSelect">Выберите таблицу:</label>
-        <select name="tableType" id="tableTypeSelect">
-            <option selected="selected">Текущие статусы</option>
-            <option>История статусов</option>
-        </select>
-
-        <div id="buttonsContainer" style="display: inline-block">
-            <button>
-                Сброс фильтров
-            </button>
+    <div id="menu" style="z-index:1;width: 100%;position: fixed;height: 41px;margin-left: -10px;margin-top: -5px;">
+        <div id="buttonsContainer" style="text-align: right;padding: 2px;">
+            <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
+                <?php
+                $data = $privUser->getUserInfo()->toArray();
+                echo $data['lastName'] . ' ' . $data['firstName'] . ' ' . $data['patronymic'] . ' | ' . $privUser->getUserEntity()->getUserRole($data['userID']) . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
+                ?>
+            </div>
             <button id="logout">выйти</button>
         </div>
-
     </div>
 
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
         <thead>
-            <tr>
-                <th>ID заявки</th>
-                <th>ID внутренней заявки</th>
-                <th>ID накладной</th>
-                <th>Клиент, ИНН</th>
-                <th>Пункт доставки</th>
-                <th>Склад отправки</th>
-                <th>Торговый представитель</th>
-                <th>Статус</th>
-                <th>Количество коробок</th>
-                <th>Водитель</th>
-                <th>Номер ТС</th>
-                <th>Количество паллет</th>
-                <th>Маршрутный лист</th>
-                <th>Направление</th>
-                <th>Текущее подразделение</th>
-                <th>Следующий пункт маршрута</th>
-                <th>Плановое время прибытия в следующий пункт</th>
-                <th>...</th>
-            </tr>
+        <tr>
+            <th>ID заявки</th>
+            <th>ID внутренней заявки</th>
+            <th>ID накладной</th>
+            <th>Клиент, ИНН</th>
+            <th>Пункт доставки</th>
+            <th>Склад отправки</th>
+            <th>Торговый представитель</th>
+            <th>Статус</th>
+            <th>Количество коробок</th>
+            <th>Водитель</th>
+            <th>Номер ТС</th>
+            <th>Количество паллет</th>
+            <th>Маршрутный лист</th>
+            <th>Направление</th>
+            <th>Текущее подразделение</th>
+            <th>Следующий пункт маршрута</th>
+            <th>Плановое время прибытия в следующий пункт</th>
+            <th>...</th>
+            <th>...</th>
+        </tr>
         </thead>
 
         <tfoot>
-            <tr>
-                <th>ID заявки</th>
-                <th>ID внутренней заявки</th>
-                <th>ID накладной</th>
-                <th>Клиент, ИНН</th>
-                <th>Пункт доставки</th>
-                <th>Склад отправки</th>
-                <th>Торговый представитель</th>
-                <th>Статус</th>
-                <th>Количество коробок</th>
-                <th>Водитель</th>
-                <th>Номер ТС</th>
-                <th>Количество паллет</th>
-                <th>Маршрутный лист</th>
-                <th>Направление</th>
-                <th>Текущее подразделение</th>
-                <th>Следующий пункт маршрута</th>
-                <th>Плановое время прибытия в следующий пункт</th>
-                <th>...</th>
-            </tr>
+        <tr>
+            <th>ID заявки</th>
+            <th>ID внутренней заявки</th>
+            <th>ID накладной</th>
+            <th>Клиент, ИНН</th>
+            <th>Пункт доставки</th>
+            <th>Склад отправки</th>
+            <th>Торговый представитель</th>
+            <th>Статус</th>
+            <th>Количество коробок</th>
+            <th>Водитель</th>
+            <th>Номер ТС</th>
+            <th>Количество паллет</th>
+            <th>Маршрутный лист</th>
+            <th>Направление</th>
+            <th>Текущее подразделение</th>
+            <th>Следующий пункт маршрута</th>
+            <th>Плановое время прибытия в следующий пункт</th>
+            <th>...</th>
+            <th>...</th>
+        </tr>
         </tfoot>
     </table>
 </div>

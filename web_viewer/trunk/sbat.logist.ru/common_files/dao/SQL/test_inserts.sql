@@ -27,15 +27,15 @@ VALUES
    'srgf@ewuf.ru', '89032343556', 'AGENCY');
 
 
-INSERT INTO users (firstName, lastName, patronymic, position, login, passMD5, phoneNumber, email, userRoleID, pointID)
+INSERT INTO users (firstName, lastName, patronymic, position, passMD5, phoneNumber, email, userRoleID, pointID)
 VALUES
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login1', md5('test'), '904534356', 'test@test.ru', 'ADMIN',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', md5('test'), '904534356', 'test@test.ru', 'ADMIN',
    getPointIDByName('point1')),
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', 'login2', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
    getPointIDByName('point2')),
-  ('erir', 'dddddd', 'ewreruiii', 'erfergg', 'login3', md5('wefwgrege'), '904534356', 'ey@irtj.ru', 'DISPATCHER',
+  ('erir', 'dddddd', 'ewreruiii', 'erfergg', md5('wefwgrege'), '904534356', 'ey@irtj.ru', 'DISPATCHER',
    getPointIDByName('point4')),
-  ('degg', 'rtgrgg', 'rtrtbtybv', 'ergrtgr', 'market_agent', md5('wertgrege'), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
+  ('degg', 'rtgrgg', 'rtrtbtybv', 'ergrtgr', md5('wertgrege'), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
    getPointIDByName('point3'));
 
 
@@ -47,9 +47,9 @@ VALUES
 
 INSERT INTO requests (requestNumber, date, marketAgentUserID, clientID, destinationPointID)
 VALUES
-  ('123356', now(), getUserIDByLogin('market_agent'), getClientIDByINN('1234567890'), getPointIDByName('point2')),
-  ('859458', now(), getUserIDByLogin('market_agent'), getClientIDByINN('8947537893'), getPointIDByName('point1')),
-  ('er9458', now(), getUserIDByLogin('market_agent'), getClientIDByINN('8947537893'), getPointIDByName('point4'));
+  ('123356', now(), getUserIDByEmail('ey@i45j.ru'), getClientIDByINN('1234567890'), getPointIDByName('point2')),
+  ('859458', now(), getUserIDByEmail('ey@i45j.ru'), getClientIDByINN('8947537893'), getPointIDByName('point1')),
+  ('er9458', now(), getUserIDByEmail('ey@i45j.ru'), getClientIDByINN('8947537893'), getPointIDByName('point4'));
 
 
 INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carrier');
@@ -78,11 +78,11 @@ INSERT INTO invoices (
   lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
 )
 VALUES
-  ('ogeghei2243', 'qwd22345', now(), now(), 4 , 20, 3000, 21000.00, NULL , getUserIDByLogin('login1'), 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2243', 'qwd22345', now(), now(), 4 , 20, 3000, 21000.00, NULL , getUserIDByEmail('test@test.ru'), 'CREATED', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point1')),
-  ('ogeghei2244', 'qwd22334', now(), now(), 2 , 20, 3000, 26000.00, NULL , getUserIDByLogin('login1'), 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2244', 'qwd22334', now(), now(), 2 , 20, 3000, 26000.00, NULL , getUserIDByEmail('test@test.ru'), 'CREATED', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point3')),
-  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, NULL , getUserIDByLogin('login1'), 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, NULL , getUserIDByEmail('test@test.ru'), 'CREATED', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), NULL, NULL);
 
 

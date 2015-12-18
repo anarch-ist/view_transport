@@ -7,7 +7,7 @@ use Exception;
 use mysqli;
 
 include_once __DIR__.'/IDAO.php';
-include_once __DIR__.'/Exceptions.php';
+include_once __DIR__ . '/Exceptions.php';
 
 class DAO implements IDAO
 {
