@@ -269,6 +269,7 @@ CREATE TABLE route_points (
 CREATE TABLE route_lists (
   routeListID       INTEGER AUTO_INCREMENT,
   routListNumber    VARCHAR(32)  NOT NULL,
+  startDate         DATE         NULL,
   palletsQty        INTEGER      NULL,
   driver            VARCHAR(255) NULL,
   driverPhoneNumber VARCHAR(12)  NULL,
@@ -284,6 +285,7 @@ CREATE TABLE route_lists (
 CREATE PROCEDURE insert_into_rout_list_history(
   routeListID       INTEGER,
   routListNumber    VARCHAR(32),
+  startDate         DATE,
   palletsQty        INTEGER,
   driver            VARCHAR(255),
   driverPhoneNumber VARCHAR(12),
@@ -292,16 +294,16 @@ CREATE PROCEDURE insert_into_rout_list_history(
   routeListStatusID VARCHAR(32)
 )
   BEGIN
-    INSERT INTO rout_list_history (timeMark, routeListID, routListNumber, palletsQty, driver, driverPhoneNumber, licensePlate, routeID, routeListStatusID)
+    INSERT INTO rout_list_history
     VALUES
-      (NOW(), routeListID, routListNumber, palletsQty, driver, driverPhoneNumber, licensePlate, routeID, routeListStatusID);
+      (NULL , NOW(), routeListID, routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID, routeListStatusID);
   END;
 
 
 CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
-    CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
+    CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
                                        NEW.driverPhoneNumber,
                                        NEW.licensePlate, NEW.routeID, 'CREATED');
   END;
@@ -309,7 +311,7 @@ FOR EACH ROW
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
-    CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.palletsQty, NEW.driver,
+    CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
                                        NEW.driverPhoneNumber,
                                        NEW.licensePlate, NEW.routeID, 'UPDATED');
   END;
@@ -317,7 +319,7 @@ FOR EACH ROW
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   BEGIN
-    CALL insert_into_rout_list_history(OLD.routeListID, OLD.routListNumber, OLD.palletsQty, OLD.driver,
+    CALL insert_into_rout_list_history(OLD.routeListID, OLD.routListNumber, OLD.startDate, OLD.palletsQty, OLD.driver,
                                        OLD.driverPhoneNumber,
                                        OLD.licensePlate, OLD.routeID, 'DELETED');
   END;
@@ -327,6 +329,7 @@ CREATE TABLE rout_list_history (
   timeMark           DATETIME,
   routeListID        INTEGER,
   routListNumber     VARCHAR(32)  NOT NULL,
+  startDate          DATE         NULL,
   palletsQty         INTEGER      NULL,
   driver             VARCHAR(255) NULL,
   driverPhoneNumber  VARCHAR(12)  NULL,
@@ -370,7 +373,7 @@ VALUES
   ('PACKAGING', 'Упаковано', 10),
   ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 11),
 -- invoice statuses
-  ('DEPARTURE', 'Накладная убыла', 12),
+  ('DEPARTURE', 'В транзите', 12),
   ('ARRIVED', 'Накладная прибыла в пункт', 13),
   ('ERROR', 'Ошибка. Возвращение в пункт', -4),
   ('DELIVERED', 'Доставлено', 14);

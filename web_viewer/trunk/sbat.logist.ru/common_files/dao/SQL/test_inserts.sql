@@ -68,9 +68,9 @@ VALUES
   (3, 20, 40, 200, '01:00:00', getPointIDByName('point3'), getRoutIDByRoutName('rout1'));
 
 
-INSERT INTO route_lists (routListNumber, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
+INSERT INTO route_lists (routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
 VALUES
-  ('1455668', 3, 'Dmitriy', '8905347890', 'екх123', getRoutIDByRoutName('rout1'));
+  ('1455668', '11-11-2015', 3, 'Dmitriy', '8905347890', 'екх123', getRoutIDByRoutName('rout1'));
 
 
 INSERT INTO invoices (
