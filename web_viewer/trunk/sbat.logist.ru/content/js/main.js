@@ -14,7 +14,6 @@ $(document).ready(function () {
 
     // create div that will be dialog container
     $("body").append(
-        '<div id="invoiceHistory" title="История накладной"><div>' +
         '<div id="statusChangeDialog" title="Выбор нового статуса">' +
         '<label for="statusSelect">Новый статус: </label>' +
         '<select id="statusSelect"></select>' + '<br><br><br>' +
@@ -23,28 +22,9 @@ $(document).ready(function () {
         '</div>'
     );
 
-    var lastSelectedStatus;
-    //$("#statusSelect").change(function() {
-    //    lastSelectedStatus = $(this).find(":selected").text();
-    //    console.log(lastSelectedStatus);
-    //});
-
     createDateTimePickerLocalization();
     var $dateTimePicker = $("#dateTimePicker");
     $dateTimePicker.datetimepicker();
-
-    var $invoiceHistory = $("#invoiceHistory");
-    $invoiceHistory.dialog({
-        autoOpen: false,
-        resizable: true,
-        height: 400,
-        width: 800,
-        modal: true,
-        close: function( event, ui ) {
-        }
-    });
-
-
 
     var $statusChangeDialog = $("#statusChangeDialog");
     $statusChangeDialog.dialog({
@@ -115,22 +95,6 @@ $(document).ready(function () {
         $statusSelect.attr("action", action);
         $statusSelect.html(options.join("")).selectmenu();
     }
-    function showInvoiceHistoryDialog(data) {   //TODO remake thie method
-        $invoiceHistory.dialog("open");
-
-        data = JSON.parse(data);
-        var elements = [];
-        for (var i=0;i<data.length;i++) {
-            string='';
-            for( var dataElem in data[i]) {
-                string += data[i][dataElem]+' ';
-            }
-            elements.push("<div>" + string + "</div>");
-        }
-
-        //append after populating all divs
-        $invoiceHistory.html(elements.join(""));
-    }
 
     function createDateTimePickerLocalization() {
         $.datepicker.regional['ru'] = {
@@ -172,7 +136,7 @@ $(document).ready(function () {
     // --------DATATABLE INIT--------------
     $('#user-grid tfoot th').each( function () {
         var title = $(this).text();
-        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        $(this).html( '<input type="text" placeholder="Поиск '+title+'" />' );
     } );
 
     var dataTable = $('#user-grid').DataTable({
@@ -205,7 +169,7 @@ $(document).ready(function () {
                     // TODO: status history
                     $.post("content/getData.php", {status: 'getStatusHistory', invoiceNumber: dataTable.row( $('#user-grid .selected') ).data().invoiceNumber},
                         function (data) {
-                            showInvoiceHistoryDialog(data);
+                            $.showInvoiceHistoryDialog(data);
                         }
                     );
                 }

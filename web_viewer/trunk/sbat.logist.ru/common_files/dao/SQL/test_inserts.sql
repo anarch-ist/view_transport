@@ -70,7 +70,7 @@ VALUES
 
 INSERT INTO route_lists (routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
 VALUES
-  ('1455668', '11-11-2015', 3, 'Dmitriy', '8905347890', 'екх123', getRoutIDByRoutName('rout1'));
+  ('1455668', '2015-11-11', 3, 'Dmitriy', '8905347890', 'екх123', getRoutIDByRoutName('rout1'));
 
 
 INSERT INTO invoices (

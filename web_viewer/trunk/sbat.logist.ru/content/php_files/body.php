@@ -27,6 +27,7 @@
     <!--custom styles-->
 
     <!--custom js-->
+    <script type="text/javascript" language="javascript" src="content/js/invoiceHistoryDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
 
 
