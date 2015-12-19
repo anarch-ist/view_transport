@@ -10,8 +10,7 @@ try {
     $privUser = PrivilegedUser::getInstance();
     include_once __DIR__ . '/body.php';
 } catch (Exception $ex) {
-    echo $ex->getMessage();
-    //header("Location: login/", true, 303);
+    header("Location: login/", true, 303);
 }
 ?>
 </html>

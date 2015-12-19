@@ -443,7 +443,7 @@ CREATE TABLE invoices (
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   UNIQUE (insiderRequestNumber),
-  UNIQUE (invoiceNumber),
+  UNIQUE (invoiceNumber)
 --   UNIQUE (lastModifiedBy, lastStatusUpdated) -- it is impossible that
 );
 

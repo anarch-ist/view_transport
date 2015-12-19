@@ -37,8 +37,8 @@ $(document).ready(function () {
     $invoiceHistory.dialog({
         autoOpen: false,
         resizable: true,
-        height: 300,
-        width: 400,
+        height: 400,
+        width: 800,
         modal: true,
         close: function( event, ui ) {
         }
