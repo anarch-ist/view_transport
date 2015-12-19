@@ -61,6 +61,23 @@ user из destinationPoint должен видеть складские стат
 6. Добавить комментарий при проставлении статуса накладной.
 7. добавить кнопку "история статусов" по нажатию - отображать всплывающее окно в котором находится история статусов.
 
+19.12.2015
+1. Добавить ввод количества паллет при изменении статуса маршрутного листа.
+2. Во всплывающем окне "История накладной" необходимо добавить названия столбцов
+3. Отображать историю статусов в табличном виде.
+По админке:
+Добавить создание расписаний.
+
+выпадающий список с возможностью поиска по строкам из направлений(directionName from routes)
+S_o  Point     arrivalTime  tLoading  timeToNextPoint distanceToNextPoint 
+0    w_point   setByUser    setByUser setByUser       setByUser
+1    any_point calculate    setByUser setByUser       setByUser
+2    any_point calculate    setByUser setByUser       setByUser
+..   any_point calculate    setByUser setByUser       setByUser
+n    any_point calculate    setByUser setByUser       setByUser
+кнопка сохранить
+
+
 
 
 
