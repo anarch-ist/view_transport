@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once __DIR__.'/ITemplate.php';
-include_once __DIR__.'/../DAO.php';
+include_once __DIR__ . '/ITemplate.php';
+include_once __DIR__ . '/../DAO.php';
 
 class TemplateEntity implements ITemplateEntity
 {
@@ -64,7 +64,7 @@ class Template implements IEntityData
     public function getData($index)
     {
         if (!isset($this->array[$index])) {
-            throw new \DataEntityException('Field doesn`t exist: '.$index.' - in '.get_class($this));
+            throw new \DataEntityException('Field doesn`t exist: ' . $index . ' - in ' . get_class($this));
         } else {
             return $this->array[$index];
         }

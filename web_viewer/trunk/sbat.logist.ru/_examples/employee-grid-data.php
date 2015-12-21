@@ -18,9 +18,6 @@ $conn = mysqli_connect($servername, $username, $password, $dbname) or die("Conne
 //}
 
 
-
-
-
 //$conn->query("CALL selectData");
 //$result = mysqli_use_result($conn);
 
@@ -35,20 +32,14 @@ $conn = mysqli_connect($servername, $username, $password, $dbname) or die("Conne
 //}
 
 
-
-
 //while ($row = $result->mysqli_fetch_assoc()) {
 //    printf("%d\n", $row['номер заявки']);
 //}
 //mysqli_free_result($result);
 
 
-
 //if ($conn->query("CALL selectData"))
 //    echo "CALL failed: (" . $conn->errno . ") " . $conn->error;
-
-
-
 
 
 /* Database connection end */

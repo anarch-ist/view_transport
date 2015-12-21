@@ -1,5 +1,6 @@
 <?php
 namespace DAO;
+include_once __DIR__ . '/Data.php';
 
 interface IPointEntity
 {
@@ -7,11 +8,12 @@ interface IPointEntity
 
     function selectPointByID($id);
 
-    function updatePoint($newPoint);
+    function updatePoint(PointEntity $newPoint);
 
-    function deletePoint($Point);
+    function deletePoint(PointEntity $Point);
 
-    function addPoint($Point);
+    function addPoint(PointEntity $Point);
+
     function selectPointByUserID($userID);
 }
 

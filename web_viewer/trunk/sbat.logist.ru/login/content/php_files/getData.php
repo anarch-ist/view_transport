@@ -1,7 +1,7 @@
 <?php
-include_once __DIR__.'/../../../common_files/privilegedUser/PrivilegedUser.php';
+include_once __DIR__ . '/../../../common_files/privilegedUser/PrivilegedUser.php';
 
-$dataToSend = ['responseCode'=>'', 'statuses'=>''];
+$dataToSend = ['responseCode' => '', 'statuses' => ''];
 try {
 
     // FIXME бросает ошибку если после logout производится повторная авторизация

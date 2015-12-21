@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once __DIR__.'/IUser.php';
-include_once __DIR__.'/../DAO.php';
+include_once __DIR__ . '/IUser.php';
+include_once __DIR__ . '/../DAO.php';
 
 
 class UserEntity implements IUserEntity
@@ -21,8 +21,13 @@ class UserEntity implements IUserEntity
         return self::$_instance;
     }
 
-    function getUserRole($userID) {
-        return $this->_DAO->select(new SelectUserRole($userID))[0]['userRoleRusName'];
+    function getUserRole($userID)
+    {
+        $userRoleArray = $this->_DAO->select(new SelectUserRole($userID));
+        if (empty($userRoleArray)) {
+            return null;
+        }
+        return $userRoleArray[0]['userRoleRusName'];
     }
 
     function selectUsers()
@@ -64,44 +69,20 @@ class UserEntity implements IUserEntity
         return new UserData($array[0]);
     }
 
-    function updateUser($newUser)
+    function updateUser(UserData $newUser)
     {
         // TODO: Implement updateUser() method.
     }
 
-    function deleteUser($user)
+    function deleteUser(UserData $user)
     {
         // TODO: Implement deleteUser() method.
     }
 
-    function addUser($user)
+    function addUser(UserData $user)
     {
 
         // TODO: Implement addUser() method.
-    }
-}
-
-class UserData implements IEntityData
-{
-    private $array;
-
-    function __construct($array)
-    {
-        $this->array = $array;
-    }
-
-    public function getData($index)
-    {
-        if (!isset($this->array[$index])) {
-            throw new \DataEntityException('Field doesn`t exist: ' . $index . ' - in ' . get_class($this));
-        } else {
-            return $this->array[$index];
-        }
-    }
-
-    public function toArray()
-    {
-        return $this->array;
     }
 }
 
@@ -122,7 +103,6 @@ class SelectAllUsers implements IEntitySelect
     }
 }
 
-// TODO: убрать из бд логин и взамен него использовать эл. почту
 class SelectUserByEmail implements IEntitySelect
 {
     private $email;
@@ -152,6 +132,7 @@ class SelectUserByID implements IEntitySelect
         return "select * from `users` where `userID` = '$this->id'";
     }
 }
+
 class SelectUserRole implements IEntitySelect
 {
     private $id;
@@ -163,7 +144,7 @@ class SelectUserRole implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select `userRoleRusName` from `user_roles`, `users` where `userID` = '$this->id' AND `user_roles`.userRoleID = `users`.userRoleID";
+        return "select `user_roles`.* from `user_roles`, `users` where `userID` = '$this->id' AND `user_roles`.userRoleID = `users`.userRoleID";
     }
 }
 
@@ -181,7 +162,7 @@ class UserUpdateEntity implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        $query='';
+        $query = '';
         $isFirst = true;
         foreach ($this->obj as $elem) {
             if ($isFirst) {

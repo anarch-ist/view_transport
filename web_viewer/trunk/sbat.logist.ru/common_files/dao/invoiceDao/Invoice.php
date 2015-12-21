@@ -36,7 +36,7 @@ class InvoiceEntity implements IInvoiceEntity
         $array = $this->_DAO->select(new SelectAllInvoices($start, $count));
         $invoices = array();
         for ($i = 0; $i < count($array); $i++) {
-            $invoices[$i] = new Invoice($array[$i]);
+            $invoices[$i] = new InvoiceData($array[$i]);
         }
         return $invoices;
     }
@@ -44,10 +44,10 @@ class InvoiceEntity implements IInvoiceEntity
     function selectInvoiceByID($id)
     {
         $array = $this->_DAO->select(new SelectInvoiceByID($id));
-        return new Invoice($array[0]);
+        return new InvoiceData($array[0]);
     }
 
-    function updateInvoice($newInvoice)
+    function updateInvoice(InvoiceData $newInvoice)
     {
         // TODO: Implement updateInvoice() method.
     }
@@ -62,12 +62,12 @@ class InvoiceEntity implements IInvoiceEntity
         return $this->_DAO->update(new UpdateInvoiceStatuses($routeListID, $newInvoiceStatus, $datetime), new UserAction('invoices', 'update'));
     }
 
-    function deleteInvoice($Invoice)
+    function deleteInvoice(InvoiceData $Invoice)
     {
         // TODO: Implement deleteInvoice() method.
     }
 
-    function addInvoice($Invoice)
+    function addInvoice(InvoiceData $Invoice)
     {
         // TODO: Implement addInvoice() method.
     }
@@ -83,29 +83,6 @@ class InvoiceEntity implements IInvoiceEntity
     }
 }
 
-class Invoice implements IEntityData
-{
-    private $array;
-
-    function __construct($array)
-    {
-        $this->array = $array;
-    }
-
-    public function getData($index)
-    {
-        if (!isset($this->array[$index])) {
-            throw new \DataEntityException('Field doesn`t exist: ' . $index . ' - in ' . get_class($this));
-        } else {
-            return $this->array[$index];
-        }
-    }
-
-    public function toArray()
-    {
-        return $this->array;
-    }
-}
 
 class SelectAllInvoices implements IEntitySelect
 {
@@ -153,6 +130,7 @@ class SelectInvoiceStatuses implements IEntitySelect
         return "select `invoice_statuses`.`invoiceStatusID`, `invoiceStatusRusName` from `invoice_statuses`, `invoice_statuses_for_user_role` where `invoice_statuses`.`invoiceStatusID` = `invoice_statuses_for_user_role`.`invoiceStatusID` AND userRoleID = '$this->role'";
     }
 }
+
 class SelectInvoiceHistory implements IEntitySelect
 {
     private $id;

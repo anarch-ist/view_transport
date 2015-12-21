@@ -62,11 +62,7 @@ interface IEntityDelete
     function getDeleteQuery();
 }
 
-interface IEntityData
-{
-    function getData($field);
-
-    function toArray();
+interface IEntityCanAct{
+    //function hasPermission(PermissionsData $permissions);
 }
-
 ?>

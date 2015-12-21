@@ -27,22 +27,28 @@ VALUES
    'srgf@ewuf.ru', '89032343556', 'AGENCY');
 
 
-INSERT INTO users (firstName, lastName, patronymic, position, passMD5, phoneNumber, email, userRoleID, pointID)
+INSERT INTO users (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
 VALUES
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', md5('test'), '904534356', 'test@test.ru', 'ADMIN',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),
+   md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))), '904534356', 'test@test.ru', 'ADMIN',
    getPointIDByName('point1')),
-  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', md5('esrhgruht'), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
+  ('ivan', 'ivanov', 'ivanovich', 'erwgewg', SUBSTRING(MD5(2) FROM 1 FOR 16),
+   md5(CONCAT(md5('esrhgruht'), SUBSTRING(MD5(2) FROM 1 FOR 16))), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
    getPointIDByName('point2')),
-  ('erir', 'dddddd', 'ewreruiii', 'erfergg', md5('wefwgrege'), '904534356', 'ey@irtj.ru', 'DISPATCHER',
+  ('erir', 'dddddd', 'ewreruiii', 'erfergg', SUBSTRING(MD5(3) FROM 1 FOR 16),
+   md5(CONCAT(md5('wefwgrege'), SUBSTRING(MD5(3) FROM 1 FOR 16))), '904534356', 'ey@irtj.ru', 'DISPATCHER',
    getPointIDByName('point4')),
-  ('degg', 'rtgrgg', 'rtrtbtybv', 'ergrtgr', md5('wertgrege'), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
+  ('degg', 'rtgrgg', 'rtrtbtybv', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
+   md5(CONCAT(md5('wertgrege'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
    getPointIDByName('point3'));
 
 
 INSERT INTO clients (INN, KPP, corAccount, curAccount, BIK, bankName, contractNumber, dateOfSigning, startContractDate, endContractDate)
 VALUES
-  ('1234567890', '23674529375734562', 'corAcccc', 'curAxccccc', '34896208375', 'moscowBank', 'erguheru', now(), now(), now()),
-  ('8947537893', '37549783469587934', 'corAcccc2', 'curAxccccc2', '3324234375', 'moscowBank1', '34guheru', now(), now(), now());
+  ('1234567890', '23674529375734562', 'corAcccc', 'curAxccccc', '34896208375', 'moscowBank', 'erguheru', now(), now(),
+   now()),
+  ('8947537893', '37549783469587934', 'corAcccc2', 'curAxccccc2', '3324234375', 'moscowBank1', '34guheru', now(), now(),
+   now());
 
 
 INSERT INTO requests (requestNumber, date, marketAgentUserID, clientID, destinationPointID)
@@ -78,11 +84,14 @@ INSERT INTO invoices (
   lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
 )
 VALUES
-  ('ogeghei2243', 'qwd22345', now(), now(), 4 , 20, 3000, 21000.00, NULL , getUserIDByEmail('test@test.ru'), 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2243', 'qwd22345', now(), now(), 4, 20, 3000, 21000.00, NULL, getUserIDByEmail('test@test.ru'), 'CREATED',
+   getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point1')),
-  ('ogeghei2244', 'qwd22334', now(), now(), 2 , 20, 3000, 26000.00, NULL , getUserIDByEmail('test@test.ru'), 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2244', 'qwd22334', now(), now(), 2, 20, 3000, 26000.00, NULL, getUserIDByEmail('test@test.ru'), 'CREATED',
+   getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point3')),
-  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, NULL , getUserIDByEmail('test@test.ru'), 'CREATED', getRequestIDByNumber('123356'),
+  ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, NULL, getUserIDByEmail('test@test.ru'), 'CREATED',
+   getRequestIDByNumber('123356'),
    getPointIDByName('point1'), NULL, NULL);
 
 

@@ -1,5 +1,6 @@
 <?php
 namespace DAO;
+include_once __DIR__ . '/Data.php';
 
 interface IUserEntity
 {
@@ -15,9 +16,9 @@ interface IUserEntity
 
     function selectUserByEmail($email);
 
-    function updateUser($newUser);
+    function updateUser(UserData $newUser);
 
-    function deleteUser($user);
+    function deleteUser(UserData $user);
 
-    function addUser($user);
+    function addUser(UserData $user);
 }

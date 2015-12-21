@@ -3,34 +3,46 @@ namespace DAO;
 
 define('PHP_NEWLINE', '<br>' . PHP_EOL);
 
-use Exception;
 use mysqli;
 
-include_once __DIR__.'/IDAO.php';
+include_once __DIR__ . '/IDAO.php';
 include_once __DIR__ . '/Exceptions.php';
 
 class DAO implements IDAO
 {
-    const AUTO_START_TRANSACTION = true;
+    const AUTO_START_TRANSACTION = false;
     private static $_instance;
+    private $_transactionStarted = false;
     private $_connection;
 
     private function __construct()
     {
-        $config = parse_ini_file('db_connection.ini');
-        $this->_connection = @new mysqli('localhost', $config['username'], $config['password'], $config['dbname']);
-        if ($this->_connection->connect_errno) {
-            throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
-        }
-        mysqli_set_charset($this->_connection, "utf8"); // fixed encoding error
-        if ($this::AUTO_START_TRANSACTION) {
+        $this->_connection = $this->privateStartConnection();
+        if ($this->_connection && $this::AUTO_START_TRANSACTION) {
             $this->startTransaction();
         }
     }
 
+    private function privateStartConnection()
+    {
+        if (!$this->_connection) {
+            $config = parse_ini_file('db_connection.ini');
+            $connection = @new mysqli('localhost', $config['username'], $config['password'], $config['dbname']);
+            if ($connection->connect_errno) {
+                throw new \MysqlException('Connection error - ' . $connection->connect_error);
+            }
+            mysqli_set_charset($connection, "utf8"); // fixed encoding error
+            return $connection;
+        }
+        return false;
+    }
+
     public function startTransaction()
     {
-        return $this->_connection->query('START TRANSACTION;');
+        if (!$this->_transactionStarted) {
+            return $this->_transactionStarted = $this->_connection->query('START TRANSACTION;');
+        }
+        return false;
     }
 
     public static function getInstance()
@@ -46,18 +58,25 @@ class DAO implements IDAO
         return $this->_connection->real_escape_string($str);
     }
 
-    function startConnection()
+    public function startConnection()
     {
-        $this->_connection = @new mysqli('localhost', 'andy', 'andyandy', 'project_database');
-        if ($this->_connection->connect_errno) {
-            throw new \MysqlException('Connection error - ' . $this->_connection->connect_error);
+        $connection = $this->privateStartConnection();
+        if ($connection) {
+            $this->_connection = $connection;
+            if ($this::AUTO_START_TRANSACTION) {
+                return $this->startTransaction();
+            }
         }
-
+        return !($connection === false);
     }
 
     public function rollback()
     {
-        return $this->_connection->query('ROLLBACK;');
+        if ($this->_transactionStarted) {
+            $this->_transactionStarted = !$this->_connection->query('ROLLBACK;');
+            return !$this->_transactionStarted;
+        }
+        return false;
 
     }
 
@@ -69,20 +88,27 @@ class DAO implements IDAO
 
     public function commit()
     {
-        return $this->_connection->query('COMMIT;');
+        if ($this->_transactionStarted) {
+            $this->_transactionStarted = !$this->_connection->query('COMMIT;');
+            return !$this->_transactionStarted;
+        }
+        return false;
     }
 
     function closeConnection()
     {
-        return $this->_connection->close();
+        if (!$this->_connection) {
+            return false;
+        }
+        $this->_transactionStarted = false;
+        $this->_connection->close();
+        $this->_connection = false;
+        return true;
     }
 
     function select(IEntitySelect $selectObj)
     {
-        $result = @self::query($selectObj->getSelectQuery());
-        if (!$result) {
-            throw new Exception('ошибка в выборочном запросе - ' . $this->_connection->error);
-        }
+        $result = $this->query($selectObj->getSelectQuery());
         $array = array();
         $count = 0;
         while ($row = $result->fetch_assoc()) {
@@ -94,10 +120,14 @@ class DAO implements IDAO
 
     function query($sql)
     {
-        return $this->_connection->query($sql);
+        $result = @$this->_connection->query($sql);
+        if ($this->_connection->errno) {
+            throw new \MysqlException('Ошибка в запросе: ' . $this->_connection->error . '. Запрос: ' . $sql);
+        }
+        return $result;
     }
 
-    function update(IEntityUpdate $newObj, IEntityInsert $updateTable=null)
+    function update(IEntityUpdate $newObj, IEntityInsert $updateTable = null)
     {
         // TODO: Check update() method.
         if (!is_null($updateTable)) {
@@ -106,7 +136,7 @@ class DAO implements IDAO
         return $this->query($newObj->getUpdateQuery());
     }
 
-    function insert(IEntityInsert $obj, IEntityInsert $updateTable=null)
+    function insert(IEntityInsert $obj, IEntityInsert $updateTable = null)
     {
         // TODO: Check insert() method.
         if (!is_null($updateTable)) {
@@ -115,7 +145,7 @@ class DAO implements IDAO
         return $this->query($obj->getInsertQuery());
     }
 
-    function delete(IEntityDelete $obj, IEntityInsert $updateTable=null)
+    function delete(IEntityDelete $obj, IEntityInsert $updateTable = null)
     {
         // TODO: Check delete() method.
         if (!is_null($updateTable)) {
@@ -124,6 +154,7 @@ class DAO implements IDAO
         return $this->query($obj->getDeleteQuery());
     }
 }
+
 class UserAction implements IEntityInsert
 {
     private $table;

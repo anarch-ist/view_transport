@@ -11,7 +11,7 @@ USE `transmaster_transport_db`;
 
 # added field userRoleRusName
 CREATE TABLE user_roles (
-  userRoleID VARCHAR(32),
+  userRoleID      VARCHAR(32),
   userRoleRusName VARCHAR(128),
   PRIMARY KEY (userRoleID)
 );
@@ -33,8 +33,7 @@ VALUES
 -- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
   ('TEMP_REMOVED', 'TEMP_REMOVED'),
 
-  ('VIEW_LAST_TEN', 'VIEW_LAST_TEN')
-;
+  ('VIEW_LAST_TEN', 'VIEW_LAST_TEN');
 
 CREATE TABLE point_types (
   pointTypeID VARCHAR(32),
@@ -72,15 +71,16 @@ CREATE TABLE points (
 # deleted login because we don't need in it
 CREATE TABLE users (
   userID      INTEGER AUTO_INCREMENT,
-  firstName   VARCHAR(64)  NULL,
-  lastName    VARCHAR(64)  NULL,
-  patronymic  VARCHAR(64)  NULL,
-  position    VARCHAR(64)  NULL, -- должность
-  passMD5     VARCHAR(64)  NOT NULL,
-  phoneNumber VARCHAR(16)  NULL,
-  email       VARCHAR(64)  NULL,
-  userRoleID  VARCHAR(32)  NOT NULL,
-  pointID     INTEGER      NOT NULL,
+  firstName   VARCHAR(64) NULL,
+  lastName    VARCHAR(64) NULL,
+  patronymic  VARCHAR(64) NULL,
+  position    VARCHAR(64) NULL, -- должность
+  salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
+  passAndSalt VARCHAR(64) NOT NULL,
+  phoneNumber VARCHAR(16) NULL,
+  email       VARCHAR(64) NULL,
+  userRoleID  VARCHAR(32) NOT NULL,
+  pointID     INTEGER     NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
     ON DELETE NO ACTION
@@ -228,9 +228,9 @@ CREATE TABLE tariffs (
 
 CREATE TABLE routes (
   routeID       INTEGER AUTO_INCREMENT,
-  routeName     VARCHAR(64)    NOT NULL,
-  directionName VARCHAR(255)   NULL, -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
-  tariffID INTEGER NULL,
+  routeName     VARCHAR(64)  NOT NULL,
+  directionName VARCHAR(255) NULL, -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
+  tariffID      INTEGER      NULL,
   PRIMARY KEY (routeID),
   FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
     ON DELETE SET NULL
@@ -296,7 +296,8 @@ CREATE PROCEDURE insert_into_rout_list_history(
   BEGIN
     INSERT INTO rout_list_history
     VALUES
-      (NULL , NOW(), routeListID, routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID, routeListStatusID);
+      (NULL, NOW(), routeListID, routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate,
+       routeID, routeListStatusID);
   END;
 
 
@@ -379,11 +380,11 @@ VALUES
   ('DELIVERED', 'Доставлено', 14);
 
 CREATE TABLE invoice_statuses_for_user_role (
-  userRoleID VARCHAR(32),
+  userRoleID      VARCHAR(32),
   invoiceStatusID VARCHAR(32),
   PRIMARY KEY (userRoleID, invoiceStatusID),
-  FOREIGN KEY (userRoleID) REFERENCES user_roles(userRoleID),
-  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses(invoiceStatusID)
+  FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID),
+  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
 );
 
 -- TODO fill this list
@@ -403,7 +404,6 @@ VALUES
   ('DISPATCHER', 'DELIVERED'),
   ('MARKET_AGENT', 'ERROR'),
   ('MARKET_AGENT', 'DELIVERED');
-
 
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
@@ -503,7 +503,8 @@ CREATE PROCEDURE insert_into_invoice_history(
     INSERT INTO invoice_history
     VALUES
       (NULL, NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate,
-       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
+       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID,
+       warehousePointID, routeListID, lastVisitedUserPointID
       );
   END;
 
@@ -520,16 +521,19 @@ FOR EACH ROW
   BEGIN
 -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт, и этот
 -- пункт записываем в таблицу invoices в поле lastVisitedUserPointID
-    IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR NEW.invoiceStatusID = 'DELIVERED')
+    IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR
+        NEW.invoiceStatusID = 'DELIVERED')
     THEN
       BEGIN
 -- LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
 -- DECLARE _userID INTEGER;
 -- SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
-        SET NEW.lastVisitedUserPointID = (SELECT pointID FROM users WHERE userID = NEW.lastModifiedBy);
+        SET NEW.lastVisitedUserPointID = (SELECT pointID
+                                          FROM users
+                                          WHERE userID = NEW.lastModifiedBy);
       END;
-    END IF ;
-  END ;
+    END IF;
+  END;
 
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
@@ -619,7 +623,8 @@ CREATE FUNCTION getPointIDByName(name VARCHAR(128))
   END;
 
 # changed `getUserIDByLogin` function to `getUserIDByEmail` for working with email instead of login
-CREATE FUNCTION `getUserIDByEmail`(_email VARCHAR(64)) RETURNS INTEGER
+CREATE FUNCTION `getUserIDByEmail`(_email VARCHAR(64))
+  RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT userID
@@ -704,11 +709,15 @@ CREATE FUNCTION getNextSortOrder(_routeID INTEGER, _lastVisitedPointID INTEGER)
 -- this function returns pointID for the next routePoint or NULL if it is already the last point
 CREATE FUNCTION getNextPointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER
-  RETURN (SELECT pointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
+  RETURN (SELECT pointID
+          FROM route_points
+          WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
 
 CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER
-  RETURN (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
+  RETURN (SELECT routePointID
+          FROM route_points
+          WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
 
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -779,7 +788,7 @@ search[regex]:"false"               true if the global filter should be treated 
 CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
   RETURNS TEXT
   RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(stringSpl, delim, pos),
-                           CHAR_LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos -1)) + 1),
+                           CHAR_LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos - 1)) + 1),
                  delim, '');
 
 
@@ -791,14 +800,16 @@ CREATE FUNCTION generateHaving(map TEXT)
     DECLARE pair VARCHAR(255) DEFAULT '----';
     DECLARE result TEXT DEFAULT '';
 
-    if (map = '') THEN RETURN 'TRUE';
-    END IF ;
+    IF (map = '')
+    THEN RETURN 'TRUE';
+    END IF;
 
     wloop: WHILE (TRUE) DO
       SET i = i + 1;
       SET pair = splitString(map, ';', i);
-      IF pair = '' THEN LEAVE wloop;
-      END IF ;
+      IF pair = ''
+      THEN LEAVE wloop;
+      END IF;
       SET @columnName = splitString(pair, ',', 1);
       SET @searchString = splitString(pair, ',', 2);
       SET @searchString = CONCAT('%', @searchString, '%');
@@ -818,7 +829,8 @@ CREATE FUNCTION generateHaving(map TEXT)
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
 
 # added `invoiceStatusRusName` field for showing it in page
-CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
+CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
+                            _isDesc BOOLEAN, _search TEXT)
   BEGIN
     SET @mainPart =
     'SELECT
@@ -891,15 +903,17 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     )';
     SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
 
-    IF _orderby <> '' THEN
-      IF _isDesc THEN
+    IF _orderby <> ''
+    THEN
+      IF _isDesc
+      THEN
         SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
       ELSE
         SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
-      END IF ;
+      END IF;
     ELSE
       SET @orderByPart = '';
-    END IF ;
+    END IF;
 
     SET @limitPart = ' LIMIT ?, ? ';
     SET @sqlString = CONCAT(@mainPart, @wherePart, @havingPart, @orderByPart, @limitPart);
@@ -910,15 +924,24 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @_startEntry = _startEntry;
     SET @_length = _length;
 
-    EXECUTE statement USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
-    DEALLOCATE  PREPARE statement;
+    EXECUTE statement
+    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
+    DEALLOCATE PREPARE statement;
   END;
 
 # changed this `selectInvoiceStatusHistory` procedure because it couldn't work with invoise number. But i don't know this info
 CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
     SELECT
-      pointName, firstName, lastName, patronymic, invoiceStatusRusName, invoice_history.lastStatusUpdated, routListNumber, palletsQty, invoice_history.boxQty
+      pointName,
+      firstName,
+      lastName,
+      patronymic,
+      invoiceStatusRusName,
+      invoice_history.lastStatusUpdated,
+      routListNumber,
+      palletsQty,
+      invoice_history.boxQty
     FROM invoice_history
       INNER JOIN (route_lists, users, points, invoice_statuses, invoices)
         ON (

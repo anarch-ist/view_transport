@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
-include_once __DIR__.'/IPoint.php';
-include_once __DIR__.'/../DAO.php';
+include_once __DIR__ . '/IPoint.php';
+include_once __DIR__ . '/../DAO.php';
 
 class PointEntity implements IPointEntity
 {
@@ -25,7 +25,7 @@ class PointEntity implements IPointEntity
         $array = $this->_DAO->select(new SelectAllPoints());
         $points = array();
         for ($i = 0; $i < count($array); $i++) {
-            $points[$i] = new Point($array[$i]);
+            $points[$i] = new PointData($array[$i]);
         }
         return $points;
     }
@@ -33,49 +33,27 @@ class PointEntity implements IPointEntity
     function selectPointByID($id)
     {
         $array = $this->_DAO->select(new SelectPointByID($id));
-        return new Point($array[0]);
+        return new PointData($array[0]);
     }
 
-    function updatePoint($newPoint)
+    function updatePoint(PointEntity $newPoint)
     {
         // TODO: Implement updatePoint() method.
     }
 
-    function deletePoint($point)
+    function deletePoint(PointEntity $point)
     {
         // TODO: Implement deletePoint() method.
     }
 
-    function addPoint($point)
+    function addPoint(PointEntity $point)
     {
         // TODO: Implement addPoint() method.
     }
-    function selectPointByUserID($userID) {
+
+    function selectPointByUserID($userID)
+    {
         return $this->_DAO->select(new SelectPointByUserID($userID))[0]['pointName'];
-    }
-}
-
-class Point implements IEntityData
-{
-    private $array;
-
-    function __construct($array)
-    {
-        $this->array = $array;
-    }
-
-    public function getData($index)
-    {
-        if (!isset($this->array[$index])) {
-            throw new \DataEntityException('Field doesn`t exist: ' . $index . ' - in ' . get_class($this));
-        } else {
-            return $this->array[$index];
-        }
-    }
-
-    public function toArray()
-    {
-        return $this->array;
     }
 }
 
@@ -87,7 +65,7 @@ class SelectAllPoints implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select * from `points`;";
+        return "SELECT * FROM `points`;";
     }
 }
 
@@ -105,6 +83,7 @@ class SelectPointByID implements IEntitySelect
         return "select * from `points` where `pointID` = '$this->id'";
     }
 }
+
 class SelectPointByUserID implements IEntitySelect
 {
     private $id;

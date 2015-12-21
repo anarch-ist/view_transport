@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
 require_once 'IInvoicesForUser.php';
-include_once __DIR__.'/../DAO.php';
+include_once __DIR__ . '/../DAO.php';
 
 
 class InvoicesForUserEntity implements IInvoicesForUserEntity
@@ -37,7 +37,7 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
                 $start = func_get_arg(0);
                 break;
         }
-        $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start,$count));
+        $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start, $count));
         return $array;
     }
 
@@ -49,20 +49,23 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
 
 class EntitySelectAllInvoicesForUser implements IEntitySelect
 {
-    private $start, $count,$orderByColumn, $isDesc,$searchString;
-    function __construct($start, $count) {
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
+
+    function __construct($start, $count)
+    {
         $this->start = DAO::getInstance()->checkString($start);
         $this->count = DAO::getInstance()->checkString($count);
         $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
-        $this->searchString='';
+        $this->searchString = '';
         $searchArray = $_POST['columns'];
-        for ($i=0;$i<count($searchArray);$i++) {
-            if ($searchArray[$i]['search']['value']!=='') {
-                $this->searchString.=$searchArray[$i]['name'].','.$searchArray[$i]['search']['value'].';';
+        for ($i = 0; $i < count($searchArray); $i++) {
+            if ($searchArray[$i]['search']['value'] !== '') {
+                $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';
             }
         }
         $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
     }
+
     function getSelectQuery()
     {
         $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');

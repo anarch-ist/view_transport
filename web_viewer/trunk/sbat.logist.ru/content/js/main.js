@@ -6,7 +6,7 @@ $(document).ready(function () {
     });
     $("#logout").button().on("click", function () {
         // delete auth cookies
-        $.cookie('SESSION_CHECK_STRING',null,-1,'/');
+        $.cookie('SESSION_CHECK_STRING', null, -1, '/');
         // make redirect to login page
         window.location.reload();
         //location.reload(true);
@@ -33,7 +33,7 @@ $(document).ready(function () {
         height: 300,
         width: 400,
         modal: true,
-        close: function( event, ui ) {
+        close: function (event, ui) {
             document.location.reload();
         },
         buttons: {
@@ -42,33 +42,38 @@ $(document).ready(function () {
                 // возможно это пригодится для
                 //var table = $('#user-grid').DataTable();
                 //table.rows( { selected: true } ).data();
-                newStatusID =  $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
-				date = $('#dateTimePicker')[0].value;
+                newStatusID = $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
+                date = $('#dateTimePicker')[0].value;
                 var action = $('#statusSelect').attr("action");
                 if (action === "changeStatusForInvoice") {
                     // получение ИД выделенной в таблице накладной
-                    invoiceNumber = dataTable.row( $('#user-grid .selected') ).data().invoiceNumber;
-                    $.post("content/getData.php", {status: action, invoiceNumber: invoiceNumber, newStatusID: newStatusID, date: date},
+                    invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
+                    $.post("content/getData.php", {
+                            status: action,
+                            invoiceNumber: invoiceNumber,
+                            newStatusID: newStatusID,
+                            date: date
+                        },
                         function (data) {
-                            if (data==='1') {
+                            if (data === '1') {
                                 document.location.reload();
                             }
                         }
                     );
                 } else if (action === "changeStatusForSeveralInvoices") {
                     // получение ИД маршрутного листа
-                    routeListID = dataTable.row( $('#user-grid .selected') ).data().routeListID;
+                    routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
                     console.log(routeListID);
                     $.post(
-						"content/getData.php",
-						{status: action, routeListID: routeListID, newStatusID: newStatusID, date: date},
+                        "content/getData.php",
+                        {status: action, routeListID: routeListID, newStatusID: newStatusID, date: date},
                         function (data) {
-                            if (data==='1') {
+                            if (data === '1') {
                                 dataTable.columns().draw();
                                 $(this).dialog("close");
                             }
                         }
-					);
+                    );
                 }
             },
             "Отмена": function () {
@@ -82,11 +87,11 @@ $(document).ready(function () {
         $statusChangeDialog.dialog("open");
 
         var options = [];
-        var storedStatuses='';
+        var storedStatuses = '';
         if (window.sessionStorage["USER_STATUSES"]) {
             storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
         }
-        for (var i=0;i<storedStatuses.length;i++) {
+        for (var i = 0; i < storedStatuses.length; i++) {
             console.log(storedStatuses[i]);
             options.push("<option value='" + storedStatuses[i].invoiceStatusID + "'>" + storedStatuses[i].invoiceStatusRusName + "</option>");
         }
@@ -134,10 +139,10 @@ $(document).ready(function () {
     }
 
     // --------DATATABLE INIT--------------
-    $('#user-grid tfoot th').each( function () {
+    $('#user-grid tfoot th').each(function () {
         var title = $(this).text();
-        $(this).html( '<input type="text" placeholder="Поиск '+title+'" />' );
-    } );
+        $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
+    });
 
     var dataTable = $('#user-grid').DataTable({
         processing: true,
@@ -167,7 +172,10 @@ $(document).ready(function () {
                 text: 'история статусов',
                 action: function (e, dt, node, config) {
                     // TODO: status history
-                    $.post("content/getData.php", {status: 'getStatusHistory', invoiceNumber: dataTable.row( $('#user-grid .selected') ).data().invoiceNumber},
+                    $.post("content/getData.php", {
+                            status: 'getStatusHistory',
+                            invoiceNumber: dataTable.row($('#user-grid .selected')).data().invoiceNumber
+                        },
                         function (data) {
                             $.showInvoiceHistoryDialog(data);
                         }
@@ -177,11 +185,11 @@ $(document).ready(function () {
             {
                 text: 'сброс фильтров',
                 action: function (e, dt, node, config) {
-                    dataTable.columns().every( function () {
-                        $( 'input', this.footer())[0].value = '';
+                    dataTable.columns().every(function () {
+                        $('input', this.footer())[0].value = '';
                         this.search('');
                         dataTable.columns().draw();
-                    } );
+                    });
                 }
             }
         ],
@@ -197,46 +205,46 @@ $(document).ready(function () {
             }
         },
         columns: [
-            { "data": "requestNumber"},
-            { "data": "insiderRequestNumber"},
-            { "data": "invoiceNumber"},
-            { "data": "INN"},
-            { "data": "deliveryPoint"},
-            { "data": "warehousePoint"},
-            { "data": "lastName"},
-            { "data": "invoiceStatusRusName"},
-            { "data": "boxQty"},
-            { "data": "driver"},
-            { "data": "licensePlate"},
-            { "data": "palletsQty"},
-            { "data": "routListNumber"},
-            { "data": "directionName"},
-            { "data": "currentPoint"},
-            { "data": "nextPoint"},
-            { "data": "arrivalTime"},
-            { "data": "invoiceStatusID"},
-            { "data": "routeListID"}
+            {"data": "requestNumber"},
+            {"data": "insiderRequestNumber"},
+            {"data": "invoiceNumber"},
+            {"data": "INN"},
+            {"data": "deliveryPoint"},
+            {"data": "warehousePoint"},
+            {"data": "lastName"},
+            {"data": "invoiceStatusRusName"},
+            {"data": "boxQty"},
+            {"data": "driver"},
+            {"data": "licensePlate"},
+            {"data": "palletsQty"},
+            {"data": "routListNumber"},
+            {"data": "directionName"},
+            {"data": "currentPoint"},
+            {"data": "nextPoint"},
+            {"data": "arrivalTime"},
+            {"data": "invoiceStatusID"},
+            {"data": "routeListID"}
         ],
         columnDefs: [
-            { "name": "requestNumber", "searchable": true, "targets": 0 },
-            { "name": "insiderRequestNumber", "searchable": true, "targets": 1 },
-            { "name": "invoiceNumber", "searchable": true, "targets": 2 },
-            { "name": "INN", "searchable": true, "targets": 3 },
-            { "name": "deliveryPoint", "searchable": true,   "targets": 4 },
-            { "name": "warehousePoint", "searchable": true,   "targets": 5 },
-            { "name": "lastName", "searchable": true,   "targets": 6 },
-            { "name": "invoiceStatusRusName", "searchable": true,   "targets": 7 },
-            { "name": "boxQty", "searchable": true,   "targets": 8 },
-            { "name": "driver", "searchable": true,   "targets": 9 },
-            { "name": "licensePlate", "searchable": true,   "targets": 10},
-            { "name": "palletsQty", "searchable": true,   "targets": 11},
-            { "name": "routListNumber", "searchable": true,   "targets": 12},
-            { "name": "directionName", "searchable": true,   "targets": 13},
-            { "name": "currentPoint", "searchable": true,   "targets": 14},
-            { "name": "nextPoint", "searchable": true,   "targets": 15},
-            { "name": "arrivalTime", "searchable": true,   "targets": 16},
-            { "name": "invoiceStatusID", "searchable": false, "visible": false,   "targets": 17 },
-            { "name": "routeListID", "searchable": false, "visible": false, "targets": 18}
+            {"name": "requestNumber", "searchable": true, "targets": 0},
+            {"name": "insiderRequestNumber", "searchable": true, "targets": 1},
+            {"name": "invoiceNumber", "searchable": true, "targets": 2},
+            {"name": "INN", "searchable": true, "targets": 3},
+            {"name": "deliveryPoint", "searchable": true, "targets": 4},
+            {"name": "warehousePoint", "searchable": true, "targets": 5},
+            {"name": "lastName", "searchable": true, "targets": 6},
+            {"name": "invoiceStatusRusName", "searchable": true, "targets": 7},
+            {"name": "boxQty", "searchable": true, "targets": 8},
+            {"name": "driver", "searchable": true, "targets": 9},
+            {"name": "licensePlate", "searchable": true, "targets": 10},
+            {"name": "palletsQty", "searchable": true, "targets": 11},
+            {"name": "routListNumber", "searchable": true, "targets": 12},
+            {"name": "directionName", "searchable": true, "targets": 13},
+            {"name": "currentPoint", "searchable": true, "targets": 14},
+            {"name": "nextPoint", "searchable": true, "targets": 15},
+            {"name": "arrivalTime", "searchable": true, "targets": 16},
+            {"name": "invoiceStatusID", "searchable": false, "visible": false, "targets": 17},
+            {"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
         ],
         language: {
             select: {
@@ -268,19 +276,19 @@ $(document).ready(function () {
         }
     });
     // set padding for dataTable
-    $('#user-grid_wrapper').css('padding-top','40px');
+    $('#user-grid_wrapper').css('padding-top', '40px');
 
     // Apply the search
-    dataTable.columns().every( function () {
+    dataTable.columns().every(function () {
         var that = this;
 
-        $( 'input', this.footer() ).on( 'keyup change', function () {
-            if ( that.search() !== this.value ) {
+        $('input', this.footer()).on('keyup change', function () {
+            if (that.search() !== this.value) {
                 that
-                    .search( this.value )
+                    .search(this.value)
                     .draw();
             }
-        } );
-    } );
+        });
+    });
 });
 
