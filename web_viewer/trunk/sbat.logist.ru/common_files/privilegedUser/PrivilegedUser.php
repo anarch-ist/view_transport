@@ -49,7 +49,7 @@ abstract class AuthUser
     {
         session_start();
         if (!isset($_COOKIE['SESSION_CHECK_STRING']) || $_COOKIE['SESSION_CHECK_STRING'] !== md5($_SESSION['UserID'] . session_id() . $_SESSION['md5'])) {
-            setcookie('SESSION_CHECK_STRING');
+            setcookie('SESSION_CHECK_STRING', null, -1, '/');
             session_destroy();
             return false;
         }

@@ -10,7 +10,7 @@ include_once __DIR__ . '/Exceptions.php';
 
 class DAO implements IDAO
 {
-    const AUTO_START_TRANSACTION = false;
+    const AUTO_START_TRANSACTION = true;
     private static $_instance;
     private $_transactionStarted = false;
     private $_connection;
