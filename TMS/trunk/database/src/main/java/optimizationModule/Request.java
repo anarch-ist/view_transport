@@ -7,7 +7,7 @@ public class Request{
     private int requestId;
     private int clientId;
     private String deliveryAddress;
-    private Date plannedDeliveryTime;
+    private int plannedDeliveryTime;
 
     public int getRequestId() {
         return requestId;
@@ -33,11 +33,11 @@ public class Request{
         this.deliveryAddress = deliveryAddress;
     }
 
-    public Date getPlannedDeliveryTime() {
+    public int getPlannedDeliveryTime() {
         return plannedDeliveryTime;
     }
 
-    public void setPlannedDeliveryTime(Date plannedDeliveryTime) {
+    public void setPlannedDeliveryTime(int plannedDeliveryTime) {
         this.plannedDeliveryTime = plannedDeliveryTime;
     }
 }

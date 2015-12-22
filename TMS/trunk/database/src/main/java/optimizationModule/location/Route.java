@@ -4,9 +4,18 @@ package optimizationModule.location;
 import optimizationModule.utils.DayOfWeek;
 
 public class Route{
+    private Integer departureTime;
     private DayOfWeek dayOfWeek;
-    private Integer time;
+    private Integer timeToNextArrival;
     private Point point;
+
+    public Integer getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(Integer departureTime) {
+        this.departureTime = departureTime;
+    }
 
     public DayOfWeek getDayOfWeek() {
         return dayOfWeek;
@@ -16,12 +25,12 @@ public class Route{
         this.dayOfWeek = dayOfWeek;
     }
 
-    public Integer getTime() {
-        return time;
+    public Integer getTimeToNextArrival() {
+        return timeToNextArrival;
     }
 
-    public void setTime(Integer time) {
-        this.time = time;
+    public void setTimeToNextArrival(Integer timeToNextArrival) {
+        this.timeToNextArrival = timeToNextArrival;
     }
 
     public Point getPoint() {
