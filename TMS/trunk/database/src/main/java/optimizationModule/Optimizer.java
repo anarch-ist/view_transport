@@ -20,6 +20,8 @@ public class Optimizer implements IOptimizer{
                     inv = InvoiceTypes.B;
                 }else if(plannedDeliveryTime - transitTimeOfPlannedMachine > departureTime + 2){
                     inv = InvoiceTypes.C;
+                }else{
+
                 }
         }
         }

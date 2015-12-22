@@ -3,11 +3,13 @@ package optimizationModule.location;
 
 import optimizationModule.utils.DayOfWeek;
 
+import java.util.ArrayList;
+
 public class Route{
     private Integer departureTime;
     private DayOfWeek dayOfWeek;
     private Integer timeToNextArrival;
-    private Point point;
+    private ArrayList<Point> points;
 
     public Integer getDepartureTime() {
         return departureTime;
@@ -33,11 +35,11 @@ public class Route{
         this.timeToNextArrival = timeToNextArrival;
     }
 
-    public Point getPoint() {
-        return point;
+    public ArrayList<Point> getPoints() {
+        return points;
     }
 
-    public void setPoint(Point point) {
-        this.point = point;
+    public void setPoints(ArrayList<Point> points) {
+        this.points = points;
     }
 }
