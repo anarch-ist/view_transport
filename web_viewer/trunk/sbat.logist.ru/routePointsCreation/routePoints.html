@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <!--jquery-->
+    <script type="text/javascript" language="javascript" src="../common_files/media/js/jquery.js"></script>
+    <!--jquery-ui-->
+    <link rel="stylesheet" type="text/css" href="../common_files/media/css/jquery-ui.min.css">
+    <script src="../common_files/media/js/jquery-ui.min.js"></script>
+
+    <!--dataTables with plugins libs-->
+    <link rel="stylesheet" type="text/css" href="../common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.css"/>
+    <link rel="stylesheet" type="text/css" href="../common_files/media/Buttons-1.1.0/css/buttons.jqueryui.css"/>
+    <link rel="stylesheet" type="text/css" href="../common_files/media/Select-1.1.0/css/select.jqueryui.css"/>
+    <link rel="stylesheet" type="text/css" href="../common_files/media/Editor-1.5.4/editor.jqueryui.min.css"/>
+
+    <script src="../common_files/media/DataTables-1.10.10/js/jquery.dataTables.js"></script>
+    <script src="../common_files/media/DataTables-1.10.10/js/dataTables.jqueryui.js"></script>
+    <script src="../common_files/media/Buttons-1.1.0/js/dataTables.buttons.js"></script>
+    <script src="../common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
+    <script src="../common_files/media/Select-1.1.0/js/dataTables.select.js"></script>
+    <script src="../common_files/media/Editor-1.5.4/dataTables.editor.min.js"></script>
+    <script src="../common_files/media/Editor-1.5.4/editor.jqueryui.min.js"></script>
+
+    <!--custom-->
+    <script src="routePoints.js"></script>
+
+</head>
+<body>
+<div>
+    <div>
+        <label for="routeSelect">Направление: </label>
+        <select id="routeSelect">
+            <option value="routeId1">Направление1</option>
+            <option value="routeId2">Направление2</option>
+            <option value="routeId3">Направление3</option>
+        </select>
+    </div>
+    <table id="routePointsTable">
+        <thead>
+            <tr>
+                <th>Порядок</th>
+                <th>Пункт</th>
+                <th>время разгрузки</th>
+                <th>время следующего пункта</th>
+                <th>расстояние</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+</body>
+</html>

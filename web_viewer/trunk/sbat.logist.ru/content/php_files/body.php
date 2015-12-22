@@ -24,8 +24,6 @@
 
     <script src="common_files/media/jqueryCookie-1.4.1/jquery.cookie.js"></script>
 
-    <!--custom styles-->
-
     <!--custom js-->
     <script type="text/javascript" language="javascript" src="content/js/invoiceHistoryDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
