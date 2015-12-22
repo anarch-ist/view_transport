@@ -1280,7 +1280,7 @@
         mouseenter: "mouseover",
         mouseleave: "mouseout",
         pointerenter: "pointerover",
-        pointerleave: "pointerout"
+        pointerleave: "pointeroute"
     }, function (a, b) {
         m.event.special[a] = {
             delegateType: b, bindType: b, handle: function (a) {

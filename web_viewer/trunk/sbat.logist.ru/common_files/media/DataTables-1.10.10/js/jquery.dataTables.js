@@ -12455,7 +12455,7 @@
             /**
              * Flag to say if DataTables should automatically try to calculate the
              * optimum table and columns widths (true) or not (false).
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12466,7 +12466,7 @@
              * needed by a driven page draw. This can give a significant speed
              * increase for Ajax source and Javascript source data, but makes no
              * difference at all fro DOM and server-side processing tables.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12476,7 +12476,7 @@
              * Enable filtering on the table or not. Note that if this is disabled
              * then there is no filtering at all on the table, including fnFilter.
              * To just remove the filtering input use sDom and remove the 'f' option.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12485,7 +12485,7 @@
             /**
              * Table information element (the 'Showing x of y records' div) enable
              * flag.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12494,7 +12494,7 @@
             /**
              * Present a user control allowing the end user to change the page size
              * when pagination is enabled.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12503,7 +12503,7 @@
             /**
              * Pagination enabled or not. Note that if this is disabled then length
              * changing must also be disabled.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12512,7 +12512,7 @@
             /**
              * Processing indicator enable flag whenever DataTables is enacting a
              * user request - typically an Ajax request for server-side processing.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12522,7 +12522,7 @@
              * Server-side processing enabled flag - when enabled DataTables will
              * get all data from the server for every draw - there is no filtering,
              * sorting or paging done on the client-side.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12530,7 +12530,7 @@
 
             /**
              * Sorting enablement flag.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12538,7 +12538,7 @@
 
             /**
              * Multi-column sorting
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12548,7 +12548,7 @@
              * Apply a class to the columns which are being sorted to provide a
              * visual highlight or not. This can slow things down when enabled since
              * there is a lot of DOM interaction.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12556,7 +12556,7 @@
 
             /**
              * State saving enablement flag.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12572,7 +12572,7 @@
             /**
              * When the table is shorter in height than sScrollY, collapse the
              * table container down to the height of the table (when true).
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type boolean
              */
@@ -12589,7 +12589,7 @@
             /**
              * Viewport width for horizontal scrolling. Horizontal scrolling is
              * disabled if an empty string.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type string
              */
@@ -12598,7 +12598,7 @@
             /**
              * Width to expand the table to when using x-scrolling. Typically you
              * should not need to use this.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type string
              *  @deprecated
@@ -12608,7 +12608,7 @@
             /**
              * Viewport height for vertical scrolling. Vertical scrolling is disabled
              * if an empty string.
-             * Note that this parameter will be set by the initialisation routine. To
+             * Note that this parameter will be set by the initialisation routeine. To
              * set a default use {@link DataTable.defaults}.
              *  @type string
              */
@@ -12740,7 +12740,7 @@
         /**
          * Store the applied global search information in case we want to force a
          * research or compare the old search to a new one.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @namespace
          *  @extends DataTable.models.oSearch
@@ -12763,7 +12763,7 @@
          *   <li>Index 0 - column number</li>
          *   <li>Index 1 - current sorting direction</li>
          * </ul>
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type array
          *  @todo These inner arrays should really be objects
@@ -12773,7 +12773,7 @@
         /**
          * Sorting that is always applied to the table (i.e. prefixed in front of
          * aaSorting).
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type array
          *  @default []
@@ -12782,7 +12782,7 @@
 
         /**
          * Classes to use for the striping of a table.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type array
          *  @default []
@@ -12923,7 +12923,7 @@
         /**
          * Indicate if when using server-side processing the loading of data
          * should be deferred until the second draw.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type boolean
          *  @default false
@@ -12948,7 +12948,7 @@
         /**
          * Dictate the positioning of DataTables' control elements - see
          * {@link DataTable.model.oInit.sDom}.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type string
          *  @default null
@@ -12964,7 +12964,7 @@
 
         /**
          * Which type of pagination should be used.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type string
          *  @default two_button
@@ -12973,7 +12973,7 @@
 
         /**
          * The state duration (for `stateSave`) in seconds.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type int
          *  @default 0
@@ -13024,7 +13024,7 @@
 
         /**
          * Source url for AJAX data for the table.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type string
          *  @default null
@@ -13035,7 +13035,7 @@
          * Property from a given object from which to read the table data from. This
          * can be an empty string (when not server-side processing), in which case
          * it is  assumed an an array is given directly.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type string
          */
@@ -13073,7 +13073,7 @@
 
         /**
          * Function to get the server-side data.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type function
          */
@@ -13090,7 +13090,7 @@
         /**
          * Send the XHR HTTP method - GET or POST (could be PUT or DELETE if
          * required).
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type string
          */
@@ -13098,7 +13098,7 @@
 
         /**
          * Format numbers for display.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type function
          */
@@ -13106,7 +13106,7 @@
 
         /**
          * List of options that can be used for the user selectable length menu.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type array
          *  @default []
@@ -13173,7 +13173,7 @@
 
         /**
          * Flag to indicate if jQuery UI marking and classes should be used.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type boolean
          */
@@ -13210,7 +13210,7 @@
          * Indicate that if multiple rows are in the header and there is more than
          * one unique cell per column, if the top one (true) or bottom one (false)
          * should be used for sorting / title by DataTables.
-         * Note that this parameter will be set by the initialisation routine. To
+         * Note that this parameter will be set by the initialisation routeine. To
          * set a default use {@link DataTable.defaults}.
          *  @type boolean
          */

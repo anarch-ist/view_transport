@@ -39,7 +39,7 @@ $(document).ready(function () {
                 {"name": "fullName", "data": "fullName", "targets": 1},
                 {"name": "invoiceStatusRusName", "data": "invoiceStatusRusName", "targets": 2},
                 {"name": "lastStatusUpdated", "data": "lastStatusUpdated", "targets": 3},
-                {"name": "routListNumber", "data": "routListNumber", "targets": 4},
+                {"name": "routeListNumber", "data": "routeListNumber", "targets": 4},
                 {"name": "palletsQty", "data": "palletsQty", "targets": 5},
                 {"name": "boxQty", "data": "boxQty", "targets": 6}
             ]

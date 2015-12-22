@@ -11,7 +11,7 @@ TRUNCATE route_points;
 TRUNCATE route_lists;
 TRUNCATE invoices;
 TRUNCATE invoice_history;
-TRUNCATE rout_list_history;
+TRUNCATE route_list_history;
 SET FOREIGN_KEY_CHECKS = 1;
 
 # insert some test data
@@ -63,20 +63,20 @@ INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carri
 
 INSERT INTO routes (routeName, directionName, tariffID)
 VALUES
-  ('rout1', 'direction1', 1),
-  ('rout2', 'direction2', 1);
+  ('route1', 'direction1', 1),
+  ('route2', 'direction2', 1);
 
 
 INSERT INTO route_points (sortOrder, tLoading, timeToNextPoint, distanceToNextPoint, arrivalTime, pointID, routeID)
 VALUES
-  (1, 20, 40, 200, '12:00:00', getPointIDByName('point1'), getRoutIDByRoutName('rout1')),
-  (2, 20, 40, 200, '17:00:00', getPointIDByName('point2'), getRoutIDByRoutName('rout1')),
-  (3, 20, 40, 200, '01:00:00', getPointIDByName('point3'), getRoutIDByRoutName('rout1'));
+  (1, 20, 40, 200, '12:00:00', getPointIDByName('point1'), getRouteIDByRouteName('route1')),
+  (2, 20, 40, 200, '17:00:00', getPointIDByName('point2'), getRouteIDByRouteName('route1')),
+  (3, 20, 40, 200, '01:00:00', getPointIDByName('point3'), getRouteIDByRouteName('route1'));
 
 
-INSERT INTO route_lists (routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
+INSERT INTO route_lists (routeListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
 VALUES
-  ('1455668', '2015-11-11', 3, 'Dmitriy', '8905347890', 'екх123', getRoutIDByRoutName('rout1'));
+  ('1455668', '2015-11-11', 3, 'Dmitriy', '8905347890', 'екх123', getRouteIDByRouteName('route1'));
 
 
 INSERT INTO invoices (

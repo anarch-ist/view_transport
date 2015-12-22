@@ -268,7 +268,7 @@ CREATE TABLE route_points (
 
 CREATE TABLE route_lists (
   routeListID       INTEGER AUTO_INCREMENT,
-  routListNumber    VARCHAR(32)  NOT NULL,
+  routeListNumber    VARCHAR(32)  NOT NULL,
   startDate         DATE         NULL,
   palletsQty        INTEGER      NULL,
   driver            VARCHAR(255) NULL,
@@ -279,12 +279,12 @@ CREATE TABLE route_lists (
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
-  UNIQUE (routListNumber)
+  UNIQUE (routeListNumber)
 );
 
-CREATE PROCEDURE insert_into_rout_list_history(
+CREATE PROCEDURE insert_into_route_list_history(
   routeListID       INTEGER,
-  routListNumber    VARCHAR(32),
+  routeListNumber    VARCHAR(32),
   startDate         DATE,
   palletsQty        INTEGER,
   driver            VARCHAR(255),
@@ -294,9 +294,9 @@ CREATE PROCEDURE insert_into_rout_list_history(
   routeListStatusID VARCHAR(32)
 )
   BEGIN
-    INSERT INTO rout_list_history
+    INSERT INTO route_list_history
     VALUES
-      (NULL, NOW(), routeListID, routListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate,
+      (NULL, NOW(), routeListID, routeListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate,
        routeID, routeListStatusID);
   END;
 
@@ -304,7 +304,7 @@ CREATE PROCEDURE insert_into_rout_list_history(
 CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
-    CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
+    CALL insert_into_route_list_history(NEW.routeListID, NEW.routeListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
                                        NEW.driverPhoneNumber,
                                        NEW.licensePlate, NEW.routeID, 'CREATED');
   END;
@@ -312,7 +312,7 @@ FOR EACH ROW
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
-    CALL insert_into_rout_list_history(NEW.routeListID, NEW.routListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
+    CALL insert_into_route_list_history(NEW.routeListID, NEW.routeListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
                                        NEW.driverPhoneNumber,
                                        NEW.licensePlate, NEW.routeID, 'UPDATED');
   END;
@@ -320,16 +320,16 @@ FOR EACH ROW
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   BEGIN
-    CALL insert_into_rout_list_history(OLD.routeListID, OLD.routListNumber, OLD.startDate, OLD.palletsQty, OLD.driver,
+    CALL insert_into_route_list_history(OLD.routeListID, OLD.routeListNumber, OLD.startDate, OLD.palletsQty, OLD.driver,
                                        OLD.driverPhoneNumber,
                                        OLD.licensePlate, OLD.routeID, 'DELETED');
   END;
 
-CREATE TABLE rout_list_history (
+CREATE TABLE route_list_history (
   routeListHistoryID BIGINT AUTO_INCREMENT,
   timeMark           DATETIME,
   routeListID        INTEGER,
-  routListNumber     VARCHAR(32)  NOT NULL,
+  routeListNumber     VARCHAR(32)  NOT NULL,
   startDate          DATE         NULL,
   palletsQty         INTEGER      NULL,
   driver             VARCHAR(255) NULL,
@@ -653,33 +653,33 @@ CREATE FUNCTION getRequestIDByNumber(_requestNumber VARCHAR(16))
     RETURN result;
   END;
 
-CREATE FUNCTION getRoutIDByRoutName(_routName VARCHAR(64))
+CREATE FUNCTION getRouteIDByRouteName(_routeName VARCHAR(64))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT routeID
                   FROM routes
-                  WHERE routeName = _routName);
+                  WHERE routeName = _routeName);
     RETURN result;
   END;
 
-CREATE FUNCTION getRouteListIDByNumber(_routListNumber VARCHAR(32))
+CREATE FUNCTION getRouteListIDByNumber(_routeListNumber VARCHAR(32))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT routeListID
                   FROM route_lists
-                  WHERE routListNumber = _routListNumber);
+                  WHERE routeListNumber = _routeListNumber);
     RETURN result;
   END;
 
-CREATE FUNCTION getRoutPointIDByRoutNameAndSortOrder(_routName VARCHAR(64), _sortOrder INTEGER)
+CREATE FUNCTION getRoutePointIDByRouteNameAndSortOrder(_routeName VARCHAR(64), _sortOrder INTEGER)
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT routePointID
                   FROM route_points
-                  WHERE routeID = getRoutIDByRoutName(_routName) AND sortOrder = _sortOrder);
+                  WHERE routeID = getRouteIDByRouteName(_routeName) AND sortOrder = _sortOrder);
     RETURN result;
   END;
 
@@ -848,7 +848,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       route_lists.driver,
       route_lists.licensePlate,
       route_lists.palletsQty,
-      route_lists.routListNumber,
+      route_lists.routeListNumber,
       route_lists.routeListID,
       routes.directionName,
 
@@ -929,7 +929,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     DEALLOCATE PREPARE statement;
   END;
 
-# changed this `selectInvoiceStatusHistory` procedure because it couldn't work with invoise number. But i don't know this info
+# changed this `selectInvoiceStatusHistory` procedure because it couldn't work with invoice number. But i don't know this info
 CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
     SELECT
@@ -939,7 +939,7 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
       patronymic,
       invoiceStatusRusName,
       invoice_history.lastStatusUpdated,
-      routListNumber,
+      routeListNumber,
       palletsQty,
       invoice_history.boxQty
     FROM invoice_history
@@ -957,7 +957,7 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
 # CREATE PROCEDURE selectInvoiceStatusHistory(_invoiceID INTEGER)
 #   BEGIN
 #     SELECT
-#       pointName, firstName, lastName, patronymic, invoiceStatusRusName, lastStatusUpdated, routListNumber, palletsQty, boxQty
+#       pointName, firstName, lastName, patronymic, invoiceStatusRusName, lastStatusUpdated, routeListNumber, palletsQty, boxQty
 #     FROM invoice_history
 #       INNER JOIN (route_lists, users, points, invoice_statuses)
 #         ON (
@@ -969,6 +969,11 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
 #     ORDER BY lastStatusUpdated;
 #   END;
 
+CREATE PROCEDURE `getRoutePointsByDirectionName` (_directionName VARCHAR(255))
+  BEGIN
+    SET @_routeID = (SELECT `routeID` FROM `routes` WHERE `directionName` LIKE concat('%',_directionName,'%') LIMIT 1);
+    SELECT * FROM route_points WHERE routeID = @_routeID;
+  END;
 
 
 

@@ -42,7 +42,7 @@ selectNames
       route_lists.driver              AS 'водитель',
       route_lists.licensePlate        AS 'номер ТС',
       route_lists.palletsQty          AS 'количество паллет',
-      route_lists.routListNumber      AS 'номер маршрутного листа',
+      route_lists.routeListNumber      AS 'номер маршрутного листа',
       routes.directionName            AS 'направление',
 
       last_visited_points.pointName   AS 'последний посещенный пункт',
