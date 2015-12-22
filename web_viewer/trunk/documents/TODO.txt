@@ -77,7 +77,8 @@ S_o  Point     arrivalTime  tLoading  timeToNextPoint distanceToNextPoint
 n    any_point calculate    setByUser setByUser       setByUser
 кнопка сохранить
 
-
+21.12.2015 
+Из описания выше неясно, как должен выглядеть функционал для пользователя, потому предлагаю актуализировать файл GUI.odt - нарисовать желаемый интерфейс и добавить по возможности приблизительное описание действий на странице.
 
 
 
