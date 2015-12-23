@@ -943,10 +943,9 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
       palletsQty,
       invoice_history.boxQty
     FROM invoice_history
-      INNER JOIN (route_lists, users, points, invoice_statuses, invoices)
+      INNER JOIN (route_lists, users, points, invoice_statuses)
         ON (
-        invoices.invoiceNumber = _invoiceNumber AND
-        invoice_history.invoiceID = invoices.invoiceID AND
+        invoice_history.invoiceNumber = _invoiceNumber AND
         invoice_history.lastModifiedBy = users.userID AND
         invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
         users.pointID = points.pointID

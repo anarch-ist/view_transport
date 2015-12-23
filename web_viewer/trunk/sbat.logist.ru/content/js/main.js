@@ -70,7 +70,7 @@ $(document).ready(function () {
                         function (data) {
                             if (data === '1') {
                                 dataTable.columns().draw();
-                                $(this).dialog("close");
+                                $statusChangeDialog.dialog("close");
                             }
                         }
                     );
@@ -88,8 +88,8 @@ $(document).ready(function () {
 
         var options = [];
         var storedStatuses = '';
-        if (window.sessionStorage["USER_STATUSES"]) {
-            storedStatuses = JSON.parse(window.sessionStorage["USER_STATUSES"]);
+        if (window.localStorage["USER_STATUSES"]) {
+            storedStatuses = JSON.parse(window.localStorage["USER_STATUSES"]);
         }
         for (var i = 0; i < storedStatuses.length; i++) {
             console.log(storedStatuses[i]);

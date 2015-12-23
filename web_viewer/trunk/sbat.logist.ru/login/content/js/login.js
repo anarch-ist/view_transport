@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    window.localStorage.removeItem("USER_STATUSES");
 
     $("#loginButton").click(function () {
         var $loginInput = $("#loginInput");
@@ -33,7 +34,7 @@ $(document).ready(function () {
                             "border": "2px solid #00F5FF",
                             "box-shadow": "0 0 5px #00F5FF"
                         });
-                        window.sessionStorage.setItem("USER_STATUSES", JSON.stringify(result.statuses));
+                        window.localStorage.setItem("USER_STATUSES", JSON.stringify(result.statuses));
                         document.location = '/';
                     }
 
