@@ -1,13 +1,11 @@
-package optimizationModule;
+package ru.sbat.transport.optimization;
 
-
-import java.util.Date;
 
 public class Request{
     private int requestId;
     private int clientId;
     private String deliveryAddress;
-    private int plannedDeliveryTime;
+    private String plannedDeliveryTime;
 
     public int getRequestId() {
         return requestId;
@@ -33,11 +31,11 @@ public class Request{
         this.deliveryAddress = deliveryAddress;
     }
 
-    public int getPlannedDeliveryTime() {
+    public String getPlannedDeliveryTime() {
         return plannedDeliveryTime;
     }
 
-    public void setPlannedDeliveryTime(int plannedDeliveryTime) {
+    public void setPlannedDeliveryTime(String plannedDeliveryTime) {
         this.plannedDeliveryTime = plannedDeliveryTime;
     }
 }

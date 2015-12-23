@@ -1,8 +1,8 @@
-package optimizationModule;
+package ru.sbat.transport.optimization;
 
 
-import optimizationModule.location.Route;
-import optimizationModule.user.MarketAgent;
+import ru.sbat.transport.optimization.location.Route;
+import ru.sbat.transport.optimization.user.MarketAgent;
 
 public class Invoice{
     private Request request;

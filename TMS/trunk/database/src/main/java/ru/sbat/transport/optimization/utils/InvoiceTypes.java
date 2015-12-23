@@ -1,4 +1,4 @@
-package optimizationModule.utils;
+package ru.sbat.transport.optimization.utils;
 
 
 public enum InvoiceTypes{

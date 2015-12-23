@@ -1,6 +1,6 @@
-package optimizationModule.location;
+package ru.sbat.transport.optimization.location;
 
-import optimizationModule.Invoice;
+import ru.sbat.transport.optimization.Invoice;
 
 import java.util.ArrayList;
 import java.util.Set;
