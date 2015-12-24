@@ -63,7 +63,6 @@ $(document).ready(function () {
                 } else if (action === "changeStatusForSeveralInvoices") {
                     // получение ИД маршрутного листа
                     routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
-                    console.log(routeListID);
                     $.post(
                         "content/getData.php",
                         {status: action, routeListID: routeListID, newStatusID: newStatusID, date: date},
@@ -201,7 +200,6 @@ $(document).ready(function () {
                 $(".user-grid-error").html("");
                 $("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
                 $("#user-grid_processing").css("display", "none");
-
             }
         },
         columns: [
