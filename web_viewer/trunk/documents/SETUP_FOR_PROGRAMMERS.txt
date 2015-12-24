@@ -169,7 +169,7 @@ Deployment | Upload to <server name> (or Deployment | Upload to...
 if you want to download from server make right click on folder inside remote host panel;
 
 
--- SERVER DATATASE Configuration
+-- SERVER DATABASE Configuration
 
 create new datasource: MySQL - production
 
@@ -200,7 +200,11 @@ http://185.75.182.92/phpmyadmin/
 5. Во вкладке обозревателя проекта жмем ПКМ по директории tests, выбираем в контекстном меню "Create run configuration" -> "tests" .
 6. Жмем ОК и пользуемся тестами
 
+-- DATATABLES EDITOR
 
+email: ask_sergey@inbox.ru
+login: sergey88
+password: dregt56kl
 
 
 
