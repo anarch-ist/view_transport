@@ -948,6 +948,7 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
         invoice_history.invoiceNumber = _invoiceNumber AND
         invoice_history.lastModifiedBy = users.userID AND
         invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
+        invoice_history.routeListID = route_lists.routeListID AND
         users.pointID = points.pointID
         )
     ORDER BY lastStatusUpdated;
