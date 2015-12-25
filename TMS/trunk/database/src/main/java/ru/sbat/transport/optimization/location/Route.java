@@ -16,16 +16,25 @@ public class Route extends LinkedList<TrackCourse> implements IRoute{
 
     @Override
     public Integer getFullTime() {
-        return null;
+        int result = 0;
+        for(TrackCourse trackCourse: this){
+            result += trackCourse.getTimeToNextPoint();
+        }
+        return result;
     }
 
     @Override
     public Integer getDepartureTime() {
-        return null;
+        return this.get(0).getDepartureTime();
     }
 
     @Override
     public Integer getArrivalTime() {
-        return null;
+        int result = 0;
+        result = this.get(this.size()-2).getDepartureTime() + this.get(this.size()-2).getTimeToNextPoint();
+        if(result > 24){
+            result = result - 24;
+        }
+        return result;
     }
 }
