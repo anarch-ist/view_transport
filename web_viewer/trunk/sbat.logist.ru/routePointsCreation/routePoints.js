@@ -1,3 +1,15 @@
+//Client-to-server
+/*
+Client-to-server
+action: create, edit, remove
+data: An object containing the row ids to act upon and edited data for those rows.
+preSubmit: hook to add additional parameters before send to the server
+postSubmit: hook to manupulate submitted data before draw
+*/
+
+
+
+
 $(document).ready(function() {
     // custom plugin
     // https://editor.datatables.net/examples/plug-ins/fieldPlugin.html
@@ -7,10 +19,10 @@ $(document).ready(function() {
     <!-- EXAMPLE DATA-->
     // data must have ID column
     var exampleData = [
-        {"routePointID":101, "sortOrder":0, "pointName":"point1", "tLoading": 100, "timeToNextPoint": 200, "distanceToNextPoint": 350},
-        {"routePointID":102, "sortOrder":1, "pointName":"point2", "tLoading": 50, "timeToNextPoint": 130, "distanceToNextPoint": 340}
+        {"routePointID":101, "sortOrder":0, "pointName":"пункт1", "tLoading": "02ч.30м.", "timeToNextPoint": "10ч.00м.", "distanceToNextPoint": 350},
+        {"routePointID":102, "sortOrder":1, "pointName":"пункт2", "tLoading": "01ч.20м.", "timeToNextPoint": "12ч.30м.", "distanceToNextPoint": 340}
     ];
-
+    // create
     $("#routeSelect").selectize({
         diacritics: true,
         maxOptions: 10000,
@@ -80,7 +92,7 @@ $(document).ready(function() {
         idSrc: 'routePointID',
 
         fields: [
-            { label: 'Порядковый номер', name: 'sortOrder' },
+            { label: 'Порядковый номер', name: 'sortOrder', type: 'mask', mask: "0", placeholder: "0-9" },
             { label: 'Пункт',  name: 'pointName', type: 'selectize',
 
                 options: [
@@ -97,9 +109,9 @@ $(document).ready(function() {
                     dropdownParent: null
                 }
             },
-            { label: 'Время разгрузки',  name: 'tLoading'  },
-            { label: 'Время следующего пункта',  name: 'timeToNextPoint'  },
-            { label: 'Расстояние до следующего пункта',  name: 'distanceToNextPoint'  }
+            { label: 'Время разгрузки',  name: 'tLoading', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."},
+            { label: 'Время до следующего пункта',  name: 'timeToNextPoint', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."},
+            { label: 'Расстояние до следующего пункта',  name: 'distanceToNextPoint', type: 'mask', mask:"9999", placeholder:"____км."}
             // etc
         ],
         i18n: {
@@ -140,7 +152,44 @@ $(document).ready(function() {
             }
         }
     } );
-    //editor.field('pointName')
+
+    //$(editor.field('pointName')).on("");
+    // transfrom string like 18ч.30м. to 18*60+30
+    editor.on( 'preSubmit', function (e, data, action) {
+        if (action === 'create' || action === 'edit') {
+            data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
+            data.data[0].timeToNextPoint = stringToMinutes(data.data[0].timeToNextPoint);
+        }
+    } );
+
+    editor.on( 'postSubmit', function (e, json, data, action) {
+        if (action === 'create' || action === 'edit') {
+        //TODO use minutes toString
+            //console.log(data);
+            //console.log(json);
+            //console.log(action);
+        }
+    } );
+
+    function stringToMinutes(string) {
+        var houres = string.substring(0, 2);
+        var minutes = string.substring(2, 4);
+        return houres * 60 + minutes * 1;
+    }
+
+    function minutesToString(intMinutes) {
+        var minutes = intMinutes % 60;
+        var strMinutes = "";
+        if (minutes <= 9) strMinutes = "0" + minutes;
+        else strMinutes = minutes + "";
+
+        var houres = Math.floor(intMinutes / 60);
+        var strHoures = "";
+        if (houres <= 9) strHoures = "0" + minutes;
+        else strHoures = houres + "";
+
+        return strHoures + "ч." + strMinutes + "м.";
+    }
 
     var $routePointsDataTable =  $("#routePointsTable").DataTable({
             "dom": 'Bt', // show only buttons and table with no decorations
@@ -164,7 +213,6 @@ $(document).ready(function() {
                     editor: editor,
                     text: "изменить"
                 }
-
             ],
             "paging": false, // no pagination
             "columnDefs": [
