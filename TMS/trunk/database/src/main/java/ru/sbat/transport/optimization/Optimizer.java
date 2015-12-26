@@ -20,7 +20,7 @@ public class Optimizer implements IOptimizer{
         for(Invoice invoice: unassignedInvoices){
 
             if(invoice.getRoute() == null) {
-                if(invoice.getRoute().getArrivalTime() < invoice.getRequest().getPlannedDeliveryTime()){
+                if(invoice.getRoute().getArrivalTime() < invoice.getRequest().getPlannedDeliveryTime() && (invoice.getRoute().get(invoice.getRoute().size()-1).getDayOfWeek().equals(invoice.getRequest().getDayOfWeek() || )){
 
                 }else if(invoice.getRoute().getArrivalTime() > invoice.getRequest().getPlannedDeliveryTime()){
 
