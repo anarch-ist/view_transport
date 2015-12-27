@@ -1,13 +1,16 @@
 package ru.sbat.transport.optimization;
 
 
+import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.utils.DayOfWeek;
+
+import java.util.Date;
 
 public class Request{
     private int requestId;
     private int clientId;
-    private String deliveryAddress;
-    private Integer plannedDeliveryTime;
+    private Point deliveryPoint;
+    private Date plannedDeliveryTime;
     private DayOfWeek dayOfWeek;
 
     public DayOfWeek getDayOfWeek() {
@@ -34,19 +37,19 @@ public class Request{
         this.clientId = clientId;
     }
 
-    public String getDeliveryAddress() {
-        return deliveryAddress;
+    public Point getDeliveryPoint() {
+        return deliveryPoint;
     }
 
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
+    public void setDeliveryPoint(Point deliveryPoint) {
+        this.deliveryPoint = deliveryPoint;
     }
 
-    public Integer getPlannedDeliveryTime() {
+    public Date getPlannedDeliveryTime() {
         return plannedDeliveryTime;
     }
 
-    public void setPlannedDeliveryTime(Integer plannedDeliveryTime) {
+    public void setPlannedDeliveryTime(Date plannedDeliveryTime) {
         this.plannedDeliveryTime = plannedDeliveryTime;
     }
 }

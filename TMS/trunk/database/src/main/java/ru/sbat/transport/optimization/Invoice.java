@@ -4,6 +4,8 @@ package ru.sbat.transport.optimization;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.user.MarketAgent;
 
+import java.util.Date;
+
 public class Invoice{
     private Request request;
     private String addressOfWarehouse;
@@ -13,6 +15,15 @@ public class Invoice{
     private MarketAgent marketAgent;
     private int priority;
     private Route route;
+    private Date creationDate;
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
 
     public Route getRoute() {
         return route;
