@@ -21,14 +21,17 @@ class RouteEntity implements IRouteEntity
         return self::$_instance;
     }
 
+    /**
+     * @return array:RouteData
+     */
     function selectRoutes()
     {
         $array = $this->_DAO->select(new SelectAllRoutes());
-        $Routes = array();
+        $routes = array();
         for ($i = 0; $i < count($array); $i++) {
-            $Routes[$i] = new RouteData($array[$i]);
+            $routes[$i] = new RouteData($array[$i]);
         }
-        return $Routes;
+        return $routes;
     }
 
     function selectRouteByID($id)
@@ -58,9 +61,9 @@ class RouteEntity implements IRouteEntity
         return new RouteData($array[0]);
     }
 
-    function selectRoutePointsByDirectionName($directionName)
+    function selectRoutePointsByRouteID($directionName)
     {
-        $array = $this->_DAO->select(new SelectRoutePointsByDirectionName($directionName));
+        $array = $this->_DAO->select(new SelectRoutePointsByRouteID($directionName));
         $RoutePoints = array();
         for ($i = 0; $i < count($array); $i++) {
             $RoutePoints[$i] = new RoutePointData($array[$i]);
@@ -77,7 +80,7 @@ class SelectAllRoutes implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT * FROM `routes`;";
+        return "SELECT * FROM `routes`";
     }
 }
 
@@ -96,18 +99,18 @@ class SelectRouteByID implements IEntitySelect
     }
 }
 
-class SelectRoutePointsByDirectionName implements IEntitySelect
+class SelectRoutePointsByRouteID implements IEntitySelect
 {
-    private $directionName;
+    private $routeID;
 
-    function __construct($directionName)
+    function __construct($routeID)
     {
-        $this->directionName = DAO::getInstance()->checkString($directionName);
+        $this->routeID = DAO::getInstance()->checkString($routeID);
     }
 
     function getSelectQuery()
     {
-        throw new \Exception('Запрос не написан');
+        return "SELECT routePointID, sortOrder, pointName, tLoading, timeToNextPoint, distanceToNextPoint FROM route_points, points WHERE route_points.pointID = points.pointID AND routeID = '$this->routeID' ORDER BY `sortOrder`;";
     }
 }
 
@@ -122,6 +125,6 @@ class SelectRouteByDirectionName implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "CALL getRoutePointsByDirectionName('$this->directionName');";
+        throw new \MysqlException('Запрос не написан');
     }
 }

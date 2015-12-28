@@ -3,7 +3,7 @@ include_once __DIR__ . '/../dao/userDao/User.php';
 include_once __DIR__ . '/../dao/pointDao/Point.php';
 include_once __DIR__ . '/../dao/invoicesForUser/InvoicesForUser.php';
 include_once __DIR__ . '/../dao/invoiceDao/Invoice.php';
-include_once __DIR__ . '/../dao/RouteDao/Route.php';
+include_once __DIR__ . '/../dao/routeDao/Route.php';
 include_once __DIR__ . '/../sessionAndCookieWork/SessionAndCookieWork.php';
 
 use DAO\InvoiceEntity as InvoiceEntity;
@@ -41,7 +41,12 @@ abstract class AuthUser
             }
         } else if ($authVariant === 'auth') {
             if (!(isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password']))) {
-                throw new AuthException('Ошибка авторизации');
+                $login = '';
+                if (isset($_POST['login'])) $login = $_POST['login'];
+                $password = '';
+                if (isset($_POST['password'])) $password = $_POST['password'];
+                $string = 'login: '.$login.' | password: '.$password;
+                throw new AuthException('Ошибка авторизации. '.$string);
             }
         } else {
             throw new AuthException('Передан неверный параметр: ' . $authVariant);

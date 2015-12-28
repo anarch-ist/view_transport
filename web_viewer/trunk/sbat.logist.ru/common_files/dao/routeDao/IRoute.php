@@ -9,7 +9,7 @@ interface IRouteEntity
 
     function selectRouteByDirectionName($directionName);
 
-    function selectRoutePointsByDirectionName($directionName);
+    function selectRoutePointsByRouteID($directionName);
 
     function updateRoute($newRoute);
 

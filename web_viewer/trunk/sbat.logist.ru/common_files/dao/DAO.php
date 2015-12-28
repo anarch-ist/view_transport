@@ -31,6 +31,7 @@ class DAO implements IDAO
             if ($connection->connect_errno) {
                 throw new \MysqlException('Connection error - ' . $connection->connect_error);
             }
+            //$connection->set_charset()
             mysqli_set_charset($connection, "utf8"); // fixed encoding error
             return $connection;
         }
@@ -40,7 +41,7 @@ class DAO implements IDAO
     public function startTransaction()
     {
         if (!$this->_transactionStarted) {
-            return $this->_transactionStarted = $this->_connection->query('START TRANSACTION;');
+            return $this->_transactionStarted = $this->query('START TRANSACTION');
         }
         return false;
     }
@@ -73,7 +74,7 @@ class DAO implements IDAO
     public function rollback()
     {
         if ($this->_transactionStarted) {
-            $this->_transactionStarted = !$this->_connection->query('ROLLBACK;');
+            $this->_transactionStarted = !$this->query('ROLLBACK');
             return !$this->_transactionStarted;
         }
         return false;
@@ -82,14 +83,13 @@ class DAO implements IDAO
 
     function __destruct()
     {
-        $this->commit();
         $this->closeConnection();
     }
 
     public function commit()
     {
         if ($this->_transactionStarted) {
-            $this->_transactionStarted = !$this->_connection->query('COMMIT;');
+            $this->_transactionStarted = !$this->query('COMMIT');
             return !$this->_transactionStarted;
         }
         return false;
@@ -101,6 +101,7 @@ class DAO implements IDAO
             return false;
         }
         $this->_transactionStarted = false;
+        $this->commit();
         $this->_connection->close();
         $this->_connection = false;
         return true;
@@ -120,11 +121,22 @@ class DAO implements IDAO
 
     function query($sql)
     {
-        $result = @$this->_connection->query($sql);
+        while($this->_connection->more_results()) $this->_connection->next_result();
+        $result = $this->_connection->query($sql);
         if ($this->_connection->errno) {
             throw new \MysqlException('Ошибка в запросе: ' . $this->_connection->error . '. Запрос: ' . $sql);
         }
         return $result;
+//        if($this->_connection->multi_query($sql)) {
+//            $result = '';
+//            do {
+//                $result = $this->_connection->store_result();
+//            } while($this->_connection->next_result());
+//            return $result;
+//        }
+//        else {
+//            throw new \MysqlException('Ошибка в запросе: ' . $this->_connection->error . '. Запрос: ' . $sql);
+//        }
     }
 
     function update(IEntityUpdate $newObj, IEntityInsert $updateTable = null)
@@ -133,7 +145,8 @@ class DAO implements IDAO
         if (!is_null($updateTable)) {
             $this->query($updateTable->getInsertQuery());
         }
-        return $this->query($newObj->getUpdateQuery());
+        $result = $this->query($newObj->getUpdateQuery());
+        return $result;
     }
 
     function insert(IEntityInsert $obj, IEntityInsert $updateTable = null)
@@ -158,11 +171,13 @@ class DAO implements IDAO
 class UserAction implements IEntityInsert
 {
     private $table;
+    private $userID;
     private $action;
 
-    function __construct($table, $action)
+    function __construct($userID, $table, $action)
     {
         $this->table = DAO::getInstance()->checkString($table);
+        $this->userID = DAO::getInstance()->checkString($userID);
         $this->action = DAO::getInstance()->checkString($action);
     }
 
@@ -171,8 +186,7 @@ class UserAction implements IEntityInsert
      */
     function getInsertQuery()
     {
-        $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
         // TODO: Implement getUpdateQuery() method.
-        return "INSERT INTO `user_action_history`(`userID`, `tableID`, `action`) VALUES ($userID,'$this->table','$this->action');";
+        return "INSERT INTO `user_action_history`(`userID`, `tableID`, `action`) VALUES ($this->userID,'$this->table','$this->action')";
     }
 }

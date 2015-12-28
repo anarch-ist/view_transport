@@ -23,17 +23,23 @@ class UserEntityTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testCreateUserEntity
+     * @depends      testCreateUserEntity
+     * @dataProvider provideUserEmail
      */
-    public function testGetUserByEmail(\DAO\UserEntity $user)
+    public function testGetUserByEmail($email, $isEmpty, $userID, \DAO\UserEntity $user)
     {
-        $userData = $user->selectUserByEmail('andy');
-        $this->assertEmpty($userData);
-        $userData = $user->selectUserByEmail('\' OR true; select * from `users`; --');
-        $this->assertEmpty($userData);
-        $userData = $user->selectUserByEmail('" OR true; select * from `users`; --');
-        $this->assertEmpty($userData);
-        $userData = $user->selectUserByEmail('test@test.ru');
-        $this->assertEquals($userData->getData('userID'), 1);
+        $userData = $user->selectUserByEmail($email);
+        if ($isEmpty) {
+            $this->assertEmpty($userData);
+        } else {
+            $this->assertEquals($userID, $userData->getData('userID'));
+        }
+    }
+
+    function provideUserEmail()
+    {
+        $test1 = array('email' => 'andy', 'isEmpty' => true, 'userID' => 1);
+        $test2 = array('email' => 'test@test.ru', 'isEmpty' => false, 'userID' => 1);
+        return array($test1, $test2);
     }
 }

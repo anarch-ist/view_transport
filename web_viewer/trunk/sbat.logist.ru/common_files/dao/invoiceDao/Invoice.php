@@ -52,14 +52,14 @@ class InvoiceEntity implements IInvoiceEntity
         // TODO: Implement updateInvoice() method.
     }
 
-    function updateInvoiceStatus($invoiceID, $newInvoiceStatus, $datetime)
+    function updateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatus($invoiceID, $newInvoiceStatus, $datetime), new UserAction('invoices', 'update'));
+        return $this->_DAO->update(new UpdateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime));
     }
 
-    function updateInvoiceStatuses($routeListID, $newInvoiceStatus, $datetime)
+    function updateInvoiceStatuses($userID, $routeListID, $newInvoiceStatus, $datetime)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatuses($routeListID, $newInvoiceStatus, $datetime), new UserAction('invoices', 'update'));
+        return $this->_DAO->update(new UpdateInvoiceStatuses($userID, $routeListID, $newInvoiceStatus, $datetime));
     }
 
     function deleteInvoice(InvoiceData $Invoice)
@@ -74,12 +74,12 @@ class InvoiceEntity implements IInvoiceEntity
 
     function getInvoiceStatuses(\PrivilegedUser $pUser)
     {
-        return $possibleStatuses = $this->_DAO->select(new SelectInvoiceStatuses($pUser->getUserInfo()->getData('userRoleID')));
+        return $this->_DAO->select(new SelectInvoiceStatuses($pUser->getUserInfo()->getData('userRoleID')));
     }
 
-    function getInvoiceHistoryByID($invoiceID)
+    function getInvoiceHistoryByInvoiceNumber($invoiceNumber)
     {
-        return $possibleStatuses = $this->_DAO->select(new SelectInvoiceHistory($invoiceID));
+        return $this->_DAO->select(new SelectInvoiceHistory($invoiceNumber));
     }
 }
 
@@ -97,7 +97,7 @@ class SelectAllInvoices implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select * from `invoices` LIMIT $this->start, $this->count;";
+        return "SELECT * FROM `invoices` LIMIT $this->start, $this->count;";
     }
 }
 
@@ -112,7 +112,7 @@ class SelectInvoiceByID implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select * from `invoices` where `InvoiceID` = $this->id";
+        return "SELECT * FROM `invoices` WHERE `InvoiceID` = $this->id";
     }
 }
 
@@ -127,33 +127,35 @@ class SelectInvoiceStatuses implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select `invoice_statuses`.`invoiceStatusID`, `invoiceStatusRusName` from `invoice_statuses`, `invoice_statuses_for_user_role` where `invoice_statuses`.`invoiceStatusID` = `invoice_statuses_for_user_role`.`invoiceStatusID` AND userRoleID = '$this->role'";
+        return "SELECT `invoice_statuses`.`invoiceStatusID`, `invoiceStatusRusName` from `invoice_statuses`, `invoice_statuses_for_user_role` where `invoice_statuses`.`invoiceStatusID` = `invoice_statuses_for_user_role`.`invoiceStatusID` AND userRoleID = '$this->role'";
     }
 }
 
 class SelectInvoiceHistory implements IEntitySelect
 {
-    private $id;
+    private $invoiceNumber;
 
     function __construct($id)
     {
-        $this->id = $id;
+        $this->invoiceNumber = $id;
     }
 
     function getSelectQuery()
     {
-        return "CALL selectInvoiceStatusHistory('$this->id')";
+        return "CALL selectInvoiceStatusHistory('$this->invoiceNumber');";
     }
 }
 
 class UpdateInvoiceStatus implements IEntityUpdate
 {
     private $invoiceNumber;
+    private $userID;
     private $newInvoiceStatus;
     private $datetime;
 
-    function __construct($invoiceNumber, $newInvoiceStatus, $datetime)
+    function __construct($userID, $invoiceNumber, $newInvoiceStatus, $datetime)
     {
+        $this->userID = DAO::getInstance()->checkString($userID);
         $this->invoiceNumber = DAO::getInstance()->checkString($invoiceNumber);
         $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
         $this->datetime = DAO::getInstance()->checkString($datetime);
@@ -165,7 +167,7 @@ class UpdateInvoiceStatus implements IEntityUpdate
     function getUpdateQuery()
     {
         // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `invoiceNumber` = '$this->invoiceNumber';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `invoiceNumber` = '$this->invoiceNumber';";
 //        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `invoiceNumber` = '$this->invoiceNumber';";
     }
 }
@@ -173,12 +175,14 @@ class UpdateInvoiceStatus implements IEntityUpdate
 class UpdateInvoiceStatuses implements IEntityUpdate
 {
     private $routeListID;
+    private $userID;
     private $newInvoiceStatus;
     private $datetime;
 
-    function __construct($routeListID, $newInvoiceStatus, $datetime)
+    function __construct($userID, $routeListID, $newInvoiceStatus, $datetime)
     {
         $this->routeListID = DAO::getInstance()->checkString($routeListID);
+        $this->userID = DAO::getInstance()->checkString($userID);
         $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
         $this->datetime = DAO::getInstance()->checkString($datetime);
     }
@@ -189,7 +193,7 @@ class UpdateInvoiceStatuses implements IEntityUpdate
     function getUpdateQuery()
     {
         // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
 //        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `routeListID` = '$this->routeListID';";
     }
 }

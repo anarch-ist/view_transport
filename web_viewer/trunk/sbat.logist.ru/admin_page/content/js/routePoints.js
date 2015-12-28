@@ -11,6 +11,23 @@ postSubmit: hook to manupulate submitted data before draw
 
 
 $(document).ready(function() {
+
+    function getAllRoutePointsDataForRouteID(value) {
+        $.post(
+            "content/getData.php",
+            {status: "getAllRoutePointsDataForRouteID", routeID: value, format:"json"},
+            function(data) {
+                data = JSON.parse(data);
+                for(var i in data) {
+                    data[i].tLoading = minutesToString(data[i].tLoading);
+                    data[i].timeToNextPoint = minutesToString(data[i].timeToNextPoint);
+                }
+                $routePointsDataTable.rows().remove();
+                $routePointsDataTable.rows.add(data).draw(false);
+            }
+        );
+    }
+
     // custom plugin
     // https://editor.datatables.net/examples/plug-ins/fieldPlugin.html
     // plugin for autocomplete fields, add autoComplete field type to Editor
@@ -23,50 +40,46 @@ $(document).ready(function() {
         {"routePointID":102, "sortOrder":1, "pointName":"пункт2", "tLoading": "01ч.20м.", "timeToNextPoint": "12ч.30м.", "distanceToNextPoint": 340}
     ];
     // create
-    $("#routeSelect").selectize({
+    routeSelectOptions = {
         diacritics: true,
         maxOptions: 10000,
         maxItems: 1,
         dropdownParent: null, // body or null
         selectOnTab: true,
         onChange: function(value) {
-            $.getJSON(
-                "../content/getData.php",
-                {status: "getAllRoutePointsDataForRouteID", routeID: value, format:"json"},
-                function(data) {
-                    $routePointsDataTable.rows().remove();
-                    $routePointsDataTable.rows.add(data).draw(false);
-                }
-            );
+            getAllRoutePointsDataForRouteID(value);
         }
-    });
+    };
 
     // when page is loading make request and get all points
-    $.getJSON(
-        "../content/getData.php",
+    $.post(
+        "content/getData.php",
         {status: "getAllPointIdPointNamePairs", format:"json"},
         // server returns array of pairs [{pointID:1, pointName:"somePoint1"}, {pointID:2, pointName:"somePoint2"}]
         function(data) {
             var options = [];
+            data = JSON.parse(data);
             data.forEach(function(entry) {
                 var option = "<option value=" + entry.pointID+">" + entry.pointName + "</option>";
                 options.push(option);
             });
-            //$("#pointSelect").html(options.join(""));
+            $("#pointSelect").html(options.join(""));
         }
     );
     // when page is loading make request and get all routes
-    $.getJSON(
-        "../content/getData.php",
+    $.post(
+        "content/getData.php",
         {status: "getAllRouteIdDirectionPairs", format:"json"},
         // server returns array of pairs [{routeID:1, directionName:"SomeDir1"}, {routeID:2, directionName:"SomeDir2"}]
         function(data) {
             var options = [];
+            data = JSON.parse(data);
             data.forEach(function(entry) {
                 var option = "<option value=" + entry.routeID+">" + entry.directionName + "</option>";
                 options.push(option);
             });
-            $("#routeSelect").html(options.join(""));
+            $("#routeSelect").html(options.join("")).selectize(routeSelectOptions);
+            getAllRoutePointsDataForRouteID($("#routeSelect option")[0].value);
         }
     );
 
@@ -77,15 +90,15 @@ $(document).ready(function() {
         ajax: {
             create: {
                 type: 'POST',
-                url: '../content/getData.php'
+                url: 'content/getData.php'
             },
             edit: {
                 type: 'PUT',
-                url: '../content/getData.php'
+                url: 'content/getData.php'
             },
             remove: {
                 type: 'DELETE',
-                url: '../content/getData.php'
+                url: 'content/getData.php'
             }
         },
         table: '#routePointsTable',
@@ -96,11 +109,11 @@ $(document).ready(function() {
             { label: 'Пункт',  name: 'pointName', type: 'selectize',
 
                 options: [
-                    { "label": "пункт1", "value": "1" },
-                    { "label": "пункт2", "value": "2" },
-                    { "label": "пункт3", "value": "3" },
-                    { "label": "пункт4", "value": "4" },
-                    { "label": "пункт5", "value": "5" }
+                    //{ "label": "пункт1", "value": "1" },
+                    //{ "label": "пункт2", "value": "2" },
+                    //{ "label": "пункт3", "value": "3" },
+                    //{ "label": "пункт4", "value": "4" },
+                    //{ "label": "пункт5", "value": "5" }
                 ],
                 opts: {
                     diacritics: true,
@@ -173,8 +186,8 @@ $(document).ready(function() {
 
     function stringToMinutes(string) {
         var houres = string.substring(0, 2);
-        var minutes = string.substring(2, 4);
-        return houres * 60 + minutes * 1;
+        var minutes = string.substr(4, 2);
+        return houres * 60 + parseInt(minutes);
     }
 
     function minutesToString(intMinutes) {
@@ -185,7 +198,7 @@ $(document).ready(function() {
 
         var houres = Math.floor(intMinutes / 60);
         var strHoures = "";
-        if (houres <= 9) strHoures = "0" + minutes;
+        if (houres <= 9) strHoures = "0" + houres;
         else strHoures = houres + "";
 
         return strHoures + "ч." + strMinutes + "м.";
@@ -193,7 +206,7 @@ $(document).ready(function() {
 
     var $routePointsDataTable =  $("#routePointsTable").DataTable({
             "dom": 'Bt', // show only buttons and table with no decorations
-            "data": exampleData,
+            //"data": exampleData,
             select: {
                 style: 'single'
             },

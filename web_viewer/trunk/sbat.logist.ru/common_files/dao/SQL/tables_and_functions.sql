@@ -9,7 +9,6 @@ USE `transmaster_transport_db`;
 --                                        USERS ROLES PERMISSIONS AND POINTS
 -- -------------------------------------------------------------------------------------------------------------------
 
-# added field userRoleRusName
 CREATE TABLE user_roles (
   userRoleID      VARCHAR(32),
   userRoleRusName VARCHAR(128),
@@ -68,7 +67,6 @@ CREATE TABLE points (
   UNIQUE (pointName)
 );
 
-# deleted login because we don't need in it
 CREATE TABLE users (
   userID      INTEGER AUTO_INCREMENT,
   firstName   VARCHAR(64) NULL,
@@ -622,7 +620,6 @@ CREATE FUNCTION getPointIDByName(name VARCHAR(128))
     RETURN result;
   END;
 
-# changed `getUserIDByLogin` function to `getUserIDByEmail` for working with email instead of login
 CREATE FUNCTION `getUserIDByEmail`(_email VARCHAR(64))
   RETURNS INTEGER
   BEGIN
@@ -828,7 +825,6 @@ CREATE FUNCTION generateHaving(map TEXT)
 -- _orderby 'id'  <> - название колонки из файла main.js
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
 
-# added `invoiceStatusRusName` field for showing it in page
 CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
                             _isDesc BOOLEAN, _search TEXT)
   BEGIN
@@ -929,7 +925,6 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     DEALLOCATE PREPARE statement;
   END;
 
-# changed this `selectInvoiceStatusHistory` procedure because it couldn't work with invoice number. But i don't know this info
 CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
     SELECT
@@ -953,40 +948,6 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
         )
     ORDER BY lastStatusUpdated;
   END;
-
-# CREATE PROCEDURE selectInvoiceStatusHistory(_invoiceID INTEGER)
-#   BEGIN
-#     SELECT
-#       pointName, firstName, lastName, patronymic, invoiceStatusRusName, lastStatusUpdated, routeListNumber, palletsQty, boxQty
-#     FROM invoice_history
-#       INNER JOIN (route_lists, users, points, invoice_statuses)
-#         ON (
-#         invoice_history.invoiceID = _invoiceID AND
-#         invoice_history.lastModifiedBy = users.userID AND
-#         invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
-#         users.pointID = points.pointID
-#         )
-#     ORDER BY lastStatusUpdated;
-#   END;
-
-CREATE PROCEDURE `getRoutePointsByDirectionName` (_directionName VARCHAR(255))
-  BEGIN
-    SET @_routeID = (SELECT `routeID` FROM `routes` WHERE `directionName` LIKE concat('%',_directionName,'%') LIMIT 1);
-    SELECT * FROM route_points WHERE routeID = @_routeID;
-  END;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

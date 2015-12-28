@@ -48,7 +48,8 @@ $(document).ready(function () {
                 if (action === "changeStatusForInvoice") {
                     // получение ИД выделенной в таблице накладной
                     invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
-                    $.post("content/getData.php", {
+                    $.post("content/getData.php",
+                        {
                             status: action,
                             invoiceNumber: invoiceNumber,
                             newStatusID: newStatusID,

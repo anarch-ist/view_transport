@@ -4,6 +4,9 @@ include_once __DIR__ . '/Data.php';
 
 interface IInvoiceEntity
 {
+    /**
+     * @return array of InvoiceData
+     */
     function selectInvoices();
 
     function selectInvoiceByID($id);
@@ -16,5 +19,5 @@ interface IInvoiceEntity
 
     function getInvoiceStatuses(\PrivilegedUser $pUser);
 
-    function getInvoiceHistoryByID($invoiceID);
+    function getInvoiceHistoryByInvoiceNumber($invoiceNumber);
 }

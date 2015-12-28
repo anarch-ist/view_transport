@@ -3,7 +3,7 @@ include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
 try {
     $privUser = PrivilegedUser::getInstance();
     if (!isset($_POST['status'])) {
-        throw new DataTransferException('Не задан параметр "статус"');
+        throw new DataTransferException('Не задан параметр "статус"',__FILE__);
     } else if ($_POST['status'] === 'getInvoicesForUser') {
         getInvoicesForUser($privUser);
     } else if ($_POST['status'] === 'changeStatusForInvoice') {
@@ -20,9 +20,9 @@ function getStatusHistory(PrivilegedUser $privUser)
 {
     $invoiceNumber = $_POST['invoiceNumber'];
     if (!isset($invoiceNumber) || empty($invoiceNumber)) {
-        throw new DataTransferException('Не задан параметр "номер накладной"');
+        throw new DataTransferException('Не задан параметр "номер накладной"',__FILE__);
     }
-    $data = $privUser->getInvoiceEntity()->getInvoiceHistoryByID($invoiceNumber);
+    $data = $privUser->getInvoiceEntity()->getInvoiceHistoryByInvoiceNumber($invoiceNumber);
     echo json_encode($data);
 }
 
@@ -45,7 +45,8 @@ function changeStatusForInvoice(PrivilegedUser $privUser)
     $invoiceNumber = $_POST['invoiceNumber'];
     $newStatusID = $_POST['newStatusID'];
     $datetime = $_POST['date'];
-    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($invoiceNumber, $newStatusID, $datetime);
+    $userID = $privUser->getUserInfo()->getData('userID');
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($userID, $invoiceNumber, $newStatusID, $datetime);
 }
 
 function changeStatusForSeveralInvoices(PrivilegedUser $privUser)
@@ -53,5 +54,6 @@ function changeStatusForSeveralInvoices(PrivilegedUser $privUser)
     $routeListID = $_POST['routeListID'];
     $newStatusID = $_POST['newStatusID'];
     $datetime = $_POST['date'];
-    echo $privUser->getInvoiceEntity()->updateInvoiceStatuses($routeListID, $newStatusID, $datetime);
+    $userID = $privUser->getUserInfo()->getData('userID');
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatuses($userID, $routeListID, $newStatusID, $datetime);
 }

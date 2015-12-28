@@ -1,5 +1,4 @@
 <?php
-ob_start();
 include_once __DIR__ . '/../common_files/privilegedUser/PrivilegedUser.php';
 
 class UserTest extends AuthUser

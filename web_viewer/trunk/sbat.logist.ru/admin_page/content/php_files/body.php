@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title></title>
@@ -27,7 +25,7 @@
     <script src="../common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
 
     <!--custom-->
-    <script src="routePoints.js"></script>
+    <script src="content/js/routePoints.js"></script>
 
 </head>
 <body>
@@ -42,15 +40,14 @@
     </div>
     <table id="routePointsTable">
         <thead>
-            <tr>
-                <th>Порядок</th>
-                <th>Пункт</th>
-                <th>Время разгрузки</th>
-                <th>Время до следующего пункта</th>
-                <th>Расстояние, км.</th>
-            </tr>
+        <tr>
+            <th>Порядок</th>
+            <th>Пункт</th>
+            <th>Время разгрузки</th>
+            <th>Время до следующего пункта</th>
+            <th>Расстояние, км.</th>
+        </tr>
         </thead>
     </table>
 </div>
 </body>
-</html>
