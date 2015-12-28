@@ -37,4 +37,12 @@ public class Route extends LinkedList<TrackCourse> implements IRoute{
         }
         return result;
     }
+
+    @Override
+    public Point getArrivalPoint() {
+        Point result = this.get(this.size()-1).getArrivalPoint();
+        return result;
+    }
+
+
 }

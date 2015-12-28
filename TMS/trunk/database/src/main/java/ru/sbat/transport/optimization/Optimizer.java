@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.Point;
+import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RouteList;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
@@ -23,28 +24,19 @@ public class Optimizer implements IOptimizer{
 
             Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime();
             Date creationDate = invoice.getCreationDate();
-
             Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
-
-
             double invoiceWeight = invoice.getWeight();
 
             RouteList routeListForInvoice = new RouteList();
-            //routeListForInvoice.getCarryingCapacity();
-
-//            if(plannedDeliveryTime
-//            getArrivalTime() < plannedDeliveryTime && (invoice.getRoute().get(invoice.getRoute().size()-1).getDayOfWeek().equals(invoice.getRequest().getDayOfWeek() || )){
+            for(Route route: plannedSchedule){
+//                if(deliveryPoint.equals(route.getArrivalPoint()) && (creationDate) && (plannedDeliveryTime.before(route.getDepartureTime()))){
 //
-//            }else if(invoice.getRoute().getArrivalTime() > plannedDeliveryTime){
-//
-//            }
-
+//                }
+            }
         }
 
     }
 
-
-    //
 
     @Override
     public InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices) {

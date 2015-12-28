@@ -77,4 +77,22 @@ public class RouteTest {
         route.add(trackCourse4);
         if (route.getArrivalTime() != 6) throw new AssertionError();
     }
+
+    @Test
+    public void getArrPoint() throws Exception {
+        Route route = new Route();
+        TrackCourse trackCourse1 = new TrackCourse();
+        TrackCourse trackCourse2 = new TrackCourse();
+        TrackCourse trackCourse3 = new TrackCourse();
+        TrackCourse trackCourse4 = new TrackCourse();
+        TradeRepresentativePoint tr1 = new TradeRepresentativePoint();
+        TradeRepresentativePoint rightPoint = new TradeRepresentativePoint();
+        trackCourse1.setArrivalPoint(tr1);
+        trackCourse4.setArrivalPoint(rightPoint);
+        route.add(trackCourse1);
+        route.add(trackCourse2);
+        route.add(trackCourse3);
+        route.add(trackCourse4);
+        if (!route.getArrivalPoint().equals(rightPoint)) throw new AssertionError();
+    }
 }

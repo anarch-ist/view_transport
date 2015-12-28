@@ -6,4 +6,5 @@ public interface IRoute {
     Integer getFullTime();
     Integer getDepartureTime();
     Integer getArrivalTime();
+    Point getArrivalPoint();
 }
