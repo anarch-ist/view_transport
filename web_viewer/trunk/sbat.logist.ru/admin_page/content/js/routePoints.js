@@ -58,12 +58,25 @@ $(document).ready(function() {
         // server returns array of pairs [{pointID:1, pointName:"somePoint1"}, {pointID:2, pointName:"somePoint2"}]
         function(data) {
             var options = [];
+            var selectizeOptions = [];
             data = JSON.parse(data);
             data.forEach(function(entry) {
                 var option = "<option value=" + entry.pointID+">" + entry.pointName + "</option>";
                 options.push(option);
+                var selectizeOption = { "label": entry.pointName, "value": entry.pointID };
+                selectizeOptions.push(selectizeOption);
             });
-            $("#pointSelect").html(options.join(""));
+
+            var allOptions = options.join("");
+            var selectize = editor.field('pointName').inst();
+            selectize.clear();
+            selectize.clearOptions();
+            selectize.load(function(callback) {
+                callback(selectizeOptions);
+            });
+
+            $("#pointSelect").html(allOptions);
+            //editor.field('pointName').update(options);
         }
     );
     // when page is loading make request and get all routes
@@ -166,7 +179,7 @@ $(document).ready(function() {
         }
     } );
 
-    //$(editor.field('pointName')).on("");
+
     // transfrom string like 18ч.30м. to 18*60+30
     editor.on( 'preSubmit', function (e, data, action) {
         if (action === 'create' || action === 'edit') {
