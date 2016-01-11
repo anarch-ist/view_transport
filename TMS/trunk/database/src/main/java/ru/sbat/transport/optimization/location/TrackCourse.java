@@ -10,7 +10,6 @@ public class TrackCourse {
     private DayOfWeek dayOfWeek;
     private Double distanceToNextPoint; // km
     private Point departurePoint;
-    private Point arrivalPoint;
 
     public Integer getDepartureTime() {
         return departureTime;
@@ -52,13 +51,6 @@ public class TrackCourse {
         this.departurePoint = departurePoint;
     }
 
-    public Point getArrivalPoint() {
-        return arrivalPoint;
-    }
-
-    public void setArrivalPoint(Point arrivalPoint) {
-        this.arrivalPoint = arrivalPoint;
-    }
 
     @Override
     public String toString() {

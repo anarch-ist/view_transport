@@ -1,5 +1,5 @@
 package ru.sbat.transport.optimization.location;
 
 
-public abstract class Point{
+public abstract class Point {
 }

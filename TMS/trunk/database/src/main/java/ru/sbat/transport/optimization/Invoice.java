@@ -6,7 +6,7 @@ import ru.sbat.transport.optimization.user.MarketAgent;
 
 import java.util.Date;
 
-public class Invoice{
+public class Invoice {
     private Request request;
     private String addressOfWarehouse;
     private double weight;

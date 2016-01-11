@@ -86,9 +86,13 @@ public class RouteTest {
         TrackCourse trackCourse3 = new TrackCourse();
         TrackCourse trackCourse4 = new TrackCourse();
         TradeRepresentativePoint tr1 = new TradeRepresentativePoint();
+        TradeRepresentativePoint tr2 = new TradeRepresentativePoint();
+        TradeRepresentativePoint tr3 = new TradeRepresentativePoint();
         TradeRepresentativePoint rightPoint = new TradeRepresentativePoint();
-        trackCourse1.setArrivalPoint(tr1);
-        trackCourse4.setArrivalPoint(rightPoint);
+        trackCourse1.setDeparturePoint(tr1);
+        trackCourse2.setDeparturePoint(tr2);
+        trackCourse3.setDeparturePoint(tr3);
+        trackCourse4.setDeparturePoint(rightPoint);
         route.add(trackCourse1);
         route.add(trackCourse2);
         route.add(trackCourse3);

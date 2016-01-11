@@ -1,5 +1,5 @@
 package ru.sbat.transport.optimization.location;
 
 
-public class TradeRepresentativePoint extends Point{
+public class TradeRepresentativePoint extends Point {
 }

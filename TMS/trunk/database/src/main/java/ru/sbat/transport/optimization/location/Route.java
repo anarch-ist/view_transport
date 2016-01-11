@@ -3,7 +3,7 @@ package ru.sbat.transport.optimization.location;
 
 import java.util.LinkedList;
 
-public class Route extends LinkedList<TrackCourse> implements IRoute{
+public class Route extends LinkedList<TrackCourse> implements IRoute {
 
     @Override
     public Double getFullDistance() {
@@ -40,9 +40,7 @@ public class Route extends LinkedList<TrackCourse> implements IRoute{
 
     @Override
     public Point getArrivalPoint() {
-        Point result = this.get(this.size()-1).getArrivalPoint();
-        return result;
+        return this.get(this.size()-1).getDeparturePoint();
     }
-
 
 }

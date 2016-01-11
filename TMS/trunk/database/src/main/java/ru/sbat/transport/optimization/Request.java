@@ -6,7 +6,7 @@ import ru.sbat.transport.optimization.utils.DayOfWeek;
 
 import java.util.Date;
 
-public class Request{
+public class Request {
     private int requestId;
     private int clientId;
     private Point deliveryPoint;

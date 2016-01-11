@@ -11,7 +11,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
-public class Optimizer implements IOptimizer{
+public class Optimizer implements IOptimizer {
 
 
 
@@ -29,9 +29,9 @@ public class Optimizer implements IOptimizer{
 
             RouteList routeListForInvoice = new RouteList();
             for(Route route: plannedSchedule){
-//                if(deliveryPoint.equals(route.getArrivalPoint()) && (creationDate) && (plannedDeliveryTime.before(route.getDepartureTime()))){
-//
-//                }
+                if(route.getArrivalPoint().equals(deliveryPoint)){
+
+                }
             }
         }
 
