@@ -224,11 +224,13 @@ CREATE TABLE tariffs (
   PRIMARY KEY (tariffID)
 );
 
+-- zero time is 00:00(GMT) of that day, when carrier arrives at first point of route.
 CREATE TABLE routes (
-  routeID       INTEGER AUTO_INCREMENT,
-  routeName     VARCHAR(64)  NOT NULL,
-  directionName VARCHAR(255) NULL, -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
-  tariffID      INTEGER      NULL,
+  routeID               INTEGER AUTO_INCREMENT,
+  firstPointArrivalTime TIME         NOT NULL, -- relative to zero time
+  routeName             VARCHAR(64)  NOT NULL,
+  directionName         VARCHAR(255) NULL, -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
+  tariffID              INTEGER      NULL,
   PRIMARY KEY (routeID),
   FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
     ON DELETE SET NULL
@@ -246,20 +248,35 @@ VALUES
   ('UPDATED'),
   ('DELETED');
 
+
 CREATE TABLE route_points (
-  routePointID        INTEGER AUTO_INCREMENT,
-  sortOrder           INTEGER NOT NULL,
-  tLoading            INTEGER NOT NULL, -- в минутах
-  timeToNextPoint     INTEGER NOT NULL, -- в минутах
-  distanceToNextPoint INTEGER NOT NULL, -- в километрах
-  arrivalTime         TIME    NOT NULL, -- время прибытия в данный пункт
-  pointID             INTEGER NOT NULL,
-  routeID             INTEGER NOT NULL,
+  routePointID             INTEGER AUTO_INCREMENT,
+  sortOrder                INTEGER NOT NULL,
+  timeForLoadingOperations INTEGER NOT NULL, -- time in minutes
+  pointID                  INTEGER NOT NULL,
+  routeID                  INTEGER NOT NULL,
   PRIMARY KEY (routePointID),
   FOREIGN KEY (pointID) REFERENCES points (pointID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+-- всегда ли время на преодоление расстояния одинаковое?
+-- CONSTRAINT pointIDFirst must not be equal pointIDSecond
+CREATE TABLE relations_between_points (
+  pointIDFirst        INTEGER,
+  pointIDSecond       INTEGER,
+  isFromFirstToSecond BOOLEAN,
+  distance            SMALLINT, -- distance between routePoints measured in km.
+  timeForDistance     INTEGER, -- time in minutes for carrier drive through distance
+  PRIMARY KEY (pointIDFirst, pointIDSecond, isFromFirstToSecond),
+  FOREIGN KEY (pointIDFirst) REFERENCES points (pointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (pointIDSecond) REFERENCES points (pointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );

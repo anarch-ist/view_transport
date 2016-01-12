@@ -7,9 +7,6 @@ preSubmit: hook to add additional parameters before send to the server
 postSubmit: hook to manupulate submitted data before draw
 */
 
-
-
-
 $(document).ready(function() {
 
     function getAllRoutePointsDataForRouteID(value) {
