@@ -67,6 +67,21 @@ CREATE TABLE points (
   UNIQUE (pointName)
 );
 
+-- CONSTRAINT pointIDFirst must not be equal pointIDSecond
+CREATE TABLE distances_between_points (
+  pointIDFirst        INTEGER,
+  pointIDSecond       INTEGER,
+  isFromFirstToSecond BOOLEAN,
+  distance            SMALLINT, -- distance between routePoints measured in km.
+  PRIMARY KEY (pointIDFirst, pointIDSecond, isFromFirstToSecond),
+  FOREIGN KEY (pointIDFirst) REFERENCES points (pointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (pointIDSecond) REFERENCES points (pointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
 CREATE TABLE users (
   userID      INTEGER AUTO_INCREMENT,
   firstName   VARCHAR(64) NULL,
@@ -264,22 +279,23 @@ CREATE TABLE route_points (
     ON UPDATE CASCADE
 );
 
--- всегда ли время на преодоление расстояния одинаковое?
--- CONSTRAINT pointIDFirst must not be equal pointIDSecond
-CREATE TABLE relations_between_points (
-  pointIDFirst        INTEGER,
-  pointIDSecond       INTEGER,
+
+-- CONSTRAINT routePointIDFirst must not be equal routePointIDSecond
+CREATE TABLE relations_between_route_points (
+  routePointIDFirst   INTEGER,
+  routePointIDSecond  INTEGER,
   isFromFirstToSecond BOOLEAN,
-  distance            SMALLINT, -- distance between routePoints measured in km.
   timeForDistance     INTEGER, -- time in minutes for carrier drive through distance
-  PRIMARY KEY (pointIDFirst, pointIDSecond, isFromFirstToSecond),
-  FOREIGN KEY (pointIDFirst) REFERENCES points (pointID)
+  PRIMARY KEY (routePointIDFirst, routePointIDSecond, isFromFirstToSecond),
+  FOREIGN KEY (routePointIDFirst) REFERENCES route_points (routePointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  FOREIGN KEY (pointIDSecond) REFERENCES points (pointID)
+  FOREIGN KEY (routePointIDSecond) REFERENCES route_points (routePointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
+
+
 
 CREATE TABLE route_lists (
   routeListID       INTEGER AUTO_INCREMENT,
