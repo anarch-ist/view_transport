@@ -26,6 +26,10 @@ VALUES
   ('point4', 'chel', 5, 1, 'some_comment3', '9:00:00', '17:00:00', 'erhjeig', 'efregrthr', '123456', 'ergersghrth',
    'srgf@ewuf.ru', '89032343556', 'AGENCY');
 
+INSERT INTO distances_between_points (pointIDFirst, pointIDSecond, distance) VALUES
+  (getPointIDByName('point1'), getPointIDByName('point2'), 400),
+  (getPointIDByName('point2'), getPointIDByName('point3'), 230),
+  (getPointIDByName('point3'), getPointIDByName('point4'), 340);
 
 INSERT INTO users (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
 VALUES
@@ -60,24 +64,27 @@ VALUES
 
 INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carrier');
 
-
-INSERT INTO routes (routeName, directionName, tariffID)
+-- ROUTE CREATION
+INSERT INTO routes (firstPointArrivalTime, routeName, directionName, tariffID)
 VALUES
-  ('route1', 'direction1', 1),
-  ('route2', 'direction2', 1);
+  ('18:00:00', 'route1', 'direction1', 1),
+  ('14:30:00', 'route2', 'direction2', 1);
 
-
-INSERT INTO route_points (sortOrder, tLoading, timeToNextPoint, distanceToNextPoint, arrivalTime, pointID, routeID)
+INSERT INTO route_points (sortOrder, timeForLoadingOperations, pointID, routeID)
 VALUES
-  (1, 20, 40, 200, '12:00:00', getPointIDByName('point1'), getRouteIDByRouteName('route1')),
-  (2, 20, 40, 200, '17:00:00', getPointIDByName('point2'), getRouteIDByRouteName('route1')),
-  (3, 20, 40, 200, '01:00:00', getPointIDByName('point3'), getRouteIDByRouteName('route1'));
+  (1, 120, getPointIDByName('point1'), getRouteIDByRouteName('route1')),
+  (2, 40, getPointIDByName('point2'), getRouteIDByRouteName('route1')),
+  (3, 230, getPointIDByName('point3'), getRouteIDByRouteName('route1'));
 
+INSERT INTO relations_between_route_points(routePointIDFirst, routePointIDSecond, timeForDistance)
+VALUES
+  (getRoutePointIDByRouteNameAndSortOrder('route1', 1), getRoutePointIDByRouteNameAndSortOrder('route1', 2), 120),
+  (getRoutePointIDByRouteNameAndSortOrder('route1', 2), getRoutePointIDByRouteNameAndSortOrder('route1', 3), 200);
+-- END ROUTE CREATION
 
 INSERT INTO route_lists (routeListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
 VALUES
   ('1455668', '2015-11-11', 3, 'Dmitriy', '8905347890', 'екх123', getRouteIDByRouteName('route1'));
-
 
 INSERT INTO invoices (
   insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,

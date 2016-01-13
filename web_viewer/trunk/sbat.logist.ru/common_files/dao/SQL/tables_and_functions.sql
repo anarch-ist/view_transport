@@ -71,9 +71,8 @@ CREATE TABLE points (
 CREATE TABLE distances_between_points (
   pointIDFirst        INTEGER,
   pointIDSecond       INTEGER,
-  isFromFirstToSecond BOOLEAN,
   distance            SMALLINT, -- distance between routePoints measured in km.
-  PRIMARY KEY (pointIDFirst, pointIDSecond, isFromFirstToSecond),
+  PRIMARY KEY (pointIDFirst, pointIDSecond),
   FOREIGN KEY (pointIDFirst) REFERENCES points (pointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -284,9 +283,8 @@ CREATE TABLE route_points (
 CREATE TABLE relations_between_route_points (
   routePointIDFirst   INTEGER,
   routePointIDSecond  INTEGER,
-  isFromFirstToSecond BOOLEAN,
   timeForDistance     INTEGER, -- time in minutes for carrier drive through distance
-  PRIMARY KEY (routePointIDFirst, routePointIDSecond, isFromFirstToSecond),
+  PRIMARY KEY (routePointIDFirst, routePointIDSecond),
   FOREIGN KEY (routePointIDFirst) REFERENCES route_points (routePointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -294,8 +292,6 @@ CREATE TABLE relations_between_route_points (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
-
-
 
 CREATE TABLE route_lists (
   routeListID       INTEGER AUTO_INCREMENT,
@@ -777,6 +773,48 @@ CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
     RETURN result;
   END;
 
+-- get total time in minutes consumed for delivery
+CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
+  RETURNS VARCHAR(255)
+  BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE $currentRoutePointID INTEGER;
+    DECLARE $previousRoutePointID INTEGER;
+    DECLARE $timeForLoadingOperations INTEGER;
+    DECLARE $timeCount INTEGER DEFAULT 0;
+    DECLARE $timeResult INTEGER DEFAULT 0;
+    DECLARE cur CURSOR FOR
+      SELECT
+        routePointID,
+        timeForLoadingOperations
+      FROM route_points
+      WHERE _routeID = route_points.routeID
+      ORDER BY sortOrder;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+      FETCH cur
+      INTO $currentRoutePointID, $timeForLoadingOperations;
+      IF done
+      THEN LEAVE read_loop; END IF;
+      IF $previousRoutePointID IS NOT NULL
+      THEN
+        SET $timeCount = (SELECT timeForDistance
+                          FROM relations_between_route_points
+                          WHERE
+                            routePointIDFirst = $previousRoutePointID AND routePointIDSecond = $currentRoutePointID);
+      END IF;
+      SET $timeResult = $timeResult + $timeCount + $timeForLoadingOperations;
+      SET $previousRoutePointID = $currentRoutePointID;
+    END LOOP;
+
+    CLOSE cur;
+    RETURN $timeResult;
+    -- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
+  END;
+
 -- startEntry - number of record to start from(0 is first record)
 -- length - Number of records that the table can display in the current draw
 
@@ -854,6 +892,8 @@ CREATE FUNCTION generateHaving(map TEXT)
     RETURN result;
   END;
 
+
+
 -- _search - array of strings
 -- _orderby 'id'  <> - название колонки из файла main.js
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
@@ -883,7 +923,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
       last_visited_points.pointName AS `currentPoint`,
       next_route_points.pointName   AS `nextPoint`,
-      route_points.arrivalTime
+      getDurationForRoute(routes.routeID) AS `arrivalTime`
 
      FROM requests
 

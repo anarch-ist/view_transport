@@ -123,3 +123,110 @@ CREATE PROCEDURE examplePrStatement(id VARCHAR(255), _orderBy VARCHAR(255))
     EXECUTE statement USING @_id;
     DEALLOCATE PREPARE statement;
   END;
+
+
+DROP PROCEDURE selectData;
+
+-- _search - array of strings
+-- _orderby 'id'  <> - название колонки из файла main.js
+-- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
+
+CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
+                            _isDesc BOOLEAN, _search TEXT)
+  BEGIN
+    SET @mainPart =
+    'SELECT
+      requests.requestNumber,
+      invoices.insiderRequestNumber,
+      invoices.invoiceNumber,
+      clients.INN,
+      delivery_points.pointName     AS `deliveryPoint`,
+      w_points.pointName            AS `warehousePoint`,
+      users.lastName,
+      invoices.invoiceStatusID,
+      invoice_statuses.invoiceStatusRusName,
+      invoices.boxQty,
+
+      route_lists.driver,
+      route_lists.licensePlate,
+      route_lists.palletsQty,
+      route_lists.routeListNumber,
+      route_lists.routeListID,
+      routes.directionName,
+
+      last_visited_points.pointName AS `currentPoint`,
+      next_route_points.pointName   AS `nextPoint`,
+      \'arrival_Time\'
+
+     FROM requests
+
+      LEFT JOIN (invoices, clients, points AS delivery_points, points AS w_points, users)
+        ON (
+        invoices.requestID = requests.requestID AND
+        invoices.warehousePointID = w_points.pointID AND
+        requests.clientID = clients.clientID AND
+        requests.destinationPointID = delivery_points.pointID AND
+        requests.marketAgentUserID = users.userID
+        )
+      LEFT JOIN (invoice_statuses)
+        ON (
+          invoices.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
+        )
+      -- because routeList in invoices table can be null, we use left join.
+      LEFT JOIN (route_lists, routes)
+        ON (
+        invoices.routeListID = route_lists.routeListID AND
+        route_lists.routeID = routes.routeID
+        )
+      LEFT JOIN (points AS last_visited_points)
+        ON (
+        invoices.lastVisitedUserPointID = last_visited_points.pointID
+        )
+      LEFT JOIN (route_points, points AS next_route_points)
+        ON (
+        route_lists.routeID = routes.routeID AND
+        routes.routeID = route_points.routeID AND
+        route_points.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedUserPointID) AND
+        next_route_points.pointID = route_points.pointID
+        ) ';
+
+
+    -- 1) если у пользователя роль админ, то показываем все записи из БД
+    -- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил.
+    -- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
+    -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
+
+    SET @wherePart =
+    'WHERE (
+    (getRoleIDByUserID(?) = \'ADMIN\') OR
+    (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND requests.marketAgentUserID = ?) OR
+    (getPointIDByUserID(?) = w_points.pointID) OR
+    (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
+    )';
+    SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
+
+    IF _orderby <> ''
+    THEN
+      IF _isDesc
+      THEN
+        SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
+      ELSE
+        SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
+      END IF;
+    ELSE
+      SET @orderByPart = '';
+    END IF;
+
+    SET @limitPart = ' LIMIT ?, ? ';
+    SET @sqlString = CONCAT(@mainPart, @wherePart, @havingPart, @orderByPart, @limitPart);
+
+    PREPARE statement FROM @sqlString;
+
+    SET @_userID = _userID;
+    SET @_startEntry = _startEntry;
+    SET @_length = _length;
+
+    EXECUTE statement
+    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
+    DEALLOCATE PREPARE statement;
+  END;
