@@ -1,142 +1,12 @@
 $(document).ready(function () {
 
-    // create selectColumnsControl
-    $("#selectColumnsControl").on("click", function () {
-        // create dialog here with selection content
-    });
+    // --------LOGOUT-----------------
     $("#logout").button().on("click", function () {
         // delete auth cookies
         $.cookie('SESSION_CHECK_STRING', null, -1, '/');
         // make redirect to login page
         window.location.reload();
-        //location.reload(true);
     });
-
-    // create div that will be dialog container
-    $("body").append(
-        '<div id="statusChangeDialog" title="Выбор нового статуса">' +
-        '<label for="statusSelect">Новый статус: </label>' +
-        '<select id="statusSelect"></select>' + '<br><br><br>' +
-        '<label for="dateTimePickerInput">Дата и время: </label>' +
-        '<input id="dateTimePicker" type="text">' +
-        '</div>'
-    );
-
-    createDateTimePickerLocalization();
-    var $dateTimePicker = $("#dateTimePicker");
-    $dateTimePicker.datetimepicker();
-
-    var $statusChangeDialog = $("#statusChangeDialog");
-    $statusChangeDialog.dialog({
-        autoOpen: false,
-        resizable: true,
-        height: 300,
-        width: 400,
-        modal: true,
-        close: function (event, ui) {
-            document.location.reload();
-        },
-        buttons: {
-            "Сохранить": function () {
-                //TODO get new invoice status ID for request
-                // возможно это пригодится для
-                //var table = $('#user-grid').DataTable();
-                //table.rows( { selected: true } ).data();
-                newStatusID = $('#statusSelect')[0][$('#statusSelect')[0].selectedIndex].value;
-                date = $('#dateTimePicker')[0].value;
-                var action = $('#statusSelect').attr("action");
-                if (action === "changeStatusForInvoice") {
-                    // получение ИД выделенной в таблице накладной
-                    invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
-                    $.post("content/getData.php",
-                        {
-                            status: action,
-                            invoiceNumber: invoiceNumber,
-                            newStatusID: newStatusID,
-                            date: date
-                        },
-                        function (data) {
-                            if (data === '1') {
-                                document.location.reload();
-                            }
-                        }
-                    );
-                } else if (action === "changeStatusForSeveralInvoices") {
-                    // получение ИД маршрутного листа
-                    routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
-                    $.post(
-                        "content/getData.php",
-                        {status: action, routeListID: routeListID, newStatusID: newStatusID, date: date},
-                        function (data) {
-                            if (data === '1') {
-                                dataTable.columns().draw();
-                                $statusChangeDialog.dialog("close");
-                            }
-                        }
-                    );
-                }
-            },
-            "Отмена": function () {
-                $(this).dialog("close");
-            }
-        }
-    });
-
-
-    function showInvoiceStatusDialog(action) {
-        $statusChangeDialog.dialog("open");
-
-        var options = [];
-        var storedStatuses = '';
-        if (window.localStorage["USER_STATUSES"]) {
-            storedStatuses = JSON.parse(window.localStorage["USER_STATUSES"]);
-        }
-        for (var i = 0; i < storedStatuses.length; i++) {
-            console.log(storedStatuses[i]);
-            options.push("<option value='" + storedStatuses[i].invoiceStatusID + "'>" + storedStatuses[i].invoiceStatusRusName + "</option>");
-        }
-        //append after populating all options
-        var $statusSelect = $("#statusSelect");
-        $statusSelect.attr("action", action);
-        $statusSelect.html(options.join("")).selectmenu();
-    }
-
-    function createDateTimePickerLocalization() {
-        $.datepicker.regional['ru'] = {
-            closeText: 'Закрыть',
-            prevText: '<Пред',
-            nextText: 'След>',
-            currentText: 'Сегодня',
-            monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-            monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-            dayNames: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
-            dayNamesShort: ['вск', 'пнд', 'втр', 'срд', 'чтв', 'птн', 'сбт'],
-            dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-            weekHeader: 'Не',
-            dateFormat: 'dd.mm.yy',
-            firstDay: 1,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix: ''
-        };
-        $.datepicker.setDefaults($.datepicker.regional['ru']);
-        $.timepicker.regional['ru'] = {
-            timeOnlyTitle: 'Выберите время',
-            timeText: 'Время',
-            hourText: 'Часы',
-            minuteText: 'Минуты',
-            secondText: 'Секунды',
-            millisecText: 'Миллисекунды',
-            timezoneText: 'Часовой пояс',
-            currentText: 'Сейчас',
-            closeText: 'Закрыть',
-            timeFormat: 'HH:mm',
-            amNames: ['AM', 'A'],
-            pmNames: ['PM', 'P'],
-            isRTL: false
-        };
-        $.timepicker.setDefaults($.timepicker.regional['ru']);
-    }
 
     // --------DATATABLE INIT--------------
     $('#user-grid tfoot th').each(function () {
@@ -156,22 +26,20 @@ $(document).ready(function () {
                 extend: 'selectedSingle',
                 text: 'изменить статус накладной',
                 action: function (e, dt, node, config) {
-
-                    showInvoiceStatusDialog("changeStatusForInvoice");
+                    $.showInvoiceStatusDialog("changeStatusForInvoice", dataTable);
                 }
             },
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
-                    showInvoiceStatusDialog("changeStatusForSeveralInvoices");
+                    $.showInvoiceStatusDialog("changeStatusForSeveralInvoices", dataTable);
                 }
             },
             {
                 extend: 'selectedSingle',
                 text: 'история статусов',
                 action: function (e, dt, node, config) {
-                    // TODO: status history
                     $.post("content/getData.php", {
                             status: 'getStatusHistory',
                             invoiceNumber: dataTable.row($('#user-grid .selected')).data().invoiceNumber

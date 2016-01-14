@@ -815,6 +815,28 @@ CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
     -- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
   END;
 
+-- get DATE and TIME when route should be finished
+CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _invoiceID INTEGER)
+  RETURNS TIMESTAMP
+  BEGIN
+    DECLARE $routeStartDate TIMESTAMP;
+    DECLARE $arrivalDateTime TIMESTAMP;
+
+    SET $routeStartDate = (SELECT lastStatusUpdated
+                           FROM invoice_history
+                           WHERE _invoiceID = invoiceID AND invoiceStatusID = 'DEPARTURE');
+    -- отсчитывать от времени отправления или от времени начала маршрута?
+    SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
+    RETURN $arrivalDateTime;
+  END;
+
+
+-- TODO обсудить время прибытия в следующий пункт
+
+-- arrivalTime is a delivery time + date when invoice has
+
+
+
 -- startEntry - number of record to start from(0 is first record)
 -- length - Number of records that the table can display in the current draw
 
@@ -923,7 +945,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
       last_visited_points.pointName AS `currentPoint`,
       next_route_points.pointName   AS `nextPoint`,
-      getDurationForRoute(routes.routeID) AS `arrivalTime`
+      getArrivalDateTime(routes.routeID, invoices.invoiceID) AS `arrivalTime`
 
      FROM requests
 
