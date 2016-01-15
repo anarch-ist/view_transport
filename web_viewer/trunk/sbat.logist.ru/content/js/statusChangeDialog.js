@@ -3,22 +3,24 @@ $(document).ready(function () {
     const  STATUS_SELECT_MENU_WIDTH = 600,
            DIALOG_HEIGHT = 430,
            DIALOG_WIDTH = 800,
-           COMMENT_WIDTH = 595;
+           COMMENT_WIDTH = 595,
+           DEPARTURE_STATUS = "DEPARTURE";
 
     // create divs that will be dialog container
     $("body").append(
         '<div id="statusChangeDialog" title="Выбор нового статуса">' +
         '<table>' +
-        '<tr><td width="200" valign="top"><label for="statusSelect">Новый статус: </label></td><td valign="top"><select id="statusSelect"></select></td></tr>'+
-        '<tr><td width="200" valign="top"><label for="dateTimePickerInput">Дата и время: </label></td><td valign="top"><input id="dateTimePicker" type="text"></td></tr>'+
-        '<tr><td width="200" valign="top"><label for="palletsQtyInput">Количество паллет: </label></td><td valign="top"><input id="palletsQtyInput" type="text"/></td></tr>'+
-        '<tr><td width="200" valign="top"><label for="commentInput">Комментарий: </label></td><td valign="top"><textarea id="commentInput" maxlength="500"/></td></tr>'+
+        '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>'+
+        '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>'+
+        '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>'+
+        '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>'+
         '</table>'+
         '</div>'
     );
 
     // create status select menu
     var $statusSelect = $("#statusSelect");
+
     function populateStatusSelectMenu() {
         var options = [];
         var storedStatuses = '';
@@ -63,47 +65,84 @@ $(document).ready(function () {
         width: DIALOG_WIDTH,
         height: DIALOG_HEIGHT,
         modal: true,
-        close: function (event, ui) {
-            document.location.reload();
+        // when dialog open transform it to one of two types
+        open: function() {
+            var dialogType = $statusChangeDialog.data('dialogType');
+            $("#palletsQtyTr").hide();
+            switch (dialogType) {
+                case "changeStatusForInvoice":
+                    $statusSelect.off("selectmenuchange");
+                    break;
+                case "changeStatusForSeveralInvoices":
+                    $statusSelect.on("selectmenuchange", function (e, ui) {
+                        if (ui.item.value === DEPARTURE_STATUS)
+                            $("#palletsQtyTr").show();
+                        else
+                            $("#palletsQtyTr").hide();
+                    });
+                    break;
+            }
         },
         buttons: {
             "Сохранить": function () {
+
+                // get all common variables
                 var dialogType = $statusChangeDialog.data('dialogType');
                 var dataTable = $statusChangeDialog.data('dataTable');
-
-                // возможно это пригодится для
-                //table.rows( { selected: true } ).data();
                 var newStatusID = $statusSelect[0][$statusSelect[0].selectedIndex].value;
                 var date = $('#dateTimePicker')[0].value;
+                var comment = $("#commentInput").val();
+
                 if (dialogType === "changeStatusForInvoice") {
-                    // получение ИД выделенной в таблице накладной
+
+                    // get specific vars for "changeStatusForInvoice" dialogType
                     var invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
-                    $.post("content/getData.php",
-                        {
-                            status: dialogType,
-                            invoiceNumber: invoiceNumber,
-                            newStatusID: newStatusID,
-                            date: date
-                        },
-                        function (data) {
-                            if (data === '1') {
-                                document.location.reload();
+                    if (date)
+                        $.post("content/getData.php",
+                            {
+                                status: dialogType,
+                                invoiceNumber: invoiceNumber,
+                                newStatusID: newStatusID,
+                                date: date,
+                                comment:comment
+                            },
+                            function (data) {
+                                if (data === '1') {
+                                    dataTable.draw(false);
+                                    $statusChangeDialog.dialog("close");
+                                }
                             }
-                        }
-                    );
+                        );
+                    else {
+                        alert("date should not be empty"); // TODO
+                    }
                 } else if (dialogType === "changeStatusForSeveralInvoices") {
-                    // получение ИД маршрутного листа
+
+                    // get specific vars for "changeStatusForSeveralInvoices" dialogType
                     var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
-                    $.post(
-                        "content/getData.php",
-                        {status: dialogType, routeListID: routeListID, newStatusID: newStatusID, date: date},
-                        function (data) {
-                            if (data === '1') {
-                                dataTable.columns().draw();
-                                $statusChangeDialog.dialog("close");
+                    var palletsQty = $("#palletsQtyInput").cleanVal();
+
+                    if ((newStatusID !== DEPARTURE_STATUS && date) || (newStatusID === DEPARTURE_STATUS && date && palletsQty))
+                        $.post(
+                            "content/getData.php",
+                            {
+                                status: dialogType,
+                                routeListID: routeListID,
+                                newStatusID: newStatusID,
+                                date: date,
+                                comment: comment,
+                                palletsQty: palletsQty
+                            },
+                            function (data) {
+                                if (data === '1') {
+                                    dataTable.draw(false);
+                                    $statusChangeDialog.dialog("close");
+                                }
                             }
-                        }
-                    );
+                        );
+                    else {
+                        alert("date and palletsQty should not be empty"); // TODO
+                    }
                 }
             },
             "Отмена": function () {
