@@ -7,4 +7,5 @@ public interface IRoute {
     Integer getDepartureTime();
     Integer getArrivalTime();
     Point getArrivalPoint();
+    Point getDeparturePoint();
 }

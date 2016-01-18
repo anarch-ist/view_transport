@@ -51,6 +51,28 @@ public class TrackCourse {
         this.departurePoint = departurePoint;
     }
 
+    public int getWeekDay(){
+        int result = 0;
+        DayOfWeek dayOfWeek = this.getDayOfWeek();
+        switch (dayOfWeek){
+            case SUNDAY: result = 1;
+                break;
+            case MONDAY: result = 2;
+                break;
+            case TUESDAY: result = 3;
+                break;
+            case WEDNESDAY: result = 4;
+                break;
+            case THURSDAY: result = 5;
+                break;
+            case FRIDAY: result = 6;
+                break;
+            case SATURDAY: result = 7;
+                break;
+        }
+        return result;
+    }
+
 
     @Override
     public String toString() {

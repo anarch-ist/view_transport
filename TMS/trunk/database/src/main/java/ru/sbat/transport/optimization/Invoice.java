@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization;
 
 
+import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.user.MarketAgent;
 
@@ -8,7 +9,7 @@ import java.util.Date;
 
 public class Invoice {
     private Request request;
-    private String addressOfWarehouse;
+    private Point addressOfWarehouse;
     private double weight;
     private double amount;
     private int countOfBoxes;
@@ -73,11 +74,11 @@ public class Invoice {
         this.weight = weight;
     }
 
-    public String getAddressOfWarehouse() {
+    public Point getAddressOfWarehouse() {
         return addressOfWarehouse;
     }
 
-    public void setAddressOfWarehouse(String addressOfWarehouse) {
+    public void setAddressOfWarehouse(Point addressOfWarehouse) {
         this.addressOfWarehouse = addressOfWarehouse;
     }
 

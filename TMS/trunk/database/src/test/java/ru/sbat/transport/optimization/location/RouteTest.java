@@ -99,4 +99,26 @@ public class RouteTest {
         route.add(trackCourse4);
         if (!route.getArrivalPoint().equals(rightPoint)) throw new AssertionError();
     }
+
+    @Test
+    public void getDepPoint() throws Exception {
+        Route route = new Route();
+        TrackCourse trackCourse1 = new TrackCourse();
+        TrackCourse trackCourse2 = new TrackCourse();
+        TrackCourse trackCourse3 = new TrackCourse();
+        TrackCourse trackCourse4 = new TrackCourse();
+        TradeRepresentativePoint rightPoint = new TradeRepresentativePoint();
+        TradeRepresentativePoint tr2 = new TradeRepresentativePoint();
+        TradeRepresentativePoint tr3 = new TradeRepresentativePoint();
+        TradeRepresentativePoint tr4 = new TradeRepresentativePoint();
+        trackCourse1.setDeparturePoint(rightPoint);
+        trackCourse2.setDeparturePoint(tr2);
+        trackCourse3.setDeparturePoint(tr3);
+        trackCourse4.setDeparturePoint(tr4);
+        route.add(trackCourse1);
+        route.add(trackCourse2);
+        route.add(trackCourse3);
+        route.add(trackCourse4);
+        if (!route.getDeparturePoint().equals(rightPoint)) throw new AssertionError();
+    }
 }

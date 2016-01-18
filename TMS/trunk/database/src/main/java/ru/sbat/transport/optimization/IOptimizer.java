@@ -5,6 +5,7 @@ import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 public interface IOptimizer {
@@ -20,5 +21,5 @@ public interface IOptimizer {
 
     InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices);
 
-
+    public int getWeekDay(Date date);
 }
