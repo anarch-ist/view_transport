@@ -241,13 +241,13 @@ CREATE TABLE tariffs (
 -- zero time is 00:00(GMT) of that day, when carrier arrives at first point of route.
 CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
-  firstPointArrivalTime TIME                                                                  NOT NULL,
+  firstPointArrivalTime TIME                                                                              NOT NULL,
   -- days of weeks when route is available
-  daysOfWeeks           SET('monday, tuesday, wednesday, thursday, friday, saturday, sunday') NOT NULL,
-  routeName             VARCHAR(64)                                                           NOT NULL,
+  daysOfWeeks           SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') NOT NULL,
+  routeName             VARCHAR(64)                                                                       NOT NULL,
   -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
-  directionName         VARCHAR(255)                                                          NULL,
-  tariffID              INTEGER                                                               NULL,
+  directionName         VARCHAR(255)                                                                      NULL,
+  tariffID              INTEGER                                                                           NULL,
   PRIMARY KEY (routeID),
   FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
     ON DELETE SET NULL
