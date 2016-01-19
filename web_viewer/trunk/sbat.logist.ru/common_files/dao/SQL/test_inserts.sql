@@ -12,6 +12,8 @@ TRUNCATE route_lists;
 TRUNCATE invoices;
 TRUNCATE invoice_history;
 TRUNCATE route_list_history;
+TRUNCATE relations_between_route_points;
+TRUNCATE distances_between_points;
 SET FOREIGN_KEY_CHECKS = 1;
 
 # insert some test data
@@ -88,18 +90,17 @@ VALUES
 
 INSERT INTO invoices (
   insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,
-  lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID, warehousePointID, routeListID, lastVisitedUserPointID
+  lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus, requestID, warehousePointID, routeListID, lastVisitedUserPointID
 )
 VALUES
   ('ogeghei2243', 'qwd22345', now(), now(), 4, 20, 3000, 21000.00, NULL, getUserIDByEmail('test@test.ru'), 'CREATED',
-   getRequestIDByNumber('123356'),
+   'some_comment123', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point1')),
   ('ogeghei2244', 'qwd22334', now(), now(), 2, 20, 3000, 26000.00, NULL, getUserIDByEmail('test@test.ru'), 'CREATED',
-   getRequestIDByNumber('123356'),
+   'some_comment2323', getRequestIDByNumber('123356'),
    getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point3')),
   ('ogeghei2245', 'qwd22346', now(), now(), 10, 20, 3000, 11000.00, NULL, getUserIDByEmail('test@test.ru'), 'CREATED',
-   getRequestIDByNumber('123356'),
-   getPointIDByName('point1'), NULL, NULL);
+   'some_comment27349', getRequestIDByNumber('123356'), getPointIDByName('point1'), NULL, NULL);
 
 
 

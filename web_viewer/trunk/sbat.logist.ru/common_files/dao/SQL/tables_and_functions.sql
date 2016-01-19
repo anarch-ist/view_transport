@@ -449,6 +449,7 @@ CREATE TABLE invoices (
   lastStatusUpdated      DATETIME       NULL, -- date and time when status was updated by any user
   lastModifiedBy         INTEGER        NULL,
   invoiceStatusID        VARCHAR(32)    NOT NULL,
+  commentForStatus       TEXT           NULL,
   requestID              INTEGER        NOT NULL,
   warehousePointID       INTEGER        NOT NULL,
   routeListID            INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
@@ -474,18 +475,7 @@ CREATE TABLE invoices (
     ON UPDATE CASCADE,
   UNIQUE (insiderRequestNumber),
   UNIQUE (invoiceNumber)
---   UNIQUE (lastModifiedBy, lastStatusUpdated) -- it is impossible that
 );
-
-# CREATE TABLE invoice_status_comments (
-#   invoiceID INTEGER,
-#   userID INTEGER,
-#   invoiceStatusID VARCHAR(32),
-#   invoiceUpdateStatusComment TEXT,
-#   PRIMARY KEY (invoiceID, userID)
-#
-# );
-
 
 CREATE FUNCTION is_warehouse(_pointID INTEGER)
   RETURNS BOOLEAN
@@ -521,6 +511,7 @@ CREATE PROCEDURE insert_into_invoice_history(
   lastStatusUpdated      DATETIME,
   lastModifiedBy         INTEGER,
   invoiceStatusID        VARCHAR(32),
+  commentForStatus       TEXT,
   requestID              INTEGER,
   warehousePointID       INTEGER,
   routeListID            INTEGER,
@@ -530,7 +521,7 @@ CREATE PROCEDURE insert_into_invoice_history(
     INSERT INTO invoice_history
     VALUES
       (NULL, NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate,
-       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, requestID,
+       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus, requestID,
        warehousePointID, routeListID, lastVisitedUserPointID
       );
   END;
@@ -540,7 +531,7 @@ FOR EACH ROW
   CALL insert_into_invoice_history(
       NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
       NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-      'CREATED', NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+      'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
@@ -568,7 +559,7 @@ FOR EACH ROW
     CALL insert_into_invoice_history(
         NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
         NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-        NEW.invoiceStatusID, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+        NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
   END;
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
@@ -576,7 +567,7 @@ FOR EACH ROW
   CALL insert_into_invoice_history(
       OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
       OLD.weight, OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy,
-      'DELETED', OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
+      'DELETED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
 
 CREATE TABLE invoice_history (
   invoiceHistoryID       BIGINT AUTO_INCREMENT,
@@ -593,6 +584,7 @@ CREATE TABLE invoice_history (
   lastStatusUpdated      DATETIME       NULL,
   lastModifiedBy         INTEGER        NULL,
   invoiceStatusID        VARCHAR(32)    NOT NULL,
+  commentForStatus       TEXT           NULL,
   requestID              INTEGER        NOT NULL,
   warehousePointID       INTEGER        NOT NULL,
   routeListID            INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
@@ -609,29 +601,29 @@ CREATE TABLE invoice_history (
 -- -------------------------------------------------------------------------------------------------------------------
 
 
-CREATE TABLE tables (
-  tableID VARCHAR(64),
-  PRIMARY KEY (tableID)
-);
-
-INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
-                             FROM information_schema.TABLES
-                             WHERE TABLE_SCHEMA = 'transmaster_transport_db';
+-- CREATE TABLE tables (
+--   tableID VARCHAR(64),
+--   PRIMARY KEY (tableID)
+-- );
+--
+-- INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
+--                              FROM information_schema.TABLES
+--                              WHERE TABLE_SCHEMA = 'transmaster_transport_db';
 
 -- invoices - диспетчер меняет статус
 -- информация о том. какой пользователь какую таблицу изменил есть на уровне сессии приложения
 -- на уровне приложения, во время установки нового статуса накладной - сначала идет запись в таблицу user_action_history а затем изменение статуса
-CREATE TABLE user_action_history (
-  userActionHistoryID BIGINT AUTO_INCREMENT,
-  timeMark            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  userID              INTEGER,
-  tableID             VARCHAR(64),
-  action              ENUM('insert', 'update', 'delete'),
-  PRIMARY KEY (userActionHistoryID),
-  FOREIGN KEY (tableID) REFERENCES tables (tableID)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
-);
+-- CREATE TABLE user_action_history (
+--   userActionHistoryID BIGINT AUTO_INCREMENT,
+--   timeMark            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   userID              INTEGER,
+--   tableID             VARCHAR(64),
+--   action              ENUM('insert', 'update', 'delete'),
+--   PRIMARY KEY (userActionHistoryID),
+--   FOREIGN KEY (tableID) REFERENCES tables (tableID)
+--     ON DELETE NO ACTION
+--     ON UPDATE NO ACTION
+-- );
 
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -830,8 +822,6 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _invoiceID INTEGER)
     RETURN $arrivalDateTime;
   END;
 
-
--- TODO обсудить время прибытия в следующий пункт
 
 -- arrivalTime is a delivery time + date when invoice has
 
