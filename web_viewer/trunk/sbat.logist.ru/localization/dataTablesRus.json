@@ -1,0 +1,64 @@
+{
+  "select": {
+    "rows": {
+      "0": "Выделите запись",
+      "1": ""
+    }
+  },
+  "processing": "Подождите...",
+  "search": "Поиск:",
+  "lengthMenu": "Показать _MENU_ записей",
+  "info": "Записи с _START_ до _END_ из _TOTAL_ записей",
+  "infoEmpty": "Записи с 0 до 0 из 0 записей",
+  "infoFiltered": "(отфильтровано из _MAX_ записей)",
+  "infoPostFix": "",
+  "loadingRecords": "Загрузка записей...",
+  "zeroRecords": "Записи отсутствуют.",
+  "emptyTable": "В таблице отсутствуют данные",
+  "paginate": {
+    "first": "Первая",
+    "previous": "Предыдущая",
+    "next": "Следующая",
+    "last": "Последняя"
+  },
+  "aria": {
+    "sortAscending": ": активировать для сортировки столбца по возрастанию",
+    "sortDescending": ": активировать для сортировки столбца по убыванию"
+  },
+
+  "create": {
+    "button": "Новая",
+    "title":  "Добавить новую запись",
+    "submit": "Добавить"
+  },
+  "edit": {
+    "button": "Изменить",
+    "title":  "Изменить запись",
+    "submit": "Обновить"
+  },
+  "remove": {
+    "button": "Удалить",
+    "title":  "Удалить",
+    "submit": "Удалить",
+    "confirm": {
+      "_": "Вы уверены, что хотите удалить %d записей?",
+      "1": "Вы уверены, что хотите удалить запись?"
+    }
+  },
+  "error": {
+    "system": "Возникла системная ошибка"
+  },
+  "multi": {
+    "title": "Множество значений",
+    "info": "The selected items contain different values for this input. To edit and set all items for this input to the same value, click or tap here, otherwise they will retain their individual values.",
+    "restore": "Обратить изменения"
+  },
+  "datetime": {
+    "previous": "Предыдущая",
+    "next":     "Следующая",
+    "months":   [ "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" ],
+    "weekdays": [ "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" ],
+    "amPm":     [ "am", "pm" ],
+    "unknown":  "-"
+  }
+}

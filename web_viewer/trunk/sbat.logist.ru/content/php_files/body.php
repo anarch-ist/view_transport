@@ -39,7 +39,7 @@
 
 <div class="container">
 
-    <div id="menu" style="z-index:1;width: 100%;position: fixed;height: 41px;margin-left: -10px;margin-top: -5px;">
+    <div id="menu" style="z-index:1;width: 500px;position: absolute;right: 0; height: 41px;  margin-left: -10px;margin-top: -5px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php

@@ -30,24 +30,45 @@
 </head>
 <body>
 <div>
+    <label for="routeSelect">Направление: </label>
+    <select id="routeSelect"></select>
     <div>
-        <label for="routeSelect">Направление: </label>
-        <select id="routeSelect">
-            <option value="routeId1">Направление1</option>
-            <option value="routeId2">Направление2</option>
-            <option value="routeId3">Направление3</option>
-        </select>
+        <div style="border: 3px solid lightcoral">
+            <label for="daysOfWeekSelect">Дни недели: </label>
+            <div id="daysOfWeekSelect">
+                <input type="checkbox" id="monCheck"><label for="monCheck">ПН</label>
+                <input type="checkbox" id="tueCheck"><label for="tueCheck">ВТ</label>
+                <input type="checkbox" id="wedCheck"><label for="wedCheck">СР</label>
+                <input type="checkbox" id="thuCheck"><label for="thuCheck">ЧТ</label>
+                <input type="checkbox" id="friCheck"><label for="friCheck">ПТ</label>
+                <input type="checkbox" id="satCheck"><label for="satCheck">СБ</label>
+                <input type="checkbox" id="sunCheck"><label for="sunCheck">ВС</label>
+            </div>
+            <label for="startRouteTimeInput">Старт маршрута: </label>
+            <input id="startRouteTimeInput">
+
+            <table id="routePointsTable">
+                <thead>
+                <tr>
+                    <th>Порядковый номер пункта</th>
+                    <th>Пункт</th>
+                    <th>Продолжительность разгрузочно-погрузочных операций</th>
+                </tr>
+                </thead>
+            </table>
+
+            <table id="relationsBetweenRoutePointsTable">
+                <thead>
+                <tr>
+                    <th>Начальный пункт</th>
+                    <th>Конечный пункт</th>
+                    <th>Расстояние</th>
+                    <th>Время в пути</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
     </div>
-    <table id="routePointsTable">
-        <thead>
-        <tr>
-            <th>Порядок</th>
-            <th>Пункт</th>
-            <th>Время разгрузки</th>
-            <th>Время до следующего пункта</th>
-            <th>Расстояние, км.</th>
-        </tr>
-        </thead>
-    </table>
 </div>
 </body>
