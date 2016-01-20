@@ -3,13 +3,13 @@ package ru.sbat.transport.optimization.location;
 
 import java.util.LinkedList;
 
-public class Route extends LinkedList<TrackCourse> implements IRoute {
+public class Route extends LinkedList<RoutePoint> implements IRoute {
 
     @Override
     public Double getFullDistance() {
         double result = 0;
-        for(TrackCourse trackCourse: this) {
-            result += trackCourse.getDistanceToNextPoint();
+        for(RoutePoint routePoint : this) {
+            result += routePoint.getDistanceToNextPoint();
         }
         return result;
     }
@@ -17,8 +17,8 @@ public class Route extends LinkedList<TrackCourse> implements IRoute {
     @Override
     public Integer getFullTime() {
         int result = 0;
-        for(TrackCourse trackCourse: this){
-            result += trackCourse.getTimeToNextPoint();
+        for(RoutePoint routePoint : this){
+            result += routePoint.getTimeToNextPoint();
         }
         return result;
     }

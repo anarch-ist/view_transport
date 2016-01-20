@@ -3,7 +3,7 @@ package ru.sbat.transport.optimization;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RouteList;
-import ru.sbat.transport.optimization.location.TrackCourse;
+import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
@@ -18,7 +18,7 @@ public class Optimizer implements IOptimizer {
 
 
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException {
+    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException {
 
         for(Invoice invoice: unassignedInvoices) {
             if (invoice.getRoute() != null)
@@ -30,15 +30,15 @@ public class Optimizer implements IOptimizer {
             Point departurePoint = invoice.getAddressOfWarehouse();
             double invoiceWeight = invoice.getWeight();
             int dayOfWeek = getWeekDay(plannedDeliveryTime);
-
-            RouteList routeListForInvoice = new RouteList();
             for(Route route: plannedSchedule){
+                if(route == null){
+                    throw new RouteNotFoundException("route should not be null");
+                }
                 if(route.getDeparturePoint().equals(departurePoint) && route.getArrivalPoint().equals(deliveryPoint) && dayOfWeek <= route.get(route.size()-1).getWeekDay() && (creationDate.getTime() + route.getFullTime() <= invoice.getRequest().getPlannedDeliveryTime().getTime())){
-
+                    System.out.println();
                 }
             }
         }
-
     }
 
 
@@ -52,7 +52,7 @@ public class Optimizer implements IOptimizer {
     @Override
     public int getWeekDay(Date date) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(date.getYear(), date.getMonth(), date.getDate());
+        calendar.setTime(date);
         int result = calendar.get(Calendar.DAY_OF_WEEK);
         return result;
     }

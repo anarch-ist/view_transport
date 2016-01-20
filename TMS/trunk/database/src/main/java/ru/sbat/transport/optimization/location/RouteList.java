@@ -1,40 +1,33 @@
 package ru.sbat.transport.optimization.location;
 
-import ru.sbat.transport.optimization.Invoice;
-
-import java.util.ArrayList;
-import java.util.Set;
 
 
-public class RouteList extends ArrayList {
-    private Route route;
-    private String nameDriver;
-    private String carNumber;
+public class RouteList{
+    private double capacityCar; //грузоподъемность в кг
+    private double volumeCar; //объем машины
+    private double cost;
 
-
-    public Route getRoute() {
-        return route;
+    public double getCapacityCar() {
+        return capacityCar;
     }
 
-    public void setRoute(Route route) {
-        this.route = route;
+    public void setCapacityCar(double capacityCar) {
+        this.capacityCar = capacityCar;
     }
 
-    public String getNameDriver() {
-        return nameDriver;
+    public double getVolumeCar() {
+        return volumeCar;
     }
 
-    public void setNameDriver(String nameDriver) {
-        this.nameDriver = nameDriver;
+    public void setVolumeCar(double volumeCar) {
+        this.volumeCar = volumeCar;
     }
 
-    public String getCarNumber() {
-        return carNumber;
+    public double getCost() {
+        return cost;
     }
 
-    public void setCarNumber(String carNumber) {
-        this.carNumber = carNumber;
+    public void setCost(double cost) {
+        this.cost = cost;
     }
-
-
 }

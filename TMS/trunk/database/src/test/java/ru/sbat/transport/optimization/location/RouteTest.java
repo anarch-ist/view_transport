@@ -1,42 +1,39 @@
 package ru.sbat.transport.optimization.location;
 
 import org.junit.*;
-import ru.sbat.transport.optimization.utils.DayOfWeek;
-
-import static org.junit.Assert.*;
 
 public class RouteTest {
 
     @Test
     public void getDist() throws Exception {
         Route route = new Route();
-        TrackCourse trackCourse1 = new TrackCourse();
-        TrackCourse trackCourse2 = new TrackCourse();
-        TrackCourse trackCourse3 = new TrackCourse();
-        trackCourse1.setDistanceToNextPoint(150.0);
-        trackCourse2.setDistanceToNextPoint(130.0);
-        trackCourse3.setDistanceToNextPoint(550.0);
-        route.add(trackCourse1);
-        route.add(trackCourse2);
-        route.add(trackCourse3);
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint1.setDistanceToNextPoint(150.0);
+        routePoint2.setDistanceToNextPoint(130.0);
+        routePoint3.setDistanceToNextPoint(550.0);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
         if (route.getFullDistance() != 830) throw new AssertionError();
     }
 
     @Test
     public void getTime() throws Exception {
         Route route = new Route();
-        TrackCourse trackCourse1 = new TrackCourse();
-        TrackCourse trackCourse2 = new TrackCourse();
-        TrackCourse trackCourse3 = new TrackCourse();
-        TrackCourse trackCourse4 = new TrackCourse();
-        trackCourse1.setTimeToNextPoint(15);
-        trackCourse2.setTimeToNextPoint(130);
-        trackCourse3.setTimeToNextPoint(55);
-        trackCourse4.setTimeToNextPoint(0);
-        route.add(trackCourse1);
-        route.add(trackCourse2);
-        route.add(trackCourse3);
-        route.add(trackCourse4);
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        RoutePoint routePoint4 = new RoutePoint();
+        routePoint1.setTimeToNextPoint(15);
+        routePoint2.setTimeToNextPoint(130);
+        routePoint3.setTimeToNextPoint(55);
+        routePoint4.setTimeToNextPoint(0);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        route.add(routePoint4);
         System.out.println(route.getFullTime());
         if (route.getFullTime() != 200) throw new AssertionError();
     }
@@ -44,81 +41,81 @@ public class RouteTest {
     @Test
     public void getDepTime() throws Exception {
         Route route = new Route();
-        TrackCourse trackCourse1 = new TrackCourse();
-        TrackCourse trackCourse2 = new TrackCourse();
-        TrackCourse trackCourse3 = new TrackCourse();
-        trackCourse1.setDepartureTime(15);
-        trackCourse2.setDepartureTime(13);
-        trackCourse3.setDepartureTime(5);
-        route.add(trackCourse1);
-        route.add(trackCourse2);
-        route.add(trackCourse3);
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint1.setDepartureTime(15);
+        routePoint2.setDepartureTime(13);
+        routePoint3.setDepartureTime(5);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
         if (route.getDepartureTime() != 15) throw new AssertionError();
     }
 
     @Test
     public void getArrTime() throws Exception {
         Route route = new Route();
-        TrackCourse trackCourse1 = new TrackCourse();
-        TrackCourse trackCourse2 = new TrackCourse();
-        TrackCourse trackCourse3 = new TrackCourse();
-        TrackCourse trackCourse4 = new TrackCourse();
-        trackCourse1.setDepartureTime(15);
-        trackCourse2.setDepartureTime(13);
-        trackCourse3.setDepartureTime(5);
-        trackCourse4.setDepartureTime(0);
-        trackCourse1.setTimeToNextPoint(22);
-        trackCourse2.setTimeToNextPoint(16);
-        trackCourse3.setTimeToNextPoint(25);
-        trackCourse4.setTimeToNextPoint(0);
-        route.add(trackCourse1);
-        route.add(trackCourse2);
-        route.add(trackCourse3);
-        route.add(trackCourse4);
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        RoutePoint routePoint4 = new RoutePoint();
+        routePoint1.setDepartureTime(15);
+        routePoint2.setDepartureTime(13);
+        routePoint3.setDepartureTime(5);
+        routePoint4.setDepartureTime(0);
+        routePoint1.setTimeToNextPoint(22);
+        routePoint2.setTimeToNextPoint(16);
+        routePoint3.setTimeToNextPoint(25);
+        routePoint4.setTimeToNextPoint(0);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        route.add(routePoint4);
         if (route.getArrivalTime() != 6) throw new AssertionError();
     }
 
     @Test
     public void getArrPoint() throws Exception {
         Route route = new Route();
-        TrackCourse trackCourse1 = new TrackCourse();
-        TrackCourse trackCourse2 = new TrackCourse();
-        TrackCourse trackCourse3 = new TrackCourse();
-        TrackCourse trackCourse4 = new TrackCourse();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        RoutePoint routePoint4 = new RoutePoint();
         TradeRepresentativePoint tr1 = new TradeRepresentativePoint();
         TradeRepresentativePoint tr2 = new TradeRepresentativePoint();
         TradeRepresentativePoint tr3 = new TradeRepresentativePoint();
         TradeRepresentativePoint rightPoint = new TradeRepresentativePoint();
-        trackCourse1.setDeparturePoint(tr1);
-        trackCourse2.setDeparturePoint(tr2);
-        trackCourse3.setDeparturePoint(tr3);
-        trackCourse4.setDeparturePoint(rightPoint);
-        route.add(trackCourse1);
-        route.add(trackCourse2);
-        route.add(trackCourse3);
-        route.add(trackCourse4);
+        routePoint1.setDeparturePoint(tr1);
+        routePoint2.setDeparturePoint(tr2);
+        routePoint3.setDeparturePoint(tr3);
+        routePoint4.setDeparturePoint(rightPoint);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        route.add(routePoint4);
         if (!route.getArrivalPoint().equals(rightPoint)) throw new AssertionError();
     }
 
     @Test
     public void getDepPoint() throws Exception {
         Route route = new Route();
-        TrackCourse trackCourse1 = new TrackCourse();
-        TrackCourse trackCourse2 = new TrackCourse();
-        TrackCourse trackCourse3 = new TrackCourse();
-        TrackCourse trackCourse4 = new TrackCourse();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        RoutePoint routePoint4 = new RoutePoint();
         TradeRepresentativePoint rightPoint = new TradeRepresentativePoint();
         TradeRepresentativePoint tr2 = new TradeRepresentativePoint();
         TradeRepresentativePoint tr3 = new TradeRepresentativePoint();
         TradeRepresentativePoint tr4 = new TradeRepresentativePoint();
-        trackCourse1.setDeparturePoint(rightPoint);
-        trackCourse2.setDeparturePoint(tr2);
-        trackCourse3.setDeparturePoint(tr3);
-        trackCourse4.setDeparturePoint(tr4);
-        route.add(trackCourse1);
-        route.add(trackCourse2);
-        route.add(trackCourse3);
-        route.add(trackCourse4);
+        routePoint1.setDeparturePoint(rightPoint);
+        routePoint2.setDeparturePoint(tr2);
+        routePoint3.setDeparturePoint(tr3);
+        routePoint4.setDeparturePoint(tr4);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        route.add(routePoint4);
         if (!route.getDeparturePoint().equals(rightPoint)) throw new AssertionError();
     }
 }

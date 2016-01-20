@@ -4,12 +4,15 @@ package ru.sbat.transport.optimization.location;
 import ru.sbat.transport.optimization.utils.DayOfWeek;
 
 
-public class TrackCourse {
+public class RoutePoint {
+    private RouteList routeList;
     private Integer departureTime;
-    private Integer timeToNextPoint;
     private DayOfWeek dayOfWeek;
-    private Double distanceToNextPoint; // km
+    private Integer timeToNextPoint;
+
+    private Double distanceToNextPoint ; // km
     private Point departurePoint;
+
 
     public Integer getDepartureTime() {
         return departureTime;
@@ -51,6 +54,14 @@ public class TrackCourse {
         this.departurePoint = departurePoint;
     }
 
+    public RouteList getRouteList() {
+        return routeList;
+    }
+
+    public void setRouteList(RouteList routeList) {
+        this.routeList = routeList;
+    }
+
     public int getWeekDay(){
         int result = 0;
         DayOfWeek dayOfWeek = this.getDayOfWeek();
@@ -76,7 +87,7 @@ public class TrackCourse {
 
     @Override
     public String toString() {
-        return "TrackCourse{" +
+        return "RoutePoint{" +
                 "departureTime=" + departureTime +
                 ", timeToNextPoint=" + timeToNextPoint +
                 ", dayOfWeek=" + dayOfWeek +

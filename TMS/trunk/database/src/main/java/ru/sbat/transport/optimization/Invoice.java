@@ -10,9 +10,9 @@ import java.util.Date;
 public class Invoice {
     private Request request;
     private Point addressOfWarehouse;
-    private double weight;
-    private double amount;
-    private int countOfBoxes;
+    private double weight; //масса
+    private double volume;//объем
+    private int countOfBoxes;//кол-во коробок
     private MarketAgent marketAgent;
     private int priority;
     private Route route;
@@ -58,12 +58,12 @@ public class Invoice {
         this.countOfBoxes = countOfBoxes;
     }
 
-    public double getAmount() {
-        return amount;
+    public double getVolume() {
+        return volume;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public void setVolume(double volume) {
+        this.volume = volume;
     }
 
     public double getWeight() {
