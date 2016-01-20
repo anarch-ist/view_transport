@@ -243,7 +243,7 @@ CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
   firstPointArrivalTime TIME                                                                              NOT NULL,
   -- days of weeks when route is available
-  daysOfWeeks           SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') NOT NULL,
+  daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') NOT NULL,
   routeName             VARCHAR(64)                                                                       NOT NULL,
   -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
   directionName         VARCHAR(255)                                                                      NULL,

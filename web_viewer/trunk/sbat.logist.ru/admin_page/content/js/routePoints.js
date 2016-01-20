@@ -60,32 +60,118 @@ $(document).ready(function() {
                         dropdownParent: null, // body or null
                         selectOnTab: true,
                         onChange: function (value) {
-                            getAllRoutePointsDataForRouteID(value);
+                            onRouteChanged(value);
                         }
                     });
-                getAllRoutePointsDataForRouteID($("#routeSelect option")[0].value);
+                onRouteChanged($("#routeSelect option")[0].value);
             }
         );
 
         // TODO load distances between points
     }
 
-    $("#daysOfWeekSelect").buttonset();
-    $("#startRouteTimeInput").mask('00:00', {clearIfNotMatch: true, placeholder: "чч:мм"});
+    //$("#daysOfWeekSelect").buttonset();
+    //$("#startRouteTimeInput").mask('00:00', {clearIfNotMatch: true, placeholder: "чч:мм"});
 
-
-
-    // custom plugin
-    // https://editor.datatables.net/examples/plug-ins/fieldPlugin.html
-    // plugin for autocomplete fields, add autoComplete field type to Editor
-    // https://editor.datatables.net/plug-ins/field-type/editor.selectize
-    // list of all field types: https://editor.datatables.net/reference/field/
     <!-- EXAMPLE DATA-->
     // data must have ID column
     //var exampleData = [
     //    {"routePointID":101, "sortOrder":0, "pointName":"пункт1", "tLoading": "02ч.30м.", "timeToNextPoint": "10ч.00м.", "distanceToNextPoint": 350},
     //    {"routePointID":102, "sortOrder":1, "pointName":"пункт2", "tLoading": "01ч.20м.", "timeToNextPoint": "12ч.30м.", "distanceToNextPoint": 340}
     //];
+
+    // create Editor Internatialization
+    $.extend(true, $.fn.dataTable.Editor.defaults, {
+        "i18n": {
+            "create": {
+                "button": "Новая",
+                "title": "Добавить новую запись",
+                "submit": "Добавить"
+            },
+            "edit": {
+                "button": "Изменить",
+                "title": "Изменить запись",
+                "submit": "Обновить"
+            },
+            "remove": {
+                "button": "Удалить",
+                "title": "Удалить",
+                "submit": "Удалить",
+                "confirm": {
+                    "_": "Вы уверены, что хотите удалить %d записей?",
+                    "1": "Вы уверены, что хотите удалить запись?"
+                }
+            },
+            "error": {
+                "system": "Возникла системная ошибка"
+            },
+            "multi": {
+                "title": "Множество значений",
+                "info": "The selected items contain different values for this input. To edit and set all items for this input to the same value, click or tap here, otherwise they will retain their individual values.",
+                "restore": "Обратить изменения"
+            },
+            "datetime": {
+                "previous": "Предыдущая",
+                "next": "Следующая",
+                "months": ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                "weekdays": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                "amPm": ["am", "pm"],
+                "unknown": "-"
+            }
+        }
+    });
+
+    // create editor for days of week and start route time
+    {
+        var fieldsEditor = new $.fn.dataTable.Editor({
+            ajax: {
+                edit: {
+                    type: 'PUT',
+                    url: 'content/getData.php'
+                }
+            },
+
+            fields: [{
+                label: "daysOfWeekSelect:",
+                name: "daysOfWeekSelect",
+                type: 'selectize',
+                options: [
+                    {label: 'ПН', value: 'monday'},
+                    {label: 'ВТ', value: 'tuesday'},
+                    {label: 'СР', value: 'wednesday'},
+                    {label: 'ЧТ', value: 'thursday'},
+                    {label: 'ПТ', value: 'friday'},
+                    {label: 'СБ', value: 'saturday'},
+                    {label: 'ВС', value: 'sunday'}
+                ],
+                opts: {
+                    labelField: 'label',
+                    maxItems:7,
+                    dropdownParent: null
+                }
+            }, {
+                label: "startRouteTimeInput:",
+                name: "startRouteTimeInput"
+                //type: mask
+            }
+            ]
+        });
+
+        //fieldsEditor.inline( $('[data-editor-field]'), {
+        //
+        //} );
+
+
+        // inline, submit
+
+        $('[data-editor-field]').on( 'click', function (e) {
+            fieldsEditor.inline( this, {
+                buttons: '_basic'
+                //onBlur: 'none'
+            } );
+        } );
+    }
+
 
     // routePointsDataTable and routePointsEditor
     {
@@ -108,7 +194,7 @@ $(document).ready(function() {
             idSrc: 'routePointID',
 
             fields: [
-                { label: 'Порядковый номер', name: 'sortOrder', type: 'mask', mask: "0", placeholder: "0-9" },
+                { label: 'Порядковый номер', name: 'sortOrder', type: 'readonly'},
                 { label: 'Пункт',  name: 'pointName', type: 'selectize',
                     options: [
                     ],
@@ -119,10 +205,7 @@ $(document).ready(function() {
                         dropdownParent: null
                     }
                 },
-                { label: 'Время разгрузки',  name: 'tLoading', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."},
-                { label: 'Время до следующего пункта',  name: 'timeToNextPoint', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."},
-                { label: 'Расстояние до следующего пункта',  name: 'distanceToNextPoint', type: 'mask', mask:"9999", placeholder:"____км."}
-                // etc
+                { label: 'Продолжительность разгрузочных работ',  name: 'tLoading', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
             ]
         } );
 
@@ -130,7 +213,6 @@ $(document).ready(function() {
         routePointsEditor.on( 'preSubmit', function (e, data, action) {
             if (action === 'create' || action === 'edit') {
                 data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
-                data.data[0].timeToNextPoint = stringToMinutes(data.data[0].timeToNextPoint);
             }
         } );
 
@@ -148,7 +230,6 @@ $(document).ready(function() {
                 language: {
                     url:'/localization/dataTablesRus.json'
                 },
-                //"data": exampleData,
                 select: {
                     style: 'single'
                 },
@@ -189,7 +270,7 @@ $(document).ready(function() {
                 }
             },
             table: '#relationsBetweenRoutePointsTable',
-            idSrc: 'routePointID', //TODO consist of two components
+            idSrc: 'relationID',
 
             fields: [
                 { label: 'Начальный пункт', name: 'pointNameFirst', type: 'readonly'},
@@ -227,6 +308,7 @@ $(document).ready(function() {
 
     }
 
+
     // helper functions
     {
         function stringToMinutes(string) {
@@ -249,18 +331,42 @@ $(document).ready(function() {
             return strHoures + "ч." + strMinutes + "м.";
         }
 
-        function getAllRoutePointsDataForRouteID(value) {
+        function onRouteChanged(value) {
             $.post(
                 "content/getData.php",
                 {status: "getAllRoutePointsDataForRouteID", routeID: value, format:"json"},
                 function(data) {
+                    // example result data
+                    data = {
+                        directionName:"SomeDir1",
+                        daysOfWeek:["monday", "wednesday", "friday"],
+                        firstPointArrivalTime: "18:00",
+                        routePoints: [
+                            {routePointID: 10, sortOrder:0, pointName:"point1", tLoading: 180},
+                            {routePointID: 11, sortOrder:1, pointName:"point2", tLoading: 90},
+                            {routePointID: 12, sortOrder:2, pointName:"point3", tLoading: 110}
+                        ],
+                        relationsBetweenRoutePoints: [
+                            {relationID:"10_11", pointNameFirst:"point1", pointNameSecond:"point2", distance: 300, timeForDistance: 450},
+                            {relationID:"11_12", pointNameFirst:"point2", pointNameSecond:"point3", distance: 500, timeForDistance: 780}
+                        ]
+                    };
+                    data = JSON.stringify(data);
+
                     data = JSON.parse(data);
-                    for(var i in data) {
-                        data[i].tLoading = minutesToString(data[i].tLoading);
-                        data[i].timeToNextPoint = minutesToString(data[i].timeToNextPoint);
-                    }
+                    $("[data-editor-field*='daysOfWeekSelect']").text(data.daysOfWeek.join(" "));
+                    $("[data-editor-field*='startRouteTimeInput']").text(data.firstPointArrivalTime);
+
                     $routePointsDataTable.rows().remove();
-                    $routePointsDataTable.rows.add(data).draw(false);
+                    $routePointsDataTable.rows.add(data.routePoints).draw(false);
+
+                    $relationsBetweenRoutePointsDataTable.rows().remove();
+                    $relationsBetweenRoutePointsDataTable.rows.add(data.relationsBetweenRoutePoints).draw(false);
+
+                    //for(var i in data) {
+                    //    data[i].tLoading = minutesToString(data[i].tLoading);
+                    //    data[i].timeToNextPoint = minutesToString(data[i].timeToNextPoint);
+                    //}
                 }
             );
         }
