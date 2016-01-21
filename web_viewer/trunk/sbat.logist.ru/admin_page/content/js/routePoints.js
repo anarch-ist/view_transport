@@ -39,7 +39,7 @@ $(document).ready(function() {
                 //editor.field('pointName').update(options);
             }
         );
-
+        var $routeSelectSelectize;
         // when page is loading make request and get all routes
         $.post(
             "content/getData.php",
@@ -52,7 +52,7 @@ $(document).ready(function() {
                     var option = "<option value=" + entry.routeID+">" + entry.directionName + "</option>";
                     options.push(option);
                 });
-                $("#routeSelect").html(options.join("")).selectize(
+                $routeSelectSelectize = $("#routeSelect").html(options.join("")).selectize(
                     {
                         diacritics: true,
                         maxOptions: 10000,
@@ -70,15 +70,45 @@ $(document).ready(function() {
         // TODO load distances between points
     }
 
-    //$("#daysOfWeekSelect").buttonset();
-    //$("#startRouteTimeInput").mask('00:00', {clearIfNotMatch: true, placeholder: "чч:мм"});
+    $("#daysOfWeekSelect").buttonset();
+    $("#updateDaysOfWeek").button().click(function (e) {
 
-    <!-- EXAMPLE DATA-->
-    // data must have ID column
-    //var exampleData = [
-    //    {"routePointID":101, "sortOrder":0, "pointName":"пункт1", "tLoading": "02ч.30м.", "timeToNextPoint": "10ч.00м.", "distanceToNextPoint": 350},
-    //    {"routePointID":102, "sortOrder":1, "pointName":"пункт2", "tLoading": "01ч.20м.", "timeToNextPoint": "12ч.30м.", "distanceToNextPoint": 340}
-    //];
+        var daysOfWeek = [];
+        $("#daysOfWeekSelect :checkbox:checked").each(function () {
+            daysOfWeek.push($(this).attr('id'));
+        });
+        $("#ajaxLoaderGif").show();
+        $.post(
+            'content/getData.php',
+            {
+                routeID: $routeSelectSelectize[0].selectize.items[0],
+                daysOfWeek: daysOfWeek
+            },
+            // example serverData : ["monday", "friday", "saturday"]
+            function (serverData) {
+                setDaysOfWeekData(serverData);
+                $("#ajaxLoaderGif").hide();
+            }
+        );
+    });
+
+    $("#startRouteTimeInput").mask('00:00', {clearIfNotMatch: true, placeholder: "чч:мм"});
+    $("#updateStartRouteTime").button().click(function (e) {
+        $("#ajaxLoaderGif").show();
+        $.post(
+            'content/getData.php',
+            {
+                routeID: $routeSelectSelectize[0].selectize.items[0],
+                firstPointArrivalTime:$('#startRouteTimeInput').val()
+            },
+            // example serverData : "17:00"
+            function (serverData) {
+                setFirstPointArrivalTime(serverData);
+                $("#ajaxLoaderGif").hide();
+            }
+        );
+    });
+
 
     // create Editor Internatialization
     $.extend(true, $.fn.dataTable.Editor.defaults, {
@@ -121,57 +151,34 @@ $(document).ready(function() {
         }
     });
 
-    // create editor for days of week and start route time
-    {
-        var fieldsEditor = new $.fn.dataTable.Editor({
-            ajax: {
-                edit: {
-                    type: 'PUT',
-                    url: 'content/getData.php'
-                }
-            },
-
-            fields: [{
-                label: "daysOfWeekSelect:",
-                name: "daysOfWeekSelect",
-                type: 'selectize',
-                options: [
-                    {label: 'ПН', value: 'monday'},
-                    {label: 'ВТ', value: 'tuesday'},
-                    {label: 'СР', value: 'wednesday'},
-                    {label: 'ЧТ', value: 'thursday'},
-                    {label: 'ПТ', value: 'friday'},
-                    {label: 'СБ', value: 'saturday'},
-                    {label: 'ВС', value: 'sunday'}
-                ],
-                opts: {
-                    labelField: 'label',
-                    maxItems:7,
-                    dropdownParent: null
-                }
-            }, {
-                label: "startRouteTimeInput:",
-                name: "startRouteTimeInput"
-                //type: mask
-            }
-            ]
-        });
-
-        //fieldsEditor.inline( $('[data-editor-field]'), {
-        //
-        //} );
 
 
-        // inline, submit
 
-        $('[data-editor-field]').on( 'click', function (e) {
-            fieldsEditor.inline( this, {
-                buttons: '_basic'
-                //onBlur: 'none'
-            } );
-        } );
-    }
-
+    // PROTOCOL DESCRIPTION
+    // https://editor.datatables.net/manual/server
+    //Client-to-server
+    //action:
+    //On create: create
+    //On edit: edit
+    //On remove: remove
+    //data:
+    //contains routePointID and other columns with data
+    //EXAMPLE:
+    //action:"create"
+    //data[0][sortOrder]:"4"
+    //data[0][pointName]:"2"
+    //data[0][tLoading]:"743"
+    //Server-to-client
+    //{
+    //    "data": [
+    //    {
+    //        "routePointID":   "row_29",
+    //        "sortOrder": "4",
+    //        "pointName":  "point5",
+    //        "tLoading":   "564"
+    //    }
+    //    ]
+    //}
 
     // routePointsDataTable and routePointsEditor
     {
@@ -194,7 +201,7 @@ $(document).ready(function() {
             idSrc: 'routePointID',
 
             fields: [
-                { label: 'Порядковый номер', name: 'sortOrder', type: 'readonly'},
+                { label: 'Порядковый номер', name: 'sortOrder', type: 'mask', mask:"0", maskOptions: {clearIfNotMatch: true}, placeholder:"0-9"},
                 { label: 'Пункт',  name: 'pointName', type: 'selectize',
                     options: [
                     ],
@@ -212,6 +219,7 @@ $(document).ready(function() {
         // transfrom string like 18ч.30м. to 18*60+30
         routePointsEditor.on( 'preSubmit', function (e, data, action) {
             if (action === 'create' || action === 'edit') {
+                console.log(data.data[0].tLoading);
                 data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
             }
         } );
@@ -275,9 +283,8 @@ $(document).ready(function() {
             fields: [
                 { label: 'Начальный пункт', name: 'pointNameFirst', type: 'readonly'},
                 { label: 'Конечный пункт',  name: 'pointNameSecond', type: 'readonly'},
-                { label: 'Расстояние между пунктами',  name: 'distance', type: 'readonly'},
-                { label: 'Время разгрузки',  name: 'timeForDistance', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
-                // etc
+                { label: 'Расстояние',  name: 'distance', type: 'readonly'},
+                { label: 'Время в пути',  name: 'timeForDistance', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
             ]
         } );
 
@@ -313,7 +320,9 @@ $(document).ready(function() {
     {
         function stringToMinutes(string) {
             var houres = string.substring(0, 2);
-            var minutes = string.substr(4, 2);
+            console.log(houres);
+            var minutes = string.substr(2, 3);
+            console.log(minutes);
             return houres * 60 + parseInt(minutes);
         }
 
@@ -331,14 +340,31 @@ $(document).ready(function() {
             return strHoures + "ч." + strMinutes + "м.";
         }
 
+        function setDaysOfWeekData(daysOfWeek) {
+            if (!$.isArray(daysOfWeek)) throw "illegalArgumentException: input arg should be array";
+
+            $("#daysOfWeekSelect").find("input").each(function () {
+                $(this).prop('checked', false).button("refresh");
+            });
+
+            daysOfWeek.forEach(function (dayOfWeek) {
+                $('#' + dayOfWeek).prop('checked', true).button("refresh");
+            });
+        }
+
+        function setFirstPointArrivalTime(firstPointArrivalTime) {
+            $('#startRouteTimeInput').val(firstPointArrivalTime).trigger('keyup');
+        }
+
+        // initial loading of all data
         function onRouteChanged(value) {
             $.post(
                 "content/getData.php",
                 {status: "getAllRoutePointsDataForRouteID", routeID: value, format:"json"},
                 function(data) {
+
                     // example result data
                     data = {
-                        directionName:"SomeDir1",
                         daysOfWeek:["monday", "wednesday", "friday"],
                         firstPointArrivalTime: "18:00",
                         routePoints: [
@@ -354,19 +380,25 @@ $(document).ready(function() {
                     data = JSON.stringify(data);
 
                     data = JSON.parse(data);
-                    $("[data-editor-field*='daysOfWeekSelect']").text(data.daysOfWeek.join(" "));
-                    $("[data-editor-field*='startRouteTimeInput']").text(data.firstPointArrivalTime);
 
+                    setDaysOfWeekData(data.daysOfWeek);
+
+                    setFirstPointArrivalTime(data.firstPointArrivalTime);
+
+                    // set routePoints table data
                     $routePointsDataTable.rows().remove();
+                    data.routePoints.forEach(function(entry) {
+                       entry.tLoading = minutesToString(entry.tLoading);
+                    });
                     $routePointsDataTable.rows.add(data.routePoints).draw(false);
 
+                    // set relationsBetweenRoutePoints table data
                     $relationsBetweenRoutePointsDataTable.rows().remove();
+                    data.relationsBetweenRoutePoints.forEach(function(entry) {
+                        entry.timeForDistance = minutesToString(entry.timeForDistance);
+                    });
                     $relationsBetweenRoutePointsDataTable.rows.add(data.relationsBetweenRoutePoints).draw(false);
 
-                    //for(var i in data) {
-                    //    data[i].tLoading = minutesToString(data[i].tLoading);
-                    //    data[i].timeToNextPoint = minutesToString(data[i].timeToNextPoint);
-                    //}
                 }
             );
         }

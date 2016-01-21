@@ -1,4 +1,4 @@
-<head>
+<head xmlns:display="http://www.w3.org/1999/xhtml">
     <meta charset="UTF-8">
     <title></title>
 
@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/FieldType-Selectize/editor.selectize.min.css"/> <!--z-index:999-->
     <link rel="stylesheet" type="text/css" href="../common_files/media/Select-1.1.0/css/select.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../admin_page/content/css/admin.css"/>
 
     <script src="../common_files/media/jQuery-2.1.4/jquery-2.1.4.min.js"></script>
     <script src="../common_files/media/jQueryUI-1.11.4/jquery-ui.min.js"></script>
@@ -34,27 +35,29 @@
     <select id="routeSelect"></select>
     <div>
         <div style="border: 3px solid lightcoral">
-<!--            <label for="daysOfWeekSelect">Дни недели: </label>-->
-            <dt data-editor-label="daysOfWeekSelect">Дни недели:</dt>
-            <dd data-editor-field="daysOfWeekSelect"></dd>
 
-            <dt data-editor-label="startRouteTimeInput">Старт маршрута:</dt>
-            <dd data-editor-field="startRouteTimeInput">ertert</dd>
-<!--            <div id="daysOfWeekSelect" data-editor-field="daysOfWeekSelect">-->
-<!--                <input type="checkbox" id="monCheck"><label for="monCheck">ПН</label>-->
-<!--                <input type="checkbox" id="tueCheck"><label for="tueCheck">ВТ</label>-->
-<!--                <input type="checkbox" id="wedCheck"><label for="wedCheck">СР</label>-->
-<!--                <input type="checkbox" id="thuCheck"><label for="thuCheck">ЧТ</label>-->
-<!--                <input type="checkbox" id="friCheck"><label for="friCheck">ПТ</label>-->
-<!--                <input type="checkbox" id="satCheck"><label for="satCheck">СБ</label>-->
-<!--                <input type="checkbox" id="sunCheck"><label for="sunCheck">ВС</label>-->
-<!--            </div>-->
-<!--            <label for="startRouteTimeInput">Старт маршрута: </label>-->
+            <table>
+                <tr>
+                    <td><label for="daysOfWeekSelect">Дни недели: </label></td>
+                    <td><div id="daysOfWeekSelect" style="display: inline-block">
+                            <input type="checkbox" id="monday"><label for="monday">ПН</label>
+                            <input type="checkbox" id="tuesday"><label for="tuesday">ВТ</label>
+                            <input type="checkbox" id="wednesday"><label for="wednesday">СР</label>
+                            <input type="checkbox" id="thursday"><label for="thursday">ЧТ</label>
+                            <input type="checkbox" id="friday"><label for="friday">ПТ</label>
+                            <input type="checkbox" id="saturday"><label for="saturday">СБ</label>
+                            <input type="checkbox" id="sunday"><label for="sunday">ВС</label>
+                        </div></td>
+                    <td><button id="updateDaysOfWeek" style="display: inline-block">Обновить</button></td>
+                </tr>
+                <tr>
+                    <td><label for="startRouteTimeInput">Старт маршрута: </label></td>
+                    <td><input id="startRouteTimeInput"></td>
+                    <td><button id="updateStartRouteTime">Обновить</button></td>
+                </tr>
+            </table>
 
-<!--            <input id="startRouteTimeInput" data-editor-field="startRouteTimeInput">-->
-
-
-
+            <img id="ajaxLoaderGif" src="../admin_page/content/res/ajax-loader-small.gif" style="display: none">
 
             <div >
                 <div style="width: 49%; display: inline-block">
