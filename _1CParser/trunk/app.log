@@ -1,2 +1,0 @@
-2015-12-14 12:03:07,747 INFO r.l.s.DataBase [main] database connection with URL: jdbc:mysql://localhost:3306/transmaster_transport_db succefully recieved. 
-2015-12-14 12:03:30,040 INFO r.l.s.DataBase [main] database connection with URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] succefully recieved. 

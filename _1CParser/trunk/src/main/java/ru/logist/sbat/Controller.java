@@ -3,44 +3,25 @@ package ru.logist.sbat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
     private static final Logger logger = LogManager.getLogger(Controller.class);
-    private final DataBase dataBase;
-    private Properties properties;
+    private final Integer generatePeriod;
+    private DataBase dataBase;
     private Timer timer;
     volatile private boolean isGenerateInsertIntoRequestTable = false;
     volatile private boolean isGenerateInsertIntoRouteListsTable = false;
     volatile private boolean isGenerateInsertIntoInvoicesTable = false;
     volatile private boolean isGenerateUpdateInvoiceStatuses = false;
+    public Controller(Integer generatePeriod) {
+        this.generatePeriod = generatePeriod;
+    }
 
-    public Controller() {
-
-        // get All properties
-        try {
-            properties = handleProperties();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // create database connection
-        dataBase = new DataBase(
-                properties.getProperty("url"),
-                properties.getProperty("dbName"),
-                properties.getProperty("user"),
-                properties.getProperty("password")
-        );
-
-
+    public void setDataBase(DataBase dataBase) {
+        this.dataBase = dataBase;
     }
 
     public void setGenerateInsertIntoRequestTable(boolean generateInsertIntoRequestTable) {
@@ -58,23 +39,6 @@ public class Controller {
     public void setGenerateUpdateInvoiceStatuses(boolean generateUpdateInvoiceStatuses) {
         isGenerateUpdateInvoiceStatuses = generateUpdateInvoiceStatuses;
     }
-
-    private Properties handleProperties() throws IOException {
-        Path userDir = Paths.get(System.getProperty("user.dir"));
-        Path prefsPath = userDir.resolve("prefs.property");
-        Properties properties = new Properties();
-        if (!prefsPath.toFile().exists()) {
-            DefaultProperties defaultProperties = new DefaultProperties();
-            try (FileOutputStream fos = new FileOutputStream(prefsPath.toFile())) {
-                defaultProperties.storeToXML(fos, "prefs", "UTF-8");
-                return defaultProperties;
-            }
-        } else {
-            properties.loadFromXML(new FileInputStream(prefsPath.toFile()));
-            return properties;
-        }
-    }
-
 
     public void startGeneration() {
         timer = new Timer("insert timer", true);
@@ -99,7 +63,7 @@ public class Controller {
                 }
             }
         };
-        timer.schedule(timerTask, 1_000, Integer.parseInt(properties.getProperty("generatePeriod")) * 1_000);
+        timer.schedule(timerTask, 1_000, generatePeriod);
     }
 
     public void close() {
@@ -107,4 +71,5 @@ public class Controller {
         if (timer != null)
             timer.cancel();
     }
+
 }

@@ -13,7 +13,7 @@ public class DataBase {
     private Connection connection;
     private List<String> invoiceStatuses;
 
-    public DataBase(String url, String dbName, String user, String password) {
+    public DataBase(String url, String dbName, String user, String password) throws SQLException {
         // create connection to dbName
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -24,10 +24,10 @@ public class DataBase {
             );
             connection.setAutoCommit(true);
             invoiceStatuses = getInvoiceStatuses();
-            logger.info("database connection succefully recieved, URL: [" + url + dbName + "] ");
+
         } catch (ClassNotFoundException | SQLException e) {
-            logger.debug(e);
             closeConnectionQuietly();
+            throw new SQLException(e);
         }
     }
 
@@ -52,7 +52,7 @@ public class DataBase {
         try {
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 

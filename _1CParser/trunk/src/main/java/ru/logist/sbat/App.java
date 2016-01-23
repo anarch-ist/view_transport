@@ -3,13 +3,25 @@ package ru.logist.sbat;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
+import ru.logist.sbat.properties.PropertiesManager;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class App {
@@ -19,10 +31,71 @@ public class App {
     public static final String IIT = "IIT"; // insert into invoices table
     public static final String UIT = "UIT"; // update invoice statuses
 
+    public static String getLoggerFile( Logger log ) {
+        org.apache.logging.log4j.core.Logger loggerImpl = (org.apache.logging.log4j.core.Logger) log;
+        Appender appender = loggerImpl.getAppenders().get("FILE");
+        return ((FileAppender) appender).getFileName();
+    }
+
     public static void main(String[] args) {
 
-        Controller controller = new Controller();
+        // show logs path
+        Path rootDir = Paths.get(System.getProperty("user.dir"));
+
+
+        logger.info("log file path: " + rootDir.resolve(getLoggerFile(logger)));
+
+        // get All properties
+        Properties properties = null;
+        try {
+            Path prefsPath = rootDir.resolve("prefs.property");
+            PropertiesManager.setPrefsPath(prefsPath);
+            properties = PropertiesManager.handleProperties();
+            logger.info("path to preferences directory: " + PropertiesManager.getPrefsPath());
+            logger.info("property file content: " + properties);
+        } catch (IOException e) {
+            logger.error(e);
+            System.exit(-1);
+        }
+
+        // create database connection
+        DataBase dataBase = null;
+        try {
+            String url = properties.getProperty("url");
+            String dbName = properties.getProperty("dbName");
+            String user = properties.getProperty("user");
+            dataBase = new DataBase(
+                    url,
+                    dbName,
+                    user,
+                    properties.getProperty("password")
+            );
+            logger.info("database connection succefully recieved, URL: [" + url + dbName + "] " + "User: [" + user + "]");
+        } catch (SQLException e) {
+            logger.error(e);
+            System.exit(-1);
+        }
+
+        // create controller
+        Controller controller = new Controller(Integer.parseInt(properties.getProperty("generatePeriod")) * 1_000);
+        controller.setDataBase(dataBase);
+
+        // create cmd parser and options
         Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("choose mode: \n1 - parse\n2 - generate");
+            String nextLine = scanner.nextLine();
+            try {
+                if (Integer.parseInt(nextLine) == 1) {
+                    System.out.println(1);
+                    break;
+                } else if (Integer.parseInt(nextLine) == 2) {
+                    System.out.println(2);
+                    break;
+                }
+            } catch (NumberFormatException ignored) {/*NOPE*/}
+        }
+
         Options options = new Options();
         Option exit = new Option("exit");
         Option start = new Option("start");
