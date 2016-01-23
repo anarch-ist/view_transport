@@ -1,8 +1,9 @@
 package ru.sbat.transport.optimization.location;
 
 
-
-public class RouteList{
+// переименовать класс во время дальнейшей работы с ним
+// characteristicsOfVehicle or characteristicsOfCar
+public class CharacteristicsOfCar {
     private double capacityCar; //грузоподъемность в кг
     private double volumeCar; //объем машины
     private double cost;

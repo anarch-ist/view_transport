@@ -5,13 +5,13 @@ import ru.sbat.transport.optimization.utils.DayOfWeek;
 
 
 public class RoutePoint {
-    private RouteList routeList;
+    private CharacteristicsOfCar characteristicsOfCar;
     private Integer departureTime;
     private DayOfWeek dayOfWeek;
     private Integer timeToNextPoint;
-
     private Double distanceToNextPoint ; // km
     private Point departurePoint;
+    private Integer loadingOperationsTime;
 
 
     public Integer getDepartureTime() {
@@ -54,12 +54,20 @@ public class RoutePoint {
         this.departurePoint = departurePoint;
     }
 
-    public RouteList getRouteList() {
-        return routeList;
+    public CharacteristicsOfCar getCharacteristicsOfCar() {
+        return characteristicsOfCar;
     }
 
-    public void setRouteList(RouteList routeList) {
-        this.routeList = routeList;
+    public void setCharacteristicsOfCar(CharacteristicsOfCar characteristicsOfCar) {
+        this.characteristicsOfCar = characteristicsOfCar;
+    }
+
+    public Integer getLoadingOperationsTime() {
+        return loadingOperationsTime;
+    }
+
+    public void setLoadingOperationsTime(Integer loadingOperationsTime) {
+        this.loadingOperationsTime = loadingOperationsTime;
     }
 
     public int getWeekDay(){
@@ -84,15 +92,16 @@ public class RoutePoint {
         return result;
     }
 
-
     @Override
     public String toString() {
         return "RoutePoint{" +
-                "departureTime=" + departureTime +
-                ", timeToNextPoint=" + timeToNextPoint +
+                "characteristicsOfCar=" + characteristicsOfCar +
+                ", departureTime=" + departureTime +
                 ", dayOfWeek=" + dayOfWeek +
+                ", timeToNextPoint=" + timeToNextPoint +
                 ", distanceToNextPoint=" + distanceToNextPoint +
                 ", departurePoint=" + departurePoint +
+                ", loadingOperationsTime=" + loadingOperationsTime +
                 '}';
     }
 }

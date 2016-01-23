@@ -89,4 +89,19 @@ public class Invoice {
     public void setRequest(Request request) {
         this.request = request;
     }
+
+    @Override
+    public String toString() {
+        return "Invoice{" +
+                "request=" + request +
+                ", addressOfWarehouse=" + addressOfWarehouse +
+                ", weight=" + weight +
+                ", volume=" + volume +
+                ", countOfBoxes=" + countOfBoxes +
+                ", marketAgent=" + marketAgent +
+                ", priority=" + priority +
+                ", route=" + route +
+                ", creationDate=" + creationDate +
+                '}';
+    }
 }

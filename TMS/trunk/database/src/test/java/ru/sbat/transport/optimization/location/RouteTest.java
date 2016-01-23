@@ -5,7 +5,7 @@ import org.junit.*;
 public class RouteTest {
 
     @Test
-    public void getDist() throws Exception {
+    public void testGetFullDistance() throws Exception {
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();
@@ -20,26 +20,25 @@ public class RouteTest {
     }
 
     @Test
-    public void getTime() throws Exception {
+    public void testGetFullTime() throws Exception {
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();
         RoutePoint routePoint3 = new RoutePoint();
-        RoutePoint routePoint4 = new RoutePoint();
-        routePoint1.setTimeToNextPoint(15);
-        routePoint2.setTimeToNextPoint(130);
-        routePoint3.setTimeToNextPoint(55);
-        routePoint4.setTimeToNextPoint(0);
+        routePoint1.setTimeToNextPoint(10);
+        routePoint2.setTimeToNextPoint(15);
+        routePoint3.setTimeToNextPoint(0);
+        routePoint1.setLoadingOperationsTime(0);
+        routePoint2.setLoadingOperationsTime(2);
+        routePoint3.setLoadingOperationsTime(2);
         route.add(routePoint1);
         route.add(routePoint2);
         route.add(routePoint3);
-        route.add(routePoint4);
-        System.out.println(route.getFullTime());
-        if (route.getFullTime() != 200) throw new AssertionError();
+        if (route.getFullTime() != 29) throw new AssertionError();
     }
 
     @Test
-    public void getDepTime() throws Exception {
+    public void testGetDepartureTime() throws Exception {
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();
@@ -54,7 +53,7 @@ public class RouteTest {
     }
 
     @Test
-    public void getArrTime() throws Exception {
+    public void testGetArrivalTime() throws Exception {
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();
@@ -76,7 +75,7 @@ public class RouteTest {
     }
 
     @Test
-    public void getArrPoint() throws Exception {
+    public void testGetArrivalPoint() throws Exception {
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();
@@ -98,7 +97,7 @@ public class RouteTest {
     }
 
     @Test
-    public void getDepPoint() throws Exception {
+    public void testGetDeparturePoint() throws Exception {
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();

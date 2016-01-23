@@ -6,7 +6,6 @@ import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 public interface IOptimizer {
@@ -21,4 +20,6 @@ public interface IOptimizer {
     void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException;
 
     InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices);
+
+    void filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException;
 }

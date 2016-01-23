@@ -2,7 +2,6 @@ package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
-import ru.sbat.transport.optimization.location.RouteList;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
@@ -15,10 +14,8 @@ import java.util.List;
 
 public class Optimizer implements IOptimizer {
 
-
-
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException {
+    public void filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException {
 
         for(Invoice invoice: unassignedInvoices) {
             if (invoice.getRoute() != null)
@@ -31,10 +28,8 @@ public class Optimizer implements IOptimizer {
             Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime(); //плановое время доставки Dd
             Date creationDate = invoice.getCreationDate(); //время создания заявки
             Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // пункт доставки
-            Point departurePoint = invoice.getAddressOfWarehouse(); // пункт в котором была сформирована накладная(первый пункт маршрута)
-            //double invoiceWeight = invoice.getWeight(); // масса товаров в накладной(не должна быть больше чем грузоподъёмность автомобиля)
-            int dayOfWeek = getWeekDay(plannedDeliveryTime); // день недели в который будет планово доставлен товар в накладной
-
+            Point departurePoint = invoice.getAddressOfWarehouse(); // пункт, в котором была сформирована накладная(первый пункт маршрута)
+            int dayOfWeek = getWeekDay(plannedDeliveryTime); // день недели, в который будет планово доставлен товар в накладной
 
             for(Route route: plannedSchedule){
                 if(route == null){
@@ -43,18 +38,23 @@ public class Optimizer implements IOptimizer {
                 if (route.getDeparturePoint().equals(departurePoint) &&
                         route.getArrivalPoint().equals(deliveryPoint) &&
                         dayOfWeek <= route.get(route.size() - 1).getWeekDay() &&
-                        (creationDate.getTime() + route.getFullTime() <= invoice.getRequest().getPlannedDeliveryTime().getTime())) {
-                    //invoice.setRoute(route);
-                    //System.out.println("for invoice" + invoice + "found route = " + route);
+                        (creationDate.getTime() + route.getFullTime() < invoice.getRequest().getPlannedDeliveryTime().getTime())) {
+                    invoice.setRoute(route);
+//                    System.out.println("For invoice: " + invoice.toString() + " found route = " + route.toString());
                 }
             }
         }
     }
 
 
-    // TODO сделать toString для Invoice and Route
-    // TODO сделать метод который отбирает все подходящие маршруты для накладной(бех оптимизации)
+    // TODO сделать toString для Invoice and Route +
+    // TODO сделать метод который отбирает все подходящие маршруты для накладной(бех оптимизации) +
     // TODO написать тесты для проверки
+
+    @Override
+    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException {
+
+    }
 
     @Override
     public InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices) {
@@ -68,7 +68,7 @@ public class Optimizer implements IOptimizer {
      * @param date
      * @return day of week from date
      */
-    private int getWeekDay(Date date) {
+    public int getWeekDay(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.DAY_OF_WEEK);

@@ -18,7 +18,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     public Integer getFullTime() {
         int result = 0;
         for(RoutePoint routePoint : this){
-            result += routePoint.getTimeToNextPoint();
+            result += routePoint.getTimeToNextPoint() + routePoint.getLoadingOperationsTime();
         }
         return result;
     }
@@ -48,5 +48,15 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return this.get(0).getDeparturePoint();
     }
 
-
+    @Override
+    public String toString(){
+        return "Route{" +
+                "fullDistance=" + getFullDistance() + " км." +
+                ", fullTime=" + getFullTime() + " ч." +
+                ", departureTime=" + getDepartureTime() + " ч." +
+                ", arrivalTime=" + getArrivalTime() + " ч." +
+                ", arrivalPoint=" + getArrivalPoint() +
+                ", departurePoint=" + getDeparturePoint() +
+                '}';
+    }
 }
