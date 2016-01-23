@@ -6,7 +6,6 @@ import ru.sbat.transport.optimization.Invoice;
 import ru.sbat.transport.optimization.Optimizer;
 import ru.sbat.transport.optimization.Request;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.user.WarehouseDispatcher;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,4 +67,7 @@ public class OptimizerTest {
         plannedSchedule.add(route3);
 
     }
+
+    // создать три вспомогательных метода для сигнатуры метода фильтрации
+    // посмотреть видеоуроки по JUNIT
 }

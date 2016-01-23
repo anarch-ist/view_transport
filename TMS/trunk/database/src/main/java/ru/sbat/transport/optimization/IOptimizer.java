@@ -21,6 +21,4 @@ public interface IOptimizer {
     void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException;
 
     InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices);
-
-    public int getWeekDay(Date date);
 }
