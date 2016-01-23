@@ -67,7 +67,7 @@ VALUES
 INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carrier');
 
 -- ROUTE CREATION
-INSERT INTO routes (firstPointArrivalTime, daysOfWeeks, routeName, directionName, tariffID)
+INSERT INTO routes (firstPointArrivalTime, daysOfWeek, routeName, directionName, tariffID)
 VALUES
   ('18:00:00', 'monday,tuesday,wednesday,thursday,friday', 'route1', 'direction1', 1),
   ('14:30:00', 'monday,tuesday,wednesday,thursday,friday', 'route2', 'direction2', 1);

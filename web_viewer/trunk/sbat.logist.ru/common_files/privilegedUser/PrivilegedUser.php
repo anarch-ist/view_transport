@@ -1,17 +1,8 @@
 <?php
 include_once __DIR__ . '/../dao/userDao/User.php';
-include_once __DIR__ . '/../dao/pointDao/Point.php';
 include_once __DIR__ . '/../dao/invoicesForUser/InvoicesForUser.php';
-include_once __DIR__ . '/../dao/invoiceDao/Invoice.php';
-include_once __DIR__ . '/../dao/routeDao/Route.php';
 include_once __DIR__ . '/../sessionAndCookieWork/SessionAndCookieWork.php';
 
-use DAO\InvoiceEntity as InvoiceEntity;
-use DAO\InvoicesForUserEntity as InvoicesForUserEntity;
-use DAO\PointEntity as PointEntity;
-use DAO\RouteEntity as RouteEntity;
-use DAO\UserData as UserData;
-use DAO\UserEntity as UserEntity;
 use SessionAndCookieWork\SessionAndCookieWork as SessionAndCookieWork;
 use SessionAndCookieWork\ISessionAndCookieWork as ISessionAndCookieWork;
 
@@ -24,7 +15,7 @@ abstract class AuthUser
     protected function __construct($authVariant, ISessionAndCookieWork $sessionAndCookieWork)
     {
         $this->sessCookieWork = $sessionAndCookieWork;
-        $this->user = new UserData(array());
+        $this->user = new \DAO\UserData(array());
         $this->isValid($authVariant);
     }
 
@@ -62,7 +53,7 @@ abstract class AuthUser
     {
         $this->sessCookieWork->startSession();
         if ($this->sessCookieWork->sessionIsValid($this->sessCookieWork->getSessionParameter('UserID'))) {
-            $this->user = UserEntity::getInstance()->selectUserByID($this->sessCookieWork->getSessionParameter('UserID'));
+            $this->user = \DAO\UserEntity::getInstance()->selectUserByID($this->sessCookieWork->getSessionParameter('UserID'));
             return (!is_null($this->user) && $this->user->getData('passAndSalt') === md5($_SESSION['md5'] . $this->user->getData('salt')));
         } else {
             $this->sessCookieWork->closeSession();
@@ -72,7 +63,7 @@ abstract class AuthUser
 
     private function authorize($email, $md5)
     {
-        $this->user = UserEntity::getInstance()->selectUserByEmail($email);
+        $this->user = \DAO\UserEntity::getInstance()->selectUserByEmail($email);
         if (!is_null($this->user) && $this->user->getData('passAndSalt') === md5($md5 . $this->user->getData('salt'))) {
             $this->sessCookieWork->startSession();
             $this->sessCookieWork->setSessionParameter('UserID',$this->user->getData('userID'));
@@ -115,26 +106,29 @@ class PrivilegedUser extends AuthUser
 
     public function getUserEntity()
     {
-        return UserEntity::getInstance();
+        return \DAO\UserEntity::getInstance();
     }
 
     public function getInvoicesForUser()
     {
-        return InvoicesForUserEntity::getInstance();
+        return \DAO\InvoicesForUserEntity::getInstance();
     }
 
     public function getInvoiceEntity()
     {
-        return InvoiceEntity::getInstance();
+        include_once __DIR__ . '/../dao/invoiceDao/Invoice.php';
+        return \DAO\InvoiceEntity::getInstance();
     }
 
     public function getPointEntity()
     {
-        return PointEntity::getInstance();
+        include_once __DIR__ . '/../dao/pointDao/Point.php';
+        return \DAO\PointEntity::getInstance();
     }
 
     public function getRouteEntity()
     {
-        return RouteEntity::getInstance();
+        include_once __DIR__ . '/../dao/routeDao/Route.php';
+        return \DAO\RouteEntity::getInstance();
     }
 }

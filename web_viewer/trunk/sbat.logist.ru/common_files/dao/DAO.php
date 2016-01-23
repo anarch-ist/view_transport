@@ -41,7 +41,7 @@ class DAO implements IDAO
     public function startTransaction()
     {
         if (!$this->_transactionStarted) {
-            return $this->_transactionStarted = $this->query('START TRANSACTION');
+            return $this->_transactionStarted = $this->query('START TRANSACTION;');
         }
         return false;
     }
@@ -74,7 +74,7 @@ class DAO implements IDAO
     public function rollback()
     {
         if ($this->_transactionStarted) {
-            $this->_transactionStarted = !$this->query('ROLLBACK');
+            $this->_transactionStarted = !$this->query('ROLLBACK;');
             return !$this->_transactionStarted;
         }
         return false;
@@ -89,8 +89,9 @@ class DAO implements IDAO
     public function commit()
     {
         if ($this->_transactionStarted) {
-            $this->_transactionStarted = !$this->query('COMMIT');
-            return !$this->_transactionStarted;
+            $this->query('COMMIT');
+            $this->_transactionStarted = false;
+            return true;
         }
         return false;
     }
@@ -100,7 +101,6 @@ class DAO implements IDAO
         if (!$this->_connection) {
             return false;
         }
-        $this->_transactionStarted = false;
         $this->commit();
         $this->_connection->close();
         $this->_connection = false;

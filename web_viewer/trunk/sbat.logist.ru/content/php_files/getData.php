@@ -44,16 +44,19 @@ function changeStatusForInvoice(PrivilegedUser $privUser)
 {
     $invoiceNumber = $_POST['invoiceNumber'];
     $newStatusID = $_POST['newStatusID'];
+    $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
-    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($userID, $invoiceNumber, $newStatusID, $datetime);
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatus($userID, $invoiceNumber, $newStatusID, $datetime, $comment);
+//    print_r($privUser->getInvoiceEntity()->updateInvoiceStatus($userID, $invoiceNumber, $newStatusID, $datetime, $comment));
 }
 
 function changeStatusForSeveralInvoices(PrivilegedUser $privUser)
 {
     $routeListID = $_POST['routeListID'];
     $newStatusID = $_POST['newStatusID'];
+    $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
-    echo $privUser->getInvoiceEntity()->updateInvoiceStatuses($userID, $routeListID, $newStatusID, $datetime);
+    echo $privUser->getInvoiceEntity()->updateInvoiceStatuses($userID, $routeListID, $newStatusID, $datetime, $comment);
 }

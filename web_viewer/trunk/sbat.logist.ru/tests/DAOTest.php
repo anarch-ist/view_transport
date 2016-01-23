@@ -6,16 +6,16 @@ class DAOTest extends PHPUnit_Framework_TestCase
     public function testCommitTransaction()
     {
         $dao = \DAO\DAO::getInstance();
-        $_transactionStartedNew = new ReflectionProperty('\DAO\DAO','_transactionStarted');
+        $_transactionStartedNew = new ReflectionProperty('\DAO\DAO', '_transactionStarted');
         $_transactionStartedNew->setAccessible(true);
         $this->assertEquals($dao::AUTO_START_TRANSACTION, $_transactionStartedNew->getValue($dao));
-        $this->assertEquals($dao::AUTO_START_TRANSACTION , $dao->commit());
+        $this->assertEquals($dao::AUTO_START_TRANSACTION, $dao->commit());
         $this->assertFalse($dao->commit());
         $dao->closeConnection();
         $this->assertFalse($dao->commit());
         $dao->startConnection();
         $this->assertEquals($dao::AUTO_START_TRANSACTION, $_transactionStartedNew->getValue($dao));
-        $this->assertEquals($dao::AUTO_START_TRANSACTION , $dao->commit());
+        $this->assertEquals($dao::AUTO_START_TRANSACTION, $dao->commit());
     }
 
     /**
@@ -26,12 +26,12 @@ class DAOTest extends PHPUnit_Framework_TestCase
         $dao = \DAO\DAO::getInstance();
         $dao->closeConnection();
         $dao->startConnection();
-        $this->assertEquals($dao::AUTO_START_TRANSACTION , $dao->rollback());
+        $this->assertEquals($dao::AUTO_START_TRANSACTION, $dao->rollback());
         $this->assertFalse($dao->rollback());
         $dao->closeConnection();
         $this->assertFalse($dao->rollback());
         $dao->startConnection();
-        $this->assertEquals($dao::AUTO_START_TRANSACTION , $dao->rollback());
+        $this->assertEquals($dao::AUTO_START_TRANSACTION, $dao->rollback());
         //unset($dao);
     }
 

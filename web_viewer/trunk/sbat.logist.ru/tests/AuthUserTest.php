@@ -139,22 +139,20 @@ class AuthUserTest extends PHPUnit_Framework_TestCase
     {
         $_POST['login'] = $login;
         $_POST['password'] = md5($password);
-        $sessId='';
+        $sessId = '';
         try {
             $user = new UserTest('auth', $sess);
             $sessId = $sess->sessId;
             $this->assertEquals($user->getUserInfo()->getData('email'), $_POST['login']);
             $this->assertNotNull($sessId);
-        }
-        catch(AuthException $ex) {
+        } catch (AuthException $ex) {
             $this->assertFalse($isRight);
         }
         try {
             $user = new UserTest('check', $sess);
             $this->assertEquals($user->getUserInfo()->getData('userID'), $sess->getSessionParameter('UserID'));
             $this->assertEquals($sessId, $sess->sessId);
-        }
-        catch(AuthException $ex) {
+        } catch (AuthException $ex) {
             $this->assertFalse($isRight);
         }
 

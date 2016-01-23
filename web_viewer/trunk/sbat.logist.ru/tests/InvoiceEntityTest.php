@@ -16,8 +16,8 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
     static function initializeDB()
     {
         $connection = new mysqli('localhost', 'root', '', 'transmaster_transport_db');
-        $connection->multi_query(file_get_contents(__DIR__.'/insertsForInvoiceEntityTest.sql'));
-        while($connection->more_results()) $connection->next_result();
+        $connection->multi_query(file_get_contents(__DIR__ . '/insertsForInvoiceEntityTest.sql'));
+        while ($connection->more_results()) $connection->next_result();
         $connection->close();
         unset($connection);
         \DAO\DAO::getInstance()->commit();
@@ -29,9 +29,10 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
     static function restoreDB()
     {
         $connection = new mysqli('localhost', 'root', '', 'transmaster_transport_db');
-        $connection->multi_query(file_get_contents(__DIR__.'/../common_files/dao/SQL/test_inserts.sql'));
-        while($connection->more_results()) $connection->next_result();
+        $connection->multi_query(file_get_contents(__DIR__ . '/../common_files/dao/SQL/test_inserts.sql'));
+        while ($connection->more_results()) $connection->next_result();
         $connection->close();
+        unset($connection);
     }
 
     public function testSelects()
@@ -44,7 +45,7 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    function testCreateInvoiceEntity()
+    function testGetInvoiceEntity()
     {
         $invoice = InvoiceEntity::getInstance();
         $this->assertNotNull($invoice);
@@ -59,10 +60,10 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
      * @depends      testSelects
      * @dataProvider updateInvoiceStatusDataProvider
      */
-    public function testUpdateInvoiceStatus($userID, $invoiceNumber, $newStatus, $historyExpected, $datetime, $count)
+    public function testUpdateInvoiceStatus($userID, $invoiceNumber, $newStatus, $historyExpected, $datetime, $comment, $count)
     {
         $invoice = InvoiceEntity::getInstance();
-        $this->assertNotFalse($invoice->updateInvoiceStatus($userID, $invoiceNumber, $newStatus, $datetime));
+        $this->assertNotFalse($invoice->updateInvoiceStatus($userID, $invoiceNumber, $newStatus, $datetime, $comment));
         $history = $invoice->getInvoiceHistoryByInvoiceNumber($invoiceNumber);
         $this->assertNotFalse($history);
         $this->assertEquals($count, count($history));
@@ -102,6 +103,7 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
             'newStatus' => 'ARRIVED',
             'historyExpected' => $historyExpected,
             'datetime' => $date,
+            'comment' => md5(rand(1, 100)),
             'count' => 2
         );
         $date = date('d.m.Y H:i:s', strtotime($date) + 1);
@@ -123,6 +125,7 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
             'newStatus' => 'CHECK',
             'historyExpected' => $historyExpected,
             'datetime' => $date,
+            'comment' => md5(rand(1, 100)),
             'count' => 3
         );
         $date = date('d.m.Y H:i:s', strtotime($date) + 1);
@@ -144,6 +147,7 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
             'newStatus' => 'DELETED',
             'historyExpected' => $historyExpected,
             'datetime' => $date,
+            'comment' => md5(rand(1, 100)),
             'count' => 4
         );
 

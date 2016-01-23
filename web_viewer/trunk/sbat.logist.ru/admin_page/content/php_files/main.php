@@ -13,6 +13,6 @@ try {
     </html>
 <?php
 } catch (Exception $ex) {
-    //header("Location: ../login/", true, 303);
+    header("Location: ../login/", true, 303);
 }
 ?>

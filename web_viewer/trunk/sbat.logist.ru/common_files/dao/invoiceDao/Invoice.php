@@ -52,14 +52,16 @@ class InvoiceEntity implements IInvoiceEntity
         // TODO: Implement updateInvoice() method.
     }
 
-    function updateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime)
+    function updateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime, $comment)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime));
+        return $this->_DAO->update(new UpdateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime, $comment));
+//        $this->_DAO->update(new UpdateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime, $comment));
+//        return $this->getInvoiceHistoryByInvoiceNumber($invoiceNumber);
     }
 
-    function updateInvoiceStatuses($userID, $routeListID, $newInvoiceStatus, $datetime)
+    function updateInvoiceStatuses($userID, $routeListID, $newInvoiceStatus, $datetime, $comment)
     {
-        return $this->_DAO->update(new UpdateInvoiceStatuses($userID, $routeListID, $newInvoiceStatus, $datetime));
+        return $this->_DAO->update(new UpdateInvoiceStatuses($userID, $routeListID, $newInvoiceStatus, $datetime, $comment));
     }
 
     function deleteInvoice(InvoiceData $Invoice)
@@ -152,13 +154,17 @@ class UpdateInvoiceStatus implements IEntityUpdate
     private $userID;
     private $newInvoiceStatus;
     private $datetime;
+    private $comment;
 
-    function __construct($userID, $invoiceNumber, $newInvoiceStatus, $datetime)
+    function __construct($userID, $invoiceNumber, $newInvoiceStatus, $datetime, $comment)
     {
-        $this->userID = DAO::getInstance()->checkString($userID);
-        $this->invoiceNumber = DAO::getInstance()->checkString($invoiceNumber);
-        $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
-        $this->datetime = DAO::getInstance()->checkString($datetime);
+        $dao = DAO::getInstance();
+
+        $this->userID = $dao->checkString($userID);
+        $this->invoiceNumber = $dao->checkString($invoiceNumber);
+        $this->newInvoiceStatus = $dao->checkString($newInvoiceStatus);
+        $this->datetime = $dao->checkString($datetime);
+        $this->comment = $dao->checkString($comment);
     }
 
     /**
@@ -166,9 +172,7 @@ class UpdateInvoiceStatus implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `invoiceNumber` = '$this->invoiceNumber';";
-//        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `invoiceNumber` = '$this->invoiceNumber';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `invoiceNumber` = '$this->invoiceNumber';";
     }
 }
 
@@ -178,13 +182,17 @@ class UpdateInvoiceStatuses implements IEntityUpdate
     private $userID;
     private $newInvoiceStatus;
     private $datetime;
+    private $comment;
 
-    function __construct($userID, $routeListID, $newInvoiceStatus, $datetime)
+    function __construct($userID, $routeListID, $newInvoiceStatus, $datetime, $comment)
     {
-        $this->routeListID = DAO::getInstance()->checkString($routeListID);
-        $this->userID = DAO::getInstance()->checkString($userID);
-        $this->newInvoiceStatus = DAO::getInstance()->checkString($newInvoiceStatus);
-        $this->datetime = DAO::getInstance()->checkString($datetime);
+        $dao = DAO::getInstance();
+
+        $this->routeListID = $dao->checkString($routeListID);
+        $this->userID = $dao->checkString($userID);
+        $this->newInvoiceStatus = $dao->checkString($newInvoiceStatus);
+        $this->datetime = $dao->checkString($datetime);
+        $this->comment = $dao->checkString($comment);
     }
 
     /**
@@ -192,8 +200,6 @@ class UpdateInvoiceStatuses implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        // TODO: Implement getUpdateQuery() method.
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
-//        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus' WHERE `routeListID` = '$this->routeListID';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
     }
 }
