@@ -27,16 +27,12 @@ $(document).ready(function() {
                     selectizeOptions.push(selectizeOption);
                 });
 
-                var allOptions = options.join("");
                 var selectize = routePointsEditor.field('pointName').inst();
                 selectize.clear();
                 selectize.clearOptions();
                 selectize.load(function(callback) {
                     callback(selectizeOptions);
                 });
-
-                $("#pointSelect").html(allOptions);
-                //editor.field('pointName').update(options);
             }
         );
         var $routeSelectSelectize;
