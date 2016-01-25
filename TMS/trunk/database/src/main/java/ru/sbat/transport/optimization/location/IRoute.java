@@ -1,6 +1,8 @@
 package ru.sbat.transport.optimization.location;
 
 
+import java.util.Date;
+
 public interface IRoute {
     Double getFullDistance();
     Integer getFullTime();
@@ -8,4 +10,8 @@ public interface IRoute {
     Integer getArrivalTime();
     Point getArrivalPoint();
     Point getDeparturePoint();
+    int getWeekDayOfActualDeliveryTime();
+    Date getActualDeliveryTime();
+    int[] splitToComponentTime(Integer time);
+    int getWeekDayOfDepartureTime();
 }

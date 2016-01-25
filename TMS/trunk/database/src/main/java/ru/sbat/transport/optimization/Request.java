@@ -2,7 +2,6 @@ package ru.sbat.transport.optimization;
 
 
 import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.utils.DayOfWeek;
 
 import java.util.Date;
 
@@ -11,13 +10,13 @@ public class Request {
     private int clientId;
     private Point deliveryPoint;
     private Date plannedDeliveryTime;
-    private DayOfWeek dayOfWeek;
+    private int dayOfWeek;
 
-    public DayOfWeek getDayOfWeek() {
+    public int getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(DayOfWeek dayOfWeek) {
+    public void setDayOfWeek(int dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
 

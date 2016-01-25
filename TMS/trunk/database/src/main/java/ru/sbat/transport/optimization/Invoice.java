@@ -5,6 +5,7 @@ import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.user.MarketAgent;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class Invoice {
@@ -88,6 +89,12 @@ public class Invoice {
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public int getWeekDay(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(this.getCreationDate());
+        return calendar.get(Calendar.DAY_OF_WEEK);
     }
 
     @Override

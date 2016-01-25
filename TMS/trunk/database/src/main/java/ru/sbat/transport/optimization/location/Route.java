@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization.location;
 
 
+import java.util.Date;
 import java.util.LinkedList;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
@@ -47,6 +48,38 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     public Point getDeparturePoint() {
         return this.get(0).getDeparturePoint();
     }
+
+    @Override
+    public int getWeekDayOfActualDeliveryTime() {
+        return this.get(this.size()-1).getDayOfWeek();
+    }
+
+    @Override
+    public Date getActualDeliveryTime() {
+        Date date = new Date();
+        int time = this.get(this.size()-2).getDepartureTime() + this.get(this.size()-2).getTimeToNextPoint() + this.get(this.size()-1).getLoadingOperationsTime();
+        if(time >= 1440){
+            time = (time - 1440);
+        }
+        int[]hoursAndMinutes = splitToComponentTime(time);
+        date.setHours(hoursAndMinutes[0]);
+        date.setMinutes(hoursAndMinutes[1]);
+        return date;
+    }
+
+    @Override
+    public int[] splitToComponentTime(Integer time) {
+        int hours = time / 60;
+        int minutes = (int) time - hours * 60;
+        int[] result = new int[]{hours, minutes};
+        return result;
+    }
+
+    @Override
+    public int getWeekDayOfDepartureTime() {
+        return this.get(0).getDayOfWeek();
+    }
+
 
     @Override
     public String toString(){

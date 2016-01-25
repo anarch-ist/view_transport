@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization.location;
 
 import org.junit.*;
+import org.postgresql.ssl.jdbc4.AbstractJdbc4MakeSSL;
 
 public class RouteTest {
 
@@ -116,5 +117,67 @@ public class RouteTest {
         route.add(routePoint3);
         route.add(routePoint4);
         if (!route.getDeparturePoint().equals(rightPoint)) throw new AssertionError();
+    }
+
+    @Test
+    public void testGetWeekDayOfActualDeliveryTime() {
+        Route route = new Route();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        RoutePoint routePoint4 = new RoutePoint();
+        routePoint1.setDayOfWeek(1);
+        routePoint2.setDayOfWeek(1);
+        routePoint3.setDayOfWeek(2);
+        routePoint4.setDayOfWeek(2);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        route.add(routePoint4);
+        Assert.assertEquals(2, route.getWeekDayOfActualDeliveryTime());
+    }
+
+    @Test
+    public void testGetActualDeliveryTime(){
+        Route route = new Route();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint1.setDepartureTime(510);
+        routePoint1.setLoadingOperationsTime(0);
+        routePoint1.setTimeToNextPoint(600);
+        routePoint2.setDepartureTime(1200);
+        routePoint2.setLoadingOperationsTime(90);
+        routePoint2.setTimeToNextPoint(900);
+        routePoint3.setDepartureTime(0);
+        routePoint3.setLoadingOperationsTime(173);
+        routePoint3.setTimeToNextPoint(0);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        Assert.assertEquals(13, route.getActualDeliveryTime().getHours());
+        Assert.assertEquals(53, route.getActualDeliveryTime().getMinutes());
+    }
+
+    @Test
+    public void testSplitTimeComponents() {
+        Route route = new Route();
+        Assert.assertEquals(13, route.splitToComponentTime(833)[0]);
+        Assert.assertEquals(53, route.splitToComponentTime(833)[1]);
+    }
+
+    @Test
+    public void testGetWeekDayOfDepartureTime(){
+        Route route = new Route();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint1.setDayOfWeek(4);
+        routePoint2.setDayOfWeek(1);
+        routePoint3.setDayOfWeek(2);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        Assert.assertEquals(4, route.getWeekDayOfDepartureTime());
     }
 }
