@@ -5,8 +5,9 @@
     <link rel="stylesheet" href="../common_files/media/jQueryUI-1.11.4/jquery-ui.min.css"/>
     <script type="text/javascript" src="../common_files/media/jQuery-2.1.4/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="../common_files/media/jQueryUI-1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../common_files/media/md5.js"></script>
+    <!--custom js-->
     <script type="text/javascript" src="content/js/login.js"></script>
-    <script type="text/javascript" src="content/js/md5.js"></script>
 </head>
 <body>
 <div class="container">

@@ -24,6 +24,7 @@
     <script src="../common_files/media/FieldType-Mask/editor.mask.min.js"></script>
     <script src="../common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
     <script src="../common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
+    <script src="../common_files/media/md5.js"></script>
 
     <!--custom-->
     <script src="content/js/routePoints.js"></script>

@@ -6,35 +6,45 @@
  preSubmit: hook to add additional parameters before send to the server
  postSubmit: hook to manupulate submitted data before draw
  */
-
+// TODO remove code duplicates
 $(document).ready(function () {
 
     // load all required data
     {
-        // when page is loading make request and get all points. data is loading into
+        // when page is loading make request and get all points
         $.post(
             "content/getData.php",
             {status: "getAllPointIdPointNamePairs", format: "json"},
             // server returns array of pairs [{pointID:1, pointName:"somePoint1"}, {pointID:2, pointName:"somePoint2"}]
             function (data) {
                 var options = [];
-                var selectizeOptions = [];
+
+                var selectizePointsOptions = [];
                 data = JSON.parse(data);
                 data.forEach(function (entry) {
                     var option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
                     options.push(option);
                     var selectizeOption = {"label": entry.pointName, "value": entry.pointID};
-                    selectizeOptions.push(selectizeOption);
+                    selectizePointsOptions.push(selectizeOption);
                 });
 
-                var selectize = routePointsEditor.field('pointName').inst();
-                selectize.clear();
-                selectize.clearOptions();
-                selectize.load(function (callback) {
-                    callback(selectizeOptions);
+
+                var selectize1 = routePointsEditor.field('pointName').inst();
+                selectize1.clear();
+                selectize1.clearOptions();
+                selectize1.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+
+                var selectize2 = usersEditor.field('pointName').inst();
+                selectize2.clear();
+                selectize2.clearOptions();
+                selectize2.load(function (callback) {
+                    callback(selectizePointsOptions);
                 });
             }
         );
+
         var $routeSelectSelectize;
         // when page is loading make request and get all routes
         $.post(
@@ -62,6 +72,29 @@ $(document).ready(function () {
                 onRouteChanged($("#routeSelect option")[0].value);
             }
         );
+
+        // get all user roles from server
+        $.post( "content/getData.php",
+            {status: "getAllUserRoles", format:"json"},
+            // server returns array of pairs [{userRoleID:'ADMIN', userRoleRusName:'Администратор'}, {userRoleID:'W_DISPATCHER', userRoleRusName:'Диспетчер_склада'}]
+            function(userRolesData) {
+                var options = [];
+                var selectizeOptions = [];
+                userRolesData = JSON.parse(userRolesData);
+                userRolesData.forEach(function(entry) {
+                    var option = "<option value=" + entry.userRoleID+">" + entry.userRoleRusName + "</option>";
+                    options.push(option);
+                    var selectizeOption = { "label": entry.userRoleRusName, "value": entry.userRoleID };
+                    selectizeOptions.push(selectizeOption);
+                });
+                var userRoleSelectize = usersEditor.field('role').inst();
+
+                userRoleSelectize.clear();
+                userRoleSelectize.clearOptions();
+                userRoleSelectize.load(function(callback) {
+                    callback(selectizeOptions);
+                });
+            });
 
         // TODO load distances between points
     }
@@ -210,7 +243,7 @@ $(document).ready(function () {
                         diacritics: true,
                         searchField: 'label',
                         labelField: 'label',
-                        dropdownParent: null
+                        dropdownParent: "body"
                     }
                 },
                 {
@@ -235,7 +268,6 @@ $(document).ready(function () {
                     data = data.data[i];
                     break;
                 }
-                console.log(data.tLoading);
                 data.tLoading = stringToMinutes(data.tLoading);
             }
         });
@@ -428,4 +460,118 @@ $(document).ready(function () {
             );
         }
     }
+
+    // $usersDataTable and usersEditor
+    {
+        var usersEditor = new $.fn.dataTable.Editor( {
+            ajax: {
+                create: {
+                    type: 'POST',
+                    url: 'content/getData.php'
+                },
+                edit: {
+                    type: 'PUT',
+                    url: 'content/getData.php'
+                },
+                remove: {
+                    type: 'DELETE',
+                    url: 'content/getData.php'
+                }
+            },
+            table: '#usersTable',
+            idSrc: 'userID',
+
+            fields: [
+                { label: 'Имя', name: 'firstName', type: 'text'},
+                { label: 'Фамилия',  name: 'lastName', type: 'text'},
+                { label: 'Отчество',  name: 'patronymic', type: 'text'},
+                { label: 'Должность',  name: 'position', type: 'text'},
+                { label: 'Номер телефона',  name: 'phoneNumber', type: 'mask', mask:"(000) 000-00-00", maskOptions: {clearIfNotMatch: true}, placeholder:"(999) 999-99-99"},
+                { label: 'Почта',  name: 'email', type: 'text'},
+                { label: 'Пароль',  name: 'password', type: 'password'},
+                { label: 'Роль',  name: 'userRoleRusName', type: 'selectize', options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'label',
+                        labelField: 'label',
+                        dropdownParent: "body"
+                    }
+                },
+                { label: 'Пункт',  name: 'pointName', type: 'selectize', options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'label',
+                        labelField: 'label',
+                        dropdownParent: "body"
+                    }
+                }
+            ]
+        } );
+
+        // TODO add same type of code to other selectize fields for editors
+        // set current selected value to pointName and userRoleRusName
+        usersEditor.on('open', function (e , mode, action) {
+            if (action === "edit") {
+                var selectedRowData = $usersDataTable.row().data();
+                var usersPointNameSelectize = usersEditor.field('pointName').inst();
+                usersPointNameSelectize.setValue(usersPointNameSelectize.search(selectedRowData.pointName).items[0].id, true);
+                var usersRoleSelectize = usersEditor.field('userRoleRusName').inst();
+                usersRoleSelectize.setValue(usersPointNameSelectize.search(selectedRowData.userRoleRusName).items[0].id, true);
+            }
+        });
+
+        // transform password to md5
+        usersEditor.on('preSubmit', function (e, data, action) {
+            if (action === 'create' || action === 'edit') {
+                data.data[0].password = calcMD5(data.data[0].password);
+            }
+        });
+
+        // example data for exchange with server
+        var exampleData = [{userID: 1, firstName:"wefwfe", lastName:"ewrkbfif", position: "efewerfw", patronymic:"ergerge", phoneNumber: "9055487552",
+            email: "qwe@qwe.ru", password:"lewrhbwueu23232", userRoleRusName:"Диспетчер", pointName:"point1"}];
+
+        var $usersDataTable =  $("#usersTable").DataTable({
+                ajax: 'content/getData.php',
+                dom: 'Bfrtip',
+                language: {
+                    url:'/localization/dataTablesRus.json'
+                },
+                data: exampleData,
+                select: {
+                    style: 'single'
+                },
+                "buttons": [
+                    {
+                        extend: "create",
+                        editor: usersEditor,
+                        text: 'добавить запись'
+                    },
+                    {
+                        extend: "remove",
+                        editor: usersEditor,
+                        text: 'удалить запись'
+                    },
+                    {
+                        extend: "edit",
+                        editor: usersEditor,
+                        text: "изменить"
+                    }
+                ],
+                "paging": 10,
+                "columnDefs": [
+                    {"name": "firstName", "data": "firstName", "targets": 0},
+                    {"name": "lastName", "data": "lastName", "targets": 1},
+                    {"name": "patronymic", "data": "patronymic", "targets": 2},
+                    {"name": "position", "data": "position", "targets": 3},
+                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 4},
+                    {"name": "email", "data": "email", "targets": 5},
+                    {"name": "password", "data": "password", "targets": 6, visible:false},
+                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 7},
+                    {"name": "pointName", "data": "pointName", "targets": 8}
+                ]
+            }
+        );
+    }
+
 });
