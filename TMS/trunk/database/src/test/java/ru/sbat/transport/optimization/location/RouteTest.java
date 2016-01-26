@@ -1,7 +1,6 @@
 package ru.sbat.transport.optimization.location;
 
 import org.junit.*;
-import org.postgresql.ssl.jdbc4.AbstractJdbc4MakeSSL;
 
 public class RouteTest {
 
@@ -179,5 +178,20 @@ public class RouteTest {
         route.add(routePoint2);
         route.add(routePoint3);
         Assert.assertEquals(4, route.getWeekDayOfDepartureTime());
+    }
+
+    @Test
+    public void testGetDaysCountOfRoute(){
+        Route route = new Route();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint1.setDayOfWeek(1);
+        routePoint2.setDayOfWeek(1);
+        routePoint3.setDayOfWeek(1);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        Assert.assertEquals(0, route.getDaysCountOfRoute());
     }
 }

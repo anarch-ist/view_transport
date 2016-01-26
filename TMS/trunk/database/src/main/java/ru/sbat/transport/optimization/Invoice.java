@@ -4,7 +4,6 @@ package ru.sbat.transport.optimization;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.user.MarketAgent;
-
 import java.util.Calendar;
 import java.util.Date;
 

@@ -80,6 +80,14 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return this.get(0).getDayOfWeek();
     }
 
+    @Override
+    public int getDaysCountOfRoute() {
+        int result = this.get(this.size()-1).getDayOfWeek() - this.get(0).getDayOfWeek();
+        if(result < 0){
+            result = 7 - (this.get(0).getDayOfWeek() - this.get(this.size()-1).getDayOfWeek());
+        }
+        return result;
+    }
 
     @Override
     public String toString(){

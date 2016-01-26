@@ -14,4 +14,5 @@ public interface IRoute {
     Date getActualDeliveryTime();
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
+    int getDaysCountOfRoute();
 }

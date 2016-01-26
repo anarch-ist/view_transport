@@ -7,7 +7,6 @@ import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -55,25 +54,51 @@ public class Optimizer implements IOptimizer {
     @Override
     public Date[] getPossibleDepartureDate(Route route, Invoice invoice){
         Date creationDate = invoice.getCreationDate();
-        Date date1;
+        Date date1 = creationDate;
         int differenceWeekDays = route.getWeekDayOfDepartureTime() - invoice.getWeekDay();
-        if (differenceWeekDays <= 0) {
-            long tmp = 7 - (invoice.getWeekDay() - route.getWeekDayOfDepartureTime());
-            LocalDate localDate = LocalDate.of(creationDate.getYear(), creationDate.getMonth(), creationDate.getDay()).plusDays(tmp);
-            date1 = new Date(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
-        }else {
-            LocalDate localDate = LocalDate.of(creationDate.getYear(), creationDate.getMonth(), creationDate.getDay()).plusDays(differenceWeekDays);
-            date1 = new Date(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
+        if (differenceWeekDays < 0) {
+            int tmp = 7 - (invoice.getWeekDay() - route.getWeekDayOfDepartureTime());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(creationDate);
+            calendar.add(Calendar.DAY_OF_MONTH, tmp);
+            date1.setTime(calendar.getTimeInMillis());
+        }else if(differenceWeekDays > 0){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(creationDate);
+            calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
+            date1.setTime(calendar.getTimeInMillis());
+        }else if(differenceWeekDays == 0){
+            date1 = creationDate;
         }
-        Date date2;
-        Date date3;
-        LocalDate localDate = LocalDate.of(date1.getYear(), date1.getMonth(), date1.getDay()).plusDays(7);
-        date2 = new Date(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth());
-        LocalDate localDate2 = LocalDate.of(date2.getYear(), date2.getMonth(), date2.getDay()).plusDays(7);
-        date3 = new Date(localDate2.getYear(), localDate2.getMonthValue(), localDate2.getDayOfMonth());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        calendar.add(Calendar.DAY_OF_MONTH, 7);
+        Date date2 = new Date(calendar.getTimeInMillis());
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(date2);
+        calendar2.add(Calendar.DAY_OF_MONTH, 7);
+        Date date3 = new Date(calendar2.getTimeInMillis());
         Date[] result = new Date[]{date1, date2, date3};
         return result;
     }
+
+    @Override
+    public boolean isFittingForDeliveryTime(Route route, Invoice invoice, Date date) {
+        boolean result = false;
+        Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime();
+        Calendar calendar = Calendar.getInstance();
+        date.setHours(route.getActualDeliveryTime().getHours());
+        date.setMinutes(route.getActualDeliveryTime().getMinutes());
+        calendar.setTime(date);
+        int countDays = route.getDaysCountOfRoute();
+        calendar.add(Calendar.DAY_OF_MONTH, countDays);
+        Date actualDeliveryDate = new Date(calendar.getTimeInMillis());
+        if(actualDeliveryDate.before(plannedDeliveryTime)){
+            result = true;
+        }
+        return result;
+    }
+
 
     @Override
     public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException {

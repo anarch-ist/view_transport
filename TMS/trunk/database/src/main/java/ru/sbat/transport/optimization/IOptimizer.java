@@ -25,4 +25,6 @@ public interface IOptimizer {
     void filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException;
 
     Date[] getPossibleDepartureDate(Route route, Invoice invoice);
+
+    boolean isFittingForDeliveryTime(Route route, Invoice invoice, Date date);
 }

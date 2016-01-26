@@ -26,7 +26,14 @@ public class TestOptimazer {
     @Test
     public void TestGetWeekDay(){
         Optimizer optimizer = new Optimizer();
-        Assert.assertEquals(2, optimizer.getWeekDay(new Date()));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2016);
+        calendar.set(Calendar.MONTH, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 26);
+        calendar.set(Calendar.HOUR_OF_DAY, 17);
+        calendar.set(Calendar.MINUTE, 10);
+        Date date = calendar.getTime();
+        Assert.assertEquals(3, optimizer.getWeekDay(date));
     }
 
     @BeforeClass
@@ -101,18 +108,30 @@ public class TestOptimazer {
         RoutePoint routePoint = new RoutePoint();
         RoutePoint routePoint2 = new RoutePoint();
         RoutePoint routePoint3 = new RoutePoint();
-        routePoint.setDayOfWeek(6);
-        routePoint2.setDayOfWeek(7);
-        routePoint3.setDayOfWeek(1);
+        routePoint.setDayOfWeek(2);
+        routePoint2.setDayOfWeek(3);
+        routePoint3.setDayOfWeek(4);
         route.add(routePoint);
         route.add(routePoint2);
         route.add(routePoint3);
         Invoice invoice = new Invoice();
-        Date date = new Date();
-        invoice.setCreationDate(date);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2016);
+        calendar.set(Calendar.MONTH, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 26);
+        calendar.set(Calendar.HOUR_OF_DAY, 17);
+        calendar.set(Calendar.MINUTE, 10);
+        Date currentDate = calendar.getTime();
+        invoice.setCreationDate(currentDate);
         route.getWeekDayOfDepartureTime();
-        Date[] result = new Date[]{optimizer.getPossibleDepartureDate(route, invoice)[0], optimizer.getPossibleDepartureDate(route, invoice)[1], optimizer.getPossibleDepartureDate(route, invoice)[2]};
-        Date date1 = new Date(2016, 29, 1, 17, 0);
+        int tmp = 7 - (invoice.getWeekDay() - route.getWeekDayOfDepartureTime());
+        Date[] result = optimizer.getPossibleDepartureDate(route, invoice);
+        System.out.println("calTime = " + calendar.getTime());
+        calendar.add(Calendar.DAY_OF_YEAR, tmp);
+        Date date1 = new Date(calendar.getTimeInMillis());
+        System.out.println(result[0]);
+        System.out.println(result[1]);
+        System.out.println(result[2]);
         Assert.assertEquals(date1, result[0]);
     }
 
@@ -127,6 +146,55 @@ public class TestOptimazer {
         optimizer.filtrate(plannedSchedule, unassignedInvoices);
         System.out.println("size " + unassignedInvoices.get(0).getRoute());
         Assert.assertEquals(route2, unassignedInvoices.get(0).getRoute());
+    }
+
+    @Test
+    public void testIsFittingForDeliveryTime(){
+        Optimizer optimizer = new Optimizer();
+        Route route = new Route();
+        RoutePoint routePoint1 = new RoutePoint();
+        routePoint1.setDayOfWeek(2);
+        routePoint1.setDepartureTime(900); // в минутах от начала суток
+        routePoint1.setTimeToNextPoint(600);
+        routePoint1.setLoadingOperationsTime(0);
+        RoutePoint routePoint2 = new RoutePoint();
+        routePoint2.setDayOfWeek(3);
+        routePoint2.setDepartureTime(180);
+        routePoint2.setTimeToNextPoint(1500);
+        routePoint2.setLoadingOperationsTime(120);
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint3.setDayOfWeek(4);
+        routePoint3.setDepartureTime(0);
+        routePoint3.setTimeToNextPoint(0);
+        routePoint3.setLoadingOperationsTime(120);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        Invoice invoice = new Invoice();
+        Request request = new Request();
+        invoice.setRequest(request);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2016);
+        calendar.set(Calendar.MONTH, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 4);
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.MINUTE, 0);
+        Date date = calendar.getTime();
+        request.setPlannedDeliveryTime(date);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2016);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 26);
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 0);
+        Date creationDate = cal.getTime();
+        invoice.setCreationDate(creationDate);
+        Date[]dateArray = optimizer.getPossibleDepartureDate(route, invoice);
+        System.out.println(dateArray[0]);
+        System.out.println(dateArray[1]);
+        System.out.println(dateArray[2]);
+        Assert.assertTrue(optimizer.isFittingForDeliveryTime(route, invoice, dateArray[0]));
+
     }
 
 //    @Test
