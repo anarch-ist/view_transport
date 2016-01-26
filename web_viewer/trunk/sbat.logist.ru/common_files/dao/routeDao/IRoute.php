@@ -9,8 +9,6 @@ interface IRouteEntity
 
     function selectRouteByDirectionName($directionName);
 
-    function selectRoutePointsByRouteID($directionName);
-
     function updateRoute($newRoute);
 
     function deleteRoute($Route);

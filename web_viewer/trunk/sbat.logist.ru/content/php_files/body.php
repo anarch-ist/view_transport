@@ -4,7 +4,8 @@
 
     <link rel="stylesheet" type="text/css" href="common_files/media/jQueryUI-1.11.4/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Selectize/css/selectize.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.1.0/css/buttons.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
@@ -39,7 +40,8 @@
 
 <div class="container">
 
-    <div id="menu" style="z-index:1;width: 500px;position: absolute;right: 0; height: 41px;  margin-left: -10px;margin-top: -5px;">
+    <div id="menu"
+         style="z-index:1;width: 500px;position: absolute;right: 0; height: 41px;  margin-left: -10px;margin-top: -5px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php

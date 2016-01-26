@@ -1,36 +1,36 @@
 //Client-to-server
 /*
-Client-to-server
-action: create, edit, remove
-data: An object containing the row ids to act upon and edited data for those rows.
-preSubmit: hook to add additional parameters before send to the server
-postSubmit: hook to manupulate submitted data before draw
-*/
+ Client-to-server
+ action: create, edit, remove
+ data: An object containing the row ids to act upon and edited data for those rows.
+ preSubmit: hook to add additional parameters before send to the server
+ postSubmit: hook to manupulate submitted data before draw
+ */
 
-$(document).ready(function() {
+$(document).ready(function () {
 
     // load all required data
     {
         // when page is loading make request and get all points. data is loading into
         $.post(
             "content/getData.php",
-            {status: "getAllPointIdPointNamePairs", format:"json"},
+            {status: "getAllPointIdPointNamePairs", format: "json"},
             // server returns array of pairs [{pointID:1, pointName:"somePoint1"}, {pointID:2, pointName:"somePoint2"}]
-            function(data) {
+            function (data) {
                 var options = [];
                 var selectizeOptions = [];
                 data = JSON.parse(data);
-                data.forEach(function(entry) {
-                    var option = "<option value=" + entry.pointID+">" + entry.pointName + "</option>";
+                data.forEach(function (entry) {
+                    var option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
                     options.push(option);
-                    var selectizeOption = { "label": entry.pointName, "value": entry.pointID };
+                    var selectizeOption = {"label": entry.pointName, "value": entry.pointID};
                     selectizeOptions.push(selectizeOption);
                 });
 
                 var selectize = routePointsEditor.field('pointName').inst();
                 selectize.clear();
                 selectize.clearOptions();
-                selectize.load(function(callback) {
+                selectize.load(function (callback) {
                     callback(selectizeOptions);
                 });
             }
@@ -39,13 +39,13 @@ $(document).ready(function() {
         // when page is loading make request and get all routes
         $.post(
             "content/getData.php",
-            {status: "getAllRouteIdDirectionPairs", format:"json"},
+            {status: "getAllRouteIdDirectionPairs", format: "json"},
             // server returns array of pairs [{routeID:1, directionName:"SomeDir1"}, {routeID:2, directionName:"SomeDir2"}]
-            function(data) {
+            function (data) {
                 var options = [];
                 data = JSON.parse(data);
-                data.forEach(function(entry) {
-                    var option = "<option value=" + entry.routeID+">" + entry.directionName + "</option>";
+                data.forEach(function (entry) {
+                    var option = "<option value=" + entry.routeID + ">" + entry.directionName + "</option>";
                     options.push(option);
                 });
                 $routeSelectSelectize = $("#routeSelect").html(options.join("")).selectize(
@@ -95,7 +95,7 @@ $(document).ready(function() {
             'content/getData.php',
             {
                 routeID: $routeSelectSelectize[0].selectize.items[0],
-                firstPointArrivalTime:$('#startRouteTimeInput').val()
+                firstPointArrivalTime: $('#startRouteTimeInput').val()
             },
             // example serverData : "17:00"
             function (serverData) {
@@ -148,8 +148,6 @@ $(document).ready(function() {
     });
 
 
-
-
     // PROTOCOL DESCRIPTION
     // https://editor.datatables.net/manual/server
     //Client-to-server
@@ -178,18 +176,18 @@ $(document).ready(function() {
 
     // routePointsDataTable and routePointsEditor
     {
-        var routePointsEditor = new $.fn.dataTable.Editor( {
+        var routePointsEditor = new $.fn.dataTable.Editor({
             ajax: {
                 create: {
                     type: 'POST',
                     url: 'content/getData.php'
                 },
                 edit: {
-                    type: 'PUT',
+                    type: 'POST',
                     url: 'content/getData.php'
                 },
                 remove: {
-                    type: 'DELETE',
+                    type: 'POST',
                     url: 'content/getData.php'
                 }
             },
@@ -197,10 +195,17 @@ $(document).ready(function() {
             idSrc: 'routePointID',
 
             fields: [
-                { label: 'Порядковый номер', name: 'sortOrder', type: 'mask', mask:"0", maskOptions: {clearIfNotMatch: true}, placeholder:"0-9"},
-                { label: 'Пункт',  name: 'pointName', type: 'selectize',
-                    options: [
-                    ],
+                {
+                    label: 'Порядковый номер',
+                    name: 'sortOrder',
+                    type: 'mask',
+                    mask: "0",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "0-9"
+                },
+                {
+                    label: 'Пункт', name: 'pointName', type: 'selectize',
+                    options: [],
                     opts: {
                         diacritics: true,
                         searchField: 'label',
@@ -208,31 +213,46 @@ $(document).ready(function() {
                         dropdownParent: null
                     }
                 },
-                { label: 'Продолжительность разгрузочных работ',  name: 'tLoading', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
+                {
+                    label: 'Продолжительность разгрузочных работ',
+                    name: 'tLoading',
+                    type: 'mask',
+                    mask: '00:00',
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "чч:мм"
+                }
+                //{ label: 'Продолжительность разгрузочных работ',  name: 'tLoading', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
             ]
-        } );
+        });
 
         // transfrom string like 18ч.30м. to 18*60+30
-        routePointsEditor.on( 'preSubmit', function (e, data, action) {
+        routePointsEditor.on('preSubmit', function (e, data, action) {
             if (action === 'create' || action === 'edit') {
-                console.log(data.data[0].tLoading);
-                data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
+                //
+                //console.log(data.data[0].tLoading);
+                //data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
+                for (var i in data.data) {
+                    data = data.data[i];
+                    break;
+                }
+                console.log(data.tLoading);
+                data.tLoading = stringToMinutes(data.tLoading);
             }
-        } );
+        });
 
-        routePointsEditor.on( 'postSubmit', function (e, json, data, action) {
+        routePointsEditor.on('postSubmit', function (e, json, data, action) {
             if (action === 'create' || action === 'edit') {
                 //TODO use minutes toString
                 //console.log(data);
                 //console.log(json);
                 //console.log(action);
             }
-        } );
+        });
 
-        var $routePointsDataTable =  $("#routePointsTable").DataTable({
+        var $routePointsDataTable = $("#routePointsTable").DataTable({
                 "dom": 'Bt', // show only buttons and table with no decorations
                 language: {
-                    url:'/localization/dataTablesRus.json'
+                    url: '/localization/dataTablesRus.json'
                 },
                 select: {
                     style: 'single'
@@ -266,7 +286,7 @@ $(document).ready(function() {
 
     // $relationsBetweenRoutePointsDataTable and relationsBetweenRoutePointsEditor
     {
-        var relationsBetweenRoutePointsEditor = new $.fn.dataTable.Editor( {
+        var relationsBetweenRoutePointsEditor = new $.fn.dataTable.Editor({
             ajax: {
                 edit: {
                     type: 'PUT',
@@ -277,17 +297,25 @@ $(document).ready(function() {
             idSrc: 'relationID',
 
             fields: [
-                { label: 'Начальный пункт', name: 'pointNameFirst', type: 'readonly'},
-                { label: 'Конечный пункт',  name: 'pointNameSecond', type: 'readonly'},
-                { label: 'Расстояние',  name: 'distance', type: 'readonly'},
-                { label: 'Время в пути',  name: 'timeForDistance', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
+                {label: 'Начальный пункт', name: 'pointNameFirst', type: 'readonly'},
+                {label: 'Конечный пункт', name: 'pointNameSecond', type: 'readonly'},
+                {label: 'Расстояние', name: 'distance', type: 'readonly'},
+                {
+                    label: 'Время в пути',
+                    name: 'timeForDistance',
+                    type: 'mask',
+                    mask: '00:00',
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "чч:мм"
+                }
+                //{ label: 'Время в пути',  name: 'timeForDistance', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
             ]
-        } );
+        });
 
-        var $relationsBetweenRoutePointsDataTable =  $("#relationsBetweenRoutePointsTable").DataTable({
+        var $relationsBetweenRoutePointsDataTable = $("#relationsBetweenRoutePointsTable").DataTable({
                 "dom": 'Bt', // show only buttons and table with no decorations
                 language: {
-                    url:'/localization/dataTablesRus.json'
+                    url: '/localization/dataTablesRus.json'
                 },
                 select: {
                     style: 'single'
@@ -317,7 +345,7 @@ $(document).ready(function() {
         function stringToMinutes(string) {
             var houres = string.substring(0, 2);
             console.log(houres);
-            var minutes = string.substr(2, 3);
+            var minutes = string.substr(3, 2);
             console.log(minutes);
             return houres * 60 + parseInt(minutes);
         }
@@ -333,7 +361,8 @@ $(document).ready(function() {
             if (houres <= 9) strHoures = "0" + houres;
             else strHoures = houres + "";
 
-            return strHoures + "ч." + strMinutes + "м.";
+            return strHoures + ":" + strMinutes;
+            //return strHoures + "ч." + strMinutes + "м.";
         }
 
         function setDaysOfWeekData(daysOfWeek) {
@@ -356,24 +385,24 @@ $(document).ready(function() {
         function onRouteChanged(value) {
             $.post(
                 "content/getData.php",
-                {status: "getAllRoutePointsDataForRouteID", routeID: value, format:"json"},
-                function(data) {
+                {status: "getAllRoutePointsDataForRouteID", routeID: value, format: "json"},
+                function (data) {
 
-                    // example result data
-                    data = {
-                        daysOfWeek:["monday", "wednesday", "friday"],
-                        firstPointArrivalTime: "18:00",
-                        routePoints: [
-                            {routePointID: 10, sortOrder:0, pointName:"point1", tLoading: 180},
-                            {routePointID: 11, sortOrder:1, pointName:"point2", tLoading: 90},
-                            {routePointID: 12, sortOrder:2, pointName:"point3", tLoading: 110}
-                        ],
-                        relationsBetweenRoutePoints: [
-                            {relationID:"10_11", pointNameFirst:"point1", pointNameSecond:"point2", distance: 300, timeForDistance: 450},
-                            {relationID:"11_12", pointNameFirst:"point2", pointNameSecond:"point3", distance: 500, timeForDistance: 780}
-                        ]
-                    };
-                    data = JSON.stringify(data);
+                    //// example result data
+                    //data = {
+                    //    daysOfWeek:["monday", "wednesday", "friday"],
+                    //    firstPointArrivalTime: "18:00",
+                    //    routePoints: [
+                    //        {routePointID: 10, sortOrder:0, pointName:"point1", tLoading: 180},
+                    //        {routePointID: 11, sortOrder:1, pointName:"point2", tLoading: 90},
+                    //        {routePointID: 12, sortOrder:2, pointName:"point3", tLoading: 110}
+                    //    ],
+                    //    relationsBetweenRoutePoints: [
+                    //        {relationID:"10_11", pointNameFirst:"point1", pointNameSecond:"point2", distance: 300, timeForDistance: 450},
+                    //        {relationID:"11_12", pointNameFirst:"point2", pointNameSecond:"point3", distance: 500, timeForDistance: 780}
+                    //    ]
+                    //};
+                    //data = JSON.stringify(data);
 
                     data = JSON.parse(data);
 
@@ -383,14 +412,14 @@ $(document).ready(function() {
 
                     // set routePoints table data
                     $routePointsDataTable.rows().remove();
-                    data.routePoints.forEach(function(entry) {
-                       entry.tLoading = minutesToString(entry.tLoading);
+                    data.routePoints.forEach(function (entry) {
+                        entry.tLoading = minutesToString(entry.tLoading);
                     });
                     $routePointsDataTable.rows.add(data.routePoints).draw(false);
 
                     // set relationsBetweenRoutePoints table data
                     $relationsBetweenRoutePointsDataTable.rows().remove();
-                    data.relationsBetweenRoutePoints.forEach(function(entry) {
+                    data.relationsBetweenRoutePoints.forEach(function (entry) {
                         entry.timeForDistance = minutesToString(entry.timeForDistance);
                     });
                     $relationsBetweenRoutePointsDataTable.rows.add(data.relationsBetweenRoutePoints).draw(false);

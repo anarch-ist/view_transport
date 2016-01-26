@@ -19,7 +19,7 @@
  * @requires [jQuery Mask plug-in](http://igorescobar.github.io/jQuery-Mask-Plugin/)
  *
  * @depjs //igorescobar.github.io/jQuery-Mask-Plugin/js/jquery.mask.min.js
- * 
+ *
  * @opt `e-type string` **`mask`**: The mask to apply. The default special
  *   characters are:
  *
@@ -28,7 +28,7 @@
  *   * `#` - Recursive numeric character
  *   * `A` - Letter or number
  *   * `Z` - Letter only
- * 
+ *
  * @opt `e-type string` **`placeholder`**: The placeholder to show in the input.
  *   This can be useful to let the user know what format is expected in the
  *   input.
@@ -37,7 +37,7 @@
  *   of options.
  *
  * @example
- *     
+ *
  * new $.fn.dataTable.Editor( {
  *   "ajax": "php/dates.php",
  *   "table": "#staff",
@@ -69,46 +69,46 @@
 (function ($, DataTable) {
 
 
-if ( ! DataTable.ext.editorFields ) {
-    DataTable.ext.editorFields = {};
-}
+    if (!DataTable.ext.editorFields) {
+        DataTable.ext.editorFields = {};
+    }
 
-var Editor = DataTable.Editor;
-var _fieldTypes = DataTable.ext.editorFields;
+    var Editor = DataTable.Editor;
+    var _fieldTypes = DataTable.ext.editorFields;
 
 
-_fieldTypes.mask = {
-	create: function ( conf ) {
-		conf._input = $('<input/>').attr( $.extend( {
-			id: Editor.safeId( conf.id ),
-			type: 'text'
-		}, conf.attr || {} ) );
+    _fieldTypes.mask = {
+        create: function (conf) {
+            conf._input = $('<input/>').attr($.extend({
+                id: Editor.safeId(conf.id),
+                type: 'text'
+            }, conf.attr || {}));
 
-		conf._input.mask( conf.mask, $.extend( {
-			placeholder: conf.placeholder || conf.mask.replace(/[09#AS]/g, '_')
-		}, conf.maskOptions ) );
+            conf._input.mask(conf.mask, $.extend({
+                placeholder: conf.placeholder || conf.mask.replace(/[09#AS]/g, '_')
+            }, conf.maskOptions));
 
-		return conf._input[0];
-	},
+            return conf._input[0];
+        },
 
-	get: function ( conf ) {
-		return conf._input.cleanVal();
-	},
+        get: function (conf) {
+            return conf._input.cleanVal();
+        },
 
-	set: function ( conf, val ) {
-		conf._input
-			.val( val )
-			.trigger( 'change' )
-			.trigger( 'keyup.mask' );
-	},
+        set: function (conf, val) {
+            conf._input
+                .val(val)
+                .trigger('change')
+                .trigger('keyup.mask');
+        },
 
-	enable: function ( conf ) {
-		conf._input.prop( 'disabled', false );
-	},
+        enable: function (conf) {
+            conf._input.prop('disabled', false);
+        },
 
-	disable: function ( conf ) {
-		conf._input.prop( 'disabled', true );
-	}
-};
+        disable: function (conf) {
+            conf._input.prop('disabled', true);
+        }
+    };
 
 }(jQuery, jQuery.fn.dataTable));

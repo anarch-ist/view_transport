@@ -34,7 +34,7 @@ class DataTransferException extends Exception
     public function __construct($str, $page)
     {
         parent::__construct($str);
-        writeInErrorlog("DataTransferException: " . $str.' на странице '.$page);
+        writeInErrorlog("DataTransferException: " . $str . ' на странице ' . $page);
     }
 }
 

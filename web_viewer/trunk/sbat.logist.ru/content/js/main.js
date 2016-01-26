@@ -114,7 +114,7 @@ $(document).ready(function () {
             {"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
         ],
         language: {
-            url:'/localization/dataTablesRus.json'
+            url: '/localization/dataTablesRus.json'
         }
     });
     // set padding for dataTable

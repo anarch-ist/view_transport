@@ -16,11 +16,13 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
     static function initializeDB()
     {
         $connection = new mysqli('localhost', 'root', '', 'transmaster_transport_db');
+        mysqli_set_charset($connection, "utf8");
         $connection->multi_query(file_get_contents(__DIR__ . '/insertsForInvoiceEntityTest.sql'));
         while ($connection->more_results()) $connection->next_result();
         $connection->close();
         unset($connection);
-        \DAO\DAO::getInstance()->commit();
+        \DAO\DAO::getInstance()->closeConnection();
+        \DAO\DAO::getInstance()->startConnection();
     }
 
     /**
@@ -29,6 +31,7 @@ class InvoiceEntityTest extends PHPUnit_Framework_TestCase
     static function restoreDB()
     {
         $connection = new mysqli('localhost', 'root', '', 'transmaster_transport_db');
+        mysqli_set_charset($connection, "utf8");
         $connection->multi_query(file_get_contents(__DIR__ . '/../common_files/dao/SQL/test_inserts.sql'));
         while ($connection->more_results()) $connection->next_result();
         $connection->close();

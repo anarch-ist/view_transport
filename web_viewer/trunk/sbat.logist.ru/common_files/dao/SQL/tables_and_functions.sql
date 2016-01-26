@@ -69,9 +69,9 @@ CREATE TABLE points (
 
 -- CONSTRAINT pointIDFirst must not be equal pointIDSecond
 CREATE TABLE distances_between_points (
-  pointIDFirst        INTEGER,
-  pointIDSecond       INTEGER,
-  distance            SMALLINT, -- distance between routePoints measured in km.
+  pointIDFirst  INTEGER,
+  pointIDSecond INTEGER,
+  distance      SMALLINT, -- distance between routePoints measured in km.
   PRIMARY KEY (pointIDFirst, pointIDSecond),
   FOREIGN KEY (pointIDFirst) REFERENCES points (pointID)
     ON DELETE CASCADE
@@ -242,10 +242,10 @@ CREATE TABLE tariffs (
 CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
   firstPointArrivalTime TIME                                                                              NOT NULL,
-  -- days of weeks when route is available
+-- days of weeks when route is available
   daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') NOT NULL,
   routeName             VARCHAR(64)                                                                       NOT NULL,
-  -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
+-- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
   directionName         VARCHAR(255)                                                                      NULL,
   tariffID              INTEGER                                                                           NULL,
   PRIMARY KEY (routeID),
@@ -284,9 +284,9 @@ CREATE TABLE route_points (
 
 -- CONSTRAINT routePointIDFirst must not be equal routePointIDSecond
 CREATE TABLE relations_between_route_points (
-  routePointIDFirst   INTEGER,
-  routePointIDSecond  INTEGER,
-  timeForDistance     INTEGER, -- time in minutes for carrier drive through distance
+  routePointIDFirst  INTEGER,
+  routePointIDSecond INTEGER,
+  timeForDistance    INTEGER, -- time in minutes for carrier drive through distance
   PRIMARY KEY (routePointIDFirst, routePointIDSecond),
   FOREIGN KEY (routePointIDFirst) REFERENCES route_points (routePointID)
     ON DELETE CASCADE
@@ -298,7 +298,7 @@ CREATE TABLE relations_between_route_points (
 
 CREATE TABLE route_lists (
   routeListID       INTEGER AUTO_INCREMENT,
-  routeListNumber    VARCHAR(32)  NOT NULL,
+  routeListNumber   VARCHAR(32)  NOT NULL,
   startDate         DATE         NULL,
   palletsQty        INTEGER      NULL,
   driver            VARCHAR(255) NULL,
@@ -314,7 +314,7 @@ CREATE TABLE route_lists (
 
 CREATE PROCEDURE insert_into_route_list_history(
   routeListID       INTEGER,
-  routeListNumber    VARCHAR(32),
+  routeListNumber   VARCHAR(32),
   startDate         DATE,
   palletsQty        INTEGER,
   driver            VARCHAR(255),
@@ -335,31 +335,31 @@ CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_route_list_history(NEW.routeListID, NEW.routeListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
-                                       NEW.driverPhoneNumber,
-                                       NEW.licensePlate, NEW.routeID, 'CREATED');
+                                        NEW.driverPhoneNumber,
+                                        NEW.licensePlate, NEW.routeID, 'CREATED');
   END;
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_route_list_history(NEW.routeListID, NEW.routeListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
-                                       NEW.driverPhoneNumber,
-                                       NEW.licensePlate, NEW.routeID, 'UPDATED');
+                                        NEW.driverPhoneNumber,
+                                        NEW.licensePlate, NEW.routeID, 'UPDATED');
   END;
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   BEGIN
     CALL insert_into_route_list_history(OLD.routeListID, OLD.routeListNumber, OLD.startDate, OLD.palletsQty, OLD.driver,
-                                       OLD.driverPhoneNumber,
-                                       OLD.licensePlate, OLD.routeID, 'DELETED');
+                                        OLD.driverPhoneNumber,
+                                        OLD.licensePlate, OLD.routeID, 'DELETED');
   END;
 
 CREATE TABLE route_list_history (
   routeListHistoryID BIGINT AUTO_INCREMENT,
   timeMark           DATETIME,
   routeListID        INTEGER,
-  routeListNumber     VARCHAR(32)  NOT NULL,
+  routeListNumber    VARCHAR(32)  NOT NULL,
   startDate          DATE         NULL,
   palletsQty         INTEGER      NULL,
   driver             VARCHAR(255) NULL,
@@ -524,7 +524,8 @@ CREATE PROCEDURE insert_into_invoice_history(
     INSERT INTO invoice_history
     VALUES
       (NULL, NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate,
-       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus, requestID,
+       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus,
+       requestID,
        warehousePointID, routeListID, lastVisitedUserPointID
       );
   END;
@@ -534,7 +535,8 @@ FOR EACH ROW
   CALL insert_into_invoice_history(
       NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
       NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-      'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+      'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
+      NEW.lastVisitedUserPointID);
 
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
@@ -562,7 +564,8 @@ FOR EACH ROW
     CALL insert_into_invoice_history(
         NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
         NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-        NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+        NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
+        NEW.lastVisitedUserPointID);
   END;
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
@@ -570,7 +573,8 @@ FOR EACH ROW
   CALL insert_into_invoice_history(
       OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
       OLD.weight, OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy,
-      'DELETED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
+      'DELETED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID,
+      OLD.lastVisitedUserPointID);
 
 CREATE TABLE invoice_history (
   invoiceHistoryID       BIGINT AUTO_INCREMENT,
@@ -807,7 +811,7 @@ CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
 
     CLOSE cur;
     RETURN $timeResult;
-    -- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
+-- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
   END;
 
 -- get DATE and TIME when route should be finished
@@ -820,7 +824,7 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _invoiceID INTEGER)
     SET $routeStartDate = (SELECT lastStatusUpdated
                            FROM invoice_history
                            WHERE _invoiceID = invoiceID AND invoiceStatusID = 'DEPARTURE');
-    -- отсчитывать от времени отправления или от времени начала маршрута?
+-- отсчитывать от времени отправления или от времени начала маршрута?
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;
@@ -906,7 +910,6 @@ CREATE FUNCTION generateHaving(map TEXT)
 
     RETURN result;
   END;
-
 
 
 -- _search - array of strings
@@ -1037,6 +1040,33 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
     ORDER BY lastStatusUpdated;
   END;
 
+-- procedure for getting time and distance between routePoints
+CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
+  BEGIN
+    SELECT
+      CONCAT_WS('_', routePointIDFirst, routePointIDSecond) AS relationID,
+      pointFirst.pointName                                  AS `pointNameFirst`,
+      pointSecond.pointName                                 AS `pointNameSecond`,
+      timeForDistance,
+      distance
+    FROM routes
+      JOIN (
+          route_points AS routePointFirst,
+          route_points AS routePointSecond,
+          relations_between_route_points,
+          points AS pointFirst,
+          points AS pointSecond
+        ) ON
+            (routePointFirst.routePointID = routePointIDFirst AND routePointSecond.routePointID = routePointIDSecond AND
+             routePointFirst.routeID = `routes`.routeID AND routePointSecond.routeID = `routes`.routeID AND
+             routePointFirst.pointID = pointFirst.pointID AND routePointSecond.pointID = pointSecond.pointID
+              )
+      LEFT JOIN (`distances_between_points`)
+        ON
+          (pointIDFirst = routePointFirst.pointID AND pointIDSecond = routePointSecond.pointID)
+    WHERE routes.RouteID = _routeID
+    ORDER BY routePointFirst.sortOrder;
+  END;
 
 
 

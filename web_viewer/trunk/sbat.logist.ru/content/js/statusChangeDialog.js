@@ -1,20 +1,20 @@
 $(document).ready(function () {
 
-    const  STATUS_SELECT_MENU_WIDTH = 600,
-           DIALOG_HEIGHT = 430,
-           DIALOG_WIDTH = 800,
-           COMMENT_WIDTH = 595,
-           DEPARTURE_STATUS = "DEPARTURE";
+    const STATUS_SELECT_MENU_WIDTH = 600,
+        DIALOG_HEIGHT = 430,
+        DIALOG_WIDTH = 800,
+        COMMENT_WIDTH = 595,
+        DEPARTURE_STATUS = "DEPARTURE";
 
     // create divs that will be dialog container
     $("body").append(
         '<div id="statusChangeDialog" title="Выбор нового статуса">' +
         '<table>' +
-        '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>'+
-        '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>'+
-        '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>'+
-        '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>'+
-        '</table>'+
+        '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>' +
+        '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
+        '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
+        '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
+        '</table>' +
         '</div>'
     );
 
@@ -44,8 +44,7 @@ $(document).ready(function () {
         .attr("rows", "5")
         .attr("placeholder", "введите комментарий")
         .width(COMMENT_WIDTH)
-        .css("resize","none");
-
+        .css("resize", "none");
 
 
     // create and init dateTimePicker
@@ -66,7 +65,7 @@ $(document).ready(function () {
         height: DIALOG_HEIGHT,
         modal: true,
         // when dialog open transform it to one of two types
-        open: function() {
+        open: function () {
             var dialogType = $statusChangeDialog.data('dialogType');
             $("#palletsQtyTr").hide();
             switch (dialogType) {
@@ -104,7 +103,7 @@ $(document).ready(function () {
                                 invoiceNumber: invoiceNumber,
                                 newStatusID: newStatusID,
                                 date: date,
-                                comment:comment
+                                comment: comment
                             },
                             function (data) {
                                 if (data === '1') {
@@ -152,7 +151,7 @@ $(document).ready(function () {
     });
 
     // external function
-    $.showInvoiceStatusDialog = function(dialogType, dataTable) {
+    $.showInvoiceStatusDialog = function (dialogType, dataTable) {
         $statusChangeDialog
             .data("dialogType", dialogType)
             .data("dataTable", dataTable)

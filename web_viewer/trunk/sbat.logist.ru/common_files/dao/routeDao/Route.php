@@ -1,8 +1,8 @@
 <?php
 namespace DAO;
-include_once __DIR__ . '/IRoute.php';
+include_once 'IRoute.php';
 include_once __DIR__ . '/../DAO.php';
-include_once __DIR__ . '/Data.php';
+include_once 'Data.php';
 
 class RouteEntity implements IRouteEntity
 {
@@ -60,16 +60,6 @@ class RouteEntity implements IRouteEntity
         $array = $this->_DAO->select(new SelectRouteByDirectionName($directionName));
         return new RouteData($array[0]);
     }
-
-    function selectRoutePointsByRouteID($directionName)
-    {
-        $array = $this->_DAO->select(new SelectRoutePointsByRouteID($directionName));
-        $RoutePoints = array();
-        for ($i = 0; $i < count($array); $i++) {
-            $RoutePoints[$i] = new RoutePointData($array[$i]);
-        }
-        return $RoutePoints;
-    }
 }
 
 class SelectAllRoutes implements IEntitySelect
@@ -99,21 +89,6 @@ class SelectRouteByID implements IEntitySelect
     }
 }
 
-class SelectRoutePointsByRouteID implements IEntitySelect
-{
-    private $routeID;
-
-    function __construct($routeID)
-    {
-        $this->routeID = DAO::getInstance()->checkString($routeID);
-    }
-
-    function getSelectQuery()
-    {
-        return "SELECT routePointID, sortOrder, pointName, tLoading, timeToNextPoint, distanceToNextPoint FROM route_points, points WHERE route_points.pointID = points.pointID AND routeID = '$this->routeID' ORDER BY `sortOrder`;";
-    }
-}
-
 class SelectRouteByDirectionName implements IEntitySelect
 {
     private $directionName;
@@ -125,6 +100,6 @@ class SelectRouteByDirectionName implements IEntitySelect
 
     function getSelectQuery()
     {
-        throw new \MysqlException('Запрос не написан');
+        throw new \MysqlException('Запрос не написан для SelectRouteByDirectionName::getSelectQuery');
     }
 }

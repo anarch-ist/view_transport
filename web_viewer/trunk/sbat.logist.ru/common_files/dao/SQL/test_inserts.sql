@@ -78,7 +78,7 @@ VALUES
   (2, 40, getPointIDByName('point2'), getRouteIDByRouteName('route1')),
   (3, 230, getPointIDByName('point3'), getRouteIDByRouteName('route1'));
 
-INSERT INTO relations_between_route_points(routePointIDFirst, routePointIDSecond, timeForDistance)
+INSERT INTO relations_between_route_points (routePointIDFirst, routePointIDSecond, timeForDistance)
 VALUES
   (getRoutePointIDByRouteNameAndSortOrder('route1', 1), getRoutePointIDByRouteNameAndSortOrder('route1', 2), 120),
   (getRoutePointIDByRouteNameAndSortOrder('route1', 2), getRoutePointIDByRouteNameAndSortOrder('route1', 3), 200);
@@ -86,7 +86,7 @@ VALUES
 
 INSERT INTO route_lists (routeListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate, routeID)
 VALUES
-  ('1455668', '2015-11-11', 3, 'Dmitriy', '8905347890', 'екх123', getRouteIDByRouteName('route1'));
+  ('1455668', '2015-11-11', 3, 'Дмитрий Лже Первый', '8905347890', 'екх123', getRouteIDByRouteName('route1'));
 
 INSERT INTO invoices (
   insiderRequestNumber, invoiceNumber, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,

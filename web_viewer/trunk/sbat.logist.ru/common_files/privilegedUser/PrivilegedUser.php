@@ -3,8 +3,8 @@ include_once __DIR__ . '/../dao/userDao/User.php';
 include_once __DIR__ . '/../dao/invoicesForUser/InvoicesForUser.php';
 include_once __DIR__ . '/../sessionAndCookieWork/SessionAndCookieWork.php';
 
-use SessionAndCookieWork\SessionAndCookieWork as SessionAndCookieWork;
 use SessionAndCookieWork\ISessionAndCookieWork as ISessionAndCookieWork;
+use SessionAndCookieWork\SessionAndCookieWork as SessionAndCookieWork;
 
 
 abstract class AuthUser
@@ -36,8 +36,8 @@ abstract class AuthUser
                 if (isset($_POST['login'])) $login = $_POST['login'];
                 $password = '';
                 if (isset($_POST['password'])) $password = $_POST['password'];
-                $string = 'login: '.$login.' | password: '.$password;
-                throw new AuthException('Ошибка авторизации. '.$string);
+                $string = 'login: ' . $login . ' | password: ' . $password;
+                throw new AuthException('Ошибка авторизации. ' . $string);
             }
         } else {
             throw new AuthException('Передан неверный параметр: ' . $authVariant);
@@ -66,8 +66,8 @@ abstract class AuthUser
         $this->user = \DAO\UserEntity::getInstance()->selectUserByEmail($email);
         if (!is_null($this->user) && $this->user->getData('passAndSalt') === md5($md5 . $this->user->getData('salt'))) {
             $this->sessCookieWork->startSession();
-            $this->sessCookieWork->setSessionParameter('UserID',$this->user->getData('userID'));
-            $this->sessCookieWork->setSessionParameter('md5',$md5);
+            $this->sessCookieWork->setSessionParameter('UserID', $this->user->getData('userID'));
+            $this->sessCookieWork->setSessionParameter('md5', $md5);
             $this->sessCookieWork->encodeSessionID($this->user->getData('userID'));
             return true;
         }
@@ -109,6 +109,11 @@ class PrivilegedUser extends AuthUser
         return \DAO\UserEntity::getInstance();
     }
 
+    public function getDaoEntity()
+    {
+        return \DAO\DAO::getInstance();
+    }
+
     public function getInvoicesForUser()
     {
         return \DAO\InvoicesForUserEntity::getInstance();
@@ -130,5 +135,17 @@ class PrivilegedUser extends AuthUser
     {
         include_once __DIR__ . '/../dao/routeDao/Route.php';
         return \DAO\RouteEntity::getInstance();
+    }
+
+    public function getRouteAndRoutePointsEntity()
+    {
+        include_once __DIR__ . '/../dao/routeAndRoutePoints/RouteAndRoutePoints.php';
+        return \DAO\RouteAndRoutePoints::getInstance();
+    }
+
+    public function getRoutePointEntity()
+    {
+        include_once __DIR__ . '/../dao/routePointDao/RoutePoint.php';
+        return \DAO\RoutePointEntity::getInstance();
     }
 }

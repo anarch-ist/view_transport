@@ -46,6 +46,34 @@ class DAO implements IDAO
         return false;
     }
 
+    function query($sql)
+    {
+        $connection = $this->getConnection();
+        if (!$connection) throw new \MysqlException('There is no connections');
+        while ($connection->more_results()) $connection->next_result();
+        $result = $connection->query($sql);
+        if ($connection->errno) {
+            throw new \MysqlException('Ошибка в запросе: ' . $connection->error . '. Запрос: ' . $sql);
+        }
+        return $result;
+//        if($this->_connection->multi_query($sql)) {
+//            $result = '';
+//            do {
+//                $result = $this->_connection->store_result();
+//            } while($this->_connection->next_result());
+//            return $result;
+//        }
+//        else {
+//            throw new \MysqlException('Ошибка в запросе: ' . $this->_connection->error . '. Запрос: ' . $sql);
+//        }
+    }
+
+    function getConnection()
+    {
+        if (!$this->_connection) throw new \MysqlException('There is no connections');
+        return $this->_connection;
+    }
+
     public static function getInstance()
     {
         if (is_null(self::$_instance)) {
@@ -56,19 +84,25 @@ class DAO implements IDAO
 
     public function checkString($str)
     {
-        return $this->_connection->real_escape_string($str);
+        $connection = $this->getConnection();
+        return $connection->real_escape_string($str);
     }
 
     public function startConnection()
     {
-        $connection = $this->privateStartConnection();
-        if ($connection) {
-            $this->_connection = $connection;
-            if ($this::AUTO_START_TRANSACTION) {
-                return $this->startTransaction();
-            }
+        $this->_connection = $this->privateStartConnection();
+        if ($this->_connection && $this::AUTO_START_TRANSACTION) {
+            return $this->startTransaction();
         }
-        return !($connection === false);
+        return !($this->_connection === false);
+//        $connection = $this->privateStartConnection();
+//        if ($connection) {
+//            $this->_connection = $connection;
+//            if ($this::AUTO_START_TRANSACTION) {
+//                return $this->startTransaction();
+//            }
+//        }
+//        return !($connection === false);
     }
 
     public function rollback()
@@ -86,16 +120,6 @@ class DAO implements IDAO
         $this->closeConnection();
     }
 
-    public function commit()
-    {
-        if ($this->_transactionStarted) {
-            $this->query('COMMIT');
-            $this->_transactionStarted = false;
-            return true;
-        }
-        return false;
-    }
-
     function closeConnection()
     {
         if (!$this->_connection) {
@@ -105,6 +129,16 @@ class DAO implements IDAO
         $this->_connection->close();
         $this->_connection = false;
         return true;
+    }
+
+    public function commit()
+    {
+        if ($this->_transactionStarted) {
+            $this->query('COMMIT');
+            $this->_transactionStarted = false;
+            return true;
+        }
+        return false;
     }
 
     function select(IEntitySelect $selectObj)
@@ -117,26 +151,6 @@ class DAO implements IDAO
             $count++;
         }
         return $array;
-    }
-
-    function query($sql)
-    {
-        while($this->_connection->more_results()) $this->_connection->next_result();
-        $result = $this->_connection->query($sql);
-        if ($this->_connection->errno) {
-            throw new \MysqlException('Ошибка в запросе: ' . $this->_connection->error . '. Запрос: ' . $sql);
-        }
-        return $result;
-//        if($this->_connection->multi_query($sql)) {
-//            $result = '';
-//            do {
-//                $result = $this->_connection->store_result();
-//            } while($this->_connection->next_result());
-//            return $result;
-//        }
-//        else {
-//            throw new \MysqlException('Ошибка в запросе: ' . $this->_connection->error . '. Запрос: ' . $sql);
-//        }
     }
 
     function update(IEntityUpdate $newObj, IEntityInsert $updateTable = null)

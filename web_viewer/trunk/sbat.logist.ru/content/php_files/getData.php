@@ -3,7 +3,7 @@ include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
 try {
     $privUser = PrivilegedUser::getInstance();
     if (!isset($_POST['status'])) {
-        throw new DataTransferException('Не задан параметр "статус"',__FILE__);
+        throw new DataTransferException('Не задан параметр "статус"', __FILE__);
     } else if ($_POST['status'] === 'getInvoicesForUser') {
         getInvoicesForUser($privUser);
     } else if ($_POST['status'] === 'changeStatusForInvoice') {
@@ -20,7 +20,7 @@ function getStatusHistory(PrivilegedUser $privUser)
 {
     $invoiceNumber = $_POST['invoiceNumber'];
     if (!isset($invoiceNumber) || empty($invoiceNumber)) {
-        throw new DataTransferException('Не задан параметр "номер накладной"',__FILE__);
+        throw new DataTransferException('Не задан параметр "номер накладной"', __FILE__);
     }
     $data = $privUser->getInvoiceEntity()->getInvoiceHistoryByInvoiceNumber($invoiceNumber);
     echo json_encode($data);
