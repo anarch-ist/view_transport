@@ -6,29 +6,25 @@ import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
+import ru.sbat.transport.optimization.utils.MapWithArrayList;
+
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Optimizer implements IOptimizer {
 
     @Override
-    public void filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException {
-
+    public MapWithArrayList filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException {
+        MapWithArrayList result = new MapWithArrayList();
         for(Invoice invoice: unassignedInvoices) {
             if (invoice.getRoute() != null)
-               throw new IllegalArgumentException("invoice.getRoute() should be null");
+                throw new IllegalArgumentException("invoice.getRoute() should be null");
 
-            // сначала нужно для каждого инвойса выбрать подходящие маршруты, такие что начальный и конечный пункт совпадали с соответсвующими пунктами накладных,
-            // также маршруты должны проходить по времени, то есть время доставки по указанному маршруту должно быть меньше чем время доставки указанное в заявке
-            // день недели в который осуществляется доставка должен совпадать с днями недели доставки маршрута
+            Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime();
+            Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
+            Point departurePoint = invoice.getAddressOfWarehouse();
+            ArrayList<Route> possibleRouteForInvoice = new ArrayList<>();
 
-            Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime(); //плановое время доставки Dd
-            Date creationDate = invoice.getCreationDate(); //время создания заявки
-            Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // пункт доставки
-            Point departurePoint = invoice.getAddressOfWarehouse(); // пункт, в котором была сформирована накладная(первый пункт маршрута)
-            int dayOfWeek = getWeekDay(plannedDeliveryTime); // день недели, в который будет планово доставлен товар в накладной
 
             for(Route route: plannedSchedule){
                 if(route == null){
@@ -36,16 +32,18 @@ public class Optimizer implements IOptimizer {
                 }
                 if (route.getDeparturePoint().equals(departurePoint) &&
                         route.getArrivalPoint().equals(deliveryPoint)) {
-
+                    Date[] possibleDepartureDate = getPossibleDepartureDate(route, invoice);
+                    for(Date date: possibleDepartureDate){
+                        if(date.before(plannedDeliveryTime)){
+                            possibleRouteForInvoice.add(route);
+                           }
+                        }
+                    }
                 }
-                    invoice.setRoute(route);
-//                    System.out.println("For invoice: " + invoice.toString() + " found route = " + route.toString());
-                }
+            result.put(invoice, possibleRouteForInvoice);
             }
+        return result;
         }
-
-    /* dayOfWeek <= route.getWeekDayOfActualDeliveryTime() &&
-    (creationDate.getTime() + route.getFullTime() < invoice.getRequest().getPlannedDeliveryTime().getTime()*/
 
     // TODO сделать toString для Invoice and Route +
     // TODO сделать метод который отбирает все подходящие маршруты для накладной(бех оптимизации) +
@@ -54,6 +52,9 @@ public class Optimizer implements IOptimizer {
     @Override
     public Date[] getPossibleDepartureDate(Route route, Invoice invoice){
         Date creationDate = invoice.getCreationDate();
+        int[] timeDeparture = route.splitToComponentTime(route.getDepartureTime());
+        creationDate.setHours(timeDeparture[0]);
+        creationDate.setMinutes(timeDeparture[1]);
         Date date1 = creationDate;
         int differenceWeekDays = route.getWeekDayOfDepartureTime() - invoice.getWeekDay();
         if (differenceWeekDays < 0) {

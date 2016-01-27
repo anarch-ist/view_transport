@@ -140,22 +140,25 @@ public class RouteTest {
     public void testGetActualDeliveryTime(){
         Route route = new Route();
         RoutePoint routePoint1 = new RoutePoint();
-        RoutePoint routePoint2 = new RoutePoint();
-        RoutePoint routePoint3 = new RoutePoint();
-        routePoint1.setDepartureTime(510);
-        routePoint1.setLoadingOperationsTime(0);
+        routePoint1.setDayOfWeek(2);
+        routePoint1.setDepartureTime(900); // в минутах от начала суток
         routePoint1.setTimeToNextPoint(600);
-        routePoint2.setDepartureTime(1200);
-        routePoint2.setLoadingOperationsTime(90);
-        routePoint2.setTimeToNextPoint(900);
+        routePoint1.setLoadingOperationsTime(0);
+        RoutePoint routePoint2 = new RoutePoint();
+        routePoint2.setDayOfWeek(3);
+        routePoint2.setDepartureTime(180);
+        routePoint2.setTimeToNextPoint(1500);
+        routePoint2.setLoadingOperationsTime(120);
+        RoutePoint routePoint3 = new RoutePoint();
+        routePoint3.setDayOfWeek(4);
         routePoint3.setDepartureTime(0);
-        routePoint3.setLoadingOperationsTime(173);
         routePoint3.setTimeToNextPoint(0);
+        routePoint3.setLoadingOperationsTime(83);
         route.add(routePoint1);
         route.add(routePoint2);
         route.add(routePoint3);
-        Assert.assertEquals(13, route.getActualDeliveryTime().getHours());
-        Assert.assertEquals(53, route.getActualDeliveryTime().getMinutes());
+        Assert.assertEquals(5, route.getActualDeliveryTime().getHours());
+        Assert.assertEquals(23, route.getActualDeliveryTime().getMinutes());
     }
 
     @Test
