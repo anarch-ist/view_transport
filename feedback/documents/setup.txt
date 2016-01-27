@@ -1,0 +1,29 @@
+-- DEPLOYMENT SETTINGS
+https://confluence.jetbrains.com/display/PhpStorm/Deploying+PHP+applications+with+PhpStorm
+
+ Tools | Deployment | Configuration
+ name: productionServer
+ type: FTP
+
+ftp host: 185.75.182.92
+Port: 21
+root path: /web/feedback.sbat.ru/public_html/
+userName: feedback
+password: n3n9bxHG6k
+web server root URL: http://feedback.sbat.ru
+advanced options: set encoding UTF-8
+
+
+MAPPINGS:
+Local Path: C:\web\wamp\www\sbat.feedback.ru
+Deployment path on server: /
+Web path on server: /
+
+EXCLUDED:
+
+Tools | Deployment | Browse Remote Hosts : view server content\
+
+-- DEPLOYING:
+
+Deployment | Upload to <server name> (or Deployment | Upload to...
+if you want to download from server make right click on folder inside remote host panel;
