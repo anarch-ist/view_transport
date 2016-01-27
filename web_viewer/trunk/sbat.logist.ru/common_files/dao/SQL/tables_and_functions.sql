@@ -5,6 +5,12 @@ CREATE DATABASE `transmaster_transport_db`
   COLLATE utf8_bin;
 USE `transmaster_transport_db`;
 
+
+CREATE TABLE emails (
+  emailID VARCHAR(64),
+  PRIMARY KEY (emailID)
+);
+
 -- -------------------------------------------------------------------------------------------------------------------
 --                                        USERS ROLES PERMISSIONS AND POINTS
 -- -------------------------------------------------------------------------------------------------------------------
@@ -45,26 +51,40 @@ VALUES
   ('AGENCY');
 
 CREATE TABLE points (
-  pointID     INTEGER AUTO_INCREMENT,
-  pointName   VARCHAR(128)   NOT NULL,
-  region      VARCHAR(128)   NULL,
-  timeZone    TINYINT SIGNED NULL, -- сдвиг времени по гринвичу GMT + value
-  docs        TINYINT SIGNED NULL, -- количество окон разгрузки
-  comments    LONGTEXT       NULL,
-  openTime    TIME           NULL, -- например 9:00
-  closeTime   TIME           NULL, -- например 17:00
-  district    VARCHAR(64)    NULL,
-  locality    VARCHAR(64)    NULL,
-  mailIndex   VARCHAR(6)     NULL,
-  address     VARCHAR(256)   NOT NULL,
-  email       VARCHAR(64)    NULL,
-  phoneNumber VARCHAR(16)    NULL,
-  pointTypeID VARCHAR(32)    NOT NULL,
+  pointID             INTEGER AUTO_INCREMENT,
+  pointIDExternal     INTEGER        NOT NULL,
+  pointName           VARCHAR(128)   NOT NULL,
+  responsiblePersonID INTEGER        NULL, -- TODO уточнить по поводу ответственного лица
+  region              VARCHAR(128)   NULL,
+  timeZone            TINYINT SIGNED NULL, -- сдвиг времени по гринвичу GMT + value
+  docs                TINYINT SIGNED NULL, -- количество окон разгрузки
+  comments            LONGTEXT       NULL,
+  openTime            TIME           NULL, -- например 9:00
+  closeTime           TIME           NULL, -- например 17:00
+  district            VARCHAR(64)    NULL,
+  locality            VARCHAR(64)    NULL,
+  mailIndex           VARCHAR(6)     NULL,
+  address             VARCHAR(256)   NOT NULL,
+  phoneNumber         VARCHAR(16)    NULL,
+  pointTypeID         VARCHAR(32)    NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   UNIQUE (pointName)
+);
+
+-- contains list of emails for every point
+CREATE TABLE emails_for_points (
+  pointID INTEGER,
+  emailID VARCHAR(64),
+  PRIMARY KEY (pointID, emailID),
+  FOREIGN KEY (pointID) REFERENCES points (pointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (emailID) REFERENCES emails (emailID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 -- CONSTRAINT pointIDFirst must not be equal pointIDSecond
@@ -82,22 +102,26 @@ CREATE TABLE distances_between_points (
 );
 
 CREATE TABLE users (
-  userID      INTEGER AUTO_INCREMENT,
-  firstName   VARCHAR(64) NULL,
-  lastName    VARCHAR(64) NULL,
-  patronymic  VARCHAR(64) NULL,
-  position    VARCHAR(64) NULL, -- должность
-  salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
-  passAndSalt VARCHAR(64) NOT NULL,
-  phoneNumber VARCHAR(16) NULL,
-  email       VARCHAR(64) NULL,
-  userRoleID  VARCHAR(32) NOT NULL,
-  pointID     INTEGER     NOT NULL,
+  userID         INTEGER     AUTO_INCREMENT,
+  userIDExternal VARCHAR(64) NULL,
+  firstName      VARCHAR(64) NULL,
+  lastName       VARCHAR(64) NULL,
+  patronymic     VARCHAR(64) NULL,
+  position       VARCHAR(64) NULL, -- должность
+  salt           VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
+  passAndSalt    VARCHAR(64) NOT NULL,
+  phoneNumber    VARCHAR(16) NULL,
+  email          VARCHAR(64) NULL,
+  userRoleID     VARCHAR(32) NOT NULL,
+  pointID        INTEGER     NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE,
+  FOREIGN KEY (email) REFERENCES emails (emailID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE
 );
@@ -170,7 +194,9 @@ CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
 CREATE TABLE clients (
   clientID          INTEGER AUTO_INCREMENT,
+  clientIDExternal  INTEGER      NOT NULL,
   INN               VARCHAR(32)  NOT NULL,
+  clientName        VARCHAR(256) NULL,
   KPP               VARCHAR(64)  NULL,
   corAccount        VARCHAR(64)  NULL,
   curAccount        VARCHAR(64)  NULL,
@@ -187,6 +213,7 @@ CREATE TABLE clients (
 -- insert only manager users
 CREATE TABLE requests (
   requestID          INTEGER AUTO_INCREMENT,
+  requestIDExternal  VARCHAR(16) NOT NULL, -- TODO надо ли это?
   requestNumber      VARCHAR(16) NOT NULL,
   date               DATETIME    NOT NULL,
   marketAgentUserID  INTEGER     NULL,
@@ -241,11 +268,14 @@ CREATE TABLE tariffs (
 -- zero time is 00:00(GMT) of that day, when carrier arrives at first point of route.
 CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
+  -- соответствует directId
+  routeIDExternal       INTEGER                                                                           NOT NULL,
   firstPointArrivalTime TIME                                                                              NOT NULL,
--- days of weeks when route is available
+  -- days of weeks when route is available
   daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') NOT NULL,
+  -- TODO думаю можно совместить имя направления и имя маршрута
   routeName             VARCHAR(64)                                                                       NOT NULL,
--- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
+  -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
   directionName         VARCHAR(255)                                                                      NULL,
   tariffID              INTEGER                                                                           NULL,
   PRIMARY KEY (routeID),
@@ -297,14 +327,15 @@ CREATE TABLE relations_between_route_points (
 );
 
 CREATE TABLE route_lists (
-  routeListID       INTEGER AUTO_INCREMENT,
-  routeListNumber   VARCHAR(32)  NOT NULL,
-  startDate         DATE         NULL,
-  palletsQty        INTEGER      NULL,
-  driver            VARCHAR(255) NULL,
-  driverPhoneNumber VARCHAR(12)  NULL,
-  licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  routeID           INTEGER      NOT NULL,
+  routeListID         INTEGER AUTO_INCREMENT,
+  routeListExternalID VARCHAR(16)  NOT NULL,
+  routeListNumber     VARCHAR(32)  NOT NULL,
+  startDate           DATE         NULL,
+  palletsQty          INTEGER      NULL,
+  driver              VARCHAR(255) NULL,
+  driverPhoneNumber   VARCHAR(12)  NULL,
+  licensePlate        VARCHAR(9)   NULL, -- государственный номер автомобиля
+  routeID             INTEGER      NOT NULL,
   PRIMARY KEY (routeListID),
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE NO ACTION
