@@ -911,6 +911,21 @@ CREATE FUNCTION generateHaving(map TEXT)
     RETURN result;
   END;
 
+CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
+  RETURNS VARCHAR(255)
+  BEGIN
+    IF _orderby <> ''
+    THEN
+      IF _isDesc
+      THEN
+        RETURN CONCAT(' ORDER BY ', _orderby, ' DESC');
+      ELSE
+        RETURN CONCAT(' ORDER BY ', _orderby);
+      END IF;
+    ELSE
+      RETURN '';
+    END IF;
+  END;
 
 -- _search - array of strings
 -- _orderby 'id'  <> - название колонки из файла main.js
@@ -988,21 +1003,13 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     (getPointIDByUserID(?) = w_points.pointID) OR
     (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
     )';
+
     SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
 
-    IF _orderby <> ''
-    THEN
-      IF _isDesc
-      THEN
-        SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
-      ELSE
-        SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
-      END IF;
-    ELSE
-      SET @orderByPart = '';
-    END IF;
+    SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
 
     SET @limitPart = ' LIMIT ?, ? ';
+
     SET @sqlString = CONCAT(@mainPart, @wherePart, @havingPart, @orderByPart, @limitPart);
 
     PREPARE statement FROM @sqlString;
@@ -1015,6 +1022,48 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
     DEALLOCATE PREPARE statement;
   END;
+
+-- select users procedure
+CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
+  BEGIN
+
+    SET @mainPart =
+    'SELECT
+      users.firstName,
+      users.lastName,
+      users.patronymic,
+      users.position,
+      users.phoneNumber,
+      users.email,
+      ''dummy'' AS password,
+      points.pointName,
+      user_roles.userRoleRusName
+    FROM users
+      INNER JOIN (user_roles, points) ON (
+        users.pointID = points.pointID AND
+        users.userRoleID = user_roles.userRoleID
+        ) ';
+
+
+    SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
+
+    SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
+
+    SET @limitPart = ' LIMIT ?, ? ';
+
+    SET @sqlString = CONCAT(@mainPart, @havingPart, @orderByPart, @limitPart);
+
+    PREPARE statement FROM @sqlString;
+
+    SET @_startEntry = _startEntry;
+    SET @_length = _length;
+
+    EXECUTE statement
+    USING @_startEntry, @_length;
+    DEALLOCATE PREPARE statement;
+
+  END;
+
 
 CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
@@ -1103,6 +1152,8 @@ CREATE PROCEDURE `createRoutePoint`(_sortOrder INTEGER, _tLoading INTEGER, _poin
       INSERT INTO relations_between_route_points (routePointIDFirst, routePointIDSecond, timeForDistance) VALUE (@routePointID1,@routePointID2,0);
     END IF;
   END;
+
+
 
 
 

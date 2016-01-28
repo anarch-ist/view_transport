@@ -21,6 +21,25 @@ $(document).ready(function () {
             style: 'single'
         },
         dom: 'Brtip',
+        language: {
+            url: '/localization/dataTablesRus.json'
+        },
+        // Note that when language url parameter is set, DataTables' initialisation will be asynchronous due to the Ajax data load.
+        // That is to say that the table will not be drawn until the Ajax request as completed.
+        // As such, any actions that require the table to have completed its initialisation should be placed into the initComplete callback.
+        initComplete: function(settings, json) {
+            // Apply the search
+            dataTable.columns().every(function () {
+                var that = this;
+                $('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        },
         buttons: [
             {
                 extend: 'selectedSingle',
@@ -56,8 +75,8 @@ $(document).ready(function () {
                     dataTable.columns().every(function () {
                         $('input', this.footer())[0].value = '';
                         this.search('');
-                        dataTable.columns().draw();
                     });
+                    dataTable.columns().draw();
                 }
             }
         ],
@@ -112,25 +131,9 @@ $(document).ready(function () {
             {"name": "arrivalTime", "searchable": true, "targets": 16},
             {"name": "invoiceStatusID", "searchable": false, "visible": false, "targets": 17},
             {"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
-        ],
-        language: {
-            url: '/localization/dataTablesRus.json'
-        }
+        ]
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
-
-    // Apply the search
-    dataTable.columns().every(function () {
-        var that = this;
-
-        $('input', this.footer()).on('keyup change', function () {
-            if (that.search() !== this.value) {
-                that
-                    .search(this.value)
-                    .draw();
-            }
-        });
-    });
 });
 
