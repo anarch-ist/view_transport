@@ -4,6 +4,23 @@ include_once __DIR__ . '/../common_files/dao/routeAndRoutePoints/RouteAndRoutePo
 
 class RouteAndRoutePointsEntityTest extends PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @after
+     */
+    static function closeConnection()
+    {
+        \DAO\DAO::getInstance()->closeConnection();
+    }
+
+    /**
+     * @before
+     */
+    static function openConnection()
+    {
+        \DAO\DAO::getInstance()->startConnection();
+    }
+
     function testCreateRouteAndRoutePoints()
     {
         $this->assertNotNull(\DAO\RouteAndRoutePoints::getInstance());

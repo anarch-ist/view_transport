@@ -110,12 +110,13 @@ $(document).ready(function () {
         $.post(
             'content/getData.php',
             {
+                status: 'updateDaysOfWeek',
                 routeID: $routeSelectSelectize[0].selectize.items[0],
                 daysOfWeek: daysOfWeek
             },
             // example serverData : ["monday", "friday", "saturday"]
             function (serverData) {
-                setDaysOfWeekData(serverData);
+                setDaysOfWeekData(JSON.parse(serverData));
                 $("#ajaxLoaderGif").hide();
             }
         );
@@ -127,6 +128,7 @@ $(document).ready(function () {
         $.post(
             'content/getData.php',
             {
+                status: 'updateStartRouteTime',
                 routeID: $routeSelectSelectize[0].selectize.items[0],
                 firstPointArrivalTime: $('#startRouteTimeInput').val()
             },
@@ -309,7 +311,8 @@ $(document).ready(function () {
             ajax: {
                 edit: {
                     type: 'POST',
-                    url: 'content/getData.php'
+                    url: 'content/getData.php',
+                    data: {"status": "relationsBetweenRoutePoints"}
                 }
             },
             table: '#relationsBetweenRoutePointsTable',
@@ -366,7 +369,7 @@ $(document).ready(function () {
             console.log(houres);
             var minutes = string.substr(3, 2);
             console.log(minutes);
-            return houres * 60 + parseInt(minutes);
+            return 60 * parseInt(houres) + parseInt(minutes);
         }
 
         function minutesToString(intMinutes) {

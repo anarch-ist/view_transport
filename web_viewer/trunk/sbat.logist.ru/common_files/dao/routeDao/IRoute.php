@@ -9,7 +9,9 @@ interface IRouteEntity
 
     function selectRouteByDirectionName($directionName);
 
-    function updateRoute($newRoute);
+    function updateStartRouteTime($routeID, $newTime);
+
+    function updateRouteDaysOfWeek($routeID, $days);
 
     function deleteRoute($Route);
 

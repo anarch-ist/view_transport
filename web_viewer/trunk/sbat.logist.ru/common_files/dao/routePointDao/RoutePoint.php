@@ -39,9 +39,9 @@ class RoutePointEntity implements IRoutePointEntity
         return new RoutePointsData($routePoints);
     }
 
-    function updateRelationBetweenRoutePoints($firstRoutePoint, $secondRoutePoint, $newDistance, $newTimeToDestination)
+    function updateRelationBetweenRoutePoints($firstRoutePoint, $secondRoutePoint, $newTimeToDestination)
     {
-        // TODO: Implement updateRelationBetweenRoutePoints() method.
+        return $this->_DAO->update(new UpdateRelationBetweenRoutePoints($firstRoutePoint, $secondRoutePoint, $newTimeToDestination));
     }
 
     function updateRoutePoint($routePointID, $sortOrder, $tLoading, $pointName)
@@ -163,5 +163,26 @@ class AddRoutePoint implements IEntityInsert
     {
         // TODO: check getInsertQuery() method.
         return "CALL createRoutePoint($this->sortOrder, $this->tLoading, $this->pointID, $this->routeID);";
+    }
+}
+
+class UpdateRelationBetweenRoutePoints implements IEntityUpdate
+{
+    private $routePoint1, $routePoint2, $time;
+
+    function __construct($rp1, $rp2, $t)
+    {
+        $this->routePoint1 = $rp1;
+        $this->routePoint2 = $rp2;
+        $this->time = $t;
+    }
+
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        return "UPDATE `relations_between_route_points` set `timeForDistance` = $this->time where routePointIDFirst = $this->routePoint1 AND routePointIDSecond = $this->routePoint2";
     }
 }

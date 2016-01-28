@@ -117,6 +117,23 @@ class AuthUserTest extends PHPUnit_Framework_TestCase
         new UserTest('auth', new SessionAndCookieWorkTest());
     }
 
+
+    /**
+     * @after
+     */
+    static function closeConnection()
+    {
+        \DAO\DAO::getInstance()->closeConnection();
+    }
+
+    /**
+     * @before
+     */
+    static function openConnection()
+    {
+        \DAO\DAO::getInstance()->startConnection();
+    }
+
     function testIsValid()
     {
         $_POST['login'] = 'test@test.ru';

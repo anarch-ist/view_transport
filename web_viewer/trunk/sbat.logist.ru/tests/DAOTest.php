@@ -3,6 +3,23 @@ include_once __DIR__ . '/../common_files/dao/DAO.php';
 
 class DAOTest extends PHPUnit_Framework_TestCase
 {
+//
+//    /**
+//     * @after
+//     */
+//    static function closeConnection()
+//    {
+//        \DAO\DAO::getInstance()->closeConnection();
+//    }
+//
+//    /**
+//     * @before
+//     */
+//    static function openConnection()
+//    {
+//        \DAO\DAO::getInstance()->startConnection();
+//    }
+
     public function testCommitTransaction()
     {
         $dao = \DAO\DAO::getInstance();

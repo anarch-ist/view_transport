@@ -40,11 +40,6 @@ class RouteEntity implements IRouteEntity
         return new RouteData($array[0]);
     }
 
-    function updateRoute($newRoute)
-    {
-        // TODO: Implement updateRoute() method.
-    }
-
     function deleteRoute($Route)
     {
         // TODO: Implement deleteRoute() method.
@@ -59,6 +54,16 @@ class RouteEntity implements IRouteEntity
     {
         $array = $this->_DAO->select(new SelectRouteByDirectionName($directionName));
         return new RouteData($array[0]);
+    }
+
+    function updateStartRouteTime($routeID, $newTime)
+    {
+        return $this->_DAO->update(new UpdateStartRouteTime($routeID, $newTime));
+    }
+
+    function updateRouteDaysOfWeek($routeID, $days)
+    {
+        return $this->_DAO->update(new UpdateRouteDaysOfWeek($routeID, $days));
     }
 }
 
@@ -101,5 +106,45 @@ class SelectRouteByDirectionName implements IEntitySelect
     function getSelectQuery()
     {
         throw new \MysqlException('Запрос не написан для SelectRouteByDirectionName::getSelectQuery');
+    }
+}
+
+class UpdateStartRouteTime implements IEntityUpdate {
+
+    /**
+     * @return string
+     */
+    private $routeID, $newTime;
+    function __construct($routeID, $newTime) {
+
+        $this->routeID = DAO::getInstance()->checkString($routeID);
+        $this->newTime = $this->checkTime($newTime);
+    }
+    function checkTime($str) {
+        if (!($time = strtotime($str) === false)) {
+            return $str;
+        }
+        throw new \DataTransferException('неправильный формат времени', __FILE__);
+    }
+    function getUpdateQuery()
+    {
+        return "UPDATE `routes` SET `firstPointArrivalTime` = '$this->newTime' WHERE routeID = $this->routeID";
+    }
+}
+
+class UpdateRouteDaysOfWeek implements IEntityUpdate {
+
+    /**
+     * @return string
+     */
+    private $routeID, $dayArray;
+    function __construct($routeID, $dayArray) {
+
+        $this->routeID = DAO::getInstance()->checkString($routeID);
+        $this->dayArray = DAO::getInstance()->checkString(implode(',',$dayArray));
+    }
+    function getUpdateQuery()
+    {
+        return "UPDATE `routes` SET `daysOfWeek` = '$this->dayArray' WHERE routeID = $this->routeID";
     }
 }

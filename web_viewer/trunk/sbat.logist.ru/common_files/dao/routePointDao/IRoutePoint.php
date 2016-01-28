@@ -9,7 +9,7 @@ interface IRoutePointEntity
 
     function selectRoutePointsByRouteID($routeID);
 
-    function updateRelationBetweenRoutePoints($firstRoutePoint, $secondRoutePoint, $newDistance, $newTimeToDestination);
+    function updateRelationBetweenRoutePoints($firstRoutePoint, $secondRoutePoint, $newTimeToDestination);
 
     function updateRoutePoint($routePointID, $sortOrder, $tLoading, $pointName);
 
