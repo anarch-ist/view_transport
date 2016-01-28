@@ -334,6 +334,18 @@ $(document).ready(function () {
             ]
         });
 
+        relationsBetweenRoutePointsEditor.on('preSubmit', function (e, data, action) {
+            if (action === 'edit') {
+                for (i in data.data) {
+                    data.data[i].timeForDistance = stringToMinutes(data.data[i].timeForDistance);
+                    console.log(data.data[i].timeForDistance);
+                }
+                //console.log(data);
+                //console.log(json);
+                //console.log(action);
+            }
+        });
+
         var $relationsBetweenRoutePointsDataTable = $("#relationsBetweenRoutePointsTable").DataTable({
                 "dom": 'Bt', // show only buttons and table with no decorations
                 language: {
