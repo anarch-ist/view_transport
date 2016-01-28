@@ -5,11 +5,12 @@ import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
-import ru.sbat.transport.optimization.utils.MapWithArrayList;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface IOptimizer {
 
@@ -24,9 +25,11 @@ public interface IOptimizer {
 
     InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices);
 
-    MapWithArrayList filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException;
+    Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException;
 
     Date[] getPossibleDepartureDate(Route route, Invoice invoice);
+
+    Date getPossibleArrivalDate(Route route, Invoice invoice, Date date);
 
     boolean isFittingForDeliveryTime(Route route, Invoice invoice, Date date);
 }

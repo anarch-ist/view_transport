@@ -90,6 +90,10 @@ public class Invoice {
         this.request = request;
     }
 
+    /** determines week day of invoice's creation date
+     *
+     * @return day of week from date
+     */
     public int getWeekDay(){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(this.getCreationDate());

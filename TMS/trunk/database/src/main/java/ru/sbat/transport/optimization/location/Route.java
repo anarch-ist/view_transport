@@ -6,6 +6,10 @@ import java.util.LinkedList;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
 
+    /** calculates the total distance on the route
+     *
+     * @return km route
+     */
     @Override
     public Double getFullDistance() {
         double result = 0;
@@ -15,6 +19,10 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return result;
     }
 
+    /** calculates the total time on the route
+     *
+     * @return minutes of all route
+     */
     @Override
     public Integer getFullTime() {
         int result = 0;
@@ -24,11 +32,19 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return result;
     }
 
+    /** determines the time of departure
+     *
+     * @return minutes from the start of the day
+     */
     @Override
     public Integer getDepartureTime() {
         return this.get(0).getDepartureTime();
     }
 
+    /** determines the arrival time to the final point of the route
+     *
+     * @return minutes from the start of the day
+     */
     @Override
     public Integer getArrivalTime() {
         int result = 0;
@@ -39,21 +55,38 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return result;
     }
 
+    /** determines the final point of the route
+     *
+     * @return the final point
+     */
     @Override
     public Point getArrivalPoint() {
         return this.get(this.size()-1).getDeparturePoint();
     }
 
+    /** determines the first point of the route
+     *
+     * @return the first point of the route
+     */
     @Override
     public Point getDeparturePoint() {
         return this.get(0).getDeparturePoint();
     }
 
+
+    /** determines day of week of arrival in the last point of route
+     *
+     * @return day of week of last point
+     */
     @Override
     public int getWeekDayOfActualDeliveryTime() {
         return this.get(this.size()-1).getDayOfWeek();
     }
 
+    /** determines time of arrival in the last point of route
+     *
+     * @return date with real hours and minutes of arrival in the last point
+     */
     @Override
     public Date getActualDeliveryTime() {
         Date date = new Date();
@@ -67,6 +100,11 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return date;
     }
 
+    /** parts minutes from the start of the day to hours and minutes
+     *
+     * @param time
+     * @return int array of hours(0) and minutes(1)
+     */
     @Override
     public int[] splitToComponentTime(Integer time) {
         int hours = time / 60;
@@ -75,11 +113,19 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return result;
     }
 
+    /** determines day of week of departure from the first point of route
+     *
+     * @return day of week from the first element of route
+     */
     @Override
     public int getWeekDayOfDepartureTime() {
         return this.get(0).getDayOfWeek();
     }
 
+    /** calculates count of days in route
+     *
+     * @return count of days
+     */
     @Override
     public int getDaysCountOfRoute() {
         int result = this.get(this.size()-1).getDayOfWeek() - this.get(0).getDayOfWeek();

@@ -6,21 +6,25 @@ import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceTypes;
-import ru.sbat.transport.optimization.utils.MapWithArrayList;
 
 import java.text.ParseException;
 import java.util.*;
 
 public class Optimizer implements IOptimizer {
-
+    /** Selects for invoice appropriate routes
+     *
+     * @param plannedSchedule
+     * @param unassignedInvoices
+     * @return map with invoice(key) and routes(values)
+     * @throws RouteNotFoundException
+     */
     @Override
-    public MapWithArrayList filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException {
-        MapWithArrayList result = new MapWithArrayList();
+    public Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException {
+        Map<Invoice, ArrayList<Route>> map = new HashMap<>();
         for(Invoice invoice: unassignedInvoices) {
             if (invoice.getRoute() != null)
                 throw new IllegalArgumentException("invoice.getRoute() should be null");
 
-            Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime();
             Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
             Point departurePoint = invoice.getAddressOfWarehouse();
             ArrayList<Route> possibleRouteForInvoice = new ArrayList<>();
@@ -34,21 +38,25 @@ public class Optimizer implements IOptimizer {
                         route.getArrivalPoint().equals(deliveryPoint)) {
                     Date[] possibleDepartureDate = getPossibleDepartureDate(route, invoice);
                     for(Date date: possibleDepartureDate){
-                        if(date.before(plannedDeliveryTime)){
+                        if(isFittingForDeliveryTime(route, invoice, date)){
                             possibleRouteForInvoice.add(route);
+                            System.out.println(date + " день отправления");
+                            System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
                            }
                         }
                     }
                 }
-            result.put(invoice, possibleRouteForInvoice);
+            map.put(invoice, possibleRouteForInvoice);
             }
-        return result;
+        return map;
         }
 
-    // TODO сделать toString для Invoice and Route +
-    // TODO сделать метод который отбирает все подходящие маршруты для накладной(бех оптимизации) +
-    // TODO написать тесты для проверки
-
+    /** selects possible options of routes by departure time
+     *
+     * @param route
+     * @param invoice
+     * @return array of three possible departure date
+     */
     @Override
     public Date[] getPossibleDepartureDate(Route route, Invoice invoice){
         Date creationDate = invoice.getCreationDate();
@@ -57,19 +65,19 @@ public class Optimizer implements IOptimizer {
         creationDate.setMinutes(timeDeparture[1]);
         Date date1 = creationDate;
         int differenceWeekDays = route.getWeekDayOfDepartureTime() - invoice.getWeekDay();
-        if (differenceWeekDays < 0) {
-            int tmp = 7 - (invoice.getWeekDay() - route.getWeekDayOfDepartureTime());
+        if(differenceWeekDays > 0){
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(creationDate);
-            calendar.add(Calendar.DAY_OF_MONTH, tmp);
-            date1.setTime(calendar.getTimeInMillis());
-        }else if(differenceWeekDays > 0){
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(creationDate);
+            calendar.setTime(date1);
             calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
             date1.setTime(calendar.getTimeInMillis());
-        }else if(differenceWeekDays == 0){
+        }else if(differenceWeekDays == 0 &&((invoice.getCreationDate().getHours()*60 + invoice.getCreationDate().getMinutes()) < route.getDepartureTime())){
             date1 = creationDate;
+        }else {
+            int tmp = 7 - (invoice.getWeekDay() - route.getWeekDayOfDepartureTime());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date1);
+            calendar.add(Calendar.DAY_OF_MONTH, tmp);
+            date1.setTime(calendar.getTimeInMillis());
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date1);
@@ -83,10 +91,25 @@ public class Optimizer implements IOptimizer {
         return result;
     }
 
+    /** Determines the suitability of the route for the day planned delivery
+     *
+     * @param route
+     * @param invoice
+     * @param date
+     * @return suitable or not
+     */
     @Override
     public boolean isFittingForDeliveryTime(Route route, Invoice invoice, Date date) {
         boolean result = false;
         Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime();
+        if(getPossibleArrivalDate(route, invoice, date).before(plannedDeliveryTime)){
+            result = true;
+        }
+        return result;
+    }
+
+    @Override
+    public Date getPossibleArrivalDate(Route route, Invoice invoice, Date date){
         Calendar calendar = Calendar.getInstance();
         date.setHours(route.getActualDeliveryTime().getHours());
         date.setMinutes(route.getActualDeliveryTime().getMinutes());
@@ -94,10 +117,7 @@ public class Optimizer implements IOptimizer {
         int countDays = route.getDaysCountOfRoute();
         calendar.add(Calendar.DAY_OF_MONTH, countDays);
         Date actualDeliveryDate = new Date(calendar.getTimeInMillis());
-        if(actualDeliveryDate.before(plannedDeliveryTime)){
-            result = true;
-        }
-        return result;
+        return actualDeliveryDate;
     }
 
 
@@ -106,6 +126,11 @@ public class Optimizer implements IOptimizer {
 
     }
 
+    /** sets the invoice's types
+     *
+     * @param unassignedInvoices
+     * @return type of invoice (A, B, C)
+     */
     @Override
     public InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices) {
         InvoiceTypes invoiceTypes = null;
