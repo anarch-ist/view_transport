@@ -84,6 +84,9 @@ class UserEntity implements IUserEntity
 
         // TODO: Implement addUser() method.
     }
+    function getUserRoles() {
+        return $this->_DAO->select(new SelectUserRoles());
+    }
 }
 
 class SelectAllUsers implements IEntitySelect
@@ -145,6 +148,19 @@ class SelectUserRole implements IEntitySelect
     function getSelectQuery()
     {
         return "select `user_roles`.* from `user_roles`, `users` where `userID` = '$this->id' AND `user_roles`.userRoleID = `users`.userRoleID";
+    }
+}
+
+class SelectUserRoles implements IEntitySelect
+{
+
+    function __construct()
+    {
+    }
+
+    function getSelectQuery()
+    {
+        return "select * from `user_roles`;";
     }
 }
 

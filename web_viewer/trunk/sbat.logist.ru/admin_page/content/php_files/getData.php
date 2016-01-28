@@ -4,21 +4,59 @@ try {
     $privUser = PrivilegedUser::getInstance();
     if (isset($_POST['status'])) {
         $action = $_POST['status'];
-    } elseif (isset($_POST['action'])) {
-        $action = $_POST['action'];
     } else {
         throw new DataTransferException('Не задан параметр "статус"', __FILE__);
     }
     if ($action === 'getAllPointIdPointNamePairs') {
         getAllPointIdPointNamePairs($privUser);
+    } else if ($action === 'getAllUserRoles') {
+        getAllUserRoles($privUser);
+    } else if ($action === 'getUsersData') {
+
+        $dataArray = json_decode('[{"userID": "1", "firstName":"wefwfe", "lastName":"ewrkbfif", "position": "efewerfw", "patronymic":"ergerge", "phoneNumber": "9055487552",
+            "email": "qwe@qwe.ru", "password":"lewrhbwueu23232", "userRoleRusName":"Диспетчер", "pointName":"point1"}]');
+        $json_data = array(
+            "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+            "recordsTotal" => intval(1),  // total number of records
+            "recordsFiltered" => intval(1), // total number of records after searching, if there is no searching then totalFiltered = totalData
+            "data" => $dataArray   // total data array
+        );
+        echo json_encode($json_data);
+
     } else if ($action === 'getAllRouteIdDirectionPairs') {
         getAllRouteIdDirectionPairs($privUser);
     } else if ($action === 'getAllRoutePointsDataForRouteID') {
         getAllRoutePointsDataForRouteID($privUser);
-    } else if ($action === 'remove') {
-        //removeRoutePoint($privUser);
-    } else if ($action === 'edit') {
-        //updateRoutePoint($privUser);
+    } else if ($action === 'routeEditing') {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if ($action === 'remove') {
+            removeRoutePoint($privUser);
+        } else if ($action === 'edit') {
+            updateRoutePoints($privUser);
+        } else if ($action === 'create') {
+            createRoutePoint($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
+    } else if ($action === 'userEditing') {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if ($action === 'remove') {
+            removeRoutePoint($privUser);
+        } else if ($action === 'edit') {
+            updateRoutePoints($privUser);
+        } else if ($action === 'create') {
+            createRoutePoint($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
+    } else {
+        throw new DataTransferException('Неверно задан параметр "статус"', __FILE__);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
@@ -86,21 +124,51 @@ function getAllRoutePointsDataForRouteID(PrivilegedUser $privUser)
     //throw new DataTransferException('need to fill method',__FILE__);
 }
 
+function getAllUserRoles(PrivilegedUser $privUser)
+{
+
+    $dataArray = $privUser->getUserEntity()->getUserRoles();
+    echo json_encode($dataArray);
+}
+
 function removeRoutePoint(PrivilegedUser $privUser)
 {
+    $serverAnswer = array();
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
-    $routePointID = $_POST['data'][1]['routePointID'];
-    echo $privUser->getRoutePointEntity()->deleteRoutePoint($routePointID);
+    $dataSourceArray = $_POST['data'];
+    $routePointEntity = $privUser->getRoutePointEntity();
+    foreach ($dataSourceArray as $routePointID => $dataSourceElem) {
+        $privUser->getRoutePointEntity()->deleteRoutePoint($routePointID);
+//        $sortOrder = $dataSourceElem['sortOrder'];
+//        $tLoading = $dataSourceElem['tLoading'];
+//        $pointName = $dataSourceElem['pointName'];
+//        if (!$routePointEntity->updateRoutePoint($routePointID, $sortOrder, $tLoading, $pointName)) {
+//            $privUser->getDaoEntity()->rollback();
+//            throw new DataTransferException('Данные не были обновлены', __FILE__);
+//        }
+//        $serverAnswerElem = $routePointEntity->selectRoutePointByID($routePointID)->toArray();
+//        unset($serverAnswerElem['routeID']);
+//        $serverAnswer[] = $serverAnswerElem;
+    }
 //    $dataArray = $privUser->getRouteEntity()->getAllRoutePointsDataForRouteID($routeID);
 //    echo json_encode($dataArray);
     //throw new DataTransferException('need to fill method', __FILE__);
 }
 
+function createRoutePoint(PrivilegedUser $privUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'][0];
+    echo $privUser->getRoutePointEntity()->addRoutePoint($dataSourceArray['sortOrder'], $dataSourceArray['tLoading'], $dataSourceArray['pointName'], $dataSourceArray['routeID']);
+}
+
 function updateRoutePoints(PrivilegedUser $privUser)
 {
-    //$serverAnswer = array();
+    $serverAnswer = array();
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -114,9 +182,11 @@ function updateRoutePoints(PrivilegedUser $privUser)
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
-        //$serverAnswer[] = $routeEntity->getAllRoutePointsDataForRouteID();
+        $serverAnswerElem = $routePointEntity->selectRoutePointByID($routePointID)->toArray();
+        unset($serverAnswerElem['routeID']);
+        $serverAnswer[] = $serverAnswerElem;
     }
-    echo 1;
+    echo json_encode($serverAnswer);
 //    $dataArray = $privUser->getRouteEntity()->getAllRoutePointsDataForRouteID($routeID);
 //    echo json_encode($dataArray);
     //throw new DataTransferException('need to fill method', __FILE__);

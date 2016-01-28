@@ -34,9 +34,7 @@ abstract class AuthUser
             if (!(isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password']))) {
                 $login = '';
                 if (isset($_POST['login'])) $login = $_POST['login'];
-                $password = '';
-                if (isset($_POST['password'])) $password = $_POST['password'];
-                $string = 'login: ' . $login . ' | password: ' . $password;
+                $string = 'login: ' . $login;
                 throw new AuthException('Ошибка авторизации. ' . $string);
             }
         } else {
@@ -54,7 +52,7 @@ abstract class AuthUser
         $this->sessCookieWork->startSession();
         if ($this->sessCookieWork->sessionIsValid($this->sessCookieWork->getSessionParameter('UserID'))) {
             $this->user = \DAO\UserEntity::getInstance()->selectUserByID($this->sessCookieWork->getSessionParameter('UserID'));
-            return (!is_null($this->user) && $this->user->getData('passAndSalt') === md5($_SESSION['md5'] . $this->user->getData('salt')));
+            return (!is_null($this->user) && $this->user->getData('passAndSalt') === md5($this->sessCookieWork->getSessionParameter('md5') . $this->user->getData('salt')));
         } else {
             $this->sessCookieWork->closeSession();
             return false;

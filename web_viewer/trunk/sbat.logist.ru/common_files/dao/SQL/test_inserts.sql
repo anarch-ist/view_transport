@@ -13,7 +13,7 @@ TRUNCATE invoices;
 TRUNCATE invoice_history;
 TRUNCATE route_list_history;
 TRUNCATE relations_between_route_points;
-TRUNCATE distances_between_points;
+TRUNCATE `distances_between_points`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 # insert some test data

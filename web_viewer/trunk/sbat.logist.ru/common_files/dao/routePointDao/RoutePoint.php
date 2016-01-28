@@ -25,7 +25,10 @@ class RoutePointEntity implements IRoutePointEntity
 
     function selectRoutePointByID($id)
     {
-        // TODO: Implement selectRoutePointByID() method.
+        // TODO: check selectRoutePointByID() method.
+        $answer = $this->_DAO->select(new SelectRoutePointByID($id));
+        if (!isset($answer[0])) return null;
+        return new RoutePointData($answer[0]);
     }
 
     function selectRoutePointsByRouteID($routeID)
@@ -53,10 +56,12 @@ class RoutePointEntity implements IRoutePointEntity
         return $this->_DAO->delete(new DeleteRoutePointFromRoute($RoutePointID));
     }
 
-    function addRoutePoint($Route)
+    function addRoutePoint($sortOrder, $tLoading, $pointID, $routeID)
     {
         // TODO: Implement addRoutePoint() method.
+        return $this->_DAO->insert(new AddRoutePoint($sortOrder, $tLoading, $pointID, $routeID));
     }
+
 }
 
 class DeleteRoutePointFromRoute implements IEntityDelete
@@ -70,8 +75,7 @@ class DeleteRoutePointFromRoute implements IEntityDelete
 
     function getDeleteQuery()
     {
-        throw new \MysqlException('запрос не написан для DeleteRoutePointFromRoute::getDeleteQuery');
-        //return "DELETE FROM route_points WHERE routePointID = '$this->routePointID';";
+        return "CALL deleteRoutePoint($this->routePointID);";
     }
 }
 
@@ -89,7 +93,7 @@ class UpdateRoutePoint implements IEntityUpdate
 
     function getUpdateQuery()
     {
-        return "UPDATE route_points SET sortOrder = $this->sortOrder, pointID = getPointIDByName($this->pointName), timeForLoadingOperations = $this->tLoading WHERE routePointID = 2;";
+        return "UPDATE route_points SET sortOrder = $this->sortOrder, pointID = $this->pointName, timeForLoadingOperations = $this->tLoading WHERE routePointID = $this->routePointID;";
     }
 }
 
@@ -139,5 +143,25 @@ class SelectRelationsBetweenRoutePoints implements IEntitySelect
     function getSelectQuery()
     {
         return "CALL getRelationsBetweenRoutePoints($this->id);";
+    }
+}
+
+class AddRoutePoint implements IEntityInsert
+{
+    private $sortOrder, $tLoading, $pointID, $routeID;
+
+    function __construct($sortOrder, $tLoading, $pointID, $routeID)
+    {
+        $dao = DAO::getInstance();
+        $this->sortOrder = $dao->checkString($sortOrder);
+        $this->tLoading = $dao->checkString($tLoading);
+        $this->pointID = $dao->checkString($pointID);
+        $this->routeID = $dao->checkString($routeID);
+    }
+
+    function getInsertQuery()
+    {
+        // TODO: check getInsertQuery() method.
+        return "CALL createRoutePoint($this->sortOrder, $this->tLoading, $this->pointID, $this->routeID);";
     }
 }

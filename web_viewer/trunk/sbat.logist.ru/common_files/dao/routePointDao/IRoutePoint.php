@@ -13,7 +13,7 @@ interface IRoutePointEntity
 
     function updateRoutePoint($routePointID, $sortOrder, $tLoading, $pointName);
 
-    function deleteRoutePoint($Route);
+    function deleteRoutePoint($routePointID);
 
-    function addRoutePoint($Route);
+    function addRoutePoint($sortOrder, $tLoading, $pointName, $routeID);
 }

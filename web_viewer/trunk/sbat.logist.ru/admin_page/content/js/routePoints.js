@@ -87,7 +87,7 @@ $(document).ready(function () {
                     var selectizeOption = { "label": entry.userRoleRusName, "value": entry.userRoleID };
                     selectizeOptions.push(selectizeOption);
                 });
-                var userRoleSelectize = usersEditor.field('role').inst();
+                var userRoleSelectize = usersEditor.field('userRoleRusName').inst();
 
                 userRoleSelectize.clear();
                 userRoleSelectize.clearOptions();
@@ -210,20 +210,7 @@ $(document).ready(function () {
     // routePointsDataTable and routePointsEditor
     {
         var routePointsEditor = new $.fn.dataTable.Editor({
-            ajax: {
-                create: {
-                    type: 'POST',
-                    url: 'content/getData.php'
-                },
-                edit: {
-                    type: 'POST',
-                    url: 'content/getData.php'
-                },
-                remove: {
-                    type: 'POST',
-                    url: 'content/getData.php'
-                }
-            },
+            ajax: 'content/getData.php',
             table: '#routePointsTable',
             idSrc: 'routePointID',
 
@@ -260,15 +247,15 @@ $(document).ready(function () {
 
         // transfrom string like 18ч.30м. to 18*60+30
         routePointsEditor.on('preSubmit', function (e, data, action) {
+            data.status = 'routeEditing';
             if (action === 'create' || action === 'edit') {
                 //
                 //console.log(data.data[0].tLoading);
                 //data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
                 for (var i in data.data) {
-                    data = data.data[i];
-                    break;
+                    data.data[i].routeID = $("#routeSelect option")[0].value;
+                    data.data[i].tLoading = stringToMinutes(data.data[i].tLoading);
                 }
-                data.tLoading = stringToMinutes(data.tLoading);
             }
         });
 
@@ -321,7 +308,7 @@ $(document).ready(function () {
         var relationsBetweenRoutePointsEditor = new $.fn.dataTable.Editor({
             ajax: {
                 edit: {
-                    type: 'PUT',
+                    type: 'POST',
                     url: 'content/getData.php'
                 }
             },
@@ -464,20 +451,7 @@ $(document).ready(function () {
     // $usersDataTable and usersEditor
     {
         var usersEditor = new $.fn.dataTable.Editor( {
-            ajax: {
-                create: {
-                    type: 'POST',
-                    url: 'content/getData.php'
-                },
-                edit: {
-                    type: 'PUT',
-                    url: 'content/getData.php'
-                },
-                remove: {
-                    type: 'DELETE',
-                    url: 'content/getData.php'
-                }
-            },
+            ajax: 'content/getData.php',
             table: '#usersTable',
             idSrc: 'userID',
 
@@ -522,8 +496,11 @@ $(document).ready(function () {
 
         // transform password to md5
         usersEditor.on('preSubmit', function (e, data, action) {
+            data.status = 'userEditing';
             if (action === 'create' || action === 'edit') {
-                data.data[0].password = calcMD5(data.data[0].password);
+                for (i in data.data) {
+                    data.data[i].password = calcMD5(data.data[i].password);
+                }
             }
         });
 
@@ -532,12 +509,18 @@ $(document).ready(function () {
             email: "qwe@qwe.ru", password:"lewrhbwueu23232", userRoleRusName:"Диспетчер", pointName:"point1"}];
 
         var $usersDataTable =  $("#usersTable").DataTable({
-                ajax: 'content/getData.php',
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "content/getData.php", // json datasource
+                    type: "post",  // method  , by default get
+                    data: {"status": "getUsersData"}
+                },
                 dom: 'Bfrtip',
                 language: {
                     url:'/localization/dataTablesRus.json'
                 },
-                data: exampleData,
+
                 select: {
                     style: 'single'
                 },

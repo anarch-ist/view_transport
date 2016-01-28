@@ -28,7 +28,6 @@
 
     <!--custom-->
     <script src="content/js/routePoints.js"></script>
-    <script src="content/js/users.js"></script>
 
 </head>
 <body>
