@@ -59,11 +59,11 @@ try {
         }
         $action = $_POST['action'];
         if ($action === 'remove') {
-            removeRoutePoint($privUser);
+//            removeRoutePoint($privUser);
         } else if ($action === 'edit') {
-            updateRoutePoints($privUser);
+//            updateRoutePoints($privUser);
         } else if ($action === 'create') {
-            createRoutePoint($privUser);
+//            createRoutePoint($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
@@ -175,21 +175,24 @@ function createRoutePoint(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
     $dataSourceArray = $_POST['data'][0];
-    echo $privUser->getRoutePointEntity()->addRoutePoint($dataSourceArray['sortOrder'], $dataSourceArray['tLoading'], $dataSourceArray['pointName'], $dataSourceArray['routeID']);
+    $responce = array('data' => $dataSourceArray);
+    if ($privUser->getRoutePointEntity()->addRoutePoint($dataSourceArray['sortOrder'], $dataSourceArray['tLoading'], $dataSourceArray['pointName'], $dataSourceArray['routeID'])) {
+        echo json_encode($responce);
+    }
 }
 
 function updateDaysOfWeek(PrivilegedUser $privUser)
 {
     if (!isset($_POST['routeID'])) {
-        throw new DataTransferException('Не задан параметр "идентификатор маршрута"',__FILE__);
+        throw new DataTransferException('Не задан параметр "идентификатор маршрута"', __FILE__);
     }
     if (!isset($_POST['daysOfWeek'])) {
-        throw new DataTransferException('Не задан параметр "Дни недели"',__FILE__);
+        throw new DataTransferException('Не задан параметр "Дни недели"', __FILE__);
     }
-    if ($privUser->getRouteEntity()->updateRouteDaysOfWeek($_POST['routeID'],$_POST['daysOfWeek'])) {
+    if ($privUser->getRouteEntity()->updateRouteDaysOfWeek($_POST['routeID'], $_POST['daysOfWeek'])) {
         echo json_encode($_POST['daysOfWeek']);
     } else {
-        throw new DataTransferException('нет данных для updateDaysOfWeek',__FILE__);
+        throw new DataTransferException('нет данных для updateDaysOfWeek', __FILE__);
     }
 //    if (!isset($_POST['data'])) {
 //        throw new DataTransferException('Не задан параметр "data"', __FILE__);
@@ -201,26 +204,26 @@ function updateDaysOfWeek(PrivilegedUser $privUser)
 function updateStartRouteTime(PrivilegedUser $privUser)
 {
     if (!isset($_POST['routeID'])) {
-        throw new DataTransferException('Не задан параметр "идентификатор маршрута"',__FILE__);
+        throw new DataTransferException('Не задан параметр "идентификатор маршрута"', __FILE__);
     }
     if (!isset($_POST['firstPointArrivalTime'])) {
-        throw new DataTransferException('Не задан параметр "Старт маршрута"',__FILE__);
+        throw new DataTransferException('Не задан параметр "Старт маршрута"', __FILE__);
     }
-    if ($privUser->getRouteEntity()->updateStartRouteTime($_POST['routeID'],$_POST['firstPointArrivalTime'].':00')) {
+    if ($privUser->getRouteEntity()->updateStartRouteTime($_POST['routeID'], $_POST['firstPointArrivalTime'] . ':00')) {
         echo $_POST['firstPointArrivalTime'];
     } else {
-        throw new DataTransferException('нет данных для updateStartRouteTime',__FILE__);
+        throw new DataTransferException('нет данных для updateStartRouteTime', __FILE__);
     }
 }
 
 function relationsBetweenRoutePoints(PrivilegedUser $privUser)
 {
     if (!isset($_POST['data'])) {
-        throw new DataTransferException('Не задан параметр "данные"',__FILE__);
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
     }
-    foreach($_POST['data'] as $ids => $elem) {
-        $id = explode('_',$ids);
-        $privUser->getRoutePointEntity()->updateRelationBetweenRoutePoints($id[0],$id[1],$elem['timeForDistance']);
+    foreach ($_POST['data'] as $ids => $elem) {
+        $id = explode('_', $ids);
+        $privUser->getRoutePointEntity()->updateRelationBetweenRoutePoints($id[0], $id[1], $elem['timeForDistance']);
     }
 //    if ($privUser->getRouteEntity()->updateStartRouteTime($_POST['routeID'],$_POST['firstPointArrivalTime'].':00')) {
 //        echo $_POST['firstPointArrivalTime'];
@@ -245,9 +248,9 @@ function updateRoutePoints(PrivilegedUser $privUser)
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
-        $serverAnswerElem = $routePointEntity->selectRoutePointByID($routePointID)->toArray();
-        unset($serverAnswerElem['routeID']);
-        $serverAnswer[] = $serverAnswerElem;
+        $serverAnswerElem = $dataSourceArray[$routePointID];
+        $serverAnswerElem['routePointID'] = $routePointID;
+        $serverAnswer['data'] = $serverAnswerElem;
     }
     echo json_encode($serverAnswer);
 //    $dataArray = $privUser->getRouteEntity()->getAllRoutePointsDataForRouteID($routeID);

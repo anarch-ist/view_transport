@@ -1093,7 +1093,8 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
       pointFirst.pointName                                  AS `pointNameFirst`,
       pointSecond.pointName                                 AS `pointNameSecond`,
       timeForDistance,
-      distance
+      distance,
+      routePointFirst.sortOrder
     FROM routes
       JOIN (
           route_points AS routePointFirst,
@@ -1104,11 +1105,10 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
         ) ON
             (routePointFirst.routePointID = routePointIDFirst AND routePointSecond.routePointID = routePointIDSecond AND
              routePointFirst.routeID = `routes`.routeID AND routePointSecond.routeID = `routes`.routeID AND
-             routePointFirst.pointID = pointFirst.pointID AND routePointSecond.pointID = pointSecond.pointID
-              )
+             routePointFirst.pointID = pointFirst.pointID AND routePointSecond.pointID = pointSecond.pointID)
       LEFT JOIN (`distances_between_points`)
         ON
-          (pointIDFirst = routePointFirst.pointID AND pointIDSecond = routePointSecond.pointID)
+          (pointIDFirst = routePointFirst.pointID AND pointIDSecond = routePointSecond.pointID) OR (pointIDFirst = routePointSecond.pointID AND pointIDSecond = routePointFirst.pointID)
     WHERE routes.RouteID = _routeID
     ORDER BY routePointFirst.sortOrder;
   END;

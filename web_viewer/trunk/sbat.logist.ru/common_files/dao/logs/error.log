@@ -1,9 +1,0 @@
-DataTransferException: неправильный формат времени на странице E:\web\www\sbat.logist.ru\common_files\dao\routeDao\Route.php
-DataTransferException: неправильный формат времени на странице E:\web\www\sbat.logist.ru\common_files\dao\routeDao\Route.php
-DataTransferException: нет данных для updateDaysOfWeek на странице E:\web\www\sbat.logist.ru\admin_page\content\php_files\getData.php
-DataTransferException: нет данных для updateDaysOfWeek на странице E:\web\www\sbat.logist.ru\admin_page\content\php_files\getData.php
-DataTransferException: Не задан параметр "статус" на странице E:\web\www\sbat.logist.ru\admin_page\content\php_files\getData.php
-DataTransferException: Неверно задан параметр "действие" на странице E:\web\www\sbat.logist.ru\admin_page\content\php_files\getData.php
-DataTransferException: Не задан параметр "статус" на странице C:\web\wamp\www\sbat.logist.ru\admin_page\content\php_files\getData.php
-MysqlException: Ошибка в запросе: Column 'routePointIDFirst' cannot be null. Запрос: CALL createRoutePoint(1, 3244, 1, 1);
-MysqlException: Ошибка в запросе: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1. Запрос: SELECT * FROM `routes` WHERE `routeID` = 
