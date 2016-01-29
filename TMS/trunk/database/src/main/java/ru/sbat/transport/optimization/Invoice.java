@@ -95,9 +95,9 @@ public class Invoice {
      * @return day of week from date
      */
     public int getWeekDay(){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(this.getCreationDate());
-        return calendar.get(Calendar.DAY_OF_WEEK);
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(this.getCreationDate());
+        return this.getCreationDate().getDay() + 1;
     }
 
     @Override

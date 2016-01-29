@@ -27,7 +27,7 @@ public interface IOptimizer {
 
     Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException;
 
-    Date[] getPossibleDepartureDate(Route route, Invoice invoice);
+    ArrayList<Date> getPossibleDepartureDate(Route route, Invoice invoice);
 
     Date getPossibleArrivalDate(Route route, Invoice invoice, Date date);
 

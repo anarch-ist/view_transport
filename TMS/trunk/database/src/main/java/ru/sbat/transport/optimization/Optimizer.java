@@ -36,7 +36,7 @@ public class Optimizer implements IOptimizer {
                 }
                 if (route.getDeparturePoint().equals(departurePoint) &&
                         route.getArrivalPoint().equals(deliveryPoint)) {
-                    Date[] possibleDepartureDate = getPossibleDepartureDate(route, invoice);
+                    ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
                     for(Date date: possibleDepartureDate){
                         if(isFittingForDeliveryTime(route, invoice, date)){
                             possibleRouteForInvoice.add(route);
@@ -58,36 +58,44 @@ public class Optimizer implements IOptimizer {
      * @return array of three possible departure date
      */
     @Override
-    public Date[] getPossibleDepartureDate(Route route, Invoice invoice){
-        Date creationDate = invoice.getCreationDate();
+    public ArrayList<Date> getPossibleDepartureDate(Route route, Invoice invoice){
+        ArrayList<Date> result = new ArrayList<>();
+        Date invoiceCreationDate = new Date(invoice.getCreationDate().getTime());
+        Date plannedDeliveryDate = invoice.getRequest().getPlannedDeliveryTime();
+        int timeOfCreation = invoiceCreationDate.getHours()*60 + invoiceCreationDate.getMinutes();
         int[] timeDeparture = route.splitToComponentTime(route.getDepartureTime());
-        creationDate.setHours(timeDeparture[0]);
-        creationDate.setMinutes(timeDeparture[1]);
-        Date date1 = creationDate;
-        int differenceWeekDays = route.getWeekDayOfDepartureTime() - invoice.getWeekDay();
+        invoiceCreationDate.setHours(timeDeparture[0]);
+        invoiceCreationDate.setMinutes(timeDeparture[1]);
+        Date date = invoiceCreationDate;
+        int differenceWeekDays = route.getWeekDayOfDepartureTime() - (invoiceCreationDate.getDay()+1);
         if(differenceWeekDays > 0){
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date1);
+            calendar.setTime(date);
             calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
-            date1.setTime(calendar.getTimeInMillis());
-        }else if(differenceWeekDays == 0 &&((invoice.getCreationDate().getHours()*60 + invoice.getCreationDate().getMinutes()) < route.getDepartureTime())){
-            date1 = creationDate;
+            date.setTime(calendar.getTimeInMillis());
+        }else if(differenceWeekDays == 0 &&(timeOfCreation < route.getDepartureTime())){
+            date = invoiceCreationDate;
         }else {
-            int tmp = 7 - (invoice.getWeekDay() - route.getWeekDayOfDepartureTime());
+            int tmp = 7 - ((invoiceCreationDate.getDay()+1) - route.getWeekDayOfDepartureTime());
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date1);
+            calendar.setTime(date);
             calendar.add(Calendar.DAY_OF_MONTH, tmp);
-            date1.setTime(calendar.getTimeInMillis());
+            date.setTime(calendar.getTimeInMillis());
         }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date1);
-        calendar.add(Calendar.DAY_OF_MONTH, 7);
-        Date date2 = new Date(calendar.getTimeInMillis());
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.setTime(date2);
-        calendar2.add(Calendar.DAY_OF_MONTH, 7);
-        Date date3 = new Date(calendar2.getTimeInMillis());
-        Date[] result = new Date[]{date1, date2, date3};
+        if(date.before(plannedDeliveryDate) && isFittingForDeliveryTime(route, invoice, date)){
+            result.add(date);
+        }
+        while (true) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, 7);
+            date = new Date(calendar.getTimeInMillis());
+            if(date.before(plannedDeliveryDate) && isFittingForDeliveryTime(route, invoice, date)) {
+                result.add(date);
+            }else{
+                break;
+            }
+        }
         return result;
     }
 
@@ -101,19 +109,27 @@ public class Optimizer implements IOptimizer {
     @Override
     public boolean isFittingForDeliveryTime(Route route, Invoice invoice, Date date) {
         boolean result = false;
-        Date plannedDeliveryTime = invoice.getRequest().getPlannedDeliveryTime();
+        Date plannedDeliveryTime = new Date(invoice.getRequest().getPlannedDeliveryTime().getTime());
         if(getPossibleArrivalDate(route, invoice, date).before(plannedDeliveryTime)){
             result = true;
         }
         return result;
     }
 
+    /** Determines arrival date for certain route
+     *
+     * @param route
+     * @param invoice
+     * @param date
+     * @return actual delivery date after loading operations
+     */
     @Override
     public Date getPossibleArrivalDate(Route route, Invoice invoice, Date date){
         Calendar calendar = Calendar.getInstance();
-        date.setHours(route.getActualDeliveryTime().getHours());
-        date.setMinutes(route.getActualDeliveryTime().getMinutes());
-        calendar.setTime(date);
+        Date tmp = new Date(date.getTime());
+        tmp.setHours(route.getActualDeliveryTime().getHours());
+        tmp.setMinutes(route.getActualDeliveryTime().getMinutes());
+        calendar.setTime(tmp);
         int countDays = route.getDaysCountOfRoute();
         calendar.add(Calendar.DAY_OF_MONTH, countDays);
         Date actualDeliveryDate = new Date(calendar.getTimeInMillis());
