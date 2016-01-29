@@ -1043,12 +1043,8 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
         users.pointID = points.pointID AND
         users.userRoleID = user_roles.userRoleID
         ) ';
-
-
-    SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
-
     SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
-
+    SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
     SET @limitPart = ' LIMIT ?, ? ';
 
     SET @sqlString = CONCAT(@mainPart, @havingPart, @orderByPart, @limitPart);

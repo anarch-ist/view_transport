@@ -99,6 +99,22 @@ $(document).ready(function () {
         // TODO load distances between points
     }
 
+
+    $( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+    $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+
+    //$("#menu").menu();
+    //var $routesCreation = $("#routesCreation"),
+    //    $usersCreation = $("#usersCreation");
+    //$("#routes").on("click", function() {
+    //    $routesCreation.show();
+    //    $usersCreation.hide();
+    //});
+    //$("#users").on("click", function() {
+    //    $routesCreation.hide();
+    //    $usersCreation.show();
+    //});
+
     $("#daysOfWeekSelect").buttonset();
     $("#updateDaysOfWeek").button().click(function (e) {
 
@@ -520,8 +536,8 @@ $(document).ready(function () {
         });
 
         // example data for exchange with server
-        var exampleData = [{userID: 1, firstName:"wefwfe", lastName:"ewrkbfif", position: "efewerfw", patronymic:"ergerge", phoneNumber: "9055487552",
-            email: "qwe@qwe.ru", password:"lewrhbwueu23232", userRoleRusName:"Диспетчер", pointName:"point1"}];
+        //var exampleData = [{userID: 1, firstName:"wefwfe", lastName:"ewrkbfif", position: "efewerfw", patronymic:"ergerge", phoneNumber: "9055487552",
+        //    email: "qwe@qwe.ru", password:"lewrhbwueu23232", userRoleRusName:"Диспетчер", pointName:"point1"}];
 
         var $usersDataTable =  $("#usersTable").DataTable({
                 processing: true,

@@ -31,83 +31,104 @@
 
 </head>
 <body>
-<div>
-    <div id="routesCreation">
-        <label for="routeSelect">Направление: </label>
-        <select id="routeSelect"></select>
-        <div>
-            <div style="border: 3px solid lightcoral">
+<!--<ul id="menu">-->
+<!--    <li id="routes">Маршруты</li>-->
+<!--    <li id="users">Пользователи</li>-->
+<!--    <li id="distances" class="ui-state-disabled">Расстояния между пунктами</li>-->
+<!--</ul>-->
 
-                <table>
-                    <tr>
-                        <td><label for="daysOfWeekSelect">Дни недели: </label></td>
-                        <td><div id="daysOfWeekSelect" style="display: inline-block">
-                                <input type="checkbox" id="monday"><label for="monday">ПН</label>
-                                <input type="checkbox" id="tuesday"><label for="tuesday">ВТ</label>
-                                <input type="checkbox" id="wednesday"><label for="wednesday">СР</label>
-                                <input type="checkbox" id="thursday"><label for="thursday">ЧТ</label>
-                                <input type="checkbox" id="friday"><label for="friday">ПТ</label>
-                                <input type="checkbox" id="saturday"><label for="saturday">СБ</label>
-                                <input type="checkbox" id="sunday"><label for="sunday">ВС</label>
-                            </div></td>
-                        <td><button id="updateDaysOfWeek" style="display: inline-block">Обновить</button></td>
-                    </tr>
-                    <tr>
-                        <td><label for="startRouteTimeInput">Старт маршрута: </label></td>
-                        <td><input id="startRouteTimeInput"></td>
-                        <td><button id="updateStartRouteTime">Обновить</button></td>
-                    </tr>
-                </table>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Маршруты</a></li>
+        <li><a href="#tabs-2">Пользователи</a></li>
+    </ul>
+    <div id="tabs-1">
+        <h2>Маршруты</h2>
+        <div id="routesCreation">
+            <label for="routeSelect">Направление: </label>
+            <select id="routeSelect"></select>
 
-                <img id="ajaxLoaderGif" src="../admin_page/content/res/ajax-loader-small.gif" style="display: none">
+            <div>
+                <div>
+                    <table>
+                        <tr>
+                            <td><label for="daysOfWeekSelect">Дни недели: </label></td>
+                            <td>
+                                <div id="daysOfWeekSelect" style="display: inline-block">
+                                    <input type="checkbox" id="monday"><label for="monday">ПН</label>
+                                    <input type="checkbox" id="tuesday"><label for="tuesday">ВТ</label>
+                                    <input type="checkbox" id="wednesday"><label for="wednesday">СР</label>
+                                    <input type="checkbox" id="thursday"><label for="thursday">ЧТ</label>
+                                    <input type="checkbox" id="friday"><label for="friday">ПТ</label>
+                                    <input type="checkbox" id="saturday"><label for="saturday">СБ</label>
+                                    <input type="checkbox" id="sunday"><label for="sunday">ВС</label>
+                                </div>
+                            </td>
+                            <td>
+                                <button id="updateDaysOfWeek" style="display: inline-block">Обновить</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="startRouteTimeInput">Старт маршрута: </label></td>
+                            <td><input id="startRouteTimeInput"></td>
+                            <td>
+                                <button id="updateStartRouteTime">Обновить</button>
+                            </td>
+                        </tr>
+                    </table>
 
-                <div >
-                    <div style="width: 49%; display: inline-block">
-                        <table id="routePointsTable" >
-                            <thead>
-                            <tr>
-                                <th>Порядковый номер пункта</th>
-                                <th>Пункт</th>
-                                <th>Продолжительность разгрузочно-погрузочных операций</th>
-                            </tr>
-                            </thead>
-                        </table>
+                    <img id="ajaxLoaderGif" src="../admin_page/content/res/ajax-loader-small.gif" style="display: none">
+
+                    <div>
+                        <div style="width: 49%; display: inline-block">
+                            <table id="routePointsTable">
+                                <thead>
+                                <tr>
+                                    <th>Порядковый номер пункта</th>
+                                    <th>Пункт</th>
+                                    <th>Продолжительность разгрузочно-погрузочных операций</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+
+                        <div style="width: 50%; display: inline-block">
+                            <table id="relationsBetweenRoutePointsTable">
+                                <thead>
+                                <tr>
+                                    <th>Начальный пункт</th>
+                                    <th>Конечный пункт</th>
+                                    <th>Расстояние</th>
+                                    <th>Время в пути</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+
                     </div>
-
-                    <div style="width: 50%; display: inline-block">
-                        <table id="relationsBetweenRoutePointsTable" >
-                            <thead>
-                            <tr>
-                                <th>Начальный пункт</th>
-                                <th>Конечный пункт</th>
-                                <th>Расстояние</th>
-                                <th>Время в пути</th>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="usersCreation">
-        <table id="usersTable" >
-            <thead>
-            <tr>
-                <th>Имя</th>
-                <th>Фамилия</th>
-                <th>Отчество</th>
-                <th>Должность</th>
-                <th>Номер телефона</th>
-                <th>Электронная почта</th>
-                <th>Пароль</th>
-                <th>Роль</th>
-                <th>Пункт</th>
-            </tr>
-            </thead>
-        </table>
+    <div id="tabs-2">
+        <h2>Пользователи</h2>
+        <div id="usersCreation">
+            <table id="usersTable">
+                <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th>Отчество</th>
+                    <th>Должность</th>
+                    <th>Номер телефона</th>
+                    <th>Электронная почта</th>
+                    <th>Пароль</th>
+                    <th>Роль</th>
+                    <th>Пункт</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
     </div>
 </div>
 </body>
