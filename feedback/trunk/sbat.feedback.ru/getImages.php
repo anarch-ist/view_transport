@@ -1,5 +1,9 @@
 <?php
 
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Expires: " . date("r"));
+
+
 $dir = "thumb";
 if (is_dir($dir)) {
     if ($dd = opendir($dir)) {
@@ -13,7 +17,7 @@ if (is_dir($dir)) {
 
     $n = $_GET["n"];
     $response = "";
-    for ($i = $n; $i < $n + 15; $i++) {
+    for ($i = $n; $i < $n + 500; $i++) {
         $response = $response . $files[$i % count($files)] . ';';
     }
     echo $response;

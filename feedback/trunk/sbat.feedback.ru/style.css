@@ -2,8 +2,8 @@
 /* CSS */
 
 body{
-	background:#222;
-	color:#666;
+	background: #749A9F;
+	color:#B0C4DE;
 }
 
 #header{
@@ -41,22 +41,29 @@ a{
 #container{
 	margin: 0 auto;
 	width:1400px;
-	border:1px solid #333;
+	background:#F5F5F5;
+	border:1px solid #008080;
+	-o-border-radius: 5px;
+	-khtml-border-radius: 5px;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
+	border-radius: 10px;
 	font-family:Verdana, Geneva, sans-serif;
 	text-align:center;
 }
 
 img{
-	border:10px solid #444;
+	border:10px solid #2F4F4F;
+	-o-border-radius: 5px;
+	-khtml-border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 10px;
+	border-radius: 10px;
 	margin: 15px;
 }
 
 img:hover{
-	border-color:#555;
+	border-color:#008080;
 	-moz-box-shadow: 0px 0px 15px #111;
 	-webkit-box-shadow: 0px 0px 15px #111;
 }
