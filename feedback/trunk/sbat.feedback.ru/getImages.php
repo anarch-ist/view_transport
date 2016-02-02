@@ -12,14 +12,15 @@ if (is_dir($dir)) {
                 $files[] = $f;
         closedir($dd);
     }
-
-    shuffle($files);
+shuffle($files);
 
     $n = $_GET["n"];
     $response = "";
-    for ($i = $n; $i < $n + 500; $i++) {
+
+    for ($i = $n; $i < $n + 15; $i++) {
         $response = $response . $files[$i % count($files)] . ';';
     }
     echo $response;
 }
 ?>
+
