@@ -28,12 +28,12 @@ public class JSONReadFromFileTest {
 
     @Before
     public void setUp() throws Exception {
-        URL resource = JSONReadFromFileTest.class.getResource("example1.pkg");
+        URL resource = JSONReadFromFileTest.class.getResource("EKA_fixed.pkg");
         path = Paths.get(resource.toURI());
         inputStream = resource.openStream();
 
     }
-
+    // ^\".*:\s+\"
     @After
     public void tearDown() throws Exception {
 
@@ -47,15 +47,14 @@ public class JSONReadFromFileTest {
         //JsonFileFixer.fix(path);
         JSONObject jsonObject = JSONReadFromFile.read(inputStream);
 
+        JSONObject dataFrom1C = (JSONObject) jsonObject.get("dataFrom1C");
+        System.out.println(dataFrom1C.get("server"));
+        System.out.println(dataFrom1C.get("packageNumber"));
+        System.out.println(dataFrom1C.get("created"));
 
-//        JSONObject dataFrom1C = (JSONObject) jsonObject.get("dataFrom1C");
-//        System.out.println(dataFrom1C.get("server"));
-//        System.out.println(dataFrom1C.get("packageNumber"));
-//        System.out.println(dataFrom1C.get("created"));
-
-//        JSONObject packageData = (JSONObject) dataFrom1C.get("packageData");
-//        JSONArray updatePointsArray = (JSONArray) packageData.get("updatePoints");
-//        updatePointsArray.get(0);
+        JSONObject packageData = (JSONObject) dataFrom1C.get("packageData");
+        JSONArray updatePointsArray = (JSONArray) packageData.get("updatePoints");
+        System.out.println(updatePointsArray.get(0));
 
 
 

@@ -20,7 +20,7 @@ public class JSONReadFromFile {
 
     public static JSONObject read(InputStream jsonIn) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(jsonIn, "cp1251"))) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(jsonIn, "UTF-8"))) {
             Object obj = parser.parse(in);
             return (JSONObject) obj;
         }
