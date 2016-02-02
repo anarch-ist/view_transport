@@ -5,7 +5,6 @@ header("Expires: " . date("r"));
 $files = array();
 session_start();
 if (!isset($_COOKIE['PHPSESSID'])) {
-
     $dir = "thumb";
     if (is_dir($dir)) {
         if ($dd = opendir($dir)) {
@@ -15,21 +14,16 @@ if (!isset($_COOKIE['PHPSESSID'])) {
             closedir($dd);
         }
         shuffle($files);
-
-        $n = $_GET["n"];
-        $response = "";
-
-        for ($i = $n; $i < $n + 15; $i++) {
-            $response = $response . $files[$i % count($files)] . ';';
-        }
-        echo $response;
+		$_SESSION['files'] = $files;
     }
+} else {
+	$files = $_SESSION['files'];
 }
 $n = $_GET["n"];
 $response = "";
 
 for ($i = $n; $i < $n + 15; $i++) {
-    $response = $response . $files[$i % count($files)] . ';';
+    $response .= $files[$i % count($files)] . ';';
 }
 echo $response;
 ?>

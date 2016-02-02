@@ -30,7 +30,7 @@
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
 
-         //   n += 15;
+            n += 15;
             for (i=1;i<500;i++) {
                 xmlhttp.onreadystatechange = putImages;
             }
