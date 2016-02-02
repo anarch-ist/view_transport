@@ -1,5 +1,10 @@
 (function () {
-
+	function delCookie(name) {
+		document.cookie = name + "=" + "; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+	}
+	
+	delCookie('PHPSESSID');
+	
     var pageHeight = document.documentElement.clientHeight;
     var scrollPosition;
     var n = 500;
@@ -30,7 +35,7 @@
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
 
-            n += 15;
+            // n += 15;
             for (i=1;i<500;i++) {
                 xmlhttp.onreadystatechange = putImages;
             }
