@@ -2,7 +2,7 @@
 
     var pageHeight = document.documentElement.clientHeight;
     var scrollPosition;
-    var n = 0;
+    var n = 500;
     var xmlhttp;
 
     setInterval(function () {
@@ -30,8 +30,10 @@
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
 
-            n += 15;
-            xmlhttp.onreadystatechange = putImages;
+         //   n += 15;
+            for (i=1;i<500;i++) {
+                xmlhttp.onreadystatechange = putImages;
+            }
         }
     }
 
@@ -51,7 +53,6 @@
                 var files = resp.split(";");
                 var j = 0;
                 for (var i = 0; i < files.length; i++) {
-
 
                     if (files[i] != "") {
                         var imageElement = '<a class="fancybox" rel="group" href="img/' + files[i] + '"><img alt="" src="thumb/' + files[i] + '" /></a>';
