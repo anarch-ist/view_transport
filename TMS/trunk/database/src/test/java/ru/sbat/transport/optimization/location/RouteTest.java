@@ -1,55 +1,68 @@
 package ru.sbat.transport.optimization.location;
 
 import org.junit.*;
+import ru.sbat.transport.optimization.schedule.PlannedSchedule;
+
+import java.util.Collections;
 
 public class RouteTest {
 
+    static PlannedSchedule plannedSchedule = new PlannedSchedule();
+    static Route route = new Route();
+    static WarehousePoint warehousePoint1 = new WarehousePoint();
+    static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint();
+    static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
+
+    //----------СЛУЖЕБНЫЕ МЕТОДЫ--------------
+    public void createPlannedSchedule(){
+        initRoute(
+                route,
+                createRoutePoint(createCharacteristicsOfCar(10, 15, 13054.5), warehousePoint1,         2, 930, 600,   0, 120),
+                createRoutePoint(createCharacteristicsOfCar(15, 25, 17894), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
+                createRoutePoint(createCharacteristicsOfCar(20, 30, 25040), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
+        );
+        plannedSchedule.add(route);
+    }
+
+    public void initRoute(Route route, RoutePoint... routePoints){
+        Collections.addAll(route, routePoints);
+    }
+
+    public RoutePoint createRoutePoint(CharacteristicsOfCar characteristicsOfCar,  Point departurePoint, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint){
+        RoutePoint result = new RoutePoint();
+        result.setCharacteristicsOfCar(characteristicsOfCar);
+        result.setDepartureTime(departureTime);
+        result.setDayOfWeek(dayOfWeek);
+        result.setTimeToNextPoint(timeToNextPoint);
+        result.setDistanceToNextPoint(distanceToNextPoint);
+        result.setDeparturePoint(departurePoint);
+        result.setLoadingOperationsTime(loadingOperationsTime);
+        return result;
+    }
+
+    public CharacteristicsOfCar createCharacteristicsOfCar(double capacityCar, double volumeCar, double cost){
+        CharacteristicsOfCar result = new CharacteristicsOfCar();
+        result.setCapacityCar(capacityCar);
+        result.setVolumeCar(volumeCar);
+        result.setCost(cost);
+        return result;
+    }
+    //-------------END СЛУЖЕБНЫЕ МЕТОДЫ-------------
+
     @Test
     public void testGetFullDistance() throws Exception {
-        Route route = new Route();
-        RoutePoint routePoint1 = new RoutePoint();
-        RoutePoint routePoint2 = new RoutePoint();
-        RoutePoint routePoint3 = new RoutePoint();
-        routePoint1.setDistanceToNextPoint(150.0);
-        routePoint2.setDistanceToNextPoint(130.0);
-        routePoint3.setDistanceToNextPoint(550.0);
-        route.add(routePoint1);
-        route.add(routePoint2);
-        route.add(routePoint3);
-        if (route.getFullDistance() != 830) throw new AssertionError();
+
+        if (route.getFullDistance() != 470) throw new AssertionError();
     }
 
     @Test
     public void testGetFullTime() throws Exception {
-        Route route = new Route();
-        RoutePoint routePoint1 = new RoutePoint();
-        RoutePoint routePoint2 = new RoutePoint();
-        RoutePoint routePoint3 = new RoutePoint();
-        routePoint1.setTimeToNextPoint(10);
-        routePoint2.setTimeToNextPoint(15);
-        routePoint3.setTimeToNextPoint(0);
-        routePoint1.setLoadingOperationsTime(0);
-        routePoint2.setLoadingOperationsTime(2);
-        routePoint3.setLoadingOperationsTime(2);
-        route.add(routePoint1);
-        route.add(routePoint2);
-        route.add(routePoint3);
-        if (route.getFullTime() != 29) throw new AssertionError();
+        if (route.getFullTime() != 1770) throw new AssertionError();
     }
 
     @Test
     public void testGetDepartureTime() throws Exception {
-        Route route = new Route();
-        RoutePoint routePoint1 = new RoutePoint();
-        RoutePoint routePoint2 = new RoutePoint();
-        RoutePoint routePoint3 = new RoutePoint();
-        routePoint1.setDepartureTime(15);
-        routePoint2.setDepartureTime(13);
-        routePoint3.setDepartureTime(5);
-        route.add(routePoint1);
-        route.add(routePoint2);
-        route.add(routePoint3);
-        if (route.getDepartureTime() != 15) throw new AssertionError();
+        if (route.getDepartureTime() != 1110) throw new AssertionError();
     }
 
     @Test
@@ -196,5 +209,27 @@ public class RouteTest {
         route.add(routePoint2);
         route.add(routePoint3);
         Assert.assertEquals(0, route.getDaysCountOfRoute());
+    }
+
+    @Test
+    public void testGetStartingCost(){
+        Route route = new Route();
+        RoutePoint routePoint1 = new RoutePoint();
+        RoutePoint routePoint2 = new RoutePoint();
+        RoutePoint routePoint3 = new RoutePoint();
+        CharacteristicsOfCar characteristicsOfCar1 = new CharacteristicsOfCar();
+        CharacteristicsOfCar characteristicsOfCar2 = new CharacteristicsOfCar();
+        CharacteristicsOfCar characteristicsOfCar3 = new CharacteristicsOfCar();
+        characteristicsOfCar1.setCost(125.5);
+        characteristicsOfCar2.setCost(56);
+        characteristicsOfCar3.setCost(100);
+        routePoint1.setCharacteristicsOfCar(characteristicsOfCar1);
+        routePoint2.setCharacteristicsOfCar(characteristicsOfCar2);
+        routePoint3.setCharacteristicsOfCar(characteristicsOfCar3);
+        route.add(routePoint1);
+        route.add(routePoint2);
+        route.add(routePoint3);
+        System.out.println(route.getStartingCost());
+        Assert.assertEquals(125.5, route.getStartingCost(), 0);
     }
 }

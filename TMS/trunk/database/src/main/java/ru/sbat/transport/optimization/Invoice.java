@@ -17,6 +17,7 @@ public class Invoice {
     private int priority;
     private Route route;
     private Date creationDate;
+    private double cost;
 
     public Date getCreationDate() {
         return creationDate;
@@ -88,6 +89,14 @@ public class Invoice {
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public double getCost() {
+        return cost;
+    }
+
+    public void setCost(double cost) {
+        this.cost = cost;
     }
 
     /** determines week day of invoice's creation date

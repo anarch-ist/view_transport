@@ -136,6 +136,11 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
     @Override
+    public double getStartingCost() {
+        return this.get(0).getCharacteristicsOfCar().getCost();
+    }
+
+    @Override
     public String toString(){
         return "Route{" +
                 "fullDistance=" + getFullDistance() + " км." +

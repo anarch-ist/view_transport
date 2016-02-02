@@ -15,4 +15,5 @@ public interface IRoute {
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
     int getDaysCountOfRoute();
+    double getStartingCost();
 }
