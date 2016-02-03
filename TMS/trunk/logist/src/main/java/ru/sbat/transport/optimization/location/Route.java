@@ -48,9 +48,9 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     @Override
     public Integer getArrivalTime() {
         int result = 0;
-        result = this.get(this.size()-2).getDepartureTime() + this.get(this.size()-2).getTimeToNextPoint();
-        if(result > 24){
-            result = result - 24;
+        result = this.get(this.size()-2).getDepartureTime() + this.get(this.size()-2).getTimeToNextPoint() + this.get(this.size()-1).getLoadingOperationsTime();
+        if(result >= 1440){
+            result = result - 1440;
         }
         return result;
     }
