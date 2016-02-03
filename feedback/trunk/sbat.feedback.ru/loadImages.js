@@ -1,13 +1,8 @@
 (function () {
-	function delCookie(name) {
-		document.cookie = name + "=" + "; expires=Thu, 01 Jan 1970 00:00:01 GMT";
-	}
-	
-	delCookie('PHPSESSID');
-	
+
     var pageHeight = document.documentElement.clientHeight;
     var scrollPosition;
-    var n = 500;
+    var n = 0;
     var xmlhttp;
 
     setInterval(function () {
@@ -30,15 +25,19 @@
             else
                 alert("Извините! Ваш браузер не поддерживает XMLHTTP!");
 
-            var url = "getImages.php?n=" + n;
+            if(n<=450) {
+                var url = "getImages.php?n=" + n;
 
-            xmlhttp.open("GET", url, true);
-            xmlhttp.send();
+                xmlhttp.open("GET", url, true);
+                xmlhttp.send();
 
-            // n += 15;
-            for (i=1;i<500;i++) {
+                n += 15;
+
                 xmlhttp.onreadystatechange = putImages;
             }
+         //  else {url = "destroy.php";
+
+              //  xmlhttp.open("GET", url, true);}
         }
     }
 
