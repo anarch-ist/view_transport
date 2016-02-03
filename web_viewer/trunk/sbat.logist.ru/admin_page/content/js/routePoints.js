@@ -278,16 +278,26 @@ $(document).ready(function () {
         });
 
         routePointsEditor.on('postSubmit', function (e, json, data, action) {
-            if (action === 'create' || action === 'edit') {
-                //TODO use minutes toString
-                //console.log(data);
+
+            var dataObject;
+            if (action === 'create') {
+                dataObject = data.data[0];
+                dataObject.tLoading = minutesToString(dataObject.tLoading);
+                $routePointsDataTable.row.add(dataObject).draw(false);
+            } else if (action === 'edit') {
+                dataObject = json.data;
                 //console.log(json);
-                //console.log(action);
+                dataObject.tLoading = minutesToString(dataObject.tLoading);
+                $routePointsDataTable.row(".selected").data(dataObject).draw(false)
+            } else if (action == 'remove') {
+
             }
         });
 
         var $routePointsDataTable = $("#routePointsTable").DataTable({
                 "dom": 'Bt', // show only buttons and table with no decorations
+                "idSrc": 'routePointID',
+                //ajax: 'content/getData.php',
                 language: {
                     url: '/localization/dataTablesRus.json'
                 },
@@ -361,6 +371,18 @@ $(document).ready(function () {
                 //console.log(action);
             }
         });
+
+        //manually edit data in table
+        relationsBetweenRoutePointsEditor.on('postSubmit', function (e, json, data, action) {
+            console.log(data);
+            if (action === "edit") {
+                //$relationsBetweenRoutePointsDataTable.row.add(
+                //
+                //).draw(false);
+            }
+
+        });
+
 
         var $relationsBetweenRoutePointsDataTable = $("#relationsBetweenRoutePointsTable").DataTable({
                 "dom": 'Bt', // show only buttons and table with no decorations
