@@ -28,7 +28,7 @@ public class JSONReadFromFileTest {
 
     @Before
     public void setUp() throws Exception {
-        URL resource = JSONReadFromFileTest.class.getResource("EKA_fixed.pkg");
+        URL resource = JSONReadFromFileTest.class.getResource("EKA_second.pkg");
         path = Paths.get(resource.toURI());
         inputStream = resource.openStream();
 

@@ -27,8 +27,8 @@ public class JsonFileFixer {
 
 
     public static void main(String[] args) throws URISyntaxException, IOException {
-        //URL resource = JsonFileFixer.class.getResource("EKA.pkg");
-        URL resource = JSONReadFromFileTest.class.getResource("EKA.pkg");
+        //URL resource = JsonFileFixer.class.getResource("EKA_first.pkg");
+        URL resource = JSONReadFromFileTest.class.getResource("EKA_first.pkg");
         Path path = Paths.get(resource.toURI());
         fix(path);
     }
