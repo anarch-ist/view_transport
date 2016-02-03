@@ -9,6 +9,10 @@
         scroll();
     }, 250);
 
+    setInterval(function () {
+        scroll_delay();
+    }, 3000);
+
     function scroll() {
 
         if (navigator.appName == "Microsoft Internet Explorer")
@@ -25,7 +29,7 @@
             else
                 alert("Извините! Ваш браузер не поддерживает XMLHTTP!");
 
-            if(n<=450) {
+            if (n <= 500) {
                 var url = "getImages.php?n=" + n;
 
                 xmlhttp.open("GET", url, true);
@@ -35,10 +39,44 @@
 
                 xmlhttp.onreadystatechange = putImages;
             }
-         //  else {url = "destroy.php";
+            //  else {url = "destroy.php";
 
-              //  xmlhttp.open("GET", url, true);}
+            //  xmlhttp.open("GET", url, true);}
         }
+
+    }
+
+    function scroll_delay() {
+
+        if (navigator.appName == "Microsoft Internet Explorer")
+            scrollPosition = document.documentElement.scrollTop;
+        else
+            scrollPosition = window.pageYOffset;
+
+     //   if ((getContentHeight() - pageHeight - scrollPosition) < 1000) {
+
+            if (window.XMLHttpRequest)
+                xmlhttp = new XMLHttpRequest();
+            else if (window.ActiveXObject)
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            else
+                alert("Извините! Ваш браузер не поддерживает XMLHTTP!");
+
+            if (n <= 517) {
+                var url = "getImages.php?n=" + n;
+
+                xmlhttp.open("GET", url, true);
+                xmlhttp.send();
+
+                n += 15;
+
+                xmlhttp.onreadystatechange = putImages;
+            }
+            //  else {url = "destroy.php";
+
+            //  xmlhttp.open("GET", url, true);}
+     //   }
+
     }
 
     function getContentHeight() {
