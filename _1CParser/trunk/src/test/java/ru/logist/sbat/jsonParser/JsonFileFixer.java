@@ -25,9 +25,7 @@ import java.util.regex.Pattern;
 
 public class JsonFileFixer {
 
-
     public static void main(String[] args) throws URISyntaxException, IOException {
-        //URL resource = JsonFileFixer.class.getResource("EKA_first.pkg");
         URL resource = JSONReadFromFileTest.class.getResource("EKA_first.pkg");
         Path path = Paths.get(resource.toURI());
         fix(path);
@@ -43,7 +41,6 @@ public class JsonFileFixer {
                 builder.append((char) symbol);
             }
         }
-        //builder.toString();
 
         String jsonFileAsString = builder.toString();
         Pattern pattern = Pattern.compile("\".*\":\\s+\"(.*\"+.*)\"|\\,\\n", Pattern.UNICODE_CHARACTER_CLASS);
@@ -58,19 +55,17 @@ public class JsonFileFixer {
                     indexes.add(matcher.start(1) + i);
                 }
             }
-            //System.out.println("group 1 = " + matcher.group(1));
         }
 
         String fileAsString = new String(Files.readAllBytes(path));
         StringBuilder sb = new StringBuilder(fileAsString);
-
 
         int offset = 0;
         for (Integer index : indexes) {
             sb.deleteCharAt(index - offset);
             offset++;
         }
+
         FileUtils.writeStringToFile(path.getParent().resolve("EKA_fixed.pkg").toFile(),  sb.toString(), StandardCharsets.UTF_8);
-        //Path write = Files.write(, Arrays.asList(.toCharArray()), null);
     }
 }

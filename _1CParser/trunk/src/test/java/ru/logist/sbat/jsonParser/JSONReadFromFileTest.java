@@ -28,7 +28,7 @@ public class JSONReadFromFileTest {
 
     @Before
     public void setUp() throws Exception {
-        URL resource = JSONReadFromFileTest.class.getResource("EKA_second.pkg");
+        URL resource = JSONReadFromFileTest.class.getResource("EKA_fixed.pkg");
         path = Paths.get(resource.toURI());
         inputStream = resource.openStream();
 
@@ -54,7 +54,10 @@ public class JSONReadFromFileTest {
 
         JSONObject packageData = (JSONObject) dataFrom1C.get("packageData");
         JSONArray updatePointsArray = (JSONArray) packageData.get("updatePoints");
-        System.out.println(updatePointsArray.get(0));
+        System.out.println(updatePointsArray);
+
+
+
 
 
 
