@@ -45,26 +45,27 @@ VALUES
   ('AGENCY');
 
 CREATE TABLE points (
-  pointID     INTEGER AUTO_INCREMENT,
-  pointName   VARCHAR(128)   NOT NULL,
-  region      VARCHAR(128)   NULL,
-  timeZone    TINYINT SIGNED NULL, -- сдвиг времени по гринвичу GMT + value
-  docs        TINYINT SIGNED NULL, -- количество окон разгрузки
-  comments    LONGTEXT       NULL,
-  openTime    TIME           NULL, -- например 9:00
-  closeTime   TIME           NULL, -- например 17:00
-  district    VARCHAR(64)    NULL,
-  locality    VARCHAR(64)    NULL,
-  mailIndex   VARCHAR(6)     NULL,
-  address     VARCHAR(256)   NOT NULL,
-  email       VARCHAR(64)    NULL,
-  phoneNumber VARCHAR(16)    NULL,
-  pointTypeID VARCHAR(32)    NOT NULL,
+  pointID             INTEGER AUTO_INCREMENT,
+  pointIDExternal     INTEGER        NOT NULL,
+  pointName           VARCHAR(128)   NOT NULL,
+  region              VARCHAR(128)   NULL,
+  timeZone            TINYINT SIGNED NULL, -- сдвиг времени по гринвичу GMT + value
+  docs                TINYINT SIGNED NULL, -- количество окон разгрузки
+  comments            LONGTEXT       NULL,
+  openTime            TIME           NULL, -- например 9:00
+  closeTime           TIME           NULL, -- например 17:00
+  district            VARCHAR(64)    NULL,
+  locality            VARCHAR(64)    NULL,
+  mailIndex           VARCHAR(6)     NULL,
+  address             TEXT           NOT NULL,
+  email               VARCHAR(255)    NULL,
+  phoneNumber         VARCHAR(16)    NULL,
+  responsiblePersonId INTEGER        NULL,
+  pointTypeID         VARCHAR(32)    NOT NULL,
   PRIMARY KEY (pointID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE,
-  UNIQUE (pointName)
+    ON UPDATE CASCADE
 );
 
 -- CONSTRAINT pointIDFirst must not be equal pointIDSecond
