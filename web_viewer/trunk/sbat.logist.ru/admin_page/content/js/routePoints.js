@@ -69,7 +69,7 @@ $(document).ready(function () {
                             onRouteChanged(value);
                         }
                     });
-                onRouteChanged($("#routeSelect option")[0].value);
+                onRouteChanged(getCurrentRouteId());
             }
         );
 
@@ -103,18 +103,6 @@ $(document).ready(function () {
     $( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
     $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-    //$("#menu").menu();
-    //var $routesCreation = $("#routesCreation"),
-    //    $usersCreation = $("#usersCreation");
-    //$("#routes").on("click", function() {
-    //    $routesCreation.show();
-    //    $usersCreation.hide();
-    //});
-    //$("#users").on("click", function() {
-    //    $routesCreation.hide();
-    //    $usersCreation.show();
-    //});
-
     $("#daysOfWeekSelect").buttonset();
     $("#updateDaysOfWeek").button().click(function (e) {
 
@@ -130,7 +118,6 @@ $(document).ready(function () {
                 routeID: $routeSelectSelectize[0].selectize.items[0],
                 daysOfWeek: daysOfWeek
             },
-            // example serverData : ["monday", "friday", "saturday"]
             function (serverData) {
                 setDaysOfWeekData(JSON.parse(serverData));
                 $("#ajaxLoaderGif").hide();
@@ -148,7 +135,6 @@ $(document).ready(function () {
                 routeID: $routeSelectSelectize[0].selectize.items[0],
                 firstPointArrivalTime: $('#startRouteTimeInput').val()
             },
-            // example serverData : "17:00"
             function (serverData) {
                 setFirstPointArrivalTime(serverData);
                 $("#ajaxLoaderGif").hide();
@@ -198,33 +184,6 @@ $(document).ready(function () {
         }
     });
 
-
-    // PROTOCOL DESCRIPTION
-    // https://editor.datatables.net/manual/server
-    //Client-to-server
-    //action:
-    //On create: create
-    //On edit: edit
-    //On remove: remove
-    //data:
-    //contains routePointID and other columns with data
-    //EXAMPLE:
-    //action:"create"
-    //data[0][sortOrder]:"4"
-    //data[0][pointName]:"2"
-    //data[0][tLoading]:"743"
-    //Server-to-client
-    //{
-    //    "data": [
-    //    {
-    //        "routePointID":   "row_29",
-    //        "sortOrder": "4",
-    //        "pointName":  "point5",
-    //        "tLoading":   "564"
-    //    }
-    //    ]
-    //}
-
     // routePointsDataTable and routePointsEditor
     {
         var routePointsEditor = new $.fn.dataTable.Editor({
@@ -267,9 +226,6 @@ $(document).ready(function () {
         routePointsEditor.on('preSubmit', function (e, data, action) {
             data.status = 'routeEditing';
             if (action === 'create' || action === 'edit') {
-                //
-                //console.log(data.data[0].tLoading);
-                //data.data[0].tLoading = stringToMinutes(data.data[0].tLoading);
                 for (var i in data.data) {
                     data.data[i].routeID = $("#routeSelect option")[0].value;
                     data.data[i].tLoading = stringToMinutes(data.data[i].tLoading);
@@ -279,18 +235,33 @@ $(document).ready(function () {
 
         routePointsEditor.on('postSubmit', function (e, json, data, action) {
 
+            // refresh relations between points dataTable
+            $.post(
+                "content/getData.php",
+                {status: "getRelationsBetweenRoutePointsDataForRouteID", routeID: getCurrentRouteId(), format: "json"},
+                function (data) {
+                    data = JSON.parse(data);
+                    setRelationsBetweenRoutePointsData(data);
+                }
+            );
+
             var dataObject;
             if (action === 'create') {
                 dataObject = json.data[0];
                 dataObject.tLoading = minutesToString(dataObject.tLoading);
-                //$routePointsDataTable.row.add(dataObject).draw(false);
             } else if (action === 'edit') {
                 dataObject = json.data[0];
-                console.log(json);
                 dataObject.tLoading = minutesToString(dataObject.tLoading);
-                $routePointsDataTable.row(".selected").data(dataObject).draw(false)
+                $routePointsDataTable.row(".selected").data(dataObject).draw(false);
             } else if (action == 'remove') {
 
+            }
+        });
+
+        // set current selected value to pointName
+        routePointsEditor.on('open', function (e , mode, action) {
+            if (action === "edit") {
+                setSelectizeValueFromTable($routePointsDataTable, routePointsEditor, 'pointName', 'pointName');
             }
         });
 
@@ -356,7 +327,6 @@ $(document).ready(function () {
                     maskOptions: {clearIfNotMatch: true},
                     placeholder: "чч:мм"
                 }
-                //{ label: 'Время в пути',  name: 'timeForDistance', type: 'mask', mask:"00ч.00м.", maskOptions: {clearIfNotMatch: true}, placeholder:"__ч.__м."}
             ]
         });
 
@@ -364,25 +334,18 @@ $(document).ready(function () {
             if (action === 'edit') {
                 for (i in data.data) {
                     data.data[i].timeForDistance = stringToMinutes(data.data[i].timeForDistance);
-                    console.log(data.data[i].timeForDistance);
                 }
-                //console.log(data);
-                //console.log(json);
-                //console.log(action);
             }
         });
 
         //manually edit data in table
         relationsBetweenRoutePointsEditor.on('postSubmit', function (e, json, data, action) {
-            console.log(data);
             if (action === "edit") {
-                //$relationsBetweenRoutePointsDataTable.row.add(
-                //
-                //).draw(false);
+                var dataObject = json.data[0];
+                dataObject.timeForDistance = minutesToString(dataObject.timeForDistance);
+                $relationsBetweenRoutePointsDataTable.row(".selected").data(dataObject).draw(false);
             }
-
         });
-
 
         var $relationsBetweenRoutePointsDataTable = $("#relationsBetweenRoutePointsTable").DataTable({
                 "dom": 'Bt', // show only buttons and table with no decorations
@@ -412,14 +375,11 @@ $(document).ready(function () {
 
     }
 
-
     // helper functions
     {
         function stringToMinutes(string) {
             var houres = string.substring(0, 2);
-            console.log(houres);
             var minutes = string.substr(3, 2);
-            console.log(minutes);
             return 60 * parseInt(houres) + parseInt(minutes);
         }
 
@@ -435,9 +395,9 @@ $(document).ready(function () {
             else strHoures = houres + "";
 
             return strHoures + ":" + strMinutes;
-            //return strHoures + "ч." + strMinutes + "м.";
         }
 
+        //  ["monday", "wednesday", "friday"]
         function setDaysOfWeekData(daysOfWeek) {
             if (!$.isArray(daysOfWeek)) throw "illegalArgumentException: input arg should be array";
 
@@ -450,8 +410,39 @@ $(document).ready(function () {
             });
         }
 
+        //   "18:00"
         function setFirstPointArrivalTime(firstPointArrivalTime) {
             $('#startRouteTimeInput').val(firstPointArrivalTime).trigger('keyup');
+        }
+
+        // set routePoints table data
+        //    [
+        //        {routePointID: 10, sortOrder:0, pointName:"point1", tLoading: 180},
+        //        {routePointID: 11, sortOrder:1, pointName:"point2", tLoading: 90},
+        //        {routePointID: 12, sortOrder:2, pointName:"point3", tLoading: 110}
+        //    ]
+        function setRoutePointsData(routePointsData) {
+            $routePointsDataTable.rows().remove();
+            routePointsData.forEach(function (entry) {
+                entry.tLoading = minutesToString(entry.tLoading);
+            });
+            $routePointsDataTable.rows.add(routePointsData).draw(false);
+        }
+
+        //    [
+        //        {relationID:"10_11", pointNameFirst:"point1", pointNameSecond:"point2", distance: 300, timeForDistance: 450},
+        //        {relationID:"11_12", pointNameFirst:"point2", pointNameSecond:"point3", distance: 500, timeForDistance: 780}
+        //    ]
+        function setRelationsBetweenRoutePointsData(relationsBetweenRoutePointsData) {
+            $relationsBetweenRoutePointsDataTable.rows().remove();
+            relationsBetweenRoutePointsData.forEach(function (entry) {
+                entry.timeForDistance = minutesToString(entry.timeForDistance);
+            });
+            $relationsBetweenRoutePointsDataTable.rows.add(relationsBetweenRoutePointsData).draw(false);
+        }
+
+        function getCurrentRouteId() {
+            return $("#routeSelect option")[0].value;
         }
 
         // initial loading of all data
@@ -460,45 +451,19 @@ $(document).ready(function () {
                 "content/getData.php",
                 {status: "getAllRoutePointsDataForRouteID", routeID: value, format: "json"},
                 function (data) {
-
-                    //// example result data
-                    //data = {
-                    //    daysOfWeek:["monday", "wednesday", "friday"],
-                    //    firstPointArrivalTime: "18:00",
-                    //    routePoints: [
-                    //        {routePointID: 10, sortOrder:0, pointName:"point1", tLoading: 180},
-                    //        {routePointID: 11, sortOrder:1, pointName:"point2", tLoading: 90},
-                    //        {routePointID: 12, sortOrder:2, pointName:"point3", tLoading: 110}
-                    //    ],
-                    //    relationsBetweenRoutePoints: [
-                    //        {relationID:"10_11", pointNameFirst:"point1", pointNameSecond:"point2", distance: 300, timeForDistance: 450},
-                    //        {relationID:"11_12", pointNameFirst:"point2", pointNameSecond:"point3", distance: 500, timeForDistance: 780}
-                    //    ]
-                    //};
-                    //data = JSON.stringify(data);
-
                     data = JSON.parse(data);
-
                     setDaysOfWeekData(data.daysOfWeek);
-
                     setFirstPointArrivalTime(data.firstPointArrivalTime);
-
-                    // set routePoints table data
-                    $routePointsDataTable.rows().remove();
-                    data.routePoints.forEach(function (entry) {
-                        entry.tLoading = minutesToString(entry.tLoading);
-                    });
-                    $routePointsDataTable.rows.add(data.routePoints).draw(false);
-
-                    // set relationsBetweenRoutePoints table data
-                    $relationsBetweenRoutePointsDataTable.rows().remove();
-                    data.relationsBetweenRoutePoints.forEach(function (entry) {
-                        entry.timeForDistance = minutesToString(entry.timeForDistance);
-                    });
-                    $relationsBetweenRoutePointsDataTable.rows.add(data.relationsBetweenRoutePoints).draw(false);
-
+                    setRoutePointsData(data.routePoints);
+                    setRelationsBetweenRoutePointsData(data.relationsBetweenRoutePoints);
                 }
             );
+        }
+
+        function setSelectizeValueFromTable(dataTable, editor, selectizeFieldName, dataTableDataName) {
+            var selectedRowData = dataTable.row().data();
+            var selectizeInstance = editor.field(selectizeFieldName).inst();
+            selectizeInstance.setValue(selectizeInstance.search(selectedRowData[dataTableDataName]).items[0].id, true);
         }
     }
 
@@ -536,15 +501,11 @@ $(document).ready(function () {
             ]
         } );
 
-        // TODO add same type of code to other selectize fields for editors
         // set current selected value to pointName and userRoleRusName
         usersEditor.on('open', function (e , mode, action) {
             if (action === "edit") {
-                var selectedRowData = $usersDataTable.row().data();
-                var usersPointNameSelectize = usersEditor.field('pointName').inst();
-                usersPointNameSelectize.setValue(usersPointNameSelectize.search(selectedRowData.pointName).items[0].id, true);
-                var usersRoleSelectize = usersEditor.field('userRoleRusName').inst();
-                usersRoleSelectize.setValue(usersPointNameSelectize.search(selectedRowData.userRoleRusName).items[0].id, true);
+                setSelectizeValueFromTable($usersDataTable, usersEditor, 'pointName', 'pointName');
+                setSelectizeValueFromTable($usersDataTable, usersEditor, 'userRoleRusName', 'userRoleRusName');
             }
         });
 
@@ -611,4 +572,5 @@ $(document).ready(function () {
         );
     }
 
+    // TODO create distances between points dataTable and editor
 });
