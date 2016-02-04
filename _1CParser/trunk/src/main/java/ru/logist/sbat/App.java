@@ -4,16 +4,13 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.config.Configuration;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
+import ru.logist.sbat.db.DataBase;
 import ru.logist.sbat.properties.PropertiesManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,7 +22,7 @@ import java.util.Properties;
 import java.util.Scanner;
 
 public class App {
-    private static final Logger logger = LogManager.getLogger(App.class);
+    private static final Logger logger = LogManager.getLogger();
     public static final String IRT = "IRT"; // insert into request table
     public static final String IRLT = "IRLT"; // insert into routeListTable
     public static final String IIT = "IIT"; // insert into invoices table
@@ -68,7 +65,8 @@ public class App {
                     url,
                     dbName,
                     user,
-                    properties.getProperty("password")
+                    properties.getProperty("password"),
+                    properties.getProperty("encoding")
             );
             logger.info("database connection succefully recieved, URL: [" + url + dbName + "] " + "User: [" + user + "]");
         } catch (SQLException e) {

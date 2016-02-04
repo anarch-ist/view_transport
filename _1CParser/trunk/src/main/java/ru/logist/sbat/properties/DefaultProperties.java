@@ -10,5 +10,6 @@ public class DefaultProperties extends Properties {
         this.put("password", "rtbyg7895otlgorit");
         this.put("url", "jdbc:mysql://localhost:3306/");
         this.put("dbName", "transmaster_transport_db");
+        this.put("encoding", "useUnicode=true&characterEncoding=UTF-8");
     }
 }

@@ -1,34 +1,48 @@
-package ru.logist.sbat;
+package ru.logist.sbat.db;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONObject;
 
 import java.sql.*;
 import java.util.*;
 
 public class DataBase {
-    private static final Logger logger = LogManager.getLogger(DataBase.class);
+    private static final Logger logger = LogManager.getLogger();
     private Connection connection;
     private List<String> invoiceStatuses;
 
-    public DataBase(String url, String dbName, String user, String password) throws SQLException {
+    public DataBase(String url, String dbName, String user, String password, String encoding) throws SQLException {
         // create connection to dbName
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    url + dbName,
+                    url + dbName + "?" + encoding,
                     user,
                     password
             );
-            connection.setAutoCommit(true);
+            connection.setAutoCommit(false);
             invoiceStatuses = getInvoiceStatuses();
 
         } catch (ClassNotFoundException | SQLException e) {
-            closeConnectionQuietly();
+            DBUtils.closeConnectionQuietly(connection);
             throw new SQLException(e);
         }
+    }
+
+    public void close() {
+        DBUtils.closeConnectionQuietly(connection);
+    }
+    /**
+     * write all JSON data into database inside one transaction
+     * @param jsonObject
+     */
+    public void updateDataFromJSONObject(JSONObject jsonObject) throws SQLException {
+        InsertTransactionScript insertTransactionScript = new InsertTransactionScript(connection, jsonObject);
+        insertTransactionScript.updateData();
+
     }
 
     public List<String> getInvoiceStatuses() throws SQLException {
@@ -46,14 +60,6 @@ public class DataBase {
             }
         }
         return result;
-    }
-
-    public void closeConnectionQuietly() {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            logger.error(e);
-        }
     }
 
     public void generateInsertIntoRequestTable() throws SQLException {
@@ -166,6 +172,56 @@ public class DataBase {
                 updateStatusStm.close();
             }
         }
+
+    }
+
+    /**
+     * this method designed only for tests
+     */
+    protected void truncatePublicTables(){
+        Statement statement = null;
+
+        // get All public table names
+        DatabaseMetaData md = null;
+        try {
+            md = connection.getMetaData();
+            ResultSet rs = md.getTables(null, null, "%", null);
+            List<String> tableNames = new ArrayList<>();
+            while (rs.next()) {
+                tableNames.add(rs.getString(3));
+            }
+
+            connection.createStatement().executeUpdate("SET FOREIGN_KEY_CHECKS = 0;");
+            for (String tableName : tableNames) {
+                if (tableName.equals("user_roles")
+                        || tableName.equals("point_types")
+                        || tableName.equals("permissions")
+                        || tableName.equals("permissions_for_roles")
+                        || tableName.equals("invoice_statuses")
+                        || tableName.equals("invoice_statuses_for_user_role")
+                        ) continue;
+                statement = connection.createStatement();
+                String sql = "TRUNCATE TABLE " + tableName + ";";
+                statement.executeUpdate(sql);
+                System.out.println(sql);
+            }
+            connection.createStatement().executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
+            connection.commit();
+
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {/*NOPE*/}
+            e.printStackTrace();
+        }
+        finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {/*NOPE*/}
+            }
+        }
+
 
     }
 }

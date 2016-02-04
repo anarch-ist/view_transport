@@ -2,13 +2,15 @@ package ru.logist.sbat;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logist.sbat.db.DBUtils;
+import ru.logist.sbat.db.DataBase;
 
 import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Controller {
-    private static final Logger logger = LogManager.getLogger(Controller.class);
+    private static final Logger logger = LogManager.getLogger();
     private final Integer generatePeriod;
     private DataBase dataBase;
     private Timer timer;
@@ -67,7 +69,7 @@ public class Controller {
     }
 
     public void close() {
-        dataBase.closeConnectionQuietly();
+        dataBase.close();
         if (timer != null)
             timer.cancel();
     }
