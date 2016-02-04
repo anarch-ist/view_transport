@@ -281,12 +281,12 @@ $(document).ready(function () {
 
             var dataObject;
             if (action === 'create') {
-                dataObject = data.data[0];
+                dataObject = json.data[0];
                 dataObject.tLoading = minutesToString(dataObject.tLoading);
-                $routePointsDataTable.row.add(dataObject).draw(false);
+                //$routePointsDataTable.row.add(dataObject).draw(false);
             } else if (action === 'edit') {
-                dataObject = json.data;
-                //console.log(json);
+                dataObject = json.data[0];
+                console.log(json);
                 dataObject.tLoading = minutesToString(dataObject.tLoading);
                 $routePointsDataTable.row(".selected").data(dataObject).draw(false)
             } else if (action == 'remove') {
@@ -400,6 +400,7 @@ $(document).ready(function () {
                     }
                 ],
                 "paging": false, // no pagination
+                "ordering": false,
                 "columnDefs": [
                     {"name": "pointNameFirst", "data": "pointNameFirst", "targets": 0},
                     {"name": "pointNameSecond", "data": "pointNameSecond", "targets": 1},

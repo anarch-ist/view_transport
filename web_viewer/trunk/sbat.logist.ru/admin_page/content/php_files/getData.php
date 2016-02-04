@@ -73,6 +73,7 @@ try {
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
+
 function getAllPointIdPointNamePairs(PrivilegedUser $privUser)
 {
     $dataArray = $privUser->getPointEntity()->selectPoints();
@@ -84,13 +85,6 @@ function getAllPointIdPointNamePairs(PrivilegedUser $privUser)
         }
     }
     echo json_encode($data);
-    //throw new DataTransferException('need to fill method', __FILE__);
-//    $invoiceNumber = $_POST['invoiceNumber'];
-//    if (!isset($invoiceNumber) || empty($invoiceNumber)) {
-//        throw new DataTransferException('Не задан параметр "номер накладной"',__FILE__);
-//    }
-//    $data = $privUser->getInvoiceEntity()->getInvoiceHistoryByInvoiceNumber($invoiceNumber);
-//    echo json_encode($data);
 }
 
 function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
@@ -104,17 +98,6 @@ function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
         }
     }
     echo json_encode($data);
-    //throw new DataTransferException('need to fill method',__FILE__);
-//    $dataArray = $privUser->getInvoicesForUser()->selectAllData($_POST['start'], $_POST['length']);
-//    $totalData = count($dataArray);
-//    $totalFiltered = $totalData;
-//    $json_data = array(
-//        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
-//        "recordsTotal" => intval($totalData),  // total number of records
-//        "recordsFiltered" => intval($totalFiltered), // total number of records after searching, if there is no searching then totalFiltered = totalData
-//        "data" => $dataArray   // total data array
-//    );
-//    echo json_encode($json_data);
 }
 
 function getAllRoutePointsDataForRouteID(PrivilegedUser $privUser)
@@ -124,16 +107,7 @@ function getAllRoutePointsDataForRouteID(PrivilegedUser $privUser)
     }
     $routeID = $_POST['routeID'];
     $dataArray = $privUser->getRouteAndRoutePointsEntity()->getAllRoutePointsDataForRouteID($routeID);
-//    $data = array();
-//    foreach ($dataArray as $val) {
-//        if ($val instanceof DAO\RoutePointData)
-//        {
-//            $data[] = $val->toArray();
-//        }
-//    }
-//    echo json_encode($data);
     echo json_encode($dataArray);
-    //throw new DataTransferException('need to fill method',__FILE__);
 }
 
 function getAllUserRoles(PrivilegedUser $privUser)
@@ -145,28 +119,14 @@ function getAllUserRoles(PrivilegedUser $privUser)
 
 function removeRoutePoint(PrivilegedUser $privUser)
 {
-    $serverAnswer = array();
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
     $dataSourceArray = $_POST['data'];
-    $routePointEntity = $privUser->getRoutePointEntity();
     foreach ($dataSourceArray as $routePointID => $dataSourceElem) {
         $privUser->getRoutePointEntity()->deleteRoutePoint($routePointID);
-//        $sortOrder = $dataSourceElem['sortOrder'];
-//        $tLoading = $dataSourceElem['tLoading'];
-//        $pointName = $dataSourceElem['pointName'];
-//        if (!$routePointEntity->updateRoutePoint($routePointID, $sortOrder, $tLoading, $pointName)) {
-//            $privUser->getDaoEntity()->rollback();
-//            throw new DataTransferException('Данные не были обновлены', __FILE__);
-//        }
-//        $serverAnswerElem = $routePointEntity->selectRoutePointByID($routePointID)->toArray();
-//        unset($serverAnswerElem['routeID']);
-//        $serverAnswer[] = $serverAnswerElem;
     }
-//    $dataArray = $privUser->getRouteEntity()->getAllRoutePointsDataForRouteID($routeID);
-//    echo json_encode($dataArray);
-    //throw new DataTransferException('need to fill method', __FILE__);
+    echo '{ }';
 }
 
 function createRoutePoint(PrivilegedUser $privUser)
@@ -175,9 +135,12 @@ function createRoutePoint(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
     $dataSourceArray = $_POST['data'][0];
-    $responce = array('data' => $dataSourceArray);
-    if ($privUser->getRoutePointEntity()->addRoutePoint($dataSourceArray['sortOrder'], $dataSourceArray['tLoading'], $dataSourceArray['pointName'], $dataSourceArray['routeID'])) {
-        echo json_encode($responce);
+    $serverAnswer = array();
+    $routeID = $dataSourceArray['routeID'];
+    $sortOrder = $dataSourceArray['sortOrder'];
+    if ($privUser->getRoutePointEntity()->addRoutePoint($sortOrder, $dataSourceArray['tLoading'], $dataSourceArray['pointName'], $routeID)) {
+        $serverAnswer['data'][0] = $privUser->getRoutePointEntity()->selectRoutePointsByRouteID($routeID)->getData('routePoints')[$sortOrder - 1];
+        echo json_encode($serverAnswer);
     }
 }
 
@@ -194,11 +157,6 @@ function updateDaysOfWeek(PrivilegedUser $privUser)
     } else {
         throw new DataTransferException('нет данных для updateDaysOfWeek', __FILE__);
     }
-//    if (!isset($_POST['data'])) {
-//        throw new DataTransferException('Не задан параметр "data"', __FILE__);
-//    }
-//    $dataSourceArray = $_POST['data'][0];
-//    echo $privUser->getRoutePointEntity()->addRoutePoint($dataSourceArray['sortOrder'], $dataSourceArray['tLoading'], $dataSourceArray['pointName'], $dataSourceArray['routeID']);
 }
 
 function updateStartRouteTime(PrivilegedUser $privUser)
@@ -225,21 +183,18 @@ function relationsBetweenRoutePoints(PrivilegedUser $privUser)
         $id = explode('_', $ids);
         $privUser->getRoutePointEntity()->updateRelationBetweenRoutePoints($id[0], $id[1], $elem['timeForDistance']);
     }
-//    if ($privUser->getRouteEntity()->updateStartRouteTime($_POST['routeID'],$_POST['firstPointArrivalTime'].':00')) {
-//        echo $_POST['firstPointArrivalTime'];
-//    } else {
-//        throw new DataTransferException('нет данных для updateStartRouteTime',__FILE__);
-//    }
 }
 
 function updateRoutePoints(PrivilegedUser $privUser)
 {
     $serverAnswer = array();
+    $serverAnswer['data'] = array();
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
     $dataSourceArray = $_POST['data'];
     $routePointEntity = $privUser->getRoutePointEntity();
+    $i = 0;
     foreach ($dataSourceArray as $routePointID => $dataSourceElem) {
         $sortOrder = $dataSourceElem['sortOrder'];
         $tLoading = $dataSourceElem['tLoading'];
@@ -248,12 +203,9 @@ function updateRoutePoints(PrivilegedUser $privUser)
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
-        $serverAnswerElem = $dataSourceArray[$routePointID];
-        $serverAnswerElem['routePointID'] = $routePointID;
-        $serverAnswer['data'] = $serverAnswerElem;
+        $serverAnswer['data'][$i] = $routePointEntity->selectRoutePointsByRouteID($dataSourceArray[$routePointID]['routeID'])->getData('routePoints')[$sortOrder - 1];
+        $serverAnswer['data'][$i]['pointID'] = $dataSourceArray[$routePointID]['pointName'];
+        $i++;
     }
     echo json_encode($serverAnswer);
-//    $dataArray = $privUser->getRouteEntity()->getAllRoutePointsDataForRouteID($routeID);
-//    echo json_encode($dataArray);
-    //throw new DataTransferException('need to fill method', __FILE__);
 }
