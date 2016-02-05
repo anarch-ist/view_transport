@@ -83,19 +83,19 @@ CREATE TABLE distances_between_points (
 );
 
 CREATE TABLE users (
-  userID         INTEGER     AUTO_INCREMENT,
-  userIDExternal VARCHAR(255) NOT NULL,
-  firstName      VARCHAR(64)  NULL,
-  lastName       VARCHAR(64)  NULL,
-  patronymic     VARCHAR(64)  NULL,
-  userName       VARCHAR(255) NULL,
-  phoneNumber    VARCHAR(255) NULL, -- TODO many phoneNumbers with different formats
-  email          VARCHAR(255) NULL,
-  position       VARCHAR(64)  NULL, -- должность
-  salt           VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
-  passAndSalt    VARCHAR(64)  NOT NULL,
-  userRoleID     VARCHAR(32)  NOT NULL,
-  pointID        INTEGER      NULL, -- у пользователя не обязан быть пункт.
+  userID      INTEGER     AUTO_INCREMENT,
+  login       VARCHAR(255) NOT NULL,
+  firstName   VARCHAR(64)  NULL,
+  lastName    VARCHAR(64)  NULL,
+  patronymic  VARCHAR(64)  NULL,
+  userName    VARCHAR(255) NULL,
+  phoneNumber VARCHAR(255) NULL,
+  email       VARCHAR(255) NULL,
+  position    VARCHAR(64)  NULL, -- должность
+  salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
+  passAndSalt VARCHAR(64)  NOT NULL,
+  userRoleID  VARCHAR(32)  NOT NULL,
+  pointID     INTEGER      NULL, -- у пользователя не обязан быть пункт.
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
     ON DELETE NO ACTION

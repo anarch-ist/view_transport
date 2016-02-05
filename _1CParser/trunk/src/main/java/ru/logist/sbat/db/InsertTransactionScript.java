@@ -148,7 +148,7 @@ public class InsertTransactionScript {
         return preparedStatement;
     }
 
-
+    // 32 digits like in php
     public String md5(String md5) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
@@ -178,9 +178,7 @@ public class InsertTransactionScript {
             String salt = RandomStringUtils.randomAlphanumeric(16);
             String pass = RandomStringUtils.randomAlphanumeric(8);
             logger.info("generated password for new user [{}] = [{}]", userName, pass);
-            String passAndSaltMD5 = md5(pass + salt);
-            // TODO how to generate password correctly
-            // TODO how to fix phone numbers
+            String passAndSaltMD5 = md5(md5(pass) + salt);
             preparedStatement.setString(1, userIDExternal);
             preparedStatement.setString(2, userName);
             preparedStatement.setString(3, email);
