@@ -83,17 +83,19 @@ CREATE TABLE distances_between_points (
 );
 
 CREATE TABLE users (
-  userID      INTEGER AUTO_INCREMENT,
-  firstName   VARCHAR(64) NULL,
-  lastName    VARCHAR(64) NULL,
-  patronymic  VARCHAR(64) NULL,
-  position    VARCHAR(64) NULL, -- должность
-  salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
-  passAndSalt VARCHAR(64) NOT NULL,
-  phoneNumber VARCHAR(16) NULL,
-  email       VARCHAR(64) NULL,
-  userRoleID  VARCHAR(32) NOT NULL,
-  pointID     INTEGER     NOT NULL,
+  userID         INTEGER     AUTO_INCREMENT,
+  userIDExternal VARCHAR(255) NOT NULL,
+  firstName      VARCHAR(64)  NULL,
+  lastName       VARCHAR(64)  NULL,
+  patronymic     VARCHAR(64)  NULL,
+  userName       VARCHAR(255) NULL,
+  phoneNumber    VARCHAR(255) NULL, -- TODO many phoneNumbers with different formats
+  email          VARCHAR(255) NULL,
+  position       VARCHAR(64)  NULL, -- должность
+  salt           VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
+  passAndSalt    VARCHAR(64)  NOT NULL,
+  userRoleID     VARCHAR(32)  NOT NULL,
+  pointID        INTEGER      NULL, -- у пользователя не обязан быть пункт.
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
     ON DELETE NO ACTION
@@ -171,7 +173,9 @@ CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
 CREATE TABLE clients (
   clientID          INTEGER AUTO_INCREMENT,
+  clientIDExternal  VARCHAR(255) NOT NULL,
   INN               VARCHAR(32)  NOT NULL,
+  clientName        VARCHAR(255) NULL,
   KPP               VARCHAR(64)  NULL,
   corAccount        VARCHAR(64)  NULL,
   curAccount        VARCHAR(64)  NULL,
@@ -181,8 +185,7 @@ CREATE TABLE clients (
   dateOfSigning     DATE         NULL,
   startContractDate DATE         NULL,
   endContractDate   DATE         NULL,
-  PRIMARY KEY (clientID),
-  UNIQUE (INN)
+  PRIMARY KEY (clientID)
 );
 
 -- insert only manager users
@@ -242,17 +245,18 @@ CREATE TABLE tariffs (
 -- zero time is 00:00(GMT) of that day, when carrier arrives at first point of route.
 CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
-  firstPointArrivalTime TIME                                                                              NOT NULL,
--- days of weeks when route is available
-  daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') NOT NULL,
-  routeName             VARCHAR(64)                                                                       NOT NULL,
--- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
-  directionName         VARCHAR(255)                                                                      NULL,
-  tariffID              INTEGER                                                                           NULL,
+  routeName             VARCHAR(255)                                                                                 NOT NULL,
+  directionIDExternal   VARCHAR(255)                                                                                 NOT NULL,
+  firstPointArrivalTime TIME DEFAULT '00:00:00'                                                                      NOT NULL,
+  -- days of weeks when route is available
+  daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') DEFAULT '' NOT NULL,
+  -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
+  tariffID              INTEGER                                                                                      NULL,
   PRIMARY KEY (routeID),
   FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
     ON DELETE SET NULL
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE(routeName)
 );
 
 CREATE TABLE route_list_statuses (
