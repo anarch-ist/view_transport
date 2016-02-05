@@ -11,7 +11,10 @@ try {
         getAllPointIdPointNamePairs($privUser);
     } else if ($action === 'getAllUserRoles') {
         getAllUserRoles($privUser);
+    } else if ($action === 'getRelationsBetweenRoutePointsDataForRouteID') {
+        getRelationsBetweenRoutePointsDataForRouteID($privUser);
     } else if ($action === 'getUsersData') {
+//        TODO: method for select users (getusers($privUser);)
         $dataArray = json_decode('[{"userID": "1", "firstName":"wefwfe", "lastName":"ewrkbfif", "position": "efewerfw", "patronymic":"ergerge", "phoneNumber": "9055487552",
             "email": "qwe@qwe.ru", "password":"lewrhbwueu23232", "userRoleRusName":"Диспетчер", "pointName":"point1"}]');
         $json_data = array(
@@ -59,11 +62,11 @@ try {
         }
         $action = $_POST['action'];
         if ($action === 'remove') {
-//            removeRoutePoint($privUser);
+//            TODO: method for remove
         } else if ($action === 'edit') {
-//            updateRoutePoints($privUser);
+//            TODO: method for edit
         } else if ($action === 'create') {
-//            createRoutePoint($privUser);
+//            TODO: method for create
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
@@ -179,10 +182,13 @@ function relationsBetweenRoutePoints(PrivilegedUser $privUser)
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "данные"', __FILE__);
     }
+    $routeID = $_POST['routeID'];
     foreach ($_POST['data'] as $ids => $elem) {
         $id = explode('_', $ids);
         $privUser->getRoutePointEntity()->updateRelationBetweenRoutePoints($id[0], $id[1], $elem['timeForDistance']);
     }
+    $dataArray = $privUser->getRouteAndRoutePointsEntity()->getAllRoutePointsDataForRouteID($routeID)['relationsBetweenRoutePoints'];
+    echo json_encode(array('data' => $dataArray));
 }
 
 function updateRoutePoints(PrivilegedUser $privUser)
@@ -209,3 +215,37 @@ function updateRoutePoints(PrivilegedUser $privUser)
     }
     echo json_encode($serverAnswer);
 }
+
+function getRelationsBetweenRoutePointsDataForRouteID(PrivilegedUser $privUser)
+{
+    if (!isset($_POST['routeID'])) {
+        throw new DataTransferException('Не задан параметр "идентификатор маршрута"', __FILE__);
+    }
+    $routeID = $_POST['routeID'];
+    $dataArray = $privUser->getRouteAndRoutePointsEntity()->getAllRoutePointsDataForRouteID($routeID)['relationsBetweenRoutePoints'];
+    echo json_encode($dataArray);
+}
+
+function createNewuser(PrivilegedUser $privUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $routeID = $_POST['routeID'];
+    $dataArray = $privUser->getRouteAndRoutePointsEntity()->getAllRoutePointsDataForRouteID($routeID)['relationsBetweenRoutePoints'];
+    echo json_encode($dataArray);
+}
+
+//function getUsers(PrivilegedUser $privUser)
+//{
+//    $dataArray = $privUser->getUserEntity()->($_POST['start'], $_POST['length']);
+//    $totalData = count($dataArray);
+//    $totalFiltered = $totalData;
+//    $json_data = array(
+//        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+//        "recordsTotal" => intval($totalData),  // total number of records
+//        "recordsFiltered" => intval($totalFiltered), // total number of records after searching, if there is no searching then totalFiltered = totalData
+//        "data" => $dataArray   // total data array
+//    );
+//    echo json_encode($json_data);
+//}

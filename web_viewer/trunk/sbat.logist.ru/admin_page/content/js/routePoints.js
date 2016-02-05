@@ -331,6 +331,7 @@ $(document).ready(function () {
         });
 
         relationsBetweenRoutePointsEditor.on('preSubmit', function (e, data, action) {
+            data.routeID = $routeSelectSelectize[0].selectize.items[0];
             if (action === 'edit') {
                 for (i in data.data) {
                     data.data[i].timeForDistance = stringToMinutes(data.data[i].timeForDistance);
@@ -341,9 +342,10 @@ $(document).ready(function () {
         //manually edit data in table
         relationsBetweenRoutePointsEditor.on('postSubmit', function (e, json, data, action) {
             if (action === "edit") {
-                var dataObject = json.data[0];
-                dataObject.timeForDistance = minutesToString(dataObject.timeForDistance);
-                $relationsBetweenRoutePointsDataTable.row(".selected").data(dataObject).draw(false);
+                //var dataObject = json.data[0];
+                setRelationsBetweenRoutePointsData(json.data);
+                //dataObject.timeForDistance = minutesToString(dataObject.timeForDistance);
+                //$relationsBetweenRoutePointsDataTable.row(".selected").data(dataObject).draw(false);
             }
         });
 
@@ -379,8 +381,12 @@ $(document).ready(function () {
     {
         function stringToMinutes(string) {
             var houres = string.substring(0, 2);
-            var minutes = string.substr(3, 2);
-            return 60 * parseInt(houres) + parseInt(minutes);
+            var minutes = string.substr(2, 2);
+            var result = 60 * parseInt(houres) + parseInt(minutes);
+            console.log(string);
+            console.log(result);
+            console.log('--------------------------');
+            return result;
         }
 
         function minutesToString(intMinutes) {
