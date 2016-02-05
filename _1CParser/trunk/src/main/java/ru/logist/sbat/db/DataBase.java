@@ -114,7 +114,6 @@ public class DataBase {
                 preparedStatement.close();
             }
         }
-
     }
 
     public void generateInsertIntoInvoicesTable() throws SQLException{
