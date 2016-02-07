@@ -198,6 +198,7 @@ public class DataBase {
                         || tableName.equals("permissions_for_roles")
                         || tableName.equals("invoice_statuses")
                         || tableName.equals("invoice_statuses_for_user_role")
+                        || tableName.equals("data_sources")
                         ) continue;
                 statement = connection.createStatement();
                 String sql = "TRUNCATE TABLE " + tableName + ";";
