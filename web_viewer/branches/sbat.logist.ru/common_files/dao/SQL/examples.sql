@@ -230,3 +230,44 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
     DEALLOCATE PREPARE statement;
   END;
+
+
+
+
+CREATE TABLE clients (
+  clientIDExternal  VARCHAR(255) NOT NULL,
+  dataSourceID      VARCHAR(32)  NOT NULL,
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
+  UNIQUE(clientIDExternal, dataSourceID)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

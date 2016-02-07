@@ -5,6 +5,17 @@ CREATE DATABASE `transmaster_transport_db`
   COLLATE utf8_bin;
 USE `transmaster_transport_db`;
 
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                  DATA SOURCES
+-- -------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE data_sources (
+  dataSourceID VARCHAR(32) PRIMARY KEY
+);
+INSERT INTO data_sources VALUES ('LOGIST_1C');
+
+
 -- -------------------------------------------------------------------------------------------------------------------
 --                                        USERS ROLES PERMISSIONS AND POINTS
 -- -------------------------------------------------------------------------------------------------------------------
@@ -46,7 +57,8 @@ VALUES
 
 CREATE TABLE points (
   pointID             INTEGER AUTO_INCREMENT,
-  pointIDExternal     INTEGER        NOT NULL,
+  pointIDExternal     VARCHAR(128)   NOT NULL,
+  dataSourceID        VARCHAR(32)    NOT NULL,
   pointName           VARCHAR(128)   NOT NULL,
   region              VARCHAR(128)   NULL,
   timeZone            TINYINT SIGNED NULL, -- сдвиг времени по гринвичу GMT + value
@@ -60,13 +72,19 @@ CREATE TABLE points (
   address             TEXT           NOT NULL,
   email               VARCHAR(255)    NULL,
   phoneNumber         VARCHAR(16)    NULL,
-  responsiblePersonId INTEGER        NULL,
+  responsiblePersonId VARCHAR(128)   NULL,
   pointTypeID         VARCHAR(32)    NOT NULL,
   PRIMARY KEY (pointID),
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
     ON DELETE NO ACTION
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE(pointIDExternal, dataSourceID)
 );
+
+-- служебная запись, этот пункт используется для тех накладных у которых нет склада
+INSERT INTO points (pointID, pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime, district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID) VALUE
+  (1, 'def', 'LOGIST_1C', 'NO_W_POINT', '', 0, 0, '', '00:00:00', '00:00:00', '', '', '', '', '', '', '', 'WAREHOUSE');
 
 -- CONSTRAINT pointIDFirst must not be equal pointIDSecond
 CREATE TABLE distances_between_points (
@@ -84,7 +102,7 @@ CREATE TABLE distances_between_points (
 
 CREATE TABLE users (
   userID      INTEGER     AUTO_INCREMENT,
-  login       VARCHAR(255) NOT NULL,
+  login       VARCHAR(255) NOT NULL UNIQUE, -- userIDExternal
   firstName   VARCHAR(64)  NULL,
   lastName    VARCHAR(64)  NULL,
   patronymic  VARCHAR(64)  NULL,
@@ -165,15 +183,17 @@ CALL insert_permission_for_role('CLIENT', 'selectUser');
 CALL insert_permission_for_role('CLIENT', 'selectPoint');
 CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
+INSERT INTO users VALUES (NULL, 'parser', '', '', '', '','', 'fff', md5(CONCAT(md5('nolpitf43gwer'), 'fff')), '', '', 'ADMIN', NULL);
+
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                 CLIENTS AND REQUESTS
 -- -------------------------------------------------------------------------------------------------------------------
 
-
 CREATE TABLE clients (
   clientID          INTEGER AUTO_INCREMENT,
   clientIDExternal  VARCHAR(255) NOT NULL,
+  dataSourceID      VARCHAR(32)  NOT NULL,
   INN               VARCHAR(32)  NOT NULL,
   clientName        VARCHAR(255) NULL,
   KPP               VARCHAR(64)  NULL,
@@ -185,17 +205,21 @@ CREATE TABLE clients (
   dateOfSigning     DATE         NULL,
   startContractDate DATE         NULL,
   endContractDate   DATE         NULL,
-  PRIMARY KEY (clientID)
+  PRIMARY KEY (clientID),
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
+  UNIQUE(clientIDExternal, dataSourceID)
 );
 
 -- insert only manager users
 CREATE TABLE requests (
   requestID          INTEGER AUTO_INCREMENT,
-  requestNumber      VARCHAR(16) NOT NULL,
-  date               DATETIME    NOT NULL,
-  marketAgentUserID  INTEGER     NULL,
-  clientID           INTEGER     NULL,
-  destinationPointID INTEGER     NULL, -- адрес, куда должны быть доставлены все товары
+  requestIDExternal  VARCHAR(128) NOT NULL,
+  dataSourceID       VARCHAR(32)  NOT NULL,
+  requestNumber      VARCHAR(16)  NOT NULL,
+  creationDate       DATETIME     NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
+  marketAgentUserID  INTEGER      NULL,
+  clientID           INTEGER      NULL,
+  destinationPointID INTEGER      NULL, -- адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
   FOREIGN KEY (marketAgentUserID) REFERENCES users (userID)
     ON DELETE SET NULL
@@ -205,7 +229,9 @@ CREATE TABLE requests (
     ON UPDATE CASCADE,
   FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
     ON DELETE SET NULL
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
+  UNIQUE(requestIDExternal, dataSourceID)
 );
 
 CREATE FUNCTION is_market_agent(_userID INTEGER)
@@ -245,18 +271,19 @@ CREATE TABLE tariffs (
 -- zero time is 00:00(GMT) of that day, when carrier arrives at first point of route.
 CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
-  routeName             VARCHAR(255)                                                                                 NOT NULL,
+  dataSourceID          VARCHAR(32)                                                                                  NOT NULL,
   directionIDExternal   VARCHAR(255)                                                                                 NOT NULL,
+  routeName             VARCHAR(255)                                                                                 NOT NULL,
   firstPointArrivalTime TIME DEFAULT '00:00:00'                                                                      NOT NULL,
-  -- days of weeks when route is available
   daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') DEFAULT '' NOT NULL,
-  -- имя направления из предметной области 1С, каждому направлению соответствует один маршрут
   tariffID              INTEGER                                                                                      NULL,
   PRIMARY KEY (routeID),
   FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
-  UNIQUE(routeName)
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
+  UNIQUE (routeName),
+  UNIQUE (directionIDExternal, dataSourceID)
 );
 
 CREATE TABLE route_list_statuses (
@@ -443,11 +470,16 @@ VALUES
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
 -- при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
--- TODO this table should be normalized split one-to -one
+-- ВНИМАНИЕ при изменении порядка полей их также нужно менять в триггерах!!!
 CREATE TABLE invoices (
   invoiceID              INTEGER AUTO_INCREMENT,
-  insiderRequestNumber   VARCHAR(16)    NOT NULL,
-  invoiceNumber          VARCHAR(16)    NOT NULL,
+  invoiceIDExternal      VARCHAR(255)   NOT NULL,
+  dataSourceID           VARCHAR(32)    NOT NULL,
+  documentNumber         VARCHAR(255)   NOT NULL,
+  documentDate           DATETIME       NOT NULL,
+  firma                  VARCHAR(255)   NULL,
+  contactName            VARCHAR(255)   NULL,
+  contactPhone           VARCHAR(255)   NULL,
   creationDate           DATETIME       NULL,
   deliveryDate           DATETIME       NULL,
   boxQty                 INTEGER        NULL,
@@ -455,7 +487,7 @@ CREATE TABLE invoices (
   volume                 INTEGER        NULL, -- в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
   lastStatusUpdated      DATETIME       NULL, -- date and time when status was updated by any user
-  lastModifiedBy         INTEGER        NULL,
+  lastModifiedBy         INTEGER        NULL, -- один из пользователей - это parser.
   invoiceStatusID        VARCHAR(32)    NOT NULL,
   commentForStatus       TEXT           NULL,
   requestID              INTEGER        NOT NULL,
@@ -463,6 +495,7 @@ CREATE TABLE invoices (
   routeListID            INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedUserPointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
   FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
@@ -481,8 +514,7 @@ CREATE TABLE invoices (
   FOREIGN KEY (lastVisitedUserPointID) REFERENCES points (pointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  UNIQUE (insiderRequestNumber),
-  UNIQUE (invoiceNumber)
+  UNIQUE (invoiceIDExternal, dataSourceID)
 );
 
 CREATE FUNCTION is_warehouse(_pointID INTEGER)
@@ -506,43 +538,33 @@ BEFORE INSERT ON invoices FOR EACH ROW
   END;
 
 
-CREATE PROCEDURE insert_into_invoice_history(
-  invoiceID              INTEGER,
-  insiderRequestNumber   VARCHAR(16),
-  invoiceNumber          VARCHAR(16),
-  creationDate           DATETIME,
-  deliveryDate           DATETIME,
-  boxQty                 INTEGER,
-  weight                 INTEGER,
-  volume                 INTEGER,
-  goodsCost              DECIMAL(12, 2),
-  lastStatusUpdated      DATETIME,
-  lastModifiedBy         INTEGER,
-  invoiceStatusID        VARCHAR(32),
-  commentForStatus       TEXT,
-  requestID              INTEGER,
-  warehousePointID       INTEGER,
-  routeListID            INTEGER,
-  lastVisitedUserPointID INTEGER
-)
-  BEGIN
-    INSERT INTO invoice_history
-    VALUES
-      (NULL, NOW(), invoiceID, insiderRequestNumber, invoiceNumber, creationDate, deliveryDate,
-       boxQty, weight, volume, goodsCost, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus,
-       requestID,
-       warehousePointID, routeListID, lastVisitedUserPointID
-      );
-  END;
-
 CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
-  CALL insert_into_invoice_history(
-      NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-      NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-      'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
-      NEW.lastVisitedUserPointID);
+  INSERT INTO invoice_history
+  VALUES
+    (NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceExternalID, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
+     NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
+     'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
+     NEW.lastVisitedUserPointID
+    );
 
+CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
+FOR EACH ROW
+  BEGIN
+    CALL insert_into_invoice_history(
+        NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceExternalID, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
+        NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
+        NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
+        NEW.lastVisitedUserPointID);
+  END;
+
+CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
+FOR EACH ROW
+  CALL insert_into_invoice_history(
+      OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceExternalID, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
+      OLD.weight, OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy,
+      'DELETED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID,
+      OLD.lastVisitedUserPointID);
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
 FOR EACH ROW
@@ -553,9 +575,6 @@ FOR EACH ROW
         NEW.invoiceStatusID = 'DELIVERED')
     THEN
       BEGIN
--- LAST_INSERT_ID обязан возвращать id из таблицы user_action_history, т.е. на уровне приложения сначала нужно записать данные о пользователе, а затем менять invoice
--- DECLARE _userID INTEGER;
--- SET _userID = (SELECT userID FROM user_action_history WHERE (tableID = 'invoices' AND userActionHistoryID = LAST_INSERT_ID()));
         SET NEW.lastVisitedUserPointID = (SELECT pointID
                                           FROM users
                                           WHERE userID = NEW.lastModifiedBy);
@@ -563,38 +582,26 @@ FOR EACH ROW
     END IF;
   END;
 
-CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
-FOR EACH ROW
-  BEGIN
-    CALL insert_into_invoice_history(
-        NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceNumber, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-        NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-        NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
-        NEW.lastVisitedUserPointID);
-  END;
-
-CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
-FOR EACH ROW
-  CALL insert_into_invoice_history(
-      OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceNumber, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
-      OLD.weight, OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy,
-      'DELETED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID,
-      OLD.lastVisitedUserPointID);
 
 CREATE TABLE invoice_history (
   invoiceHistoryID       BIGINT AUTO_INCREMENT,
-  autoTimeMark           DATETIME,
-  invoiceID              INTEGER,
-  insiderRequestNumber   VARCHAR(16)    NOT NULL,
-  invoiceNumber          VARCHAR(16)    NOT NULL,
+  autoTimeMark           DATETIME       NOT NULL,
+  invoiceID              INTEGER        NOT NULL,
+  invoiceIDExternal      VARCHAR(255)   NOT NULL,
+  dataSourceID           VARCHAR(32)    NOT NULL,
+  documentNumber         VARCHAR(255)   NOT NULL,
+  documentDate           DATETIME       NOT NULL,
+  firma                  VARCHAR(255)   NULL,
+  contactName            VARCHAR(255)   NULL,
+  contactPhone           VARCHAR(255)   NULL,
   creationDate           DATETIME       NULL,
   deliveryDate           DATETIME       NULL,
   boxQty                 INTEGER        NULL,
   weight                 INTEGER        NULL, -- масса в граммах
   volume                 INTEGER        NULL, -- в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
-  lastStatusUpdated      DATETIME       NULL,
-  lastModifiedBy         INTEGER        NULL,
+  lastStatusUpdated      DATETIME       NULL, -- date and time when status was updated by any user
+  lastModifiedBy         INTEGER        NULL, -- один из пользователей - это parser.
   invoiceStatusID        VARCHAR(32)    NOT NULL,
   commentForStatus       TEXT           NULL,
   requestID              INTEGER        NOT NULL,
@@ -606,36 +613,6 @@ CREATE TABLE invoice_history (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
-
-
--- -------------------------------------------------------------------------------------------------------------------
---                                               USER ACTION HISTORY
--- -------------------------------------------------------------------------------------------------------------------
-
-
--- CREATE TABLE tables (
---   tableID VARCHAR(64),
---   PRIMARY KEY (tableID)
--- );
---
--- INSERT INTO tables (tableID) SELECT information_schema.TABLES.TABLE_NAME
---                              FROM information_schema.TABLES
---                              WHERE TABLE_SCHEMA = 'transmaster_transport_db';
-
--- invoices - диспетчер меняет статус
--- информация о том. какой пользователь какую таблицу изменил есть на уровне сессии приложения
--- на уровне приложения, во время установки нового статуса накладной - сначала идет запись в таблицу user_action_history а затем изменение статуса
--- CREATE TABLE user_action_history (
---   userActionHistoryID BIGINT AUTO_INCREMENT,
---   timeMark            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---   userID              INTEGER,
---   tableID             VARCHAR(64),
---   action              ENUM('insert', 'update', 'delete'),
---   PRIMARY KEY (userActionHistoryID),
---   FOREIGN KEY (tableID) REFERENCES tables (tableID)
---     ON DELETE NO ACTION
---     ON UPDATE NO ACTION
--- );
 
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -1081,7 +1058,7 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
     FROM invoice_history
       INNER JOIN (route_lists, users, points, invoice_statuses)
         ON (
-        invoice_history.invoiceNumber = _invoiceNumber AND
+        invoice_history.invoiceIDExternal = _invoiceNumber AND
         invoice_history.lastModifiedBy = users.userID AND
         invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
         invoice_history.routeListID = route_lists.routeListID AND
