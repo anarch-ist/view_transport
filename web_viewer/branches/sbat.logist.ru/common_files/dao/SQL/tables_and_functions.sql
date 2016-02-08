@@ -541,30 +541,30 @@ BEFORE INSERT ON invoices FOR EACH ROW
 CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   INSERT INTO invoice_history
-  VALUES
-    (NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceExternalID, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-     NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-     'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
-     NEW.lastVisitedUserPointID
-    );
+  VALUE
+    (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
+     NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
+     NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy, 'CREATED', NEW.commentForStatus,
+     NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
-  BEGIN
-    CALL insert_into_invoice_history(
-        NEW.invoiceID, NEW.insiderRequestNumber, NEW.invoiceExternalID, NEW.creationDate, NEW.deliveryDate, NEW.boxQty,
-        NEW.weight, NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-        NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID,
-        NEW.lastVisitedUserPointID);
-  END;
+  INSERT INTO invoice_history
+    VALUE
+    (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
+     NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
+     NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy, NEW.invoiceStatusID, NEW.commentForStatus,
+     NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
 FOR EACH ROW
-  CALL insert_into_invoice_history(
-      OLD.invoiceID, OLD.insiderRequestNumber, OLD.invoiceExternalID, OLD.creationDate, OLD.deliveryDate, OLD.boxQty,
-      OLD.weight, OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy,
-      'DELETED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID,
-      OLD.lastVisitedUserPointID);
+  INSERT INTO invoice_history
+    VALUE
+    (NULL, NOW(), OLD.invoiceID, OLD.invoiceIDExternal, OLD.dataSourceID, OLD.documentNumber, OLD.documentDate,
+     OLD.firma, OLD.contactName, OLD.contactPhone, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.weight,
+     OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy, 'CREATED', OLD.commentForStatus,
+     OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
 FOR EACH ROW
@@ -581,7 +581,6 @@ FOR EACH ROW
       END;
     END IF;
   END;
-
 
 CREATE TABLE invoice_history (
   invoiceHistoryID       BIGINT AUTO_INCREMENT,
@@ -630,13 +629,13 @@ CREATE FUNCTION getPointIDByName(name VARCHAR(128))
     RETURN result;
   END;
 
-CREATE FUNCTION `getUserIDByEmail`(_email VARCHAR(64))
+CREATE FUNCTION getUserIDByLogin(_login VARCHAR(64))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT userID
                   FROM users
-                  WHERE email = _email);
+                  WHERE login = _login);
     RETURN result;
   END;
 
