@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,22 +46,24 @@ public class InsertTransactionScript {
         JSONArray updateAddresses = (JSONArray) packageData.get("updateAddress");
         JSONArray updateRequests = (JSONArray) packageData.get("updateRequests");
 
-
         PreparedStatement
                 updatePointsPrepStatement = null,
                 updateRoutesPrepStatement = null,
                 updateMarketAgentUsersPrepStatement = null,
                 updateClientsPrepStatement = null,
-                updateRequestsPrepStatement = null;
+                updateRequestsPrepStatement = null,
+                updateInvoicesPrepStatement = null;
         try {
             updatePointsPrepStatement = batchPointsData(updatePointsArray, updateAddresses);
             updateRoutesPrepStatement = batchRoutesData(updateRoutesArray);
             updateMarketAgentUsersPrepStatement = batchMarketAgentUser(updateMarketAgentUsersArray);
             updateClientsPrepStatement = batchClients(updateClientsArray);
-            updateRequestsPrepStatement = batchRequestsAndInvoices(updateRequests);
+            updateRequestsPrepStatement = batchRequests(updateRequests);
+            updateInvoicesPrepStatement = batchInvoices(updateRequests);
             connection.commit();
 
         } catch(Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.error("start ROLLBACK");
             DBUtils.rollbackQuietly(connection);
@@ -71,6 +74,7 @@ public class InsertTransactionScript {
             DBUtils.closeStatementQuietly(updateMarketAgentUsersPrepStatement);
             DBUtils.closeStatementQuietly(updateClientsPrepStatement);
             DBUtils.closeStatementQuietly(updateRequestsPrepStatement);
+            DBUtils.closeStatementQuietly(updateInvoicesPrepStatement);
         }
 
     }
@@ -246,13 +250,15 @@ public class InsertTransactionScript {
     }
 
     protected java.sql.Date getSqlDateFromString(String dateString) {
+        if (dateString == null) return null;
         LocalDate requestDate = LocalDate.parse(dateString, DateTimeFormatter.BASIC_ISO_DATE);
         Date date = Date.valueOf(requestDate);
         return new java.sql.Date(date.getTime());
     }
-    //
-    private PreparedStatement batchRequestsAndInvoices(JSONArray updateRequests) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(
+
+
+    private PreparedStatement batchRequests(JSONArray updateRequests) throws SQLException {
+        PreparedStatement requestsPreparedStatement = connection.prepareStatement(
                 "INSERT INTO requests\n" +
                         "SELECT\n" +
                         "  NULL,\n" +
@@ -269,79 +275,95 @@ public class InsertTransactionScript {
             String requestIDExternal = (String)((JSONObject) updateRequest).get("requestId");
             String requestNumber = (String)((JSONObject) updateRequest).get("requestNumber");
             String requestDateAsString = (String)((JSONObject) updateRequest).get("requestDate");
-            // externals, foreign keys
             String login = (String)((JSONObject) updateRequest).get("traderId"); //userID
             String pointIdExternal = (String)((JSONObject) updateRequest).get("addressId"); //pointID
             String clientIdExternal = (String)((JSONObject) updateRequest).get("clientId");
 
-            preparedStatement.setString(1, requestIDExternal);
-            preparedStatement.setString(2, LOGIST_1C);
-            preparedStatement.setString(3, requestNumber);
-
-            preparedStatement.setDate(  4, getSqlDateFromString(requestDateAsString));
-            preparedStatement.setString(5, login);
-            preparedStatement.setString(6, clientIdExternal);
-            preparedStatement.setString(7, LOGIST_1C);
-            preparedStatement.setString(8, pointIdExternal);
-            preparedStatement.setString(9, LOGIST_1C);
-            preparedStatement.addBatch();
+            requestsPreparedStatement.setString(1, requestIDExternal);
+            requestsPreparedStatement.setString(2, LOGIST_1C);
+            requestsPreparedStatement.setString(3, requestNumber);
+            requestsPreparedStatement.setDate(4, getSqlDateFromString(requestDateAsString));
+            requestsPreparedStatement.setString(5, login);
+            requestsPreparedStatement.setString(6, clientIdExternal);
+            requestsPreparedStatement.setString(7, LOGIST_1C);
+            requestsPreparedStatement.setString(8, pointIdExternal);
+            requestsPreparedStatement.setString(9, LOGIST_1C);
+            requestsPreparedStatement.addBatch();
         }
+        int[] requestsAffectedRecords = requestsPreparedStatement.executeBatch();
+        logger.info("INSERT INTO requests completed, affected records size = [{}]", requestsAffectedRecords.length);
+        return requestsPreparedStatement;
+    }
+
+    private PreparedStatement batchInvoices(JSONArray updateRequests) throws SQLException {
 
 
-
-        PreparedStatement preparedStatement2 = connection.prepareStatement(
-
+        PreparedStatement invoicesPreparedStatement = connection.prepareStatement(
+            "INSERT INTO invoices\n" +
+                    "  VALUE\n" +
+                    "  (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), getUserIDByLogin('parser'), 'CREATED',\n" +
+                    "  ?, (SELECT requests.requestID FROM requests WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?), 1, NULL, NULL);"
         );
 
         for (Object updateRequest : updateRequests) {
-            String invoiceNumber = (String)((JSONObject) updateRequest).get("invoiceNumber");
-            String invoiceDateAsString = (String)((JSONObject) updateRequest).get("invoiceDate");
-            java.sql.Date invoiceDate = getSqlDateFromString(invoiceDateAsString);
+            String requestIDExternal = (String)((JSONObject) updateRequest).get("requestId");
+            //String invoiceIdExternal = (String)((JSONObject) updateRequest).get("invoiceNumber");
+            //TODO temporally use requestId as invoiceNumber
+            String invoiceIdExternal = (String)((JSONObject) updateRequest).get("requestId");
             String documentNumber = (String)((JSONObject) updateRequest).get("documentNumber");
-            String documentDateAsString = (String)((JSONObject) updateRequest).get("documentDate");
-            java.sql.Date documentDate = getSqlDateFromString(documentDateAsString);
+            if (documentNumber == null) documentNumber = "";
+
             String firma = (String)((JSONObject) updateRequest).get("firma");
-            String storage = (String)((JSONObject) updateRequest).get("storage");
+            // TODO what do with storage, we need ID but there is only name
+            // String storage = (String)((JSONObject) updateRequest).get("storage");
             String contactName = (String)((JSONObject) updateRequest).get("contactName");
             String contactPhone = (String)((JSONObject) updateRequest).get("contactPhone");
-            String deliveryOption = (String)((JSONObject) updateRequest).get("deliveryOption");
+            // String deliveryOption = (String)((JSONObject) updateRequest).get("deliveryOption");
+
+            String invoiceDateAsString = (String)((JSONObject) updateRequest).get("invoiceDate");
+            java.sql.Date creationDate = null;
+            try {
+                creationDate = getSqlDateFromString(invoiceDateAsString);
+            } catch (DateTimeParseException e) {
+                logger.warn("invoiceDate for requestId = [{}] has incompatible format with value = [{}]", requestIDExternal, invoiceDateAsString);
+            }
+            String documentDateAsString = (String)((JSONObject) updateRequest).get("documentDate");
+            java.sql.Date documentDate =  null;
+            try {
+                documentDate = getSqlDateFromString(documentDateAsString);
+            } catch (DateTimeParseException e) {
+                logger.warn("documentDate for requestId = [{}] has incompatible format with value = [{}]", requestIDExternal, documentDateAsString);
+            }
             String deliveryDateAsString = (String)((JSONObject) updateRequest).get("deliveryDate");
-            java.sql.Date deliveryDate = getSqlDateFromString(deliveryDateAsString);
+            java.sql.Date deliveryDate =  null;
+            try {
+                deliveryDate = getSqlDateFromString(deliveryDateAsString);
+            } catch (DateTimeParseException e) {
+                logger.warn("deliveryDate for requestId = [{}] has incompatible format with value = [{}]", requestIDExternal, deliveryDateAsString);
+            }
 
+            invoicesPreparedStatement.setString(1, invoiceIdExternal);
+            invoicesPreparedStatement.setString(2, LOGIST_1C);
+            invoicesPreparedStatement.setString(3, documentNumber);
+            invoicesPreparedStatement.setDate(4, documentDate);
+            invoicesPreparedStatement.setString(5, firma);
+            invoicesPreparedStatement.setString(6, contactName);
+            invoicesPreparedStatement.setString(7, contactPhone);
+            invoicesPreparedStatement.setDate(8, creationDate);
+            invoicesPreparedStatement.setDate(9, deliveryDate);
+            invoicesPreparedStatement.setNull(10, Types.INTEGER); //boxQty
+            invoicesPreparedStatement.setNull(11, Types.INTEGER); //weight
+            invoicesPreparedStatement.setNull(12, Types.INTEGER); //volume
+            invoicesPreparedStatement.setBigDecimal(13, null); //goodsCost
+            invoicesPreparedStatement.setString(14, null); //commentForStatus
+            invoicesPreparedStatement.setString(15, requestIDExternal); //requestIdExternal
+            invoicesPreparedStatement.setString(16, LOGIST_1C);
 
-
-
-
-
-
-
-            String requestDateAsString = (String)((JSONObject) updateRequest).get("requestDate");
-            // externals, foreign keys
-            String login = (String)((JSONObject) updateRequest).get("traderId"); //userID
-            String pointIdExternal = (String)((JSONObject) updateRequest).get("addressId"); //pointID
-            String clientIdExternal = (String)((JSONObject) updateRequest).get("clientId");
-
-            preparedStatement.setString(1, requestIDExternal);
-            preparedStatement.setString(2, LOGIST_1C);
-            preparedStatement.setString(3, requestNumber);
-
-            preparedStatement.setDate(  4, getSqlDateFromString(requestDateAsString));
-            preparedStatement.setString(5, login);
-            preparedStatement.setString(6, clientIdExternal);
-            preparedStatement.setString(7, LOGIST_1C);
-            preparedStatement.setString(8, pointIdExternal);
-            preparedStatement.setString(9, LOGIST_1C);
-            preparedStatement.addBatch();
+            invoicesPreparedStatement.addBatch();
         }
-
-
-        int[] affectedRecords = preparedStatement.executeBatch();
-
-
-
-
-        logger.info("INSERT INTO requests and invoices completed, affected records = [{}]", Arrays.toString(affectedRecords));
-        return preparedStatement;
+        int[] requestsAffectedRecords = invoicesPreparedStatement.executeBatch();
+        logger.info("INSERT INTO invoices completed, affected record size = [{}]", requestsAffectedRecords.length);
+        return invoicesPreparedStatement;
     }
 
 

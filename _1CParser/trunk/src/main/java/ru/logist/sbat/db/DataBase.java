@@ -6,6 +6,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 
@@ -42,7 +46,6 @@ public class DataBase {
     public void updateDataFromJSONObject(JSONObject jsonObject) throws SQLException {
         InsertTransactionScript insertTransactionScript = new InsertTransactionScript(connection, jsonObject);
         insertTransactionScript.updateData();
-
     }
 
     public List<String> getInvoiceStatuses() throws SQLException {
@@ -174,6 +177,30 @@ public class DataBase {
 
     }
 
+
+//    protected void recreateDatabase(String tables_and_functions_sql) {
+//        Statement statement = null;
+//
+//        // get All public table names
+//        try {
+//            statement = connection.createStatement();
+//            statement.executeUpdate(tables_and_functions_sql);
+//            connection.commit();
+//        } catch (SQLException e) {
+//            try {
+//                connection.rollback();
+//            } catch (SQLException e1) {/*NOPE*/}
+//            e.printStackTrace();
+//        }
+//        finally {
+//            if (statement != null) {
+//                try {
+//                    statement.close();
+//                } catch (SQLException e) {/*NOPE*/}
+//            }
+//        }
+//    }
+
     /**
      * this method designed only for tests
      */
@@ -205,7 +232,12 @@ public class DataBase {
                 statement.executeUpdate(sql);
                 System.out.println(sql);
             }
+
             connection.createStatement().executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
+            connection.createStatement().executeUpdate("INSERT INTO points (pointID, pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime, district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID) VALUE\n" +
+                    "  (1, 'def', 'LOGIST_1C', 'NO_W_POINT', '', 0, 0, '', '00:00:00', '00:00:00', '', '', '', '', '', '', '', 'WAREHOUSE');");
+            connection.createStatement().executeUpdate("INSERT INTO users VALUES (NULL, 'parser', '', '', '', '','', 'fff', md5(CONCAT(md5('nolpitf43gwer'), 'fff')), '', '', 'ADMIN', NULL);");
+
             connection.commit();
 
         } catch (SQLException e) {
@@ -224,4 +256,10 @@ public class DataBase {
 
 
     }
+
+    public void importSQL(InputStream in) throws SQLException {
+        SqlRunner sqlRunner = new SqlRunner(connection, new PrintWriter(System.out), new PrintWriter(System.err), true, false);
+        sqlRunner.runScript(new InputStreamReader(in, StandardCharsets.UTF_8));
+    }
+
 }
