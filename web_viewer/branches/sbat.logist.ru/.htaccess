@@ -1,6 +1,0 @@
-IndexOptions +Charset=UTF-8
-Options All -Indexes
-AddCharset UTF-8 .js
-AddCharset UTF-8 .php
-AddCharset UTF-8 .html
-php_value session.gc_maxlifetime 60
