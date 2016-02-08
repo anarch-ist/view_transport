@@ -271,12 +271,18 @@ CREATE TABLE tariffs (
 -- zero time is 00:00(GMT) of that day, when carrier arrives at first point of route.
 CREATE TABLE routes (
   routeID               INTEGER AUTO_INCREMENT,
-  dataSourceID          VARCHAR(32)                                                                                  NOT NULL,
-  directionIDExternal   VARCHAR(255)                                                                                 NOT NULL,
-  routeName             VARCHAR(255)                                                                                 NOT NULL,
-  firstPointArrivalTime TIME DEFAULT '00:00:00'                                                                      NOT NULL,
-  daysOfWeek            SET('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday') DEFAULT '' NOT NULL,
-  tariffID              INTEGER                                                                                      NULL,
+  directionIDExternal   VARCHAR(255)             NOT NULL,
+  dataSourceID          VARCHAR(32)              NOT NULL,
+  routeName             VARCHAR(255)             NOT NULL,
+  firstPointArrivalTime TIME DEFAULT '00:00:00'  NOT NULL,
+  daysOfWeek            SET('monday',
+                            'tuesday',
+                            'wednesday',
+                            'thursday',
+                            'friday',
+                            'saturday',
+                            'sunday') DEFAULT '' NOT NULL,
+  tariffID              INTEGER                  NULL,
   PRIMARY KEY (routeID),
   FOREIGN KEY (tariffID) REFERENCES tariffs (tariffID)
     ON DELETE SET NULL
@@ -287,16 +293,15 @@ CREATE TABLE routes (
 );
 
 CREATE TABLE route_list_statuses (
-  routeListStatusID VARCHAR(32),
+  routeListStatusID      VARCHAR(32),
+  routeListStatusRusName VARCHAR(255),
   PRIMARY KEY (routeListStatusID)
 );
 
 INSERT INTO route_list_statuses
 VALUES
-  ('CREATED'),
-  ('UPDATED'),
-  ('DELETED');
-
+  ('CREATED', 'Маршрутный лист создается'),
+  ('APPROVED', 'Формирование маршрутного листа завершено');
 
 CREATE TABLE route_points (
   routePointID             INTEGER AUTO_INCREMENT,
@@ -328,81 +333,77 @@ CREATE TABLE relations_between_route_points (
     ON UPDATE CASCADE
 );
 
+-- ВНИМАНИЕ! при изменении в этой таблице нужно согласовать все с триггерами и таблицей route_list_history
 CREATE TABLE route_lists (
-  routeListID       INTEGER AUTO_INCREMENT,
-  routeListNumber   VARCHAR(32)  NOT NULL,
-  startDate         DATE         NULL,
-  palletsQty        INTEGER      NULL,
-  driver            VARCHAR(255) NULL,
-  driverPhoneNumber VARCHAR(12)  NULL,
-  licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  routeID           INTEGER      NOT NULL,
+  routeListID         INTEGER AUTO_INCREMENT,
+  routeListIDExternal VARCHAR(32)  NOT NULL,
+  dataSourceID        VARCHAR(32)  NOT NULL,
+  routeListNumber     VARCHAR(32)  NOT NULL,
+  creationDate        DATE         NULL,
+  departureDate       DATE         NULL,
+  palletsQty          INTEGER      NULL,
+  driverId            VARCHAR(255) NULL,
+  driverPhoneNumber   VARCHAR(12)  NULL,
+  licensePlate        VARCHAR(9)   NULL, -- государственный номер автомобиля
+  status              VARCHAR(32)  NOT NULL,
+  routeID             INTEGER      NOT NULL,
   PRIMARY KEY (routeListID),
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
-  UNIQUE (routeListNumber)
+  FOREIGN KEY (status) REFERENCES route_list_statuses (routeListStatusID)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE,
+  UNIQUE (routeListNumber),
+  UNIQUE (routeListIDExternal, dataSourceID)
 );
-
-CREATE PROCEDURE insert_into_route_list_history(
-  routeListID       INTEGER,
-  routeListNumber   VARCHAR(32),
-  startDate         DATE,
-  palletsQty        INTEGER,
-  driver            VARCHAR(255),
-  driverPhoneNumber VARCHAR(12),
-  licensePlate      VARCHAR(9),
-  routeID           INTEGER,
-  routeListStatusID VARCHAR(32)
-)
-  BEGIN
-    INSERT INTO route_list_history
-    VALUES
-      (NULL, NOW(), routeListID, routeListNumber, startDate, palletsQty, driver, driverPhoneNumber, licensePlate,
-       routeID, routeListStatusID);
-  END;
 
 
 CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
-  BEGIN
-    CALL insert_into_route_list_history(NEW.routeListID, NEW.routeListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
-                                        NEW.driverPhoneNumber,
-                                        NEW.licensePlate, NEW.routeID, 'CREATED');
-  END;
+  INSERT INTO route_list_history
+  VALUES
+    (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
+           NEW.departureDate, NEW.palletsQty, NEW.driverId,
+           NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
-  BEGIN
-    CALL insert_into_route_list_history(NEW.routeListID, NEW.routeListNumber, NEW.startDate, NEW.palletsQty, NEW.driver,
-                                        NEW.driverPhoneNumber,
-                                        NEW.licensePlate, NEW.routeID, 'UPDATED');
-  END;
+  INSERT INTO route_list_history
+  VALUES
+    (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
+           NEW.departureDate, NEW.palletsQty, NEW.driverId,
+           NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
-  BEGIN
-    CALL insert_into_route_list_history(OLD.routeListID, OLD.routeListNumber, OLD.startDate, OLD.palletsQty, OLD.driver,
-                                        OLD.driverPhoneNumber,
-                                        OLD.licensePlate, OLD.routeID, 'DELETED');
-  END;
+  INSERT INTO route_list_history
+  VALUES
+    (NULL, NOW(), OLD.routeListID, OLD.routeListIDExternal, OLD.dataSourceID, OLD.routeListNumber, OLD.creationDate,
+           OLD.departureDate, OLD.palletsQty, OLD.driverId,
+           OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
+
 
 CREATE TABLE route_list_history (
-  routeListHistoryID BIGINT AUTO_INCREMENT,
-  timeMark           DATETIME,
-  routeListID        INTEGER,
-  routeListNumber    VARCHAR(32)  NOT NULL,
-  startDate          DATE         NULL,
-  palletsQty         INTEGER      NULL,
-  driver             VARCHAR(255) NULL,
-  driverPhoneNumber  VARCHAR(12)  NULL,
-  licensePlate       VARCHAR(9)   NULL, -- государственный номер автомобиля
-  routeID            INTEGER      NOT NULL,
-  routeListStatusID  VARCHAR(32)  NOT NULL,
+  routeListHistoryID  BIGINT AUTO_INCREMENT,
+  timeMark            DATETIME                              NOT NULL,
+  routeListID         INTEGER                               NOT NULL,
+  routeListIDExternal VARCHAR(32)                           NOT NULL,
+  dataSourceID        VARCHAR(32)                           NOT NULL,
+  routeListNumber     VARCHAR(32)                           NOT NULL,
+  creationDate        DATE                                  NULL,
+  departureDate       DATE                                  NULL,
+  palletsQty          INTEGER                               NULL,
+  driverId            VARCHAR(255)                          NULL,
+  driverPhoneNumber   VARCHAR(12)                           NULL,
+  licensePlate        VARCHAR(9)                            NULL, -- государственный номер автомобиля
+  status              VARCHAR(32)                           NOT NULL,
+  routeID             INTEGER                               NOT NULL,
+  dutyStatus          ENUM('CREATED', 'UPDATED', 'DELETED') NOT NULL,
   PRIMARY KEY (routeListHistoryID),
-  FOREIGN KEY (routeListStatusID) REFERENCES route_list_statuses (routeListStatusID)
+  FOREIGN KEY (status) REFERENCES route_list_statuses (routeListStatusID)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION
+    ON UPDATE CASCADE
 );
 
 
@@ -424,22 +425,26 @@ VALUES
   ('CREATED', 'Внутренняя заявка добавлена в БД', 0),
   ('DELETED', 'Внутренняя заявка удалена из БД', -1),
 -- insider request statuses
-  ('APPROVING', 'Выгружена на утверждение торговому представителю', 1),
-  ('RESERVED', 'Резерв', 2),
-  ('APPROVED', 'Утверждена к сборке', 3),
+  ('SAVED', 'Заявка в состоянии черновика', 1),
+  ('APPROVING', 'Выгружена на утверждение торговому представителю', 2),
+  ('RESERVED', 'Резерв', 3),
+  ('APPROVED', 'Утверждена к сборке', 4),
   ('STOP_LIST', 'Стоп-лист', -2),
   ('CREDIT_LIMIT', 'Кредитный лимит', -3),
-  ('RASH_CREATED', 'Создана расходная накладная', 6),
-  ('COLLECTING', 'Выдана на сборку', 7),
-  ('CHECK', 'На контроле', 8),
-  ('CHECK_PASSED', 'Контроль пройден', 9),
+  ('RASH_CREATED', 'Создана расходная накладная', 5),
+  ('COLLECTING', 'Выдана на сборку', 6),
+  ('CHECK', 'На контроле', 7),
+  ('CHECK_PASSED', 'Контроль пройден', 8),
+  ('ADJUSTMENTS_MADE', 'Сделаны коректировки\распечатаны документы', 9),
   ('PACKAGING', 'Упаковано', 10),
-  ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 11),
+  ('CHECK_BOXES', 'Проверка коробок в зоне отгрузки', 11),
+  ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 12),
+  ('TRANSPORTATION', 'Маршрутный лист закрыт, товар передан экспедитору на погрузку', 13),
 -- invoice statuses
-  ('DEPARTURE', 'В транзите', 12),
-  ('ARRIVED', 'Накладная прибыла в пункт', 13),
+  ('DEPARTURE', 'В транзите', 14),
+  ('ARRIVED', 'Накладная прибыла в пункт', 15),
   ('ERROR', 'Ошибка. Возвращение в пункт', -4),
-  ('DELIVERED', 'Доставлено', 14);
+  ('DELIVERED', 'Доставлено', 16);
 
 CREATE TABLE invoice_statuses_for_user_role (
   userRoleID      VARCHAR(32),
@@ -470,7 +475,7 @@ VALUES
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
 -- при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
--- ВНИМАНИЕ при изменении порядка полей их также нужно менять в триггерах и в таблице invoice_history!!!
+-- ВНИМАНИЕ! при изменении порядка полей их также нужно менять в триггерах и в таблице invoice_history!!!
 CREATE TABLE invoices (
   invoiceID              INTEGER AUTO_INCREMENT,
   invoiceIDExternal      VARCHAR(255)   NOT NULL,
@@ -689,6 +694,13 @@ CREATE FUNCTION getRoutePointIDByRouteNameAndSortOrder(_routeName VARCHAR(64), _
     RETURN result;
   END;
 
+CREATE FUNCTION getRouteIDByDirectionIDExternal(_directionIDExternal VARCHAR(64), _dataSourceID VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT routes.routeID FROM routes WHERE routes.directionIDExternal = _directionIDExternal AND routes.dataSourceID = _dataSourceID);
+    RETURN result;
+  END;
 
 CREATE FUNCTION getNextSortOrder(_routeID INTEGER, _lastVisitedPointID INTEGER)
   RETURNS INTEGER

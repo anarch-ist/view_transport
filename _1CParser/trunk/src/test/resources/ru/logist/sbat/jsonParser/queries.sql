@@ -82,3 +82,5 @@ INSERT INTO invoices
                                         'some_comment123', getRequestIDByNumber('123356'), 1, NULL, NULL);
 
 
+UPDATE invoices SET routeListID = getRouteIDByDirectionIDExternal('7002','LOGIST_1C') WHERE invoices.invoiceIDExternal = ? AND invoices.dataSourceID = 'LOGIST_1C';
+

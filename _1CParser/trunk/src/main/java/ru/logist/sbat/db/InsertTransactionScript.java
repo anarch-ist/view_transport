@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -45,6 +46,8 @@ public class InsertTransactionScript {
         JSONArray updateClientsArray = (JSONArray) packageData.get("updateClients");
         JSONArray updateAddresses = (JSONArray) packageData.get("updateAddress");
         JSONArray updateRequests = (JSONArray) packageData.get("updateRequests");
+        JSONArray updateStatuses = (JSONArray) packageData.get("updateStatus");
+        JSONArray updateRouteLists = (JSONArray) packageData.get("updateRouteLists");
 
         PreparedStatement
                 updatePointsPrepStatement = null,
@@ -52,7 +55,10 @@ public class InsertTransactionScript {
                 updateMarketAgentUsersPrepStatement = null,
                 updateClientsPrepStatement = null,
                 updateRequestsPrepStatement = null,
-                updateInvoicesPrepStatement = null;
+                updateInvoicesPrepStatement = null,
+                updateInvoicesStatusesPrepStatement = null;
+        PreparedStatement[] routeListsInsertPreparedStatements = null;
+
         try {
             updatePointsPrepStatement = batchPointsData(updatePointsArray, updateAddresses);
             updateRoutesPrepStatement = batchRoutesData(updateRoutesArray);
@@ -60,6 +66,8 @@ public class InsertTransactionScript {
             updateClientsPrepStatement = batchClients(updateClientsArray);
             updateRequestsPrepStatement = batchRequests(updateRequests);
             updateInvoicesPrepStatement = batchInvoices(updateRequests);
+            updateInvoicesStatusesPrepStatement = batchInvoiceStatuses(updateStatuses);
+            routeListsInsertPreparedStatements = batchRouteLists(updateRouteLists);
             connection.commit();
 
         } catch(Exception e) {
@@ -75,6 +83,10 @@ public class InsertTransactionScript {
             DBUtils.closeStatementQuietly(updateClientsPrepStatement);
             DBUtils.closeStatementQuietly(updateRequestsPrepStatement);
             DBUtils.closeStatementQuietly(updateInvoicesPrepStatement);
+            DBUtils.closeStatementQuietly(updateInvoicesStatusesPrepStatement);
+            for (PreparedStatement routeListsInsertPreparedStatement : routeListsInsertPreparedStatements) {
+                DBUtils.closeStatementQuietly(routeListsInsertPreparedStatement);
+            }
         }
 
     }
@@ -250,7 +262,8 @@ public class InsertTransactionScript {
     }
 
     protected java.sql.Date getSqlDateFromString(String dateString) {
-        if (dateString == null) return null;
+        if (dateString == null)
+            return null;
         LocalDate requestDate = LocalDate.parse(dateString, DateTimeFormatter.BASIC_ISO_DATE);
         Date date = Date.valueOf(requestDate);
         return new java.sql.Date(date.getTime());
@@ -362,9 +375,162 @@ public class InsertTransactionScript {
             invoicesPreparedStatement.addBatch();
         }
         int[] requestsAffectedRecords = invoicesPreparedStatement.executeBatch();
-        logger.info("INSERT INTO invoices completed, affected record size = [{}]", requestsAffectedRecords.length);
+        logger.info("INSERT INTO invoices completed, affected records size = [{}]", requestsAffectedRecords.length);
         return invoicesPreparedStatement;
     }
 
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uu.MM.dd,HH:mm:ss");
+    private PreparedStatement batchInvoiceStatuses(JSONArray updateStatuses) throws SQLException {
+        PreparedStatement invoicesUpdatePreparedStatement = connection.prepareStatement(
+                "UPDATE invoices SET boxQty = ?, invoiceStatusID = ?, commentForStatus = ?, lastStatusUpdated = ? WHERE invoiceIDExternal = ? AND dataSourceID = ?;"
+        );
+
+        for (Object updateStatus : updateStatuses) {
+            String invoiceIdExternal = (String)((JSONObject) updateStatus).get("requestId"); // should be invoiceID
+            Long numBoxes = (Long)((JSONObject) updateStatus).get("num_boxes");
+            String invoiceStatus = (String)((JSONObject) updateStatus).get("status");
+
+
+            java.sql.Date timeOutStatus = null;
+            String timeOutStatusAsString = (String)((JSONObject) updateStatus).get("timeOutStatus");
+            if (timeOutStatusAsString != null) {
+                try {
+                    LocalDate requestDate = LocalDate.parse(timeOutStatusAsString, dateTimeFormatter);
+                    Date date = Date.valueOf(requestDate);
+                    timeOutStatus = new Date(date.getTime());
+                } catch (DateTimeParseException e) {
+                    logger.warn("timeOutStatus for invoiceId = [{}] has empty value", invoiceIdExternal);
+                }
+            }
+
+            String comment = (String)((JSONObject) updateStatus).get("Comment");
+
+            if (numBoxes == null)
+                invoicesUpdatePreparedStatement.setNull(1, Types.INTEGER);
+            else {
+                invoicesUpdatePreparedStatement.setLong(1, numBoxes);
+            }
+            if (invoiceStatus == null) {
+                logger.warn("invoiceStatus for invoiceId = [{}] is null, new invoiceStatus = [CREATED]");
+                invoiceStatus = "CREATED";
+            }
+            invoicesUpdatePreparedStatement.setString(2, invoiceStatus);
+            invoicesUpdatePreparedStatement.setString(3, comment);
+            invoicesUpdatePreparedStatement.setDate(4, timeOutStatus);
+            invoicesUpdatePreparedStatement.setString(5, invoiceIdExternal);
+            invoicesUpdatePreparedStatement.setString(6, LOGIST_1C);
+
+            invoicesUpdatePreparedStatement.addBatch();
+        }
+        int[] requestsAffectedRecords = invoicesUpdatePreparedStatement.executeBatch();
+        logger.info("UPDATE invoices completed, affected records size = [{}]", requestsAffectedRecords.length);
+        return invoicesUpdatePreparedStatement;
+    }
+
+
+
+    private PreparedStatement[] batchRouteLists(JSONArray updateRouteLists) throws SQLException {
+        PreparedStatement[] result = new PreparedStatement[3];
+
+        // create routeLists
+        PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
+                "INSERT INTO route_lists VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?,?));", Statement.RETURN_GENERATED_KEYS
+        );
+
+        // add data into routePoints
+        PreparedStatement routePointsInsertPreparedStatement = connection.prepareStatement(
+                "INSERT INTO route_points VALUE (NULL, 0, 0, (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?), getRouteIDByDirectionIDExternal(?,?));"
+        );
+
+        // add data into invoices
+        PreparedStatement invoicesUpdatePreparedStatement = connection.prepareStatement(
+                "UPDATE invoices SET " +
+                        "routeListID = (SELECT route_lists.routeListID FROM route_lists WHERE route_lists.routeListIDExternal = ? AND route_lists.dataSourceID = ?)," +
+                        "warehousePointID = (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?)" +
+                        "  WHERE invoices.invoiceIDExternal = ? AND invoices.dataSourceID = ?;"
+
+        );
+
+        result[0] = routeListsInsertPreparedStatement;
+        result[1] = routePointsInsertPreparedStatement;
+        result[2] = invoicesUpdatePreparedStatement;
+
+        for (Object updateRouteList : updateRouteLists) {
+            String routeListId = (String)((JSONObject) updateRouteList).get("routerSheetId");
+            String directId = (String)((JSONObject) updateRouteList).get("directId");
+            if (directId.equals("NULL")) {
+                logger.warn("directId is NULL, routeList = [{}] not inserted", routeListId);
+                continue;
+            }
+
+            String routeListNumber = (String)((JSONObject) updateRouteList).get("routerSheetNumber");
+            java.sql.Date creationDate = null;
+            String routeListDateAsString = (String)((JSONObject) updateRouteList).get("routerSheetDate");
+            try {
+                creationDate = getSqlDateFromString(routeListDateAsString);
+            } catch (DateTimeParseException e) {
+                logger.warn("routeListDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
+            }
+            java.sql.Date departureDate = null;
+            String departureDateAsString = (String)((JSONObject) updateRouteList).get("departureDate");
+            try {
+                departureDate = getSqlDateFromString(routeListDateAsString);
+            } catch (DateTimeParseException e) {
+                logger.warn("departureDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
+            }
+            String forwarderId = (String)((JSONObject) updateRouteList).get("forwarderId");
+            String driverId = (String)((JSONObject) updateRouteList).get("driverId");
+            String pointDepartureId = (String)((JSONObject) updateRouteList).get("pointDepartureId"); // pointIDExternal
+            String pointArrivalId = (String)((JSONObject) updateRouteList).get("pointArrivalId"); // pointIDExternal
+
+            String status = (String)((JSONObject) updateRouteList).get("status");
+            JSONArray invoices = (JSONArray) ((JSONObject) updateRouteList).get("invoices"); // list of invoices inside routeList
+
+
+            routeListsInsertPreparedStatement.setString(1, routeListId);
+            routeListsInsertPreparedStatement.setString(2, LOGIST_1C);
+            routeListsInsertPreparedStatement.setString(3, routeListNumber);
+            routeListsInsertPreparedStatement.setDate(4, creationDate);
+            routeListsInsertPreparedStatement.setDate(5, departureDate);
+            routeListsInsertPreparedStatement.setNull(6, Types.INTEGER); // palletsQty
+            routeListsInsertPreparedStatement.setString(7, driverId);
+            routeListsInsertPreparedStatement.setString(8, null); // driverPhoneNumber
+            routeListsInsertPreparedStatement.setString(9, null); // license plate
+            routeListsInsertPreparedStatement.setString(10, status); // license plate
+            routeListsInsertPreparedStatement.setString(11, directId);
+            routeListsInsertPreparedStatement.setString(12, LOGIST_1C);
+            routeListsInsertPreparedStatement.addBatch();
+
+
+            routePointsInsertPreparedStatement.setString(1, pointDepartureId);
+            routePointsInsertPreparedStatement.setString(2, LOGIST_1C);
+            routePointsInsertPreparedStatement.setString(3, directId);
+            routePointsInsertPreparedStatement.setString(4, LOGIST_1C);
+            routePointsInsertPreparedStatement.addBatch();
+
+            for(Object invoiceIDExternalAsObject: invoices) {
+                String invoiceIDExternal = (String) invoiceIDExternalAsObject;
+                invoicesUpdatePreparedStatement.setString(1, routeListId);
+                invoicesUpdatePreparedStatement.setString(2, LOGIST_1C);
+                invoicesUpdatePreparedStatement.setString(3, pointDepartureId);
+                invoicesUpdatePreparedStatement.setString(4, LOGIST_1C);
+                invoicesUpdatePreparedStatement.setString(5, invoiceIDExternal);
+                invoicesUpdatePreparedStatement.setString(6, LOGIST_1C);
+                invoicesUpdatePreparedStatement.addBatch();
+            }
+
+        }
+
+        int[] routeListsAffectedRecords = routeListsInsertPreparedStatement.executeBatch();
+        logger.info("INSERT INTO route_lists completed, affected records size = [{}]", routeListsAffectedRecords.length);
+
+        int[] routePointsAffectedRecords = routePointsInsertPreparedStatement.executeBatch();
+        logger.info("INSERT INTO routePoints completed, affected records size = [{}]", routePointsAffectedRecords.length);
+
+        int[] invoicesAffectedRecords = invoicesUpdatePreparedStatement.executeBatch();
+        logger.info("UPDATE for invoices completed, affected records size = [{}]", invoicesAffectedRecords.length);
+
+        return result;
+    }
 
 }
