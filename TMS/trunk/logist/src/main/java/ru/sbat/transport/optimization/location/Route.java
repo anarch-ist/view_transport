@@ -136,6 +136,16 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
     @Override
+    public double getStartingWeight(){
+        return this.get(0).getCharacteristicsOfCar().getCapacityCar();
+    }
+
+    @Override
+    public double getStartingVolume(){
+        return this.get(0).getCharacteristicsOfCar().getVolumeCar();
+    }
+
+    @Override
     public double getStartingCost() {
         return this.get(0).getCharacteristicsOfCar().getCost();
     }

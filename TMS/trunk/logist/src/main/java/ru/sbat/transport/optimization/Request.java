@@ -1,54 +1,79 @@
 package ru.sbat.transport.optimization;
 
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import ru.sbat.transport.optimization.location.Point;
 
 import java.util.Date;
 
 public class Request {
-    private int requestId;
-    private int clientId;
-    private Point deliveryPoint;
-    private Date plannedDeliveryTime;
-    private int dayOfWeek;
+    private final IntegerProperty requestId = new SimpleIntegerProperty();
+    private final IntegerProperty clientId = new SimpleIntegerProperty();
+    private final ObjectProperty<Point> deliveryPoint = new SimpleObjectProperty<>();
+    private final ObjectProperty<Date> plannedDeliveryTime = new SimpleObjectProperty<>();
+    private final IntegerProperty dayOfWeek = new SimpleIntegerProperty();
 
     public int getDayOfWeek() {
-        return dayOfWeek;
+        return dayOfWeek.get();
     }
 
     public void setDayOfWeek(int dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
+        this.dayOfWeek.set(dayOfWeek);
+    }
+
+    public IntegerProperty getDayOfWeekProperty(){
+        return dayOfWeek;
     }
 
     public int getRequestId() {
-        return requestId;
+        return requestId.get();
     }
 
     public void setRequestId(int requestId) {
-        this.requestId = requestId;
+        this.requestId.set(requestId);
+    }
+
+    public IntegerProperty getRequestIdProperty(){
+        return requestId;
     }
 
     public int getClientId() {
-        return clientId;
+        return clientId.get();
     }
 
     public void setClientId(int clientId) {
-        this.clientId = clientId;
+        this.clientId.set(clientId);
+    }
+
+    public IntegerProperty getCLientIdProperty(){
+        return clientId;
     }
 
     public Point getDeliveryPoint() {
-        return deliveryPoint;
+        return deliveryPoint.get();
     }
 
     public void setDeliveryPoint(Point deliveryPoint) {
-        this.deliveryPoint = deliveryPoint;
+        this.deliveryPoint.set(deliveryPoint);
+    }
+
+    public ObjectProperty<Point> getDeliveryPointProperty(){
+        return deliveryPoint;
     }
 
     public Date getPlannedDeliveryTime() {
-        return plannedDeliveryTime;
+        return plannedDeliveryTime.get();
     }
 
     public void setPlannedDeliveryTime(Date plannedDeliveryTime) {
-        this.plannedDeliveryTime = plannedDeliveryTime;
+        this.plannedDeliveryTime.set(plannedDeliveryTime);
+
+    }
+
+    public ObjectProperty<Date> getPlannedDeliveryTimeProperty(){
+        return plannedDeliveryTime;
     }
 }

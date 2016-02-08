@@ -16,4 +16,6 @@ public interface IRoute {
     int getWeekDayOfDepartureTime();
     int getDaysCountOfRoute();
     double getStartingCost();
+    double getStartingWeight();
+    double getStartingVolume();
 }
