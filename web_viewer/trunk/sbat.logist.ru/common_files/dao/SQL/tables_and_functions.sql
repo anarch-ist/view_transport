@@ -1029,6 +1029,7 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
 
     SET @mainPart =
     'SELECT
+      users.userID,
       users.firstName,
       users.lastName,
       users.patronymic,

@@ -16,9 +16,11 @@ interface IUserEntity
 
     function selectUserByEmail($email);
 
-    function updateUser(UserData $newUser);
+    function updateUser(UserData $newUser, $id);
 
-    function deleteUser(UserData $user);
+    function deleteUser($user);
 
     function addUser(UserData $user);
+
+    function getTotalUserCount();
 }

@@ -59,4 +59,9 @@ class UserEntityTest extends PHPUnit_Framework_TestCase
         $test2 = array('email' => 'test@test.ru', 'isEmpty' => false, 'userID' => 1);
         return array($test1, $test2);
     }
+
+    function addUserTest()
+    {
+
+    }
 }

@@ -30,25 +30,26 @@ class UserEntity implements IUserEntity
         return $userRoleArray[0]['userRoleRusName'];
     }
 
-    function selectUsers()
+    function selectUsers($start = 0, $count = 20)
     {
-        $count = 20;
-        $start = 0;
-        switch (func_num_args()) {
-            case 2:
-                $start = func_get_arg(0);
-                $count = func_get_arg(1);
-                break;
-            case 1:
-                $start = func_get_arg(0);
-                break;
-        }
-        $array = $this->_DAO->select(new SelectAllUsers($start, $count));
-        $users = array();
-        for ($i = 0; $i < count($array); $i++) {
-            $users[$i] = new UserData($array[$i]);
-        }
-        return $users;
+//        $count = 20;
+//        $start = 0;
+//        switch (func_num_args()) {
+//            case 2:
+//                $start = func_get_arg(0);
+//                $count = func_get_arg(1);
+//                break;
+//            case 1:
+//                $start = func_get_arg(0);
+//                break;
+//        }
+        $array = $this->_DAO->select(new EntitySelectAllUsers($start, $count));
+        return $array;
+//        $users = array();
+//        for ($i = 0; $i < count($array); $i++) {
+//            $users[$i] = new UserData($array[$i]);
+//        }
+//        return $users;
     }
 
     function selectUserByID($id)
@@ -60,6 +61,11 @@ class UserEntity implements IUserEntity
         return new UserData($array[0]);
     }
 
+    function getTotalUserCount()
+    {
+        return $this->_DAO->select(new SelectTotalUserCount())[0]['count'];
+    }
+
     function selectUserByEmail($email)
     {
         $array = $this->_DAO->select(new SelectUserByEmail($email));
@@ -69,40 +75,57 @@ class UserEntity implements IUserEntity
         return new UserData($array[0]);
     }
 
-    function updateUser(UserData $newUser)
+    function updateUser(UserData $newUser, $id)
     {
-        // TODO: Implement updateUser() method.
+        return $this->_DAO->update(new UpdateUser($newUser, $id));
     }
 
-    function deleteUser(UserData $user)
+    function deleteUser($userID)
     {
-        // TODO: Implement deleteUser() method.
+        return $this->_DAO->delete(new DeleteUser($userID));
     }
 
     function addUser(UserData $user)
     {
-
-        // TODO: Implement addUser() method.
+        return $this->_DAO->insert(new InsertUser($user));
     }
-    function getUserRoles() {
+
+    function getUserRoles()
+    {
         return $this->_DAO->select(new SelectUserRoles());
     }
 }
 
-class SelectAllUsers implements IEntitySelect
+class SelectTotalUserCount implements IEntitySelect
 {
-    private $start;
-    private $count;
+    function getSelectQuery()
+    {
+        return "SELECT count(*) AS count FROM `users`;";
+    }
+}
+
+class EntitySelectAllUsers implements IEntitySelect
+{
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
 
     function __construct($start, $count)
     {
-        $this->start = $start;
-        $this->count = $count;
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString = '';
+        $searchArray = $_POST['columns'];
+        for ($i = 0; $i < count($searchArray); $i++) {
+            if ($searchArray[$i]['search']['value'] !== '') {
+                $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';
+            }
+        }
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
     }
 
     function getSelectQuery()
     {
-        return "SELECT * FROM `users` LIMIT $this->start, $this->count;";
+        return "CALL selectUsers($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
     }
 }
 
@@ -160,17 +183,77 @@ class SelectUserRoles implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "select * from `user_roles`;";
+        return "SELECT * FROM `user_roles`;";
     }
 }
 
-class UserUpdateEntity implements IEntityUpdate
+class DeleteUser implements IEntityDelete
 {
-    private $obj;
+    private $userID;
 
-    function __construct($obj)
+    function __construct($userID)
     {
-        $this->$obj = $obj;
+        $this->userID = DAO::getInstance()->checkString($userID);
+    }
+
+    /**
+     * @return string
+     */
+    function getDeleteQuery()
+    {
+        return "DELETE FROM `users` WHERE userID = $this->userID;";
+    }
+}
+
+class InsertUser implements IEntityInsert
+{
+    private $firstName, $lastName, $patronymic, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+
+    function __construct(UserData $user)
+    {
+        $dao = DAO::getInstance();
+        $this->firstName = $dao->checkString($user->getData('firstName'));
+        $this->lastName = $dao->checkString($user->getData('lastName'));
+        $this->patronymic = $dao->checkString($user->getData('patronymic'));
+        $this->position = $dao->checkString($user->getData('position'));
+        $this->passMD5 = $dao->checkString($user->getData('password'));
+        $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
+        $this->email = $dao->checkString($user->getData('email'));
+        $this->userRoleID = $dao->checkString($user->getData('userRoleRusName'));
+        $this->pointID = $dao->checkString($user->getData('pointName'));
+    }
+
+    /**
+     * @return string
+     */
+    function getInsertQuery()
+    {
+        $salt = substr(md5(rand(0, 100000000)), 0, 16);
+        $passAndSalt = md5($this->passMD5 . $salt);
+//        echo "INSERT INTO `users` (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE ($this->firstName, $this->lastName, $this->patronymic, $this->position, $salt, $passAndSalt, $this->phoneNumber, $this->email, $this->userRoleID, $this->pointID);";
+        return "INSERT INTO `users` (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE " .
+        "('$this->firstName', '$this->lastName', '$this->patronymic', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID);";
+    }
+}
+
+class UpdateUser implements IEntityUpdate
+{
+    private $firstName, $lastName, $patronymic, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+    private $userID;
+
+    function __construct(UserData $user, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->userID = $dao->checkString($id);
+        $this->firstName = $dao->checkString($user->getData('firstName'));
+        $this->lastName = $dao->checkString($user->getData('lastName'));
+        $this->patronymic = $dao->checkString($user->getData('patronymic'));
+        $this->position = $dao->checkString($user->getData('position'));
+//        $this->passMD5 = $dao->checkString($user->getData('password'));
+        $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
+        $this->email = $dao->checkString($user->getData('email'));
+        $this->userRoleID = $dao->checkString($user->getData('userRoleRusName'));
+        $this->pointID = $dao->checkString($user->getData('pointName'));
     }
 
     /**
@@ -178,17 +261,29 @@ class UserUpdateEntity implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        $query = '';
-        $isFirst = true;
-        foreach ($this->obj as $elem) {
-            if ($isFirst) {
-                $isFirst = false;
-                $query .= "0";
-            } else {
-                $query .= ", '$elem'";
-            }
-        }
-        $query = "insert into `users` values($query)";
-        return $query;
+//        $salt = substr(md5(rand(0,100000000)),0,16);
+//        $passAndSalt = md5($this->passMD5.$salt);
+        return "UPDATE `users` SET " .
+        "firstName = '$this->firstName', " .
+        "lastName = '$this->lastName', " .
+        "patronymic = '$this->patronymic', " .
+        "position = '$this->position', " .
+        "phoneNumber = '$this->phoneNumber', " .
+        "email = '$this->email', " .
+        "userRoleID = '$this->userRoleID', " .
+        "pointID = $this->pointID " .
+        "WHERE userID = $this->userID;";
+//        return "UPDATE `users` SET
+//            firstName = '$this->firstName',
+//            lastName = '$this->lastName',
+//            patronymic = '$this->patronymic',
+//            position = '$this->position',
+//            salt = '$salt',
+//            passAndSalt = '$passAndSalt',
+//            phoneNumber = '$this->phoneNumber',
+//            email = '$this->email',
+//            userRoleID = '$this->userRoleID',
+//            pointID = $this->pointID
+//            WHERE userID = this->userID;";
     }
 }

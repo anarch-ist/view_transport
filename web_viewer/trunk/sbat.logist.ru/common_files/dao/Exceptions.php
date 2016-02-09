@@ -38,6 +38,15 @@ class DataTransferException extends Exception
     }
 }
 
+class DataTablesFieldException extends Exception
+{
+    public function __construct($fieldName, $errorText, $page)
+    {
+        parent::__construct(json_encode(array('fieldErrors' => array(array('name' => $fieldName, 'status' => $errorText)))));
+        writeInErrorlog("DataTablesFieldException: " . $fieldName . ' - ' . $errorText . ' на странице ' . $page);
+    }
+}
+
 function writeInErrorlog($string)
 {
     $file = fopen(__DIR__ . '/logs/error.log', 'a');
