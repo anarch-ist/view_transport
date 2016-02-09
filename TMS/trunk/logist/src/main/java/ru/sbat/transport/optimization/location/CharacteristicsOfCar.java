@@ -7,6 +7,20 @@ public class CharacteristicsOfCar {
     private double volumeCar; //объем машины
     private double cost;
 
+    public CharacteristicsOfCar(double capacityCar, double volumeCar) {
+        this.capacityCar = capacityCar;
+        this.volumeCar = volumeCar;
+    }
+
+    public CharacteristicsOfCar(){
+    }
+
+    public CharacteristicsOfCar(double capacityCar, double volumeCar, double cost) {
+        this.capacityCar = capacityCar;
+        this.volumeCar = volumeCar;
+        this.cost = cost;
+    }
+
     public double getCapacityCar() {
         return capacityCar;
     }
