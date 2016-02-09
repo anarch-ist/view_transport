@@ -183,7 +183,9 @@ CALL insert_permission_for_role('CLIENT', 'selectUser');
 CALL insert_permission_for_role('CLIENT', 'selectPoint');
 CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
-INSERT INTO users VALUES (NULL, 'parser', '', '', '', '','', 'fff', md5(CONCAT(md5('nolpitf43gwer'), 'fff')), '', '', 'ADMIN', NULL);
+INSERT INTO users
+VALUE
+  (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
 
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -315,7 +317,8 @@ CREATE TABLE route_points (
     ON UPDATE CASCADE,
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE CASCADE
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  UNIQUE(routeID, sortOrder)
 );
 
 
@@ -342,6 +345,7 @@ CREATE TABLE route_lists (
   creationDate        DATE         NULL,
   departureDate       DATE         NULL,
   palletsQty          INTEGER      NULL,
+  forwarderId         VARCHAR(255) NULL,
   driverId            VARCHAR(255) NULL,
   driverPhoneNumber   VARCHAR(12)  NULL,
   licensePlate        VARCHAR(9)   NULL, -- государственный номер автомобиля
@@ -358,13 +362,12 @@ CREATE TABLE route_lists (
   UNIQUE (routeListIDExternal, dataSourceID)
 );
 
-
 CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-           NEW.departureDate, NEW.palletsQty, NEW.driverId,
+           NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
            NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
@@ -372,7 +375,7 @@ FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-           NEW.departureDate, NEW.palletsQty, NEW.driverId,
+           NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
            NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
@@ -380,9 +383,8 @@ FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), OLD.routeListID, OLD.routeListIDExternal, OLD.dataSourceID, OLD.routeListNumber, OLD.creationDate,
-           OLD.departureDate, OLD.palletsQty, OLD.driverId,
+           OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverId,
            OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
-
 
 CREATE TABLE route_list_history (
   routeListHistoryID  BIGINT AUTO_INCREMENT,
@@ -394,6 +396,7 @@ CREATE TABLE route_list_history (
   creationDate        DATE                                  NULL,
   departureDate       DATE                                  NULL,
   palletsQty          INTEGER                               NULL,
+  forwarderId         VARCHAR(255)                          NULL,
   driverId            VARCHAR(255)                          NULL,
   driverPhoneNumber   VARCHAR(12)                           NULL,
   licensePlate        VARCHAR(9)                            NULL, -- государственный номер автомобиля
@@ -491,6 +494,8 @@ CREATE TABLE invoices (
   weight                 INTEGER        NULL, -- масса в граммах
   volume                 INTEGER        NULL, -- в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
+  storage                VARCHAR(255)   NULL, -- наименование склада на котором собиралась накладная
+  deliveryOption         VARCHAR(255)   NULL, -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   lastStatusUpdated      DATETIME       NULL, -- date and time when status was updated by any user
   lastModifiedBy         INTEGER        NULL, -- один из пользователей - это parser.
   invoiceStatusID        VARCHAR(32)    NOT NULL,
@@ -549,8 +554,8 @@ FOR EACH ROW
   VALUE
     (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
      NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
-     NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy, 'CREATED', NEW.commentForStatus,
-     NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+     NEW.volume, NEW.goodsCost, NEW.storage, NEW.deliveryOption, NEW.lastStatusUpdated, NEW.lastModifiedBy,
+     'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
 FOR EACH ROW
@@ -558,8 +563,8 @@ FOR EACH ROW
     VALUE
     (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
      NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
-     NEW.volume, NEW.goodsCost, NEW.lastStatusUpdated, NEW.lastModifiedBy, NEW.invoiceStatusID, NEW.commentForStatus,
-     NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
+     NEW.volume, NEW.goodsCost, NEW.storage, NEW.deliveryOption, NEW.lastStatusUpdated, NEW.lastModifiedBy,
+     NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedUserPointID);
 
 
 CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
@@ -568,8 +573,8 @@ FOR EACH ROW
     VALUE
     (NULL, NOW(), OLD.invoiceID, OLD.invoiceIDExternal, OLD.dataSourceID, OLD.documentNumber, OLD.documentDate,
      OLD.firma, OLD.contactName, OLD.contactPhone, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.weight,
-     OLD.volume, OLD.goodsCost, OLD.lastStatusUpdated, OLD.lastModifiedBy, 'CREATED', OLD.commentForStatus,
-     OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
+     OLD.volume, OLD.goodsCost, OLD.storage, OLD.deliveryOption, OLD.lastStatusUpdated, OLD.lastModifiedBy,
+     'CREATED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedUserPointID);
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
 FOR EACH ROW
@@ -604,6 +609,8 @@ CREATE TABLE invoice_history (
   weight                 INTEGER        NULL, -- масса в граммах
   volume                 INTEGER        NULL, -- в кубических сантиметрах
   goodsCost              DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
+  storage                VARCHAR(255)   NULL, -- наименование склада на котором собиралась накладная
+  deliveryOption         VARCHAR(255)   NULL, -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   lastStatusUpdated      DATETIME       NULL, -- date and time when status was updated by any user
   lastModifiedBy         INTEGER        NULL, -- один из пользователей - это parser.
   invoiceStatusID        VARCHAR(32)    NOT NULL,
@@ -668,9 +675,9 @@ CREATE FUNCTION getRouteIDByRouteName(_routeName VARCHAR(64))
   RETURNS INTEGER
   BEGIN
     DECLARE result INTEGER;
-    SET result = (SELECT routeID
+    SET result = (SELECT routes.routeID
                   FROM routes
-                  WHERE routeName = _routeName);
+                  WHERE routes.routeName = _routeName);
     RETURN result;
   END;
 
@@ -702,49 +709,6 @@ CREATE FUNCTION getRouteIDByDirectionIDExternal(_directionIDExternal VARCHAR(64)
     RETURN result;
   END;
 
-CREATE FUNCTION getNextSortOrder(_routeID INTEGER, _lastVisitedPointID INTEGER)
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    DECLARE currentSortOrder INTEGER;
-    DECLARE nextSortOrder INTEGER;
-
-    SET currentSortOrder = (SELECT sortOrder
-                            FROM route_points
-                            WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
-
-    IF (currentSortOrder IS NULL)
-    THEN
-      BEGIN
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'SERGEY ERROR: Current sortOrder for route_points does not exist.';
-      END;
-    END IF;
-    SET nextSortOrder = currentSortOrder + 1;
-    RETURN nextSortOrder;
-  END;
-
--- this function returns pointID for the next routePoint or NULL if it is already the last point
-CREATE FUNCTION getNextPointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
-  RETURNS INTEGER
-  RETURN (SELECT pointID
-          FROM route_points
-          WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
-
-CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
-  RETURNS INTEGER
-  RETURN (SELECT routePointID
-          FROM route_points
-          WHERE routeID = _routeID AND sortOrder = getNextSortOrder(_routeID, _lastVisitedPointID));
-
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                SELECT_PROCEDURES
--- -------------------------------------------------------------------------------------------------------------------
-
--- запрос на выборку всех записей, которые должны быть в интерфейсе
--- нужно уметь ограничивать количество результирующих записей
-
 CREATE FUNCTION getRoleIDByUserID(_userID INTEGER)
   RETURNS VARCHAR(32)
   BEGIN
@@ -764,6 +728,39 @@ CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
                   WHERE userID = _userID);
     RETURN result;
   END;
+
+CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    DECLARE sortOrderForLastVisitedPoint INTEGER;
+    DECLARE nextRoutePointID INTEGER;
+
+    IF ((_lastVisitedPointID IS NULL) OR (_routeID IS NULL)) THEN RETURN NULL;
+    END IF;
+
+    SET sortOrderForLastVisitedPoint = (SELECT sortOrder
+                                          FROM route_points
+                                          WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
+
+    IF (sortOrderForLastVisitedPoint IS NULL)
+    THEN
+      BEGIN
+        RETURN NULL;
+        -- SIGNAL SQLSTATE '45000'
+        -- SET MESSAGE_TEXT = 'SERGEY ERROR: sortOrderForLastVisitedPoint for route_points does not exist.';
+      END;
+    END IF;
+
+    SET nextRoutePointID = (SELECT routePointID FROM route_points WHERE sortOrder > sortOrderForLastVisitedPoint ORDER BY sortOrder LIMIT 1);
+
+    RETURN nextRoutePointID;
+  END;
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                SELECT_PROCEDURES
+-- -------------------------------------------------------------------------------------------------------------------
+
 
 -- get total time in minutes consumed for delivery
 CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
@@ -930,8 +927,8 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @mainPart =
     'SELECT
       requests.requestNumber,
-      invoices.insiderRequestNumber,
-      invoices.invoiceNumber,
+      \'no data\' AS insiderRequestNumber,
+      invoices.invoiceIDExternal AS invoiceNumber,
       clients.INN,
       delivery_points.pointName     AS `deliveryPoint`,
       w_points.pointName            AS `warehousePoint`,
@@ -940,12 +937,12 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       invoice_statuses.invoiceStatusRusName,
       invoices.boxQty,
 
-      route_lists.driver,
+      route_lists.driverId,
       route_lists.licensePlate,
       route_lists.palletsQty,
       route_lists.routeListNumber,
       route_lists.routeListID,
-      routes.directionName,
+      routes.routeName AS directionName,
 
       last_visited_points.pointName AS `currentPoint`,
       next_route_points.pointName   AS `nextPoint`,
@@ -1111,7 +1108,9 @@ CREATE PROCEDURE `deleteRoutePoint`(_routePointID INTEGER)
     DECLARE routePoint1 INTEGER;
     DECLARE routePoint2 INTEGER;
     DECLARE time INTEGER;
+
     SET @relCount = (SELECT COUNT(*) FROM relations_between_route_points WHERE routePointIDFirst = _routePointID OR routePointIDSecond = _routePointID);
+
     IF @relCount = 2
     THEN
       SELECT
@@ -1127,18 +1126,111 @@ CREATE PROCEDURE `deleteRoutePoint`(_routePointID INTEGER)
         VALUE
         (routePoint1, routePoint2, time);
     END IF;
+
     DELETE FROM route_points WHERE _routePointID = routePointID;
   END;
 
--- TODO change procedure to trigger
-CREATE PROCEDURE `createRoutePoint`(_sortOrder INTEGER, _tLoading INTEGER, _pointID INTEGER, _routeID INTEGER)
+-- on create route point - automatically create relations_between_routePoints
+-- on update route point - automatically update relations_between_routePoints
+-- on delete route point - automatically delete relations_between_routePoints
+
+
+CREATE TRIGGER after_route_points_insert AFTER INSERT ON route_points
+FOR EACH ROW
   BEGIN
-    INSERT INTO `route_points` (sortOrder, timeForLoadingOperations, pointID, routeID) VALUE (_sortOrder, _tLoading, _pointID, _routeID);
-    IF (SELECT count(*) FROM route_points WHERE _routeID = routeID) > 1
+    -- если в таблице route_points 2 или больше записей, то вставляем новые значения в relations_between_routePoints
+    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = routeID) > 1
     THEN
-      SET @routePointID1 = (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = _sortOrder-1);
-      SET @routePointID2 = (SELECT routePointID FROM route_points WHERE routeID = _routeID AND sortOrder = _sortOrder);
-      INSERT INTO relations_between_route_points (routePointIDFirst, routePointIDSecond, timeForDistance) VALUE (@routePointID1,@routePointID2,0);
+      BEGIN
+
+        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = NEW.routeID AND sortOrder > NEW.sortOrder ORDER BY sortOrder ASC LIMIT 1);
+        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = NEW.routeID AND sortOrder < NEW.sortOrder ORDER BY sortOrder DESC LIMIT 1);
+        IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
+        END IF;
+
+        -- если мы добавили новый пункт в начало
+        IF (@previousRoutePointID IS NULL) THEN
+          INSERT INTO relations_between_route_points VALUE (NEW.routePointID, @nextRoutePointID, 0);
+        -- если мы добавили новый пункт в конец
+        ELSEIF (@nextRoutePointID IS NULL) THEN
+          INSERT INTO relations_between_route_points VALUE (@previousRoutePointID, NEW.routePointID, 0);
+        -- если мы добавили новый пункт в середину
+        ELSE
+          BEGIN
+            UPDATE relations_between_route_points
+            SET routePointIDSecond = NEW.routePointID, timeForDistance = 0
+            WHERE routePointIDFirst = @previousRoutePointID AND routePointIDSecond = @nextRoutePointID;
+          INSERT INTO relations_between_route_points VALUE (NEW.routePointID, @nextRoutePointID, 0);
+          END;
+        END IF;
+
+      END;
+    END IF;
+  END;
+
+CREATE TRIGGER after_route_points_delete AFTER DELETE ON route_points
+FOR EACH ROW
+  BEGIN
+    -- если в таблице route_points 2 или больше записей, то вставляем новые значения в relations_between_routePoints
+    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = routeID) >= 1
+    THEN
+      BEGIN
+
+        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder > OLD.sortOrder ORDER BY sortOrder ASC LIMIT 1);
+        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder < OLD.sortOrder ORDER BY sortOrder DESC LIMIT 1);
+        IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
+        END IF;
+
+        -- если мы удалили пункт из начала
+        IF (@previousRoutePointID IS NULL) THEN
+          DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID;
+        -- если мы удалили пункт с конца
+        ELSEIF (@nextRoutePointID IS NULL) THEN
+          DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID OR routePointIDSecond = OLD.routePointID;
+        -- если мы удалили пункт из середины
+        ELSE
+          BEGIN
+            DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID OR routePointIDSecond = OLD.routePointID;
+            INSERT INTO relations_between_route_points VALUE (@nextRoutePointID, @previousRoutePointID, 0);
+          END;
+        END IF;
+
+      END;
+    END IF;
+  END;
+
+-- TODO рассмотреть два случая - если меняется sortOrder и если меняется сам пункт и если происходит то и другое одновременно
+CREATE TRIGGER after_route_points_update AFTER UPDATE ON route_points
+FOR EACH ROW
+  BEGIN
+    -- если в таблице route_points 2 или больше записей, то вставляем новые значения в relations_between_routePoints
+    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = routeID) > 1
+    THEN
+      BEGIN
+
+        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder > OLD.sortOrder ORDER BY sortOrder ASC LIMIT 1);
+        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder < OLD.sortOrder ORDER BY sortOrder DESC LIMIT 1);
+        IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
+        END IF;
+
+        -- если мы удалили пункт из начала
+        IF (@previousRoutePointID IS NULL) THEN
+          DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID;
+        -- если мы удалили пункт с конца
+        ELSEIF (@nextRoutePointID IS NULL) THEN
+          DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID OR routePointIDSecond = OLD.routePointID;
+        -- если мы удалили пункт из середины
+        ELSE
+          BEGIN
+            DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID OR routePointIDSecond = OLD.routePointID;
+            INSERT INTO relations_between_route_points VALUE (@nextRoutePointID, @previousRoutePointID, 0);
+          END;
+        END IF;
+
+      END;
     END IF;
   END;
 

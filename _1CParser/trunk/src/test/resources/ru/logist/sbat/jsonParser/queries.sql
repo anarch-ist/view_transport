@@ -84,3 +84,7 @@ INSERT INTO invoices
 
 UPDATE invoices SET routeListID = getRouteIDByDirectionIDExternal('7002','LOGIST_1C') WHERE invoices.invoiceIDExternal = ? AND invoices.dataSourceID = 'LOGIST_1C';
 
+CALL selectData(1, 0, 100, '', TRUE , '');
+
+
+

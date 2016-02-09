@@ -84,11 +84,10 @@ public class InsertTransactionScript {
             DBUtils.closeStatementQuietly(updateRequestsPrepStatement);
             DBUtils.closeStatementQuietly(updateInvoicesPrepStatement);
             DBUtils.closeStatementQuietly(updateInvoicesStatusesPrepStatement);
-            for (PreparedStatement routeListsInsertPreparedStatement : routeListsInsertPreparedStatements) {
-                DBUtils.closeStatementQuietly(routeListsInsertPreparedStatement);
-            }
+            DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[0] : null);
+            DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[1] : null);
+            DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[2] : null);
         }
-
     }
 
     private PreparedStatement batchPointsData(JSONArray updatePointsArray, JSONArray updateAddresses) throws SQLException {
@@ -310,28 +309,26 @@ public class InsertTransactionScript {
 
     private PreparedStatement batchInvoices(JSONArray updateRequests) throws SQLException {
 
-
         PreparedStatement invoicesPreparedStatement = connection.prepareStatement(
             "INSERT INTO invoices\n" +
                     "  VALUE\n" +
-                    "  (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), getUserIDByLogin('parser'), 'CREATED',\n" +
+                    "  (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), getUserIDByLogin('parser'), 'CREATED',\n" +
                     "  ?, (SELECT requests.requestID FROM requests WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?), 1, NULL, NULL);"
         );
 
         for (Object updateRequest : updateRequests) {
             String requestIDExternal = (String)((JSONObject) updateRequest).get("requestId");
             //String invoiceIdExternal = (String)((JSONObject) updateRequest).get("invoiceNumber");
-            //TODO temporally use requestId as invoiceNumber
+            //TODO temporally use requestId instead invoiceNumber
             String invoiceIdExternal = (String)((JSONObject) updateRequest).get("requestId");
             String documentNumber = (String)((JSONObject) updateRequest).get("documentNumber");
             if (documentNumber == null) documentNumber = "";
 
             String firma = (String)((JSONObject) updateRequest).get("firma");
-            // TODO what do with storage, we need ID but there is only name
-            // String storage = (String)((JSONObject) updateRequest).get("storage");
+            String storage = (String)((JSONObject) updateRequest).get("storage");
             String contactName = (String)((JSONObject) updateRequest).get("contactName");
             String contactPhone = (String)((JSONObject) updateRequest).get("contactPhone");
-            // String deliveryOption = (String)((JSONObject) updateRequest).get("deliveryOption");
+            String deliveryOption = (String)((JSONObject) updateRequest).get("deliveryOption");
 
             String invoiceDateAsString = (String)((JSONObject) updateRequest).get("invoiceDate");
             java.sql.Date creationDate = null;
@@ -368,9 +365,11 @@ public class InsertTransactionScript {
             invoicesPreparedStatement.setNull(11, Types.INTEGER); //weight
             invoicesPreparedStatement.setNull(12, Types.INTEGER); //volume
             invoicesPreparedStatement.setBigDecimal(13, null); //goodsCost
-            invoicesPreparedStatement.setString(14, null); //commentForStatus
-            invoicesPreparedStatement.setString(15, requestIDExternal); //requestIdExternal
-            invoicesPreparedStatement.setString(16, LOGIST_1C);
+            invoicesPreparedStatement.setString(14, storage);
+            invoicesPreparedStatement.setString(15, deliveryOption);
+            invoicesPreparedStatement.setString(16, null); //commentForStatus
+            invoicesPreparedStatement.setString(17, requestIDExternal); //requestIdExternal
+            invoicesPreparedStatement.setString(18, LOGIST_1C);
 
             invoicesPreparedStatement.addBatch();
         }
@@ -434,13 +433,13 @@ public class InsertTransactionScript {
 
         // create routeLists
         PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
-                "INSERT INTO route_lists VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?,?));", Statement.RETURN_GENERATED_KEYS
+                "INSERT INTO route_lists VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?,?));", Statement.RETURN_GENERATED_KEYS
         );
 
         // add data into routePoints
-        PreparedStatement routePointsInsertPreparedStatement = connection.prepareStatement(
-                "INSERT INTO route_points VALUE (NULL, 0, 0, (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?), getRouteIDByDirectionIDExternal(?,?));"
-        );
+//        PreparedStatement routePointsInsertPreparedStatement = connection.prepareStatement(
+//                "INSERT INTO route_points VALUE (NULL, 0, 0, (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?), getRouteIDByDirectionIDExternal(?,?));"
+//        );
 
         // add data into invoices
         PreparedStatement invoicesUpdatePreparedStatement = connection.prepareStatement(
@@ -452,7 +451,7 @@ public class InsertTransactionScript {
         );
 
         result[0] = routeListsInsertPreparedStatement;
-        result[1] = routePointsInsertPreparedStatement;
+        //result[1] = routePointsInsertPreparedStatement;
         result[2] = invoicesUpdatePreparedStatement;
 
         for (Object updateRouteList : updateRouteLists) {
@@ -486,27 +485,26 @@ public class InsertTransactionScript {
             String status = (String)((JSONObject) updateRouteList).get("status");
             JSONArray invoices = (JSONArray) ((JSONObject) updateRouteList).get("invoices"); // list of invoices inside routeList
 
-
             routeListsInsertPreparedStatement.setString(1, routeListId);
             routeListsInsertPreparedStatement.setString(2, LOGIST_1C);
             routeListsInsertPreparedStatement.setString(3, routeListNumber);
             routeListsInsertPreparedStatement.setDate(4, creationDate);
             routeListsInsertPreparedStatement.setDate(5, departureDate);
             routeListsInsertPreparedStatement.setNull(6, Types.INTEGER); // palletsQty
-            routeListsInsertPreparedStatement.setString(7, driverId);
-            routeListsInsertPreparedStatement.setString(8, null); // driverPhoneNumber
-            routeListsInsertPreparedStatement.setString(9, null); // license plate
-            routeListsInsertPreparedStatement.setString(10, status); // license plate
-            routeListsInsertPreparedStatement.setString(11, directId);
-            routeListsInsertPreparedStatement.setString(12, LOGIST_1C);
+            routeListsInsertPreparedStatement.setString(7, forwarderId); // palletsQty
+            routeListsInsertPreparedStatement.setString(8, driverId);
+            routeListsInsertPreparedStatement.setString(9, null); // driverPhoneNumber
+            routeListsInsertPreparedStatement.setString(10, null); // license plate
+            routeListsInsertPreparedStatement.setString(11, status); // license plate
+            routeListsInsertPreparedStatement.setString(12, directId);
+            routeListsInsertPreparedStatement.setString(13, LOGIST_1C);
             routeListsInsertPreparedStatement.addBatch();
 
-
-            routePointsInsertPreparedStatement.setString(1, pointDepartureId);
-            routePointsInsertPreparedStatement.setString(2, LOGIST_1C);
-            routePointsInsertPreparedStatement.setString(3, directId);
-            routePointsInsertPreparedStatement.setString(4, LOGIST_1C);
-            routePointsInsertPreparedStatement.addBatch();
+//            routePointsInsertPreparedStatement.setString(1, pointDepartureId);
+//            routePointsInsertPreparedStatement.setString(2, LOGIST_1C);
+//            routePointsInsertPreparedStatement.setString(3, directId);
+//            routePointsInsertPreparedStatement.setString(4, LOGIST_1C);
+//            routePointsInsertPreparedStatement.addBatch();
 
             for(Object invoiceIDExternalAsObject: invoices) {
                 String invoiceIDExternal = (String) invoiceIDExternalAsObject;
@@ -524,8 +522,8 @@ public class InsertTransactionScript {
         int[] routeListsAffectedRecords = routeListsInsertPreparedStatement.executeBatch();
         logger.info("INSERT INTO route_lists completed, affected records size = [{}]", routeListsAffectedRecords.length);
 
-        int[] routePointsAffectedRecords = routePointsInsertPreparedStatement.executeBatch();
-        logger.info("INSERT INTO routePoints completed, affected records size = [{}]", routePointsAffectedRecords.length);
+//        int[] routePointsAffectedRecords = routePointsInsertPreparedStatement.executeBatch();
+//        logger.info("INSERT INTO routePoints completed, affected records size = [{}]", routePointsAffectedRecords.length);
 
         int[] invoicesAffectedRecords = invoicesUpdatePreparedStatement.executeBatch();
         logger.info("UPDATE for invoices completed, affected records size = [{}]", invoicesAffectedRecords.length);
