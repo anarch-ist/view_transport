@@ -625,6 +625,28 @@ CREATE TABLE invoice_history (
     ON UPDATE NO ACTION
 );
 
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                   EXCHANGE_TABLES
+-- -------------------------------------------------------------------------------------------------------------------
+
+-- 1) сначала парсер обнаруживает событие появления нового файла, или нескольких новых файлов. Если к примеру парсер в течение суток не работал, то в каталоге набралось некоторое количесвто новых выгрузок,
+-- парсер должен обнаружить их все, отсортировать по номеру пакета и начать загрузку.
+-- 2) как только начинается загрузка файла, парсер пишет об этом в таблицу exchangeHistory, если в процессе возникли ошибки, то они также пишутся в БД. В случае успешной загрузки делается запись в exchange.
+-- 3)
+-- when new file comes parser start event and make a try to write data into database. if succeded then
+CREATE TABLE exchange (
+  exchangeID INTEGER AUTO_INCREMENT,
+  packageNumber INTEGER,
+  serverName VARCHAR(32),
+  dataSource VARCHAR(32),
+  packageCreated DATETIME,
+  packageData LONGTEXT, -- наличие самих данных в соответсвующем порядке позволяет в любой момент пересоздать всю БД.
+  PRIMARY KEY (exchangeID)
+) ENGINE=ARCHIVE; -- Rows are compressed as they are inserted, https://dev.mysql.com/doc/refman/5.5/en/archive-storage-engine.html
+
+-- CREATE TABLE exchangeHistory (
+--
+-- )
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                   GETTERS
