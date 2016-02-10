@@ -1,19 +1,16 @@
 package ru.sbat.transport.optimization;
 
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 public class InvoiceOverviewController {
@@ -26,37 +23,29 @@ public class InvoiceOverviewController {
         this.invoiceObservableList = FXCollections.observableArrayList(invoiceContainer);
         this.plannedSchedule = plannedSchedule;
 
-        invoiceObservableList.addListener((ListChangeListener<Invoice>) c -> {
-            c.next();
-            if (c.wasAdded()) {
-                List<? extends Invoice> addedSubList = c.getAddedSubList();
-                List<Invoice> mySubList = new ArrayList<>(addedSubList);
-                try {
-                    optimizer.filtrate(plannedSchedule, mySubList);
-                } catch (RouteNotFoundException e) {
-                    e.printStackTrace();
+        invoiceObservableList.addListener(new ListChangeListener<Invoice>() {
+            @Override
+            public void onChanged(Change<? extends Invoice> c) {
+                while (c.next()){
+                    if(c.wasAdded()){
+                        List<? extends Invoice> addedSubList = c.getAddedSubList();
+                        List<Invoice> mySubList = new ArrayList<>(addedSubList);
+                        try {
+                            System.out.println("Элемент добавлен");
+                            Map<Invoice, ArrayList<Route>> routesForAddedInvoices = optimizer.filtrate(plannedSchedule, mySubList);
+                        } catch (RouteNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }else if(c.wasUpdated()){
+
+                    }else if(c.wasRemoved()){
+
+                    }
                 }
             }
-            if(c.wasUpdated()){
-
-            }
-
         });
-
-
-
-
     }
 
-    public static void main(String[] args) {
-        InvoiceContainer invoiceContainer = new InvoiceContainer();
-        new InvoiceOverviewController(invoiceContainer, new PlannedSchedule());
-
-        invoiceContainer.add(new Invoice());
-
-
-
-    }
     public ObservableList<Invoice> getInvoiceObservableList() {
         return invoiceObservableList;
     }

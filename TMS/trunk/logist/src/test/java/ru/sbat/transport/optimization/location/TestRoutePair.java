@@ -50,11 +50,11 @@ public class TestRoutePair {
         RoutePair result = new RoutePair(route);
         System.out.println(routePair.getWeight() + " " + routePair.getVolume() + " должно быть");
         result = result.getAvailableWeightAndVolume(invoice2, result);
-        System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 2");
+        System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 2 invoice");
         result = result.getAvailableWeightAndVolume(invoice3, result);
-        System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 3");
+        System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 3 invoice");
         result = result.getAvailableWeightAndVolume(invoice4, result);
-        System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 4");
+        System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 4 invoice");
         Assert.assertEquals(routePair.getWeight(), result.getWeight(), 0);
         Assert.assertEquals(routePair.getVolume(), result.getVolume(), 0);
     }
