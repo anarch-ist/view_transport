@@ -28,19 +28,19 @@ CREATE TABLE user_roles (
 
 INSERT INTO user_roles (userRoleID, userRoleRusName)
 VALUES
--- администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
--- имеет право изменить роль пользователя
+  -- администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
+  -- имеет право изменить роль пользователя
   ('ADMIN', 'Администратор'),
--- диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
+  -- диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
   ('W_DISPATCHER', 'Диспетчер_склада'),
--- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
+  -- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
   ('DISPATCHER', 'Диспетчер'),
--- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
+  -- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
   ('CLIENT_MANAGER', 'Пользователь_клиента'),
--- торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
+  -- торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
   ('MARKET_AGENT', 'Торговый_представитель'),
--- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
--- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
+  -- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
+  -- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
   ('TEMP_REMOVED', 'Временно_удален'),
 
   ('VIEW_LAST_TEN', 'Последние_десять');
@@ -184,7 +184,7 @@ CALL insert_permission_for_role('CLIENT', 'selectPoint');
 CALL insert_permission_for_role('CLIENT', 'selectRoute');
 
 INSERT INTO users
-VALUE
+  VALUE
   (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
 
 
@@ -367,24 +367,24 @@ FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-           NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
-           NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
+     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
+     NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
 FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-           NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
-           NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
+     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
+     NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
 FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), OLD.routeListID, OLD.routeListIDExternal, OLD.dataSourceID, OLD.routeListNumber, OLD.creationDate,
-           OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverId,
-           OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
+     OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverId,
+     OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
 
 CREATE TABLE route_list_history (
   routeListHistoryID  BIGINT AUTO_INCREMENT,
@@ -424,10 +424,10 @@ CREATE TABLE invoice_statuses (
 
 INSERT INTO invoice_statuses
 VALUES
--- duty statuses
+  -- duty statuses
   ('CREATED', 'Внутренняя заявка добавлена в БД', 0),
   ('DELETED', 'Внутренняя заявка удалена из БД', -1),
--- insider request statuses
+  -- insider request statuses
   ('SAVED', 'Заявка в состоянии черновика', 1),
   ('APPROVING', 'Выгружена на утверждение торговому представителю', 2),
   ('RESERVED', 'Резерв', 3),
@@ -443,7 +443,7 @@ VALUES
   ('CHECK_BOXES', 'Проверка коробок в зоне отгрузки', 11),
   ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 12),
   ('TRANSPORTATION', 'Маршрутный лист закрыт, товар передан экспедитору на погрузку', 13),
--- invoice statuses
+  -- invoice statuses
   ('DEPARTURE', 'В транзите', 14),
   ('ARRIVED', 'Накладная прибыла в пункт', 15),
   ('ERROR', 'Ошибка. Возвращение в пункт', -4),
@@ -551,7 +551,7 @@ BEFORE INSERT ON invoices FOR EACH ROW
 CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
 FOR EACH ROW
   INSERT INTO invoice_history
-  VALUE
+    VALUE
     (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
      NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
      NEW.volume, NEW.goodsCost, NEW.storage, NEW.deliveryOption, NEW.lastStatusUpdated, NEW.lastModifiedBy,
@@ -579,8 +579,8 @@ FOR EACH ROW
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
 FOR EACH ROW
   BEGIN
--- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт, и этот
--- пункт записываем в таблицу invoices в поле lastVisitedUserPointID
+    -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт, и этот
+    -- пункт записываем в таблицу invoices в поле lastVisitedUserPointID
     IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR
         NEW.invoiceStatusID = 'DELIVERED')
     THEN
@@ -740,8 +740,8 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedPointID INTEGE
     END IF;
 
     SET sortOrderForLastVisitedPoint = (SELECT sortOrder
-                                          FROM route_points
-                                          WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
+                                        FROM route_points
+                                        WHERE (routeID = _routeID AND pointID = _lastVisitedPointID));
 
     IF (sortOrderForLastVisitedPoint IS NULL)
     THEN
@@ -801,7 +801,7 @@ CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
 
     CLOSE cur;
     RETURN $timeResult;
--- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
+    -- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
   END;
 
 -- get DATE and TIME when route should be finished
@@ -814,7 +814,7 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _invoiceID INTEGER)
     SET $routeStartDate = (SELECT lastStatusUpdated
                            FROM invoice_history
                            WHERE _invoiceID = invoiceID AND invoiceStatusID = 'DEPARTURE');
--- отсчитывать от времени отправления или от времени начала маршрута?
+    -- отсчитывать от времени отправления или от времени начала маршрута?
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;
@@ -894,7 +894,7 @@ CREATE FUNCTION generateHaving(map TEXT)
       SET result = CONCAT(result, @columnName, ' LIKE ', '\'', @searchString, '\'', ' AND ');
     END WHILE;
 
--- remove redundant END
+    -- remove redundant END
     SET result = SUBSTR(result, 1, CHAR_LENGTH(result) - 4);
     SET result = CONCAT('(', result, ')');
 
@@ -981,10 +981,10 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
         ) ';
 
 
--- 1) если у пользователя роль админ, то показываем все записи из БД
--- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил.
--- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
--- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
+    -- 1) если у пользователя роль админ, то показываем все записи из БД
+    -- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил.
+    -- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
+    -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
 
     SET @wherePart =
     'WHERE (
@@ -1139,14 +1139,14 @@ CREATE TRIGGER after_route_points_insert AFTER INSERT ON route_points
 FOR EACH ROW
   BEGIN
     -- если в таблице route_points 2 или больше записей, то вставляем новые значения в relations_between_routePoints
-    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = routeID) > 1
+    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = route_points.routeID) > 1
     THEN
       BEGIN
 
-        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = NEW.routeID AND sortOrder > NEW.sortOrder ORDER BY sortOrder ASC LIMIT 1);
-        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = NEW.routeID AND sortOrder < NEW.sortOrder ORDER BY sortOrder DESC LIMIT 1);
+        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = NEW.routeID AND route_points.sortOrder > NEW.sortOrder ORDER BY sortOrder ASC LIMIT 1);
+        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = NEW.routeID AND route_points.sortOrder < NEW.sortOrder ORDER BY sortOrder DESC LIMIT 1);
         IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
         END IF;
 
         -- если мы добавили новый пункт в начало
@@ -1161,7 +1161,7 @@ FOR EACH ROW
             UPDATE relations_between_route_points
             SET routePointIDSecond = NEW.routePointID, timeForDistance = 0
             WHERE routePointIDFirst = @previousRoutePointID AND routePointIDSecond = @nextRoutePointID;
-          INSERT INTO relations_between_route_points VALUE (NEW.routePointID, @nextRoutePointID, 0);
+            INSERT INTO relations_between_route_points VALUE (NEW.routePointID, @nextRoutePointID, 0);
           END;
         END IF;
 
@@ -1173,12 +1173,12 @@ CREATE TRIGGER after_route_points_delete AFTER DELETE ON route_points
 FOR EACH ROW
   BEGIN
     -- если в таблице route_points 2 или больше записей, то вставляем новые значения в relations_between_routePoints
-    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = routeID) >= 1
+    IF (SELECT count(*) FROM route_points WHERE OLD.routeID = route_points.routeID) >= 1
     THEN
       BEGIN
 
-        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder > OLD.sortOrder ORDER BY sortOrder ASC LIMIT 1);
-        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder < OLD.sortOrder ORDER BY sortOrder DESC LIMIT 1);
+        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = OLD.routeID AND route_points.sortOrder > OLD.sortOrder ORDER BY sortOrder ASC LIMIT 1);
+        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = OLD.routeID AND route_points.sortOrder < OLD.sortOrder ORDER BY sortOrder DESC LIMIT 1);
         IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
         END IF;
@@ -1202,48 +1202,8 @@ FOR EACH ROW
   END;
 
 -- TODO рассмотреть два случая - если меняется sortOrder и если меняется сам пункт и если происходит то и другое одновременно
-CREATE TRIGGER after_route_points_update AFTER UPDATE ON route_points
+CREATE TRIGGER after_route_points_update BEFORE UPDATE ON route_points
 FOR EACH ROW
   BEGIN
-    -- если в таблице route_points 2 или больше записей, то вставляем новые значения в relations_between_routePoints
-    IF (SELECT count(*) FROM route_points WHERE NEW.routeID = routeID) > 1
-    THEN
-      BEGIN
-
-        SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder > OLD.sortOrder ORDER BY sortOrder ASC LIMIT 1);
-        SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE routeID = OLD.routeID AND sortOrder < OLD.sortOrder ORDER BY sortOrder DESC LIMIT 1);
-        IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
-          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: nextRoutePointID and previousRoutePointID is NULL';
-        END IF;
-
-        -- если мы удалили пункт из начала
-        IF (@previousRoutePointID IS NULL) THEN
-          DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID;
-        -- если мы удалили пункт с конца
-        ELSEIF (@nextRoutePointID IS NULL) THEN
-          DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID OR routePointIDSecond = OLD.routePointID;
-        -- если мы удалили пункт из середины
-        ELSE
-          BEGIN
-            DELETE FROM relations_between_route_points WHERE routePointIDFirst = OLD.routePointID OR routePointIDSecond = OLD.routePointID;
-            INSERT INTO relations_between_route_points VALUE (@nextRoutePointID, @previousRoutePointID, 0);
-          END;
-        END IF;
-
-      END;
-    END IF;
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: updates on route_points temporally disabled';
   END;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

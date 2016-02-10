@@ -287,9 +287,10 @@ $(document).ready(function () {
                         text: 'удалить запись'
                     },
                     {
-                        extend: "edit",
-                        editor: routePointsEditor,
-                        text: "изменить"
+                        // TODO временно блокируется возможность менять, пока можно только удалять и создавать новые пункты
+                        //extend: "edit",
+                        //editor: routePointsEditor,
+                        //text: "изменить"
                     }
                 ],
                 "paging": false, // no pagination
