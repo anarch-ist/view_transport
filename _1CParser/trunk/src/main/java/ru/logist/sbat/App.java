@@ -9,8 +9,12 @@ import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
 import ru.logist.sbat.db.DataBase;
+import ru.logist.sbat.jsonParser.JSONReadFromFile;
 import ru.logist.sbat.properties.PropertiesManager;
+import ru.logist.sbat.watchService.OnFileChangeListener;
+import ru.logist.sbat.watchService.WatchServiceStarter;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +31,7 @@ public class App {
     public static final String IRLT = "IRLT"; // insert into routeListTable
     public static final String IIT = "IIT"; // insert into invoices table
     public static final String UIT = "UIT"; // update invoice statuses
+    public static final String EXCHANGE_DIR_NAME = "exchange/";
 
     public static String getLoggerFile( Logger log ) {
         org.apache.logging.log4j.core.Logger loggerImpl = (org.apache.logging.log4j.core.Logger) log;
@@ -38,9 +43,14 @@ public class App {
 
         // show logs path
         Path rootDir = Paths.get(System.getProperty("user.dir"));
-
-
-        logger.info("log file path: " + rootDir.resolve(getLoggerFile(logger)));
+        Path exchangeDir = rootDir.resolve(EXCHANGE_DIR_NAME);
+        File file = exchangeDir.toFile();
+        if (!file.exists()) {
+            if (file.mkdir())
+                logger.info("exchange directory created");
+        }
+        logger.info("path to exchange directory: [{}]", exchangeDir);
+        logger.info("log file path: [{}]", rootDir.resolve(getLoggerFile(logger)));
 
         // get All properties
         Properties properties = null;
@@ -48,8 +58,8 @@ public class App {
             Path prefsPath = rootDir.resolve("prefs.property");
             PropertiesManager.setPrefsPath(prefsPath);
             properties = PropertiesManager.handleProperties();
-            logger.info("path to preferences directory: " + PropertiesManager.getPrefsPath());
-            logger.info("property file content: " + properties);
+            logger.info("path to preferences directory:[{}] ", PropertiesManager.getPrefsPath());
+            logger.info("property file content: [{}]", properties);
         } catch (IOException e) {
             logger.error(e);
             System.exit(-1);
@@ -85,7 +95,31 @@ public class App {
             String nextLine = scanner.nextLine();
             try {
                 if (Integer.parseInt(nextLine) == 1) {
-                    System.out.println(1);
+                    System.out.println("1");
+                    // start watch service here
+                    WatchServiceStarter watchServiceStarter = new WatchServiceStarter(exchangeDir);
+                    final DataBase finalDataBase = dataBase;
+                    System.out.println("2");
+                    watchServiceStarter.setOnFileChanged(new OnFileChangeListener() {
+                        @Override
+                        public void onFileCreate(Path filePath) {
+                            try {
+                                logger.info("start to updateDataFromFile [{}]", filePath);
+                                finalDataBase.updateDataFromJSONObject(JSONReadFromFile.read(filePath));
+                            } catch (SQLException | IOException | org.json.simple.parser.ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    try {
+                        watchServiceStarter.doWatch();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("3");
+
                     break;
                 } else if (Integer.parseInt(nextLine) == 2) {
                     System.out.println(2);
@@ -118,13 +152,13 @@ public class App {
             if (option.equals(exit)) {
                 controller.close();
                 System.exit(0);
-            } else if (option.equals(start)) {
-                controller.startGeneration();
-            } else if (option.equals(setActions)) {
-                controller.setGenerateInsertIntoRequestTable(parameters.contains(IRT));
-                controller.setGenerateInsertIntoRouteListsTable(parameters.contains(IRLT));
-                controller.setGenerateInsertIntoInvoicesTable(parameters.contains(IIT));
-                controller.setGenerateUpdateInvoiceStatuses(parameters.contains(UIT));
+//            } else if (option.equals(start)) {
+//                controller.startGeneration();
+//            } else if (option.equals(setActions)) {
+//                controller.setGenerateInsertIntoRequestTable(parameters.contains(IRT));
+//                controller.setGenerateInsertIntoRouteListsTable(parameters.contains(IRLT));
+//                controller.setGenerateInsertIntoInvoicesTable(parameters.contains(IIT));
+//                controller.setGenerateUpdateInvoiceStatuses(parameters.contains(UIT));
             } else if (option.equals(help)) {
                 System.out.println(options);
             }
