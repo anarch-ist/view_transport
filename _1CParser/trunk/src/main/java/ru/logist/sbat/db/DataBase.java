@@ -44,8 +44,8 @@ public class DataBase {
      * @param jsonObject
      */
     public void updateDataFromJSONObject(JSONObject jsonObject) throws SQLException {
-        InsertTransactionScript insertTransactionScript = new InsertTransactionScript(connection, jsonObject);
-        insertTransactionScript.updateData();
+        InsertOrUpdateTransactionScript insertOrUpdateTransactionScript = new InsertOrUpdateTransactionScript(connection, jsonObject);
+        insertOrUpdateTransactionScript.updateData();
     }
 
     public List<String> getInvoiceStatuses() throws SQLException {
@@ -227,6 +227,7 @@ public class DataBase {
                         || tableName.equals("invoice_statuses_for_user_role")
                         || tableName.equals("data_sources")
                         || tableName.equals("route_list_statuses")
+                        || tableName.equals("exchange")
                         ) continue;
                 statement = connection.createStatement();
                 String sql = "TRUNCATE TABLE " + tableName + ";";

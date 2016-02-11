@@ -5,46 +5,42 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-public class InsertTransactionScript {
+/**
+ * В случае, если ID совпали, с уже существующим - то делается UPDATE, если же такого ID нет, то делается INSERT
+ */
+public class InsertOrUpdateTransactionScript {
 
     private static final Logger logger = LogManager.getLogger();
     public static final String LOGIST_1C = "LOGIST_1C";
     private final Connection connection;
     private final JSONObject jsonObject;
 
-    public InsertTransactionScript(Connection connection, JSONObject jsonObject) {
+    public InsertOrUpdateTransactionScript(Connection connection, JSONObject jsonObject) {
         this.connection = connection;
-//        try {
-//            connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
         this.jsonObject = jsonObject;
     }
 
     public void updateData() {
 
         JSONObject dataFrom1C = (JSONObject) jsonObject.get("dataFrom1C");
-        System.out.println(dataFrom1C.get("server"));
-        System.out.println(dataFrom1C.get("packageNumber"));
-        System.out.println(dataFrom1C.get("created"));
-
+        logger.info(dataFrom1C.get("server"));
+        logger.info(dataFrom1C.get("packageNumber"));
+        logger.info(dataFrom1C.get("created"));
         JSONObject packageData = (JSONObject) dataFrom1C.get("packageData");
-        JSONArray updatePointsArray = (JSONArray) packageData.get("updatePoints");
-        JSONArray updateRoutesArray = (JSONArray) packageData.get("updateDirections");
-        JSONArray updateMarketAgentUsersArray = (JSONArray) packageData.get("updateTrader");
-        JSONArray updateClientsArray = (JSONArray) packageData.get("updateClients");
-        JSONArray updateAddresses = (JSONArray) packageData.get("updateAddress");
+
+        JSONArray updatePoints = (JSONArray) packageData.get("updatePoints");
+        JSONArray updateDirections = (JSONArray) packageData.get("updateDirections");
+        JSONArray updateTrader = (JSONArray) packageData.get("updateTrader");
+        JSONArray updateClients = (JSONArray) packageData.get("updateClients");
+        JSONArray updateAddress = (JSONArray) packageData.get("updateAddress");
         JSONArray updateRequests = (JSONArray) packageData.get("updateRequests");
         JSONArray updateStatuses = (JSONArray) packageData.get("updateStatus");
         JSONArray updateRouteLists = (JSONArray) packageData.get("updateRouteLists");
@@ -52,18 +48,19 @@ public class InsertTransactionScript {
         PreparedStatement
                 updatePointsPrepStatement = null,
                 updateRoutesPrepStatement = null,
-                updateMarketAgentUsersPrepStatement = null,
                 updateClientsPrepStatement = null,
                 updateRequestsPrepStatement = null,
                 updateInvoicesPrepStatement = null,
                 updateInvoicesStatusesPrepStatement = null;
-        PreparedStatement[] routeListsInsertPreparedStatements = null;
+
+        PreparedStatement[] routeListsInsertPreparedStatements = null,
+                            updateMarketAgentUsersPrepStatement = null;
 
         try {
-            updatePointsPrepStatement = batchPointsData(updatePointsArray, updateAddresses);
-            updateRoutesPrepStatement = batchRoutesData(updateRoutesArray);
-            updateMarketAgentUsersPrepStatement = batchMarketAgentUser(updateMarketAgentUsersArray);
-            updateClientsPrepStatement = batchClients(updateClientsArray);
+            updatePointsPrepStatement = batchPointsData(updatePoints, updateAddress);
+            updateRoutesPrepStatement = batchRoutesData(updateDirections);
+            updateMarketAgentUsersPrepStatement = batchMarketAgentUser(updateTrader);
+            updateClientsPrepStatement = batchClients(updateClients);
             updateRequestsPrepStatement = batchRequests(updateRequests);
             updateInvoicesPrepStatement = batchInvoices(updateRequests);
             updateInvoicesStatusesPrepStatement = batchInvoiceStatuses(updateStatuses);
@@ -79,22 +76,31 @@ public class InsertTransactionScript {
         } finally {
             DBUtils.closeStatementQuietly(updatePointsPrepStatement);
             DBUtils.closeStatementQuietly(updateRoutesPrepStatement);
-            DBUtils.closeStatementQuietly(updateMarketAgentUsersPrepStatement);
+            DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? updateMarketAgentUsersPrepStatement[0] : null);
+            DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? updateMarketAgentUsersPrepStatement[1] : null);
             DBUtils.closeStatementQuietly(updateClientsPrepStatement);
             DBUtils.closeStatementQuietly(updateRequestsPrepStatement);
             DBUtils.closeStatementQuietly(updateInvoicesPrepStatement);
             DBUtils.closeStatementQuietly(updateInvoicesStatusesPrepStatement);
             DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[0] : null);
             DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[1] : null);
-            DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[2] : null);
         }
     }
 
     private PreparedStatement batchPointsData(JSONArray updatePointsArray, JSONArray updateAddresses) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId) VALUES (?,?,?,?,?,?,?)"
+        logger.info("-----------------START update points table from JSON objects:[updatePointsArray], [updateAddresses]-----------------");
+        PreparedStatement pointsStatement =  connection.prepareStatement(
+                "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId)\n" +
+                        "VALUE (?, ?, ?, ?, ?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE\n" +
+                        "  pointName           = VALUES(pointName),\n" +
+                        "  address             = VALUES(address),\n" +
+                        "  email               = VALUES(email),\n" +
+                        "  pointTypeID         = VALUES(pointTypeID),\n" +
+                        "  responsiblePersonId = VALUES(responsiblePersonId);"
         );
 
+        // create or update points from updatePoints JSON array
         for (Object updatePoint : updatePointsArray) {
 
             String pointIdExternal = (String)((JSONObject) updatePoint).get("pointId");
@@ -104,63 +110,51 @@ public class InsertTransactionScript {
             String pointType = (String)((JSONObject) updatePoint).get("pointType");
             String pointEmail = (String)((JSONObject) updatePoint).get("pointEmail");
 
-            preparedStatement.setString(1, pointIdExternal);
-            preparedStatement.setString(2, LOGIST_1C);
-            preparedStatement.setString(3, pointName);
-            preparedStatement.setString(4, pointAddress);
-            preparedStatement.setString(5, pointEmail);
-            preparedStatement.setString(6, pointType);
-            preparedStatement.setString(7, responsiblePersonId);
-            preparedStatement.addBatch();
+            pointsStatement.setString(1, pointIdExternal);
+            pointsStatement.setString(2, LOGIST_1C);
+            pointsStatement.setString(3, pointName);
+            pointsStatement.setString(4, pointAddress);
+            pointsStatement.setString(5, pointEmail);
+            pointsStatement.setString(6, pointType);
+            pointsStatement.setString(7, responsiblePersonId);
+            pointsStatement.addBatch();
         }
 
+        // create or update points from updateAddresses JSON array
         // add only unique points
-        Set<String>  uniquePointIdExternals = new HashSet<>();
+        Utils.UniqueCheck uniqueCheckAddressId = Utils.getUniqueCheckObject("addressId");
         for (Object updateAddress : updateAddresses) {
             String pointIdExternal = (String)((JSONObject) updateAddress).get("addressId");
-            if (!uniquePointIdExternals.add(pointIdExternal))
+            if (!uniqueCheckAddressId.isUnique(pointIdExternal))
                 continue;
+
             String pointName = (String)((JSONObject) updateAddress).get("addressShot");
             String pointAddress = (String)((JSONObject) updateAddress).get("addressFull");
 
-            preparedStatement.setString(1, pointIdExternal);
-            preparedStatement.setString(2, LOGIST_1C);
-            preparedStatement.setString(3, pointName);
-            preparedStatement.setString(4, pointAddress);
-            preparedStatement.setString(5, "");
-            preparedStatement.setString(6, "AGENCY");
-            preparedStatement.setString(7, "");
-            preparedStatement.addBatch();
+            pointsStatement.setString(1, pointIdExternal);
+            pointsStatement.setString(2, LOGIST_1C);
+            pointsStatement.setString(3, pointName);
+            pointsStatement.setString(4, pointAddress);
+            pointsStatement.setString(5, "");
+            pointsStatement.setString(6, "AGENCY");
+            pointsStatement.setString(7, "");
+            pointsStatement.addBatch();
         }
 
-        int[] affectedRecords = preparedStatement.executeBatch();
-        logger.info("INSERT INTO points completed, affected records = [" + Arrays.toString(affectedRecords) + "]");
-        return preparedStatement;
-    }
-
-    /**
-     * if allRouteNames contains directionName then direction name changed
-     * @param allRouteNames
-     * @param directionName
-     */
-    private String getUniqueDirectionName(final Set<String> allRouteNames, final String directionName) {
-        if (!allRouteNames.contains(directionName))
-            return directionName;
-        else {
-            int count = 0;
-            do {
-                count++;
-                //generatedDirectionName = directionName + count + "";
-            } while (allRouteNames.contains(directionName + count + ""));
-            String generatedDirectionName = directionName + count + "";
-            logger.warn("direction name [{}] was duplicated, generated direction name = [{}]", directionName, generatedDirectionName);
-            return generatedDirectionName;
-        }
+        int[] affectedRecords = pointsStatement.executeBatch();
+        logger.info("INSERT OR UPDATE ON DUPLICATE INTO [points] completed, affected records size = [{}]", affectedRecords.length);
+        return pointsStatement;
     }
 
     private PreparedStatement batchRoutesData(JSONArray updateRoutesArray) throws SQLException {
+        logger.info("-----------------START update routes table from JSON object:[updateDirections]-----------------");
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO routes (directionIDExternal, dataSourceID, routeName) VALUE (?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE\n" +
+                        "  routeName = VALUES(routeName);"
+        );
 
-        // get all routeNames and check for uniqness
+        // get all routeNames from dataBase
         Set<String> allRouteNames = new HashSet<>();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT routeName FROM routes;");
@@ -168,15 +162,11 @@ public class InsertTransactionScript {
             allRouteNames.add(resultSet.getString(1));
         }
 
-        PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO routes (directionIDExternal, dataSourceID,  routeName) VALUES (?,?,?)"
-        );
-
         for (Object updateRoute : updateRoutesArray) {
             String directionIDExternal = (String)((JSONObject) updateRoute).get("directId");
             String directionName = (String)((JSONObject) updateRoute).get("directName");
 
-            String uniqueDirectionName = getUniqueDirectionName(allRouteNames, directionName);
+            String uniqueDirectionName = Utils.getUniqueDirectionName(allRouteNames, directionName);
             allRouteNames.add(uniqueDirectionName);
 
             preparedStatement.setString(1, directionIDExternal);
@@ -185,67 +175,77 @@ public class InsertTransactionScript {
             preparedStatement.addBatch();
         }
         int[] affectedRecords = preparedStatement.executeBatch();
-        logger.info("INSERT INTO routes completed, affected records = [" + Arrays.toString(affectedRecords) + "]");
+        logger.info("INSERT OR UPDATE ON DUPLICATE INTO [routes] completed, affected records size = [{}]", affectedRecords.length);
         return preparedStatement;
     }
 
-    // 32 digits like in php
-    public String md5(String md5) {
-        try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(md5.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-            }
-            return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-        }
-        return null;
-    }
-
     private static final String userRoleId = "MARKET_AGENT";
-    private PreparedStatement batchMarketAgentUser(JSONArray updateMarketAgents) throws SQLException {
+    private PreparedStatement[] batchMarketAgentUser(JSONArray updateMarketAgents) throws SQLException {
+        logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
+        PreparedStatement insertOrUpdateUsersPrSt = connection.prepareStatement(
+                "INSERT INTO users (login, userName, email, phoneNumber, userRoleID)\n" +
+                        "  VALUE (?, ?, ?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE\n" +
+                        "  userName    = VALUES(userName),\n" +
+                        "  email       = VALUES(email),\n" +
+                        "  phoneNumber = VALUES(phoneNumber),\n" +
+                        "  userRoleID  = VALUES(userRoleID);\n"
+        , Statement.RETURN_GENERATED_KEYS);
 
-        PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO users (login, userName, email, phoneNumber, salt, passAndSalt, userRoleID) VALUES (?,?,?,?,?,?,?);"
-        );
-        Set<String> logins = new HashSet<>();
+        // only insert or update data without passwords
+        Utils.UniqueCheck uniqueCheckLogins = Utils.getUniqueCheckObject("traderId");
         for (Object updateUser : updateMarketAgents) {
             String login = (String)((JSONObject) updateUser).get("traderId");
-            if (!logins.add(login)) // if duplicate do nothing
+            if (!uniqueCheckLogins.isUnique(login))
                 continue;
             String userName = (String)((JSONObject) updateUser).get("traderName");
             String email = (String)((JSONObject) updateUser).get("traderEMail");
             String phoneNumber = (String)((JSONObject) updateUser).get("traderPhone");
-            String salt = RandomStringUtils.randomAlphanumeric(16);
-            String pass = RandomStringUtils.randomAlphanumeric(8);
-            logger.info("generated password for new user [{}] = [{}]", userName, pass);
-            String passAndSaltMD5 = md5(md5(pass) + salt);
-            preparedStatement.setString(1, login);
-            preparedStatement.setString(2, userName);
-            preparedStatement.setString(3, email);
-            preparedStatement.setString(4, phoneNumber);
-            preparedStatement.setString(5, salt);
-            preparedStatement.setString(6, passAndSaltMD5);
-            preparedStatement.setString(7, userRoleId);
-            preparedStatement.addBatch();
+
+            insertOrUpdateUsersPrSt.setString(1, login);
+            insertOrUpdateUsersPrSt.setString(2, userName);
+            insertOrUpdateUsersPrSt.setString(3, email);
+            insertOrUpdateUsersPrSt.setString(4, phoneNumber);
+            insertOrUpdateUsersPrSt.setString(5, userRoleId);
+            insertOrUpdateUsersPrSt.addBatch();
         }
-        int[] affectedRecords = preparedStatement.executeBatch();
-        logger.info("INSERT INTO users for [{}]s completed, affected records = [{}]", userRoleId, Arrays.toString(affectedRecords));
-        return preparedStatement;
+        int[] insertedOrUpdateRecords = insertOrUpdateUsersPrSt.executeBatch();
+        logger.info("INSERT OR UPDATE INTO users completed, affected records size = [{}]", insertedOrUpdateRecords.length);
+
+        // generate and insert new passwords only for new Users, witch was inserted, not updated
+        PreparedStatement insertPasswordsPrSt = connection.prepareStatement("UPDATE users SET salt=?, passAndSalt=? WHERE userID = ?;");
+        try (ResultSet generatedKeys = insertOrUpdateUsersPrSt.getGeneratedKeys()) {
+            while (generatedKeys.next()) {
+                long newUserId = generatedKeys.getLong(1);
+                String salt = RandomStringUtils.randomAlphanumeric(16);
+                String pass = RandomStringUtils.randomAlphanumeric(8);
+                String passAndSaltMD5 = Utils.md5(Utils.md5(pass) + salt);
+                insertPasswordsPrSt.setString(1, salt);
+                insertPasswordsPrSt.setString(2, passAndSaltMD5);
+                insertPasswordsPrSt.setLong(3, newUserId);
+                logger.info("generated password for new userID [{}] = [{}]", newUserId, pass);
+                insertPasswordsPrSt.addBatch();
+            }
+        }
+
+        int[] insertedRecords = insertPasswordsPrSt.executeBatch();
+        logger.info("INSERT passwords for new users completed, affected records size = [{}]", insertedRecords.length);
+        return new PreparedStatement[]{insertOrUpdateUsersPrSt, insertPasswordsPrSt};
     }
 
-
     private PreparedStatement batchClients(JSONArray updateClients) throws SQLException {
-
+        logger.info("-----------------START update clients table from JSON object:[clients]-----------------");
         PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN) VALUES (?,?,?,?);"
+                "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)\n" +
+                        "  VALUE (?, ?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE\n" +
+                        "  clientName = VALUES(clientName),\n" +
+                        "  INN        = VALUES(INN);"
         );
-        Set<String> uniqueClientIdExternals = new HashSet<>();
+        Utils.UniqueCheck uniqueCheckClientId = Utils.getUniqueCheckObject("clientId");
         for (Object updateClient : updateClients) {
             String clientIDExternal = (String)((JSONObject) updateClient).get("clientId");
-            if (!uniqueClientIdExternals.add(clientIDExternal))
+            if (!uniqueCheckClientId.isUnique(clientIDExternal))
                 continue;
             String clientName = (String)((JSONObject) updateClient).get("clientName");
             String inn = (String)((JSONObject) updateClient).get("clientINN");
@@ -256,64 +256,108 @@ public class InsertTransactionScript {
             preparedStatement.addBatch();
         }
         int[] affectedRecords = preparedStatement.executeBatch();
-        logger.info("INSERT INTO clients completed, affected records = [{}]", Arrays.toString(affectedRecords));
+        logger.info("INSERT OR UPDATE for clients completed, affected records size = [{}]", affectedRecords.length);
         return preparedStatement;
     }
 
-    protected java.sql.Date getSqlDateFromString(String dateString) {
-        if (dateString == null)
-            return null;
-        LocalDate requestDate = LocalDate.parse(dateString, DateTimeFormatter.BASIC_ISO_DATE);
-        Date date = Date.valueOf(requestDate);
-        return new java.sql.Date(date.getTime());
-    }
-
-
     private PreparedStatement batchRequests(JSONArray updateRequests) throws SQLException {
+        logger.info("-----------------START update requests table from JSON object:[updateRequests]-----------------");
         PreparedStatement requestsPreparedStatement = connection.prepareStatement(
                 "INSERT INTO requests\n" +
-                        "SELECT\n" +
-                        "  NULL,\n" +
-                        "  ?,\n" +
-                        "  ?,\n" +
-                        "  ?,\n" +
-                        "  ?,\n" +
-                        "  (SELECT users.userID FROM users WHERE users.login = ?),\n" +
-                        "  (SELECT clients.clientID FROM clients WHERE clients.clientIDExternal = ? AND clients.dataSourceID = ?),\n" +
-                        "  (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?)"
+                        "  SELECT\n" +
+                        "    NULL,\n" +
+                        "    ?,\n" +
+                        "    ?,\n" +
+                        "    ?,\n" +
+                        "    ?,\n" +
+                        "    (SELECT users.userID FROM users WHERE users.login = ?),\n" +
+                        "    (SELECT clients.clientID FROM clients WHERE clients.clientIDExternal = ? AND clients.dataSourceID = ?),\n" +
+                        "    ?\n" +
+                        "  ON DUPLICATE KEY UPDATE\n" +
+                        "    requestNumber      = VALUES(requestNumber),\n" +
+                        "    creationDate       = VALUES(creationDate),\n" +
+                        "    marketAgentUserID  = VALUES(marketAgentUserID),\n" +
+                        "    clientID           = VALUES(clientID),\n" +
+                        "    destinationPointID = VALUES(destinationPointID);"
         );
-
+        PreparedStatement getPointIdExternal = connection.prepareStatement(
+                "SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?;"
+        );
         for (Object updateRequest : updateRequests) {
             String requestIDExternal = (String)((JSONObject) updateRequest).get("requestId");
             String requestNumber = (String)((JSONObject) updateRequest).get("requestNumber");
             String requestDateAsString = (String)((JSONObject) updateRequest).get("requestDate");
             String login = (String)((JSONObject) updateRequest).get("traderId"); //userID
-            String pointIdExternal = (String)((JSONObject) updateRequest).get("addressId"); //pointID
+            String destinationPointIdExternal = (String)((JSONObject) updateRequest).get("addressId"); //destinationPoint
+
+            getPointIdExternal.setString(1, destinationPointIdExternal);
+            getPointIdExternal.setString(2, LOGIST_1C);
+
+            int destinationPointId = 0;
+            try (ResultSet resultSet = getPointIdExternal.executeQuery()){
+                if (resultSet.next()) {
+                    destinationPointId = resultSet.getInt(1);
+                }
+                if (destinationPointId == 0) {
+                    logger.warn("requestId [{}] has addressId = [{}] that is not contained in points table. Set default point with id = [1]", requestIDExternal, destinationPointIdExternal);
+                    destinationPointId = 1;
+                }
+            }
+
             String clientIdExternal = (String)((JSONObject) updateRequest).get("clientId");
 
             requestsPreparedStatement.setString(1, requestIDExternal);
             requestsPreparedStatement.setString(2, LOGIST_1C);
             requestsPreparedStatement.setString(3, requestNumber);
-            requestsPreparedStatement.setDate(4, getSqlDateFromString(requestDateAsString));
+            requestsPreparedStatement.setDate(4, Utils.getSqlDateFromString(requestDateAsString));
             requestsPreparedStatement.setString(5, login);
             requestsPreparedStatement.setString(6, clientIdExternal);
             requestsPreparedStatement.setString(7, LOGIST_1C);
-            requestsPreparedStatement.setString(8, pointIdExternal);
-            requestsPreparedStatement.setString(9, LOGIST_1C);
+            requestsPreparedStatement.setInt(8, destinationPointId);
             requestsPreparedStatement.addBatch();
         }
         int[] requestsAffectedRecords = requestsPreparedStatement.executeBatch();
-        logger.info("INSERT INTO requests completed, affected records size = [{}]", requestsAffectedRecords.length);
+        logger.info("INSERT OR UPDATE on INTO requests completed, affected records size = [{}]", requestsAffectedRecords.length);
         return requestsPreparedStatement;
     }
 
     private PreparedStatement batchInvoices(JSONArray updateRequests) throws SQLException {
-
+        logger.info("-----------------START update invoices table from JSON object:[updateRequests]-----------------");
         PreparedStatement invoicesPreparedStatement = connection.prepareStatement(
             "INSERT INTO invoices\n" +
                     "  VALUE\n" +
-                    "  (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), getUserIDByLogin('parser'), 'CREATED',\n" +
-                    "  ?, (SELECT requests.requestID FROM requests WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?), 1, NULL, NULL);"
+                    "  (NULL,\n" +
+                    "   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,\n" +
+                    "   NOW(),\n" +
+                    "   getUserIDByLogin('parser'),\n" +
+                    "   'CREATED',\n" +
+                    "   ?,\n" +
+                    "   (SELECT requests.requestID FROM requests WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?),\n" +
+                    "   1,\n" +
+                    "   NULL,\n" +
+                    "   NULL\n" +
+                    "  ) ON DUPLICATE KEY UPDATE\n" +
+                    "  documentNumber         = VALUES(documentNumber),\n" +
+                    "  documentDate           = VALUES(documentDate),\n" +
+                    "  firma                  = VALUES(firma),\n" +
+                    "  contactName            = VALUES(contactName),\n" +
+                    "  contactPhone           = VALUES(contactPhone),\n" +
+                    "  creationDate           = VALUES(creationDate),\n" +
+                    "  deliveryDate           = VALUES(deliveryDate),\n" +
+                    "  boxQty                 = VALUES(boxQty),\n" +
+                    "  weight                 = VALUES(weight),\n" +
+                    "  volume                 = VALUES(volume),\n" +
+                    "  goodsCost              = VALUES(goodsCost),\n" +
+                    "  storage                = VALUES(storage),\n" +
+                    "  deliveryOption         = VALUES(deliveryOption),\n" +
+                    "  lastStatusUpdated      = VALUES(lastStatusUpdated),\n" +
+                    "  lastModifiedBy         = VALUES(lastModifiedBy),\n" +
+                    "  invoiceStatusID        = VALUES(invoiceStatusID),\n" +
+                    "  commentForStatus       = VALUES(commentForStatus),\n" +
+                    "  requestID              = VALUES(requestID),\n" +
+                    "  warehousePointID       = VALUES(warehousePointID),\n" +
+                    "  routeListID            = VALUES(routeListID),\n" +
+                    "  lastVisitedUserPointID = VALUES(lastVisitedUserPointID);"
         );
 
         for (Object updateRequest : updateRequests) {
@@ -333,21 +377,21 @@ public class InsertTransactionScript {
             String invoiceDateAsString = (String)((JSONObject) updateRequest).get("invoiceDate");
             java.sql.Date creationDate = null;
             try {
-                creationDate = getSqlDateFromString(invoiceDateAsString);
+                creationDate = Utils.getSqlDateFromString(invoiceDateAsString);
             } catch (DateTimeParseException e) {
                 logger.warn("invoiceDate for requestId = [{}] has incompatible format with value = [{}]", requestIDExternal, invoiceDateAsString);
             }
             String documentDateAsString = (String)((JSONObject) updateRequest).get("documentDate");
             java.sql.Date documentDate =  null;
             try {
-                documentDate = getSqlDateFromString(documentDateAsString);
+                documentDate = Utils.getSqlDateFromString(documentDateAsString);
             } catch (DateTimeParseException e) {
                 logger.warn("documentDate for requestId = [{}] has incompatible format with value = [{}]", requestIDExternal, documentDateAsString);
             }
             String deliveryDateAsString = (String)((JSONObject) updateRequest).get("deliveryDate");
             java.sql.Date deliveryDate =  null;
             try {
-                deliveryDate = getSqlDateFromString(deliveryDateAsString);
+                deliveryDate = Utils.getSqlDateFromString(deliveryDateAsString);
             } catch (DateTimeParseException e) {
                 logger.warn("deliveryDate for requestId = [{}] has incompatible format with value = [{}]", requestIDExternal, deliveryDateAsString);
             }
@@ -374,12 +418,13 @@ public class InsertTransactionScript {
             invoicesPreparedStatement.addBatch();
         }
         int[] requestsAffectedRecords = invoicesPreparedStatement.executeBatch();
-        logger.info("INSERT INTO invoices completed, affected records size = [{}]", requestsAffectedRecords.length);
+        logger.info("INSERT OR UPDATE INTO invoices completed, affected records size = [{}]", requestsAffectedRecords.length);
         return invoicesPreparedStatement;
     }
 
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uu.MM.dd,HH:mm:ss");
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("uu.MM.dd,HH:mm:ss");
     private PreparedStatement batchInvoiceStatuses(JSONArray updateStatuses) throws SQLException {
+        logger.info("-----------------START update invoices table from JSON object:[updateStatus]-----------------");
         PreparedStatement invoicesUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE invoices SET boxQty = ?, invoiceStatusID = ?, commentForStatus = ?, lastStatusUpdated = ? WHERE invoiceIDExternal = ? AND dataSourceID = ?;"
         );
@@ -410,7 +455,7 @@ public class InsertTransactionScript {
                 invoicesUpdatePreparedStatement.setLong(1, numBoxes);
             }
             if (invoiceStatus == null) {
-                logger.warn("invoiceStatus for invoiceId = [{}] is null, new invoiceStatus = [CREATED]");
+                logger.warn("invoiceStatus for invoiceId = [{}] is null, new invoiceStatus = [CREATED]", invoiceIdExternal);
                 invoiceStatus = "CREATED";
             }
             invoicesUpdatePreparedStatement.setString(2, invoiceStatus);
@@ -426,22 +471,26 @@ public class InsertTransactionScript {
         return invoicesUpdatePreparedStatement;
     }
 
-
-
     private PreparedStatement[] batchRouteLists(JSONArray updateRouteLists) throws SQLException {
-        PreparedStatement[] result = new PreparedStatement[3];
-
+        logger.info("-----------------START update routeLists and invoices table from JSON object:[updateRouteLists]-----------------");
         // create routeLists
         PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
-                "INSERT INTO route_lists VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?,?));", Statement.RETURN_GENERATED_KEYS
+                "INSERT INTO route_lists\n" +
+                        "  VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?, ?))\n" +
+                        "ON DUPLICATE KEY UPDATE\n" +
+                        "  routeListNumber   = VALUES(routeListNumber),\n" +
+                        "  creationDate      = VALUES(creationDate),\n" +
+                        "  departureDate     = VALUES(departureDate),\n" +
+                        "  palletsQty        = VALUES(palletsQty),\n" +
+                        "  forwarderId       = VALUES(forwarderId),\n" +
+                        "  driverId          = VALUES(driverId),\n" +
+                        "  driverPhoneNumber = VALUES(driverPhoneNumber),\n" +
+                        "  licensePlate      = VALUES(licensePlate),\n" +
+                        "  status            = VALUES(status),\n" +
+                        "  routeID           = VALUES(routeID);", Statement.RETURN_GENERATED_KEYS
         );
 
-        // add data into routePoints
-//        PreparedStatement routePointsInsertPreparedStatement = connection.prepareStatement(
-//                "INSERT INTO route_points VALUE (NULL, 0, 0, (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?), getRouteIDByDirectionIDExternal(?,?));"
-//        );
-
-        // add data into invoices
+        // update invoices data
         PreparedStatement invoicesUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE invoices SET " +
                         "routeListID = (SELECT route_lists.routeListID FROM route_lists WHERE route_lists.routeListIDExternal = ? AND route_lists.dataSourceID = ?)," +
@@ -449,10 +498,6 @@ public class InsertTransactionScript {
                         "  WHERE invoices.invoiceIDExternal = ? AND invoices.dataSourceID = ?;"
 
         );
-
-        result[0] = routeListsInsertPreparedStatement;
-        //result[1] = routePointsInsertPreparedStatement;
-        result[2] = invoicesUpdatePreparedStatement;
 
         for (Object updateRouteList : updateRouteLists) {
             String routeListId = (String)((JSONObject) updateRouteList).get("routerSheetId");
@@ -466,14 +511,14 @@ public class InsertTransactionScript {
             java.sql.Date creationDate = null;
             String routeListDateAsString = (String)((JSONObject) updateRouteList).get("routerSheetDate");
             try {
-                creationDate = getSqlDateFromString(routeListDateAsString);
+                creationDate = Utils.getSqlDateFromString(routeListDateAsString);
             } catch (DateTimeParseException e) {
                 logger.warn("routeListDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
             }
             java.sql.Date departureDate = null;
             String departureDateAsString = (String)((JSONObject) updateRouteList).get("departureDate");
             try {
-                departureDate = getSqlDateFromString(routeListDateAsString);
+                departureDate = Utils.getSqlDateFromString(routeListDateAsString);
             } catch (DateTimeParseException e) {
                 logger.warn("departureDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
             }
@@ -500,12 +545,6 @@ public class InsertTransactionScript {
             routeListsInsertPreparedStatement.setString(13, LOGIST_1C);
             routeListsInsertPreparedStatement.addBatch();
 
-//            routePointsInsertPreparedStatement.setString(1, pointDepartureId);
-//            routePointsInsertPreparedStatement.setString(2, LOGIST_1C);
-//            routePointsInsertPreparedStatement.setString(3, directId);
-//            routePointsInsertPreparedStatement.setString(4, LOGIST_1C);
-//            routePointsInsertPreparedStatement.addBatch();
-
             for(Object invoiceIDExternalAsObject: invoices) {
                 String invoiceIDExternal = (String) invoiceIDExternalAsObject;
                 invoicesUpdatePreparedStatement.setString(1, routeListId);
@@ -520,15 +559,12 @@ public class InsertTransactionScript {
         }
 
         int[] routeListsAffectedRecords = routeListsInsertPreparedStatement.executeBatch();
-        logger.info("INSERT INTO route_lists completed, affected records size = [{}]", routeListsAffectedRecords.length);
-
-//        int[] routePointsAffectedRecords = routePointsInsertPreparedStatement.executeBatch();
-//        logger.info("INSERT INTO routePoints completed, affected records size = [{}]", routePointsAffectedRecords.length);
+        logger.info("INSERT OR UPDATE INTO route_lists completed, affected records size = [{}]", routeListsAffectedRecords.length);
 
         int[] invoicesAffectedRecords = invoicesUpdatePreparedStatement.executeBatch();
-        logger.info("UPDATE for invoices completed, affected records size = [{}]", invoicesAffectedRecords.length);
+        logger.info("UPDATE routeListID and warehousePoint for invoices completed, affected records size = [{}]", invoicesAffectedRecords.length);
 
-        return result;
+        return new PreparedStatement[]{routeListsInsertPreparedStatement, invoicesUpdatePreparedStatement};
     }
 
 }
