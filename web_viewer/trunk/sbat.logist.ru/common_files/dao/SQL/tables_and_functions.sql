@@ -77,7 +77,7 @@ CREATE TABLE points (
   PRIMARY KEY (pointID),
   FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
   FOREIGN KEY (pointTypeID) REFERENCES point_types (pointTypeID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   UNIQUE(pointIDExternal, dataSourceID)
 );
@@ -100,6 +100,7 @@ CREATE TABLE distances_between_points (
     ON UPDATE CASCADE
 );
 
+-- TODO CONSTRAINT у пользователей с определнной ролью обязан быть пункт
 CREATE TABLE users (
   userID      INTEGER     AUTO_INCREMENT,
   login       VARCHAR(255) NOT NULL UNIQUE, -- userIDExternal
@@ -111,15 +112,15 @@ CREATE TABLE users (
   email       VARCHAR(255) NULL,
   position    VARCHAR(64)  NULL, -- должность
   salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
-  passAndSalt VARCHAR(64)  NOT NULL,
+  passAndSalt VARCHAR(64)  NOT NULL DEFAULT 'cnorebutbvoertvb3040384342u4hf',
   userRoleID  VARCHAR(32)  NOT NULL,
   pointID     INTEGER      NULL, -- у пользователя не обязан быть пункт.
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
     ON UPDATE CASCADE
 );
 
@@ -152,11 +153,11 @@ CREATE TABLE permissions_for_roles (
   permissionID VARCHAR(32),
   PRIMARY KEY (userRoleID, permissionID),
   FOREIGN KEY (permissionID) REFERENCES permissions (permissionID)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
 
 CREATE PROCEDURE insert_permission_for_role(IN user_role_name VARCHAR(32), IN permission_name VARCHAR(32))
@@ -219,18 +220,18 @@ CREATE TABLE requests (
   dataSourceID       VARCHAR(32)  NOT NULL,
   requestNumber      VARCHAR(16)  NOT NULL,
   creationDate       DATETIME     NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
-  marketAgentUserID  INTEGER      NULL,
-  clientID           INTEGER      NULL,
-  destinationPointID INTEGER      NULL, -- адрес, куда должны быть доставлены все товары
+  marketAgentUserID  INTEGER      NOT NULL,
+  clientID           INTEGER      NOT NULL,
+  destinationPointID INTEGER      NOT NULL, -- адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
   FOREIGN KEY (marketAgentUserID) REFERENCES users (userID)
-    ON DELETE SET NULL
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (clientID) REFERENCES clients (clientID)
-    ON DELETE SET NULL
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
-    ON DELETE SET NULL
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
   UNIQUE(requestIDExternal, dataSourceID)
@@ -313,7 +314,7 @@ CREATE TABLE route_points (
   routeID                  INTEGER NOT NULL,
   PRIMARY KEY (routePointID),
   FOREIGN KEY (pointID) REFERENCES points (pointID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE CASCADE
@@ -352,11 +353,11 @@ CREATE TABLE route_lists (
   status              VARCHAR(32)  NOT NULL,
   routeID             INTEGER      NOT NULL,
   PRIMARY KEY (routeListID),
-  FOREIGN KEY (routeID) REFERENCES routes (routeID)
-    ON DELETE NO ACTION
-    ON UPDATE CASCADE,
   FOREIGN KEY (status) REFERENCES route_list_statuses (routeListStatusID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  FOREIGN KEY (routeID) REFERENCES routes (routeID)
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   UNIQUE (routeListNumber),
   UNIQUE (routeListIDExternal, dataSourceID)
@@ -405,7 +406,7 @@ CREATE TABLE route_list_history (
   dutyStatus          ENUM('CREATED', 'UPDATED', 'DELETED') NOT NULL,
   PRIMARY KEY (routeListHistoryID),
   FOREIGN KEY (status) REFERENCES route_list_statuses (routeListStatusID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
     ON UPDATE CASCADE
 );
 
@@ -510,13 +511,13 @@ CREATE TABLE invoices (
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT,
   FOREIGN KEY (requestID) REFERENCES requests (requestID)
     ON DELETE CASCADE
-    ON UPDATE NO ACTION,
+    ON UPDATE RESTRICT,
   FOREIGN KEY (warehousePointID) REFERENCES points (pointID)
-    ON DELETE NO ACTION
+    ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (routeListID) REFERENCES route_lists (routeListID)
     ON DELETE SET NULL
@@ -621,8 +622,8 @@ CREATE TABLE invoice_history (
   lastVisitedUserPointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceHistoryID),
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION
+    ON DELETE RESTRICT
+    ON UPDATE RESTRICT
 );
 
 -- -------------------------------------------------------------------------------------------------------------------
