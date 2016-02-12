@@ -14,7 +14,6 @@ import java.util.Map;
 
 
 public class InvoiceOverviewController {
-    private InvoiceContainer invoiceContainer;
     private PlannedSchedule plannedSchedule;
     private ObservableList<Invoice> invoiceObservableList;
     private Optimizer optimizer;
@@ -29,10 +28,11 @@ public class InvoiceOverviewController {
                 while (c.next()){
                     if(c.wasAdded()){
                         List<? extends Invoice> addedSubList = c.getAddedSubList();
-                        List<Invoice> mySubList = new ArrayList<>(addedSubList);
+                        InvoiceContainer invoiceContainer = new InvoiceContainer();
+                        invoiceContainer.addAll(addedSubList);
                         try {
                             System.out.println("Элемент добавлен");
-                            Map<Invoice, ArrayList<Route>> routesForAddedInvoices = optimizer.filtrate(plannedSchedule, mySubList);
+                            Map<Invoice, ArrayList<Route>> routesForAddedInvoices = optimizer.filtrate(plannedSchedule, invoiceContainer);
                         } catch (RouteNotFoundException e) {
                             e.printStackTrace();
                         }

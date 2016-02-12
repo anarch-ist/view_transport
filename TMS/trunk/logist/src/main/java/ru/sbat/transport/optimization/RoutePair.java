@@ -1,21 +1,10 @@
 package ru.sbat.transport.optimization;
 
 
-import ru.sbat.transport.optimization.location.Route;
-
-
 public class RoutePair {
     private double weight;
     private double volume;
 
-    public RoutePair(){
-
-    }
-
-    public RoutePair(Route route) {
-        this.weight = route.getStartingWeight();
-        this.volume = route.getStartingVolume();
-    }
 
     public RoutePair(double weight, double volume) {
         this.weight = weight;

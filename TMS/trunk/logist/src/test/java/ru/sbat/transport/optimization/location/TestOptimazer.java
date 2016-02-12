@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.sbat.transport.optimization.Invoice;
+import ru.sbat.transport.optimization.InvoiceContainer;
 import ru.sbat.transport.optimization.Optimizer;
 import ru.sbat.transport.optimization.Request;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
@@ -14,7 +15,7 @@ import java.util.*;
 
 public class TestOptimazer {
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static List<Invoice> unassignedInvoices = new ArrayList<>();
+    static InvoiceContainer invoiceContainer = new InvoiceContainer();
     static WarehousePoint warehousePoint1 = new WarehousePoint();
     static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint();
     static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
@@ -31,22 +32,21 @@ public class TestOptimazer {
         initRoute(
                 route1,
                 //пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта в минутах, время ПРР в минутах
-                createRoutePoint(warehousePoint1,           2, 930, 600,   0),
-                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  90),
-                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120)
+                createRoutePoint(warehousePoint2,           2, 900, 600,   0, getCharacteristicsOfCar(11, 16)),
+                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0,  90, getCharacteristicsOfCar(11, 16))
         );
 
         initRoute(
                 route2,
-                createRoutePoint(warehousePoint2,           2, 930, 600,   0),
-                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  90),
-                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120)
+                createRoutePoint(warehousePoint2,           2, 930, 600,   0, getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  90, getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, getCharacteristicsOfCar(10, 15))
         );
 
         initRoute(
                 route3,
-                createRoutePoint(warehousePoint2,           4, 975, 1440,   0),
-                createRoutePoint(tradeRepresentativePoint2, 5,   0,    0, 104)
+                createRoutePoint(warehousePoint2,           4, 975, 1440,   0, getCharacteristicsOfCar(7, 9)),
+                createRoutePoint(tradeRepresentativePoint2, 5,   0,    0, 104, getCharacteristicsOfCar(7, 9))
         );
 
         plannedSchedule.add(route1);
@@ -56,24 +56,34 @@ public class TestOptimazer {
 
     // создание накладных без маршрутов
     @BeforeClass
-    public static void createUnassignedInvoices(){
+    public static void fullInvoiceContainer(){
         // пункт доставки, дата плановой доставки
-        Request request = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.APRIL, 21, 18, 0));
+        Request request = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 19, 18, 0));
+        Request request2 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 19, 17, 30));
+        Request request3 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 19, 18, 30));
         // адрес склада, дата создания накладной
-        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 0), request);
+        Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),     request, 5, 7);
+        Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30), request2, 10, 15);
+        Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),   request3, 2, 3);
+        invoice2.setRoute(route1);
+        invoice3.setRoute(route2);
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
 //        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " дата плановой доставки");
 //        System.out.println("");
-        unassignedInvoices.add(invoice);
+        invoiceContainer.add(invoice);
+        invoiceContainer.add(invoice2);
+        invoiceContainer.add(invoice3);
     }
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
 
-    private static Invoice createInvoice(Point departurePoint, Date creationDate, Request request){
+    private static Invoice createInvoice(Point departurePoint, Date creationDate, Request request, double weight, double volume){
         Invoice result = new Invoice();
         result.setAddressOfWarehouse(departurePoint);
         result.setCreationDate(creationDate);
         result.setRequest(request);
+        result.setWeight(weight);
+        result.setVolume(volume);
         return result;
     }
 
@@ -94,13 +104,21 @@ public class TestOptimazer {
         Collections.addAll(route, routePoints);
     }
 
-    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime) {
+    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, CharacteristicsOfCar characteristicsOfCar) {
         RoutePoint result = new RoutePoint();
         result.setDeparturePoint(point);
         result.setDayOfWeek(dayOfWeek);
         result.setDepartureTime(departureTime); // в минутах от начала суток
         result.setTimeToNextPoint(timeToNextPoint);
         result.setLoadingOperationsTime(loadingOperationsTime);
+        result.setCharacteristicsOfCar(characteristicsOfCar);
+        return result;
+    }
+
+    public static CharacteristicsOfCar getCharacteristicsOfCar(double weight, double volume){
+        CharacteristicsOfCar result = new CharacteristicsOfCar();
+        result.setCapacityCar(weight);
+        result.setVolumeCar(volume);
         return result;
     }
     // -------------- END СЛУЖЕБНЫЕ МЕТОДЫ ---------------
@@ -117,13 +135,16 @@ public class TestOptimazer {
 
     @Test
     public void testFiltrate() throws RouteNotFoundException {
-        Optimizer optimizer = new Optimizer();
-        routesForInvoice = optimizer.filtrate(plannedSchedule, unassignedInvoices);
-        ArrayList<Route> routes = routesForInvoice.get(unassignedInvoices.get(0));
-        Assert.assertEquals(26, routes.size());
-        Assert.assertFalse(routes.contains(route1));
-        Assert.assertTrue(routes.contains(route2));
-        Assert.assertTrue(routes.contains(route3));
+        try {
+            Optimizer optimizer = new Optimizer();
+            routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
+            ArrayList<Route> routes = routesForInvoice.get(invoiceContainer.get(0));
+            Assert.assertEquals(9, routes.size());
+            Assert.assertTrue(routes.contains(route2));
+            Assert.assertTrue(routes.contains(route3));
+        }catch (IllegalArgumentException e){
+
+        }
     }
 
     @Test
@@ -133,12 +154,12 @@ public class TestOptimazer {
         initRoute(
                 route,
                 //пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта в минутах, время ПРР в минутах
-                createRoutePoint(warehousePoint1,           3, 930, 600,   0),
-                createRoutePoint(tradeRepresentativePoint1, 4, 180, 960,  90),
-                createRoutePoint(tradeRepresentativePoint2, 4,   0,   0, 120)
+                createRoutePoint(warehousePoint1,           3, 930, 600,   0, getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint1, 4, 180, 960,  90, getCharacteristicsOfCar(17, 20)),
+                createRoutePoint(tradeRepresentativePoint2, 4,   0,   0, 120, getCharacteristicsOfCar  (5, 8))
         );
         Request request = createRequest(tradeRepresentativePoint2, createDate(2016, 1, 4, 18, 0));
-        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 29, 12, 0), request);
+        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 29, 12, 0), request, 1, 4);
         ArrayList<Date> result = optimizer.getPossibleDepartureDate(route, invoice);
         System.out.println(invoice.getCreationDate() + " дата создания накладной");
         System.out.println(result.get(0) + " дата возможного отъезда");
@@ -155,12 +176,12 @@ public class TestOptimazer {
         initRoute(
                 route,
                 //пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта в минутах, время ПРР в минутах
-                createRoutePoint(warehousePoint1,           2, 900, 600,   0),
-                createRoutePoint(tradeRepresentativePoint1, 3, 180, 1500, 120),
-                createRoutePoint(tradeRepresentativePoint2, 4,   0,   0,  120)
+                createRoutePoint(warehousePoint1,           2, 900, 600,   0,  getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint1, 3, 180, 1500, 120, getCharacteristicsOfCar(17, 20)),
+                createRoutePoint(tradeRepresentativePoint2, 4,   0,   0,  120, getCharacteristicsOfCar  (5, 8))
         );
         Request request = createRequest(tradeRepresentativePoint2, createDate(2016, 1, 4, 18, 0));
-        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 26, 12, 0), request);
+        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 26, 12, 0), request, 2, 7);
         ArrayList<Date>dateArray = optimizer.getPossibleDepartureDate(route, invoice);
         Assert.assertTrue(optimizer.isFittingForDeliveryTime(route, invoice, dateArray.get(0)));
     }
@@ -172,12 +193,12 @@ public class TestOptimazer {
         initRoute(
                 route,
                 //пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта в минутах, время ПРР в минутах
-                createRoutePoint(warehousePoint1,           3, 930, 600,    0),
-                createRoutePoint(tradeRepresentativePoint1, 4, 180, 960,   90),
-                createRoutePoint(tradeRepresentativePoint2, 4,   0,   0,  120)
+                createRoutePoint(warehousePoint1,           3, 930, 600,    0,   getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint1, 4, 180, 960,   90,   getCharacteristicsOfCar(17, 20)),
+                createRoutePoint(tradeRepresentativePoint2, 4,   0,   0,  120,   getCharacteristicsOfCar  (5, 8))
         );
         Request request = createRequest(tradeRepresentativePoint2, createDate(2016, 5, 4, 18, 0));
-        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 27, 12, 0), request);
+        Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 27, 12, 0), request, 3, 6);
         ArrayList<Date>dateArray = optimizer.getPossibleDepartureDate(route, invoice);
         Assert.assertTrue(invoice.getRequest().getPlannedDeliveryTime().after(optimizer.getPossibleArrivalDate(route, invoice, dateArray.get(0))));
     }

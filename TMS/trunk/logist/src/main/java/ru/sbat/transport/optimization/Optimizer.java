@@ -14,14 +14,16 @@ public class Optimizer implements IOptimizer {
     /** Selects for invoice appropriate routes
      *
      * @param plannedSchedule
-     * @param unassignedInvoices
+     * @param invoiceContainer
      * @return map with invoice(key) and routes(values)
      * @throws RouteNotFoundException
      */
     @Override
-    public Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException {
+    public Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
         Map<Invoice, ArrayList<Route>> map = new HashMap<>();
-        for(Invoice invoice: unassignedInvoices) {
+        RouteWeightAndVolume routeWeightAndVolume = new RouteWeightAndVolume();
+        Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
+        for(Invoice invoice: invoiceContainer) {
             if (invoice.getRoute() != null)
                 throw new IllegalArgumentException("invoice.getRoute() should be null");
 
@@ -38,7 +40,7 @@ public class Optimizer implements IOptimizer {
                         route.getArrivalPoint().equals(deliveryPoint)) {
                     ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
                     for(Date date: possibleDepartureDate){
-                        if(isFittingForDeliveryTime(route, invoice, date)){
+                        if(isFittingForDeliveryTime(route, invoice, date) && routeData.get(route).isFittingForRoute(invoice, routeData.get(route))){
                             possibleRouteForInvoice.add(route);
                             System.out.println(date + " день отправления");
                             System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
@@ -138,7 +140,7 @@ public class Optimizer implements IOptimizer {
 
 
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException {
+    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, InvoiceContainer invoiceContainer) throws ParseException, RouteNotFoundException {
 
     }
 

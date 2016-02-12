@@ -5,7 +5,7 @@ import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.Collections;
 
-public class RouteTest {
+public class TestRoute {
 
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
     static Route route = new Route();

@@ -47,7 +47,7 @@ public class TestRoutePair {
     @Test
     public void testGetAvailableWeightVolume(){
         RoutePair routePair = new RoutePair(2, 5);
-        RoutePair result = new RoutePair(route);
+        RoutePair result = new RoutePair(route.getStartingWeight(), route.getStartingVolume());
         System.out.println(routePair.getWeight() + " " + routePair.getVolume() + " должно быть");
         result = result.getAvailableWeightAndVolume(invoice2, result);
         System.out.println(result.getWeight() + " " + result.getVolume() + " что есть после 2 invoice");
@@ -61,7 +61,7 @@ public class TestRoutePair {
 
     @Test
     public void testIsFittingForRoute(){
-        RoutePair routePair = new RoutePair(route2);
+        RoutePair routePair = new RoutePair(route2.getStartingWeight(), route2.getStartingVolume());
         Assert.assertFalse(routePair.isFittingForRoute(invoice1, routePair));
     }
 }

@@ -7,11 +7,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 
-public class PlannedSchedule extends AbstractSchedule implements Observer{
+public class PlannedSchedule extends AbstractSchedule {
     private InvoiceContainer invoiceContainer;
 
-    @Override
-    public void update(Observable o, Object arg) {
-
-    }
 }

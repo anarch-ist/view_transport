@@ -18,14 +18,14 @@ public interface IOptimizer {
      * mutable method, set routes for unassigned invoices.
      * @param plannedSchedule
      * @param additionalSchedule
-     * @param unassignedInvoices
+     * @param invoiceContainer
      * @throws ParseException
      */
-    void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, List<Invoice> unassignedInvoices) throws ParseException, RouteNotFoundException;
+    void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, InvoiceContainer invoiceContainer) throws ParseException, RouteNotFoundException;
 
     InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices);
 
-    Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, List<Invoice> unassignedInvoices) throws RouteNotFoundException;
+    Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException;
 
     ArrayList<Date> getPossibleDepartureDate(Route route, Invoice invoice);
 
