@@ -1225,8 +1225,8 @@ FOR EACH ROW
   END;
 
 -- TODO рассмотреть два случая - если меняется sortOrder и если меняется сам пункт и если происходит то и другое одновременно
-CREATE TRIGGER after_route_points_update BEFORE UPDATE ON route_points
-FOR EACH ROW
-  BEGIN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: updates on route_points temporally disabled';
-  END;
+ CREATE TRIGGER after_route_points_update BEFORE UPDATE ON route_points
+ FOR EACH ROW
+   BEGIN
+     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SERGEY ERROR: updates on route_points temporally disabled';
+END;

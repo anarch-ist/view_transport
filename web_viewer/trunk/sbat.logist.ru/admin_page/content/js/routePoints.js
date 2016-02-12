@@ -198,7 +198,7 @@ $(document).ready(function () {
                     type: 'mask',
                     mask: "0",
                     maskOptions: {clearIfNotMatch: true},
-                    placeholder: "0-9"
+                    placeholder: "1-9"
                 },
                 {
                     label: 'Пункт', name: 'pointName', type: 'selectize',
