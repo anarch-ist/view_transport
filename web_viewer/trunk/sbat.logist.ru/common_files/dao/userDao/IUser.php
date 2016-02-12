@@ -10,17 +10,17 @@ interface IUserEntity
      * @param $userID
      * @return string
      */
-    function  getUserRole($userID);
+    function getUserRole($userID);  //covered
 
-    function selectUserByID($id);
+    function selectUserByID($id); //covered
 
-    function selectUserByEmail($email);
+    function selectUserByEmail($email); //covered
 
-    function updateUser(UserData $newUser, $id);
+    function updateUser(UserData $newUser, $id); //covered
 
-    function deleteUser($user);
+    function deleteUser($userID); //covered
 
-    function addUser(UserData $user);
+    function addUser(UserData $user); //covered
 
-    function getTotalUserCount();
+    function getUsersTotalCount();
 }

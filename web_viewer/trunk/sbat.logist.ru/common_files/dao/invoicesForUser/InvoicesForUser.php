@@ -24,51 +24,49 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
     /**
      * @return array
      */
-    function selectAllData()
+    function selectAllData($start = 0, $count = 20, $userID = -1)
     {
-        $count = 20;
-        $start = 0;
-        switch (func_num_args()) {
-            case 2:
-                $start = func_get_arg(0);
-                $count = func_get_arg(1);
-                break;
-            case 1:
-                $start = func_get_arg(0);
-                break;
+        if ($userID < 1) {
+            $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
         }
-        $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start, $count));
+        $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start, $count, $userID));
         return $array;
     }
 
-    /**
-     * @param $keyword
-     * @return array
-     */
 }
 
 class EntitySelectAllInvoicesForUser implements IEntitySelect
 {
-    private $start, $count, $orderByColumn, $isDesc, $searchString;
+    private $start, $count, $orderByColumn, $isDesc, $searchString, $userID;
 
-    function __construct($start, $count)
+    function __construct($start, $count, $userID, $order = -1, $orderColumn = -1, $cols = -1)
     {
+        $this->userID = $userID;
+        //TODO: remake this shit
+        if ($order === -1) {
+            $order = $_POST['order'][0]['dir'];
+        }
+        if ($cols === -1) {
+            $cols = $_POST['columns'];
+        }
+        if ($orderColumn === -1) {
+            $orderColumn = $_POST['order'][0]['column'];
+        }
         $this->start = DAO::getInstance()->checkString($start);
         $this->count = DAO::getInstance()->checkString($count);
-        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->isDesc = ($order === 'desc' ? 'TRUE' : 'FALSE');
         $this->searchString = '';
-        $searchArray = $_POST['columns'];
+        $searchArray = $cols;
         for ($i = 0; $i < count($searchArray); $i++) {
             if ($searchArray[$i]['search']['value'] !== '') {
                 $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';
             }
         }
-        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
+        $this->orderByColumn = $searchArray[$orderColumn]['name'];
     }
 
     function getSelectQuery()
     {
-        $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
-        return "CALL selectData($userID,$this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        return "CALL selectData($this->userID,$this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
     }
 }

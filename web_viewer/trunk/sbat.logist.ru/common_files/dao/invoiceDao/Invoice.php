@@ -20,19 +20,8 @@ class InvoiceEntity implements IInvoiceEntity
         return self::$_instance;
     }
 
-    function selectInvoices()
+    function selectInvoices($start=0, $count=20)
     {
-        $count = 20;
-        $start = 0;
-        switch (func_num_args()) {
-            case 2:
-                $start = func_get_arg(0);
-                $count = func_get_arg(1);
-                break;
-            case 1:
-                $start = func_get_arg(0);
-                break;
-        }
         $array = $this->_DAO->select(new SelectAllInvoices($start, $count));
         $invoices = array();
         for ($i = 0; $i < count($array); $i++) {
@@ -82,6 +71,11 @@ class InvoiceEntity implements IInvoiceEntity
     function getInvoiceHistoryByInvoiceNumber($invoiceNumber)
     {
         return $this->_DAO->select(new SelectInvoiceHistory($invoiceNumber));
+    }
+
+    function getInvoicesForRouteList($routeListID)
+    {
+        return $this->_DAO->select(new SelectInvoicesByRouteList($routeListID));
     }
 }
 
@@ -172,7 +166,7 @@ class UpdateInvoiceStatus implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `invoiceNumber` = '$this->invoiceNumber';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `documentNumber` = '$this->invoiceNumber';";
     }
 }
 
@@ -201,5 +195,24 @@ class UpdateInvoiceStatuses implements IEntityUpdate
     function getUpdateQuery()
     {
         return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
+    }
+}
+
+
+class SelectInvoicesByRouteList implements IEntitySelect
+{
+    private $routeListID;
+
+    function __construct($routeListID)
+    {
+        $this->routeListID = DAO::getInstance()->checkString($routeListID);
+    }
+
+    /**
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "SELECT * FROM `invoices` WHERE routeListID='$this->routeListID';";
     }
 }

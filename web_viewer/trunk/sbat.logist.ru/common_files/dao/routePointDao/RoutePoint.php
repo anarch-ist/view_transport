@@ -159,10 +159,13 @@ class AddRoutePoint implements IEntityInsert
         $this->routeID = $dao->checkString($routeID);
     }
 
+    /**
+     * @return string
+     */
     function getInsertQuery()
     {
         // TODO: check getInsertQuery() method.
-        return "CALL createRoutePoint($this->sortOrder, $this->tLoading, $this->pointID, $this->routeID);";
+        return "INSERT INTO route_points (sortOrder, timeForLoadingOperations, pointID, routeID) VALUES ($this->sortOrder, $this->tLoading, $this->pointID, $this->routeID);";
     }
 }
 

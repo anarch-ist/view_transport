@@ -92,7 +92,7 @@ function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
     foreach ($dataArray as $key => $val) {
         if ($val instanceof DAO\RouteData) {
             $data[$key]['routeID'] = $val->getData('routeID');
-            $data[$key]['directionName'] = $val->getData('directionName');
+            $data[$key]['directionName'] = $val->getData('routeName');
         }
     }
     echo json_encode($data);
@@ -250,7 +250,7 @@ function getRelationsBetweenRoutePointsDataForRouteID(PrivilegedUser $privUser)
 function getUsers(PrivilegedUser $privUser)
 {
     $dataArray = $privUser->getUserEntity()->selectUsers($_POST['start'], $_POST['length']);
-    $totalData = $privUser->getUserEntity()->getTotalUserCount();
+    $totalData = $privUser->getUserEntity()->getUsersTotalCount();
     $totalFiltered = count($dataArray);
     $json_data = array(
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.

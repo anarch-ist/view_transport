@@ -1,24 +1,33 @@
 <?php
 
 include_once __DIR__ . '/../common_files/dao/routeAndRoutePoints/RouteAndRoutePoints.php';
+include_once 'AbstractEntityTestClass.php';
 
-class RouteAndRoutePointsEntityTest extends PHPUnit_Framework_TestCase
+class RouteAndRoutePointsEntityTest extends AbstractEntityTestClass
 {
-
-    /**
-     * @after
-     */
-    static function closeConnection()
-    {
-        \DAO\DAO::getInstance()->closeConnection();
-    }
 
     /**
      * @before
      */
-    static function openConnection()
+    static function openMysqlConnection()
     {
-        \DAO\DAO::getInstance()->startConnection();
+        parent::openMysqlConnection();
+    }
+
+    /**
+     * @after
+     */
+    static function closeMysqlConnection()
+    {
+        parent::closeMysqlConnection();
+    }
+
+    /**
+     * @afterClass
+     */
+    static function flushDB()
+    {
+        parent::flushDB();
     }
 
     function testCreateRouteAndRoutePoints()
@@ -28,6 +37,7 @@ class RouteAndRoutePointsEntityTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideDirectionName
+     * @test
      */
     function testGetAllRoutePointsDataForRouteID($routeID, $result)
     {

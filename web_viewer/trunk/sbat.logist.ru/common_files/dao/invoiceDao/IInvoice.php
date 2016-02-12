@@ -7,17 +7,27 @@ interface IInvoiceEntity
     /**
      * @return array of InvoiceData
      */
-    function selectInvoices();
+    function selectInvoices(); //covered
+    //unnecessary
 
     function selectInvoiceByID($id);
+    //unnecessary
 
     function updateInvoice(InvoiceData $newInvoice);
 
+    function updateInvoiceStatus($userID, $invoiceNumber, $newInvoiceStatus, $datetime, $comment);
+    //covered
+
     function deleteInvoice(InvoiceData $Invoice);
+    //later
 
     function addInvoice(InvoiceData $Invoice);
+    //later
 
     function getInvoiceStatuses(\PrivilegedUser $pUser);
+    //unnecessary
 
-    function getInvoiceHistoryByInvoiceNumber($invoiceNumber);
+    function getInvoicesForRouteList($routeListID); //covered
+
+    function getInvoiceHistoryByInvoiceNumber($invoiceNumber); //covered
 }

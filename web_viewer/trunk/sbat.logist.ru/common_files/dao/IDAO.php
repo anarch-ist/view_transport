@@ -14,19 +14,19 @@ interface IDAO
      * @param $newObj
      * @return string
      */
-    function update(IEntityUpdate $newObj, IEntityInsert $updateTable);
+    function update(IEntityUpdate $newObj, IEntityInsert $updateTable=null);
 
     /**
      * @param $obj
      * @return string
      */
-    function insert(IEntityInsert $obj, IEntityInsert $updateTable);
+    function insert(IEntityInsert $obj, IEntityInsert $updateTable=null);
 
     /**
      * @param IEntityDelete $obj
      * @return string
      */
-    function delete(IEntityDelete $obj, IEntityInsert $updateTable);
+    function delete(IEntityDelete $obj, IEntityInsert $updateTable=null);
 }
 
 interface IEntitySelect

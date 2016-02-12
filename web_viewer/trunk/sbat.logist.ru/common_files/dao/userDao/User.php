@@ -9,15 +9,15 @@ class UserEntity implements IUserEntity
     private static $_instance;
     private $_DAO;
 
-    protected function __construct()
+    protected function __construct(IDAO $dao)
     {
-        $this->_DAO = DAO::getInstance();
+        $this->_DAO = $dao;
         self::$_instance = $this;
     }
 
     public static function getInstance()
     {
-        if (is_null(self::$_instance)) return new UserEntity();
+        if (is_null(self::$_instance)) return new UserEntity(DAO::getInstance());
         return self::$_instance;
     }
 
@@ -61,7 +61,7 @@ class UserEntity implements IUserEntity
         return new UserData($array[0]);
     }
 
-    function getTotalUserCount()
+    function getUsersTotalCount()
     {
         return $this->_DAO->select(new SelectTotalUserCount())[0]['count'];
     }
