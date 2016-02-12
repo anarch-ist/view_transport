@@ -207,7 +207,7 @@ class DeleteUser implements IEntityDelete
 
 class InsertUser implements IEntityInsert
 {
-    private $firstName, $lastName, $patronymic, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+    private $firstName, $lastName, $login, $patronymic, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
 
     function __construct(UserData $user)
     {
@@ -219,6 +219,7 @@ class InsertUser implements IEntityInsert
         $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
         $this->email = $dao->checkString($user->getData('email'));
+        $this->login = $dao->checkString($user->getData('email'));
         $this->userRoleID = $dao->checkString($user->getData('userRoleRusName'));
         $this->pointID = $dao->checkString($user->getData('pointName'));
     }
@@ -231,8 +232,8 @@ class InsertUser implements IEntityInsert
         $salt = substr(md5(rand(0, 100000000)), 0, 16);
         $passAndSalt = md5($this->passMD5 . $salt);
 //        echo "INSERT INTO `users` (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE ($this->firstName, $this->lastName, $this->patronymic, $this->position, $salt, $passAndSalt, $this->phoneNumber, $this->email, $this->userRoleID, $this->pointID);";
-        return "INSERT INTO `users` (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE " .
-        "('$this->firstName', '$this->lastName', '$this->patronymic', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID);";
+        return "INSERT INTO `users` (firstName, lastName, patronymic, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE " .
+        "('$this->firstName', '$this->lastName', '$this->patronymic', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID);";
     }
 }
 
