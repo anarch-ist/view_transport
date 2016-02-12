@@ -141,6 +141,8 @@ https://confluence.jetbrains.com/display/PhpStorm/Deploying+PHP+applications+wit
  name: productionServer
  type: FTP
 
+for VESTA via browser 185.75.182.92:8083
+
 ftp host: 185.75.182.92
 Port: 21
 root path: /web/transport.sbat.ru/public_html/
@@ -184,6 +186,8 @@ information_shema should be selected
 connection to database with phpStorm;
 http://185.75.182.92/phpmyadmin/
 
+
+-- 
 
 -- phpUnit
 
