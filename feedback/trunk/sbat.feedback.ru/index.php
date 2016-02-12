@@ -1,14 +1,27 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+session_start();
+$dir = "thumb";
+if (is_dir($dir)) {
+    if ($dd = opendir($dir)) {
+        while (($f = readdir($dd)) !== false)
+            if ($f != "." && $f != "..")
+                $files[] = $f;
+        closedir($dd);
+    }
+    shuffle($files);
+    session_destroy();
+    session_unset();}
+//session_destroy();
+//session_unset();
+    ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Expires" content="Mon, 26 Jul 1997 05:00:00 GMT" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Отзывы клиентов ГК "Энергомикс"</title>
-    <header><!--Это шапка сайта-->
-        <h1>Отзывы покупателей ГК "Энергомикс"</h1>
-    </header>
+    <title>������ �������� �� "����������"</title>
 
     <!-- Add jQuery library -->
     <script type="text/javascript" src="lib/jquery-1.10.1.min.js"></script>
@@ -41,5 +54,4 @@
 </div>
 </body>
 </html>
-
 

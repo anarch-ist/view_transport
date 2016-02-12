@@ -29,7 +29,7 @@
             else
                 alert("Извините! Ваш браузер не поддерживает XMLHTTP!");
 
-            if (n <= 500) {
+            if (n <= 550) {
                 var url = "getImages.php?n=" + n;
 
                 xmlhttp.open("GET", url, true);
@@ -39,9 +39,10 @@
 
                 xmlhttp.onreadystatechange = putImages;
             }
-            //  else {url = "destroy.php";
-
-            //  xmlhttp.open("GET", url, true);}
+              else {
+                url = "destroy.php";
+                xmlhttp.open("GET", url, true);
+            }
         }
 
     }
@@ -53,29 +54,31 @@
         else
             scrollPosition = window.pageYOffset;
 
-     //   if ((getContentHeight() - pageHeight - scrollPosition) < 1000) {
+        //   if ((getContentHeight() - pageHeight - scrollPosition) < 1000) {
 
-            if (window.XMLHttpRequest)
-                xmlhttp = new XMLHttpRequest();
-            else if (window.ActiveXObject)
-                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-            else
-                alert("Извините! Ваш браузер не поддерживает XMLHTTP!");
+        if (window.XMLHttpRequest)
+            xmlhttp = new XMLHttpRequest();
+        else if (window.ActiveXObject)
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        else
+            alert("Извините! Ваш браузер не поддерживает XMLHTTP!");
 
-            if (n <= 517) {
-                var url = "getImages.php?n=" + n;
+        if (n <= 550) {
+            var url = "getImages.php?n=" + n;
 
-                xmlhttp.open("GET", url, true);
-                xmlhttp.send();
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
 
-                n += 15;
+            n += 15;
 
-                xmlhttp.onreadystatechange = putImages;
-            }
-            //  else {url = "destroy.php";
+            xmlhttp.onreadystatechange = putImages;
+        }
+        else {
+            url = "destroy.php";
 
-            //  xmlhttp.open("GET", url, true);}
-     //   }
+            xmlhttp.open("GET", url, true);
+        }
+
 
     }
 
