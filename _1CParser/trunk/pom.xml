@@ -6,7 +6,7 @@
 
     <groupId>logist</groupId>
     <artifactId>parser1c</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -48,7 +48,22 @@
 
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>productionServer</id>
+            <url>ftp://185.75.182.92:21/web/transport.sbat.ru/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
+        <extensions>
+            <!-- Enabling the use of FTP -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

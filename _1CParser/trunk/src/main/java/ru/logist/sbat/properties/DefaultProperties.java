@@ -4,7 +4,8 @@ import java.util.Properties;
 
 public class DefaultProperties extends Properties {
     public DefaultProperties() {
-        this.put("mode", "generate");
+        // property can be parse or generate.
+        this.put("mode", "parse");
         this.put("generatePeriod", "10"); // seconds
         this.put("user", "root");
         this.put("password", "rtbyg7895otlgorit");

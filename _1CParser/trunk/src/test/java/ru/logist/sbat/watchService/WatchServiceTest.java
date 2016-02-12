@@ -2,11 +2,13 @@ package ru.logist.sbat.watchService;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Ignore
 public class WatchServiceTest {
 
     private Path path;

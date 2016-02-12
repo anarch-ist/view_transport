@@ -1,1 +1,1 @@
-java -jar parser1c-0.1-SNAPSHOT-capsule.jar
+java -jar parser1c-0.2-SNAPSHOT-capsule.jar

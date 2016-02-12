@@ -14,6 +14,7 @@ public class WatchServiceStarter {
 
     private Path watchPath;
     private OnFileChangeListener onFileChangeListener;
+    private volatile java.nio.file.WatchService watchService;
 
     public WatchServiceStarter(Path watchPath) {
         this.watchPath = watchPath;
@@ -26,13 +27,13 @@ public class WatchServiceStarter {
         this.onFileChangeListener = onFileChangeListener;
     }
 
-    public void doWatch() throws IOException, InterruptedException {
+    public void doWatch() throws IOException {
 
-        java.nio.file.WatchService watchService = FileSystems.getDefault().newWatchService();
+        watchService = FileSystems.getDefault().newWatchService();
         logger.info("start watch service for [{}]", watchPath.toString());
         WatchKey watchKey = watchPath.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
-        for (;;) {
+        while (!Thread.currentThread().isInterrupted()){
 
             WatchKey key;
 
@@ -85,9 +86,15 @@ public class WatchServiceStarter {
 
         } // end infinite for loop
 
-        watchService.close();
-        logger.info("Watch service closed.");
+        closeWatchService();
     }
 
+    public void closeWatchService() {
+        try {
+            if (watchService != null)
+                watchService.close();
+        } catch (IOException e) {/*NOPE*/}
+        logger.info("Watch service closed.");
+    }
 
 }

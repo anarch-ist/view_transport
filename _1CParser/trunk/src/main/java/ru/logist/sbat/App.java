@@ -27,11 +27,8 @@ import java.util.Scanner;
 
 public class App {
     private static final Logger logger = LogManager.getLogger();
-    public static final String IRT = "IRT"; // insert into request table
-    public static final String IRLT = "IRLT"; // insert into routeListTable
-    public static final String IIT = "IIT"; // insert into invoices table
-    public static final String UIT = "UIT"; // update invoice statuses
     public static final String EXCHANGE_DIR_NAME = "exchange/";
+    private static Thread watchServiceThread;
 
     public static String getLoggerFile( Logger log ) {
         org.apache.logging.log4j.core.Logger loggerImpl = (org.apache.logging.log4j.core.Logger) log;
@@ -39,9 +36,19 @@ public class App {
         return ((FileAppender) appender).getFileName();
     }
 
+    public static void closeAllAndExit() {
+        dataBase.close();
+        watchServiceThread.interrupt();
+        watchServiceStarter.closeWatchService();
+        System.exit(0);
+    }
+
+    private static DataBase dataBase;
+    private static volatile WatchServiceStarter watchServiceStarter;
+
     public static void main(String[] args) {
 
-        // show logs path
+        // show logs path and exchange path
         Path rootDir = Paths.get(System.getProperty("user.dir"));
         Path exchangeDir = rootDir.resolve(EXCHANGE_DIR_NAME);
         File file = exchangeDir.toFile();
@@ -66,7 +73,6 @@ public class App {
         }
 
         // create database connection
-        DataBase dataBase = null;
         try {
             String url = properties.getProperty("url");
             String dbName = properties.getProperty("dbName");
@@ -84,59 +90,51 @@ public class App {
             System.exit(-1);
         }
 
-        // create controller
-        Controller controller = new Controller(Integer.parseInt(properties.getProperty("generatePeriod")) * 1_000);
-        controller.setDataBase(dataBase);
+        // create watchService
+        watchServiceStarter = new WatchServiceStarter(exchangeDir);
+
+        watchServiceStarter.setOnFileChanged(new OnFileChangeListener() {
+            @Override
+            public void onFileCreate(Path filePath) {
+                try {
+                    logger.info("start to updateDataFromFile [{}]", filePath);
+                    //dataBase.truncatePublicTables();
+                    dataBase.updateDataFromJSONObject(JSONReadFromFile.read(filePath));
+                } catch (SQLException | IOException | org.json.simple.parser.ParseException e) {
+                    logger.error(e);
+                    closeAllAndExit();
+                }
+            }
+        });
+
+        // create thread for observing exchange directory
+        watchServiceThread = new Thread(() -> {
+            try {
+                watchServiceStarter.doWatch();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        watchServiceThread.start();
+
+//        // add shutdown hook
+//        Runtime.getRuntime().addShutdownHook(new Thread()
+//        {
+//            @Override
+//            public void run() {
+//                closeAllAndExit();
+//                System.out.println("close and EXIT");
+//            }
+//        });
 
         // create cmd parser and options
         Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.println("choose mode: \n1 - parse\n2 - generate");
-            String nextLine = scanner.nextLine();
-            try {
-                if (Integer.parseInt(nextLine) == 1) {
-                    System.out.println("1");
-                    // start watch service here
-                    WatchServiceStarter watchServiceStarter = new WatchServiceStarter(exchangeDir);
-                    final DataBase finalDataBase = dataBase;
-                    System.out.println("2");
-                    watchServiceStarter.setOnFileChanged(new OnFileChangeListener() {
-                        @Override
-                        public void onFileCreate(Path filePath) {
-                            try {
-                                logger.info("start to updateDataFromFile [{}]", filePath);
-                                finalDataBase.updateDataFromJSONObject(JSONReadFromFile.read(filePath));
-                            } catch (SQLException | IOException | org.json.simple.parser.ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    try {
-                        watchServiceStarter.doWatch();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("3");
-
-                    break;
-                } else if (Integer.parseInt(nextLine) == 2) {
-                    System.out.println(2);
-                    break;
-                }
-            } catch (NumberFormatException ignored) {/*NOPE*/}
-        }
-
         Options options = new Options();
         Option exit = new Option("exit");
-        Option start = new Option("start");
         Option help = new Option("help");
-        Option setActions = new Option("setActions", IRT, IRLT, IIT, UIT);
-        options.addAll(Arrays.asList(exit, start, setActions, help));
+        options.addAll(Arrays.asList(exit, help));
 
         CmdLineParser cmdLineParser = new CmdLineParser(options);
-
         while (true) {
             String nextLine = scanner.nextLine();
             Pair<Option, List<String>> optionListPair;
@@ -150,15 +148,7 @@ public class App {
             List<String> parameters = optionListPair.getValue();
 
             if (option.equals(exit)) {
-                controller.close();
-                System.exit(0);
-//            } else if (option.equals(start)) {
-//                controller.startGeneration();
-//            } else if (option.equals(setActions)) {
-//                controller.setGenerateInsertIntoRequestTable(parameters.contains(IRT));
-//                controller.setGenerateInsertIntoRouteListsTable(parameters.contains(IRLT));
-//                controller.setGenerateInsertIntoInvoicesTable(parameters.contains(IIT));
-//                controller.setGenerateUpdateInvoiceStatuses(parameters.contains(UIT));
+                closeAllAndExit();
             } else if (option.equals(help)) {
                 System.out.println(options);
             }
