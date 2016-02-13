@@ -84,7 +84,7 @@ VALUES
   (2, 40, getPointIDByName('point2'), getRouteIDByRouteName('route1')),
   (5, 230, getPointIDByName('point3'), getRouteIDByRouteName('route1')),
   (4, 230, getPointIDByName('point1'), getRouteIDByRouteName('route1')),
-  (3, 120, getPointIDByName('point4'), getRouteIDByRouteName('route1'));
+  (8, 120, getPointIDByName('point4'), getRouteIDByRouteName('route1'));
 
 
 
@@ -98,16 +98,16 @@ VALUES
 
 INSERT INTO invoices (
   invoiceIDExternal, dataSourceID, documentNumber, documentDate, firma, contactName, contactPhone, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,
-  storage, deliveryOption, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus, requestID, warehousePointID, routeListID, lastVisitedUserPointID
+  storage, deliveryOption, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus, requestID, warehousePointID, routeListID, lastVisitedRoutePointID
 )
 VALUES
   ('invIdExt1', 'LOGIST_1C', 'doc1', '2015-11-11', 'firm1', 'Ivan1', '9044343433', now(), now(), 4, 20, 3000, 21000.00,
     'storage1', 'del_opt1', NULL, getUserIDByLogin('test'), 'CREATED', 'some_comment123', getRequestIDByNumber('123356'),
-   getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point1')),
+   getPointIDByName('point1'), getRouteListIDByNumber('1455668'), 1),
 
   ('invIdExt2', 'LOGIST_1C', 'doc2', '2015-11-11', 'firm2', 'Ivan2', '9044347433', now(), now(), 2, 20, 3000, 26000.00,
     'storage2', 'del_opt2', NULL, getUserIDByLogin('test'), 'CREATED', 'some_comment2323', getRequestIDByNumber('123356'),
-   getPointIDByName('point1'), getRouteListIDByNumber('1455668'), getPointIDByName('point3')),
+   getPointIDByName('point1'), getRouteListIDByNumber('1455668'), 2),
 
   ('invIdExt3', 'LOGIST_1C', 'doc3', '2015-11-11', 'firm3', 'Ivan3', '9024397433', now(), now(), 10, 20, 3000, 11000.00,
     'storage3', 'del_opt3', NULL, getUserIDByLogin('test'), 'CREATED', 'some_comment27349', getRequestIDByNumber('123356'),

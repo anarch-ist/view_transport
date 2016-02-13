@@ -197,7 +197,7 @@ $(document).ready(function () {
                     name: 'sortOrder',
                     type: 'mask',
                     mask: "0",
-                    maskOptions: {clearIfNotMatch: true},
+                    maskOptions: {clearIfNotMatch: true, translation:{'0': {pattern: /[1-9]/}}},
                     placeholder: "1-9"
                 },
                 {
@@ -285,13 +285,14 @@ $(document).ready(function () {
                         extend: "remove",
                         editor: routePointsEditor,
                         text: 'удалить запись'
-                    },
-                    {
-                        // TODO временно блокируется возможность менять, пока можно только удалять и создавать новые пункты
-                        //extend: "edit",
-                        //editor: routePointsEditor,
-                        //text: "изменить"
                     }
+                    // TODO временно блокируется возможность менять, пока можно только удалять и создавать новые пункты
+                    //{
+                    //
+                    //    extend: "edit",
+                    //    editor: routePointsEditor,
+                    //    text: "изменить"
+                    //}
                 ],
                 "paging": false, // no pagination
                 "columnDefs": [
