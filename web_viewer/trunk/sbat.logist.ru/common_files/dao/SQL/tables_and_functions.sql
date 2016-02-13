@@ -1248,35 +1248,3 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
     WHERE routes.RouteID = _routeID
     ORDER BY routePointFirst.sortOrder;
   END;
-
-CREATE PROCEDURE `deleteRoutePoint`(_routePointID INTEGER)
-  BEGIN
-    DECLARE routePoint1 INTEGER;
-    DECLARE routePoint2 INTEGER;
-    DECLARE time INTEGER;
-
-    SET @relCount = (SELECT COUNT(*) FROM relations_between_route_points WHERE routePointIDFirst = _routePointID OR routePointIDSecond = _routePointID);
-
-    IF @relCount = 2
-    THEN
-      SELECT
-        rbrp2.routePointIDFirst, rbrp1.routePointIDSecond, (rbrp1.timeForDistance + rbrp2.timeForDistance) as `timeForDistance`
-      INTO
-        routePoint1, routePoint2, time
-      FROM
-        relations_between_route_points as rbrp1,relations_between_route_points as rbrp2
-      WHERE
-        rbrp1.routePointIDFirst = _routePointID AND rbrp2.routePointIDSecond = _routePointID;
-      INSERT INTO
-        relations_between_route_points (routePointIDFirst, routePointIDSecond, timeForDistance)
-        VALUE
-        (routePoint1, routePoint2, time);
-    END IF;
-
-    DELETE FROM route_points WHERE _routePointID = routePointID;
-  END;
-
--- on create route point - automatically create relations_between_routePoints
--- on update route point - automatically update relations_between_routePoints
--- on delete route point - automatically delete relations_between_routePoints
-
