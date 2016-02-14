@@ -71,7 +71,6 @@ public class DataBase {
                         || tableName.equals("invoice_statuses_for_user_role")
                         || tableName.equals("data_sources")
                         || tableName.equals("route_list_statuses")
-                        || tableName.equals("exchange")
                         ) continue;
                 statement = connection.createStatement();
                 String sql = "TRUNCATE TABLE " + tableName + ";";
@@ -80,8 +79,6 @@ public class DataBase {
             }
 
             connection.createStatement().executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
-            connection.createStatement().executeUpdate("INSERT INTO points (pointID, pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime, district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID) VALUE\n" +
-                    "  (1, 'def', 'LOGIST_1C', 'NO_W_POINT', '', 0, 0, '', '00:00:00', '00:00:00', '', '', '', '', '', '', '', 'WAREHOUSE');");
             connection.createStatement().executeUpdate("INSERT INTO users VALUES (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);");
 
             connection.commit();

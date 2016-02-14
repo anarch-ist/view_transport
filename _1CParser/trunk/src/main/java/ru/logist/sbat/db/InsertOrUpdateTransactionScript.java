@@ -1,6 +1,7 @@
 package ru.logist.sbat.db;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -46,6 +47,7 @@ public class InsertOrUpdateTransactionScript {
         JSONArray updateRouteLists = (JSONArray) packageData.get("updateRouteLists");
 
         PreparedStatement
+                updateExchangePrepStatement = null,
                 updatePointsPrepStatement = null,
                 updateRoutesPrepStatement = null,
                 updateClientsPrepStatement = null,
@@ -57,7 +59,7 @@ public class InsertOrUpdateTransactionScript {
                             updateMarketAgentUsersPrepStatement = null;
 
         try {
-            updatePointsPrepStatement = batchPointsData(updatePoints, updateAddress);
+            updatePointsPrepStatement = batchPackageData(dataFrom1C);
             updateRoutesPrepStatement = batchRoutesData(updateDirections);
             updateMarketAgentUsersPrepStatement = batchMarketAgentUser(updateTrader);
             updateClientsPrepStatement = batchClients(updateClients);
@@ -87,63 +89,22 @@ public class InsertOrUpdateTransactionScript {
         }
     }
 
-    private PreparedStatement batchPointsData(JSONArray updatePointsArray, JSONArray updateAddresses) throws SQLException {
-        logger.info("-----------------START update points table from JSON objects:[updatePointsArray], [updateAddresses]-----------------");
-        PreparedStatement pointsStatement =  connection.prepareStatement(
-                "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId)\n" +
-                        "VALUE (?, ?, ?, ?, ?, ?, ?)\n" +
-                        "ON DUPLICATE KEY UPDATE\n" +
-                        "  pointName           = VALUES(pointName),\n" +
-                        "  address             = VALUES(address),\n" +
-                        "  email               = VALUES(email),\n" +
-                        "  pointTypeID         = VALUES(pointTypeID),\n" +
-                        "  responsiblePersonId = VALUES(responsiblePersonId);"
+    private static final DateTimeFormatter dateTimeSQLFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss 'GMT+'0");
+    private PreparedStatement batchPackageData(JSONObject dataFrom1C) throws SQLException {
+        logger.info("-----------------START update exchange table from JSON object:[dataFrom1C]-----------------");
+        PreparedStatement preparedStatement =  connection.prepareStatement(
+                "INSERT INTO exchange (packageNumber, serverName, dataSource, packageCreated, packageData)\n" +
+                        "VALUE (?, ?, ?, ?, ?);"
         );
-
-        // create or update points from updatePoints JSON array
-        for (Object updatePoint : updatePointsArray) {
-
-            String pointIdExternal = (String)((JSONObject) updatePoint).get("pointId");
-            String responsiblePersonId = (String)((JSONObject) updatePoint).get("responsiblePersonId");
-            String pointName = (String)((JSONObject) updatePoint).get("pointName");
-            String pointAddress = (String)((JSONObject) updatePoint).get("pointAdress");
-            String pointType = (String)((JSONObject) updatePoint).get("pointType");
-            String pointEmail = (String)((JSONObject) updatePoint).get("pointEmail");
-
-            pointsStatement.setString(1, pointIdExternal);
-            pointsStatement.setString(2, LOGIST_1C);
-            pointsStatement.setString(3, pointName);
-            pointsStatement.setString(4, pointAddress);
-            pointsStatement.setString(5, pointEmail);
-            pointsStatement.setString(6, pointType);
-            pointsStatement.setString(7, responsiblePersonId);
-            pointsStatement.addBatch();
-        }
-
-        // create or update points from updateAddresses JSON array
-        // add only unique points
-        Utils.UniqueCheck uniqueCheckAddressId = Utils.getUniqueCheckObject("addressId");
-        for (Object updateAddress : updateAddresses) {
-            String pointIdExternal = (String)((JSONObject) updateAddress).get("addressId");
-            if (!uniqueCheckAddressId.isUnique(pointIdExternal))
-                continue;
-
-            String pointName = (String)((JSONObject) updateAddress).get("addressShot");
-            String pointAddress = (String)((JSONObject) updateAddress).get("addressFull");
-
-            pointsStatement.setString(1, pointIdExternal);
-            pointsStatement.setString(2, LOGIST_1C);
-            pointsStatement.setString(3, pointName);
-            pointsStatement.setString(4, pointAddress);
-            pointsStatement.setString(5, "");
-            pointsStatement.setString(6, "AGENCY");
-            pointsStatement.setString(7, "");
-            pointsStatement.addBatch();
-        }
-
-        int[] affectedRecords = pointsStatement.executeBatch();
-        logger.info("INSERT OR UPDATE ON DUPLICATE INTO [points] completed, affected records size = [{}]", affectedRecords.length);
-        return pointsStatement;
+        int packageNumber = Integer.parseInt(String.valueOf(dataFrom1C.get("packageNumber")));
+        preparedStatement.setInt(1, packageNumber);
+        preparedStatement.setString(2, (String)dataFrom1C.get("server"));
+        preparedStatement.setString(3, LOGIST_1C);
+        preparedStatement.setDate(4, Date.valueOf(LocalDate.parse((String)dataFrom1C.get("created"), dateTimeSQLFormatter)));
+        preparedStatement.setString(5, dataFrom1C.toString());
+        preparedStatement.executeUpdate();
+        logger.info("INSERT INTO exchange table completed packageNumber = [{}]", packageNumber);
+        return preparedStatement;
     }
 
     private PreparedStatement batchRoutesData(JSONArray updateRoutesArray) throws SQLException {
@@ -290,22 +251,8 @@ public class InsertOrUpdateTransactionScript {
             String login = (String)((JSONObject) updateRequest).get("traderId"); //userID
             String destinationPointIdExternal = (String)((JSONObject) updateRequest).get("addressId"); //destinationPoint
 
-            getPointIdExternal.setString(1, destinationPointIdExternal);
-            getPointIdExternal.setString(2, LOGIST_1C);
-
-            int destinationPointId = 0;
-            try (ResultSet resultSet = getPointIdExternal.executeQuery()){
-                if (resultSet.next()) {
-                    destinationPointId = resultSet.getInt(1);
-                }
-                if (destinationPointId == 0) {
-                    logger.warn("requestId [{}] has addressId = [{}] that is not contained in points table. Set default point with id = [1]", requestIDExternal, destinationPointIdExternal);
-                    destinationPointId = 1;
-                }
-            }
 
             String clientIdExternal = (String)((JSONObject) updateRequest).get("clientId");
-
             requestsPreparedStatement.setString(1, requestIDExternal);
             requestsPreparedStatement.setString(2, LOGIST_1C);
             requestsPreparedStatement.setString(3, requestNumber);
@@ -313,7 +260,22 @@ public class InsertOrUpdateTransactionScript {
             requestsPreparedStatement.setString(5, login);
             requestsPreparedStatement.setString(6, clientIdExternal);
             requestsPreparedStatement.setString(7, LOGIST_1C);
-            requestsPreparedStatement.setInt(8, destinationPointId);
+
+            getPointIdExternal.setString(1, destinationPointIdExternal);
+            getPointIdExternal.setString(2, LOGIST_1C);
+            int destinationPointId = 0;
+            try (ResultSet resultSet = getPointIdExternal.executeQuery()){
+                if (resultSet.next()) {
+                    destinationPointId = resultSet.getInt(1);
+                }
+            }
+            if (destinationPointId == 0) {
+                logger.warn("requestId [{}] has addressId = [{}] that is not contained in points table. Set NULL for pointID", requestIDExternal, destinationPointIdExternal);
+                requestsPreparedStatement.setNull(8, Types.INTEGER);
+            }
+            else
+                requestsPreparedStatement.setInt(8, destinationPointId);
+
             requestsPreparedStatement.addBatch();
         }
         int[] requestsAffectedRecords = requestsPreparedStatement.executeBatch();
@@ -333,31 +295,31 @@ public class InsertOrUpdateTransactionScript {
                     "   'CREATED',\n" +
                     "   ?,\n" +
                     "   (SELECT requests.requestID FROM requests WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?),\n" +
-                    "   1,\n" +
+                    "   NULL,\n" +
                     "   NULL,\n" +
                     "   NULL\n" +
                     "  ) ON DUPLICATE KEY UPDATE\n" +
-                    "  documentNumber         = VALUES(documentNumber),\n" +
-                    "  documentDate           = VALUES(documentDate),\n" +
-                    "  firma                  = VALUES(firma),\n" +
-                    "  contactName            = VALUES(contactName),\n" +
-                    "  contactPhone           = VALUES(contactPhone),\n" +
-                    "  creationDate           = VALUES(creationDate),\n" +
-                    "  deliveryDate           = VALUES(deliveryDate),\n" +
-                    "  boxQty                 = VALUES(boxQty),\n" +
-                    "  weight                 = VALUES(weight),\n" +
-                    "  volume                 = VALUES(volume),\n" +
-                    "  goodsCost              = VALUES(goodsCost),\n" +
-                    "  storage                = VALUES(storage),\n" +
-                    "  deliveryOption         = VALUES(deliveryOption),\n" +
-                    "  lastStatusUpdated      = VALUES(lastStatusUpdated),\n" +
-                    "  lastModifiedBy         = VALUES(lastModifiedBy),\n" +
-                    "  invoiceStatusID        = VALUES(invoiceStatusID),\n" +
-                    "  commentForStatus       = VALUES(commentForStatus),\n" +
-                    "  requestID              = VALUES(requestID),\n" +
-                    "  warehousePointID       = VALUES(warehousePointID),\n" +
-                    "  routeListID            = VALUES(routeListID),\n" +
-                    "  lastVisitedUserPointID = VALUES(lastVisitedUserPointID);"
+                    "  documentNumber          = VALUES(documentNumber),\n" +
+                    "  documentDate            = VALUES(documentDate),\n" +
+                    "  firma                   = VALUES(firma),\n" +
+                    "  contactName             = VALUES(contactName),\n" +
+                    "  contactPhone            = VALUES(contactPhone),\n" +
+                    "  creationDate            = VALUES(creationDate),\n" +
+                    "  deliveryDate            = VALUES(deliveryDate),\n" +
+                    "  boxQty                  = VALUES(boxQty),\n" +
+                    "  weight                  = VALUES(weight),\n" +
+                    "  volume                  = VALUES(volume),\n" +
+                    "  goodsCost               = VALUES(goodsCost),\n" +
+                    "  storage                 = VALUES(storage),\n" +
+                    "  deliveryOption          = VALUES(deliveryOption),\n" +
+                    "  lastStatusUpdated       = VALUES(lastStatusUpdated),\n" +
+                    "  lastModifiedBy          = VALUES(lastModifiedBy),\n" +
+                    "  invoiceStatusID         = VALUES(invoiceStatusID),\n" +
+                    "  commentForStatus        = VALUES(commentForStatus),\n" +
+                    "  requestID               = VALUES(requestID),\n" +
+                    "  warehousePointID        = VALUES(warehousePointID),\n" +
+                    "  routeListID             = VALUES(routeListID),\n" +
+                    "  lastVisitedRoutePointID = VALUES(lastVisitedRoutePointID);"
         );
 
         for (Object updateRequest : updateRequests) {
@@ -473,6 +435,7 @@ public class InsertOrUpdateTransactionScript {
 
     private PreparedStatement[] batchRouteLists(JSONArray updateRouteLists) throws SQLException {
         logger.info("-----------------START update routeLists and invoices table from JSON object:[updateRouteLists]-----------------");
+
         // create routeLists
         PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
                 "INSERT INTO route_lists\n" +
@@ -502,48 +465,54 @@ public class InsertOrUpdateTransactionScript {
         for (Object updateRouteList : updateRouteLists) {
             String routeListId = (String)((JSONObject) updateRouteList).get("routerSheetId");
             String directId = (String)((JSONObject) updateRouteList).get("directId");
-            if (directId.equals("NULL")) {
-                logger.warn("directId is NULL, routeList = [{}] not inserted", routeListId);
-                continue;
-            }
-
-            String routeListNumber = (String)((JSONObject) updateRouteList).get("routerSheetNumber");
-            java.sql.Date creationDate = null;
-            String routeListDateAsString = (String)((JSONObject) updateRouteList).get("routerSheetDate");
-            try {
-                creationDate = Utils.getSqlDateFromString(routeListDateAsString);
-            } catch (DateTimeParseException e) {
-                logger.warn("routeListDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
-            }
-            java.sql.Date departureDate = null;
-            String departureDateAsString = (String)((JSONObject) updateRouteList).get("departureDate");
-            try {
-                departureDate = Utils.getSqlDateFromString(routeListDateAsString);
-            } catch (DateTimeParseException e) {
-                logger.warn("departureDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
-            }
-            String forwarderId = (String)((JSONObject) updateRouteList).get("forwarderId");
-            String driverId = (String)((JSONObject) updateRouteList).get("driverId");
-            String pointDepartureId = (String)((JSONObject) updateRouteList).get("pointDepartureId"); // pointIDExternal
-            String pointArrivalId = (String)((JSONObject) updateRouteList).get("pointArrivalId"); // pointIDExternal
-
-            String status = (String)((JSONObject) updateRouteList).get("status");
+            boolean isDirectIdExists = !directId.equals("NULL");
+            // импортируем только начальный пункт накладной
+//            if (directId.equals("NULL")) {
+//                logger.warn("directId is NULL, routeList = [{}] not inserted", routeListId);
+//                continue;
+//            } else {
+//
+//            }
             JSONArray invoices = (JSONArray) ((JSONObject) updateRouteList).get("invoices"); // list of invoices inside routeList
+            String pointDepartureId = (String)((JSONObject) updateRouteList).get("pointDepartureId"); // pointIDExternal
 
-            routeListsInsertPreparedStatement.setString(1, routeListId);
-            routeListsInsertPreparedStatement.setString(2, LOGIST_1C);
-            routeListsInsertPreparedStatement.setString(3, routeListNumber);
-            routeListsInsertPreparedStatement.setDate(4, creationDate);
-            routeListsInsertPreparedStatement.setDate(5, departureDate);
-            routeListsInsertPreparedStatement.setNull(6, Types.INTEGER); // palletsQty
-            routeListsInsertPreparedStatement.setString(7, forwarderId); // palletsQty
-            routeListsInsertPreparedStatement.setString(8, driverId);
-            routeListsInsertPreparedStatement.setString(9, null); // driverPhoneNumber
-            routeListsInsertPreparedStatement.setString(10, null); // license plate
-            routeListsInsertPreparedStatement.setString(11, status); // license plate
-            routeListsInsertPreparedStatement.setString(12, directId);
-            routeListsInsertPreparedStatement.setString(13, LOGIST_1C);
-            routeListsInsertPreparedStatement.addBatch();
+            if (isDirectIdExists) {
+                String routeListNumber = (String)((JSONObject) updateRouteList).get("routerSheetNumber");
+                java.sql.Date creationDate = null;
+                String routeListDateAsString = (String)((JSONObject) updateRouteList).get("routerSheetDate");
+                try {
+                    creationDate = Utils.getSqlDateFromString(routeListDateAsString);
+                } catch (DateTimeParseException e) {
+                    logger.warn("routeListDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
+                }
+                java.sql.Date departureDate = null;
+                String departureDateAsString = (String)((JSONObject) updateRouteList).get("departureDate");
+                try {
+                    departureDate = Utils.getSqlDateFromString(routeListDateAsString);
+                } catch (DateTimeParseException e) {
+                    logger.warn("departureDate for routeListId = [{}] has incompatible format with value = [{}]", routeListId, routeListDateAsString);
+                }
+                String forwarderId = (String)((JSONObject) updateRouteList).get("forwarderId");
+                String driverId = (String)((JSONObject) updateRouteList).get("driverId");
+                String pointArrivalId = (String)((JSONObject) updateRouteList).get("pointArrivalId"); // pointIDExternal
+                String status = (String)((JSONObject) updateRouteList).get("status");
+
+
+                routeListsInsertPreparedStatement.setString(1, routeListId);
+                routeListsInsertPreparedStatement.setString(2, LOGIST_1C);
+                routeListsInsertPreparedStatement.setString(3, routeListNumber);
+                routeListsInsertPreparedStatement.setDate(4, creationDate);
+                routeListsInsertPreparedStatement.setDate(5, departureDate);
+                routeListsInsertPreparedStatement.setNull(6, Types.INTEGER); // palletsQty
+                routeListsInsertPreparedStatement.setString(7, forwarderId); // palletsQty
+                routeListsInsertPreparedStatement.setString(8, driverId);
+                routeListsInsertPreparedStatement.setString(9, null); // driverPhoneNumber
+                routeListsInsertPreparedStatement.setString(10, null); // license plate
+                routeListsInsertPreparedStatement.setString(11, status); // license plate
+                routeListsInsertPreparedStatement.setString(12, directId);
+                routeListsInsertPreparedStatement.setString(13, LOGIST_1C);
+                routeListsInsertPreparedStatement.addBatch();
+            }
 
             for(Object invoiceIDExternalAsObject: invoices) {
                 String invoiceIDExternal = (String) invoiceIDExternalAsObject;

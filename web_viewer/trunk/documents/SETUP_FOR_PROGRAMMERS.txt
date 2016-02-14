@@ -31,6 +31,11 @@
 8)  заменяем содержание файла C:\web\wamp\bin\apache\apache2.4.9\conf\extra\httpd-vhosts.conf
     следующим контентом:
 
+9) Для, того. чтобы парсер мог залить в БД целиком весь пакет, необходимо в my.ini установить опцию 
+   max_allowed_packet = 128M в [wampmysqld] и в [mysql] и в [mysqld]
+
+
+
 ----FILE-CONTENT-INSIDE----
 
 # Virtual Hosts

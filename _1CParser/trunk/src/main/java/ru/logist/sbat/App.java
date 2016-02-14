@@ -97,8 +97,7 @@ public class App {
             @Override
             public void onFileCreate(Path filePath) {
                 try {
-                    logger.info("start to updateDataFromFile [{}]", filePath);
-                    //dataBase.truncatePublicTables();
+                    logger.info("start update data from file [{}]", filePath);
                     dataBase.updateDataFromJSONObject(JSONReadFromFile.read(filePath));
                 } catch (SQLException | IOException | org.json.simple.parser.ParseException e) {
                     logger.error(e);

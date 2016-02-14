@@ -7,8 +7,8 @@ public class DefaultProperties extends Properties {
         // property can be parse or generate.
         this.put("mode", "parse");
         this.put("generatePeriod", "10"); // seconds
-        this.put("user", "root");
-        this.put("password", "rtbyg7895otlgorit");
+        this.put("user", "parser");
+        this.put("password", "refka1203");
         this.put("url", "jdbc:mysql://localhost:3306/");
         this.put("dbName", "transmaster_transport_db");
         this.put("encoding", "useUnicode=true&characterEncoding=UTF-8");

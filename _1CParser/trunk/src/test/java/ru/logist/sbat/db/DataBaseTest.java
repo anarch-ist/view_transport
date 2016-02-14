@@ -55,8 +55,8 @@ public class DataBaseTest {
         dataBase = new DataBase(
                 defaultProperties.getProperty("url"),
                 defaultProperties.getProperty("dbName"),
-                defaultProperties.getProperty("user"),
-                defaultProperties.getProperty("password"),
+                "root",
+                "rtbyg7895otlgorit",
                 defaultProperties.getProperty("encoding")
         );
 
