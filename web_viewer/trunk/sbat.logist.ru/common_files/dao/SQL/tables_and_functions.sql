@@ -82,10 +82,6 @@ CREATE TABLE points (
   UNIQUE(pointIDExternal, dataSourceID)
 );
 
--- служебная запись, этот пункт используется для тех накладных у которых нет склада
-INSERT INTO points (pointID, pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime, district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID) VALUE
-  (1, 'def', 'LOGIST_1C', 'NO_W_POINT', '', 0, 0, '', '00:00:00', '00:00:00', '', '', '', '', '', '', '', 'WAREHOUSE');
-
 -- CONSTRAINT pointIDFirst must not be equal pointIDSecond
 CREATE TABLE distances_between_points (
   pointIDFirst  INTEGER,
@@ -223,7 +219,7 @@ CREATE TABLE requests (
   creationDate       DATETIME     NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
   marketAgentUserID  INTEGER      NOT NULL,
   clientID           INTEGER      NOT NULL,
-  destinationPointID INTEGER      NOT NULL, -- адрес, куда должны быть доставлены все товары
+  destinationPointID INTEGER      NULL, -- адрес, куда должны быть доставлены все товары
   PRIMARY KEY (requestID),
   FOREIGN KEY (marketAgentUserID) REFERENCES users (userID)
     ON DELETE RESTRICT
@@ -618,12 +614,12 @@ CREATE TABLE invoices (
   storage                 VARCHAR(255)   NULL, -- наименование склада на котором собиралась накладная
   deliveryOption          VARCHAR(255)   NULL, -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   lastStatusUpdated       DATETIME       NULL, -- date and time when status was updated by any user
-  -- TODO это поле нужно перенести в users, саму таблицу users разбить на три таблицы из-пункта.
+  -- TODO это поле нужно перенести в users, саму таблицу users разбить на три таблицы из-за пункта.
   lastModifiedBy          INTEGER        NULL, -- один из пользователей - это parser.
   invoiceStatusID         VARCHAR(32)    NOT NULL,
   commentForStatus        TEXT           NULL,
   requestID               INTEGER        NOT NULL,
-  warehousePointID        INTEGER        NOT NULL,
+  warehousePointID        INTEGER        NULL,
   routeListID             INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedRoutePointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceID),
@@ -649,24 +645,20 @@ CREATE TABLE invoices (
   UNIQUE (invoiceIDExternal, dataSourceID)
 );
 
-
-CREATE FUNCTION is_warehouse(_pointID INTEGER)
-  RETURNS BOOLEAN
-  BEGIN
-    DECLARE pointType VARCHAR(32);
-    SET pointType = (SELECT pointTypeID
-                     FROM points
-                     WHERE pointID = _pointID);
-    RETURN (pointType = 'WAREHOUSE');
-  END;
-
-CREATE TRIGGER before_invoice_insert
+CREATE TRIGGER check_for_warehousePoint
 BEFORE INSERT ON invoices FOR EACH ROW
   BEGIN
-    IF NOT (is_warehouse(NEW.warehousePointID))
+    SET @pointType = (SELECT pointTypeID
+                     FROM points
+                     WHERE pointID = NEW.warehousePointID);
+
+    IF (@pointType IS NOT NULL)
     THEN
-      SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only warehouse points allowed';
+      BEGIN
+        IF (@pointType <> 'WAREHOUSE') THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only warehouse points allowed';
+        END IF;
+      END;
     END IF;
   END;
 
@@ -763,7 +755,7 @@ CREATE TABLE invoice_history (
   invoiceStatusID         VARCHAR(32)    NOT NULL,
   commentForStatus        TEXT           NULL,
   requestID               INTEGER        NOT NULL,
-  warehousePointID        INTEGER        NOT NULL,
+  warehousePointID        INTEGER        NULL,
   routeListID             INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedRoutePointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   PRIMARY KEY (invoiceHistoryID),
@@ -782,14 +774,14 @@ CREATE TABLE invoice_history (
 -- 3)
 -- when new file comes parser start event and make a try to write data into database. if succeded then
 CREATE TABLE exchange (
-  exchangeID INTEGER AUTO_INCREMENT,
   packageNumber INTEGER,
   serverName VARCHAR(32),
   dataSource VARCHAR(32),
   packageCreated DATETIME,
   packageData LONGTEXT, -- наличие самих данных в соответсвующем порядке позволяет в любой момент пересоздать всю БД.
-  PRIMARY KEY (exchangeID)
-) ENGINE=ARCHIVE; -- Rows are compressed as they are inserted, https://dev.mysql.com/doc/refman/5.5/en/archive-storage-engine.html
+  PRIMARY KEY (packageNumber, serverName, dataSource)
+);
+-- Rows are compressed as they are inserted, https://dev.mysql.com/doc/refman/5.5/en/archive-storage-engine.html
 
 -- CREATE TABLE exchangeHistory (
 --
