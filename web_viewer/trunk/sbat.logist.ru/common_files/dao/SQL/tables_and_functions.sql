@@ -177,9 +177,8 @@ INSERT INTO permissions_for_roles (userRoleID, permissionID)
 -- TODO add permissions to 'WAREHOUSE_MANAGER'
 -- TODO add permissions to 'MANAGER'
 -- TODO add permissions to 'TEMP_REMOVED'
-CALL insert_permission_for_role('CLIENT', 'selectUser');
-CALL insert_permission_for_role('CLIENT', 'selectPoint');
-CALL insert_permission_for_role('CLIENT', 'selectRoute');
+CALL insert_permission_for_role('CLIENT_MANAGER', 'updateInvoiceStatus');
+CALL insert_permission_for_role('CLIENT_MANAGER', 'selectDataProcedure');
 
 INSERT INTO users
   VALUE
@@ -575,7 +574,6 @@ CREATE TABLE invoice_statuses_for_user_role (
   FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
 );
 
--- TODO fill this list
 INSERT INTO invoice_statuses_for_user_role
 VALUES
   ('ADMIN', 'APPROVING'),
@@ -591,7 +589,10 @@ VALUES
   ('DISPATCHER', 'ERROR'),
   ('DISPATCHER', 'DELIVERED'),
   ('MARKET_AGENT', 'ERROR'),
-  ('MARKET_AGENT', 'DELIVERED');
+  ('MARKET_AGENT', 'DELIVERED'),
+  ('CLIENT_MANAGER', 'ERROR'),
+  ('MARKET_AGENT', 'DELIVERED'),
+  ('MARKET_AGENT', 'ERROR');
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
 -- при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
@@ -694,8 +695,7 @@ FOR EACH ROW
   BEGIN
     -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт маршрута, и этот
     -- пункт записываем в таблицу invoices в поле lastVisitedRoutePointID
-    IF (NEW.invoiceStatusID = 'DEPARTURE' OR NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR
-        NEW.invoiceStatusID = 'DELIVERED')
+    IF (NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR NEW.invoiceStatusID = 'DELIVERED')
     THEN
       BEGIN
         IF (NEW.routeListID IS NULL) THEN
@@ -707,12 +707,14 @@ FOR EACH ROW
         SET @pointID = (SELECT pointID FROM users WHERE users.userID = NEW.lastModifiedBy);
 
         -- TODO проставить всю эту логику вместе с Юлей, учесть зависимость от пользователя от пункта пользователя и от статуса накладной
-        IF (NEW.invoiceStatusID = 'DEPARTURE' AND NEW.lastVisitedRoutePointID IS NULL) THEN
+        -- при появлении маршрутного листа сразу выставляем последний посещенный пункт, как первый пункт маршрута
+        IF (NEW.routeListID IS NOT NULL AND NEW.lastVisitedRoutePointID IS NULL) THEN
           -- установка самого первого пункта маршрута
           SET NEW.lastVisitedRoutePointID = (SELECT routePointID
                                              FROM route_points
                                              WHERE (routeID = @routeID) ORDER BY sortOrder LIMIT 1);
-        ELSEIF (NEW.invoiceStatusID = 'DEPARTURE' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
+        -- если была установка статуса в ARRIVED, то послдний посещенный пункт меняется на следующий
+        ELSEIF (NEW.invoiceStatusID = 'ARRIVED' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
           BEGIN
             -- получаем порядковый номер последнего routePoint
             SET @lastRoutePointSortOrder = (SELECT sortOrder FROM route_points WHERE route_points.routePointID = OLD.lastVisitedRoutePointID);
@@ -721,7 +723,16 @@ FOR EACH ROW
                                                FROM route_points
                                                WHERE (routeID = @routeID AND sortOrder > @lastRoutePointSortOrder) ORDER BY sortOrder LIMIT 1);
           END;
-        ELSEIF (NEW.invoiceStatusID = 'DELIVERED') THEN
+        ELSEIF (NEW.invoiceStatusID = 'ERROR' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
+          BEGIN
+            -- получаем порядковый номер последнего routePoint
+            SET @lastRoutePointSortOrder = (SELECT sortOrder FROM route_points WHERE route_points.routePointID = OLD.lastVisitedRoutePointID);
+            -- устанавливаем предыдущий пункт маршрута
+            SET NEW.lastVisitedRoutePointID = (SELECT routePointID
+                                               FROM route_points
+                                               WHERE (routeID = @routeID AND sortOrder < @lastRoutePointSortOrder) ORDER BY sortOrder LIMIT 1);
+          END;
+        ELSEIF (NEW.invoiceStatusID = 'DELIVERED' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
           -- установка самого последнего пункта маршрута
           SET NEW.lastVisitedRoutePointID = (SELECT routePointID
                                              FROM route_points
@@ -1239,4 +1250,9 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
           (pointIDFirst = routePointFirst.pointID AND pointIDSecond = routePointSecond.pointID) OR (pointIDFirst = routePointSecond.pointID AND pointIDSecond = routePointFirst.pointID)
     WHERE routes.RouteID = _routeID
     ORDER BY routePointFirst.sortOrder;
+  END;
+
+-- TODO remove this method
+CREATE PROCEDURE `deleteRoutePoint`(_routePointID INTEGER)
+  BEGIN
   END;

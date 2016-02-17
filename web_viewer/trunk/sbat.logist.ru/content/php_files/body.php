@@ -46,7 +46,15 @@
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php
                 $data = $privUser->getUserInfo()->toArray();
-                echo $data['lastName'] . ' ' . $data['firstName'] . ' ' . $data['patronymic'] . ' | ' . $privUser->getUserEntity()->getUserRole($data['userID']) . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
+
+                $userRole = $privUser->getUserEntity()->getUserRole($data['userID']);
+                echo $data['lastName'] . ' ' . $data['firstName'] . ' ' . $data['patronymic'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
+
+                ?>
+            </div>
+            <div id="userRoleContainer" style="display: none">
+                <?php
+                echo $userRole;
                 ?>
             </div>
             <button id="logout">выйти</button>

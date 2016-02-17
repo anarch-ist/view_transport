@@ -17,10 +17,6 @@ TRUNCATE distances_between_points;
 TRUNCATE exchange;
 SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT INTO points (pointID, pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime,
-                    district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID) VALUE
-       (1, 'def', 'LOGIST_1C', 'NO_W_POINT', '', 0, 0, '', '00:00:00', '00:00:00', '', '', '', '', '', '', '', 'WAREHOUSE');
-
 INSERT INTO points (pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime,
                     district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID)
 VALUES ('wle', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',
@@ -54,7 +50,10 @@ VALUES
    getPointIDByName('point4')),
   ('user4', 'degg', 'rtgrgg', 'rtrtbtybv', 'sidorov i.A.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
    md5(CONCAT(md5('wertgrege'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
-   getPointIDByName('point3'));
+   getPointIDByName('point3')),
+  ('clientUser', 'degg', 'rtgrgg', 'rtrtbtybv', 'wlrfekj.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
+   md5(CONCAT(md5('1111'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'cl@cl.ru', 'CLIENT_MANAGER',
+   getPointIDByName('point2'));
 
 
 INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN, KPP, corAccount, curAccount, BIK, bankName, contractNumber, dateOfSigning, startContractDate, endContractDate)
