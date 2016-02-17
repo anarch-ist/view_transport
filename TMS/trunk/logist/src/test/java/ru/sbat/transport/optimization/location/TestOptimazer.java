@@ -58,15 +58,15 @@ public class TestOptimazer {
     @BeforeClass
     public static void fullInvoiceContainer(){
         // пункт доставки, дата плановой доставки
-        Request request = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 19, 18, 0));
-        Request request2 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 19, 17, 30));
-        Request request3 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 19, 18, 30));
+        Request request = createRequest(tradeRepresentativePoint2,  createDate(2016, Calendar.FEBRUARY, 9, 18,  0));
+        Request request2 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 17, 30));
+        Request request3 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 18, 30));
         // адрес склада, дата создания накладной
         Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),     request, 5, 7);
         Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30), request2, 10, 15);
-        Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),   request3, 2, 3);
-        invoice2.setRoute(route1);
-        invoice3.setRoute(route2);
+        Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),    request3, 2, 3);
+        invoice2.setRoute(route1);// накладная (10кг., 15т.), маршрут (11кг., 16т.) - заполнен
+        invoice3.setRoute(route2);// накладная (2кг., 3т.), маршрут (10кг., 15т.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
 //        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " дата плановой доставки");
 //        System.out.println("");
@@ -135,16 +135,13 @@ public class TestOptimazer {
 
     @Test
     public void testFiltrate() throws RouteNotFoundException {
-        try {
-            Optimizer optimizer = new Optimizer();
-            routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
-            ArrayList<Route> routes = routesForInvoice.get(invoiceContainer.get(0));
-            Assert.assertEquals(9, routes.size());
-            Assert.assertTrue(routes.contains(route2));
-            Assert.assertTrue(routes.contains(route3));
-        }catch (IllegalArgumentException e){
-
-        }
+        Optimizer optimizer = new Optimizer();
+        routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
+        ArrayList<Route> routes = routesForInvoice.get(invoiceContainer.get(0));
+        System.out.println(routes.size() + " варианта(-ов) маршрута с датой и временем");
+        Assert.assertFalse(routes.contains(route1));
+        Assert.assertTrue(routes.contains(route2));
+        Assert.assertTrue(routes.contains(route3));
     }
 
     @Test

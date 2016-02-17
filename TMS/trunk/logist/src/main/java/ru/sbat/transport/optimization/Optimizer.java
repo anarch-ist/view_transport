@@ -23,35 +23,36 @@ public class Optimizer implements IOptimizer {
         Map<Invoice, ArrayList<Route>> map = new HashMap<>();
         RouteWeightAndVolume routeWeightAndVolume = new RouteWeightAndVolume();
         Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
-        for(Invoice invoice: invoiceContainer) {
-            if (invoice.getRoute() != null)
-                throw new IllegalArgumentException("invoice.getRoute() should be null");
+        for (Invoice invoice : invoiceContainer) {
+            if (invoice.getRoute() == null) {
+//                throw new IllegalArgumentException("invoice.getRoute() should be null");
 
-            Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
-            Point departurePoint = invoice.getAddressOfWarehouse();
-            ArrayList<Route> possibleRouteForInvoice = new ArrayList<>();
+                Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
+                Point departurePoint = invoice.getAddressOfWarehouse();
+                ArrayList<Route> possibleRouteForInvoice = new ArrayList<>();
 
 
-            for(Route route: plannedSchedule){
-                if(route == null){
-                    throw new RouteNotFoundException("route should not be null");
-                }
-                if (route.getDeparturePoint().equals(departurePoint) &&
-                        route.getArrivalPoint().equals(deliveryPoint)) {
-                    ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
-                    for(Date date: possibleDepartureDate){
-                        if(isFittingForDeliveryTime(route, invoice, date) && routeData.get(route).isFittingForRoute(invoice, routeData.get(route))){
-                            possibleRouteForInvoice.add(route);
-                            System.out.println(date + " день отправления");
-                            System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
-                           }
+                for (Route route : plannedSchedule) {
+                    if (route == null) {
+                        throw new RouteNotFoundException("route should not be null");
+                    }
+                    if (route.getDeparturePoint().equals(departurePoint) &&
+                            route.getArrivalPoint().equals(deliveryPoint)) {
+                        ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
+                        for (Date date : possibleDepartureDate) {
+                            if (isFittingForDeliveryTime(route, invoice, date) && routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
+                                possibleRouteForInvoice.add(route);
+                                System.out.println(date + " день отправления");
+                                System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
+                            }
                         }
                     }
                 }
-            map.put(invoice, possibleRouteForInvoice);
+                map.put(invoice, possibleRouteForInvoice);
             }
-        return map;
         }
+        return map;
+    }
 
     /** selects possible options of routes by departure time
      *
