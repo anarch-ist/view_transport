@@ -1,6 +1,7 @@
 <?php
 
 include_once __DIR__ . '/../common_files/dao/routePointDao/RoutePoint.php';
+include_once __DIR__ . '/../common_files/dao/routeAndRoutePoints/RouteAndRoutePoints.php';
 include_once 'AbstractEntityTestClass.php';
 
 class RoutePointEntityTest extends AbstractEntityTestClass
@@ -27,7 +28,7 @@ class RoutePointEntityTest extends AbstractEntityTestClass
      */
     static function flushDB()
     {
-        //parent::flushDB();
+        parent::flushDB();
     }
 
     /**
@@ -45,8 +46,10 @@ class RoutePointEntityTest extends AbstractEntityTestClass
      */
     function testRemoveRoutePoint()
     {
+        $expectResult = '{"daysOfWeek":["monday","tuesday","wednesday","thursday","friday"],"firstPointArrivalTime":"18:00","routePoints":[{"routePointID":"1","sortOrder":"1","pointName":"point1","tLoading":"120"},{"routePointID":"2","sortOrder":"2","pointName":"point2","tLoading":"40"},{"routePointID":"4","sortOrder":"4","pointName":"point1","tLoading":"230"},{"routePointID":"5","sortOrder":"8","pointName":"point4","tLoading":"120"}],"relationsBetweenRoutePoints":[{"relationID":"1_2","pointNameFirst":"point1","pointNameSecond":"point2","timeForDistance":"0","distance":"400","sortOrder":"1"},{"relationID":"2_4","pointNameFirst":"point2","pointNameSecond":"point1","timeForDistance":"0","distance":"400","sortOrder":"2"},{"relationID":"1_4","pointNameFirst":"point1","pointNameSecond":"point4","timeForDistance":"0","distance":null,"sortOrder":"4"}]}';
         $routePointEntity = \DAO\RoutePointEntity::getInstance();
-        $this->assertTrue($routePointEntity->deleteRoutePoint(1));
+        $this->assertTrue($routePointEntity->deleteRoutePoint(3));
+        $this->assertEquals(json_decode($expectResult),json_decode(json_encode(\DAO\RouteAndRoutePoints::getInstance()->getAllRoutePointsDataForRouteID(1))));
     }
 
     /**
@@ -87,7 +90,7 @@ class RoutePointEntityTest extends AbstractEntityTestClass
 
     function routePointsForAdditingProvider()
     {
-        $dataTest0 = array('sortOrder' => 6, 'pointName' => 4, 'tLoading' => 60, 'routeID' => 1, 'result' => true);
+        $dataTest0 = array('sortOrder' => 6, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => true);
 //        $dataTest1 = array('sortOrder' => 5, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => true);
 //        $dataTest2 = array('sortOrder' => 3, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => false);
         return array($dataTest0);//, $dataTest1, $dataTest2);

@@ -166,7 +166,7 @@ class UpdateInvoiceStatus implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `documentNumber` = '$this->invoiceNumber';";
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `invoiceIDExternal` = '$this->invoiceNumber';";
     }
 }
 

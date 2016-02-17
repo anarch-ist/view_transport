@@ -100,8 +100,8 @@ class InvoiceEntityTest extends AbstractEntityTestClass
  }');
         $test1 = array
         (
-            'userID' => '1',
-            'invoiceNumber' => 'qwd22345',
+            'userID' => '2',
+            'invoiceNumber' => 'invIdExt1',
             'newStatus' => 'ARRIVED',
             'historyExpected' => $historyExpected,
             'datetime' => $date,
@@ -122,7 +122,7 @@ class InvoiceEntityTest extends AbstractEntityTestClass
 //        $test2 = array
 //        (
 //            'userID' => '1',
-//            'invoiceNumber' => 'qwd22345',
+//            'invoiceNumber' => 'invIdExt1',
 //            'newStatus' => 'CHECK',
 //            'historyExpected' => $historyExpected,
 //            'datetime' => $date,
@@ -143,7 +143,7 @@ class InvoiceEntityTest extends AbstractEntityTestClass
 //        $test3 = array
 //        (
 //            'userID' => '1',
-//            'invoiceNumber' => 'qwd22345',
+//            'invoiceNumber' => 'invIdExt1',
 //            'newStatus' => 'DELETED',
 //            'historyExpected' => $historyExpected,
 //            'datetime' => $date,
@@ -281,7 +281,7 @@ class InvoiceEntityTest extends AbstractEntityTestClass
 //        $search['regex']= 'false';
 //        $_POST['search'] = $search;
         $userID = '1';
-        $expectedResult = json_decode('[{"requestNumber":"123356","insiderRequestNumber":"ogeghei2243","invoiceNumber":"qwd22345","INN":"1234567890","deliveryPoint":"point2","warehousePoint":"point1","lastName":"rtgrgg","invoiceStatusID":"CREATED","invoiceStatusRusName":"Внутренняя заявка добавлена в БД","boxQty":"4","driver":"Dmitriy","licensePlate":"екх123","palletsQty":"3","routeListNumber":"1455668","routeListID":"1","directionName":"direction1","currentPoint":"point1","nextPoint":"point2","arrivalTime":null},{"requestNumber":"123356","insiderRequestNumber":"ogeghei2244","invoiceNumber":"qwd22334","INN":"1234567890","deliveryPoint":"point2","warehousePoint":"point1","lastName":"rtgrgg","invoiceStatusID":"CREATED","invoiceStatusRusName":"Внутренняя заявка добавлена в БД","boxQty":"2","driver":"Dmitriy","licensePlate":"екх123","palletsQty":"3","routeListNumber":"1455668","routeListID":"1","directionName":"direction1","currentPoint":"point3","nextPoint":null,"arrivalTime":null},{"requestNumber":"123356","insiderRequestNumber":"ogeghei2245","invoiceNumber":"qwd22346","INN":"1234567890","deliveryPoint":"point2","warehousePoint":"point1","lastName":"rtgrgg","invoiceStatusID":"CREATED","invoiceStatusRusName":"Внутренняя заявка добавлена в БД","boxQty":"10","driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null},{"requestNumber":"859458","insiderRequestNumber":null,"invoiceNumber":null,"INN":null,"deliveryPoint":null,"warehousePoint":null,"lastName":null,"invoiceStatusID":null,"invoiceStatusRusName":null,"boxQty":null,"driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null},{"requestNumber":"er9458","insiderRequestNumber":null,"invoiceNumber":null,"INN":null,"deliveryPoint":null,"warehousePoint":null,"lastName":null,"invoiceStatusID":null,"invoiceStatusRusName":null,"boxQty":null,"driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null}]');
+        $expectedResult = json_decode('[{"requestNumber":"123356","insiderRequestNumber":"ogeghei2243","invoiceNumber":"invIdExt1","INN":"1234567890","deliveryPoint":"point2","warehousePoint":"point1","lastName":"rtgrgg","invoiceStatusID":"CREATED","invoiceStatusRusName":"Внутренняя заявка добавлена в БД","boxQty":"4","driver":"Dmitriy","licensePlate":"екх123","palletsQty":"3","routeListNumber":"1455668","routeListID":"1","directionName":"direction1","currentPoint":"point1","nextPoint":"point2","arrivalTime":null},{"requestNumber":"123356","insiderRequestNumber":"ogeghei2244","invoiceNumber":"qwd22334","INN":"1234567890","deliveryPoint":"point2","warehousePoint":"point1","lastName":"rtgrgg","invoiceStatusID":"CREATED","invoiceStatusRusName":"Внутренняя заявка добавлена в БД","boxQty":"2","driver":"Dmitriy","licensePlate":"екх123","palletsQty":"3","routeListNumber":"1455668","routeListID":"1","directionName":"direction1","currentPoint":"point3","nextPoint":null,"arrivalTime":null},{"requestNumber":"123356","insiderRequestNumber":"ogeghei2245","invoiceNumber":"qwd22346","INN":"1234567890","deliveryPoint":"point2","warehousePoint":"point1","lastName":"rtgrgg","invoiceStatusID":"CREATED","invoiceStatusRusName":"Внутренняя заявка добавлена в БД","boxQty":"10","driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null},{"requestNumber":"859458","insiderRequestNumber":null,"invoiceNumber":null,"INN":null,"deliveryPoint":null,"warehousePoint":null,"lastName":null,"invoiceStatusID":null,"invoiceStatusRusName":null,"boxQty":null,"driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null},{"requestNumber":"er9458","insiderRequestNumber":null,"invoiceNumber":null,"INN":null,"deliveryPoint":null,"warehousePoint":null,"lastName":null,"invoiceStatusID":null,"invoiceStatusRusName":null,"boxQty":null,"driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null}]');
         $this->assertEquals($expectedResult,json_decode(json_encode(\DAO\InvoicesForUserEntity::getInstance()->selectAllData($start,$length,$userID))));
     }
 }

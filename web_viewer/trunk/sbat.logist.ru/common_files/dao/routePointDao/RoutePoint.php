@@ -75,7 +75,7 @@ class DeleteRoutePointFromRoute implements IEntityDelete
 
     function getDeleteQuery()
     {
-        return "CALL deleteRoutePoint($this->routePointID);";
+        return "DELETE FROM route_points WHERE routePointID = $this->routePointID;";
     }
 }
 
