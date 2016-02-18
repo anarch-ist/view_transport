@@ -1,0 +1,179 @@
+
+-------------------------------установка mysql---------------------------------------
+
+http://www.debiantutorials.com/install-mysql-server-5-6-debian-7-8/
+
+прежде чем делать update нужно вырубить firewall на сервере, а потом врубить
+wget http://dev.mysql.com/get/mysql-apt-config_0.3.5-1debian8_all.deb
+dpkg -i mysql-apt-config_0.3.5-1debian8_all.deb
+apt-get update 
+apt-get install mysql-community-server
+
+просмотреть firewall rules:  iptables -L
+перезапуск сетевых служб: ifdown eth0 && ifup eth0
+список dns серверов /etc/resolv.confping
+проверка как работает dns: dig +short security.debian.org
+проблема была в файле настройки /etc/apt/apt.conf в нем нужно было закомментировать все содержимое
+
+
+
+Запуск сервера MySQL:
+/etc/init.d/mysql start
+
+Остановка работы сервера MySQL:
+/etc/init.d/mysql stop
+
+Перезапуск сервера MySQL:
+/etc/init.d/mysql restart
+
+remoteMysql:
+http://www.debianhelp.co.uk/remotemysql.htm
+
+Для того, чтобы mysql стал доступным снаружи надо ему прописать в файле /etc/mysql/my.cnf
+bind-address = 185.75.182.94
+
+затем необходимо разрешить любые входящие ip адреса:
+~#  mysql -u root -p 
+вводим пароль
+mysql> CREATE DATABASE `transmaster_transport_db` CHARACTER SET utf8 COLLATE utf8_bin;
+mysql> GRANT ALL PRIVILEGES ON *.* TO root@"%" IDENTIFIED BY 'aftR179Kp' WITH GRANT OPTION;
+mysql> exit;
+~# mysqladmin -u root -p flush-privileges
+
+ДЛЯ ТОГО, при нажатии ctrl+shift+f10 всплывало окно выбора datasource необходимо найти окно datasources 
+Choose Data Source в статусной строке phpStorm.
+
+
+-------------------------------Установка apache 2.4 и PHP 5.6---------------------------------------
+
+apt-get -y install apache2
+
+Apache's default document root is /var/www on Debian, and the configuration file is /etc/apache2/apache2.conf. Additional configurations are stored in subdirectories of the /etc/apache2 directory such as /etc/apache2/mods-enabled (for Apache modules), /etc/apache2/sites-enabled (for virtual hosts), and /etc/apache2/conf-enabled.
+
+установка PHP 5.6
+apt-get -y install php5 libapache2-mod-php5
+service apache2 restart
+проверка, что всё работает
+nano /var/www/html/info.php
+добавить туда содержание:
+<?php
+phpinfo();
+?>
+ставим поддержку mysql
+apt-get -y install php5-mysql
+service apache2 restart
+
+создание каталога с содержанием сайта
+su pigin_s
+mkdir public_html
+
+для того, чтобы файлы проекта хранились в каталоге home/pigin_s/public_html нужно открыть файл 
+
+su
+nano /etc/apache2/apache2.conf
+и в нем закомментировать
+
+#<Directory var/www>
+#       Options Indexes FollowSymLinks
+#       AllowOverride None
+#       Require all granted
+#</Directory>
+
+и добавить:
+
+<Directory /home/pigin_s/public_html>
+       Options Indexes FollowSymLinks
+       AllowOverride None
+       Require all granted
+</Directory>
+
+затем отредактировать еще один файл, в нем заменить document root на: /home/pigin_s/public_html
+nano /etc/apache2/sites-available/000-default.conf
+
+затем нужно выставить разрешение на execute для наших файлов
+$ chmod +755 /home/sergey/
+$ chmod +755 /home/sergey/public_html/
+
+
+
+service apache2 restart
+
+
+# Ensure that Apache listens on port 80
+
+#Listen 80
+#<VirtualHost 192.168.1.37:80>
+#    DocumentRoot "/var/www/logist"
+#    ServerName www.example.com
+#      # Other directives here
+#</VirtualHost>
+
+
+-------------------------------УСТАНОВКА FTP server---------------------------------------
+УСТАНОВКА FTP server:
+
+http://vacadem.ru/blog/linux-unix-and-other/install-vsftpd-on-debian-7.html
+https://wiki.debian.org/ru/vsftpd
+
+aptitude install vsftpd
+netstat -npl
+настройки сервера vsftpd находятся в файле:
+/etc/vsftpd.conf
+
+раскомментировать:
+local_umask=022;// с какими начальными permissions будут создаваться файлы или каталоги
+write_enables=YES
+chroot_local_user=YES
+
+остановка /etc/init.d/vsftpd stop
+запуск /etc/init.d/vsftpd start
+перезапуск service vsftpd restart
+
+ftp localhost
+
+если возникнет ошибка такого вида
+500 OOPS: vsftpd: refusing to run with writable root inside chroot (), то нужно сделать следующее:
+
+chmod a-w /home/pigin_s
+
+чтобы вернуться из режима root нужно ввести su pigin_s
+
+репозитории сервера:
+
+/etc/apt/sources.list
+# deb http://mirror.mephi.ru/debian/ jessie main
+
+deb http://mirror.mephi.ru/debian/ jessie main
+deb-src http://mirror.mephi.ru/debian/ jessie main
+
+deb http://security.debian.org/ jessie/updates main
+deb-src http://security.debian.org/ jessie/updates main
+
+# jessie-updates, previously known as 'volatile'
+deb http://mirror.mephi.ru/debian/ jessie-updates main
+deb-src http://mirror.mephi.ru/debian/ jessie-updates main
+
+
+--------------------------УСТАНОВКИ ДЛЯ PHP STORM НОВЫЙ СЕРВЕР--------------------------------------
+Настройки для ftp клиента:
+ftp host: 185.75.182.94
+port 21
+root path: /public_html
+user name: pigin_s
+password: 6RuPd9Kk
+adv opt, control encoding: UTF-8
+
+local path: C:\web\wamp\www\sbat.logist.ru
+deployment path: /
+
+Поключение к БД:
+host: 185.75.182.94
+port: 3306
+database: ""
+user: root
+password: aftR179Kp
+
+
+
+
+
