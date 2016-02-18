@@ -30,8 +30,7 @@
 
 -- Создание пароля для root пользователя.
 -- Используется только во время разработки, позволяет не только менять данные, но и создавать новые таблицы, процедуры, ... DDL
-SET PASSWORD FOR 'root'@'localhost' = PASSWORD('rtbyg7895otlgorit');
-
+-- SET PASSWORD FOR 'root'@'localhost' = PASSWORD('aftR179Kp');
 
 
 --  Создание пользователя для PHP.

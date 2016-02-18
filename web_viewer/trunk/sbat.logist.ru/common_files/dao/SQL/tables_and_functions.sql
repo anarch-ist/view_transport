@@ -590,9 +590,7 @@ VALUES
   ('DISPATCHER', 'DELIVERED'),
   ('MARKET_AGENT', 'ERROR'),
   ('MARKET_AGENT', 'DELIVERED'),
-  ('CLIENT_MANAGER', 'ERROR'),
-  ('MARKET_AGENT', 'DELIVERED'),
-  ('MARKET_AGENT', 'ERROR');
+  ('CLIENT_MANAGER', 'ERROR');
 
 -- invoice объеденяет в себе внутреннюю заявку и накладную,
 -- при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
