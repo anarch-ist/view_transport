@@ -216,6 +216,27 @@ login: sergey88
 password: dregt56kl
 
 
+--------------------------УСТАНОВКИ ДЛЯ PHP STORM НОВЫЙ СЕРВЕР--------------------------------------
+Настройки для ftp клиента:
+ftp host: 185.75.182.94
+port 21
+root path: /public_html
+user name: pigin_s
+password: 6RuPd9Kk
+adv opt, control encoding: UTF-8
+
+local path: C:\web\wamp\www\sbat.logist.ru
+deployment path: /
+
+ДЛЯ ТОГО ЧТОБЫ, при нажатии ctrl+shift+f10 всплывало окно выбора datasource необходимо найти окно datasources 
+Choose Data Source в статусной строке phpStorm.
+
+Поключение к БД:
+host: 185.75.182.94
+port: 3306
+database: ""
+user: root
+password: aftR179Kp
 
 
 
