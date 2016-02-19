@@ -39,7 +39,6 @@ $(document).ready(function () {
                     }
                 });
             });
-            console.log("userRoleContainer content = "+$("#userRoleContainer").html());
             if ($("#userRoleContainer").html().trim() === "Пользователь_клиента")
                 dataTable.buttons(1).remove();
         },

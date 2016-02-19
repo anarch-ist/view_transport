@@ -113,13 +113,13 @@ class EntitySelectAllUsers implements IEntitySelect
         $this->start = DAO::getInstance()->checkString($start);
         $this->count = DAO::getInstance()->checkString($count);
         $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
-        $this->searchString = '';
+        $this->searchString = $_POST['search']['value'];
         $searchArray = $_POST['columns'];
-        for ($i = 0; $i < count($searchArray); $i++) {
-            if ($searchArray[$i]['search']['value'] !== '') {
-                $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';
-            }
-        }
+//        for ($i = 0; $i < count($searchArray); $i++) {
+//            if ($searchArray[$i]['search']['value'] !== '') {
+//                $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';
+//            }
+//        }
         $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
     }
 

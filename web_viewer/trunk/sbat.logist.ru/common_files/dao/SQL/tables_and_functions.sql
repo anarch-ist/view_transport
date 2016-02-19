@@ -385,6 +385,7 @@ FOR EACH ROW
         -- если мы добавили новый пункт в конец
         ELSEIF (@nextRoutePointID IS NULL) THEN
           INSERT INTO relations_between_route_points VALUE (@previousRoutePointID, NEW.routePointID, 0);
+        -- TODO была ситуация, когда после вставки в середину данные не добавились в relations_between_route_points
         -- если мы добавили новый пункт в середину
         ELSE
           BEGIN
@@ -1161,6 +1162,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
   END;
 
 -- select users procedure
+-- _search - строка для глобального поиска по всем колонкам
 CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
   BEGIN
 
@@ -1180,7 +1182,18 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
         users.pointID = points.pointID AND
         users.userRoleID = user_roles.userRoleID
         ) ';
-    SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
+
+    SET @searchString = CONCAT('%', _search, '%');
+    SET @searchCondition = CONCAT('users.firstName LIKE '           , '\'', @searchString, '\'', ' OR ',
+                                  'users.lastName LIKE '            , '\'', @searchString, '\'', ' OR ',
+                                  'users.patronymic LIKE '          , '\'', @searchString, '\'', ' OR ',
+                                  'users.position LIKE '            , '\'', @searchString, '\'', ' OR ',
+                                  'users.phoneNumber LIKE '         , '\'', @searchString, '\'', ' OR ',
+                                  'users.email LIKE '               , '\'', @searchString, '\'', ' OR ',
+                                  'points.pointName LIKE '          , '\'', @searchString, '\'', ' OR ',
+                                  'user_roles.userRoleRusName LIKE ', '\'', @searchString, '\'');
+
+    SET @havingPart = CONCAT(' HAVING ', @searchCondition);
     SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
     SET @limitPart = ' LIMIT ?, ? ';
 
@@ -1248,9 +1261,4 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
           (pointIDFirst = routePointFirst.pointID AND pointIDSecond = routePointSecond.pointID) OR (pointIDFirst = routePointSecond.pointID AND pointIDSecond = routePointFirst.pointID)
     WHERE routes.RouteID = _routeID
     ORDER BY routePointFirst.sortOrder;
-  END;
-
--- TODO remove this method
-CREATE PROCEDURE `deleteRoutePoint`(_routePointID INTEGER)
-  BEGIN
   END;
