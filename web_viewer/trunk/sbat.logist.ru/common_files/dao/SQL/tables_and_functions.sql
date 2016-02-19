@@ -584,6 +584,7 @@ VALUES
   ('ADMIN', 'READY'),
   ('ADMIN', 'DEPARTURE'),
   ('ADMIN', 'ERROR'),
+  ('ADMIN', 'ARRIVED'),
   ('W_DISPATCHER', 'DEPARTURE'),
   ('DISPATCHER', 'DEPARTURE'),
   ('DISPATCHER', 'ARRIVED'),
@@ -691,23 +692,22 @@ FOR EACH ROW
 
 CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
 FOR EACH ROW
-  BEGIN
     -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт маршрута, и этот
     -- пункт записываем в таблицу invoices в поле lastVisitedRoutePointID
-    IF (NEW.invoiceStatusID = 'ARRIVED' OR NEW.invoiceStatusID = 'ERROR' OR NEW.invoiceStatusID = 'DELIVERED')
-    THEN
+#     IF (NEW.routeListID IS NULL) THEN
+#       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: routeList in invoices must not be null';
+#     END IF;
+    -- находим маршрут по которому едет накладная.
+    IF (NEW.routeListID IS NOT NULL) THEN
       BEGIN
-        IF (NEW.routeListID IS NULL) THEN
-          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: routeList in invoices must not be null';
-        END IF;
-        -- находим маршрут по которому едет накладная.
+
         SET @routeID = (SELECT routeID FROM route_lists WHERE NEW.routeListID = route_lists.routeListID);
         -- находим пункт пользователя, который изменил статус накладной.
-        SET @pointID = (SELECT pointID FROM users WHERE users.userID = NEW.lastModifiedBy);
+        -- SET @pointID = (SELECT pointID FROM users WHERE users.userID = NEW.lastModifiedBy);
 
         -- TODO проставить всю эту логику вместе с Юлей, учесть зависимость от пользователя от пункта пользователя и от статуса накладной
         -- при появлении маршрутного листа сразу выставляем последний посещенный пункт, как первый пункт маршрута
-        IF (NEW.routeListID IS NOT NULL AND NEW.lastVisitedRoutePointID IS NULL) THEN
+        IF (NEW.lastVisitedRoutePointID IS NULL) THEN
           -- установка самого первого пункта маршрута
           SET NEW.lastVisitedRoutePointID = (SELECT routePointID
                                              FROM route_points
@@ -738,8 +738,10 @@ FOR EACH ROW
                                              WHERE (routeID = @routeID) ORDER BY sortOrder DESC LIMIT 1);
         END IF;
       END;
+    ELSEIF (OLD.routeListID IS NOT NULL) THEN
+      SET NEW.lastVisitedRoutePointID = NULL;
     END IF;
-  END;
+
 
 CREATE TABLE invoice_history (
   invoiceHistoryID        BIGINT AUTO_INCREMENT,
