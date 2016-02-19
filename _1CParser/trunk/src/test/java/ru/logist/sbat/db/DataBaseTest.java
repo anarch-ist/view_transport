@@ -61,7 +61,7 @@ public class DataBaseTest {
         );
 
         // clean dataBase content
-        dataBase.truncatePublicTables();
+        //dataBase.truncatePublicTables();
 
         //dataBase.importSQL(new ByteArrayInputStream(sqlStringWithoutComments.getBytes("UTF-8")));
 

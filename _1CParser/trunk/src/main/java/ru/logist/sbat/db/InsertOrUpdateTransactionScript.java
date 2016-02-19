@@ -36,7 +36,6 @@ public class InsertOrUpdateTransactionScript {
         logger.info(dataFrom1C.get("packageNumber"));
         logger.info(dataFrom1C.get("created"));
         JSONObject packageData = (JSONObject) dataFrom1C.get("packageData");
-
         JSONArray updatePoints = (JSONArray) packageData.get("updatePoints");
         JSONArray updateDirections = (JSONArray) packageData.get("updateDirections");
         JSONArray updateTrader = (JSONArray) packageData.get("updateTrader");
@@ -47,6 +46,7 @@ public class InsertOrUpdateTransactionScript {
         JSONArray updateRouteLists = (JSONArray) packageData.get("updateRouteLists");
 
         PreparedStatement
+
                 updateExchangePrepStatement = null,
                 updatePointsPrepStatement = null,
                 updateRoutesPrepStatement = null,
@@ -59,7 +59,8 @@ public class InsertOrUpdateTransactionScript {
                             updateMarketAgentUsersPrepStatement = null;
 
         try {
-            updatePointsPrepStatement = batchPackageData(dataFrom1C);
+            updateExchangePrepStatement = batchPackageData(dataFrom1C);
+            updatePointsPrepStatement = batchPointsData(updatePoints, updateAddress);
             updateRoutesPrepStatement = batchRoutesData(updateDirections);
             updateMarketAgentUsersPrepStatement = batchMarketAgentUser(updateTrader);
             updateClientsPrepStatement = batchClients(updateClients);
@@ -76,6 +77,7 @@ public class InsertOrUpdateTransactionScript {
             DBUtils.rollbackQuietly(connection);
             logger.error("end ROLLBACK");
         } finally {
+            DBUtils.closeStatementQuietly(updateExchangePrepStatement);
             DBUtils.closeStatementQuietly(updatePointsPrepStatement);
             DBUtils.closeStatementQuietly(updateRoutesPrepStatement);
             DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? updateMarketAgentUsersPrepStatement[0] : null);
@@ -105,6 +107,65 @@ public class InsertOrUpdateTransactionScript {
         preparedStatement.executeUpdate();
         logger.info("INSERT INTO exchange table completed packageNumber = [{}]", packageNumber);
         return preparedStatement;
+    }
+
+    private PreparedStatement batchPointsData(JSONArray updatePointsArray, JSONArray updateAddresses) throws SQLException {
+        logger.info("-----------------START update points table from JSON objects:[updatePointsArray], [updateAddresses]-----------------");
+        PreparedStatement pointsStatement =  connection.prepareStatement(
+                "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId)\n" +
+                        "VALUE (?, ?, ?, ?, ?, ?, ?)\n" +
+                        "ON DUPLICATE KEY UPDATE\n" +
+                        "  pointName           = VALUES(pointName),\n" +
+                        "  address             = VALUES(address),\n" +
+                        "  email               = VALUES(email),\n" +
+                        "  pointTypeID         = VALUES(pointTypeID),\n" +
+                        "  responsiblePersonId = VALUES(responsiblePersonId);"
+        );
+
+        // create or update points from updatePoints JSON array
+        for (Object updatePoint : updatePointsArray) {
+
+            String pointIdExternal = (String)((JSONObject) updatePoint).get("pointId");
+            String responsiblePersonId = (String)((JSONObject) updatePoint).get("responsiblePersonId");
+            String pointName = (String)((JSONObject) updatePoint).get("pointName");
+            String pointAddress = (String)((JSONObject) updatePoint).get("pointAdress");
+            String pointType = (String)((JSONObject) updatePoint).get("pointType");
+            String pointEmail = (String)((JSONObject) updatePoint).get("pointEmail");
+
+            pointsStatement.setString(1, pointIdExternal);
+            pointsStatement.setString(2, LOGIST_1C);
+            pointsStatement.setString(3, pointName);
+            pointsStatement.setString(4, pointAddress);
+            pointsStatement.setString(5, pointEmail);
+            pointsStatement.setString(6, pointType);
+            pointsStatement.setString(7, responsiblePersonId);
+            pointsStatement.addBatch();
+        }
+
+        // create or update points from updateAddresses JSON array
+        // add only unique points
+        Utils.UniqueCheck uniqueCheckAddressId = Utils.getUniqueCheckObject("addressId");
+        for (Object updateAddress : updateAddresses) {
+            String pointIdExternal = (String)((JSONObject) updateAddress).get("addressId");
+            if (!uniqueCheckAddressId.isUnique(pointIdExternal))
+                continue;
+
+            String pointName = (String)((JSONObject) updateAddress).get("addressShot");
+            String pointAddress = (String)((JSONObject) updateAddress).get("addressFull");
+
+            pointsStatement.setString(1, pointIdExternal);
+            pointsStatement.setString(2, LOGIST_1C);
+            pointsStatement.setString(3, pointName);
+            pointsStatement.setString(4, pointAddress);
+            pointsStatement.setString(5, "");
+            pointsStatement.setString(6, "AGENCY");
+            pointsStatement.setString(7, "");
+            pointsStatement.addBatch();
+        }
+
+        int[] affectedRecords = pointsStatement.executeBatch();
+        logger.info("INSERT OR UPDATE ON DUPLICATE INTO [points] completed, affected records size = [{}]", affectedRecords.length);
+        return pointsStatement;
     }
 
     private PreparedStatement batchRoutesData(JSONArray updateRoutesArray) throws SQLException {
