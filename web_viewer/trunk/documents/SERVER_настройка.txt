@@ -31,6 +31,7 @@ http://www.debianhelp.co.uk/remotemysql.htm
 
 Для того, чтобы mysql стал доступным снаружи надо ему прописать в файле /etc/mysql/my.cnf
 bind-address = 185.75.182.94
+также в этом файле нужно установить max_allowed_packet = 128M в разделах [mysql]?, [mysqld] и в [mysqldump]
 
 затем необходимо разрешить любые входящие ip адреса:
 ~#  mysql -u root -p 
@@ -39,6 +40,12 @@ mysql> CREATE DATABASE `transmaster_transport_db` CHARACTER SET utf8 COLLATE utf
 mysql> GRANT ALL PRIVILEGES ON *.* TO root@"%" IDENTIFIED BY 'aftR179Kp' WITH GRANT OPTION;
 mysql> exit;
 ~# mysqladmin -u root -p flush-privileges
+
+
+тюнинг mysql под сервер 4-8 гб(сейчас это не применено, всё стандартно)
+http://linuxguru.ru/administration/mysql-konfig-dlya-servera-s-4-8gb-ozu/
+
+
 
 ДЛЯ ТОГО, при нажатии ctrl+shift+f10 всплывало окно выбора datasource необходимо найти окно datasources 
 Choose Data Source в статусной строке phpStorm.
@@ -138,10 +145,48 @@ chmod a-w /home/pigin_s
 
 чтобы вернуться из режима root нужно ввести su pigin_s
 
+
+
+--------------------------УСТАНОВКА JAVA-------------------------------------------------
+
+https://wiki.debian.org/JavaPackage
+
+в /etc/apt/sources.list файле добавить contrib для jessie main. Должно выглядеть как:
+deb http://mirror.mephi.ru/debian/ jessie main contrib
+
+установка ПО для сборки пакета java.
+apt-get update && apt-get install java-package && exit
+
+скачиваем саму java с сайта oracle и заливаем на сервер при помощи ftp.
+server-jre-8u74-linux-x64.tar.gz
+
+Use java-package to create a Debian package, for example: 
+make-jpkg server-jre-8u74-linux-x64.tar.gz
+
+при сборке пакета возникла ошибка, для её устранения нужно установить следующие библиотеки
+apt-get install libgl1-mesa-glx libfontconfig1 libxslt1.1 libxtst6 libxxf86vm1 libgtk2.0-0
+
+Install the binary package created: 
+su
+# dpkg -i oracle-java8-jre_8u74_amd64.deb
+
+просмотреть доступные версии java
+# update-alternatives --display java
+выбрать нужную версию java
+# update-alternatives --config java 
+
+java лежит в каталоге usr/lib/jvm/
+
+чтобы проверить работоспособность нужно просто ввести в командную строку: 
+java
+такая команда должна быть
+
+
+-----------------------------Разное-----------------------------------------------------
 репозитории сервера:
 
 /etc/apt/sources.list
-# deb http://mirror.mephi.ru/debian/ jessie main
+# deb http://mirror.mephi.ru/debian/ jessie main contrib
 
 deb http://mirror.mephi.ru/debian/ jessie main
 deb-src http://mirror.mephi.ru/debian/ jessie main
@@ -152,6 +197,12 @@ deb-src http://security.debian.org/ jessie/updates main
 # jessie-updates, previously known as 'volatile'
 deb http://mirror.mephi.ru/debian/ jessie-updates main
 deb-src http://mirror.mephi.ru/debian/ jessie-updates main
+
+структура каталогов пользователя pigin_s
+exchange/data_from_1c -каталог для передачи JSON DATA на сервер
+exchange/parser_response -каталог в котором находится ответ parser на полученный пакет из 1c
+parser - каталог в котором находится само ПО - parser.
+public_html - каталог в котором находятся данные сайта
 
 
 --------------------------УСТАНОВКИ ДЛЯ PHP STORM НОВЫЙ СЕРВЕР--------------------------------------

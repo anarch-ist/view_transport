@@ -1,16 +1,16 @@
 package ru.logist.sbat.jsonParser;
 
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 public class JSONReadFromFile {
 

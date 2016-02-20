@@ -1,0 +1,17 @@
+2016-02-20 20:52:11,541 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 20:52:11,609 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 
+2016-02-20 20:57:02,230 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 20:57:02,294 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 
+2016-02-20 20:59:04,544 DEBUG r.l.s.App [main] option name [] does not exist. 
+2016-02-20 20:59:09,503 INFO r.l.s.w.WatchServiceStarter [main] Watch service closed. 
+2016-02-20 20:59:09,504 ERROR r.l.s.w.WatchServiceStarter [Thread-1] java.lang.InterruptedException 
+2016-02-20 20:59:22,367 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 20:59:22,433 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 
+2016-02-20 21:02:58,224 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 21:02:58,291 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 
+2016-02-20 21:11:02,578 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 21:11:02,648 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 
+2016-02-20 21:11:37,863 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 21:11:37,929 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 
+2016-02-20 21:30:33,191 INFO r.l.s.App [main] database connection succefully recieved, URL: [jdbc:mysql://localhost:3306/transmaster_transport_db] User: [parser] 
+2016-02-20 21:30:33,258 INFO r.l.s.w.WatchServiceStarter [Thread-1] start watch service for [C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data] 

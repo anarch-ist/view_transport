@@ -1,18 +1,17 @@
 package ru.logist.sbat.db;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.text.StrBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.*;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * В случае, если ID совпали, с уже существующим - то делается UPDATE, если же такого ID нет, то делается INSERT

@@ -1,24 +1,15 @@
 package ru.logist.sbat.db;
 
 import org.json.simple.JSONObject;
-import org.junit.*;
-import ru.logist.sbat.db.DataBase;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
 import ru.logist.sbat.jsonParser.JSONReadFromFileTest;
-import ru.logist.sbat.properties.DefaultProperties;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Collector;
+import java.util.Properties;
 
 /**
  * This test working only if database launched
@@ -51,21 +42,21 @@ public class DataBaseTest {
         jsonObject = JSONReadFromFile.read(inputStream);
 
         // get connection to database
-        DefaultProperties defaultProperties = new DefaultProperties();
+
+        Properties testProperties = new Properties();
+        testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
         dataBase = new DataBase(
-                defaultProperties.getProperty("url"),
-                defaultProperties.getProperty("dbName"),
-                "root",
-                "rtbyg7895otlgorit",
-                defaultProperties.getProperty("encoding")
+                testProperties.getProperty("url"),
+                testProperties.getProperty("dbName"),
+                testProperties.getProperty("user"),
+                testProperties.getProperty("password"),
+                testProperties.getProperty("encoding")
         );
 
         // clean dataBase content
-        //dataBase.truncatePublicTables();
+        dataBase.truncatePublicTables();
 
         //dataBase.importSQL(new ByteArrayInputStream(sqlStringWithoutComments.getBytes("UTF-8")));
-
-
     }
 
     @AfterClass
