@@ -83,13 +83,17 @@ public class TestRoute {
 
     @Test
     public void testGetWeekDayOfActualDeliveryTime() {
-        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryTime());
+        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryTimeInRoutePoint(tradeRepresentativePoint1));
     }
 
     @Test
     public void testGetActualDeliveryTime() {
-        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryTime().getHours());
-        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTime().getMinutes());
+        Assert.assertEquals(3, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(tradeRepresentativePoint1).getHours());
+        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(tradeRepresentativePoint1).getMinutes());
+        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(tradeRepresentativePoint2).getHours());
+        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(tradeRepresentativePoint2).getMinutes());
+        Assert.assertEquals(15, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(warehousePoint1).getHours());
+        Assert.assertEquals(30, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(warehousePoint1).getMinutes());
     }
 
     @Test

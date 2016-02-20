@@ -10,8 +10,8 @@ public interface IRoute {
     Integer getArrivalTime();
     Point getArrivalPoint();
     Point getDeparturePoint();
-    int getWeekDayOfActualDeliveryTime();
-    Date getActualDeliveryTime();
+    int getWeekDayOfActualDeliveryTimeInRoutePoint(Point point);
+    Date getActualDeliveryTimeInRoutePoint(Point point);
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
     int getDaysCountOfRoute();

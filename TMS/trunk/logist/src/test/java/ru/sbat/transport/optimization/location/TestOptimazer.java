@@ -39,7 +39,7 @@ public class TestOptimazer {
         initRoute(
                 route2,
                 createRoutePoint(warehousePoint2,           2, 930, 600,   0, getCharacteristicsOfCar(10, 15)),
-                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  90, getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  80, getCharacteristicsOfCar(10, 15)),
                 createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, getCharacteristicsOfCar(10, 15))
         );
 
@@ -58,7 +58,7 @@ public class TestOptimazer {
     @BeforeClass
     public static void fullInvoiceContainer(){
         // пункт доставки, дата плановой доставки
-        Request request = createRequest(tradeRepresentativePoint2,  createDate(2016, Calendar.FEBRUARY, 9, 18,  0));
+        Request request = createRequest(tradeRepresentativePoint1,  createDate(2016, Calendar.FEBRUARY, 9, 18,  0));
         Request request2 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 17, 30));
         Request request3 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 18, 30));
         // адрес склада, дата создания накладной
@@ -141,7 +141,7 @@ public class TestOptimazer {
         System.out.println(routes.size() + " варианта(-ов) маршрута с датой и временем");
         Assert.assertFalse(routes.contains(route1));
         Assert.assertTrue(routes.contains(route2));
-        Assert.assertTrue(routes.contains(route3));
+        Assert.assertFalse(routes.contains(route3));
     }
 
     @Test

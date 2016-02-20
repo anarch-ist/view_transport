@@ -74,29 +74,50 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
 
-    /** determines day of week of arrival in the last point of route
+    /** determines day of week of arrival in the point of route
      *
-     * @return day of week of last point
+     * @return day of week of point
      */
     @Override
-    public int getWeekDayOfActualDeliveryTime() {
-        return this.get(this.size()-1).getDayOfWeek();
+    public int getWeekDayOfActualDeliveryTimeInRoutePoint(Point point) {
+        int result = 0;
+        for(RoutePoint routePoint: this){
+            if(routePoint.getDeparturePoint().equals(point)){
+                result = routePoint.getDayOfWeek();
+            }
+        }
+        return result;
     }
 
-    /** determines time of arrival in the last point of route
+    /** determines time of arrival in the point of route
      *
-     * @return date with real hours and minutes of arrival in the last point
+     * @return date with real hours and minutes of arrival in the point
      */
     @Override
-    public Date getActualDeliveryTime() {
+    public Date getActualDeliveryTimeInRoutePoint(Point point) {
         Date date = new Date();
-        int time = this.get(this.size()-2).getDepartureTime() + this.get(this.size()-2).getTimeToNextPoint() + this.get(this.size()-1).getLoadingOperationsTime();
-        if(time >= 1440){
-            time = (time - 1440);
+        for(RoutePoint routePoint: this) {
+            if (routePoint.getDeparturePoint().equals(point)) {
+                if (indexOf(routePoint) != 0) {
+                    int index = this.indexOf(routePoint);
+                    int time = this.get(index - 1).getDepartureTime() + this.get(index - 1).getTimeToNextPoint() + this.get(index).getLoadingOperationsTime();
+                    if (time >= 1440) {
+                        time = (time - 1440);
+                    }
+                    int[] hoursAndMinutes = splitToComponentTime(time);
+                    date.setHours(hoursAndMinutes[0]);
+                    date.setMinutes(hoursAndMinutes[1]);
+                }else if(indexOf(routePoint) == 0){
+                    int time = routePoint.getDepartureTime();
+                    if (time >= 1440) {
+                        time = (time - 1440);
+                    }
+                    int[] hoursAndMinutes = splitToComponentTime(time);
+                    date.setHours(hoursAndMinutes[0]);
+                    date.setMinutes(hoursAndMinutes[1]);
+                }
+            }
         }
-        int[]hoursAndMinutes = splitToComponentTime(time);
-        date.setHours(hoursAndMinutes[0]);
-        date.setMinutes(hoursAndMinutes[1]);
         return date;
     }
 

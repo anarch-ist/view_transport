@@ -2,6 +2,7 @@ package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
+import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
@@ -36,16 +37,20 @@ public class Optimizer implements IOptimizer {
                     if (route == null) {
                         throw new RouteNotFoundException("route should not be null");
                     }
-                    if (route.getDeparturePoint().equals(departurePoint) &&
-                            route.getArrivalPoint().equals(deliveryPoint)) {
-                        ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
-                        for (Date date : possibleDepartureDate) {
-                            if (isFittingForDeliveryTime(route, invoice, date) && routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
-                                possibleRouteForInvoice.add(route);
-                                System.out.println(date + " день отправления");
-                                System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
+                    if (route.getDeparturePoint().equals(departurePoint)){
+                        for(RoutePoint routePoint: route){
+                            if(routePoint.getDeparturePoint().equals(deliveryPoint)){
+                                ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
+                                for (Date date : possibleDepartureDate) {
+                                    if (isFittingForDeliveryTime(route, invoice, date) && routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
+                                        possibleRouteForInvoice.add(route);
+                                        System.out.println(date + " день отправления");
+                                        System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
                 map.put(invoice, possibleRouteForInvoice);
@@ -130,19 +135,31 @@ public class Optimizer implements IOptimizer {
     public Date getPossibleArrivalDate(Route route, Invoice invoice, Date date){
         Calendar calendar = Calendar.getInstance();
         Date tmp = new Date(date.getTime());
-        tmp.setHours(route.getActualDeliveryTime().getHours());
-        tmp.setMinutes(route.getActualDeliveryTime().getMinutes());
-        calendar.setTime(tmp);
-        int countDays = route.getDaysCountOfRoute();
-        calendar.add(Calendar.DAY_OF_MONTH, countDays);
+        for(RoutePoint routePoint: route){
+            if(invoice.getRequest().getDeliveryPoint().equals(routePoint.getDeparturePoint())){
+                tmp.setHours(route.getActualDeliveryTimeInRoutePoint(invoice.getRequest().getDeliveryPoint()).getHours());
+                tmp.setMinutes(route.getActualDeliveryTimeInRoutePoint(invoice.getRequest().getDeliveryPoint()).getMinutes());
+                calendar.setTime(tmp);
+                int countDays = route.getDaysCountOfRoute();
+                calendar.add(Calendar.DAY_OF_MONTH, countDays);
+            }
+        }
         Date actualDeliveryDate = new Date(calendar.getTimeInMillis());
         return actualDeliveryDate;
     }
 
 
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, InvoiceContainer invoiceContainer) throws ParseException, RouteNotFoundException {
+    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice) throws ParseException, RouteNotFoundException {
+        Iterator<Map.Entry<Invoice, ArrayList<Route>>> iterator = routesForInvoice.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Invoice, ArrayList<Route>> entry = iterator.next();
+            ArrayList<Invoice> possibleInvoices = new ArrayList<>();
+            ArrayList<Route> routes = entry.getValue();
+            for(Route route: routes){
 
+            }
+        }
     }
 
     /** sets the invoice's types
