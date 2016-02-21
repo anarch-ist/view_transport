@@ -22,18 +22,35 @@ public class InsertOrUpdateTransactionScript {
     public static final String LOGIST_1C = "LOGIST_1C";
     private final Connection connection;
     private final JSONObject jsonObject;
+    private InsertOrUpdateResult insertOrUpdateResult;
 
     public InsertOrUpdateTransactionScript(Connection connection, JSONObject jsonObject) {
         this.connection = connection;
         this.jsonObject = jsonObject;
     }
 
-    public void updateData() {
+    /**
+     * this method may run only after updateData
+     * @return
+     */
+    public InsertOrUpdateResult getResult() {
+        if (insertOrUpdateResult == null)
+            throw new IllegalStateException("you must start method updateData() before launch this method");
+        return insertOrUpdateResult;
+    }
 
+    public void updateData() {
         JSONObject dataFrom1C = (JSONObject) jsonObject.get("dataFrom1C");
-        logger.info(dataFrom1C.get("server"));
-        logger.info(dataFrom1C.get("packageNumber"));
+        String server = (String)dataFrom1C.get("server");
+        logger.info(server);
+        Integer packageNumber = Integer.parseInt(String.valueOf(dataFrom1C.get("packageNumber")));
+        logger.info(packageNumber);
         logger.info(dataFrom1C.get("created"));
+        insertOrUpdateResult = new InsertOrUpdateResult();
+        insertOrUpdateResult.setServer(server);
+        insertOrUpdateResult.setPackageNumber(packageNumber);
+
+
         JSONObject packageData = (JSONObject) dataFrom1C.get("packageData");
         JSONArray updatePoints = (JSONArray) packageData.get("updatePoints");
         JSONArray updateDirections = (JSONArray) packageData.get("updateDirections");
@@ -45,7 +62,6 @@ public class InsertOrUpdateTransactionScript {
         JSONArray updateRouteLists = (JSONArray) packageData.get("updateRouteLists");
 
         PreparedStatement
-
                 updateExchangePrepStatement = null,
                 updatePointsPrepStatement = null,
                 updateRoutesPrepStatement = null,
@@ -68,13 +84,14 @@ public class InsertOrUpdateTransactionScript {
             updateInvoicesStatusesPrepStatement = batchInvoiceStatuses(updateStatuses);
             routeListsInsertPreparedStatements = batchRouteLists(updateRouteLists);
             connection.commit();
-
+            insertOrUpdateResult.setStatus("OK");
         } catch(Exception e) {
             e.printStackTrace();
             logger.error(e);
             logger.error("start ROLLBACK");
             DBUtils.rollbackQuietly(connection);
             logger.error("end ROLLBACK");
+            insertOrUpdateResult.setStatus("ERROR");
         } finally {
             DBUtils.closeStatementQuietly(updateExchangePrepStatement);
             DBUtils.closeStatementQuietly(updatePointsPrepStatement);

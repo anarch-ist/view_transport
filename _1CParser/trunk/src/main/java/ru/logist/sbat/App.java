@@ -1,12 +1,15 @@
 package ru.logist.sbat;
 
 import javafx.util.Pair;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONObject;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
 import ru.logist.sbat.db.DataBase;
+import ru.logist.sbat.db.InsertOrUpdateResult;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
 import ru.logist.sbat.watchService.OnFileChangeListener;
 import ru.logist.sbat.watchService.WatchServiceStarter;
@@ -14,6 +17,7 @@ import ru.logist.sbat.watchService.WatchServiceStarter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -22,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 public class App {
     private static Properties properties;
@@ -31,20 +36,24 @@ public class App {
     }
     private static final Logger logger = LogManager.getLogger();
     private static Thread watchServiceThread;
+    private static ExecutorService executorService = Executors.newSingleThreadExecutor();
     private static Path jsonDataDir;
     private static DataBase dataBase;
     private static volatile WatchServiceStarter watchServiceStarter;
 
 
     public static void main(String[] args) {
-
         // create database connection
         createDatabaseConnection(properties);
 
         // create separate thread that observe JsonData directory for new files, and starts if new files appeared
         createWatchService();
 
-        // create cmd parser and options
+        // create cmd parser and options, blocking method
+        createOptionsAndStartScanner();
+    }
+
+    private static void createOptionsAndStartScanner() {
         Scanner scanner = new Scanner(System.in);
         Options options = new Options();
         Option exit = new Option("exit");
@@ -73,25 +82,50 @@ public class App {
 
     public static void closeAllAndExit() {
         dataBase.close();
+        logger.info("Database connection closed");
         watchServiceThread.interrupt();
         watchServiceStarter.closeWatchService();
+        logger.info("Watch service closed.");
+        executorService.shutdown();
+        logger.info("Executor service closed");
         System.exit(0);
     }
 
     private static void createWatchService() {
-        // create watchService
+
         watchServiceStarter = new WatchServiceStarter(jsonDataDir);
 
         watchServiceStarter.setOnFileChanged(new OnFileChangeListener() {
             @Override
             public void onFileCreate(Path filePath) {
-                try {
-                    logger.info("start update data from file [{}]", filePath);
-                    dataBase.updateDataFromJSONObject(JSONReadFromFile.read(filePath));
-                } catch (SQLException | IOException | org.json.simple.parser.ParseException e) {
-                    logger.error(e);
-                    closeAllAndExit();
-                }
+
+                executorService.submit((Runnable) () -> {
+                    try {
+                        logger.info("Start update data from file [{}]", filePath);
+                        JSONObject jsonObject = JSONReadFromFile.read(filePath);
+                        InsertOrUpdateResult insertOrUpdateResult = dataBase.updateDataFromJSONObject(jsonObject);
+                        logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
+                        logger.info("Start write result data into response directory");
+                        String responseDir = properties.getProperty("responseDir");
+                        Path responsePath = Paths.get(responseDir).resolve("response.txt");
+                        String resultString = insertOrUpdateResult.toString();
+                        try {
+                            FileUtils.writeStringToFile(responsePath.toFile(), resultString, StandardCharsets.UTF_8);
+                            logger.info("Response data were successfully written");
+                        } catch (IOException e) {
+                            logger.error("Can't write response into [{}]", responsePath);
+                            logger.error(e);
+                        }
+
+                    } catch (IOException e) {
+                        logger.error("Can't read file [{}]", filePath);
+                        logger.error(e);
+                    } catch (org.json.simple.parser.ParseException e) {
+                        logger.error("Illegal JSON file format [{}]", filePath);
+                        logger.error(e);
+                    }
+                });
+
             }
         });
 
@@ -100,7 +134,8 @@ public class App {
             try {
                 watchServiceStarter.doWatch();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Watch service error");
+                logger.error(e);
             }
         });
         watchServiceThread.setDaemon(true);
@@ -128,9 +163,8 @@ public class App {
 
     private static Properties getProperties() {
 
-        File configFile = null;
         Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("config.property");
-        configFile = configPath.toFile();
+        File configFile = configPath.toFile();
         if (!configFile.exists()) {
             System.out.println("config file not exist, exit application");
             System.exit(-1);

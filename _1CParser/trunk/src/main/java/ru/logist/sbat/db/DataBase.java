@@ -14,7 +14,7 @@ import java.util.List;
 
 public class DataBase {
     private static final Logger logger = LogManager.getLogger();
-    private Connection connection;
+    private volatile Connection connection;
 
     public DataBase(String url, String dbName, String user, String password, String encoding) throws SQLException {
         // create connection to dbName
@@ -36,19 +36,21 @@ public class DataBase {
     public void close() {
         DBUtils.closeConnectionQuietly(connection);
     }
+
     /**
-     * write all JSON data into database inside one transaction
+     * write all JSON data into database inside one transaction or ROLLBACK if error.
      * @param jsonObject
      */
-    public void updateDataFromJSONObject(JSONObject jsonObject) throws SQLException {
+    public InsertOrUpdateResult updateDataFromJSONObject(JSONObject jsonObject) {
         InsertOrUpdateTransactionScript insertOrUpdateTransactionScript = new InsertOrUpdateTransactionScript(connection, jsonObject);
         insertOrUpdateTransactionScript.updateData();
+        return insertOrUpdateTransactionScript.getResult();
     }
 
     /**
      * this method designed only for tests
      */
-    public void truncatePublicTables(){
+    protected void truncatePublicTables(){
         Statement statement = null;
 
         // get All public table names
@@ -98,11 +100,6 @@ public class DataBase {
         }
 
 
-    }
-
-    public void importSQL(InputStream in) throws SQLException {
-        SqlRunner sqlRunner = new SqlRunner(connection, new PrintWriter(System.out), new PrintWriter(System.err), true, false);
-        sqlRunner.runScript(new InputStreamReader(in, StandardCharsets.UTF_8));
     }
 
 }

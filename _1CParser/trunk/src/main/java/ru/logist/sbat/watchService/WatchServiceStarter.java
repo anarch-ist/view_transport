@@ -94,7 +94,7 @@ public class WatchServiceStarter {
             if (watchService != null)
                 watchService.close();
         } catch (IOException e) {/*NOPE*/}
-        logger.info("Watch service closed.");
+
     }
 
 }
