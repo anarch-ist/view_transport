@@ -1,5 +1,8 @@
 package ru.logist.sbat.db;
 
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.collections4.bidimap.DualTreeBidiMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,7 +13,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -192,20 +197,29 @@ public class InsertOrUpdateTransactionScript {
                         "  routeName = VALUES(routeName);"
         );
 
-        // get all routeNames from dataBase
-        Set<String> allRouteNames = new HashSet<>();
+        // get all routeNames and all routeID from dataBase
+        BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT routeName FROM routes;");
+        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
         while (resultSet.next()) {
-            allRouteNames.add(resultSet.getString(1));
+            allRoutes.put(resultSet.getString(1), resultSet.getString(2));
         }
 
         for (Object updateRoute : updateRoutesArray) {
             String directionIDExternal = (String)((JSONObject) updateRoute).get("directId");
             String directionName = (String)((JSONObject) updateRoute).get("directName");
-
-            String uniqueDirectionName = Utils.getUniqueDirectionName(allRouteNames, directionName);
-            allRouteNames.add(uniqueDirectionName);
+            // если у нас новое направление(directionIDExternal нет в БД) и routeName - дублируется => нужно присвоить новый routeName
+            String uniqueDirectionName;
+            if (!allRoutes.containsKey(directionIDExternal) && allRoutes.containsValue(directionName)) {
+                uniqueDirectionName = Utils.getUniqueDirectionName(allRoutes.values(), directionName);
+            } else if (allRoutes.containsKey(directionIDExternal) && !allRoutes.containsValue(directionName)) {
+                // запрет на переименование, т.к. такое имя уже есть
+                logger.warn("directionName [{}] already exist in database ", directionName);
+                uniqueDirectionName = directionName;
+            }
+            else
+                uniqueDirectionName = directionName;
+            allRoutes.put(directionIDExternal, uniqueDirectionName);
 
             preparedStatement.setString(1, directionIDExternal);
             preparedStatement.setString(2, LOGIST_1C);

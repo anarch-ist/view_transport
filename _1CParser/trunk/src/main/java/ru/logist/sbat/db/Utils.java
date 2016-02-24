@@ -63,20 +63,16 @@ class Utils {
     /**
      * if allRouteNames contains routeNameCandidate then direction name changed
      * @param allRouteNames
-     * @param routeNameCandidate
+     * @param duplicatedRouteName
      */
-    public static String getUniqueDirectionName(final Set<String> allRouteNames, final String routeNameCandidate) {
-        if (!allRouteNames.contains(routeNameCandidate))
-            return routeNameCandidate;
-        else {
-            int count = 0;
-            do {
-                count++;
-            } while (allRouteNames.contains(routeNameCandidate + count + ""));
-            String generatedDirectionName = routeNameCandidate + count + "";
-            logger.warn("direction name [{}] was duplicated, generated direction name = [{}]", routeNameCandidate, generatedDirectionName);
-            return generatedDirectionName;
-        }
+    public static String getUniqueDirectionName(final Set<String> allRouteNames, final String duplicatedRouteName) {
+        int count = 0;
+        do {
+            count++;
+        } while (allRouteNames.contains(duplicatedRouteName + count + ""));
+        String generatedDirectionName = duplicatedRouteName + count + "";
+        logger.warn("direction name [{}] was duplicated, generated direction name = [{}]", duplicatedRouteName, generatedDirectionName);
+        return generatedDirectionName;
     }
 
     public static java.sql.Date getSqlDateFromString(String dateString) {

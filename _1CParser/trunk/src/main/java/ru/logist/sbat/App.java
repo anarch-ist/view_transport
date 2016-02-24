@@ -26,7 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class App {
     private static Properties properties;
@@ -116,6 +117,15 @@ public class App {
                             logger.error("Can't write response into [{}]", responsePath);
                             logger.error(e);
                         }
+
+                        logger.info("Delete file: [{}]", filePath);
+                        try {
+                            FileUtils.forceDelete(filePath.toFile());
+                        } catch (IOException e) {
+                            logger.error("Can't delete [{}]", filePath);
+                            logger.error(e);
+                        }
+
 
                     } catch (IOException e) {
                         logger.error("Can't read file [{}]", filePath);
