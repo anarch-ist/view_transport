@@ -11,6 +11,7 @@ import ru.sbat.transport.optimization.Request;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
+import java.text.ParseException;
 import java.util.*;
 
 public class TestOptimazer {
@@ -39,7 +40,7 @@ public class TestOptimazer {
         initRoute(
                 route2,
                 createRoutePoint(warehousePoint2,           2, 930, 600,   0, getCharacteristicsOfCar(10, 15)),
-                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  80, getCharacteristicsOfCar(10, 15)),
+                createRoutePoint(tradeRepresentativePoint1, 3, 170, 960,  80, getCharacteristicsOfCar(10, 15)),
                 createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, getCharacteristicsOfCar(10, 15))
         );
 
@@ -65,8 +66,8 @@ public class TestOptimazer {
         Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),     request, 5, 7);
         Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30), request2, 10, 15);
         Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),    request3, 2, 3);
-        invoice2.setRoute(route1);// накладная (10кг., 15т.), маршрут (11кг., 16т.) - заполнен
-        invoice3.setRoute(route2);// накладная (2кг., 3т.), маршрут (10кг., 15т.) - можно догрузить
+        invoice2.setRoute(route1);// накладная (10кг., 15м3.), маршрут (11кг., 16м3.) - заполнен
+        invoice3.setRoute(route2);// накладная (2кг., 3м3.), маршрут (10кг., 15м3.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
 //        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " дата плановой доставки");
 //        System.out.println("");
@@ -143,6 +144,7 @@ public class TestOptimazer {
         Assert.assertTrue(routes.contains(route2));
         Assert.assertFalse(routes.contains(route3));
     }
+
 
     @Test
     public void testGetPossibleDepartureDate(){

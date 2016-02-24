@@ -27,7 +27,7 @@ public class RoutePair {
         this.volume = volume;
     }
 
-    public RoutePair getAvailableWeightAndVolume(Invoice invoice, RoutePair routePair){
+    public RoutePair getRestAvailableWeightAndVolume(Invoice invoice, RoutePair routePair){
         if(isFittingForRoute(invoice, routePair)){
             routePair.setWeight(routePair.getWeight() - invoice.getWeight());
             routePair.setVolume(routePair.getVolume() - invoice.getVolume());

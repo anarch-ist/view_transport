@@ -53,6 +53,7 @@ public class Optimizer implements IOptimizer {
 
                     }
                 }
+                System.out.println(" ");
                 map.put(invoice, possibleRouteForInvoice);
             }
         }
@@ -150,14 +151,18 @@ public class Optimizer implements IOptimizer {
 
 
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, AdditionalSchedule additionalSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice) throws ParseException, RouteNotFoundException {
+    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice) throws ParseException, RouteNotFoundException {
         Iterator<Map.Entry<Invoice, ArrayList<Route>>> iterator = routesForInvoice.entrySet().iterator();
+        RouteWeightAndVolume routeWeightAndVolume = new RouteWeightAndVolume();
         while (iterator.hasNext()){
+            Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
             Map.Entry<Invoice, ArrayList<Route>> entry = iterator.next();
-            ArrayList<Invoice> possibleInvoices = new ArrayList<>();
             ArrayList<Route> routes = entry.getValue();
-            for(Route route: routes){
-
+            Invoice invoice = entry.getKey();
+            for(Route route: routes) {
+                if(routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
+                    invoice.setRoute(route);
+                }
             }
         }
     }

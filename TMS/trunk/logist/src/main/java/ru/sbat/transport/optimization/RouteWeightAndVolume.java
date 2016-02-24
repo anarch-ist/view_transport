@@ -16,7 +16,7 @@ public class RouteWeightAndVolume extends HashMap<Route, RoutePair> {
             for (Invoice invoice : invoiceContainer) {
                 if (invoice.getRoute() != null) {
                     if (invoice.getRoute().equals(route))
-                        routePair = routePair.getAvailableWeightAndVolume(invoice, routePair);
+                        routePair = routePair.getRestAvailableWeightAndVolume(invoice, routePair);
                 }
             }
             result.put(route, routePair);
