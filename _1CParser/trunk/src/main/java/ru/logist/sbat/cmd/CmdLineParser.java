@@ -1,7 +1,5 @@
 package ru.logist.sbat.cmd;
 
-import javafx.util.Pair;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;

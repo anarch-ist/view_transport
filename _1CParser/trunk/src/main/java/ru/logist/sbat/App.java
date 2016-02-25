@@ -1,6 +1,5 @@
 package ru.logist.sbat;
-
-import javafx.util.Pair;
+import ru.logist.sbat.cmd.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +43,7 @@ public class App {
 
 
     public static void main(String[] args) {
+
         // create database connection
         createDatabaseConnection(properties);
 
@@ -71,7 +71,7 @@ public class App {
                 logger.debug(e.getMessage());
                 continue;
             }
-            Option option = optionListPair.getKey();
+            Option option = optionListPair.getFirst();
 
             if (option.equals(exit)) {
                 closeAllAndExit();
@@ -100,6 +100,18 @@ public class App {
             @Override
             public void onFileCreate(Path filePath) {
 
+                File file = filePath.toFile();
+
+                // wait for loading all data
+                long currentFileSize = -1;
+                while (currentFileSize != file.length()) {
+                    currentFileSize = file.length();
+                    try {
+                        Thread.currentThread().sleep(1000);
+                    } catch (InterruptedException e) {/*NOPE*/}
+                    logger.info("wait for loading... file size = [{}], size second ago = [{}]", file.length(), currentFileSize);
+                }
+
                 executorService.submit((Runnable) () -> {
                     try {
                         logger.info("Start update data from file [{}]", filePath);
@@ -121,11 +133,11 @@ public class App {
                         logger.info("Delete file: [{}]", filePath);
                         try {
                             FileUtils.forceDelete(filePath.toFile());
+                            logger.info("file was deleted: [{}]", filePath);
                         } catch (IOException e) {
                             logger.error("Can't delete [{}]", filePath);
                             logger.error(e);
                         }
-
 
                     } catch (IOException e) {
                         logger.error("Can't read file [{}]", filePath);
@@ -176,7 +188,7 @@ public class App {
         Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("config.property");
         File configFile = configPath.toFile();
         if (!configFile.exists()) {
-            System.out.println("config file not exist, exit application");
+            System.out.println("config file not exist at path = [" + configFile + "], exit application");
             System.exit(-1);
         }
 

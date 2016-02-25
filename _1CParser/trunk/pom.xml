@@ -50,26 +50,9 @@
             <version>4.1</version>
         </dependency>
 
-
-
     </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>productionServer</id>
-            <url>ftp://185.75.182.92:21/web/transport.sbat.ru/</url>
-        </repository>
-    </distributionManagement>
-
     <build>
-        <extensions>
-            <!-- Enabling the use of FTP -->
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-                <version>1.0-beta-6</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -82,19 +65,30 @@
             </plugin>
 
             <plugin>
-                <groupId>com.github.pguedes</groupId>
-                <artifactId>capsule-maven-plugin</artifactId>
-                <version>0.3</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <!-- get all project dependencies -->
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- MainClass in mainfest make a executable jar -->
+                    <archive>
+                        <manifest>
+                            <mainClass>ru.logist.sbat.App</mainClass>
+                        </manifest>
+                    </archive>
+
+                </configuration>
                 <executions>
                     <execution>
+                        <id>make-assembly</id>
+                        <!-- bind to the packaging phase -->
                         <phase>package</phase>
                         <goals>
-                            <goal>capsule</goal>
+                            <goal>single</goal>
                         </goals>
-                        <configuration>
-                            <mainClass>ru.logist.sbat.App</mainClass>
-                            <capsuleVersion>0.10.0</capsuleVersion>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
