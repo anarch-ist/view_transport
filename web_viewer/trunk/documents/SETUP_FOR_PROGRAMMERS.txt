@@ -7,9 +7,7 @@
 
 4)  делаем checkout проекта по указанному URL и пути
     svncheckout:
-    "http://svn.sbat.ru/svn/view_transport/web_viewer/trunk/projectlogist.ru/www"
-    "C:\web\wamp\www\projectlogist.ru"
- 
+    
     "http://svn.sbat.ru/svn/view_transport/web_viewer/trunk/sbat.logist.ru"
     "C:\web\wamp\www\sbat.logist.ru"
 
@@ -24,18 +22,11 @@
 
 7)  добавляем в файл C:\Windows\System32\drivers\etc\hosts следующее содержание:
     
-    127.0.0.1      projectlogist.ru
     127.0.0.1      sbat.logist.ru
 	    
 
 8)  заменяем содержание файла C:\web\wamp\bin\apache\apache2.4.9\conf\extra\httpd-vhosts.conf
     следующим контентом:
-
-9) Для, того. чтобы парсер мог залить в БД целиком весь пакет, необходимо в my.ini установить опцию 
-   max_allowed_packet = 128M в [wampmysqld] и в [mysql] и в [mysqld]
-
-
-
 ----FILE-CONTENT-INSIDE----
 
 # Virtual Hosts
@@ -83,23 +74,17 @@ ServerName sbat.logist.ru
 
 ----FILE-CONTENT-INSIDE-END----
 
-9)  скачиваем, устанавливаем phpStorm и создаем 2 проекта:
+
+9)  скачиваем, устанавливаем phpStorm и создаем проект:
 Create New Project from Existing Files
 
 Web server is installed locally, source files are located under its document root.
-
-Project root is C:\web\wamp\www\projectlogist.ru
-use projlog Server with http://projectlogist URL. (сервер должен быть запущен)
 
 Project root is C:\web\wamp\www\sbat.logist.ru
 use sbat Server with http://sbat.logist.ru URL. (сервер должен быть запущен)
 
 
 10) подключаем базу данных к проекту:
-
-заходим из браузера по адресу http://localhost/phpmyadmin/
-там выбираем вкладку SQL и копируем туда содержание скрипта ..\trunk\documents\create.sql
-нажимаем 'ок' и обновляем страницу, должна появится БД 'requestdb'
 
 в phpStorm:
 нажимаем alt+Insert в окне Database
@@ -111,24 +96,25 @@ Password = "" // emptyString
 port = 3306
 
 нажимаем кнопку "TestConnection" соединение должно пройти успешно.
-запускаем скрипт createUsers
+запускаем скрипт create_users
 в Datasource properties меняем пароль root user, на тот, что указан в скрипте и перезапускаем соединение
 
-запускаем скрипт create.sql - будет создана БД 'requestDB'
-запускаем скрипт newDB.sql - будет создана БД 'transmaster_transport_db'
+запускаем скрипт tables_and_functions.sql - будет создана БД 'transmaster_transport_db'
 
 для того, чтобы эти БД отображались, необходимо зайти в Datasource properties -> Shemas&Tables и там поставить галки у этих схем.
 
+11) Для, того. чтобы парсер мог залить в БД целиком весь пакет, необходимо в my.ini установить опцию 
+   max_allowed_packet = 128M в [wampmysqld] и в [mysql] и в [mysqld]
 
 
-11) создаем конфигурацию для запуска:
+12) создаем конфигурацию для запуска:
 выбираем в правом верхнем углу "edit configurations"
 там во нажимаем зеленый плюс и добавляем PHP Web Application 
 добавляем сервер = projlog, debugger - XDebug, Port 80;
 start URl = /
 Browser = Chrome(должен быть установлен)
 
-12) для того, чтобы не было проблем с кодировками нужно добавить в файл httpd.conf строку
+13) для того, чтобы не было проблем с кодировками нужно добавить в файл httpd.conf строку
 AddDefaultCharset UTF-8
 а также возможно в файл .htaccess
 IndexOptions +Charset=UTF-8
