@@ -180,6 +180,11 @@ INSERT INTO permissions_for_roles (userRoleID, permissionID)
 CALL insert_permission_for_role('CLIENT_MANAGER', 'updateInvoiceStatus');
 CALL insert_permission_for_role('CLIENT_MANAGER', 'selectDataProcedure');
 
+INSERT INTO points (pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime,
+                    district, locality, mailIndex, address, email, phoneNumber, responsiblePersonId, pointTypeID)
+VALUES ('wle', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',
+        'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE');
+
 INSERT INTO users
   VALUE
   (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
@@ -1264,3 +1269,10 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
     WHERE routes.RouteID = _routeID
     ORDER BY routePointFirst.sortOrder;
   END;
+
+
+INSERT INTO users (login, firstName, lastName, patronymic, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
+VALUES
+  ('test', 'ivan', 'ivanov', 'ivanovich', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),
+           md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))), '904534356', 'test@test.ru', 'ADMIN',
+   getPointIDByName('point1'));
