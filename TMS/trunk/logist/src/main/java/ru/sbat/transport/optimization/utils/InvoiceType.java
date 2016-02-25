@@ -1,7 +1,7 @@
 package ru.sbat.transport.optimization.utils;
 
 
-public enum InvoiceTypes{
+public enum InvoiceType {
     A,
     B,
     C

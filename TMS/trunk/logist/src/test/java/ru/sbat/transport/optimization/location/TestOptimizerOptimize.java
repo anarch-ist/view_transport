@@ -21,6 +21,7 @@ public class TestOptimizerOptimize {
     static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
     static TradeRepresentativePoint tradeRepresentativePoint3 = new TradeRepresentativePoint();
     static WarehousePoint warehousePoint2 = new WarehousePoint();
+    static Route route = new Route();
     static Route route1 = new Route();
     static Route route2 = new Route();
     static Route route3 = new Route();
@@ -32,6 +33,13 @@ public class TestOptimizerOptimize {
     public static void createPlannedSchedule(){
 
         initRoute(
+                route,
+                //пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта в минутах, время ПРР в минутах
+                createRoutePoint(warehousePoint2,           2, 900, 600,   0, getCharacteristicsOfCar(11, 16), 1000),
+                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0,  90, getCharacteristicsOfCar(11, 16),    0)
+        );
+
+        initRoute(
                 route1,
                 //пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта в минутах, время ПРР в минутах
                 createRoutePoint(warehousePoint2,           2, 900, 600,   0, getCharacteristicsOfCar(11, 16), 1000),
@@ -40,27 +48,28 @@ public class TestOptimizerOptimize {
 
         initRoute(
                 route2,
-                createRoutePoint(warehousePoint2,           2, 930, 600,   0, getCharacteristicsOfCar(10, 15), 800),
-                createRoutePoint(tradeRepresentativePoint1, 3, 170, 960,  80, getCharacteristicsOfCar(10, 15), 730),
-                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, getCharacteristicsOfCar(10, 15),   0)
+                createRoutePoint(warehousePoint2,           2, 930, 600,   0, getCharacteristicsOfCar(15, 20), 800),
+                createRoutePoint(tradeRepresentativePoint1, 3, 170, 960,  80, getCharacteristicsOfCar(15, 20), 730),
+                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, getCharacteristicsOfCar(15, 20),   0)
         );
 
-//        initRoute(
-//                route3,
-//                createRoutePoint(warehousePoint2,           4, 975, 1440,   0, getCharacteristicsOfCar(7, 9), 990),
-//                createRoutePoint(tradeRepresentativePoint2, 5,   0,    0, 104, getCharacteristicsOfCar(7, 9),   0)
-//        );
-//
-//        initRoute(
-//                route4,
-//                createRoutePoint(warehousePoint2,           5, 1080, 540,   0, getCharacteristicsOfCar(7, 9), 760),
-//                createRoutePoint(tradeRepresentativePoint1, 6,   0,    0, 120, getCharacteristicsOfCar(7, 9),   0)
-//        );
+        initRoute(
+                route3,
+                createRoutePoint(warehousePoint2,           4, 975, 1440,   0, getCharacteristicsOfCar(7, 9), 990),
+                createRoutePoint(tradeRepresentativePoint2, 5,   0,    0, 104, getCharacteristicsOfCar(7, 9),   0)
+        );
 
+        initRoute(
+                route4,
+                createRoutePoint(warehousePoint2,           5, 1080, 540,   0, getCharacteristicsOfCar(7, 9), 760),
+                createRoutePoint(tradeRepresentativePoint1, 6,   0,    0, 120, getCharacteristicsOfCar(7, 9),   0)
+        );
+
+        plannedSchedule.add(route);
         plannedSchedule.add(route1);
         plannedSchedule.add(route2);
-//        plannedSchedule.add(route3);
-//        plannedSchedule.add(route4);
+        plannedSchedule.add(route3);
+        plannedSchedule.add(route4);
     }
 
     // создание накладных без маршрутов
@@ -71,11 +80,13 @@ public class TestOptimizerOptimize {
         Request request2 = createRequest(tradeRepresentativePoint3, createDate(2016, Calendar.FEBRUARY, 9, 17, 30));
         Request request3 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 18, 30));
         Request request4 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 19, 30));
+        Request request5 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 21, 00));
         // адрес склада, дата создания накладной
         Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),     request, 5, 7);
         Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30), request2, 10, 15);
         Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),    request3, 2, 3);
         Invoice invoice4 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 14, 0),    request4, 4, 6);
+        Invoice invoice5 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 15, 0),    request5, 1, 2);
         invoice2.setRoute(route1);// накладная (10кг., 15м3.), маршрут (11кг., 16м3.) - заполнен
         invoice3.setRoute(route2);// накладная (2кг., 3м3.), маршрут (10кг., 15м3.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
@@ -85,6 +96,7 @@ public class TestOptimizerOptimize {
         invoiceContainer.add(invoice2);
         invoiceContainer.add(invoice3);
         invoiceContainer.add(invoice4);
+        invoiceContainer.add(invoice5);
     }
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
@@ -142,7 +154,11 @@ public class TestOptimizerOptimize {
         Optimizer optimizer = new Optimizer();
         routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
         optimizer.optimize(plannedSchedule, invoiceContainer, routesForInvoice);
+        System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(0).getRoute(), invoiceContainer.get(0)));
         Assert.assertEquals(invoiceContainer.get(0).getRoute(), route2);
-//        Assert.assertEquals(invoiceContainer.get(3).getRoute(), route2);
+        Assert.assertEquals(invoiceContainer.get(3).getRoute(), route);
+        Assert.assertNotEquals(invoiceContainer.get(3).getRoute(), route3);
+        Assert.assertNotEquals(invoiceContainer.get(3).getRoute(), route4);
+        Assert.assertEquals(invoiceContainer.get(invoiceContainer.size()-1).getRoute(), route);
     }
 }

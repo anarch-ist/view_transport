@@ -4,9 +4,8 @@ import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
-import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utils.InvoiceTypes;
+import ru.sbat.transport.optimization.utils.InvoiceType;
 
 import java.text.ParseException;
 import java.util.*;
@@ -162,6 +161,9 @@ public class Optimizer implements IOptimizer {
             for(Route route: routes) {
                 if(routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
                     invoice.setRoute(route);
+                    invoice.setInvoiceType(InvoiceType.C);
+                    System.out.println("For invoice: " + invoice + " route: " + invoice.getRoute());
+                    break;
                 }
             }
         }
@@ -173,10 +175,10 @@ public class Optimizer implements IOptimizer {
      * @return type of invoice (A, B, C)
      */
     @Override
-    public InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices) {
-        InvoiceTypes invoiceTypes = null;
+    public InvoiceType getInvoiceTypes(List<Invoice> unassignedInvoices) {
+        InvoiceType invoiceType = null;
 
-        return invoiceTypes;
+        return invoiceType;
     }
 
     /**

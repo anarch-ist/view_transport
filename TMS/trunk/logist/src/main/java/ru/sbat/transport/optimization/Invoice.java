@@ -5,6 +5,7 @@ import javafx.beans.property.*;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.user.MarketAgent;
+import ru.sbat.transport.optimization.utils.InvoiceType;
 
 import java.util.*;
 
@@ -19,6 +20,7 @@ public class Invoice {
     private final ObjectProperty<Route> route = new SimpleObjectProperty<>();
     private final ObjectProperty<Date> creationDate = new SimpleObjectProperty<>();
     private final DoubleProperty cost = new SimpleDoubleProperty();
+    private final ObjectProperty<InvoiceType> invoiceType = new SimpleObjectProperty<>();
 
     public Invoice() {
     }
@@ -143,6 +145,18 @@ public class Invoice {
         return request;
     }
 
+    public InvoiceType getInvoiceType() {
+        return invoiceType.get();
+    }
+
+    public void setInvoiceType(InvoiceType invoiceType) {
+        this.invoiceType.set(invoiceType);
+    }
+
+    public ObjectProperty<InvoiceType> invoiceTypeProperty() {
+        return invoiceType;
+    }
+
     /** determines week day of invoice's creation date
      *
      * @return day of week from date
@@ -156,16 +170,17 @@ public class Invoice {
     @Override
     public String toString() {
         return "Invoice{" +
-                "request=" + getRequest() +
-                ", addressOfWarehouse=" + getAddressOfWarehouse() +
-                ", weight=" + getWeight() +
-                ", volume=" + getVolume() +
-                ", countOfBoxes=" + getCountOfBoxes() +
-                ", marketAgent=" + getMarketAgent() +
-                ", priority=" + getPriority() +
-                ", route=" + getRoute() +
-                ", creationDate=" + getCreationDate() +
-                ", cost=" + getCost() +
+                "request=" + request +
+                ", addressOfWarehouse=" + addressOfWarehouse +
+                ", weight=" + weight +
+                ", volume=" + volume +
+                ", countOfBoxes=" + countOfBoxes +
+                ", marketAgent=" + marketAgent +
+                ", priority=" + priority +
+                ", route=" + route +
+                ", creationDate=" + creationDate +
+                ", cost=" + cost +
+                ", invoiceType=" + invoiceType +
                 '}';
     }
 }

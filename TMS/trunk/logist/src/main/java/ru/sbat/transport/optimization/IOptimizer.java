@@ -2,9 +2,8 @@ package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
-import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utils.InvoiceTypes;
+import ru.sbat.transport.optimization.utils.InvoiceType;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public interface IOptimizer {
      */
     void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice) throws ParseException, RouteNotFoundException;
 
-    InvoiceTypes getInvoiceTypes(List<Invoice> unassignedInvoices);
+    InvoiceType getInvoiceTypes(List<Invoice> unassignedInvoices);
 
     Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException;
 
