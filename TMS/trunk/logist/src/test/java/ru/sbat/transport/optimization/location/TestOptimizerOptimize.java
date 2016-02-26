@@ -81,12 +81,14 @@ public class TestOptimizerOptimize {
         Request request3 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 18, 30));
         Request request4 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 19, 30));
         Request request5 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.FEBRUARY, 9, 21, 00));
+        Request request6 = createRequest(tradeRepresentativePoint2, createDate(2016, Calendar.JANUARY,  26, 16, 00));
         // адрес склада, дата создания накладной
-        Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),     request, 5, 7);
-        Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30), request2, 10, 15);
-        Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),    request3, 2, 3);
-        Invoice invoice4 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 14, 0),    request4, 4, 6);
-        Invoice invoice5 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 15, 0),    request5, 1, 2);
+        Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),   request,    5, 7);
+        Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30),  request2, 10, 15);
+        Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),   request3,   2, 3);
+        Invoice invoice4 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 14, 0),   request4,  9, 11);
+        Invoice invoice5 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 15, 0),   request5,   1, 2);
+        Invoice invoice6 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 15, 0),   request6,   1, 2);
         invoice2.setRoute(route1);// накладная (10кг., 15м3.), маршрут (11кг., 16м3.) - заполнен
         invoice3.setRoute(route2);// накладная (2кг., 3м3.), маршрут (10кг., 15м3.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
@@ -97,6 +99,7 @@ public class TestOptimizerOptimize {
         invoiceContainer.add(invoice3);
         invoiceContainer.add(invoice4);
         invoiceContainer.add(invoice5);
+        invoiceContainer.add(invoice6);
     }
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
@@ -154,11 +157,12 @@ public class TestOptimizerOptimize {
         Optimizer optimizer = new Optimizer();
         routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
         optimizer.optimize(plannedSchedule, invoiceContainer, routesForInvoice);
-        System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(0).getRoute(), invoiceContainer.get(0)));
+        System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(3).getRoute(), invoiceContainer.get(3)));
+//        System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(5).getRoute(), invoiceContainer.get(5)));
         Assert.assertEquals(invoiceContainer.get(0).getRoute(), route2);
         Assert.assertEquals(invoiceContainer.get(3).getRoute(), route);
         Assert.assertNotEquals(invoiceContainer.get(3).getRoute(), route3);
         Assert.assertNotEquals(invoiceContainer.get(3).getRoute(), route4);
-        Assert.assertEquals(invoiceContainer.get(invoiceContainer.size()-1).getRoute(), route);
+        Assert.assertEquals(invoiceContainer.get(4).getRoute(), route);
     }
 }
