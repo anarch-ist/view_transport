@@ -1072,6 +1072,66 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
     END IF;
   END;
 
+
+CREATE VIEW transmaster_transport_db.bigSelect AS
+  SELECT
+    requests.requestNumber,
+    requests.marketAgentUserID, -- служебное поле
+    'no data'                                              AS insiderRequestNumber,
+    invoices.invoiceIDExternal                             AS invoiceNumber,
+    clients.INN,
+    delivery_points.pointName                              AS `deliveryPoint`,
+    w_points.pointName                                     AS `warehousePoint`,
+    w_points.pointID                                       AS `warehousePointID`, -- служебное поле
+    users.lastName,
+    invoices.invoiceStatusID,
+    invoice_statuses.invoiceStatusRusName,
+    invoices.boxQty,
+
+    route_lists.driverId                                   AS driver,
+    route_lists.licensePlate,
+    route_lists.palletsQty,
+    route_lists.routeListNumber,
+    route_lists.routeListID,
+    routes.routeName                                       AS directionName,
+    routes.routeID, -- служебное поле
+
+    last_visited_points.pointName                          AS `currentPoint`,
+    next_route_points.pointName                            AS `nextPoint`,
+    getArrivalDateTime(routes.routeID, invoices.invoiceID) AS `arrivalTime`
+
+  FROM requests
+    LEFT JOIN (invoices, clients, points AS delivery_points, points AS w_points, users)
+      ON (
+      invoices.requestID = requests.requestID AND
+      invoices.warehousePointID = w_points.pointID AND
+      requests.clientID = clients.clientID AND
+      requests.destinationPointID = delivery_points.pointID AND
+      requests.marketAgentUserID = users.userID
+      )
+    LEFT JOIN (invoice_statuses)
+      ON (
+      invoices.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
+      )
+    -- because routeList in invoices table can be null, we use left join.
+    LEFT JOIN (route_lists, routes)
+      ON (
+      invoices.routeListID = route_lists.routeListID AND
+      route_lists.routeID = routes.routeID
+      )
+    LEFT JOIN (route_points AS rp1, points AS last_visited_points)
+      ON (
+      rp1.routePointID = invoices.lastVisitedRoutePointID AND
+      last_visited_points.pointID = rp1.pointID
+      )
+    LEFT JOIN (route_points AS rp2, points AS next_route_points)
+      ON (
+      route_lists.routeID = routes.routeID AND
+      routes.routeID = rp2.routeID AND
+      rp2.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedRoutePointID) AND
+      next_route_points.pointID = rp2.pointID
+      );
+
 -- _search - array of strings
 -- _orderby 'id'  <> - название колонки из файла main.js
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
@@ -1079,75 +1139,47 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
 CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
                             _isDesc BOOLEAN, _search TEXT)
   BEGIN
-    SET @mainPart =
-    'SELECT
-
-      requests.requestNumber,
-      \'no data\'                                            AS insiderRequestNumber,
-      invoices.invoiceIDExternal                             AS invoiceNumber,
-      clients.INN,
-      delivery_points.pointName                              AS `deliveryPoint`,
-      w_points.pointName                                     AS `warehousePoint`,
-      users.lastName,
-      invoices.invoiceStatusID,
-      invoice_statuses.invoiceStatusRusName,
-      invoices.boxQty,
-
-      route_lists.driverId                                   AS driver,
-      route_lists.licensePlate,
-      route_lists.palletsQty,
-      route_lists.routeListNumber,
-      route_lists.routeListID,
-      routes.routeName                                       AS directionName,
-
-      last_visited_points.pointName                          AS `currentPoint`,
-      next_route_points.pointName                            AS `nextPoint`,
-      getArrivalDateTime(routes.routeID, invoices.invoiceID) AS `arrivalTime`
-
-    FROM requests
-      LEFT JOIN (invoices, clients, points AS delivery_points, points AS w_points, users)
-        ON (
-        invoices.requestID = requests.requestID AND
-        invoices.warehousePointID = w_points.pointID AND
-        requests.clientID = clients.clientID AND
-        requests.destinationPointID = delivery_points.pointID AND
-        requests.marketAgentUserID = users.userID
-        )
-      LEFT JOIN (invoice_statuses)
-        ON (
-        invoices.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
-        )
-      -- because routeList in invoices table can be null, we use left join.
-      LEFT JOIN (route_lists, routes)
-        ON (
-        invoices.routeListID = route_lists.routeListID AND
-        route_lists.routeID = routes.routeID
-        )
-      LEFT JOIN (route_points AS rp1, points AS last_visited_points)
-        ON (
-        rp1.routePointID = invoices.lastVisitedRoutePointID AND
-        last_visited_points.pointID = rp1.pointID
-        )
-      LEFT JOIN (route_points AS rp2, points AS next_route_points)
-        ON (
-        route_lists.routeID = routes.routeID AND
-        routes.routeID = rp2.routeID AND
-        rp2.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedRoutePointID) AND
-        next_route_points.pointID = rp2.pointID
-        ) ';
-
     -- 1) если у пользователя роль админ, то показываем все записи из БД
     -- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил.
     -- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
     -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
+    SET @columnsPart =
+    '
+    SELECT SQL_CALC_FOUND_ROWS
+      requestNumber,
+      insiderRequestNumber,
+      invoiceNumber,
+      INN,
+      deliveryPoint,
+      warehousePoint,
+      lastName,
+      invoiceStatusID,
+      invoiceStatusRusName,
+      boxQty,
+      driver,
+      licensePlate,
+      palletsQty,
+      routeListNumber,
+      routeListID,
+      directionName,
+      currentPoint,
+      nextPoint,
+      arrivalTime
+    FROM bigSelect
+    ';
 
     SET @wherePart =
-    'WHERE (
-    (getRoleIDByUserID(?) = \'ADMIN\') OR
-    (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND requests.marketAgentUserID = ?) OR
-    (getPointIDByUserID(?) = w_points.pointID) OR
-    (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
-    )';
+    '
+    WHERE (
+      (getRoleIDByUserID(?) = \'ADMIN\') OR
+      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND bigSelect.marketAgentUserID = ?) OR
+      (getPointIDByUserID(?) = bigSelect.warehousePointID) OR
+      (getPointIDByUserID(?) IN (SELECT pointID
+                                 FROM route_points
+                                 WHERE bigSelect.routeID = route_points.routeID))
+    )
+    '
+    ;
 
     SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
 
@@ -1155,17 +1187,28 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
     SET @limitPart = ' LIMIT ?, ? ';
 
-    SET @sqlString = CONCAT(@mainPart, @wherePart, @havingPart, @orderByPart, @limitPart);
+    SET @sqlString = CONCAT(@columnsPart, @wherePart, @havingPart, @orderByPart, @limitPart);
 
-    PREPARE statement FROM @sqlString;
+    PREPARE getDataStm FROM @sqlString;
 
     SET @_userID = _userID;
     SET @_startEntry = _startEntry;
     SET @_length = _length;
 
-    EXECUTE statement
+    EXECUTE getDataStm
     USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
-    DEALLOCATE PREPARE statement;
+    DEALLOCATE PREPARE getDataStm;
+
+    -- filtered
+    SELECT FOUND_ROWS();
+
+    -- total
+    SET @countTotalSql = CONCAT('SELECT COUNT(*) FROM bigSelect ', @wherePart);
+    PREPARE getTotalStm FROM @countTotalSql;
+    EXECUTE getTotalStm
+    USING @_userID, @_userID, @_userID, @_userID, @_userID;
+    DEALLOCATE PREPARE getTotalStm;
+
   END;
 
 -- select users procedure
@@ -1216,7 +1259,6 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
     DEALLOCATE PREPARE statement;
 
   END;
-
 
 CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
