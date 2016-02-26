@@ -19,30 +19,15 @@ public class DataBaseTest {
     public static DataBase dataBase;
     public static JSONObject jsonObject;
 
-
-
     @BeforeClass
     public static void setUp() throws Exception {
 
         // get JSON object
         URL resource = JSONReadFromFileTest.class.getResource("EKA_fixed.pkg");
-//        URL ddl = JSONReadFromFileTest.class.getResource("tables_and_functions.sql");
-//        List<String> strings = Files.readAllLines(Paths.get(ddl.toURI()), StandardCharsets.UTF_8);
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for(String string: strings) {
-//            string = string.replaceAll("--.+", "");
-//            stringBuilder.append(string + "\n");
-//        }
-//        String sqlStringWithoutComments = stringBuilder.toString();
-//        System.out.println(sqlStringWithoutComments);
-        //String ddlAsString = new String(bytes, StandardCharsets.UTF_8);
-
-
         InputStream inputStream = resource.openStream();
         jsonObject = JSONReadFromFile.read(inputStream);
 
         // get connection to database
-
         Properties testProperties = new Properties();
         testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
         dataBase = new DataBase(
@@ -55,8 +40,6 @@ public class DataBaseTest {
 
         // clean dataBase content
         dataBase.truncatePublicTables();
-
-        //dataBase.importSQL(new ByteArrayInputStream(sqlStringWithoutComments.getBytes("UTF-8")));
     }
 
     @AfterClass
@@ -68,4 +51,7 @@ public class DataBaseTest {
     public void testUpdateDataFromJSONObject() throws Exception {
         dataBase.updateDataFromJSONObject(jsonObject);
     }
+
+
+
 }

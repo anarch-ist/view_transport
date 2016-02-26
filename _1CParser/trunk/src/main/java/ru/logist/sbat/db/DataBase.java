@@ -33,6 +33,10 @@ public class DataBase {
         }
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     public void close() {
         DBUtils.closeConnectionQuietly(connection);
     }
@@ -50,7 +54,7 @@ public class DataBase {
     /**
      * this method designed only for tests
      */
-    protected void truncatePublicTables(){
+    public void truncatePublicTables(){
         Statement statement = null;
 
         // get All public table names
@@ -73,6 +77,7 @@ public class DataBase {
                         || tableName.equals("invoice_statuses_for_user_role")
                         || tableName.equals("data_sources")
                         || tableName.equals("route_list_statuses")
+                        || tableName.equals("bigselect")
                         ) continue;
                 statement = connection.createStatement();
                 String sql = "TRUNCATE TABLE " + tableName + ";";
@@ -81,7 +86,16 @@ public class DataBase {
             }
 
             connection.createStatement().executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
-            connection.createStatement().executeUpdate("INSERT INTO users VALUES (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);");
+            connection.createStatement().executeUpdate(
+                    "INSERT INTO points VALUE (8888, 'w', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',\n" +
+                    "'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE')");
+            connection.createStatement().executeUpdate("INSERT INTO users VALUE (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);");
+            connection.createStatement().executeUpdate(
+                    "INSERT INTO users (login, firstName, lastName, patronymic, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)\n" +
+                    "VALUES\n" +
+                    "  ('test', 'ivan', 'ivanov', 'ivanovich', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),\n" +
+                    "   md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))), '904534356', 'test@test.ru', 'ADMIN',\n" +
+                    "   getPointIDByName('point1'));");
 
             connection.commit();
 

@@ -185,7 +185,7 @@ public class App {
 
     private static Properties getProperties() {
 
-        Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("config.property");
+        Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("example_config.property");
         File configFile = configPath.toFile();
         if (!configFile.exists()) {
             System.out.println("config file not exist at path = [" + configFile + "], exit application");

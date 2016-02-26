@@ -117,6 +117,10 @@ service apache2 restart
 #</VirtualHost>
 
 
+ëîãè apache ëåæàò :
+/var/log/apache2/access.log
+/var/log/apache2/error.log
+
 -------------------------------ÓÑÒÀÍÎÂÊÀ FTP server---------------------------------------
 ÓÑÒÀÍÎÂÊÀ FTP server:
 
