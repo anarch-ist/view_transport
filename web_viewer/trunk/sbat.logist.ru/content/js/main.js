@@ -39,6 +39,7 @@ $(document).ready(function () {
                     }
                 });
             });
+            // if user role is CLIENT_MANAGER then delete 'изменить статус МЛ' button
             if ($("#userRoleContainer").html().trim() === "Пользователь_клиента")
                 dataTable.buttons(1).remove();
         },
@@ -137,8 +138,5 @@ $(document).ready(function () {
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
-
-    // if user role is CLIENT_MANAGER then delete 'изменить статус МЛ' button
-
 });
 

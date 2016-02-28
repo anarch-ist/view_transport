@@ -14,14 +14,15 @@ $(document).ready(function () {
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
+        '<tr id="selectInvoicesTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="invoiceCheckBoxes">aaaaaaaaaa</div></td></tr>' +
         '</table>' +
-        '<div id="invoiceCheckBoxes">aaaaaaaaaa</div>' +
         '</div>'
     );
 
     // create status select menu
     var $statusSelect = $("#statusSelect");
     var $invoiceCheckBoxes = $("#invoiceCheckBoxes");
+    var $selectInvoicesTr = $("#selectInvoicesTr");
 
     function populateStatusSelectMenu() {
         var options = [];
@@ -72,40 +73,34 @@ $(document).ready(function () {
             $("#palletsQtyTr").hide();
             switch (dialogType) {
                 case "changeStatusForInvoice":
+                    $selectInvoicesTr.hide();
                     $statusSelect.off("selectmenuchange");
-                    $invoiceCheckBoxes.hide();
                     break;
                 case "changeStatusForSeveralInvoices":
-                    $invoiceCheckBoxes.show();
-                    //$.post(
-                    //    "content/getData.php",
-                    //    {
-                    //        status: "getInvoicesForRouteList",
-                    //        routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
-                    //    },
-                    //    function (data) {
-                    //        var invoicesArray = JSON.parse(data);
-                    //        $statusChangeDialog.data('invoicesForSelectedRouteList', invoicesArray);
-                    //    }
-                    //);
-
-                    // TODO добавить выбор накладных из списка
-                    // нужны данные - id накладных которые присутствуют в маршрутном листе
-                    // нужно показывать select с накладными,
-                    // var invoices = $statusChangeDialog.data('invoicesForSelectedRouteList');
-                    // exampleData
-                    var invoices = ["inv1", "inv2", "inv3"];
-                    $invoiceCheckBoxes.html("");
-                    invoices.forEach(function(e){
-                        $invoiceCheckBoxes.append('<input type="checkbox" checked><label for="check1">' + e + '</label>');
-                    });
-
+                    $selectInvoicesTr.show();
                     $statusSelect.on("selectmenuchange", function (e, ui) {
                         if (ui.item.value === DEPARTURE_STATUS)
                             $("#palletsQtyTr").show();
                         else
                             $("#palletsQtyTr").hide();
                     });
+
+                    $.post(
+                        "content/getData.php",
+                        {
+                            status: "getInvoicesForRouteList",
+                            routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
+                        },
+                        function (data) {
+                            var invoicesArray = JSON.parse(data);
+                            $statusChangeDialog.data('invoicesForSelectedRouteList', invoicesArray);
+                            //var invoicesArray = ["invIdExternal1", "invIdExternal2", "invIdExternal3"];
+                            $invoiceCheckBoxes.html("");
+                            invoicesArray.forEach(function(invIdExt){
+                                $invoiceCheckBoxes.append('<label>'+'<input type="checkbox" value='+invIdExt+' checked>'+invIdExt+'</label>'+'<br>');
+                            });
+                        }
+                    );
                     break;
             }
         },
@@ -142,24 +137,28 @@ $(document).ready(function () {
                     else {
                         alert("date should not be empty"); // TODO
                     }
+
                 } else if (dialogType === "changeStatusForSeveralInvoices") {
 
                     // get specific vars for "changeStatusForSeveralInvoices" dialogType
-                    var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
+                    //var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
                     var palletsQty = $("#palletsQtyInput").cleanVal();
 
-
+                    var invoices = [];
+                    $invoiceCheckBoxes.find("input[type='checkbox']:checked").each(function(index){
+                        invoices.push($(this).attr('value'));
+                    });
 
                     if ((newStatusID !== DEPARTURE_STATUS && date) || (newStatusID === DEPARTURE_STATUS && date && palletsQty))
                         $.post(
                             "content/getData.php",
                             {
                                 status: dialogType,
-                                routeListID: routeListID,
                                 newStatusID: newStatusID,
                                 date: date,
                                 comment: comment,
-                                palletsQty: palletsQty
+                                palletsQty: palletsQty,
+                                invEdExt: invoices
                             },
                             function (data) {
                                 if (data === '1') {
