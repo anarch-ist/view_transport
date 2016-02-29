@@ -21,7 +21,7 @@ public class Invoice {
     private final ObjectProperty<Date> creationDate = new SimpleObjectProperty<>();
     private final DoubleProperty cost = new SimpleDoubleProperty();
     private final ObjectProperty<InvoiceType> invoiceType = new SimpleObjectProperty<>();
-    private final ObjectProperty<ArrayList<Date>> realDepartureArrayOfDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<Date> realDepartureDate = new SimpleObjectProperty<>();
 
     public Invoice() {
     }
@@ -158,16 +158,16 @@ public class Invoice {
         return invoiceType;
     }
 
-    public ArrayList<Date> getRealDepartureDate() {
-        return realDepartureArrayOfDate.get();
+    public Date getRealDepartureDate() {
+        return realDepartureDate.get();
     }
 
-    public void setRealDepartureDate(ArrayList<Date> realDepartureDate) {
-        this.realDepartureArrayOfDate.set(realDepartureDate);
+    public void setRealDepartureDate(Date realDepartureDate) {
+        this.realDepartureDate.set(realDepartureDate);
     }
 
-    public ObjectProperty<ArrayList<Date>> realDepartureDateProperty() {
-        return realDepartureArrayOfDate;
+    public ObjectProperty<Date> realDepartureDateProperty() {
+        return realDepartureDate;
     }
 
     /** determines week day of invoice's creation date
@@ -194,7 +194,7 @@ public class Invoice {
                 ", creationDate=" + creationDate +
                 ", cost=" + cost +
                 ", invoiceType=" + invoiceType +
-                ", realDepartureDate=" + realDepartureArrayOfDate +
+                ", realDepartureDate=" + realDepartureDate +
                 '}';
     }
 }

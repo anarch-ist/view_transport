@@ -161,9 +161,9 @@ public class Optimizer implements IOptimizer {
             for(Route route: routes) {
                 if(routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
                     invoice.setRoute(route);
-                    invoice.setRealDepartureDate(getPossibleDepartureDate(route, invoice));
+                    invoice.setRealDepartureDate(getPossibleDepartureDate(route, invoice).get(0));
                     invoice.setInvoiceType(InvoiceType.C);
-                    System.out.println("For invoice: " + invoice + " route: " + invoice.getRoute());
+                    System.out.println("Date: " + invoice.getRealDepartureDate() + " for invoice: " + invoice.toString());
                     break;
                 }
             }if (invoice.getRoute() == null){

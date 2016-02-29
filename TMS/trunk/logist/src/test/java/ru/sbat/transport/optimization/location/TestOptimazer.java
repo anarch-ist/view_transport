@@ -66,8 +66,8 @@ public class TestOptimazer {
         Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 25, 12, 0),     request, 5, 7);
         Invoice invoice2 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 12, 30), request2, 10, 15);
         Invoice invoice3 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 13, 0),    request3, 2, 3);
-        invoice2.setRoute(route1);// накладная (10кг., 15м3.), маршрут (11кг., 16м3.) - заполнен
-        invoice3.setRoute(route2);// накладная (2кг., 3м3.), маршрут (10кг., 15м3.) - можно догрузить
+        invoice2.setRoute(route1);// накладная (10кг., 15м^3.), маршрут (11кг., 16м^3.) - заполнен
+        invoice3.setRoute(route2);// накладная (2кг., 3м^3.), маршрут (10кг., 15м^3.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
 //        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " дата плановой доставки");
 //        System.out.println("");
