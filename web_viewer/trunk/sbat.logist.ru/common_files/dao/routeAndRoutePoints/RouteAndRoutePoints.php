@@ -43,6 +43,6 @@ class RouteAndRoutePoints
 //
 //        return $routeInfo;
 
-//        throw new \MysqlException('запрос не написан для RouteAndRoutePoints::getAllRoutePointsDataForRouteID');
+//        throw new \MysqlException('запрос не написан для routeAndRoutePoints::getAllRoutePointsDataForRouteID');
     }
 } 
