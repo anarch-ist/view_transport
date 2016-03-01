@@ -211,6 +211,52 @@ public_html - каталог в котором находятся данные сайта
 
 для того, чтобы через ssh можно было запустить несколько консолей нужно использовать screen
 
+-----------------------------Screen-----------------------------------------------------
+
+Во время работы парсер захватывает поток ввода и вывода. Поэтому его надо запускать в отдельном окне.
+Для этого служить приложение - screen.
+
+https://www.rackaid.com/blog/linux-screen-tutorial-and-how-to/#video
+
+su
+#apt-get update
+#apt-get upgrade
+#apt-get install screen
+
+starting screen:
+# screen
+
+control command: "ctrl-a"   - перейти в режим ввода команд для приложения screen
+
+create new window(previous window is still active):
+# "ctrl-a" "c"
+
+switching between windows:
+# "ctrl-a" "n"     (next)
+# "ctrl-a" "p"	   (previous)	
+
+detach from screen:
+"ctrl-a" "d"
+
+reattach to screen:
+screen -r
+
+stopping screen:
+type inside all screen windows "exit" or just "ctrl-a" "k"
+after screen is terminated you should get a message [screen is terminating].
+
+
+
+запуск персера при помощи screen:
+#su
+#screen
+#cd /home/pigin_s/parser
+#su pigin_s
+#./startup.sh
+#"ctrl-a" "d"
+
+если нужно посмотреть как работает парсер, то просто делаем 
+screen -r
 
 
 --------------------------УСТАНОВКИ ДЛЯ PHP STORM НОВЫЙ СЕРВЕР--------------------------------------
