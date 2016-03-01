@@ -101,9 +101,6 @@ CREATE TABLE distances_between_points (
 CREATE TABLE users (
   userID      INTEGER     AUTO_INCREMENT,
   login       VARCHAR(255) NOT NULL UNIQUE, -- userIDExternal
-  firstName   VARCHAR(64)  NULL,
-  lastName    VARCHAR(64)  NULL,
-  patronymic  VARCHAR(64)  NULL,
   userName    VARCHAR(255) NULL,
   phoneNumber VARCHAR(255) NULL,
   email       VARCHAR(255) NULL,
@@ -187,7 +184,7 @@ VALUES ('wle', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00'
 
 INSERT INTO users
   VALUE
-  (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
+  (1, 'parser', '', '', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
 
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -1083,7 +1080,7 @@ CREATE VIEW transmaster_transport_db.bigSelect AS
     delivery_points.pointName                              AS `deliveryPoint`,
     w_points.pointName                                     AS `warehousePoint`,
     w_points.pointID                                       AS `warehousePointID`, -- служебное поле
-    users.lastName,
+    users.userName,
     invoices.invoiceStatusID,
     invoice_statuses.invoiceStatusRusName,
     invoices.boxQty,
@@ -1152,7 +1149,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       INN,
       deliveryPoint,
       warehousePoint,
-      lastName,
+      userName,
       invoiceStatusID,
       invoiceStatusRusName,
       boxQty,
@@ -1211,52 +1208,55 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
   END;
 
+CREATE VIEW transmaster_transport_db.allUsers AS
+  SELECT
+    users.userName,
+    users.position,
+    users.phoneNumber,
+    users.email,
+    'dummy' AS password,
+    points.pointName,
+    user_roles.userRoleRusName
+  FROM users
+    INNER JOIN (user_roles) ON (
+      users.userRoleID = user_roles.userRoleID
+      )
+    LEFT JOIN (points) ON (
+      users.pointID = points.pointID
+      );
+
 -- select users procedure
 -- _search - строка для глобального поиска по всем колонкам
 CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
   BEGIN
 
-    SET @mainPart =
-    'SELECT
-      users.firstName,
-      users.lastName,
-      users.patronymic,
-      users.position,
-      users.phoneNumber,
-      users.email,
-      ''dummy'' AS password,
-      points.pointName,
-      user_roles.userRoleRusName
-    FROM users
-      INNER JOIN (user_roles, points) ON (
-        users.pointID = points.pointID AND
-        users.userRoleID = user_roles.userRoleID
-        ) ';
-
     SET @searchString = CONCAT('%', _search, '%');
-    SET @searchCondition = CONCAT('users.firstName LIKE '           , '\'', @searchString, '\'', ' OR ',
-                                  'users.lastName LIKE '            , '\'', @searchString, '\'', ' OR ',
-                                  'users.patronymic LIKE '          , '\'', @searchString, '\'', ' OR ',
-                                  'users.position LIKE '            , '\'', @searchString, '\'', ' OR ',
-                                  'users.phoneNumber LIKE '         , '\'', @searchString, '\'', ' OR ',
-                                  'users.email LIKE '               , '\'', @searchString, '\'', ' OR ',
-                                  'points.pointName LIKE '          , '\'', @searchString, '\'', ' OR ',
-                                  'user_roles.userRoleRusName LIKE ', '\'', @searchString, '\'');
 
-    SET @havingPart = CONCAT(' HAVING ', @searchCondition);
-    SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
-    SET @limitPart = ' LIMIT ?, ? ';
+    SELECT SQL_CALC_FOUND_ROWS *
+    FROM allUsers
+    WHERE (_search = '' OR userName LIKE @searchString OR position LIKE @searchString OR phoneNumber LIKE @searchString
+           OR email LIKE @searchString OR pointName LIKE @searchString OR userRoleRusName LIKE @searchString)
+    ORDER BY NULL ,
+      CASE WHEN _orderby = '' THEN NULL END,
+      CASE WHEN _isDesc AND _orderby = 'userName' THEN userName END ASC,
+      CASE WHEN _isDesc AND _orderby = 'position' THEN position END ASC,
+      CASE WHEN _isDesc AND _orderby = 'phoneNumber' THEN phoneNumber END ASC,
+      CASE WHEN _isDesc AND _orderby = 'email' THEN email END ASC,
+      CASE WHEN _isDesc AND _orderby = 'pointName' THEN pointName END ASC,
+      CASE WHEN _isDesc AND _orderby = 'userRoleRusName' THEN userRoleRusName END ASC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'userName' THEN userName END DESC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'position' THEN position END DESC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'phoneNumber' THEN phoneNumber END DESC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'email' THEN email END DESC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'pointName' THEN pointName END DESC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'userRoleRusName' THEN userRoleRusName END DESC
+    LIMIT _startEntry, _length;
 
-    SET @sqlString = CONCAT(@mainPart, @havingPart, @orderByPart, @limitPart);
+    -- filtered users
+    SELECT FOUND_ROWS();
 
-    PREPARE statement FROM @sqlString;
-
-    SET @_startEntry = _startEntry;
-    SET @_length = _length;
-
-    EXECUTE statement
-    USING @_startEntry, @_length;
-    DEALLOCATE PREPARE statement;
+    -- total users
+    SELECT COUNT(*) FROM allUsers;
 
   END;
 
@@ -1264,9 +1264,7 @@ CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
   BEGIN
     SELECT
       pointName,
-      firstName,
-      lastName,
-      patronymic,
+      userName,
       invoiceStatusRusName,
       invoice_history.lastStatusUpdated,
       routeListNumber,
@@ -1313,8 +1311,7 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
   END;
 
 
-INSERT INTO users (login, firstName, lastName, patronymic, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
+INSERT INTO users (login, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
 VALUES
-  ('test', 'ivan', 'ivanov', 'ivanovich', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),
-           md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))), '904534356', 'test@test.ru', 'ADMIN',
-   getPointIDByName('point1'));
+  ('test', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16), md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))),
+   '904534356', 'test@test.ru', 'ADMIN', getPointIDByName('point1'));

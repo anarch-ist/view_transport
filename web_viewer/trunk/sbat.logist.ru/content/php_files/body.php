@@ -48,7 +48,7 @@
                 $data = $privUser->getUserInfo()->toArray();
 
                 $userRole = $privUser->getUserEntity()->getUserRole($data['userID']);
-                echo $data['lastName'] . ' ' . $data['firstName'] . ' ' . $data['patronymic'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
+                echo $data['userName'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
 
                 ?>
             </div>

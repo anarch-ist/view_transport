@@ -54,10 +54,8 @@ $(document).ready(function () {
         data = JSON.parse(data);
 
         for (var i = 0; i < data.length; i++) {
-            data[i].fullName = data[i].firstName + " " + data[i].lastName + " " + " " + data[i].patronymic;
-            delete data[i].firstName;
-            delete data[i].lastName;
-            delete data[i].patronymic;
+            data[i].fullName = data[i].userName;
+            delete data[i].userName;
         }
         invoiceHistoryDialogTable.rows().remove();
         invoiceHistoryDialogTable.rows.add(data).draw(false);

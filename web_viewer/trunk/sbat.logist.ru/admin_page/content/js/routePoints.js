@@ -385,9 +385,6 @@ $(document).ready(function () {
             var houres = string.substring(0, 2);
             var minutes = string.substr(2, 2);
             var result = 60 * parseInt(houres) + parseInt(minutes);
-            console.log(string);
-            console.log(result);
-            console.log('--------------------------');
             return result;
         }
 
@@ -483,9 +480,7 @@ $(document).ready(function () {
             idSrc: 'userID',
 
             fields: [
-                { label: 'Имя', name: 'firstName', type: 'text'},
-                { label: 'Фамилия',  name: 'lastName', type: 'text'},
-                { label: 'Отчество',  name: 'patronymic', type: 'text'},
+                { label: 'ФИО', name: 'userName', type: 'text'},
                 { label: 'Должность',  name: 'position', type: 'text'},
                 { label: 'Номер телефона',  name: 'phoneNumber', type: 'mask', mask:"(000) 000-00-00", maskOptions: {clearIfNotMatch: true}, placeholder:"(999) 999-99-99"},
                 { label: 'Почта',  name: 'email', type: 'text'},
@@ -528,7 +523,7 @@ $(document).ready(function () {
         });
 
         // example data for exchange with server
-        //var exampleData = [{userID: 1, firstName:"wefwfe", lastName:"ewrkbfif", position: "efewerfw", patronymic:"ergerge", phoneNumber: "9055487552",
+        //var exampleData = [{userID: 1, userName:"wefwfe", position: "efewerfw", patronymic:"ergerge", phoneNumber: "9055487552",
         //    email: "qwe@qwe.ru", password:"lewrhbwueu23232", userRoleRusName:"Диспетчер", pointName:"point1"}];
 
         var $usersDataTable =  $("#usersTable").DataTable({
@@ -543,7 +538,6 @@ $(document).ready(function () {
                 language: {
                     url:'/localization/dataTablesRus.json'
                 },
-
                 select: {
                     style: 'single'
                 },
@@ -566,15 +560,13 @@ $(document).ready(function () {
                 ],
                 "paging": 10,
                 "columnDefs": [
-                    {"name": "firstName", "data": "firstName", "targets": 0},
-                    {"name": "lastName", "data": "lastName", "targets": 1},
-                    {"name": "patronymic", "data": "patronymic", "targets": 2},
-                    {"name": "position", "data": "position", "targets": 3},
-                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 4},
-                    {"name": "email", "data": "email", "targets": 5},
-                    {"name": "password", "data": "password", "targets": 6, visible:false},
-                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 7},
-                    {"name": "pointName", "data": "pointName", "targets": 8}
+                    {"name": "userName", "data": "userName", "targets": 0},
+                    {"name": "position", "data": "position", "targets": 1},
+                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 2},
+                    {"name": "email", "data": "email", "targets": 3},
+                    {"name": "password", "data": "password", "targets": 4, visible:false},
+                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 5},
+                    {"name": "pointName", "data": "pointName", "targets": 6}
                 ]
             }
         );

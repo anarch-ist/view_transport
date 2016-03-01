@@ -207,14 +207,12 @@ class DeleteUser implements IEntityDelete
 
 class InsertUser implements IEntityInsert
 {
-    private $firstName, $lastName, $login, $patronymic, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+    private $userName, $login, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
 
     function __construct(UserData $user)
     {
         $dao = DAO::getInstance();
-        $this->firstName = $dao->checkString($user->getData('firstName'));
-        $this->lastName = $dao->checkString($user->getData('lastName'));
-        $this->patronymic = $dao->checkString($user->getData('patronymic'));
+        $this->firstName = $dao->checkString($user->getData('userName'));
         $this->position = $dao->checkString($user->getData('position'));
         $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
@@ -231,24 +229,22 @@ class InsertUser implements IEntityInsert
     {
         $salt = substr(md5(rand(0, 100000000)), 0, 16);
         $passAndSalt = md5($this->passMD5 . $salt);
-//        echo "INSERT INTO `users` (firstName, lastName, patronymic, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE ($this->firstName, $this->lastName, $this->patronymic, $this->position, $salt, $passAndSalt, $this->phoneNumber, $this->email, $this->userRoleID, $this->pointID);";
-        return "INSERT INTO `users` (firstName, lastName, patronymic, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE " .
-        "('$this->firstName', '$this->lastName', '$this->patronymic', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID);";
+//        echo "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE ($this->userName, $this->login, $this->position, $salt, $passAndSalt, $this->phoneNumber, $this->email, $this->userRoleID, $this->pointID);";
+        return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE " .
+        "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID);";
     }
 }
 
 class UpdateUser implements IEntityUpdate
 {
-    private $firstName, $lastName, $patronymic, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+    private $userName, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
     private $userID;
 
     function __construct(UserData $user, $id)
     {
         $dao = DAO::getInstance();
         $this->userID = $dao->checkString($id);
-        $this->firstName = $dao->checkString($user->getData('firstName'));
-        $this->lastName = $dao->checkString($user->getData('lastName'));
-        $this->patronymic = $dao->checkString($user->getData('patronymic'));
+        $this->userName = $dao->checkString($user->getData('userName'));
         $this->position = $dao->checkString($user->getData('position'));
 //        $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
@@ -265,9 +261,7 @@ class UpdateUser implements IEntityUpdate
 //        $salt = substr(md5(rand(0,100000000)),0,16);
 //        $passAndSalt = md5($this->passMD5.$salt);
         return "UPDATE `users` SET " .
-        "firstName = '$this->firstName', " .
-        "lastName = '$this->lastName', " .
-        "patronymic = '$this->patronymic', " .
+        "userName = '$this->userName', " .
         "position = '$this->position', " .
         "phoneNumber = '$this->phoneNumber', " .
         "email = '$this->email', " .

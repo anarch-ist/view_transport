@@ -35,23 +35,23 @@ INSERT INTO distances_between_points (pointIDFirst, pointIDSecond, distance) VAL
 
 INSERT INTO users
   VALUE
-  (1, 'parser', '', '', '', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
+  (1, 'parser', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
 
-INSERT INTO users (login, firstName, lastName, patronymic, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
+INSERT INTO users (login, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
 VALUES
-  ('test', 'ivan', 'ivanov', 'ivanovich', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),
+  ('test', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),
    md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))), '904534356', 'test@test.ru', 'ADMIN',
    getPointIDByName('point1')),
-  ('user2', 'ivan', 'ivanov', 'ivanovich', 'ivanov i.A.', 'erwgewg', SUBSTRING(MD5(2) FROM 1 FOR 16),
+  ('user2', 'ivanov i.A.', 'erwgewg', SUBSTRING(MD5(2) FROM 1 FOR 16),
    md5(CONCAT(md5('esrhgruht'), SUBSTRING(MD5(2) FROM 1 FOR 16))), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
    getPointIDByName('point2')),
-  ('user3', 'erir', 'dddddd', 'ewreruiii',  'petrov i.A.', 'erfergg', SUBSTRING(MD5(3) FROM 1 FOR 16),
+  ('user3', 'petrov i.A.', 'erfergg', SUBSTRING(MD5(3) FROM 1 FOR 16),
    md5(CONCAT(md5('wefwgrege'), SUBSTRING(MD5(3) FROM 1 FOR 16))), '904534356', 'ey@irtj.ru', 'DISPATCHER',
    getPointIDByName('point4')),
-  ('user4', 'degg', 'rtgrgg', 'rtrtbtybv', 'sidorov i.A.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
+  ('user4', 'sidorov i.A.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
    md5(CONCAT(md5('wertgrege'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
    getPointIDByName('point3')),
-  ('clientUser', 'degg', 'rtgrgg', 'rtrtbtybv', 'wlrfekj.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
+  ('clientUser', 'wlrfekj.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
    md5(CONCAT(md5('1111'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'cl@cl.ru', 'CLIENT_MANAGER',
    getPointIDByName('point2'));
 
