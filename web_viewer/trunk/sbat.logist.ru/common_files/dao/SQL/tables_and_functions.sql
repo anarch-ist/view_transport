@@ -1196,11 +1196,12 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
     DEALLOCATE PREPARE getDataStm;
 
+
     -- filtered
-    SELECT FOUND_ROWS();
+    SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
-    SET @countTotalSql = CONCAT('SELECT COUNT(*) FROM bigSelect ', @wherePart);
+    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM bigSelect ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm
     USING @_userID, @_userID, @_userID, @_userID, @_userID;
@@ -1253,10 +1254,10 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
     LIMIT _startEntry, _length;
 
     -- filtered users
-    SELECT FOUND_ROWS();
+    SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total users
-    SELECT COUNT(*) FROM allUsers;
+    SELECT COUNT(*) as `totalCount` FROM allUsers;
 
   END;
 

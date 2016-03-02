@@ -213,6 +213,6 @@ class SelectInvoicesByRouteList implements IEntitySelect
      */
     function getSelectQuery()
     {
-        return "SELECT * FROM `invoices` WHERE routeListID='$this->routeListID';";
+        return "SELECT invoiceID, invoiceIDExternal FROM `invoices` WHERE routeListID='$this->routeListID';";
     }
 }

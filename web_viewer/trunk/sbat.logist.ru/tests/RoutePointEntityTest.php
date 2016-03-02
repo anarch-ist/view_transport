@@ -90,10 +90,10 @@ class RoutePointEntityTest extends AbstractEntityTestClass
 
     function routePointsForAdditingProvider()
     {
-        $dataTest0 = array('sortOrder' => 6, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => true);
-//        $dataTest1 = array('sortOrder' => 5, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => true);
+        $dataTest0 = array('sortOrder' => 6, 'pointName' => 2, 'tLoading' => 60, 'routeID' => 1, 'result' => true);
+        $dataTest1 = array('sortOrder' => 6, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => false);
 //        $dataTest2 = array('sortOrder' => 3, 'pointName' => 3, 'tLoading' => 60, 'routeID' => 1, 'result' => false);
-        return array($dataTest0);//, $dataTest1, $dataTest2);
+        return array($dataTest0, $dataTest1);//, $dataTest2);
     }
 
     /**

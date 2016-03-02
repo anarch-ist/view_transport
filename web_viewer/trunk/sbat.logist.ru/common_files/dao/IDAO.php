@@ -11,6 +11,12 @@ interface IDAO
     function select(IEntitySelect $selectObj);
 
     /**
+     * @param $selectObj
+     * @return array
+     */
+    function multiSelect(IEntitySelect $selectObj);
+
+    /**
      * @param $newObj
      * @return string
      */

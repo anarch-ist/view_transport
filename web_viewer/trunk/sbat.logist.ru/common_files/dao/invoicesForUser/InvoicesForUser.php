@@ -24,13 +24,17 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
     /**
      * @return array
      */
-    function selectAllData($start = 0, $count = 20, $userID = -1)
+    function selectAllData(array $columnInformation, $orderColumnNumber, $start = 0, $count = 20, $userID = -1)
     {
         if ($userID < 1) {
             $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
         }
-        $array = $this->_DAO->select(new EntitySelectAllInvoicesForUser($start, $count, $userID));
-        return $array;
+        $array = $this->_DAO->multiSelect(new EntitySelectAllInvoicesForUser($start, $count, $userID, $columnInformation, $orderColumnNumber));
+        $arrayResult = array();
+        $arrayResult['invoices'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
     }
 
 }
@@ -39,15 +43,12 @@ class EntitySelectAllInvoicesForUser implements IEntitySelect
 {
     private $start, $count, $orderByColumn, $isDesc, $searchString, $userID;
 
-    function __construct($start, $count, $userID, $order = -1, $orderColumn = -1, $cols = -1)
+    function __construct($start, $count, $userID, $columnInformation, $orderColumn, $order = -1)
     {
         $this->userID = $userID;
         //TODO: remake this shit
         if ($order === -1) {
             $order = $_POST['order'][0]['dir'];
-        }
-        if ($cols === -1) {
-            $cols = $_POST['columns'];
         }
         if ($orderColumn === -1) {
             $orderColumn = $_POST['order'][0]['column'];
@@ -56,7 +57,7 @@ class EntitySelectAllInvoicesForUser implements IEntitySelect
         $this->count = DAO::getInstance()->checkString($count);
         $this->isDesc = ($order === 'desc' ? 'TRUE' : 'FALSE');
         $this->searchString = '';
-        $searchArray = $cols;
+        $searchArray = $columnInformation;
         for ($i = 0; $i < count($searchArray); $i++) {
             if ($searchArray[$i]['search']['value'] !== '') {
                 $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';

@@ -3,5 +3,5 @@ namespace DAO;
 
 interface IInvoicesForUserEntity
 {
-    function selectAllData();
+    function selectAllData(array $columnInformation, $orderColumnNumber);
 }

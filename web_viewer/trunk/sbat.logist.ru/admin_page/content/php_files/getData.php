@@ -7,61 +7,58 @@ try {
     } else {
         throw new DataTransferException('Не задан параметр "статус"', __FILE__);
     }
-    if ($action === 'getAllPointIdPointNamePairs') {
+    if (strcasecmp($action,'getAllPointIdPointNamePairs')===0) {
         getAllPointIdPointNamePairs($privUser);
-    } else if ($action === 'getAllUserRoles') {
+    } else if (strcasecmp($action,'getAllUserRoles')===0) {
         getAllUserRoles($privUser);
-    } else if ($action === 'getRelationsBetweenRoutePointsDataForRouteID') {
+    } else if (strcasecmp($action,'getRelationsBetweenRoutePointsDataForRouteID')===0) {
         getRelationsBetweenRoutePointsDataForRouteID($privUser);
-    } else if ($action === 'getUsersData') {
+    } else if (strcasecmp($action,'getUsersData')===0) {
 //        TODO: check method for select users (getUsers($privUser);)
         getUsers($privUser);
 
-    } else if ($action === 'getAllRouteIdDirectionPairs') {
+    } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
         getAllRouteIdDirectionPairs($privUser);
-    } else if ($action === 'updateStartRouteTime') {
+    } else if (strcasecmp($action,'updateStartRouteTime')===0) {
         updateStartRouteTime($privUser);
-    } else if ($action === 'updateDaysOfWeek') {
+    } else if (strcasecmp($action,'updateDaysOfWeek')===0) {
         updateDaysOfWeek($privUser);
-    } else if ($action === 'getAllRoutePointsDataForRouteID') {
+    } else if (strcasecmp($action,'getAllRoutePointsDataForRouteID')===0) {
         getAllRoutePointsDataForRouteID($privUser);
-    } else if ($action === 'routeEditing') {
+    } else if (strcasecmp($action,'routeEditing')===0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
         $action = $_POST['action'];
-        if ($action === 'remove') {
+        if (strcasecmp($action,'remove')===0) {
             removeRoutePoint($privUser);
-        } else if ($action === 'edit') {
+        } else if (strcasecmp($action,'edit')===0) {
             updateRoutePoints($privUser);
-        } else if ($action === 'create') {
+        } else if (strcasecmp($action,'create')===0) {
             createRoutePoint($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if ($action === 'relationsBetweenRoutePoints') {
+    } else if (strcasecmp($action,'relationsBetweenRoutePoints')===0) {
 
         $action = $_POST['action'];
-        if ($action === 'edit') {
+        if (strcasecmp($action,'edit')===0) {
             updateRelationsBetweenRoutePoints($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
 
-    } else if ($action === 'userEditing') {
+    } else if (strcasecmp($action,'userEditing')===0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
         $action = $_POST['action'];
-        if ($action === 'remove') {
-//            TODO: check method for remove
+        if (strcasecmp($action,'remove')===0) {
             removeUser($privUser);
-        } else if ($action === 'edit') {
+        } else if (strcasecmp($action,'edit')===0) {
             updateUsers($privUser);
-//            TODO: check method for edit
-        } else if ($action === 'create') {
+        } else if (strcasecmp($action,'create')===0) {
             createNewUser($privUser);
-//            TODO: check method for create
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
@@ -250,13 +247,11 @@ function getRelationsBetweenRoutePointsDataForRouteID(PrivilegedUser $privUser)
 function getUsers(PrivilegedUser $privUser)
 {
     $dataArray = $privUser->getUserEntity()->selectUsers($_POST['start'], $_POST['length']);
-    $totalData = $privUser->getUserEntity()->getUsersTotalCount();
-    $totalFiltered = count($dataArray);
     $json_data = array(
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
-        "recordsTotal" => intval($totalData),  // total number of records
-        "recordsFiltered" => intval($totalFiltered), // total number of records after searching, if there is no searching then totalFiltered = totalData
-        "data" => $dataArray   // total data array
+        "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
+        "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
+        "data" => $dataArray['users']   // total data array
     );
     echo json_encode($json_data);
 
@@ -309,27 +304,6 @@ function updateUsers(PrivilegedUser $privUser)
     $userEntity = $privUser->getUserEntity();
     $i = 0;
     foreach ($dataSourceArray as $userID => $userInfo) {
-//        if (!isset($userInfo['sortOrder'])) {
-//            throw new DataTablesFieldException('sortOrder','данные отсутствуют',__FILE__);
-//        }
-//        $sortOrder = $userInfo['sortOrder'];
-//        if ($sortOrder<0 || !is_numeric($sortOrder)) {
-//            throw new DataTablesFieldException('sortOrder','данные некорректны',__FILE__);
-//        }
-//        if (!isset($userInfo['tLoading'])) {
-//            throw new DataTablesFieldException('tLoading','данные отсутствуют',__FILE__);
-//        }
-//        $tLoading = $userInfo['tLoading'];
-//        if ($tLoading<0 || !is_numeric($tLoading)) {
-//            throw new DataTablesFieldException('tLoading','данные некорректны',__FILE__);
-//        }
-//        if (!isset($userInfo['pointName'])) {
-//            throw new DataTablesFieldException('pointName','данные отсутствуют',__FILE__);
-//        }
-//        $pointName = $userInfo['pointName'];
-//        if (!$pointName) {
-//            throw new DataTablesFieldException('pointName','данные некорректны',__FILE__);
-//        }
         if (!$userEntity->updateUser(new \DAO\UserData($userInfo),$userID)) {
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);

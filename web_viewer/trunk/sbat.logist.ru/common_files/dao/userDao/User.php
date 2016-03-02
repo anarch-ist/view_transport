@@ -32,24 +32,12 @@ class UserEntity implements IUserEntity
 
     function selectUsers($start = 0, $count = 20)
     {
-//        $count = 20;
-//        $start = 0;
-//        switch (func_num_args()) {
-//            case 2:
-//                $start = func_get_arg(0);
-//                $count = func_get_arg(1);
-//                break;
-//            case 1:
-//                $start = func_get_arg(0);
-//                break;
-//        }
-        $array = $this->_DAO->select(new EntitySelectAllUsers($start, $count));
-        return $array;
-//        $users = array();
-//        for ($i = 0; $i < count($array); $i++) {
-//            $users[$i] = new UserData($array[$i]);
-//        }
-//        return $users;
+        $array = $this->_DAO->multiSelect(new EntitySelectAllUsers($start, $count));
+        $arrayResult = array();
+        $arrayResult['users'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
     }
 
     function selectUserByID($id)

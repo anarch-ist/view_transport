@@ -153,6 +153,28 @@ class DAO implements IDAO
         return $array;
     }
 
+    function multiSelect(IEntitySelect $selectObj)
+    {
+        $connection = $this->_connection;
+        $array = array();
+        $arrayCount = 0;
+        if ($connection->multi_query($selectObj->getSelectQuery())) {
+            do {
+                /* получаем первый результирующий набор */
+                if ($result = $connection->store_result()) {
+                    $count = 0;
+                    while ($row = $result->fetch_assoc()) {
+                        $array[$arrayCount][$count] = $row;
+                        $count++;
+                    }
+                    $arrayCount++;
+                    $result->free();
+                }
+            } while ($connection->more_results() && $connection->next_result());
+        }
+        return $array;
+    }
+
     function update(IEntityUpdate $newObj, IEntityInsert $updateTable = null)
     {
         // TODO: Check update() method.
