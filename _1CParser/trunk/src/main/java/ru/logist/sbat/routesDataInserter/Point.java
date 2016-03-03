@@ -168,7 +168,7 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
+        return "PointData{" +
                 "pointID=" + pointID +
                 ", pointIDExternal='" + pointIDExternal + '\'' +
                 ", dataSourceID='" + dataSourceID + '\'' +

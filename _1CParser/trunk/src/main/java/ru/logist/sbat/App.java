@@ -176,7 +176,7 @@ public class App {
                     properties.getProperty("password"),
                     properties.getProperty("encoding")
             );
-            logger.info("database connection succefully recieved, URL: [" + url + dbName + "] " + "User: [" + user + "]");
+            logger.info("database connection successfully received, URL: [" + url + dbName + "] " + "User: [" + user + "]");
         } catch (SQLException e) {
             logger.error(e);
             System.exit(-1);
@@ -185,7 +185,7 @@ public class App {
 
     private static Properties getProperties() {
 
-        Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("example_config.property");
+        Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("config.property");
         File configFile = configPath.toFile();
         if (!configFile.exists()) {
             System.out.println("config file not exist at path = [" + configFile + "], exit application");

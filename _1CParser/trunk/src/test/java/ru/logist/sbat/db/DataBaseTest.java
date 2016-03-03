@@ -9,6 +9,8 @@ import ru.logist.sbat.jsonParser.JSONReadFromFileTest;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -23,9 +25,8 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
 
         // get JSON object
-        URL resource = JSONReadFromFileTest.class.getResource("EKA_fixed.pkg");
-        InputStream inputStream = resource.openStream();
-        jsonObject = JSONReadFromFile.read(inputStream);
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_fixed.pkg").toURI());
+        jsonObject = JSONReadFromFile.read(path);
 
         // get connection to database
         Properties testProperties = new Properties();

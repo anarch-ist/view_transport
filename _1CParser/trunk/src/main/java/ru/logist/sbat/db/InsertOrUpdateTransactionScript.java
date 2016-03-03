@@ -112,7 +112,7 @@ public class InsertOrUpdateTransactionScript {
         }
     }
 
-    private static final DateTimeFormatter dateTimeSQLFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss 'GMT+'0");
+    private static final DateTimeFormatter dateTimeSQLFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
     private PreparedStatement batchPackageData(JSONObject dataFrom1C) throws SQLException {
         logger.info("-----------------START update exchange table from JSON object:[dataFrom1C]-----------------");
         PreparedStatement preparedStatement =  connection.prepareStatement(
