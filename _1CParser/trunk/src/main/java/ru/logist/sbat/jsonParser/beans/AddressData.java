@@ -1,7 +1,7 @@
-package ru.logist.sbat.jsonParser;
-
+package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
+import ru.logist.sbat.jsonParser.Util;
 
 public class AddressData {
     private String addressId; //not null and not empty
@@ -21,7 +21,7 @@ public class AddressData {
     }
 
     public void setAddressId(String addressId) {
-        Run.requireNonNullOrEmpty(addressId, "addressId");
+        Util.requireNonNullOrEmpty(addressId, "addressId");
         this.addressId = addressId;
     }
 
@@ -30,7 +30,7 @@ public class AddressData {
     }
 
     public void setAddressShot(String addressShot) {
-        Run.requireNonNull(addressShot, "addressShot");
+        Util.requireNonNull(addressShot, "addressShot");
         this.addressShot = addressShot;
     }
 
@@ -39,7 +39,7 @@ public class AddressData {
     }
 
     public void setAddressFull(String addressFull) {
-        Run.requireNonNull(addressFull, "addressFull");
+        Util.requireNonNull(addressFull, "addressFull");
         this.addressFull = addressFull;
     }
 
@@ -48,7 +48,7 @@ public class AddressData {
     }
 
     public void setDeliveryAreaId(String deliveryAreaId) {
-        Run.requireNonNull(deliveryAreaId, "deliveryAreaId");
+        Util.requireNonNull(deliveryAreaId, "deliveryAreaId");
         this.deliveryAreaId = deliveryAreaId;
     }
 

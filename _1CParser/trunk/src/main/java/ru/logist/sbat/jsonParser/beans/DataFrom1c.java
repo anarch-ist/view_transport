@@ -1,6 +1,7 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
+import ru.logist.sbat.jsonParser.Util;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -11,14 +12,14 @@ public class DataFrom1c {
     private static final DateTimeFormatter dateTimeSQLFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
 
     private String server; // CONSTRAINT not empty string not null
-    private Integer packageNumber; //CONSTRAINT >=0 not null
+    private Long packageNumber; //CONSTRAINT >=0 not null
     private Date created; // CONSTRAINT not null
     private PackageData packageData; // CONSTRAINT not null
 
     public DataFrom1c(JSONObject dataFrom1cAsJsonObject) {
         setServer((String)dataFrom1cAsJsonObject.get("server"));
         setCreated((String)dataFrom1cAsJsonObject.get("created"));
-        setPackageNumber((String)dataFrom1cAsJsonObject.get("packageNumber"));
+        setPackageNumber((Long)dataFrom1cAsJsonObject.get("packageNumber"));
         setPackageData((JSONObject) dataFrom1cAsJsonObject.get("packageData"));
     }
 
@@ -27,21 +28,17 @@ public class DataFrom1c {
     }
 
     private void setServer(String server) {
-        Run.requireNonNullOrEmpty(server, "server");
+        Util.requireNonNullOrEmpty(server, "server");
         this.server = server;
     }
 
-    public Integer getPackageNumber() {
+    public Long getPackageNumber() {
         return packageNumber;
     }
 
-    private void setPackageNumber(String packageNumberAsString) {
-        Run.withValidatorExceptionRedirect(() -> {
-            Objects.requireNonNull(packageNumberAsString, "[package number] must not be null");
-            packageNumber = Integer.parseInt(packageNumberAsString);
-            if (packageNumber < 0)
-                throw new IllegalArgumentException("[package number] must be greater or equal 0");
-        });
+    private void setPackageNumber(Long packageNumber) {
+        Util.requireNonNull(packageNumber, "packageNumber");
+        this.packageNumber = packageNumber;
     }
 
     public Date getCreated() {
@@ -49,8 +46,8 @@ public class DataFrom1c {
     }
 
     private void setCreated(String createdDateAsString) {
-        Run.requireNonNullOrEmpty(createdDateAsString, "createdDate");
-        Run.withValidatorExceptionRedirect(() -> created = Date.valueOf(LocalDate.parse(createdDateAsString, dateTimeSQLFormatter)));
+        Util.requireNonNullOrEmpty(createdDateAsString, "createdDate");
+        Util.withValidatorExceptionRedirect(() -> created = Date.valueOf(LocalDate.parse(createdDateAsString, dateTimeSQLFormatter)));
     }
 
     public PackageData getPackageData() {
@@ -58,7 +55,7 @@ public class DataFrom1c {
     }
 
     private void setPackageData(JSONObject packageDataAsJsonObject) {
-        Run.withValidatorExceptionRedirect(() -> {
+        Util.withValidatorExceptionRedirect(() -> {
             Objects.requireNonNull(packageDataAsJsonObject, "packageData must not be null");
             this.packageData = new PackageData(packageDataAsJsonObject);
         });

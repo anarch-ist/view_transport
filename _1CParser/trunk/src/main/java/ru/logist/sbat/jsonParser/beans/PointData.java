@@ -1,7 +1,9 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.beans;
 
 
 import org.json.simple.JSONObject;
+import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.util.Arrays;
 
@@ -29,7 +31,7 @@ public class PointData {
     }
 
     private void setPointId(String pointId) {
-        Run.requireNonNullOrEmpty(pointId, "pointId");
+        Util.requireNonNullOrEmpty(pointId, "pointId");
         this.pointId = pointId;
     }
 
@@ -38,7 +40,7 @@ public class PointData {
     }
 
     private void setResponsiblePersonId(String responsiblePersonId) {
-        Run.requireNonNull(responsiblePersonId, "responsiblePersonId");
+        Util.requireNonNull(responsiblePersonId, "responsiblePersonId");
         this.responsiblePersonId = responsiblePersonId;
     }
 
@@ -47,7 +49,7 @@ public class PointData {
     }
 
     private void setPointName(String pointName) {
-        Run.requireNonNull(pointName, "responsiblePersonId");
+        Util.requireNonNull(pointName, "responsiblePersonId");
         this.pointName = pointName;
     }
 
@@ -56,7 +58,7 @@ public class PointData {
     }
 
     private void setPointAddress(String pointAddress) {
-        Run.requireNonNull(pointAddress, "pointAddress");
+        Util.requireNonNull(pointAddress, "pointAddress");
         this.pointAddress = pointAddress;
     }
 
@@ -82,7 +84,7 @@ public class PointData {
     }
 
     private void setPointEmails(String pointEmails) {
-        Run.requireNonNull(pointEmails, "pointEmails");
+        Util.requireNonNull(pointEmails, "pointEmails");
         this.pointEmails = pointEmails;
     }
 
