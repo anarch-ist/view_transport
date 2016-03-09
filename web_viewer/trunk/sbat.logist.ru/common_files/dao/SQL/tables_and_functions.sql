@@ -1070,7 +1070,7 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
   END;
 
 
-CREATE VIEW transmaster_transport_db.bigSelect AS
+CREATE VIEW transmaster_transport_db.big_select AS
   SELECT
     requests.requestNumber,
     requests.marketAgentUserID, -- служебное поле
@@ -1162,18 +1162,18 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       currentPoint,
       nextPoint,
       arrivalTime
-    FROM bigSelect
+    FROM big_select
     ';
 
     SET @wherePart =
     '
     WHERE (
       (getRoleIDByUserID(?) = \'ADMIN\') OR
-      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND bigSelect.marketAgentUserID = ?) OR
-      (getPointIDByUserID(?) = bigSelect.warehousePointID) OR
+      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
+      (getPointIDByUserID(?) = big_select.warehousePointID) OR
       (getPointIDByUserID(?) IN (SELECT pointID
                                  FROM route_points
-                                 WHERE bigSelect.routeID = route_points.routeID))
+                                 WHERE big_select.routeID = route_points.routeID))
     )
     '
     ;
@@ -1201,7 +1201,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
-    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM bigSelect ', @wherePart);
+    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm
     USING @_userID, @_userID, @_userID, @_userID, @_userID;
@@ -1209,7 +1209,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
   END;
 
-CREATE VIEW transmaster_transport_db.allUsers AS
+CREATE VIEW transmaster_transport_db.all_users AS
   SELECT
     users.userName,
     users.position,
@@ -1234,7 +1234,7 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM allUsers
+    FROM all_users
     WHERE (_search = '' OR userName LIKE @searchString OR position LIKE @searchString OR phoneNumber LIKE @searchString
            OR email LIKE @searchString OR pointName LIKE @searchString OR userRoleRusName LIKE @searchString)
     ORDER BY NULL ,
@@ -1257,7 +1257,7 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
     SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total users
-    SELECT COUNT(*) as `totalCount` FROM allUsers;
+    SELECT COUNT(*) as `totalCount` FROM all_users;
 
   END;
 
