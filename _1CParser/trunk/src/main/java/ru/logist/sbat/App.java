@@ -57,9 +57,9 @@ public class App {
     private static void createOptionsAndStartScanner() {
         Scanner scanner = new Scanner(System.in);
         Options options = new Options();
-        Option exit = new Option("exit");
+        Option quit = new Option("quit");
         Option help = new Option("help");
-        options.addAll(Arrays.asList(exit, help));
+        options.addAll(Arrays.asList(quit, help));
 
         CmdLineParser cmdLineParser = new CmdLineParser(options);
         while (true) {
@@ -73,7 +73,7 @@ public class App {
             }
             Option option = optionListPair.getFirst();
 
-            if (option.equals(exit)) {
+            if (option.equals(quit)) {
                 closeAllAndExit();
             } else if (option.equals(help)) {
                 System.out.println(options);

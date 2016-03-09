@@ -190,9 +190,9 @@ public class App {
                 routesStatement.addBatch();
             }
 
-            System.out.println("start execute batch points");
+            System.out.println("start execute batch routes");
             int[] ints = routesStatement.executeBatch();
-            System.out.println("affected rous count = " + ints.length);
+            System.out.println("affected routes count = " + ints.length);
             dataBase.getConnection().commit();
             routesStatement.close();
 

@@ -25,7 +25,7 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
 
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_fixed.pkg").toURI());
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_third.pkg").toURI());
         jsonObject = JSONReadFromFile.read(path);
 
         // get connection to database

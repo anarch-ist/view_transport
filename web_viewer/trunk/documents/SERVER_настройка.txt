@@ -255,7 +255,8 @@ after screen is terminated you should get a message [screen is terminating].
 #./startup.sh
 #"ctrl-a" "d"
 
-если нужно посмотреть как работает парсер, то просто делаем 
+если нужно посмотреть как работает парсер, то просто делаем
+su
 screen -r
 
 
