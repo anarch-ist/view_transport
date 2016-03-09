@@ -16,14 +16,12 @@ import static org.junit.Assert.*;
 
 public class DataFrom1cTest {
 
-    private static JSONObject jsonObject;
     private static DataFrom1c dataFrom1c;
 
     @BeforeClass
     public static void setUp() throws Exception {
         Path jsonFile = Paths.get(JSONReadFromFileTest.class.getResource("EKA_third.pkg").toURI());
-        jsonObject = JSONReadFromFile.read(jsonFile);
-        dataFrom1c = new DataFrom1c((JSONObject) jsonObject.get("dataFrom1C"));
+        dataFrom1c = JSONReadFromFile.read(jsonFile);
     }
 
     @Test

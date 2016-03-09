@@ -15,12 +15,23 @@ public class DataFrom1c {
     private Long packageNumber; //CONSTRAINT >=0 not null
     private Date created; // CONSTRAINT not null
     private PackageData packageData; // CONSTRAINT not null
+    private String rawData; // CONSTRAINT not null
 
     public DataFrom1c(JSONObject dataFrom1cAsJsonObject) {
-        setServer((String)dataFrom1cAsJsonObject.get("server"));
-        setCreated((String)dataFrom1cAsJsonObject.get("created"));
-        setPackageNumber((Long)dataFrom1cAsJsonObject.get("packageNumber"));
-        setPackageData((JSONObject) dataFrom1cAsJsonObject.get("packageData"));
+        JSONObject fieldData = (JSONObject) dataFrom1cAsJsonObject.get("dataFrom1C");
+        setServer((String) fieldData.get("server"));
+        setCreated((String) fieldData.get("created"));
+        setPackageNumber((Long) fieldData.get("packageNumber"));
+        setPackageData((JSONObject) fieldData.get("packageData"));
+        setRawData(dataFrom1cAsJsonObject.toJSONString());
+    }
+
+    public String getRawData() {
+        return rawData;
+    }
+
+    public void setRawData(String rawData) {
+        this.rawData = rawData;
     }
 
     public String getServer() {

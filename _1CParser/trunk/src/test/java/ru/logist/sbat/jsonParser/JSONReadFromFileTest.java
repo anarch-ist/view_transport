@@ -1,6 +1,5 @@
 package ru.logist.sbat.jsonParser;
 
-import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +23,6 @@ public class JSONReadFromFileTest {
 
     @Test
     public void testRead() throws Exception {
-        JSONObject jsonObject2 = JSONReadFromFile.read(jsonFile);
+        JSONReadFromFile.read(jsonFile);
     }
 }

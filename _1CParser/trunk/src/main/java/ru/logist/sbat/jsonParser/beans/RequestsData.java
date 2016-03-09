@@ -118,9 +118,13 @@ public class RequestsData {
         return documentNumber;
     }
 
-    // TODO make this work
+    // TODO fix this
     private void setDocumentNumber(String documentNumber) {
         //Util.requireNonNull(documentNumber, "documentNumber");
+        if (documentNumber == null) {
+            this.documentNumber = "";
+            return;
+        }
         this.documentNumber = documentNumber;
     }
 

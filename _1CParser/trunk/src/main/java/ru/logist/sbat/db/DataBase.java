@@ -3,6 +3,7 @@ package ru.logist.sbat.db;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
+import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,10 +44,10 @@ public class DataBase {
 
     /**
      * write all JSON data into database inside one transaction or ROLLBACK if error.
-     * @param jsonObject
+     * @param dataFrom1c
      */
-    public InsertOrUpdateResult updateDataFromJSONObject(JSONObject jsonObject) {
-        InsertOrUpdateTransactionScript insertOrUpdateTransactionScript = new InsertOrUpdateTransactionScript(connection, jsonObject);
+    public InsertOrUpdateResult updateDataFromJSONObject(DataFrom1c dataFrom1c) {
+        InsertOrUpdateTransactionScript insertOrUpdateTransactionScript = new InsertOrUpdateTransactionScript(connection, dataFrom1c);
         insertOrUpdateTransactionScript.updateData();
         return insertOrUpdateTransactionScript.getResult();
     }

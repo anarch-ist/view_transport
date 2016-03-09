@@ -10,6 +10,7 @@ import ru.logist.sbat.cmd.Options;
 import ru.logist.sbat.db.DataBase;
 import ru.logist.sbat.db.InsertOrUpdateResult;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
+import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.watchService.OnFileChangeListener;
 import ru.logist.sbat.watchService.WatchServiceStarter;
 
@@ -115,8 +116,8 @@ public class App {
                 executorService.submit((Runnable) () -> {
                     try {
                         logger.info("Start update data from file [{}]", filePath);
-                        JSONObject jsonObject = JSONReadFromFile.read(filePath);
-                        InsertOrUpdateResult insertOrUpdateResult = dataBase.updateDataFromJSONObject(jsonObject);
+                        DataFrom1c dataFrom1c = JSONReadFromFile.read(filePath);
+                        InsertOrUpdateResult insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
                         logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
                         logger.info("Start write result data into response directory");
                         String responseDir = properties.getProperty("responseDir");

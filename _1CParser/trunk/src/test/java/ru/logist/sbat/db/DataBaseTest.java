@@ -1,14 +1,12 @@
 package ru.logist.sbat.db;
 
-import org.json.simple.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
 import ru.logist.sbat.jsonParser.JSONReadFromFileTest;
+import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -19,14 +17,14 @@ import java.util.Properties;
 public class DataBaseTest {
 
     public static DataBase dataBase;
-    public static JSONObject jsonObject;
+    public static DataFrom1c dataFrom1c;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
         // get JSON object
         Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_third.pkg").toURI());
-        jsonObject = JSONReadFromFile.read(path);
+        dataFrom1c = JSONReadFromFile.read(path);
 
         // get connection to database
         Properties testProperties = new Properties();
@@ -50,7 +48,7 @@ public class DataBaseTest {
 
     @Test
     public void testUpdateDataFromJSONObject() throws Exception {
-        dataBase.updateDataFromJSONObject(jsonObject);
+        dataBase.updateDataFromJSONObject(dataFrom1c);
     }
 
 
