@@ -4,10 +4,7 @@ package ru.sbat.transport.optimization.location;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.sbat.transport.optimization.Invoice;
-import ru.sbat.transport.optimization.InvoiceContainer;
-import ru.sbat.transport.optimization.Optimizer;
-import ru.sbat.transport.optimization.Request;
+import ru.sbat.transport.optimization.*;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
@@ -156,7 +153,7 @@ public class TestOptimizerOptimize {
     public void testOptimize() throws ParseException, RouteNotFoundException {
         Optimizer optimizer = new Optimizer();
         routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
-        optimizer.optimize(plannedSchedule, invoiceContainer, routesForInvoice);
+        optimizer.optimize(plannedSchedule, invoiceContainer, routesForInvoice, SelectionOption.WEIGHT);
         System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(3).getRoute(), invoiceContainer.get(3)));
         Assert.assertEquals(invoiceContainer.get(0).getRoute(), route2);
         Assert.assertEquals(invoiceContainer.get(3).getRoute(), route);

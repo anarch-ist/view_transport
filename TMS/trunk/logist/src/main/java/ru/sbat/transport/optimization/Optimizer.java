@@ -2,7 +2,6 @@ package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
-import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceType;
@@ -11,7 +10,7 @@ import java.text.ParseException;
 import java.util.*;
 
 public class Optimizer implements IOptimizer {
-    /** Selects for invoice appropriate routes
+    /** Selects for invoice appropriate routes without weight/volume/cost
      *
      * @param plannedSchedule
      * @param invoiceContainer
@@ -21,8 +20,8 @@ public class Optimizer implements IOptimizer {
     @Override
     public Map<Invoice, ArrayList<Route>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
         Map<Invoice, ArrayList<Route>> map = new HashMap<>();
-        RouteWeightAndVolume routeWeightAndVolume = new RouteWeightAndVolume();
-        Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
+//        RouteWeightAndVolume routeWeightAndVolume = new RouteWeightAndVolume();
+//        Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
         for (Invoice invoice : invoiceContainer) {
             if (invoice.getRoute() == null) {
 //                throw new IllegalArgumentException("invoice.getRoute() should be null");
@@ -37,19 +36,15 @@ public class Optimizer implements IOptimizer {
                         throw new RouteNotFoundException("route should not be null");
                     }
                     if (route.getDeparturePoint().equals(departurePoint)){
-                        for(RoutePoint routePoint: route){
-                            if(routePoint.getDeparturePoint().equals(deliveryPoint)){
-                                ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
-                                for (Date date : possibleDepartureDate) {
-                                    if (isFittingForDeliveryTime(route, invoice, date) && routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
-                                        possibleRouteForInvoice.add(route);
-                                        System.out.println(date + " день отправления");
-                                        System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
-                                    }
-                                }
-                            }
-                        }
-
+                        route.stream().filter(routePoint -> routePoint.getDeparturePoint().equals(deliveryPoint)).forEach(routePoint -> {
+                            ArrayList<Date> possibleDepartureDate = getPossibleDepartureDate(route, invoice);
+                            // && routeData.get(route).isFittingForRouteByWeight(invoice, routeData.get(route))
+                            possibleDepartureDate.stream().filter(date -> isFittingForDeliveryTime(route, invoice, date)).forEach(date -> {
+                                possibleRouteForInvoice.add(route);
+                                System.out.println(date + " день отправления");
+                                System.out.println(getPossibleArrivalDate(route, invoice, date) + " день прибытия");
+                            });
+                        });
                     }
                 }
                 System.out.println(" ");
@@ -135,31 +130,38 @@ public class Optimizer implements IOptimizer {
     public Date getPossibleArrivalDate(Route route, Invoice invoice, Date date){
         Calendar calendar = Calendar.getInstance();
         Date tmp = new Date(date.getTime());
-        for(RoutePoint routePoint: route){
-            if(invoice.getRequest().getDeliveryPoint().equals(routePoint.getDeparturePoint())){
-                tmp.setHours(route.getActualDeliveryTimeInRoutePoint(invoice.getRequest().getDeliveryPoint()).getHours());
-                tmp.setMinutes(route.getActualDeliveryTimeInRoutePoint(invoice.getRequest().getDeliveryPoint()).getMinutes());
-                calendar.setTime(tmp);
-                int countDays = route.getDaysCountOfRoute();
-                calendar.add(Calendar.DAY_OF_MONTH, countDays);
-            }
-        }
+        route.stream().filter(routePoint -> invoice.getRequest().getDeliveryPoint().equals(routePoint.getDeparturePoint())).forEach(routePoint -> {
+            tmp.setHours(route.getActualDeliveryTimeInRoutePoint(invoice.getRequest().getDeliveryPoint()).getHours());
+            tmp.setMinutes(route.getActualDeliveryTimeInRoutePoint(invoice.getRequest().getDeliveryPoint()).getMinutes());
+            calendar.setTime(tmp);
+            int countDays = route.getDaysCountOfRoute();
+            calendar.add(Calendar.DAY_OF_MONTH, countDays);
+        });
         Date actualDeliveryDate = new Date(calendar.getTimeInMillis());
         return actualDeliveryDate;
     }
 
-
+    /**
+     *
+     * @param plannedSchedule
+    //     * @param additionalSchedule
+     * @param invoiceContainer
+     * @param routesForInvoice
+     * @param selectionOption
+     * @throws ParseException
+     * @throws RouteNotFoundException
+     */
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice) throws ParseException, RouteNotFoundException {
+    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice, SelectionOption selectionOption) throws ParseException, RouteNotFoundException {
         Iterator<Map.Entry<Invoice, ArrayList<Route>>> iterator = routesForInvoice.entrySet().iterator();
         RouteWeightAndVolume routeWeightAndVolume = new RouteWeightAndVolume();
         while (iterator.hasNext()){
-            Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
+            Map<Route, RoutePair> routeData = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer, selectionOption);
             Map.Entry<Invoice, ArrayList<Route>> entry = iterator.next();
             ArrayList<Route> routes = entry.getValue();
             Invoice invoice = entry.getKey();
             for(Route route: routes) {
-                if(routeData.get(route).isFittingForRoute(invoice, routeData.get(route))) {
+                if(routeData.get(route).isFittingForRouteByWeight(invoice, routeData.get(route))) {
                     invoice.setRoute(route);
                     invoice.setRealDepartureDate(getPossibleDepartureDate(route, invoice).get(0));
                     invoice.setInvoiceType(InvoiceType.C);

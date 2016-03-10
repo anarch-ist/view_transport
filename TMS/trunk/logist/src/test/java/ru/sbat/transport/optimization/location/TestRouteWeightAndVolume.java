@@ -4,10 +4,7 @@ package ru.sbat.transport.optimization.location;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.sbat.transport.optimization.Invoice;
-import ru.sbat.transport.optimization.InvoiceContainer;
-import ru.sbat.transport.optimization.RoutePair;
-import ru.sbat.transport.optimization.RouteWeightAndVolume;
+import ru.sbat.transport.optimization.*;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.Map;
@@ -75,7 +72,7 @@ public class TestRouteWeightAndVolume {
 
     @Test
     public void testGetWeightAndVolumeForRoute(){
-        Map<Route, RoutePair> result = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
+        Map<Route, RoutePair> result = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer, SelectionOption.WEIGHT);
         Assert.assertEquals(5, result.size());
         RoutePair routePair = new RoutePair(8, 10);
         RoutePair routePair2 = new RoutePair(10, 15);
