@@ -10,7 +10,7 @@ import ru.sbat.transport.optimization.RoutePair;
 
 public class TestRoutePair {
     static Route route = new Route();
-    static RoutePoint routePoint = createRoutePoint(getCharacteristicsOfCar(10, 15));
+    static RoutePoint routePoint = createRoutePoint(getCharacteristicsOfCar(10, 16));
     static Route route2 = new Route();
     static RoutePoint routePoint2 = createRoutePoint(getCharacteristicsOfCar(10, 15));
     static Invoice invoice1 = createInvoice(9, 15);
@@ -46,7 +46,7 @@ public class TestRoutePair {
 
     @Test
     public void testGetAvailableWeightVolume(){
-        RoutePair routePair = new RoutePair(2, 5);
+        RoutePair routePair = new RoutePair(4, 12);
         RoutePair result = new RoutePair(route.getStartingWeight(), route.getStartingVolume());
         System.out.println(routePair.getWeight() + " " + routePair.getVolume() + " должно быть");
         result = result.getRestAvailableWeight(invoice2, result);
@@ -62,6 +62,7 @@ public class TestRoutePair {
     @Test
     public void testIsFittingForRoute(){
         RoutePair routePair = new RoutePair(route2.getStartingWeight(), route2.getStartingVolume());
-        Assert.assertFalse(routePair.isFittingForRouteByWeight(invoice1, routePair));
+        Assert.assertFalse(routePair.isFittingForRouteByVolume(invoice1, routePair));
+        Assert.assertTrue(routePair.isFittingForRouteByWeight(invoice1, routePair));
     }
 }

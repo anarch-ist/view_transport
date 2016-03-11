@@ -66,7 +66,7 @@ public class TestRouteWeightAndVolume {
         invoiceContainer.add(invoice4);
         invoice1.setRoute(route);
         invoice2.setRoute(route4);
-        invoice4.setRoute(route4);
+        invoice4.setRoute(route3);
         invoice3.setRoute(route4);
     }
 
@@ -74,10 +74,10 @@ public class TestRouteWeightAndVolume {
     public void testGetWeightAndVolumeForRoute(){
         Map<Route, RoutePair> result = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer, SelectionOption.WEIGHT);
         Assert.assertEquals(5, result.size());
-        RoutePair routePair = new RoutePair(8, 10);
+        RoutePair routePair = new RoutePair(8, 25);
         RoutePair routePair2 = new RoutePair(10, 15);
-        RoutePair routePair3 = new RoutePair(5, 10);
-        RoutePair routePair4 = new RoutePair(1, 2);
+        RoutePair routePair3 = new RoutePair(4, 10);
+        RoutePair routePair4 = new RoutePair(2, 13);
         System.out.println(route.getStartingWeight() + " " + route.getStartingVolume() + " были показ-ли машины");
         System.out.println(result.get(route).getWeight() + " " + result.get(route).getVolume() + " после привеса накладной стали");
         System.out.println(route.getStartingWeight() + " " + route.getStartingVolume() + " показ-ли машины не должны поменяться");
