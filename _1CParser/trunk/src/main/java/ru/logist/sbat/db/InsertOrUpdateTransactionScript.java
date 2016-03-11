@@ -168,14 +168,8 @@ public class InsertOrUpdateTransactionScript {
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  routeName = VALUES(routeName);"
         );
+        BidiMap<String, String> allRoutes = selectAllRoutes();
 
-        // get all routeNames and all routeID from dataBase
-        BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
-        while (resultSet.next()) {
-            allRoutes.put(resultSet.getString(1), resultSet.getString(2));
-        }
 
         for (DirectionsData updateRoute : updateRoutesArray) {
             String directionIDExternal = updateRoute.getDirectId();
@@ -201,6 +195,22 @@ public class InsertOrUpdateTransactionScript {
         int[] affectedRecords = preparedStatement.executeBatch();
         logger.info("INSERT OR UPDATE ON DUPLICATE INTO [routes] completed, affected records size = [{}]", affectedRecords.length);
         return preparedStatement;
+    }
+
+    /**
+     *
+     * @return All directionIDExternal and routeNames from dataBase as bidimap.
+     * @throws SQLException
+     */
+    private BidiMap<String, String> selectAllRoutes() throws SQLException {
+        //
+        BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
+        while (resultSet.next()) {
+            allRoutes.put(resultSet.getString(1), resultSet.getString(2));
+        }
+        return allRoutes;
     }
 
     private static final String userRoleId = "MARKET_AGENT";
@@ -462,6 +472,8 @@ public class InsertOrUpdateTransactionScript {
     private PreparedStatement[] batchRouteLists(List<RouteListsData> updateRouteLists) throws SQLException {
         logger.info("-----------------START update routeLists and invoices table from JSON object:[updateRouteLists]-----------------");
 
+        BidiMap<String, String> allRoutes = selectAllRoutes();
+
         // create routeLists
         PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
                 "INSERT INTO route_lists\n" +
@@ -488,22 +500,28 @@ public class InsertOrUpdateTransactionScript {
 
         );
 
+        PreparedStatement insertOrUpdateRoutesPreparedStatement = connection.prepareStatement(
+                "INSERT INTO routes (directionIDExternal, dataSourceID, routeName) VALUE (?,?,?) " +
+                        "ON DUPLICATE KEY UPDATE routeName = VALUES(routeName);"
+        );
+
         for (RouteListsData updateRouteList : updateRouteLists) {
+            //common values
             String routeListId = updateRouteList.getRouteListId();
-            String directId = updateRouteList.getDirectId();
-            boolean isDirectIdExists = !directId.equals("NULL");
-
-            Set<String> invoices = updateRouteList.getInvoices(); // list of invoices inside routeList
+            String routeListNumber = updateRouteList.getRouteListNumber();
+            Date creationDate = updateRouteList.getRouteListDate();
+            Date departureDate = updateRouteList.getDepartureDate();
+            String forwarderId = updateRouteList.getForwarderId();
+            String driverId = updateRouteList.getDriverId();
+            String status = updateRouteList.getStatus();
             String pointDepartureId = updateRouteList.getPointDepartureId(); // pointIDExternal
+            Set<String> invoices = updateRouteList.getInvoices(); // list of invoices inside routeList
 
-            if (isDirectIdExists) {
-                String routeListNumber = updateRouteList.getRouteListNumber();
-                java.sql.Date creationDate = updateRouteList.getRouteListDate();
-                java.sql.Date departureDate = updateRouteList.getDepartureDate();
-                String forwarderId = updateRouteList.getForwarderId();
-                String driverId = updateRouteList.getDriverId();
-                String pointArrivalId = updateRouteList.getPointArrivalId(); // TODO not used pointIDExternal
-                String status = updateRouteList.getStatus();
+
+
+            if (updateRouteList.isIntrasiteRoute()) {
+
+                String directId = updateRouteList.getDirectId();
 
                 routeListsInsertPreparedStatement.setString(1, routeListId);
                 routeListsInsertPreparedStatement.setString(2, LOGIST_1C);
@@ -511,14 +529,28 @@ public class InsertOrUpdateTransactionScript {
                 routeListsInsertPreparedStatement.setDate(4, creationDate);
                 routeListsInsertPreparedStatement.setDate(5, departureDate);
                 routeListsInsertPreparedStatement.setNull(6, Types.INTEGER); // palletsQty
-                routeListsInsertPreparedStatement.setString(7, forwarderId); // palletsQty
+                routeListsInsertPreparedStatement.setString(7, forwarderId);
                 routeListsInsertPreparedStatement.setString(8, driverId);
                 routeListsInsertPreparedStatement.setString(9, null); // driverPhoneNumber
                 routeListsInsertPreparedStatement.setString(10, null); // license plate
-                routeListsInsertPreparedStatement.setString(11, status); // license plate
+                routeListsInsertPreparedStatement.setString(11, status);
                 routeListsInsertPreparedStatement.setString(12, directId);
                 routeListsInsertPreparedStatement.setString(13, LOGIST_1C);
                 routeListsInsertPreparedStatement.addBatch();
+
+            } else if (updateRouteList.isTrunkRoute()) {
+                updateRouteList.getPointArrivalId();
+                updateRouteList.getGeneratedRouteId();
+                //TODO Доделать
+                // create routeName
+                // create route
+
+                insertOrUpdateRoutesPreparedStatement
+
+
+
+
+
             }
 
             for(Object invoiceIDExternalAsObject: invoices) {

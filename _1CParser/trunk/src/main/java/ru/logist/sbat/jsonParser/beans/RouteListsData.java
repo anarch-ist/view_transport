@@ -3,9 +3,9 @@ package ru.logist.sbat.jsonParser.beans;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.sql.Date;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +17,10 @@ public class RouteListsData {
     private static final Set<String> possibleStatuses = new HashSet<>(Arrays.asList(
             "CREATED", "APPROVED"
     ));
+    public static final String DELIMITER_FOR_GENERATED_ROUTE_ID = "MAG";
+
+    // внутриузловой или магистральный маршрут
+    public enum RouteScopeType{INTRASITE_ROUTE, TRUNK_ROUTE, ERROR}
 
     private String routeListId;
     private String routeListNumber;
@@ -42,6 +46,9 @@ public class RouteListsData {
         setPointArrivalId((String) updateRouteLists.get("pointArrivalId"));
         setDirectId((String) updateRouteLists.get("directId"));
         setInvoices((JSONArray) updateRouteLists.get("invoices"));
+
+        if (getRouteState().equals(RouteScopeType.ERROR))
+            throw new ValidatorException("Illegal route scope for routerSheetId = [" + getRouteListId() + "]");
     }
 
     public String getRouteListId() {
@@ -118,6 +125,8 @@ public class RouteListsData {
     }
 
     public String getPointArrivalId() {
+        if (isIntrasiteRoute())
+            throw new UnsupportedOperationException("this is intrasite route");
         return pointArrivalId;
     }
 
@@ -127,6 +136,8 @@ public class RouteListsData {
     }
 
     public String getDirectId() {
+        if (isTrunkRoute())
+            throw new UnsupportedOperationException("this is a trunk route");
         return directId;
     }
 
@@ -148,6 +159,44 @@ public class RouteListsData {
         });
     }
 
+    /**
+     *
+     * @return state of this object in terms of route scope. it can be intrasite route, trunk route or error.
+     */
+    private RouteScopeType getRouteState() {
+        if (getDirectId().equals(NULL) && !getPointArrivalId().isEmpty())
+            return RouteScopeType.TRUNK_ROUTE;
+        else if(!getDirectId().isEmpty() && getPointArrivalId().equals(NULL))
+            return RouteScopeType.INTRASITE_ROUTE;
+        else
+            return RouteScopeType.ERROR;
+    }
+
+    /**
+     * directId is NULL, pointArrivalId is not NULL
+     * If a route is the trunk route then it has no any direction, so method get directId has no sens.
+     * We must generate route for such case, with routeName like 52MAG607 where 52 is point departure id
+     * and 607 is point arrival id.
+     * @return true if route is trunk route, false in other case.
+     */
+    public boolean isTrunkRoute() {
+        return getRouteState().equals(RouteScopeType.TRUNK_ROUTE);
+    }
+
+    public String getGeneratedRouteId() {
+        if (!isTrunkRoute())
+            throw new UnsupportedOperationException("Generated route id is valuable only for trunk routes");
+        return getPointDepartureId() + DELIMITER_FOR_GENERATED_ROUTE_ID + getPointArrivalId();
+    }
+
+    /**
+     * directId is not NULL, pointArrivalId is NULL
+     * @return true if route is intrasite, false in other case.
+     */
+    public boolean isIntrasiteRoute() {
+        return getRouteState().equals(RouteScopeType.INTRASITE_ROUTE);
+    }
+
     @Override
     public String toString() {
         return "RouteListsData{" +
@@ -161,7 +210,8 @@ public class RouteListsData {
                 ", pointDepartureId='" + pointDepartureId + '\'' +
                 ", pointArrivalId='" + pointArrivalId + '\'' +
                 ", directId='" + directId + '\'' +
-                ", invoices=" + invoices +
+                ", invoices='" + invoices + '\'' +
+                ", routeState='" + getRouteState() + '\'' +
                 '}';
     }
 }
