@@ -160,13 +160,21 @@ public class Optimizer implements IOptimizer {
             Map.Entry<Invoice, ArrayList<Route>> entry = iterator.next();
             ArrayList<Route> routes = entry.getValue();
             Invoice invoice = entry.getKey();
+            // sort by car cost
+            // to do comparator for routes
+//            Collections.sort(routes, );
             for(Route route: routes) {
-                if(routeData.get(route).isFittingForRouteByWeight(invoice, routeData.get(route))) {
+                if(selectionOption.equals(selectionOption.WEIGHT) && routeData.get(route).isFittingForRouteByWeight(invoice, routeData.get(route))) {
                     invoice.setRoute(route);
+                    // maybe not first date!!!
                     invoice.setRealDepartureDate(getPossibleDepartureDate(route, invoice).get(0));
                     invoice.setInvoiceType(InvoiceType.C);
                     System.out.println("Date: " + invoice.getRealDepartureDate() + " for invoice: " + invoice.toString());
                     break;
+                }else if(selectionOption.equals(SelectionOption.VOLUME) && routeData.get(route).isFittingForRouteByVolume(invoice, routeData.get(route))){
+                    invoice.setRoute(route);
+                    invoice.setRealDepartureDate(getPossibleDepartureDate(route, invoice).get(0));
+                    invoice.setInvoiceType(InvoiceType.C);
                 }
             }if (invoice.getRoute() == null){
 
