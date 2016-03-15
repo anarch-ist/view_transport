@@ -18,10 +18,9 @@ public interface IOptimizer {
      * @param plannedSchedule
 //     * @param additionalSchedule
      * @param invoiceContainer
-     * @param selectionOption
      * @throws ParseException
      */
-    void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice, SelectionOption selectionOption) throws ParseException, RouteNotFoundException;
+    void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<Route>> routesForInvoice) throws ParseException, RouteNotFoundException;
 
     InvoiceType getInvoiceTypes(List<Invoice> unassignedInvoices);
 

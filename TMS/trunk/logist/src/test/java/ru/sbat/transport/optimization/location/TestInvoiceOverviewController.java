@@ -34,7 +34,7 @@ public class TestInvoiceOverviewController {
         result.setCountOfBoxes(countOfBoxes);
         result.setMarketAgent(marketAgent);
         result.setPriority(priority);
-        result.setRoute(route);
+//        result.setDeliveryRoute(route);
         result.setCreationDate(creationDate);
         result.setCost(cost);
         return result;
@@ -70,7 +70,7 @@ public class TestInvoiceOverviewController {
         CharacteristicsOfCar result = new CharacteristicsOfCar();
         result.setCapacityCar(capacityCar);
         result.setVolumeCar(volumeCar);
-        result.setCost(cost);
+        result.setCostOfCar(cost);
         return result;
     }
     //-------------END СЛУЖЕБНЫЕ МЕТОДЫ---------------------

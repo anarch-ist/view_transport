@@ -5,7 +5,8 @@ package ru.sbat.transport.optimization.location;
 public class CharacteristicsOfCar {
     private double capacityCar; //грузоподъемность в кг
     private double volumeCar; //объем машины
-    private double cost;
+    private double occupancyCost;
+    private double costOfCar;
 
     public CharacteristicsOfCar(double capacityCar, double volumeCar) {
         this.capacityCar = capacityCar;
@@ -15,10 +16,14 @@ public class CharacteristicsOfCar {
     public CharacteristicsOfCar(){
     }
 
-    public CharacteristicsOfCar(double capacityCar, double volumeCar, double cost) {
+    public CharacteristicsOfCar(double capacityCar, double volumeCar, double occupancyCost) {
         this.capacityCar = capacityCar;
         this.volumeCar = volumeCar;
-        this.cost = cost;
+        this.occupancyCost = occupancyCost;
+    }
+
+    public CharacteristicsOfCar(double costOfCar) {
+        this.costOfCar = costOfCar;
     }
 
     public double getCapacityCar() {
@@ -37,11 +42,19 @@ public class CharacteristicsOfCar {
         this.volumeCar = volumeCar;
     }
 
-    public double getCost() {
-        return cost;
+    public double getOccupancyCost() {
+        return occupancyCost;
     }
 
-    public void setCost(double cost) {
-        this.cost = cost;
+    public void setOccupancyCost(double occupancyCost) {
+        this.occupancyCost = occupancyCost;
+    }
+
+    public double getCostOfCar() {
+        return costOfCar;
+    }
+
+    public void setCostOfCar(double costOfCar) {
+        this.costOfCar = costOfCar;
     }
 }

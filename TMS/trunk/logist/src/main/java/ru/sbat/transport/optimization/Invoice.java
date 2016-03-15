@@ -2,6 +2,7 @@ package ru.sbat.transport.optimization;
 
 
 import javafx.beans.property.*;
+import ru.sbat.transport.optimization.location.DeliveryRoute;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.user.MarketAgent;
@@ -17,7 +18,7 @@ public class Invoice {
     private final IntegerProperty countOfBoxes = new SimpleIntegerProperty();//кол-во коробок
     private final ObjectProperty<MarketAgent> marketAgent = new SimpleObjectProperty<>();
     private final IntegerProperty priority = new SimpleIntegerProperty();
-    private final ObjectProperty<Route> route = new SimpleObjectProperty<>();
+    private final ObjectProperty<DeliveryRoute> deliveryRoute = new SimpleObjectProperty<>();
     private final ObjectProperty<Date> creationDate = new SimpleObjectProperty<>();
     private final DoubleProperty cost = new SimpleDoubleProperty();
     private final ObjectProperty<InvoiceType> invoiceType = new SimpleObjectProperty<>();
@@ -50,16 +51,16 @@ public class Invoice {
         return creationDate;
     }
 
-    public Route getRoute() {
-        return route.get();
+    public DeliveryRoute getDeliveryRoute() {
+        return deliveryRoute.get();
     }
 
-    public void setRoute(Route route) {
-        this.route.set(route);
+    public void setDeliveryRoute(DeliveryRoute deliveryRoute) {
+        this.deliveryRoute.set(deliveryRoute);
     }
 
-    public ObjectProperty<Route> routeProperty() {
-        return route;
+    public ObjectProperty<DeliveryRoute> deliveryRouteProperty() {
+        return deliveryRoute;
     }
 
     public int getPriority() {
@@ -190,7 +191,7 @@ public class Invoice {
                 ", countOfBoxes=" + countOfBoxes +
                 ", marketAgent=" + marketAgent +
                 ", priority=" + priority +
-                ", route=" + route +
+                ", route=" + deliveryRoute +
                 ", creationDate=" + creationDate +
                 ", cost=" + cost +
                 ", invoiceType=" + invoiceType +

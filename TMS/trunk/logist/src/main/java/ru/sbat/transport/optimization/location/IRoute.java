@@ -10,12 +10,12 @@ public interface IRoute {
     Integer getArrivalTime();
     Point getArrivalPoint();
     Point getDeparturePoint();
-    int getWeekDayOfActualDeliveryTimeInRoutePoint(Point point);
-    Date getActualDeliveryTimeInRoutePoint(Point point);
+    int getWeekDayOfActualDeliveryDateInRoutePoint(RoutePoint routePoint);
+    Date getActualDeliveryDateInRoutePoint(RoutePoint routePoint);
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
     int getDaysCountOfRoute();
-    double getStartingCost();
+    double getStartingOccupancyCost();
     double getStartingWeight();
     double getStartingVolume();
 }

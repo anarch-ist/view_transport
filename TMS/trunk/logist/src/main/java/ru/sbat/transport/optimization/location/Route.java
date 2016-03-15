@@ -79,11 +79,11 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
      * @return day of week of point
      */
     @Override
-    public int getWeekDayOfActualDeliveryTimeInRoutePoint(Point point) {
+    public int getWeekDayOfActualDeliveryDateInRoutePoint(RoutePoint routePoint) {
         int result = 0;
-        for(RoutePoint routePoint: this){
-            if(routePoint.getDeparturePoint().equals(point)){
-                result = routePoint.getDayOfWeek();
+        for(RoutePoint routePointFromRoute: this){
+            if(routePointFromRoute.equals(routePoint)){
+                result = routePointFromRoute.getDayOfWeek();
             }
         }
         return result;
@@ -94,12 +94,12 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
      * @return date with real hours and minutes of arrival in the point
      */
     @Override
-    public Date getActualDeliveryTimeInRoutePoint(Point point) {
+    public Date getActualDeliveryDateInRoutePoint(RoutePoint routePoint) {
         Date date = new Date();
-        for(RoutePoint routePoint: this) {
-            if (routePoint.getDeparturePoint().equals(point)) {
-                if (indexOf(routePoint) != 0) {
-                    int index = this.indexOf(routePoint);
+        for(RoutePoint routePointFromRoute: this) {
+            if (routePointFromRoute.equals(routePoint)) {
+                if (indexOf(routePointFromRoute) != 0) {
+                    int index = this.indexOf(routePointFromRoute);
                     int time = this.get(index - 1).getDepartureTime() + this.get(index - 1).getTimeToNextPoint() + this.get(index).getLoadingOperationsTime();
                     if (time >= 1440) {
                         time = (time - 1440);
@@ -107,8 +107,8 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
                     int[] hoursAndMinutes = splitToComponentTime(time);
                     date.setHours(hoursAndMinutes[0]);
                     date.setMinutes(hoursAndMinutes[1]);
-                }else if(indexOf(routePoint) == 0){
-                    int time = routePoint.getDepartureTime();
+                }else if(indexOf(routePointFromRoute) == 0){
+                    int time = routePointFromRoute.getDepartureTime();
                     if (time >= 1440) {
                         time = (time - 1440);
                     }
@@ -167,8 +167,8 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
     @Override
-    public double getStartingCost() {
-        return this.get(0).getCharacteristicsOfCar().getCost();
+    public double getStartingOccupancyCost() {
+        return this.get(0).getCharacteristicsOfCar().getOccupancyCost();
     }
 
     @Override

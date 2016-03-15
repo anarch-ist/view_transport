@@ -1,7 +1,6 @@
 package ru.sbat.transport.optimization;
 
 
-
 public class RoutePair {
     private double weight;
     private double volume;
@@ -28,33 +27,19 @@ public class RoutePair {
         this.volume = volume;
     }
 
-    public RoutePair getRestAvailableWeight(Invoice invoice, RoutePair routePair){
-        if(isFittingForRouteByWeight(invoice, routePair)){
+    public RoutePair getRestAvailableWeightAndVolume(Invoice invoice, RoutePair routePair){
+        if(isFittingForRouteByWeightAndVolume(invoice, routePair)){
+            routePair.setVolume(routePair.getVolume() - invoice.getVolume());
             routePair.setWeight(routePair.getWeight() - invoice.getWeight());
         }
         return routePair;
     }
 
-    public RoutePair getRestAvailableVolume(Invoice invoice, RoutePair routePair){
-        if(isFittingForRouteByVolume(invoice, routePair)){
-            routePair.setVolume(routePair.getVolume() - invoice.getVolume());
-        }
-        return routePair;
-    }
-
-    public boolean isFittingForRouteByWeight(Invoice invoice, RoutePair routePair){
-        boolean result = false;
-        double weightDifference = routePair.getWeight() - invoice.getWeight();
-        if(weightDifference >= 1){
-            result = true;
-        }
-        return result;
-    }
-
-    public boolean isFittingForRouteByVolume(Invoice invoice, RoutePair routePair){
+    public boolean isFittingForRouteByWeightAndVolume(Invoice invoice, RoutePair routePair){
         boolean result = false;
         double volumeDifference = routePair.getVolume() - invoice.getVolume();
-        if(volumeDifference >= 1){
+        double weightDifference = routePair.getWeight() - invoice.getWeight();
+        if(volumeDifference >= 0 && weightDifference >= 0){
             result = true;
         }
         return result;

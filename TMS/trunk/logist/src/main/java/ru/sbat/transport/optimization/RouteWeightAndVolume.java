@@ -12,22 +12,16 @@ public class RouteWeightAndVolume extends HashMap<Route, RoutePair> {
      *
      * @param plannedSchedule
      * @param invoiceContainer
-     * @param selectionOption
-     * @return
+     * @return pair of route and the rest of weight and volume
      */
-    public RouteWeightAndVolume getWeightAndVolumeForRoute(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, SelectionOption selectionOption) {
+    public RouteWeightAndVolume getWeightAndVolumeForRoute(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) {
         RouteWeightAndVolume result = new RouteWeightAndVolume();
         for (Route route : plannedSchedule) {
             RoutePair routePair = new RoutePair(route.getStartingWeight(), route.getStartingVolume());
             for (Invoice invoice : invoiceContainer) {
-                if (invoice.getRoute() != null) {
-                    if (invoice.getRoute().equals(route))
-                        if(selectionOption.equals(SelectionOption.WEIGHT)){
-                            routePair = routePair.getRestAvailableWeight(invoice, routePair);
-                        }else if(selectionOption.equals(SelectionOption.VOLUME)){
-                            routePair = routePair.getRestAvailableVolume(invoice, routePair);
-                        }
-//                        routePair = routePair.getRestAvailableWeightAndVolume(invoice, routePair);
+                if (invoice.getDeliveryRoute() != null) {
+                    if (invoice.getDeliveryRoute().equals(route))
+                        routePair = routePair.getRestAvailableWeightAndVolume(invoice, routePair);
                 }
             }
             result.put(route, routePair);

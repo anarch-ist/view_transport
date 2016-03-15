@@ -3,13 +3,14 @@ package ru.sbat.transport.optimization.location;
 
 
 public class RoutePoint {
-    private CharacteristicsOfCar characteristicsOfCar;
-    private Integer departureTime;
-    private int dayOfWeek;
-    private Integer timeToNextPoint;
-    private Double distanceToNextPoint ; // km
+
     private Point departurePoint;
     private Integer loadingOperationsTime;
+    private Integer timeToNextPoint;
+    private Integer departureTime;
+    private CharacteristicsOfCar characteristicsOfCar;
+    private int dayOfWeek;
+    private Double distanceToNextPoint ;// km
 
 
     public Integer getDepartureTime() {

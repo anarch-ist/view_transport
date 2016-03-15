@@ -86,8 +86,8 @@ public class TestOptimizerOptimize {
         Invoice invoice4 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 14, 0),   request4,  9, 11);
         Invoice invoice5 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 15, 0),   request5,   1, 2);
         Invoice invoice6 = createInvoice(warehousePoint2, createDate(2016, Calendar.JANUARY, 25, 15, 0),   request6,   1, 2);
-        invoice2.setRoute(route1);// накладная (10кг., 15м^3.), маршрут (11кг., 16м^3.) - заполнен
-        invoice3.setRoute(route2);// накладная (2кг., 3м^3.), маршрут (10кг., 15м^3.) - можно догрузить
+        invoice2.setDeliveryRoute(route1);// накладная (10кг., 15м^3.), маршрут (11кг., 16м^3.) - заполнен
+        invoice3.setDeliveryRoute(route2);// накладная (2кг., 3м^3.), маршрут (10кг., 15м^3.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
 //        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " дата плановой доставки");
 //        System.out.println("");
@@ -153,12 +153,12 @@ public class TestOptimizerOptimize {
     public void testOptimize() throws ParseException, RouteNotFoundException {
         Optimizer optimizer = new Optimizer();
         routesForInvoice = optimizer.filtrate(plannedSchedule, invoiceContainer);
-        optimizer.optimize(plannedSchedule, invoiceContainer, routesForInvoice, SelectionOption.WEIGHT);
-        System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(3).getRoute(), invoiceContainer.get(3)));
-        Assert.assertEquals(invoiceContainer.get(0).getRoute(), route2);
-        Assert.assertEquals(invoiceContainer.get(3).getRoute(), route);
-        Assert.assertNotEquals(invoiceContainer.get(3).getRoute(), route3);
-        Assert.assertNotEquals(invoiceContainer.get(3).getRoute(), route4);
-        Assert.assertEquals(invoiceContainer.get(4).getRoute(), route);
+        optimizer.optimize(plannedSchedule, invoiceContainer, routesForInvoice);
+        System.out.println(optimizer.getPossibleDepartureDate(invoiceContainer.get(3).getDeliveryRoute().get(0), invoiceContainer.get(3)));
+        Assert.assertEquals(invoiceContainer.get(0).getDeliveryRoute(), route2);
+        Assert.assertEquals(invoiceContainer.get(3).getDeliveryRoute(), route);
+        Assert.assertNotEquals(invoiceContainer.get(3).getDeliveryRoute(), route3);
+        Assert.assertNotEquals(invoiceContainer.get(3).getDeliveryRoute(), route4);
+        Assert.assertEquals(invoiceContainer.get(4).getDeliveryRoute(), route);
     }
 }

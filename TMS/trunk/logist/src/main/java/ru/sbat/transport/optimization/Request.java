@@ -1,10 +1,7 @@
 package ru.sbat.transport.optimization;
 
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import ru.sbat.transport.optimization.location.Point;
 
 import java.util.Date;
@@ -13,6 +10,7 @@ public class Request {
     private final IntegerProperty requestId = new SimpleIntegerProperty();
     private final IntegerProperty clientId = new SimpleIntegerProperty();
     private final ObjectProperty<Point> deliveryPoint = new SimpleObjectProperty<>();
+    private final StringProperty deliveryAddress = new SimpleStringProperty();
     private final ObjectProperty<Date> plannedDeliveryTime = new SimpleObjectProperty<>();
     private final IntegerProperty dayOfWeek = new SimpleIntegerProperty();
 
@@ -75,5 +73,17 @@ public class Request {
 
     public ObjectProperty<Date> getPlannedDeliveryTimeProperty(){
         return plannedDeliveryTime;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress.get();
+    }
+
+    public StringProperty deliveryAddressProperty() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress.set(deliveryAddress);
     }
 }
