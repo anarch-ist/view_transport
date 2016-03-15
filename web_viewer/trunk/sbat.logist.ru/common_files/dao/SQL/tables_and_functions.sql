@@ -106,7 +106,7 @@ CREATE TABLE users (
   email       VARCHAR(255) NULL,
   position    VARCHAR(64)  NULL, -- должность
   salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
-  passAndSalt VARCHAR(64)  NOT NULL DEFAULT 'cnorebutbvoertvb3040384342u4hf',
+  passAndSalt VARCHAR(64)  NOT NULL DEFAULT '5a81a14e9b075499b73f222392a72737', -- соответсвует паролю "12345"
   userRoleID  VARCHAR(32)  NOT NULL,
   pointID     INTEGER      NULL, -- у пользователя не обязан быть пункт.
   PRIMARY KEY (userID),
@@ -871,6 +871,14 @@ CREATE FUNCTION getRouteIDByDirectionIDExternal(_directionIDExternal VARCHAR(64)
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT routes.routeID FROM routes WHERE routes.directionIDExternal = _directionIDExternal AND routes.dataSourceID = _dataSourceID);
+
+    IF (result IS NULL ) THEN
+      BEGIN
+        set @message_text = concat('LOGIST ERROR: getRouteIDByDirectionIDExternal is NULL for directionIdExternal = ', _directionIDExternal);
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
+      END ;
+
+      END IF ;
     RETURN result;
   END;
 
