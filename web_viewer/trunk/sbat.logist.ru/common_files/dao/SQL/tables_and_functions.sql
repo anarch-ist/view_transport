@@ -138,7 +138,7 @@ VALUES
   ('updateRoute'),
   ('deleteRoute'),
   ('selectRoute'),
-  ('updateInvoiceStatus'),
+  ('updateRequestStatus'),
   ('updateRouteListStatus'),
   ('selectOwnHistory');
 
@@ -174,7 +174,7 @@ INSERT INTO permissions_for_roles (userRoleID, permissionID)
 -- TODO add permissions to 'WAREHOUSE_MANAGER'
 -- TODO add permissions to 'MANAGER'
 -- TODO add permissions to 'TEMP_REMOVED'
-CALL insert_permission_for_role('CLIENT_MANAGER', 'updateInvoiceStatus');
+CALL insert_permission_for_role('CLIENT_MANAGER', 'updateRequestStatus');
 CALL insert_permission_for_role('CLIENT_MANAGER', 'selectDataProcedure');
 
 INSERT INTO points (pointIDExternal, dataSourceID, pointName, region, timeZone, docs, comments, openTime, closeTime,
@@ -188,7 +188,7 @@ INSERT INTO users
 
 
 -- -------------------------------------------------------------------------------------------------------------------
---                                                 CLIENTS AND REQUESTS
+--                                                 CLIENTS
 -- -------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE clients (
@@ -210,51 +210,6 @@ CREATE TABLE clients (
   FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
   UNIQUE(clientIDExternal, dataSourceID)
 );
-
--- insert only manager users
-CREATE TABLE requests (
-  requestID          INTEGER AUTO_INCREMENT,
-  requestIDExternal  VARCHAR(128) NOT NULL,
-  dataSourceID       VARCHAR(32)  NOT NULL,
-  requestNumber      VARCHAR(16)  NOT NULL,
-  creationDate       DATETIME     NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
-  marketAgentUserID  INTEGER      NOT NULL,
-  clientID           INTEGER      NOT NULL,
-  destinationPointID INTEGER      NULL, -- адрес, куда должны быть доставлены все товары
-  PRIMARY KEY (requestID),
-  FOREIGN KEY (marketAgentUserID) REFERENCES users (userID)
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE,
-  FOREIGN KEY (clientID) REFERENCES clients (clientID)
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE,
-  FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE,
-  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
-  UNIQUE(requestIDExternal, dataSourceID)
-);
-
-CREATE FUNCTION is_market_agent(_userID INTEGER)
-  RETURNS BOOLEAN
-  BEGIN
-    DECLARE userRole VARCHAR(32);
-    SET userRole = (SELECT userRoleID
-                    FROM users
-                    WHERE userID = _userID);
-    RETURN (userRole = 'MARKET_AGENT');
-  END;
-
-CREATE TRIGGER before_request_insert
-BEFORE INSERT ON requests FOR EACH ROW
-  BEGIN
-    IF NOT (is_market_agent(NEW.marketAgentUserID))
-    THEN
-      SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only MARKET_AGENT users allowed';
-    END IF;
-  END;
-
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                          ROUTE AND ROUTE LISTS
@@ -531,18 +486,18 @@ CREATE TABLE route_list_history (
 
 
 -- -------------------------------------------------------------------------------------------------------------------
---                                                INVOICES
+--                                                REQUESTS
 -- -------------------------------------------------------------------------------------------------------------------
 
 
-CREATE TABLE invoice_statuses (
-  invoiceStatusID      VARCHAR(32),
-  invoiceStatusRusName VARCHAR(128),
+CREATE TABLE request_statuses (
+  requestStatusID      VARCHAR(32),
+  requestStatusRusName VARCHAR(128),
   sequence             TINYINT,
-  PRIMARY KEY (invoiceStatusID)
+  PRIMARY KEY (requestStatusID)
 );
 
-INSERT INTO invoice_statuses
+INSERT INTO request_statuses
 VALUES
   -- duty statuses
   ('CREATED', 'Внутренняя заявка добавлена в БД', 0),
@@ -569,15 +524,15 @@ VALUES
   ('ERROR', 'Ошибка. Возвращение в пункт', -4),
   ('DELIVERED', 'Доставлено', 16);
 
-CREATE TABLE invoice_statuses_for_user_role (
+CREATE TABLE request_statuses_for_user_role (
   userRoleID      VARCHAR(32),
-  invoiceStatusID VARCHAR(32),
-  PRIMARY KEY (userRoleID, invoiceStatusID),
+  requestStatusID VARCHAR(32),
+  PRIMARY KEY (userRoleID, requestStatusID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID),
-  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
+  FOREIGN KEY (requestStatusID) REFERENCES request_statuses (requestStatusID)
 );
 
-INSERT INTO invoice_statuses_for_user_role
+INSERT INTO request_statuses_for_user_role
 VALUES
   ('ADMIN', 'APPROVING'),
   ('ADMIN', 'RESERVED'),
@@ -596,45 +551,62 @@ VALUES
   ('MARKET_AGENT', 'DELIVERED'),
   ('CLIENT_MANAGER', 'ERROR');
 
--- invoice объеденяет в себе внутреннюю заявку и накладную,
--- при создании invoice мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
--- ВНИМАНИЕ! при изменении порядка полей их также нужно менять в триггерах и в таблице invoice_history!!!
-CREATE TABLE invoices (
-  invoiceID               INTEGER AUTO_INCREMENT,
-  invoiceIDExternal       VARCHAR(255)   NOT NULL,
+
+-- request объеденяет в себе внутреннюю заявку и накладную,
+-- при создании request мы сразу делаем ссылку на пункт типа склад. участки склада не участвуют в нашей модели.
+-- ВНИМАНИЕ! при изменении порядка полей их также нужно менять в триггерах и в таблице requests_history!!!
+CREATE TABLE requests (
+
+  -- JSON fields
+  requestID               INTEGER AUTO_INCREMENT,
+  requestIDExternal       VARCHAR(255)   NOT NULL,
   dataSourceID            VARCHAR(32)    NOT NULL,
+  requestNumber           VARCHAR(16)    NOT NULL,
+  requestDate             DATETIME       NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
+  clientID                INTEGER        NOT NULL,
+  destinationPointID      INTEGER        NULL,     -- пункт доставки (addressId)
+  marketAgentUserID       INTEGER        NOT NULL, -- traderId
+  invoiceNumber           VARCHAR(255)   NOT NULL,
+  invoiceDate             DATETIME       NULL,
   documentNumber          VARCHAR(255)   NOT NULL,
   documentDate            DATETIME       NULL,
   firma                   VARCHAR(255)   NULL,
+  storage                 VARCHAR(255)   NULL,     -- наименование склада на котором собиралась накладная
   contactName             VARCHAR(255)   NULL,
   contactPhone            VARCHAR(255)   NULL,
-  creationDate            DATETIME       NULL,
+  deliveryOption          VARCHAR(255)   NULL,     -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   deliveryDate            DATETIME       NULL,
   boxQty                  INTEGER        NULL,
+
+  -- logist fields
   weight                  INTEGER        NULL, -- масса в граммах
   volume                  INTEGER        NULL, -- в кубических сантиметрах
   goodsCost               DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
-  storage                 VARCHAR(255)   NULL, -- наименование склада на котором собиралась накладная
-  deliveryOption          VARCHAR(255)   NULL, -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   lastStatusUpdated       DATETIME       NULL, -- date and time when status was updated by any user
   -- TODO это поле нужно перенести в users, саму таблицу users разбить на три таблицы из-за пункта.
   lastModifiedBy          INTEGER        NULL, -- один из пользователей - это parser.
-  invoiceStatusID         VARCHAR(32)    NOT NULL,
+  requestStatusID         VARCHAR(32)    NOT NULL,
   commentForStatus        TEXT           NULL,
-  requestID               INTEGER        NOT NULL,
   warehousePointID        INTEGER        NULL,
   routeListID             INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedRoutePointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
-  PRIMARY KEY (invoiceID),
+
+  PRIMARY KEY (requestID),
   FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
+  FOREIGN KEY (marketAgentUserID) REFERENCES users (userID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  FOREIGN KEY (clientID) REFERENCES clients (clientID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
   FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
-  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
+  FOREIGN KEY (requestStatusID) REFERENCES request_statuses (requestStatusID)
     ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  FOREIGN KEY (requestID) REFERENCES requests (requestID)
-    ON DELETE CASCADE
     ON UPDATE RESTRICT,
   FOREIGN KEY (warehousePointID) REFERENCES points (pointID)
     ON DELETE RESTRICT
@@ -645,59 +617,72 @@ CREATE TABLE invoices (
   FOREIGN KEY (lastVisitedRoutePointID) REFERENCES route_points (routePointID)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  UNIQUE (invoiceIDExternal, dataSourceID)
+  UNIQUE (requestIDExternal, dataSourceID)
 );
 
-CREATE TRIGGER check_for_warehousePoint
-BEFORE INSERT ON invoices FOR EACH ROW
+CREATE TRIGGER check_for_market_agents_and_warehouse_point BEFORE INSERT ON requests
+FOR EACH ROW
   BEGIN
-    SET @pointType = (SELECT pointTypeID
-                     FROM points
-                     WHERE pointID = NEW.warehousePointID);
 
+    DECLARE userRole VARCHAR(32);
+    SET userRole = (SELECT userRoleID
+                    FROM users
+                    WHERE userID = NEW.marketAgentUserID);
+    IF (userRole <> 'MARKET_AGENT')
+    THEN
+      SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only MARKET_AGENT users allowed';
+    END IF;
+
+    SET @pointType = (SELECT pointTypeID
+                      FROM points
+                      WHERE pointID = NEW.warehousePointID);
     IF (@pointType IS NOT NULL)
     THEN
       BEGIN
-        IF (@pointType <> 'WAREHOUSE') THEN
-          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only warehouse points allowed';
+        IF (@pointType <> 'WAREHOUSE')
+        THEN
+          SIGNAL SQLSTATE '45000'
+          SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only warehouse points allowed';
         END IF;
       END;
     END IF;
+
   END;
 
-CREATE TRIGGER after_invoice_insert AFTER INSERT ON invoices
+CREATE TRIGGER after_request_insert AFTER INSERT ON requests
 FOR EACH ROW
-  INSERT INTO invoice_history
+  INSERT INTO requests_history
     VALUE
-    (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
-     NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
-     NEW.volume, NEW.goodsCost, NEW.storage, NEW.deliveryOption, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-     'CREATED', NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
+    (NULL, NOW(), NEW.requestID, NEW.requestIDExternal, NEW.dataSourceID, NEW.requestNumber, NEW.requestDate,
+     NEW.clientID, NEW.destinationPointID, NEW.marketAgentUserID, NEW.invoiceNumber, NEW.invoiceDate, NEW.documentNumber, NEW.documentDate,
+     NEW.firma, NEW.storage, NEW.contactName, NEW.contactPhone, NEW.deliveryOption, NEW.deliveryDate, NEW.boxQty, NEW.weight, NEW.volume, NEW.goodsCost,
+     NEW.lastStatusUpdated, NEW.lastModifiedBy, 'CREATED', NEW.commentForStatus, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
 
-CREATE TRIGGER after_invoice_update AFTER UPDATE ON invoices
+CREATE TRIGGER after_request_update AFTER UPDATE ON requests
 FOR EACH ROW
-  INSERT INTO invoice_history
+  INSERT INTO requests_history
     VALUE
-    (NULL, NOW(), NEW.invoiceID, NEW.invoiceIDExternal, NEW.dataSourceID, NEW.documentNumber, NEW.documentDate,
-     NEW.firma, NEW.contactName, NEW.contactPhone, NEW.creationDate, NEW.deliveryDate, NEW.boxQty, NEW.weight,
-     NEW.volume, NEW.goodsCost, NEW.storage, NEW.deliveryOption, NEW.lastStatusUpdated, NEW.lastModifiedBy,
-     NEW.invoiceStatusID, NEW.commentForStatus, NEW.requestID, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
+    (NULL, NOW(), NEW.requestID, NEW.requestIDExternal, NEW.dataSourceID, NEW.requestNumber, NEW.requestDate,
+     NEW.clientID, NEW.destinationPointID, NEW.marketAgentUserID, NEW.invoiceNumber, NEW.invoiceDate, NEW.documentNumber, NEW.documentDate,
+     NEW.firma, NEW.storage, NEW.contactName, NEW.contactPhone, NEW.deliveryOption, NEW.deliveryDate, NEW.boxQty, NEW.weight, NEW.volume, NEW.goodsCost,
+     NEW.lastStatusUpdated, NEW.lastModifiedBy, NEW.requestStatusID, NEW.commentForStatus, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
 
-CREATE TRIGGER after_invoice_delete AFTER DELETE ON invoices
+CREATE TRIGGER after_request_delete AFTER DELETE ON requests
 FOR EACH ROW
-  INSERT INTO invoice_history
+  INSERT INTO requests_history
     VALUE
-    (NULL, NOW(), OLD.invoiceID, OLD.invoiceIDExternal, OLD.dataSourceID, OLD.documentNumber, OLD.documentDate,
-     OLD.firma, OLD.contactName, OLD.contactPhone, OLD.creationDate, OLD.deliveryDate, OLD.boxQty, OLD.weight,
-     OLD.volume, OLD.goodsCost, OLD.storage, OLD.deliveryOption, OLD.lastStatusUpdated, OLD.lastModifiedBy,
-     'CREATED', OLD.commentForStatus, OLD.requestID, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedRoutePointID);
+    (NULL, NOW(), OLD.requestID, OLD.requestIDExternal, OLD.dataSourceID, OLD.requestNumber, OLD.requestDate,
+     OLD.clientID, OLD.destinationPointID, OLD.marketAgentUserID, OLD.invoiceNumber, OLD.invoiceDate, OLD.documentNumber, OLD.documentDate,
+     OLD.firma, OLD.storage, OLD.contactName, OLD.contactPhone, OLD.deliveryOption, OLD.deliveryDate, OLD.boxQty, OLD.weight, OLD.volume, OLD.goodsCost,
+     OLD.lastStatusUpdated, OLD.lastModifiedBy, 'DELETED', OLD.commentForStatus, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedRoutePointID);
 
-CREATE TRIGGER before_invoice_update BEFORE UPDATE ON invoices
+CREATE TRIGGER before_request_update BEFORE UPDATE ON requests
 FOR EACH ROW
-    -- берем пользователя, который изменил статус на один из invoice statuses, затем находим его пункт маршрута, и этот
-    -- пункт записываем в таблицу invoices в поле lastVisitedRoutePointID
+    -- берем пользователя, который изменил статус на один из request statuses, затем находим его пункт маршрута, и этот
+    -- пункт записываем в таблицу requests в поле lastVisitedRoutePointID
 #     IF (NEW.routeListID IS NULL) THEN
-#       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: routeList in invoices must not be null';
+#       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: routeList in requests must not be null';
 #     END IF;
     -- находим маршрут по которому едет накладная.
     IF (NEW.routeListID IS NOT NULL) THEN
@@ -707,15 +692,14 @@ FOR EACH ROW
         -- находим пункт пользователя, который изменил статус накладной.
         -- SET @pointID = (SELECT pointID FROM users WHERE users.userID = NEW.lastModifiedBy);
 
-        -- TODO проставить всю эту логику вместе с Юлей, учесть зависимость от пользователя от пункта пользователя и от статуса накладной
         -- при появлении маршрутного листа сразу выставляем последний посещенный пункт, как первый пункт маршрута
         IF (NEW.lastVisitedRoutePointID IS NULL) THEN
           -- установка самого первого пункта маршрута
           SET NEW.lastVisitedRoutePointID = (SELECT routePointID
                                              FROM route_points
                                              WHERE (routeID = @routeID) ORDER BY sortOrder LIMIT 1);
-        -- если была установка статуса в ARRIVED, то послдний посещенный пункт меняется на следующий
-        ELSEIF (NEW.invoiceStatusID = 'ARRIVED' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
+        -- если была установка статуса в ARRIVED, то последний посещенный пункт меняется на следующий
+        ELSEIF (NEW.requestStatusID = 'ARRIVED' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
           BEGIN
             -- получаем порядковый номер последнего routePoint
             SET @lastRoutePointSortOrder = (SELECT sortOrder FROM route_points WHERE route_points.routePointID = OLD.lastVisitedRoutePointID);
@@ -724,7 +708,7 @@ FOR EACH ROW
                                                FROM route_points
                                                WHERE (routeID = @routeID AND sortOrder > @lastRoutePointSortOrder) ORDER BY sortOrder LIMIT 1);
           END;
-        ELSEIF (NEW.invoiceStatusID = 'ERROR' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
+        ELSEIF (NEW.requestStatusID = 'ERROR' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
           BEGIN
             -- получаем порядковый номер последнего routePoint
             SET @lastRoutePointSortOrder = (SELECT sortOrder FROM route_points WHERE route_points.routePointID = OLD.lastVisitedRoutePointID);
@@ -733,7 +717,7 @@ FOR EACH ROW
                                                FROM route_points
                                                WHERE (routeID = @routeID AND sortOrder < @lastRoutePointSortOrder) ORDER BY sortOrder LIMIT 1);
           END;
-        ELSEIF (NEW.invoiceStatusID = 'DELIVERED' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
+        ELSEIF (NEW.requestStatusID = 'DELIVERED' AND NEW.lastVisitedRoutePointID IS NOT NULL) THEN
           -- установка самого последнего пункта маршрута
           SET NEW.lastVisitedRoutePointID = (SELECT routePointID
                                              FROM route_points
@@ -745,35 +729,45 @@ FOR EACH ROW
     END IF;
 
 
-CREATE TABLE invoice_history (
-  invoiceHistoryID        BIGINT AUTO_INCREMENT,
+CREATE TABLE requests_history (
+  requstHistoryID        BIGINT AUTO_INCREMENT,
   autoTimeMark            DATETIME       NOT NULL,
-  invoiceID               INTEGER        NOT NULL,
-  invoiceIDExternal       VARCHAR(255)   NOT NULL,
+
+  -- JSON fields
+  requestID               INTEGER,
+  requestIDExternal       VARCHAR(255)   NOT NULL,
   dataSourceID            VARCHAR(32)    NOT NULL,
+  requestNumber           VARCHAR(16)    NOT NULL,
+  requestDate             DATETIME       NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
+  clientID                INTEGER        NOT NULL,
+  destinationPointID      INTEGER        NULL,     -- пункт доставки (addressId)
+  marketAgentUserID       INTEGER        NOT NULL, -- traderId
+  invoiceNumber           VARCHAR(255)   NOT NULL,
+  invoiceDate             DATETIME       NULL,
   documentNumber          VARCHAR(255)   NOT NULL,
   documentDate            DATETIME       NULL,
   firma                   VARCHAR(255)   NULL,
+  storage                 VARCHAR(255)   NULL,     -- наименование склада на котором собиралась накладная
   contactName             VARCHAR(255)   NULL,
   contactPhone            VARCHAR(255)   NULL,
-  creationDate            DATETIME       NULL,
+  deliveryOption          VARCHAR(255)   NULL,     -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   deliveryDate            DATETIME       NULL,
   boxQty                  INTEGER        NULL,
+
+  -- logist fields
   weight                  INTEGER        NULL, -- масса в граммах
   volume                  INTEGER        NULL, -- в кубических сантиметрах
   goodsCost               DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
-  storage                 VARCHAR(255)   NULL, -- наименование склада на котором собиралась накладная
-  deliveryOption          VARCHAR(255)   NULL, -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   lastStatusUpdated       DATETIME       NULL, -- date and time when status was updated by any user
   lastModifiedBy          INTEGER        NULL, -- один из пользователей - это parser.
-  invoiceStatusID         VARCHAR(32)    NOT NULL,
+  requestStatusID         VARCHAR(32)    NOT NULL,
   commentForStatus        TEXT           NULL,
-  requestID               INTEGER        NOT NULL,
   warehousePointID        INTEGER        NULL,
   routeListID             INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedRoutePointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
-  PRIMARY KEY (invoiceHistoryID),
-  FOREIGN KEY (invoiceStatusID) REFERENCES invoice_statuses (invoiceStatusID)
+
+  PRIMARY KEY (requstHistoryID),
+  FOREIGN KEY (requestStatusID) REFERENCES request_statuses (requestStatusID)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
@@ -796,10 +790,6 @@ CREATE TABLE exchange (
   PRIMARY KEY (packageNumber, serverName, dataSource)
 );
 -- Rows are compressed as they are inserted, https://dev.mysql.com/doc/refman/5.5/en/archive-storage-engine.html
-
--- CREATE TABLE exchangeHistory (
---
--- )
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                   GETTERS
@@ -965,23 +955,19 @@ CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
   END;
 
 -- get DATE and TIME when route should be finished
-CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _invoiceID INTEGER)
+CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
   RETURNS TIMESTAMP
   BEGIN
     DECLARE $routeStartDate TIMESTAMP;
     DECLARE $arrivalDateTime TIMESTAMP;
 
     SET $routeStartDate = (SELECT lastStatusUpdated
-                           FROM invoice_history
-                           WHERE _invoiceID = invoiceID AND invoiceStatusID = 'DEPARTURE');
+                           FROM requests_history
+                           WHERE _requestID = requestID AND requestStatusID = 'DEPARTURE');
     -- отсчитывать от времени отправления или от времени начала маршрута?
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;
-
-
--- arrivalTime is a delivery time + date when invoice has
-
 
 
 -- startEntry - number of record to start from(0 is first record)
@@ -1077,63 +1063,69 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
     END IF;
   END;
 
-
+-- TODO next route point not working
 CREATE VIEW transmaster_transport_db.big_select AS
   SELECT
+    requests.requestIDExternal,
     requests.requestNumber,
+    requests.requestDate,
+    requests.invoiceNumber,
+    requests.invoiceDate,
+    requests.documentNumber,
+    requests.documentDate,
+    requests.firma,
+    requests.storage,
+    requests.clientID,
+    requests.commentForStatus,
+    requests.requestStatusID,
+    requests.boxQty,
     requests.marketAgentUserID, -- служебное поле
-    'no data'                                              AS insiderRequestNumber,
-    invoices.invoiceIDExternal                             AS invoiceNumber,
+    request_statuses.requestStatusRusName,
     clients.INN,
-    delivery_points.pointName                              AS `deliveryPoint`,
-    w_points.pointName                                     AS `warehousePoint`,
-    w_points.pointID                                       AS `warehousePointID`, -- служебное поле
+    clients.clientName,
     users.userName,
-    invoices.invoiceStatusID,
-    invoice_statuses.invoiceStatusRusName,
-    invoices.boxQty,
-
-    route_lists.driverId                                   AS driver,
+    delivery_points.pointName                              AS deliveryPointName,
+    w_points.pointName                                     AS warehousePointName,
+    w_points.pointID                                       AS warehousePointID, -- служебное поле
+    last_visited_points.pointName                          AS currentPointName,
+    next_route_points.pointName                            AS nextPointName,
+    routes.routeID, -- служебное поле
+    routes.routeName,
+    route_lists.driverId,
     route_lists.licensePlate,
     route_lists.palletsQty,
     route_lists.routeListNumber,
     route_lists.routeListID,
-    routes.routeName                                       AS directionName,
-    routes.routeID, -- служебное поле
-
-    last_visited_points.pointName                          AS `currentPoint`,
-    next_route_points.pointName                            AS `nextPoint`,
-    getArrivalDateTime(routes.routeID, invoices.invoiceID) AS `arrivalTime`
+    NULL AS arrivalTime -- TODO FIX IT
 
   FROM requests
-    LEFT JOIN (invoices, clients, points AS delivery_points, points AS w_points, users)
+    INNER JOIN (request_statuses, clients, users)
       ON (
-      invoices.requestID = requests.requestID AND
-      invoices.warehousePointID = w_points.pointID AND
+      requests.requestStatusID = request_statuses.requestStatusID AND
       requests.clientID = clients.clientID AND
-      requests.destinationPointID = delivery_points.pointID AND
       requests.marketAgentUserID = users.userID
       )
-    LEFT JOIN (invoice_statuses)
+    LEFT JOIN (points AS delivery_points, points AS w_points)
       ON (
-      invoices.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
+      requests.warehousePointID = w_points.pointID AND
+      requests.destinationPointID = delivery_points.pointID
       )
     -- because routeList in invoices table can be null, we use left join.
     LEFT JOIN (route_lists, routes)
       ON (
-      invoices.routeListID = route_lists.routeListID AND
+      requests.routeListID = route_lists.routeListID AND
       route_lists.routeID = routes.routeID
       )
     LEFT JOIN (route_points AS rp1, points AS last_visited_points)
       ON (
-      rp1.routePointID = invoices.lastVisitedRoutePointID AND
+      rp1.routePointID = requests.lastVisitedRoutePointID AND
       last_visited_points.pointID = rp1.pointID
       )
     LEFT JOIN (route_points AS rp2, points AS next_route_points)
       ON (
       route_lists.routeID = routes.routeID AND
       routes.routeID = rp2.routeID AND
-      rp2.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedRoutePointID) AND
+      rp2.routePointID = getNextRoutePointID(routes.routeID, requests.lastVisitedRoutePointID) AND
       next_route_points.pointID = rp2.pointID
       );
 
@@ -1151,24 +1143,33 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @columnsPart =
     '
     SELECT SQL_CALC_FOUND_ROWS
+      requestIDExternal,
       requestNumber,
-      insiderRequestNumber,
+      requestDate,
       invoiceNumber,
-      INN,
-      deliveryPoint,
-      warehousePoint,
-      userName,
-      invoiceStatusID,
-      invoiceStatusRusName,
+      invoiceDate,
+      documentNumber,
+      documentDate,
+      firma,
+      storage,
+      clientID,
+      commentForStatus,
+      requestStatusID,
       boxQty,
-      driver,
+      requestStatusRusName,
+      INN,
+      clientName,
+      userName,
+      deliveryPointName,
+      warehousePointName,
+      currentPointName,
+      nextPointName,
+      routeName,
+      driverId,
       licensePlate,
       palletsQty,
       routeListNumber,
       routeListID,
-      directionName,
-      currentPoint,
-      nextPoint,
       arrivalTime
     FROM big_select
     ';
@@ -1269,23 +1270,23 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
 
   END;
 
-CREATE PROCEDURE `selectInvoiceStatusHistory`(_invoiceNumber VARCHAR(16))
+CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(16))
   BEGIN
     SELECT
       pointName,
       userName,
-      invoiceStatusRusName,
-      invoice_history.lastStatusUpdated,
+      requestStatusRusName,
+      requests_history.lastStatusUpdated,
       routeListNumber,
       palletsQty,
-      invoice_history.boxQty
-    FROM invoice_history
-      INNER JOIN (route_lists, users, points, invoice_statuses)
+      requests_history.boxQty
+    FROM requests_history
+      INNER JOIN (route_lists, users, points, request_statuses)
         ON (
-        invoice_history.invoiceIDExternal = _invoiceNumber AND
-        invoice_history.lastModifiedBy = users.userID AND
-        invoice_history.invoiceStatusID = invoice_statuses.invoiceStatusID AND
-        invoice_history.routeListID = route_lists.routeListID AND
+        requests_history.requestIDExternal = _requestIDExternal AND
+        requests_history.lastModifiedBy = users.userID AND
+        requests_history.requestStatusID = request_statuses.requestStatusID AND
+        requests_history.routeListID = route_lists.routeListID AND
         users.pointID = points.pointID
         )
     ORDER BY lastStatusUpdated;
