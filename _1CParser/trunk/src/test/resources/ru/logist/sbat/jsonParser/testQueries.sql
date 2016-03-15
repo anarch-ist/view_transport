@@ -46,40 +46,49 @@ INSERT INTO requests
     clientID           = VALUES(clientID),
     destinationPointID = VALUES(destinationPointID);
 
-INSERT INTO invoices
+INSERT INTO requests
   VALUE
   (NULL,
-   ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    ?, ?, ?, ?,
+    (SELECT clients.clientID FROM clients WHERE clients.clientIDExternal = ? AND clients.dataSourceID = ?),
+    (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?),
+    (SELECT users.userID FROM users WHERE users.login = ?),
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
    NOW(),
    getUserIDByLogin('parser'),
    'CREATED',
    ?,
-   (SELECT requests.requestID FROM requests WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?),
-   1,
+   (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?),
    NULL,
    NULL
-  ) ON DUPLICATE KEY UPDATE
-  documentNumber         = VALUES(documentNumber),
-  documentDate           = VALUES(documentDate),
-  firma                  = VALUES(firma),
-  contactName            = VALUES(contactName),
-  contactPhone           = VALUES(contactPhone),
-  creationDate           = VALUES(creationDate),
-  deliveryDate           = VALUES(deliveryDate),
-  boxQty                 = VALUES(boxQty),
-  weight                 = VALUES(weight),
-  volume                 = VALUES(volume),
-  goodsCost              = VALUES(goodsCost),
-  storage                = VALUES(storage),
-  deliveryOption         = VALUES(deliveryOption),
-  lastStatusUpdated      = VALUES(lastStatusUpdated),
-  lastModifiedBy         = VALUES(lastModifiedBy),
-  invoiceStatusID        = VALUES(invoiceStatusID),
-  commentForStatus       = VALUES(commentForStatus),
-  requestID              = VALUES(requestID),
-  warehousePointID       = VALUES(warehousePointID),
-  routeListID            = VALUES(routeListID),
-  lastVisitedUserPointID = VALUES(lastVisitedUserPointID);
+  )
+ON DUPLICATE KEY UPDATE
+  requestNumber           = VALUES(requestNumber),
+  requestDate             = VALUES(requestDate),
+  clientID                = VALUES(clientID),
+  destinationPointID      = VALUES(destinationPointID),
+  marketAgentUserID       = VALUES(marketAgentUserID),
+  invoiceNumber           = VALUES(invoiceNumber),
+  invoiceDate             = VALUES(invoiceDate),
+  documentNumber          = VALUES(documentNumber),
+  documentDate            = VALUES(documentDate),
+  firma                   = VALUES(firma),
+  storage                 = VALUES(storage),
+  contactName             = VALUES(contactName),
+  contactPhone            = VALUES(contactPhone),
+  deliveryOption          = VALUES(deliveryOption),
+  deliveryDate            = VALUES(deliveryDate),
+  boxQty                  = VALUES(boxQty),
+  weight                  = VALUES(weight),
+  volume                  = VALUES(volume),
+  goodsCost               = VALUES(goodsCost),
+  lastStatusUpdated       = VALUES(lastStatusUpdated),
+  lastModifiedBy          = VALUES(lastModifiedBy),
+  requestStatusID         = VALUES(requestStatusID),
+  commentForStatus        = VALUES(commentForStatus),
+  warehousePointID        = VALUES(warehousePointID),
+  routeListID             = VALUES(routeListID),
+  lastVisitedRoutePointID = VALUES(lastVisitedRoutePointID);
 
 INSERT INTO route_lists
   VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?, ?))

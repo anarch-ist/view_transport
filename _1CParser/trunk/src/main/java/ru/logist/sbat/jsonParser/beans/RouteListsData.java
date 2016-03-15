@@ -146,7 +146,7 @@ public class RouteListsData {
         this.directId = directId;
     }
 
-    public Set<String> getInvoices() {
+    public Set<String> getRequests() {
         return invoices;
     }
 
