@@ -22,6 +22,14 @@
 "responsiblePersonId": ""
 }
 , {
+"pointId": "00",
+"pointName": "нольноль",
+"pointAdress": "",
+"pointType": "AGENCY",
+"pointEmail": "",
+"responsiblePersonId": ""
+}
+, {
 "pointId": "53", 
 "pointName": "Архангельск", 
 "pointAdress": "", 

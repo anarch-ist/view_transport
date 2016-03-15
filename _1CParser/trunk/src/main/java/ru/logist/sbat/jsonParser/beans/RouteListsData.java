@@ -164,9 +164,9 @@ public class RouteListsData {
      * @return state of this object in terms of route scope. it can be intrasite route, trunk route or error.
      */
     private RouteScopeType getRouteState() {
-        if (getDirectId().equals(NULL) && !getPointArrivalId().isEmpty())
+        if (directId.equals(NULL) && !pointArrivalId.isEmpty())
             return RouteScopeType.TRUNK_ROUTE;
-        else if(!getDirectId().isEmpty() && getPointArrivalId().equals(NULL))
+        else if(!directId.isEmpty() && pointArrivalId.equals(NULL))
             return RouteScopeType.INTRASITE_ROUTE;
         else
             return RouteScopeType.ERROR;

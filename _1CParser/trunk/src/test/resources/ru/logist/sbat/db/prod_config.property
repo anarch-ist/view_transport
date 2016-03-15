@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+
+<entry key="url">jdbc:mysql://185.75.182.94:3306/</entry>
+<entry key="user">root</entry>
+<entry key="password">aftR179Kp</entry>
+<entry key="dbName">transmaster_transport_db</entry>
+<entry key="encoding">useUnicode=true&amp;characterEncoding=UTF-8</entry>
+
+<entry key="jsonDataDir"></entry>
+<entry key="responseDir"></entry>
+<entry key="logsDir"></entry>
+
+</properties>

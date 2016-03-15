@@ -8,12 +8,23 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 class Utils {
     private static final Logger logger = LogManager.getLogger(InsertOrUpdateTransactionScript.class);
 
     private Utils() {}
+
+
+
+    public static String generatePassword(String pass, String salt) {
+        Objects.requireNonNull(pass);
+        Objects.requireNonNull(salt);
+        if (salt.length() != 16)
+            throw new IllegalArgumentException("salt length must be 16");
+        return Utils.md5(Utils.md5(pass) + salt);
+    }
 
     //TODO check this algo the same as php use
     // 32 digits like in php
