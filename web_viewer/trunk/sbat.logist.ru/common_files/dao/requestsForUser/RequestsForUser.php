@@ -1,10 +1,10 @@
 <?php
 namespace DAO;
-require_once 'IInvoicesForUser.php';
+require_once 'IRequestsForUser.php';
 include_once __DIR__ . '/../DAO.php';
 
 
-class InvoicesForUserEntity implements IInvoicesForUserEntity
+class RequestsForUserEntity implements IRequestsForUserEntity
 {
     private static $_instance;
     private $_DAO;
@@ -17,7 +17,7 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
 
     public static function getInstance()
     {
-        if (is_null(self::$_instance)) return new InvoicesForUserEntity();
+        if (is_null(self::$_instance)) return new RequestsForUserEntity();
         return self::$_instance;
     }
 
@@ -29,9 +29,9 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
         if ($userID < 1) {
             $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
         }
-        $array = $this->_DAO->multiSelect(new EntitySelectAllInvoicesForUser($start, $count, $userID, $columnInformation, $orderColumnNumber));
+        $array = $this->_DAO->multiSelect(new EntitySelectAllRequestsForUser($start, $count, $userID, $columnInformation, $orderColumnNumber));
         $arrayResult = array();
-        $arrayResult['invoices'] = $array[0];
+        $arrayResult['requests'] = $array[0];
         $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
         $arrayResult['totalCount'] = $array[2][0]['totalCount'];
         return $arrayResult;
@@ -39,7 +39,7 @@ class InvoicesForUserEntity implements IInvoicesForUserEntity
 
 }
 
-class EntitySelectAllInvoicesForUser implements IEntitySelect
+class EntitySelectAllRequestsForUser implements IEntitySelect
 {
     private $start, $count, $orderByColumn, $isDesc, $searchString, $userID;
 

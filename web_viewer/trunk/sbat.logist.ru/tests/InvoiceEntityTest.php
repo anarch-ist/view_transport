@@ -1,10 +1,10 @@
 <?php
 
-include_once __DIR__ . '/../common_files/dao/invoiceDao/Invoice.php';
-include_once __DIR__ . '/../common_files/dao/invoicesForUser/InvoicesForUser.php';
+include_once __DIR__ . '/../common_files/dao/requestDao/Request.php';
+include_once __DIR__ . '/../common_files/dao/requestsForUser/RequestsForUser.php';
 include_once 'AbstractEntityTestClass.php';
 
-use DAO\InvoiceEntity as InvoiceEntity;
+use DAO\RequestEntity as InvoiceEntity;
 
 class InvoiceEntityTest extends AbstractEntityTestClass
 {
@@ -43,7 +43,7 @@ class InvoiceEntityTest extends AbstractEntityTestClass
     public function testSelects()
     {
         $totalCount = 3;
-        $invoices = InvoiceEntity::getInstance()->selectInvoices();
+        $invoices = RequestEntity::getInstance()->selectInvoices();
         $this->assertEquals($totalCount, count($invoices));
     }
 
@@ -56,7 +56,7 @@ class InvoiceEntityTest extends AbstractEntityTestClass
      */
     public function testUpdateInvoiceStatus($userID, $invoiceNumber, $newStatus, $historyExpected, $datetime, $comment)
     {
-        $invoice = InvoiceEntity::getInstance();
+        $invoice = RequestEntity::getInstance();
         $this->assertNotFalse($invoice->updateInvoiceStatus($userID, $invoiceNumber, $newStatus, $datetime, $comment));
         $history = $invoice->getInvoiceHistoryByInvoiceNumber($invoiceNumber);
         $this->assertNotFalse($history);
@@ -69,7 +69,7 @@ class InvoiceEntityTest extends AbstractEntityTestClass
      */
     public function testGetinvoicesForRouteList()
     {
-        $invoice = InvoiceEntity::getInstance();
+        $invoice = RequestEntity::getInstance();
         $this->assertEquals('[{"invoiceID":"1","invoiceIDExternal":"invIdExt1"},{"invoiceID":"2","invoiceIDExternal":"invIdExt2"}]',json_encode($invoice->getInvoicesForRouteList('1')));
     }
 
@@ -291,6 +291,6 @@ class InvoiceEntityTest extends AbstractEntityTestClass
 {"requestNumber":"er9458","insiderRequestNumber":"no data","invoiceNumber":null,"INN":null,"deliveryPoint":null,"warehousePoint":null,"lastName":null,"invoiceStatusID":null,"invoiceStatusRusName":null,"boxQty":null,"driver":null,"licensePlate":null,"palletsQty":null,"routeListNumber":null,"routeListID":null,"directionName":null,"currentPoint":null,"nextPoint":null,"arrivalTime":null}
 ]
         ');
-        $this->assertEquals($expectedResult,json_decode(json_encode(\DAO\InvoicesForUserEntity::getInstance()->selectAllData($start,$length,$userID))));
+        $this->assertEquals($expectedResult,json_decode(json_encode(\DAO\RequestsForUserEntity::getInstance()->selectAllData($start,$length,$userID))));
     }
 }

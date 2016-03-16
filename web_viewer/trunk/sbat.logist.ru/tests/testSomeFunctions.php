@@ -6,7 +6,7 @@ ob_start();
 //$_COOKIE['SESSION_CHECK_STRING'] = md5(session_id() . '2');
 //$sacw->setSessionParameter('UserID', '2');
 //$sacw->setSessionParameter('md5', md5('test'));
-//$_POST['status']='getInvoicesForRouteList';
+//$_POST['status']='getRequestsForRouteList';
 //$_POST['routelist'] = 1;
 //include 'E:\web\www\sbat.logist.ru\content\php_files\getData.php';
 

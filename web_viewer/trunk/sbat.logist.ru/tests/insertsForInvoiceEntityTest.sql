@@ -9,7 +9,7 @@ TRUNCATE tariffs;
 TRUNCATE routes;
 TRUNCATE route_points;
 TRUNCATE route_lists;
-TRUNCATE invoices;
+TRUNCATE requests;
 TRUNCATE invoice_history;
 TRUNCATE route_list_history;
 TRUNCATE relations_between_route_points;
@@ -63,7 +63,7 @@ VALUES
   ('extClId2', 'LOGIST_1C', 'ИП Петров', '8947537893', '37549783469587934', 'corAcccc2', 'curAxccccc2', '3324234375', 'moscowBank1', '34guheru', now(), now(),
    now());
 
-INSERT INTO requests (requestIDExternal, dataSourceID, requestNumber, creationDate, marketAgentUserID, clientID, destinationPointID)
+INSERT INTO requests (requestIDExternal, dataSourceID, requestIDExternal, creationDate, marketAgentUserID, clientID, destinationPointID)
 VALUES
   ('reqIdExt1', 'LOGIST_1C', '123356', now(), getUserIDByLogin('user4'), getClientIDByINN('1234567890'), getPointIDByName('point2')),
   ('reqIdExt2', 'LOGIST_1C', '859458', now(), getUserIDByLogin('user4'), getClientIDByINN('8947537893'), getPointIDByName('point1')),
@@ -96,7 +96,7 @@ VALUES
   ('routeListIdExt1', 'LOGIST_1C', '1455668', '2015-11-11', '2015-11-11', 3, 'Дмитрий Лже Первый', 'водила1',
                       '8905347890', 'екх123', 'APPROVED', getRouteIDByRouteName('route1'));
 
-INSERT INTO invoices (
+INSERT INTO requests (
   invoiceIDExternal, dataSourceID, documentNumber, documentDate, firma, contactName, contactPhone, creationDate, deliveryDate, boxQty, weight, volume, goodsCost,
   storage, deliveryOption, lastStatusUpdated, lastModifiedBy, invoiceStatusID, commentForStatus, requestID, warehousePointID, routeListID, lastVisitedUserPointID
 )

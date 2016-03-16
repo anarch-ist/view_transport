@@ -136,16 +136,16 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
   BEGIN
     SET @mainPart =
     'SELECT
-      requests.requestNumber,
-      invoices.insiderRequestNumber,
-      invoices.invoiceNumber,
+      requests.requestIDExternal,
+      requests.insiderRequestNumber,
+      requests.requestIDExternal,
       clients.INN,
       delivery_points.pointName     AS `deliveryPoint`,
       w_points.pointName            AS `warehousePoint`,
       users.lastName,
-      invoices.invoiceStatusID,
+      requests.invoiceStatusID,
       invoice_statuses.invoiceStatusRusName,
-      invoices.boxQty,
+      requests.boxQty,
 
       route_lists.driver,
       route_lists.licensePlate,
@@ -160,33 +160,33 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
      FROM requests
 
-      LEFT JOIN (invoices, clients, points AS delivery_points, points AS w_points, users)
+      LEFT JOIN (requests, clients, points AS delivery_points, points AS w_points, users)
         ON (
-        invoices.requestID = requests.requestID AND
-        invoices.warehousePointID = w_points.pointID AND
+        requests.requestID = requests.requestID AND
+        requests.warehousePointID = w_points.pointID AND
         requests.clientID = clients.clientID AND
         requests.destinationPointID = delivery_points.pointID AND
         requests.marketAgentUserID = users.userID
         )
       LEFT JOIN (invoice_statuses)
         ON (
-          invoices.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
+          requests.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
         )
-      -- because routeList in invoices table can be null, we use left join.
+      -- because routeList in requests table can be null, we use left join.
       LEFT JOIN (route_lists, routes)
         ON (
-        invoices.routeListID = route_lists.routeListID AND
+        requests.routeListID = route_lists.routeListID AND
         route_lists.routeID = routes.routeID
         )
       LEFT JOIN (points AS last_visited_points)
         ON (
-        invoices.lastVisitedUserPointID = last_visited_points.pointID
+        requests.lastVisitedUserPointID = last_visited_points.pointID
         )
       LEFT JOIN (route_points, points AS next_route_points)
         ON (
         route_lists.routeID = routes.routeID AND
         routes.routeID = route_points.routeID AND
-        route_points.routePointID = getNextRoutePointID(routes.routeID, invoices.lastVisitedUserPointID) AND
+        route_points.routePointID = getNextRoutePointID(routes.routeID, requests.lastVisitedUserPointID) AND
         next_route_points.pointID = route_points.pointID
         ) ';
 

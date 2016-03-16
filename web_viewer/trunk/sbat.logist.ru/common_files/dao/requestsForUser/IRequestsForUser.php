@@ -1,7 +1,7 @@
 <?php
 namespace DAO;
 
-interface IInvoicesForUserEntity
+interface IRequestsForUserEntity
 {
     function selectAllData(array $columnInformation, $orderColumnNumber);
 }

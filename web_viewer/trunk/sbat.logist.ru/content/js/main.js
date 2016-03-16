@@ -1,4 +1,3 @@
-var datatable;
 $(document).ready(function () {
 
     // --------LOGOUT-----------------
@@ -15,8 +14,7 @@ $(document).ready(function () {
         $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
     });
 
-    //var dataTable = $('#user-grid').DataTable({
-    dataTable = $('#user-grid').DataTable({
+    var dataTable = $('#user-grid').DataTable({
         processing: true,
         serverSide: true,
         select: {
@@ -50,14 +48,14 @@ $(document).ready(function () {
                 extend: 'selectedSingle',
                 text: 'изменить статус накладной',
                 action: function (e, dt, node, config) {
-                    $.showInvoiceStatusDialog("changeStatusForInvoice", dataTable);
+                    $.showRequestStatusDialog("changeStatusForRequest", dataTable);
                 }
             },
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
-                    $.showInvoiceStatusDialog("changeStatusForSeveralInvoices", dataTable);
+                    $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
                 }
             },
             {
@@ -66,10 +64,10 @@ $(document).ready(function () {
                 action: function (e, dt, node, config) {
                     $.post("content/getData.php", {
                             status: 'getStatusHistory',
-                            invoiceNumber: dataTable.row($('#user-grid .selected')).data().invoiceNumber
+                            requestIDExternal: dataTable.row($('#user-grid .selected')).data().requestIDExternal
                         },
                         function (data) {
-                            $.showInvoiceHistoryDialog(data);
+                            $.showRequestHistoryDialog(data);
                         }
                     );
                 }
@@ -88,7 +86,7 @@ $(document).ready(function () {
         ajax: {
             url: "content/getData.php", // json datasource
             type: "post",  // method  , by default get
-            data: {"status": "getInvoicesForUser"},    // post-parameter for determining type of query
+            data: {"status": "getRequestsForUser"},    // post-parameter for determining type of query
             error: function () {  // error handling
                 $(".user-grid-error").html("");
                 $("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
@@ -96,84 +94,66 @@ $(document).ready(function () {
             }
         },
         columns: [
-            {"data": "requestNumber"},
             {"data": "requestIDExternal"},
+            {"data": "requestNumber"},
+            {"data": "requestDate"},
             {"data": "invoiceNumber"},
+            {"data": "invoiceDate"},
+            {"data": "documentNumber"},
+            {"data": "documentDate"},
+            {"data": "firma"},
+            {"data": "storage"},
+            {"data": "commentForStatus"},
+            {"data": "boxQty"},
+            {"data": "requestStatusRusName"},
+            {"data": "clientIDExternal"},
             {"data": "INN"},
+            {"data": "clientName"},
+            {"data": "userName"},
             {"data": "deliveryPointName"},
             {"data": "warehousePointName"},
-            {"data": "userName"},
-            {"data": "requestStatusRusName"},
-            {"data": "boxQty"},
+            {"data": "currentPointName"},
+            {"data": "nextPointName"},
+            {"data": "routeName"},
             {"data": "driverId"},
             {"data": "licensePlate"},
             {"data": "palletsQty"},
             {"data": "routeListNumber"},
-            {"data": "routeName"},
-            {"data": "currentPointName"},
-            {"data": "nextPointName"},
             {"data": "arrivalTime"},
+
             {"data": "requestStatusID"},
             {"data": "routeListID"}
-            //{"data": "requestNumber"},
-            //{"data": "insiderRequestNumber"},
-            //{"data": "invoiceNumber"},
-            //{"data": "INN"},
-            //{"data": "deliveryPoint"},
-            //{"data": "warehousePoint"},
-            //{"data": "userName"},
-            //{"data": "invoiceStatusRusName"},
-            //{"data": "boxQty"},
-            //{"data": "driver"},
-            //{"data": "licensePlate"},
-            //{"data": "palletsQty"},
-            //{"data": "routeListNumber"},
-            //{"data": "directionName"},
-            //{"data": "currentPoint"},
-            //{"data": "nextPoint"},
-            //{"data": "arrivalTime"},
-            //{"data": "invoiceStatusID"},
-            //{"data": "routeListID"}
         ],
         columnDefs: [
-            {"name": "requestNumber", "searchable": true, "targets": 0},
-            {"name": "requestIDExternal", "searchable": true, "targets": 1},
-            {"name": "invoiceNumber", "searchable": true, "targets": 2},
-            {"name": "INN", "searchable": true, "targets": 3},
-            {"name": "deliveryPointName", "searchable": true, "targets": 4},
-            {"name": "warehousePointName", "searchable": true, "targets": 5},
-            {"name": "userName", "searchable": true, "targets": 6},
-            {"name": "requestStatusRusName", "searchable": true, "targets": 7},
-            {"name": "boxQty", "searchable": true, "targets": 8},
-            {"name": "driverId", "searchable": true, "targets": 9},
-            {"name": "licensePlate", "searchable": true, "targets": 10},
-            {"name": "palletsQty", "searchable": true, "targets": 11},
-            {"name": "routeListNumber", "searchable": true, "targets": 12},
-            {"name": "routeName", "searchable": true, "targets": 13},
-            {"name": "currentPointName", "searchable": true, "targets": 14},
-            {"name": "nextPointName", "searchable": true, "targets": 15},
-            {"name": "arrivalTime", "searchable": true, "targets": 16},
-            {"name": "requestStatusID", "searchable": false, "visible": false, "targets": 17},
-            {"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
-            //{"name": "requestNumber", "searchable": true, "targets": 0},
-            //{"name": "insiderRequestNumber", "searchable": true, "targets": 1},
-            //{"name": "invoiceNumber", "searchable": true, "targets": 2},
-            //{"name": "INN", "searchable": true, "targets": 3},
-            //{"name": "deliveryPoint", "searchable": true, "targets": 4},
-            //{"name": "warehousePoint", "searchable": true, "targets": 5},
-            //{"name": "userName", "searchable": true, "targets": 6},
-            //{"name": "invoiceStatusRusName", "searchable": true, "targets": 7},
-            //{"name": "boxQty", "searchable": true, "targets": 8},
-            //{"name": "driver", "searchable": true, "targets": 9},
-            //{"name": "licensePlate", "searchable": true, "targets": 10},
-            //{"name": "palletsQty", "searchable": true, "targets": 11},
-            //{"name": "routeListNumber", "searchable": true, "targets": 12},
-            //{"name": "directionName", "searchable": true, "targets": 13},
-            //{"name": "currentPoint", "searchable": true, "targets": 14},
-            //{"name": "nextPoint", "searchable": true, "targets": 15},
-            //{"name": "arrivalTime", "searchable": true, "targets": 16},
-            //{"name": "invoiceStatusID", "searchable": false, "visible": false, "targets": 17},
-            //{"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
+            {"name": "requestIDExternal", "searchable": true, "targets": 0},
+            {"name": "requestNumber", "searchable": true, "targets": 1},
+            {"name": "requestDate", "searchable": true, "targets": 2},
+            {"name": "invoiceNumber", "searchable": true, "targets": 3},
+            {"name": "invoiceDate", "searchable": true, "targets": 4},
+            {"name": "documentNumber", "searchable": true, "targets": 5},
+            {"name": "documentDate", "searchable": true, "targets": 6},
+            {"name": "firma", "searchable": true, "targets": 7},
+            {"name": "storage", "searchable": true, "targets": 8},
+            {"name": "commentForStatus", "searchable": true, "targets": 9},
+            {"name": "boxQty", "searchable": true, "targets": 10},
+            {"name": "requestStatusRusName", "searchable": true, "targets": 11},
+            {"name": "clientIDExternal", "searchable": true, "targets": 12},
+            {"name": "INN", "searchable": true, "targets": 13},
+            {"name": "clientName", "searchable": true, "targets": 14},
+            {"name": "userName", "searchable": true, "targets": 15},
+            {"name": "deliveryPointName", "searchable": true, "targets": 16},
+            {"name": "warehousePointName", "searchable": true, "targets": 17},
+            {"name": "currentPointName", "searchable": true, "targets": 18},
+            {"name": "nextPointName", "searchable": true, "targets": 19},
+            {"name": "routeName", "searchable": true, "targets": 20},
+            {"name": "driverId", "searchable": true, "targets": 21},
+            {"name": "licensePlate", "searchable": true, "targets": 22},
+            {"name": "palletsQty", "searchable": true, "targets": 23},
+            {"name": "routeListNumber", "searchable": true, "targets": 24},
+            {"name": "arrivalTime", "searchable": true, "targets": 25},
+
+            {"name": "requestStatusID", "searchable": false, "visible": false, "targets": 26},
+            {"name": "routeListID", "searchable": false, "visible": false, "targets": 27}
         ]
     });
     // set padding for dataTable

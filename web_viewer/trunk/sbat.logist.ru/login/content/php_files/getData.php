@@ -14,7 +14,7 @@ try {
     //header("Location: /?login=ivan&role=warehouse_manager", true, 303);
 
     // TODO connect with database
-    $possibleStatuses = $pUser->getInvoiceEntity()->getInvoiceStatuses($pUser);
+    $possibleStatuses = $pUser->getRequestEntity()->getRequestStatuses($pUser);
     $dataToSend['responseCode'] = '';
     $dataToSend['statuses'] = $possibleStatuses;
     echo(json_encode($dataToSend));

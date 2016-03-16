@@ -31,8 +31,10 @@
     <!--jqueryCookiePlugin-->
     <script src="common_files/media/jqueryCookie-1.4.1/jquery.cookie.js"></script>
     <!--custom js-->
+    
+    
+    <script type="text/javascript" language="javascript" src="content/js/requestHistoryDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
-    <script type="text/javascript" language="javascript" src="content/js/invoiceHistoryDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/statusChangeDialog.js"></script>
 
 </head>
@@ -66,20 +68,31 @@
         <tr>
             <th>ID заявки</th>
             <th>ID внутренней заявки</th>
-            <th>ID накладной</th>
+            <th>Дата заявки</th>
+            <th>Номер накладной</th>
+            <th>Дата накладной</th>
+            <th>Номер документа</th>
+            <th>Дата документа</th>
+            <th>Фирма</th>
+            <th>Склад</th>
+            <th>Комментарий</th>
+            <th>Количество коробок</th>
+            <th>Статус заявки</th>
+            <th>Клиент, Номер</th>
             <th>Клиент, ИНН</th>
+            <th>Клиент, Имя</th>
+            <th>Торговый представитель</th>
             <th>Пункт доставки</th>
             <th>Склад отправки</th>
-            <th>Торговый представитель</th>
-            <th>Статус</th>
-            <th>Количество коробок</th>
+
+            <th>Текущее подразделение</th>
+            <th>Следующий пункт маршрута</th>
+            <th>Маршрут</th>
             <th>Водитель</th>
             <th>Номер ТС</th>
             <th>Количество паллет</th>
             <th>Маршрутный лист</th>
-            <th>Направление</th>
-            <th>Текущее подразделение</th>
-            <th>Следующий пункт маршрута</th>
+
             <th>Плановое время прибытия в следующий пункт</th>
             <th>...</th>
             <th>...</th>
@@ -90,20 +103,32 @@
         <tr>
             <th>ID заявки</th>
             <th>ID внутренней заявки</th>
-            <th>ID накладной</th>
+
+            <th>Дата заявки</th>
+            <th>Номер накладной</th>
+            <th>Дата накладной</th>
+            <th>Номер документа</th>
+            <th>Дата документа</th>
+            <th>Фирма</th>
+            <th>Склад</th>
+            <th>Комментарий</th>
+            <th>Количество коробок</th>
+            <th>Статус заявки</th>
+            <th>Клиент, Номер</th>
             <th>Клиент, ИНН</th>
+            <th>Клиент, Имя</th>
+            <th>Торговый представитель</th>
             <th>Пункт доставки</th>
             <th>Склад отправки</th>
-            <th>Торговый представитель</th>
-            <th>Статус</th>
-            <th>Количество коробок</th>
+
+            <th>Текущее подразделение</th>
+            <th>Следующий пункт маршрута</th>
+            <th>Маршрут</th>
             <th>Водитель</th>
             <th>Номер ТС</th>
             <th>Количество паллет</th>
             <th>Маршрутный лист</th>
-            <th>Направление</th>
-            <th>Текущее подразделение</th>
-            <th>Следующий пункт маршрута</th>
+
             <th>Плановое время прибытия в следующий пункт</th>
             <th>...</th>
             <th>...</th>

@@ -1075,12 +1075,13 @@ CREATE VIEW transmaster_transport_db.big_select AS
     requests.documentDate,
     requests.firma,
     requests.storage,
-    requests.clientID,
     requests.commentForStatus,
-    requests.requestStatusID,
     requests.boxQty,
     requests.marketAgentUserID, -- служебное поле
+    requests.requestStatusID, -- служебное поле
+    requests.routeListID, -- служебное поле
     request_statuses.requestStatusRusName,
+    clients.clientIDExternal,
     clients.INN,
     clients.clientName,
     users.userName,
@@ -1095,7 +1096,6 @@ CREATE VIEW transmaster_transport_db.big_select AS
     route_lists.licensePlate,
     route_lists.palletsQty,
     route_lists.routeListNumber,
-    route_lists.routeListID,
     NULL AS arrivalTime -- TODO FIX IT
 
   FROM requests
@@ -1110,7 +1110,7 @@ CREATE VIEW transmaster_transport_db.big_select AS
       requests.warehousePointID = w_points.pointID AND
       requests.destinationPointID = delivery_points.pointID
       )
-    -- because routeList in invoices table can be null, we use left join.
+    -- because routeList in requests table can be null, we use left join.
     LEFT JOIN (route_lists, routes)
       ON (
       requests.routeListID = route_lists.routeListID AND
@@ -1152,11 +1152,10 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       documentDate,
       firma,
       storage,
-      clientID,
       commentForStatus,
-      requestStatusID,
       boxQty,
       requestStatusRusName,
+      clientIDExternal,
       INN,
       clientName,
       userName,
@@ -1169,8 +1168,9 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       licensePlate,
       palletsQty,
       routeListNumber,
-      routeListID,
-      arrivalTime
+      arrivalTime,
+      requestStatusID,
+      routeListID
     FROM big_select
     ';
 
@@ -1270,25 +1270,33 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
 
   END;
 
+-- get history for some request
 CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(16))
   BEGIN
     SELECT
-      pointName,
-      userName,
-      requestStatusRusName,
-      requests_history.lastStatusUpdated,
-      routeListNumber,
-      palletsQty,
-      requests_history.boxQty
+      requests_history.lastStatusUpdated    AS timeMarkWhenRequestWasChanged,
+      requests_history.boxQty               AS boxQty,
+      request_statuses.requestStatusRusName AS requestStatusRusName,
+      points.pointName                      AS pointWhereStatusWasChanged,
+      users.userName                        AS userNameThatChangedStatus,
+      route_lists.routeListIDExternal       AS routeListIDExternal
+
     FROM requests_history
-      INNER JOIN (route_lists, users, points, request_statuses)
+      INNER JOIN (request_statuses)
         ON (
-        requests_history.requestIDExternal = _requestIDExternal AND
-        requests_history.lastModifiedBy = users.userID AND
-        requests_history.requestStatusID = request_statuses.requestStatusID AND
-        requests_history.routeListID = route_lists.routeListID AND
-        users.pointID = points.pointID
+        requests_history.requestStatusID = request_statuses.requestStatusID
         )
+      LEFT JOIN (points, route_points) ON (
+        requests_history.lastVisitedRoutePointID = route_points.routePointID AND
+        route_points.pointID = points.pointID
+        )
+      LEFT JOIN (users) ON (
+        requests_history.lastModifiedBy = users.userID
+        )
+      LEFT JOIN (route_lists) ON (
+        requests_history.routeListID = route_lists.routeListID
+        )
+    WHERE requests_history.requestIDExternal = _requestIDExternal
     ORDER BY lastStatusUpdated;
   END;
 

@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     const STATUS_SELECT_MENU_WIDTH = 600,
         DIALOG_HEIGHT = 430,
         DIALOG_WIDTH = 800,
@@ -13,15 +14,15 @@ $(document).ready(function () {
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
-        '<tr id="selectInvoicesTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="invoiceCheckBoxes">aaaaaaaaaa</div></td></tr>' +
+        '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes">aaaaaaaaaa</div></td></tr>' +
         '</table>' +
         '</div>'
     );
 
     // create status select menu
     var $statusSelect = $("#statusSelect");
-    var $invoiceCheckBoxes = $("#invoiceCheckBoxes");
-    var $selectInvoicesTr = $("#selectInvoicesTr");
+    var $requestCheckBoxes = $("#requestCheckBoxes");
+    var $selectRequestsTr = $("#selectRequestsTr");
 
     function populateStatusSelectMenu() {
         var options = [];
@@ -30,7 +31,7 @@ $(document).ready(function () {
             storedStatuses = JSON.parse(window.localStorage["USER_STATUSES"]);
         }
         for (var i = 0; i < storedStatuses.length; i++) {
-            options.push("<option value='" + storedStatuses[i].invoiceStatusID + "'>" + storedStatuses[i].invoiceStatusRusName + "</option>");
+            options.push("<option value='" + storedStatuses[i].requestStatusID + "'>" + storedStatuses[i].requestStatusRusName + "</option>");
         }
         $statusSelect.html(options.join("")).selectmenu({width: STATUS_SELECT_MENU_WIDTH});
     }
@@ -71,12 +72,12 @@ $(document).ready(function () {
             var dialogType = $statusChangeDialog.data('dialogType');
             $("#palletsQtyTr").hide();
             switch (dialogType) {
-                case "changeStatusForInvoice":
-                    $selectInvoicesTr.hide();
+                case "changeStatusForRequest":
+                    $selectRequestsTr.hide();
                     $statusSelect.off("selectmenuchange");
                     break;
-                case "changeStatusForSeveralInvoices":
-                    $selectInvoicesTr.show();
+                case "changeStatusForSeveralRequests":
+                    $selectRequestsTr.show();
                     $statusSelect.on("selectmenuchange", function (e, ui) {
                         if (ui.item.value === DEPARTURE_STATUS)
                             $("#palletsQtyTr").show();
@@ -87,16 +88,16 @@ $(document).ready(function () {
                     $.post(
                         "content/getData.php",
                         {
-                            status: "getInvoicesForRouteList",
+                            status: "getRequestsForRouteList",
                             routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
                         },
                         function (data) {
-                            var invoicesArray = JSON.parse(data);
-                            $statusChangeDialog.data('invoicesForSelectedRouteList', invoicesArray);
-                            //var invoicesArray = ["invIdExternal1", "invIdExternal2", "invIdExternal3"];
-                            $invoiceCheckBoxes.html("");
-                            invoicesArray.forEach(function(invIdExt){
-                                $invoiceCheckBoxes.append('<label>'+'<input type="checkbox" value='+invIdExt.invoiceID+' checked>'+invIdExt.invoiceIDExternal+'</label>'+'<br>');
+                            var requestsArray = JSON.parse(data);
+                            $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
+                            //var requestsArray = ["reqIdExternal1", "reqIdExternal2", "reqIdExternal3"];
+                            $requestCheckBoxes.html("");
+                            requestsArray.forEach(function(reqIdExt){
+                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+reqIdExt+' checked>'+reqIdExt+'</label>'+'<br>');
                             });
                         }
                     );
@@ -113,15 +114,15 @@ $(document).ready(function () {
                 var date = $('#dateTimePicker')[0].value;
                 var comment = $("#commentInput").val();
 
-                if (dialogType === "changeStatusForInvoice") {
+                if (dialogType === "changeStatusForRequest") {
 
-                    // get specific vars for "changeStatusForInvoice" dialogType
-                    var invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
+                    // get specific vars for "changeStatusForRequest" dialogType
+                    var requestIDExternal = dataTable.row($('#user-grid .selected')).data().requestIDExternal;
                     if (date)
                         $.post("content/getData.php",
                             {
                                 status: dialogType,
-                                invoiceNumber: invoiceNumber,
+                                requestIDExternal: requestIDExternal,
                                 newStatusID: newStatusID,
                                 date: date,
                                 comment: comment
@@ -137,15 +138,15 @@ $(document).ready(function () {
                         alert("date should not be empty"); // TODO
                     }
 
-                } else if (dialogType === "changeStatusForSeveralInvoices") {
+                } else if (dialogType === "changeStatusForSeveralRequests") {
 
-                    // get specific vars for "changeStatusForSeveralInvoices" dialogType
+                    // get specific vars for "changeStatusForSeveralRequests" dialogType
                     //var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
                     var palletsQty = $("#palletsQtyInput").cleanVal();
 
-                    var invoices = [];
-                    $invoiceCheckBoxes.find("input[type='checkbox']:checked").each(function(index){
-                        invoices.push($(this).attr('value'));
+                    var requests = [];
+                    $requestCheckBoxes.find("input[type='checkbox']:checked").each(function(index){
+                        requests.push($(this).attr('value'));
                     });
 
                     if ((newStatusID !== DEPARTURE_STATUS && date) || (newStatusID === DEPARTURE_STATUS && date && palletsQty))
@@ -157,7 +158,7 @@ $(document).ready(function () {
                                 date: date,
                                 comment: comment,
                                 palletsQty: palletsQty,
-                                invEdExt: invoices
+                                requestIdExternalArray: requests
                             },
                             function (data) {
                                 if (data === '1') {
@@ -178,7 +179,7 @@ $(document).ready(function () {
     });
 
     // external function
-    $.showInvoiceStatusDialog = function (dialogType, dataTable) {
+    $.showRequestStatusDialog = function (dialogType, dataTable) {
         $statusChangeDialog
             .data("dialogType", dialogType)
             .data("dataTable", dataTable)

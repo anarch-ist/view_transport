@@ -1,6 +1,6 @@
 <?php
 include_once __DIR__ . '/../dao/userDao/User.php';
-include_once __DIR__ . '/../dao/invoicesForUser/InvoicesForUser.php';
+include_once __DIR__ . '/../dao/requestsForUser/RequestsForUser.php';
 include_once __DIR__ . '/../sessionAndCookieWork/SessionAndCookieWork.php';
 
 use SessionAndCookieWork\ISessionAndCookieWork as ISessionAndCookieWork;
@@ -112,15 +112,15 @@ class PrivilegedUser extends AuthUser
         return \DAO\DAO::getInstance();
     }
 
-    public function getInvoicesForUser()
+    public function getRequestsForUser()
     {
-        return \DAO\InvoicesForUserEntity::getInstance();
+        return \DAO\RequestsForUserEntity::getInstance();
     }
 
-    public function getInvoiceEntity()
+    public function getRequestEntity()
     {
-        include_once __DIR__ . '/../dao/invoiceDao/Invoice.php';
-        return \DAO\InvoiceEntity::getInstance();
+        include_once __DIR__ . '/../dao/requestDao/Request.php';
+        return \DAO\RequestEntity::getInstance();
     }
 
     public function getPointEntity()
