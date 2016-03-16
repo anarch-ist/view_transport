@@ -30,23 +30,6 @@ ON DUPLICATE KEY UPDATE
   INN        = VALUES(INN);
 
 INSERT INTO requests
-  SELECT
-    NULL,
-    ?,
-    ?,
-    ?,
-    ?,
-    (SELECT users.userID FROM users WHERE users.login = ?),
-    (SELECT clients.clientID FROM clients WHERE clients.clientIDExternal = ? AND clients.dataSourceID = ?),
-    (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?)
-  ON DUPLICATE KEY UPDATE
-    requestNumber      = VALUES(requestNumber),
-    creationDate       = VALUES(creationDate),
-    marketAgentUserID  = VALUES(marketAgentUserID),
-    clientID           = VALUES(clientID),
-    destinationPointID = VALUES(destinationPointID);
-
-INSERT INTO requests
   VALUE
   (NULL,
     ?, ?, ?, ?,
