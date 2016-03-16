@@ -68,7 +68,7 @@ public class TestOptimazer {
 //        invoice2.setDeliveryRoute(route1);// накладная (10кг., 15м^3.), маршрут (11кг., 16м^3.) - заполнен
 //        invoice3.setDeliveryRoute(route2);// накладная (2кг., 3м^3.), маршрут (10кг., 15м^3.) - можно догрузить
 //        System.out.println(invoice.getCreationDate() + " дата создания накладной");
-//        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " дата плановой доставки");
+//        System.out.println(invoice.getRequest().getPlannedDeliveryDate() + " дата плановой доставки");
 //        System.out.println("");
         invoiceContainer.add(invoice);
         invoiceContainer.add(invoice2);
@@ -90,7 +90,7 @@ public class TestOptimazer {
     private static Request createRequest(Point deliveryPoint, Date plannedDeliveryDateTime) {
         Request result = new Request();
         result.setDeliveryPoint(deliveryPoint);
-        result.setPlannedDeliveryTime(plannedDeliveryDateTime);
+        result.setPlannedDeliveryDate(plannedDeliveryDateTime);
         return result;
     }
 
@@ -161,10 +161,10 @@ public class TestOptimazer {
         ArrayList<Date> result = optimizer.getPossibleDepartureDate(route, invoice);
         System.out.println(invoice.getCreationDate() + " дата создания накладной");
         System.out.println(result.get(0) + " дата возможного отъезда");
-        System.out.println(invoice.getRequest().getPlannedDeliveryTime() + " планируемая дата доставки в заявке");
+        System.out.println(invoice.getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
         Assert.assertEquals(1, result.size());
         Assert.assertTrue(invoice.getCreationDate().before(result.get(0)));
-        Assert.assertTrue(invoice.getRequest().getPlannedDeliveryTime().after(result.get(0)));
+        Assert.assertTrue(invoice.getRequest().getPlannedDeliveryDate().after(result.get(0)));
     }
 
     @Test
@@ -198,7 +198,7 @@ public class TestOptimazer {
         Request request = createRequest(tradeRepresentativePoint2, createDate(2016, 5, 4, 18, 0));
         Invoice invoice = createInvoice(warehousePoint2, createDate(2016, 0, 27, 12, 0), request, 3, 6);
         ArrayList<Date>dateArray = optimizer.getPossibleDepartureDate(route, invoice);
-        Assert.assertTrue(invoice.getRequest().getPlannedDeliveryTime().after(optimizer.getPossibleArrivalDate(route, invoice, dateArray.get(0))));
+        Assert.assertTrue(invoice.getRequest().getPlannedDeliveryDate().after(optimizer.getPossibleArrivalDate(route, invoice, dateArray.get(0))));
     }
 
 }

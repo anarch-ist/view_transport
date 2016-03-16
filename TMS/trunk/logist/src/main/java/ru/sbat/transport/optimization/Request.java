@@ -11,7 +11,7 @@ public class Request {
     private final IntegerProperty clientId = new SimpleIntegerProperty();
     private final ObjectProperty<Point> deliveryPoint = new SimpleObjectProperty<>();
     private final StringProperty deliveryAddress = new SimpleStringProperty();
-    private final ObjectProperty<Date> plannedDeliveryTime = new SimpleObjectProperty<>();
+    private final ObjectProperty<Date> plannedDeliveryDate = new SimpleObjectProperty<>();
     private final IntegerProperty dayOfWeek = new SimpleIntegerProperty();
 
     public int getDayOfWeek() {
@@ -62,17 +62,17 @@ public class Request {
         return deliveryPoint;
     }
 
-    public Date getPlannedDeliveryTime() {
-        return plannedDeliveryTime.get();
+    public Date getPlannedDeliveryDate() {
+        return plannedDeliveryDate.get();
     }
 
-    public void setPlannedDeliveryTime(Date plannedDeliveryTime) {
-        this.plannedDeliveryTime.set(plannedDeliveryTime);
+    public void setPlannedDeliveryDate(Date plannedDeliveryDate) {
+        this.plannedDeliveryDate.set(plannedDeliveryDate);
 
     }
 
-    public ObjectProperty<Date> getPlannedDeliveryTimeProperty(){
-        return plannedDeliveryTime;
+    public ObjectProperty<Date> getPlannedDeliveryDateProperty(){
+        return plannedDeliveryDate;
     }
 
     public String getDeliveryAddress() {

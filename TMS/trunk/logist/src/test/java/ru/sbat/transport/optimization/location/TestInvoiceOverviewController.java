@@ -45,7 +45,7 @@ public class TestInvoiceOverviewController {
         result.setRequestId(requestId);
         result.setClientId(clientId);
         result.setDeliveryPoint(deliveryPoint);
-        result.setPlannedDeliveryTime(plannedDeliveryTime);
+        result.setPlannedDeliveryDate(plannedDeliveryTime);
         result.setDayOfWeek(dayOfWeek);
         return result;
     }

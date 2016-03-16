@@ -64,10 +64,10 @@ public class TestRouteWeightAndVolume {
         invoiceContainer.add(invoice2);
         invoiceContainer.add(invoice3);
         invoiceContainer.add(invoice4);
-        invoice1.setDeliveryRoute(route);
-        invoice2.setDeliveryRoute(route4);
-        invoice4.setDeliveryRoute(route3);
-        invoice3.setDeliveryRoute(route4);
+//        invoice1.setDeliveryRoute(route);
+//        invoice2.setDeliveryRoute(route4);
+//        invoice4.setDeliveryRoute(route3);
+//        invoice3.setDeliveryRoute(route4);
     }
 
     @Test
