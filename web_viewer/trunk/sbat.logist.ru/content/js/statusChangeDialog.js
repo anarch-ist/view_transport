@@ -69,7 +69,10 @@ $(document).ready(function () {
         modal: true,
         // when dialog open transform it to one of two types
         open: function () {
+
             var dialogType = $statusChangeDialog.data('dialogType');
+            var dataTable = $statusChangeDialog.data('dataTable');
+
             $("#palletsQtyTr").hide();
             switch (dialogType) {
                 case "changeStatusForRequest":
@@ -94,10 +97,9 @@ $(document).ready(function () {
                         function (data) {
                             var requestsArray = JSON.parse(data);
                             $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
-                            //var requestsArray = ["reqIdExternal1", "reqIdExternal2", "reqIdExternal3"];
                             $requestCheckBoxes.html("");
-                            requestsArray.forEach(function(reqIdExt){
-                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+reqIdExt+' checked>'+reqIdExt+'</label>'+'<br>');
+                            requestsArray.forEach(function(request){
+                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'<br>');
                             });
                         }
                     );
@@ -158,7 +160,7 @@ $(document).ready(function () {
                                 date: date,
                                 comment: comment,
                                 palletsQty: palletsQty,
-                                requestIdExternalArray: requests
+                                requestIDExternalArray: requests
                             },
                             function (data) {
                                 if (data === '1') {

@@ -172,21 +172,24 @@ class UpdateRequestStatus implements IEntityUpdate
 
 class UpdateRequestStatuses implements IEntityUpdate
 {
-    private $routeListID;
+    private $requests;
     private $userID;
     private $newRequestStatus;
     private $datetime;
     private $comment;
+    private $palletQuantity;
 
-    function __construct($userID, $routeListID, $newRequestStatus, $datetime, $comment)
+    function __construct($userID, $requestListArray, $newRequestStatus, $datetime, $comment, $palletQuantity=0)
     {
         $dao = DAO::getInstance();
 
-        $this->routeListID = $dao->checkString($routeListID);
+        $requestListArray = implode(", ",$requestListArray);
+        $this->requests = $dao->checkString($requestListArray);
         $this->userID = $dao->checkString($userID);
         $this->newRequestStatus = $dao->checkString($newRequestStatus);
         $this->datetime = $dao->checkString($datetime);
         $this->comment = $dao->checkString($comment);
+        $this->palletQuantity = $dao->checkString($palletQuantity);
     }
 
     /**
@@ -194,7 +197,10 @@ class UpdateRequestStatuses implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
+        if ($this->newRequestStatus === 'DEPARTURE') {
+            return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `boxQty` = $this->palletQuantity,`lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
+        }
+        return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
     }
 }
 
