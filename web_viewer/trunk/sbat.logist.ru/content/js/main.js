@@ -1,3 +1,4 @@
+var datatable;
 $(document).ready(function () {
 
     // --------LOGOUT-----------------
@@ -14,7 +15,8 @@ $(document).ready(function () {
         $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
     });
 
-    var dataTable = $('#user-grid').DataTable({
+    //var dataTable = $('#user-grid').DataTable({
+    dataTable = $('#user-grid').DataTable({
         processing: true,
         serverSide: true,
         select: {
@@ -95,45 +97,83 @@ $(document).ready(function () {
         },
         columns: [
             {"data": "requestNumber"},
-            {"data": "insiderRequestNumber"},
+            {"data": "requestIDExternal"},
             {"data": "invoiceNumber"},
             {"data": "INN"},
-            {"data": "deliveryPoint"},
-            {"data": "warehousePoint"},
+            {"data": "deliveryPointName"},
+            {"data": "warehousePointName"},
             {"data": "userName"},
-            {"data": "invoiceStatusRusName"},
+            {"data": "requestStatusRusName"},
             {"data": "boxQty"},
-            {"data": "driver"},
+            {"data": "driverId"},
             {"data": "licensePlate"},
             {"data": "palletsQty"},
             {"data": "routeListNumber"},
-            {"data": "directionName"},
-            {"data": "currentPoint"},
-            {"data": "nextPoint"},
+            {"data": "routeName"},
+            {"data": "currentPointName"},
+            {"data": "nextPointName"},
             {"data": "arrivalTime"},
-            {"data": "invoiceStatusID"},
+            {"data": "requestStatusID"},
             {"data": "routeListID"}
+            //{"data": "requestNumber"},
+            //{"data": "insiderRequestNumber"},
+            //{"data": "invoiceNumber"},
+            //{"data": "INN"},
+            //{"data": "deliveryPoint"},
+            //{"data": "warehousePoint"},
+            //{"data": "userName"},
+            //{"data": "invoiceStatusRusName"},
+            //{"data": "boxQty"},
+            //{"data": "driver"},
+            //{"data": "licensePlate"},
+            //{"data": "palletsQty"},
+            //{"data": "routeListNumber"},
+            //{"data": "directionName"},
+            //{"data": "currentPoint"},
+            //{"data": "nextPoint"},
+            //{"data": "arrivalTime"},
+            //{"data": "invoiceStatusID"},
+            //{"data": "routeListID"}
         ],
         columnDefs: [
             {"name": "requestNumber", "searchable": true, "targets": 0},
-            {"name": "insiderRequestNumber", "searchable": true, "targets": 1},
+            {"name": "requestIDExternal", "searchable": true, "targets": 1},
             {"name": "invoiceNumber", "searchable": true, "targets": 2},
             {"name": "INN", "searchable": true, "targets": 3},
-            {"name": "deliveryPoint", "searchable": true, "targets": 4},
-            {"name": "warehousePoint", "searchable": true, "targets": 5},
+            {"name": "deliveryPointName", "searchable": true, "targets": 4},
+            {"name": "warehousePointName", "searchable": true, "targets": 5},
             {"name": "userName", "searchable": true, "targets": 6},
-            {"name": "invoiceStatusRusName", "searchable": true, "targets": 7},
+            {"name": "requestStatusRusName", "searchable": true, "targets": 7},
             {"name": "boxQty", "searchable": true, "targets": 8},
-            {"name": "driver", "searchable": true, "targets": 9},
+            {"name": "driverId", "searchable": true, "targets": 9},
             {"name": "licensePlate", "searchable": true, "targets": 10},
             {"name": "palletsQty", "searchable": true, "targets": 11},
             {"name": "routeListNumber", "searchable": true, "targets": 12},
-            {"name": "directionName", "searchable": true, "targets": 13},
-            {"name": "currentPoint", "searchable": true, "targets": 14},
-            {"name": "nextPoint", "searchable": true, "targets": 15},
+            {"name": "routeName", "searchable": true, "targets": 13},
+            {"name": "currentPointName", "searchable": true, "targets": 14},
+            {"name": "nextPointName", "searchable": true, "targets": 15},
             {"name": "arrivalTime", "searchable": true, "targets": 16},
-            {"name": "invoiceStatusID", "searchable": false, "visible": false, "targets": 17},
+            {"name": "requestStatusID", "searchable": false, "visible": false, "targets": 17},
             {"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
+            //{"name": "requestNumber", "searchable": true, "targets": 0},
+            //{"name": "insiderRequestNumber", "searchable": true, "targets": 1},
+            //{"name": "invoiceNumber", "searchable": true, "targets": 2},
+            //{"name": "INN", "searchable": true, "targets": 3},
+            //{"name": "deliveryPoint", "searchable": true, "targets": 4},
+            //{"name": "warehousePoint", "searchable": true, "targets": 5},
+            //{"name": "userName", "searchable": true, "targets": 6},
+            //{"name": "invoiceStatusRusName", "searchable": true, "targets": 7},
+            //{"name": "boxQty", "searchable": true, "targets": 8},
+            //{"name": "driver", "searchable": true, "targets": 9},
+            //{"name": "licensePlate", "searchable": true, "targets": 10},
+            //{"name": "palletsQty", "searchable": true, "targets": 11},
+            //{"name": "routeListNumber", "searchable": true, "targets": 12},
+            //{"name": "directionName", "searchable": true, "targets": 13},
+            //{"name": "currentPoint", "searchable": true, "targets": 14},
+            //{"name": "nextPoint", "searchable": true, "targets": 15},
+            //{"name": "arrivalTime", "searchable": true, "targets": 16},
+            //{"name": "invoiceStatusID", "searchable": false, "visible": false, "targets": 17},
+            //{"name": "routeListID", "searchable": false, "visible": false, "targets": 18}
         ]
     });
     // set padding for dataTable

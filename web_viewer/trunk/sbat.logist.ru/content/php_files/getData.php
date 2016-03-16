@@ -29,10 +29,10 @@ function getStatusHistory(PrivilegedUser $privUser)
 }
 function getInvoicesForRouteList(PrivilegedUser $privUser)
 {
-    if (!isset($_POST['routelist'])) {
+    if (!isset($_POST['routeListID'])) {
         throw new DataTransferException('Не задан параметр "маршрутный лист"', __FILE__);
     }
-    $routelist = $_POST['routelist'];
+    $routelist = $_POST['routeListID'];
     if (empty($routelist)) {
         throw new DataTransferException('Не задан параметр "номер накладной"', __FILE__);
     }
@@ -68,10 +68,13 @@ function changeStatusForInvoice(PrivilegedUser $privUser)
 
 function changeStatusForSeveralInvoices(PrivilegedUser $privUser)
 {
-    $routeListID = $_POST['routeListID'];
+    $invoices = $_POST['invEdExt'];
     $newStatusID = $_POST['newStatusID'];
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
-    return $privUser->getInvoiceEntity()->updateInvoiceStatuses($userID, $routeListID, $newStatusID, $datetime, $comment);
+    if (isset($_POST['palletsQty'])) {
+        return $privUser->getInvoiceEntity()->updateInvoiceStatuses($userID, $invoices, $newStatusID, $datetime, $comment, $_POST['palletsQty']);
+    }
+    return $privUser->getInvoiceEntity()->updateInvoiceStatuses($userID, $invoices, $newStatusID, $datetime, $comment);
 }

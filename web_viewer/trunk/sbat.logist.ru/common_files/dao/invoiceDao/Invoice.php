@@ -138,7 +138,7 @@ class SelectInvoiceHistory implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "CALL selectInvoiceStatusHistory('$this->invoiceNumber');";
+        return "CALL selectRequestStatusHistory('$this->invoiceNumber');";
     }
 }
 
@@ -172,21 +172,24 @@ class UpdateInvoiceStatus implements IEntityUpdate
 
 class UpdateInvoiceStatuses implements IEntityUpdate
 {
-    private $routeListID;
+    private $invoices;
     private $userID;
     private $newInvoiceStatus;
     private $datetime;
     private $comment;
+    private $palletQuantity;
 
-    function __construct($userID, $routeListID, $newInvoiceStatus, $datetime, $comment)
+    function __construct($userID, $invoiceListArray, $newInvoiceStatus, $datetime, $comment, $palletQuantity=0)
     {
         $dao = DAO::getInstance();
 
-        $this->routeListID = $dao->checkString($routeListID);
+        $invoiceListArray = implode(", ",$invoiceListArray);
+        $this->invoices = $dao->checkString($invoiceListArray);
         $this->userID = $dao->checkString($userID);
         $this->newInvoiceStatus = $dao->checkString($newInvoiceStatus);
         $this->datetime = $dao->checkString($datetime);
         $this->comment = $dao->checkString($comment);
+        $this->palletQuantity = $dao->checkString($palletQuantity);
     }
 
     /**
@@ -194,7 +197,10 @@ class UpdateInvoiceStatuses implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `routeListID` = '$this->routeListID';";
+        if ($this->newInvoiceStatus === 'DEPARTURE') {
+            return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `boxQty` = $this->palletQuantity,`lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `invoiceID` IN ($this->invoices);";
+        }
+        return "UPDATE `invoices` SET `invoiceStatusID` = '$this->newInvoiceStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `invoiceID` IN ($this->invoices);";
     }
 }
 

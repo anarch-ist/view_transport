@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     const STATUS_SELECT_MENU_WIDTH = 600,
         DIALOG_HEIGHT = 430,
         DIALOG_WIDTH = 800,
@@ -97,7 +96,7 @@ $(document).ready(function () {
                             //var invoicesArray = ["invIdExternal1", "invIdExternal2", "invIdExternal3"];
                             $invoiceCheckBoxes.html("");
                             invoicesArray.forEach(function(invIdExt){
-                                $invoiceCheckBoxes.append('<label>'+'<input type="checkbox" value='+invIdExt+' checked>'+invIdExt+'</label>'+'<br>');
+                                $invoiceCheckBoxes.append('<label>'+'<input type="checkbox" value='+invIdExt.invoiceID+' checked>'+invIdExt.invoiceIDExternal+'</label>'+'<br>');
                             });
                         }
                     );
