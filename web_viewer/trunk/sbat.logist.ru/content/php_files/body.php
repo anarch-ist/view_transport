@@ -23,6 +23,7 @@
     <script src="common_files/media/FieldType-Mask/editor.mask.min.js"></script>
     <script src="common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
     <script src="common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
+    <script src="common_files/media/ColReorder-1.3.1/js/dataTables.colReorder.min.js"></script>
 
     <!--dateTimePicker-->
     <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>

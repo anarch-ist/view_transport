@@ -13,10 +13,11 @@ $(document).ready(function () {
         var title = $(this).text();
         $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
     });
-
+    
     var dataTable = $('#user-grid').DataTable({
         processing: true,
         serverSide: true,
+        colReorder: true,
         select: {
             style: 'single'
         },
