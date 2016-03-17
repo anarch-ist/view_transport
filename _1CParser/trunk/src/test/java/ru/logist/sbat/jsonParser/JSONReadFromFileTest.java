@@ -1,5 +1,6 @@
 package ru.logist.sbat.jsonParser;
 
+import org.json.simple.parser.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,4 +26,11 @@ public class JSONReadFromFileTest {
     public void testRead() throws Exception {
         JSONReadFromFile.read(jsonFile);
     }
+
+    @Test(expected = ParseException.class)
+    public void testReadWrongJsonFile() throws Exception {
+        Path wrongJsonFormatFile = Paths.get(JSONReadFromFileTest.class.getResource("wrongJson.pkg").toURI());
+        JSONReadFromFile.read(wrongJsonFormatFile);
+    }
+
 }

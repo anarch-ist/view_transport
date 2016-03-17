@@ -1,0 +1,24 @@
+{
+"dataFrom1C": {
+"server": "EKA",
+"packageNumber": 0,
+"created": "2016-03-16T13:42:31",
+"packageData": {
+"updatePoints": [
+{
+"pointId": "52",
+"pointName": "Апатиты",
+"pointAdress": "",
+"pointType": "AGENCY",
+"pointEmail": """tumanoff@aneva.ru;apatity@aneva.ru;",
+"responsiblePersonId": ""
+}
+, {
+"pointId": "62",
+"pointName": "Армавир",
+"pointAdress": "",
+"pointType": "AGENCY",
+"pointEmail": "",
+"responsiblePersonId": ""
+}
+, {

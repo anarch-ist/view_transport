@@ -101,19 +101,20 @@ public class App {
             @Override
             public void onFileCreate(Path filePath) {
 
-                File file = filePath.toFile();
-
-                // wait for loading all data
-                long currentFileSize = -1;
-                while (currentFileSize != file.length()) {
-                    currentFileSize = file.length();
-                    try {
-                        Thread.currentThread().sleep(1000);
-                    } catch (InterruptedException e) {/*NOPE*/}
-                    logger.info("wait for loading... file size = [{}], size second ago = [{}]", file.length(), currentFileSize);
-                }
-
                 executorService.submit((Runnable) () -> {
+
+                    File file = filePath.toFile();
+
+                    // wait for loading all data
+                    long currentFileSize = -1;
+                    while (currentFileSize != file.length()) {
+                        currentFileSize = file.length();
+                        try {
+                            Thread.currentThread().sleep(1000);
+                        } catch (InterruptedException e) {/*NOPE*/}
+                        logger.info("wait for loading... file size = [{}], size second ago = [{}]", file.length(), currentFileSize);
+                    }
+
                     try {
                         logger.info("Start update data from file [{}]", filePath);
                         DataFrom1c dataFrom1c = JSONReadFromFile.read(filePath);
@@ -161,6 +162,7 @@ public class App {
                 logger.error(e);
             }
         });
+        watchServiceThread.setName("watchServiceThread");
         watchServiceThread.setDaemon(true);
         watchServiceThread.start();
     }

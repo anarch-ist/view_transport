@@ -1,4 +1,4 @@
-1) файл должен быть корректным с точки зрения формата JSON.
+﻿1) файл должен быть корректным с точки зрения формата JSON.
 
 2) файл должен быть в кодировке - UTF-8 c BOM или без.
 
@@ -75,7 +75,7 @@
     "requestId": строка, UNIQUE, NOT EMPTY
     "num_boxes": long или пустая строка
     "status": один из списка статусов: (
-    SAVED,APPROVING,RESERVED,APPROVED,STOP_LIST,CREDIT_LIMIT,
+    UNKNOWN,SAVED,APPROVING,RESERVED,APPROVED,STOP_LIST,CREDIT_LIMIT,
     RASH_CREATED,COLLECTING,CHECK,CHECK_PASSED,ADJUSTMENTS_MADE,PACKAGING,CHECK_BOXES,READY,TRANSPORTATION
     )
     "timeOutStatus": дата и время в формате "YY.MM.DD,HH:MM:SS" или пустая строка

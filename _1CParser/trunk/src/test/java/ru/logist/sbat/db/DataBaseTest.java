@@ -23,7 +23,7 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
 
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_third.pkg").toURI());
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_fourth.pkg").toURI());
         dataFrom1c = JSONReadFromFile.read(path);
 
         // get connection to database
@@ -44,7 +44,8 @@ public class DataBaseTest {
 
     @AfterClass
     public static void tearDown() throws Exception {
-        dataBase.close();
+        if (dataBase != null)
+            dataBase.close();
     }
 
     @Test
