@@ -11,7 +11,7 @@ public interface IRoute {
     Point getArrivalPoint();
     Point getDeparturePoint();
     int getWeekDayOfActualDeliveryDateInRoutePoint(RoutePoint routePoint);
-    Date getActualDeliveryDateInRoutePoint(RoutePoint routePoint);
+    Date getActualDeliveryTimeInRoutePoint(RoutePoint routePoint);
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
     int getDaysCountOfRoute();

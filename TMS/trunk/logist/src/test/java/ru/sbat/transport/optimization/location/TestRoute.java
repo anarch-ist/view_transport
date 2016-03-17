@@ -81,20 +81,20 @@ public class TestRoute {
         Assert.assertEquals(warehousePoint1, plannedSchedule.get(0).getDeparturePoint());
     }
 
-//    @Test
-//    public void testGetWeekDayOfActualDeliveryTime() {
-//        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryDateInRoutePoint(tradeRepresentativePoint1));
-//    }
-//
-//    @Test
-//    public void testGetActualDeliveryTime() {
-//        Assert.assertEquals(3, plannedSchedule.get(0).getActualDeliveryDateInRoutePoint(tradeRepresentativePoint1).getHours());
-//        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryDateInRoutePoint(tradeRepresentativePoint1).getMinutes());
-//        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryDateInRoutePoint(tradeRepresentativePoint2).getHours());
-//        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryDateInRoutePoint(tradeRepresentativePoint2).getMinutes());
-//        Assert.assertEquals(15, plannedSchedule.get(0).getActualDeliveryDateInRoutePoint(warehousePoint1).getHours());
-//        Assert.assertEquals(30, plannedSchedule.get(0).getActualDeliveryDateInRoutePoint(warehousePoint1).getMinutes());
-//    }
+    @Test
+    public void testGetWeekDayOfActualDeliveryTime() {
+        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryDateInRoutePoint(route.get(1)));
+    }
+
+    @Test
+    public void testGetActualDeliveryTime() {
+        Assert.assertEquals(3, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(1)).getHours());
+        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(1)).getMinutes());
+        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(2)).getHours());
+        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(2)).getMinutes());
+        Assert.assertEquals(15, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(0)).getHours());
+        Assert.assertEquals(30, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(0)).getMinutes());
+    }
 
     @Test
     public void testSplitTimeComponents() {

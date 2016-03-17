@@ -4,13 +4,11 @@ package ru.sbat.transport.optimization;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import ru.sbat.transport.optimization.location.Route;
-import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Map;
+
 
 
 public class InvoiceOverviewController {
@@ -30,12 +28,7 @@ public class InvoiceOverviewController {
                         List<? extends Invoice> addedSubList = c.getAddedSubList();
                         InvoiceContainer invoiceContainer = new InvoiceContainer();
                         invoiceContainer.addAll(addedSubList);
-                        try {
-                            System.out.println("Элемент добавлен");
-                            Map<Invoice, ArrayList<Route>> routesForAddedInvoices = optimizer.filtrate(plannedSchedule, invoiceContainer);
-                        } catch (RouteNotFoundException e) {
-                            e.printStackTrace();
-                        }
+//
                     }else if(c.wasUpdated()){
 
                     }else if(c.wasRemoved()){

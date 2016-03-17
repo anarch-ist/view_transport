@@ -27,6 +27,10 @@ public class TestRouteWeightAndVolume {
     static Invoice invoice2 = createInvoice(5, 6);
     static Invoice invoice3 = createInvoice(3, 4);
     static Invoice invoice4 = createInvoice(1, 5);
+    static DeliveryRoute deliveryRoute1 = new DeliveryRoute();
+    static DeliveryRoute deliveryRoute2 = new DeliveryRoute();
+    static DeliveryRoute deliveryRoute3 = new DeliveryRoute();
+    static DeliveryRoute deliveryRoute4 = new DeliveryRoute();
 
     public static RoutePoint createRoutePoint(CharacteristicsOfCar characteristicsOfCar){
         RoutePoint result = new RoutePoint();
@@ -64,20 +68,24 @@ public class TestRouteWeightAndVolume {
         invoiceContainer.add(invoice2);
         invoiceContainer.add(invoice3);
         invoiceContainer.add(invoice4);
-//        invoice1.setDeliveryRoute(route);
-//        invoice2.setDeliveryRoute(route4);
-//        invoice4.setDeliveryRoute(route3);
-//        invoice3.setDeliveryRoute(route4);
+        deliveryRoute1.add(route);
+        deliveryRoute2.add(route2);
+        deliveryRoute3.add(route3);
+        deliveryRoute4.add(route4);
+        invoice1.setDeliveryRoute(deliveryRoute1);
+        invoice2.setDeliveryRoute(deliveryRoute4);
+        invoice4.setDeliveryRoute(deliveryRoute3);
+        invoice3.setDeliveryRoute(deliveryRoute4);
     }
 
     @Test
     public void testGetWeightAndVolumeForRoute(){
         Map<Route, RoutePair> result = routeWeightAndVolume.getWeightAndVolumeForRoute(plannedSchedule, invoiceContainer);
         Assert.assertEquals(5, result.size());
-        RoutePair routePair = new RoutePair(8, 10);
+        RoutePair routePair = new RoutePair(17, 25);
         RoutePair routePair2 = new RoutePair(10, 15);
-        RoutePair routePair3 = new RoutePair(4, 5);
-        RoutePair routePair4 = new RoutePair(2, 7);
+        RoutePair routePair3 = new RoutePair(5, 10);
+        RoutePair routePair4 = new RoutePair(7, 13);
         System.out.println(route.getStartingWeight() + " " + route.getStartingVolume() + " были показ-ли машины");
         System.out.println(result.get(route).getWeight() + " " + result.get(route).getVolume() + " после привеса накладной стали");
         System.out.println(route.getStartingWeight() + " " + route.getStartingVolume() + " показ-ли машины не должны поменяться");

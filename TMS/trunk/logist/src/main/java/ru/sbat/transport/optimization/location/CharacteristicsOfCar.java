@@ -3,10 +3,10 @@ package ru.sbat.transport.optimization.location;
 
 
 public class CharacteristicsOfCar {
-    private double capacityCar; //грузоподъемность в кг
-    private double volumeCar; //объем машины
-    private double occupancyCost;
-    private double costOfCar;
+    private double capacityCar; //грузоподъемность ТС в т
+    private double volumeCar; //объем ТС в м^3
+    private double occupancyCost; // вместимость ТС по стоимости
+    private double costOfCar; // стоимость ТС
 
     public CharacteristicsOfCar(double capacityCar, double volumeCar) {
         this.capacityCar = capacityCar;

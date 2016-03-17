@@ -91,10 +91,10 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
 
     /** determines time of arrival in the point of route
      *
-     * @return date with real hours and minutes of arrival in the point
+     * @return current day, month, year with REAL hours and minutes of arrival in the point
      */
     @Override
-    public Date getActualDeliveryDateInRoutePoint(RoutePoint routePoint) {
+    public Date getActualDeliveryTimeInRoutePoint(RoutePoint routePoint) {
         Date date = new Date();
         for(RoutePoint routePointFromRoute: this) {
             if (routePointFromRoute.equals(routePoint)) {

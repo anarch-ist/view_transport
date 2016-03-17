@@ -25,7 +25,7 @@ public class TestInvoiceOverviewController {
     static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
 
     //---------------СЛУЖЕБНЫЕ МЕТОДЫ----------------------
-    public Invoice createInvoice(Request request, Point addressOfWarehouse, double weight, double volume, int countOfBoxes, MarketAgent marketAgent, int priority, Route route, Date creationDate, double cost){
+    public Invoice createInvoice(Request request, Point addressOfWarehouse, double weight, double volume, int countOfBoxes, MarketAgent marketAgent, int priority, DeliveryRoute deliveryRoute, Date creationDate, double cost){
         Invoice result = new Invoice();
         result.setRequest(request);
         result.setAddressOfWarehouse(addressOfWarehouse);
@@ -34,7 +34,7 @@ public class TestInvoiceOverviewController {
         result.setCountOfBoxes(countOfBoxes);
         result.setMarketAgent(marketAgent);
         result.setPriority(priority);
-//        result.setDeliveryRoute(route);
+        result.setDeliveryRoute(deliveryRoute);
         result.setCreationDate(creationDate);
         result.setCost(cost);
         return result;
@@ -47,6 +47,12 @@ public class TestInvoiceOverviewController {
         result.setDeliveryPoint(deliveryPoint);
         result.setPlannedDeliveryDate(plannedDeliveryTime);
         result.setDayOfWeek(dayOfWeek);
+        return result;
+    }
+
+    public static DeliveryRoute initDeliveryRoute(Route... route) {
+        DeliveryRoute result = new DeliveryRoute();
+        Collections.addAll(result, route);
         return result;
     }
 
@@ -89,7 +95,7 @@ public class TestInvoiceOverviewController {
     @Test
     public void testInvoiceOverViewController(){
         Request request = createRequest(12, 4, tradeRepresentativePoint0, new Date(2016, 1, 27, 12, 30), 7);
-        Invoice invoice = createInvoice(request, warehousePoint0, 15.5, 17.7, 17, marketAgent, 1, route, new Date(2016, 1, 9, 15, 40), 14546);
+        Invoice invoice = createInvoice(request, warehousePoint0, 15.5, 17.7, 17, marketAgent, 1, initDeliveryRoute(route), new Date(2016, 1, 9, 15, 40), 14546);
         InvoiceOverviewController invoiceOverviewController = new InvoiceOverviewController(invoiceContainer, plannedSchedule);
         invoiceContainer.add(invoice);
         invoice.setVolume(15);
