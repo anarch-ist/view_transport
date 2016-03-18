@@ -36,7 +36,7 @@ public class Optimizer implements IOptimizer {
                     for(RoutePoint routePointDelivery: route){
                         DeliveryRoute deliveryRoute = new DeliveryRoute();
                         if(routePointDelivery.getDeparturePoint().equals(deliveryPoint) && route.indexOf(routePointDelivery) != 0){
-                            ArrayList<PairDate> pairDates = getDepartureArrivalDatesBetweenTwoRoutePoints(route, invoice, route.get(route.indexOf(routePointDelivery) - 1), routePointDelivery);
+                            ArrayList<PairDate> pairDates = getDepartureArrivalDatesBetweenTwoRoutePoints(route, route, invoice, route.get(route.indexOf(routePointDelivery) - 1), routePointDelivery);
                             if(pairDates.size() > 0){
                                 if((route.get(route.indexOf(routePointDelivery)).getDeparturePoint()).equals(departurePoint)){
                                     deliveryRoute.add(route);
@@ -54,15 +54,36 @@ public class Optimizer implements IOptimizer {
 
     /** creates possible delivery routes of one or more routes
      *
-     * @param routePoint
-     * @param index
-     * @param route
      * @param invoice
      * @param plannedSchedule
      * @return array list of delivery routes
      */
-    public ArrayList<DeliveryRoute> getDeliveryRoute(RoutePoint routePoint, int index, Route route, Invoice invoice, PlannedSchedule plannedSchedule){
+    public ArrayList<DeliveryRoute> getDeliveryRoute(Invoice invoice, PlannedSchedule plannedSchedule, Point point) throws RouteNotFoundException {
+        // at the beginning point is invoice.getRequest.getPlannedDeliveryPoint
         ArrayList<DeliveryRoute> result = new ArrayList<>();
+        for (Route route : plannedSchedule) {
+            if (route == null) {
+                throw new RouteNotFoundException("route should not be null");
+            }
+            for(RoutePoint routePoint: route){
+                DeliveryRoute deliveryRoute = new DeliveryRoute();
+                if(routePoint.getDeparturePoint().equals(point) && route.indexOf(routePoint) != 0){
+                    for(int i = route.indexOf(routePoint) - 1; i >= 0; i--) {
+                        ArrayList<PairDate> pairDates = getDepartureArrivalDatesBetweenTwoRoutePoints(route, route, invoice, route.get(i), routePoint);
+                        if (pairDates.size() > 0) {
+                            if ((route.get(route.indexOf(routePoint)).getDeparturePoint()).equals(invoice.getAddressOfWarehouse())) {
+                                deliveryRoute.add(route);
+                                result.add(0, deliveryRoute);
+                                System.out.println(result.size());
+                                break;
+                            }
+                        }
+                    }
+                    point = route.get(0).getDeparturePoint();
+                    getDeliveryRoute(invoice, plannedSchedule, point);
+                }
+            }
+        }
         return result;
     }
 
@@ -140,12 +161,17 @@ public class Optimizer implements IOptimizer {
             calendar.add(Calendar.DAY_OF_MONTH, tmp);
             date.setTime(calendar.getTimeInMillis());
         }
-        while (date.before(plannedDeliveryDate)) {
-            result.add(date);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            calendar.add(Calendar.DAY_OF_MONTH, 7);
-            date = new Date(calendar.getTimeInMillis());
+        while (date.before(plannedDeliveryDate)){
+            if(route.indexOf(routePoint) == (route.size() - 1)){
+
+                result.add(date);
+            }else {
+                result.add(date);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                calendar.add(Calendar.DAY_OF_MONTH, 7);
+                date = new Date(calendar.getTimeInMillis());
+            }
         }
         return result;
     }
@@ -163,7 +189,7 @@ public class Optimizer implements IOptimizer {
                 ArrayList<Date> newDate = new ArrayList<>();
                 ArrayList<Date> dates = getPossibleDepartureDateFromRoutePoint(route, route.get(i - 1), invoice);
                 for(Date date: dates){
-                    long time = date.getTime() + route.get(i - 1).getTimeToNextPoint() * 60000 + route.get(i).getLoadingOperationsTime() * 60000;
+                    long time = date.getTime() + route.get(i - 1).getTimeToNextPoint() * 60000; // + route.get(i).getLoadingOperationsTime() * 60000 ???
                     Date tmp = new Date(time);
                     newDate.add(tmp);
                 }
@@ -174,10 +200,10 @@ public class Optimizer implements IOptimizer {
     }
 
     @Override
-    public ArrayList<PairDate> getDepartureArrivalDatesBetweenTwoRoutePoints(Route route, Invoice invoice, RoutePoint departureRoutePoint, RoutePoint arrivalRoutePoint){
+    public ArrayList<PairDate> getDepartureArrivalDatesBetweenTwoRoutePoints(Route departureRoute, Route arrivalRoute, Invoice invoice, RoutePoint departureRoutePoint, RoutePoint arrivalRoutePoint){
         ArrayList<PairDate> result = new ArrayList<>();
-        ArrayList<Date> departureDates = getPossibleDepartureDateFromRoutePoint(route, departureRoutePoint, invoice);
-        ArrayList<Date> arrivalDates = getArrivalDateInEachRoutePointInRoute(route, invoice).get(arrivalRoutePoint);
+        ArrayList<Date> departureDates = getPossibleDepartureDateFromRoutePoint(departureRoute, departureRoutePoint, invoice);
+        ArrayList<Date> arrivalDates = getArrivalDateInEachRoutePointInRoute(arrivalRoute, invoice).get(arrivalRoutePoint);
         for(int i = 0; i < arrivalDates.size(); i++){
             if(arrivalDates.get(i).after(invoice.getRequest().getPlannedDeliveryDate())){
                 break;
