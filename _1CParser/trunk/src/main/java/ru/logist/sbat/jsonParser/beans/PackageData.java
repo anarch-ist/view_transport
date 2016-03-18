@@ -3,11 +3,21 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.logist.sbat.jsonParser.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PackageData {
+    private static final String FN_UPDATE_POINTS = "updatePoints";
+    private static final String FN_UPDATE_DIRECTIONS = "updateDirections";
+    private static final String FN_UPDATE_TRADER = "updateTrader";
+    private static final String FN_UPDATE_CLIENTS = "updateClients";
+    private static final String FN_UPDATE_ADDRESS = "updateAddress";
+    private static final String FN_UPDATE_REQUESTS = "updateRequests";
+    private static final String FN_UPDATE_STATUS = "updateStatus";
+    private static final String FN_UPDATE_ROUTE_LISTS = "updateRouteLists";
+
     private List<PointData> updatePoints = new ArrayList<>();
     private List<DirectionsData> updateDirections = new ArrayList<>();
     private List<TraderData> updateTraders = new ArrayList<>();
@@ -18,15 +28,33 @@ public class PackageData {
     private List<RouteListsData> updateRouteLists = new ArrayList<>();
 
     public PackageData(JSONObject packageDataAsJsonObject) {
+        // check fields
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_POINTS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_POINTS), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_DIRECTIONS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_DIRECTIONS), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_TRADER, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_TRADER), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_CLIENTS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_CLIENTS), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_ADDRESS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_ADDRESS), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_REQUESTS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_REQUESTS), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_STATUS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_STATUS), JSONArray.class, packageDataAsJsonObject);
+        Util.checkFieldAvailableAndNotNull(FN_UPDATE_ROUTE_LISTS, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_ROUTE_LISTS), JSONArray.class, packageDataAsJsonObject);
+
+        // set values
         setUpdatePoints((JSONArray)packageDataAsJsonObject.get("updatePoints"));
-        setUpdateAddresses((JSONArray)packageDataAsJsonObject.get("updateAddress"));
         setUpdateDirections((JSONArray) packageDataAsJsonObject.get("updateDirections"));
         setUpdateTraders((JSONArray) packageDataAsJsonObject.get("updateTrader"));
         setUpdateClients((JSONArray) packageDataAsJsonObject.get("updateClients"));
+        setUpdateAddresses((JSONArray)packageDataAsJsonObject.get("updateAddress"));
         setUpdateRequests((JSONArray) packageDataAsJsonObject.get("updateRequests"));
         setUpdateStatuses((JSONArray) packageDataAsJsonObject.get("updateStatus"));
         setUpdateRouteLists((JSONArray) packageDataAsJsonObject.get("updateRouteLists"));
-        setUpdateClients((JSONArray) packageDataAsJsonObject.get("updateClients"));
     }
 
     public List<TraderData> getUpdateTraders() {

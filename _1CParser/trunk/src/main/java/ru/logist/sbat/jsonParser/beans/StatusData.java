@@ -31,89 +31,39 @@ public class StatusData {
     private String comment;
 
     public StatusData(JSONObject updateStatus) {
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_REQUEST_ID, updateStatus);
+        Util.checkFieldAvailableAndNotNull           (FN_NUM_BOXES, updateStatus);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_STATUS, updateStatus);
+        Util.checkFieldAvailableAndNotNull           (FN_TIME_OUT_STATUS, updateStatus);
+        Util.checkFieldAvailableAndNotNull           (FN_COMMENT, updateStatus);
 
-        // check that fields are available and not null
-        Util.checkFieldAvailableAndNotNull(FN_REQUEST_ID, updateStatus);
-        Util.checkFieldAvailableAndNotNull(FN_NUM_BOXES, updateStatus);
-        Util.checkFieldAvailableAndNotNull(FN_STATUS, updateStatus);
-        Util.checkFieldAvailableAndNotNull(FN_TIME_OUT_STATUS, updateStatus);
-        Util.checkFieldAvailableAndNotNull(FN_COMMENT, updateStatus);
-
-        //setRequestId();
-        if (updateStatus.get(FN_NUM_BOXES).equals(""))
-            setNumBoxes(null);
-        else {
-            Util.checkCorrectType(updateStatus.get(FN_NUM_BOXES), Long.class, updateStatus);
-            numBoxes = (Long) updateStatus.get("num_boxes");
-        }
-
-        // check data types
-        Util.checkCorrectType(updateStatus.get(FN_REQUEST_ID), String.class, updateStatus);
-        Util.checkCorrectType(updateStatus.get(FN_STATUS), String.class, updateStatus);
-        Util.checkCorrectType(updateStatus.get(FN_TIME_OUT_STATUS), String.class, updateStatus);
-        Util.checkCorrectType(updateStatus.get(FN_COMMENT), String.class, updateStatus);
-
-        // check not empty
-        String requestId = (String) updateStatus.get("requestId");
-        Util.requireNonNullOrEmpty(requestId, "requestId");
-        this.requestId = requestId;
-
-
-
-        setStatus((String) updateStatus.get("status"));
-        setTimeOutStatus((String) updateStatus.get("timeOutStatus"));
-        setComment((String) updateStatus.get("comment"));
+        //set values
+        Util.setStringValue              (FN_REQUEST_ID, updateStatus, this, "requestId");
+        Util.setNullIfEmptyOrSetValueLong(FN_NUM_BOXES, updateStatus, this, "numBoxes");
+        Util.setStringValue              (FN_STATUS, updateStatus, this, "status", possibleStatuses);
+        Util.setNullIfEmptyOrSetValueDate(FN_TIME_OUT_STATUS, updateStatus, this, "timeOutStatus", timeOutStatusFormatter);
+        Util.setStringValue              (FN_COMMENT, updateStatus, this, "comment");
     }
-
-
 
     public String getRequestId() {
         return requestId;
-    }
-
-    private void setRequestId(String requestId) {
-
     }
 
     public Long getNumBoxes() {
         return numBoxes;
     }
 
-    // TODO fix it
-    private void setNumBoxes(Long numBoxes) {
-    //    Util.requireNonNull(numBoxes, "num_boxes");
-        this.numBoxes = numBoxes;
-    }
-
     public String getStatus() {
         return status;
-    }
-
-    private void setStatus(String status) {
-        Util.withValidatorExceptionRedirect(() -> {
-            if (!possibleStatuses.contains(status))
-                throw new IllegalArgumentException("status [" + status + "] is not contained in set of possible statuses [" + possibleStatuses + "]");
-            this.status = status;
-        });
     }
 
     public Date getTimeOutStatus() {
         return timeOutStatus;
     }
 
-    // TODO fix it
-    private void setTimeOutStatus(String timeOutStatusAsString) {
-        //timeOutStatus = Util.getDateWithCheck(timeOutStatusAsString, "timeOutStatus", timeOutStatusFormatter);
-    }
-
     public String getComment() {
         return comment;
-    }
-
-    // TODO fix it make warning
-    private void setComment(String comment) {
-        //Util.requireNonNull(comment, "comment");
-        this.comment = comment;
     }
 
     @Override

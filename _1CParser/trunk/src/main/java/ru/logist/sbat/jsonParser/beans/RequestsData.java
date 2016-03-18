@@ -7,187 +7,142 @@ import java.time.format.DateTimeFormatter;
 import java.sql.Date;
 
 public class RequestsData {
+    private static final String FN_REQUEST_ID = "requestId";
+    private static final String FN_REQUEST_NUMBER = "requestNumber";
+    private static final String FN_REQUEST_DATE = "requestDate";
+    private static final String FN_INVOICE_NUMBER = "invoiceNumber";
+    private static final String FN_INVOICE_DATE = "invoiceDate";
+    private static final String FN_DOCUMENT_NUMBER = "documentNumber";
+    private static final String FN_DOCUMENT_DATE = "documentDate";
+    private static final String FN_FIRMA = "firma";
+    private static final String FN_STORAGE = "storage";
+    private static final String FN_CLIENT_ID = "clientId";
+    private static final String FN_ADDRESS_ID = "addressId";
+    private static final String FN_CONTACT_NAME = "contactName";
+    private static final String FN_CONTACT_PHONE = "contactPhone";
+    private static final String FN_DELIVERY_OPTION = "deliveryOption";
+    private static final String FN_TRADER_ID = "traderId";
+    private static final String FN_DELIVERY_DATE = "deliveryDate";
     private static final DateTimeFormatter isoFormatter = DateTimeFormatter.BASIC_ISO_DATE;
+
     private String requestId;
     private String requestNumber;
     private Date requestDate;
-    private String clientId;
-    private String addressId;
-    private String traderId;
     private String invoiceNumber;
     private Date invoiceDate;
     private String documentNumber;
     private Date documentDate;
     private String firma;
     private String storage;
+    private String clientId;
+    private String addressId;
     private String contactName;
     private String contactPhone;
     private String deliveryOption;
+    private String traderId;
     private Date deliveryDate;
 
     public RequestsData(JSONObject updateRequests) {
-        setRequestId((String) updateRequests.get("requestId"));
-        setRequestNumber((String) updateRequests.get("requestNumber"));
-        setRequestDate((String) updateRequests.get("requestDate"));
-        setClientId((String) updateRequests.get("clientId"));
-        setAddressId((String) updateRequests.get("addressId"));
-        setTraderId((String) updateRequests.get("traderId"));
-        setInvoiceNumber((String) updateRequests.get("invoiceNumber"));
-        setInvoiceDate((String) updateRequests.get("invoiceDate"));
-        setDocumentNumber((String) updateRequests.get("documentNumber"));
-        setDocumentDate((String) updateRequests.get("documentDate"));
-        setFirma((String) updateRequests.get("firma"));
-        setStorage((String) updateRequests.get("storage"));
-        setContactName((String) updateRequests.get("contactName"));
-        setContactPhone((String) updateRequests.get("contactPhone"));
-        setDeliveryOption((String) updateRequests.get("deliveryOption"));
-        setDeliveryDate((String) updateRequests.get("deliveryDate"));
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_REQUEST_ID, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_REQUEST_NUMBER, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_REQUEST_DATE, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_INVOICE_NUMBER, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_INVOICE_DATE, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_DOCUMENT_NUMBER, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_DOCUMENT_DATE, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_FIRMA, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_STORAGE, updateRequests);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateRequests);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ADDRESS_ID, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_CONTACT_NAME, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_CONTACT_PHONE, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_DELIVERY_OPTION, updateRequests);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_TRADER_ID, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_DELIVERY_DATE, updateRequests);
+
+        //set values
+        Util.setStringValue              (FN_REQUEST_ID, updateRequests, this, "requestId");
+        Util.setStringValue              (FN_REQUEST_NUMBER, updateRequests, this, "requestNumber");
+        Util.setNullIfEmptyOrSetValueDate(FN_REQUEST_DATE, updateRequests, this, "requestDate", isoFormatter);
+        Util.setStringValue              (FN_INVOICE_NUMBER, updateRequests, this, "invoiceNumber");
+        Util.setNullIfEmptyOrSetValueDate(FN_INVOICE_DATE, updateRequests, this, "invoiceDate", isoFormatter);
+        Util.setStringValue              (FN_DOCUMENT_NUMBER, updateRequests, this, "documentNumber");
+        Util.setNullIfEmptyOrSetValueDate(FN_DOCUMENT_DATE, updateRequests, this, "documentDate", isoFormatter);
+        Util.setStringValue              (FN_FIRMA, updateRequests, this, "firma");
+        Util.setStringValue              (FN_STORAGE, updateRequests, this, "storage");
+        Util.setStringValue              (FN_CLIENT_ID, updateRequests, this, "clientId");
+        Util.setStringValue              (FN_ADDRESS_ID, updateRequests, this, "addressId");
+        Util.setStringValue              (FN_CONTACT_NAME, updateRequests, this, "contactName");
+        Util.setStringValue              (FN_CONTACT_PHONE, updateRequests, this, "contactPhone");
+        Util.setStringValue              (FN_DELIVERY_OPTION, updateRequests, this, "deliveryOption");
+        Util.setStringValue              (FN_TRADER_ID, updateRequests, this, "clientId");
+        Util.setStringValue              (FN_CLIENT_ID, updateRequests, this, "traderId");
+        Util.setNullIfEmptyOrSetValueDate(FN_DELIVERY_DATE, updateRequests, this, "deliveryDate", isoFormatter);
     }
 
     public String getRequestId() {
         return requestId;
     }
 
-    private void setRequestId(String requestId) {
-        Util.requireNonNullOrEmpty(requestId, "requestId");
-        this.requestId = requestId;
-    }
-
     public String getRequestNumber() {
         return requestNumber;
-    }
-
-    private void setRequestNumber(String requestNumber) {
-        Util.requireNonNull(requestNumber, "requestNumber");
-        this.requestNumber = requestNumber;
     }
 
     public Date getRequestDate() {
         return requestDate;
     }
 
-    private void setRequestDate(String requestDateAsString) {
-        requestDate = Util.getDateWithCheck(requestDateAsString, "requestDate", isoFormatter);
-    }
-
     public String getClientId() {
         return clientId;
-    }
-
-    private void setClientId(String clientId) {
-        Util.requireNonNullOrEmpty(clientId, "clientId");
-        this.clientId = clientId;
     }
 
     public String getAddressId() {
         return addressId;
     }
 
-    private void setAddressId(String addressId) {
-        Util.requireNonNullOrEmpty(addressId, "addressId");
-        this.addressId = addressId;
-    }
-
     public String getTraderId() {
         return traderId;
-    }
-
-    private void setTraderId(String traderId) {
-        Util.requireNonNullOrEmpty(traderId, "traderId");
-        this.traderId = traderId;
     }
 
     public String getInvoiceNumber() {
         return invoiceNumber;
     }
 
-    private void setInvoiceNumber(String invoiceNumber) {
-        Util.requireNonNull(invoiceNumber, "invoiceNumber");
-        this.invoiceNumber = invoiceNumber;
-    }
-
     public Date getInvoiceDate() {
         return invoiceDate;
-    }
-
-    private void setInvoiceDate(String invoiceDateAsString) {
-        invoiceDate = Util.getDateWithCheck(invoiceDateAsString, "invoiceDate", isoFormatter);
     }
 
     public String getDocumentNumber() {
         return documentNumber;
     }
 
-    // TODO fix this
-    private void setDocumentNumber(String documentNumber) {
-        //Util.requireNonNull(documentNumber, "documentNumber");
-        if (documentNumber == null) {
-            this.documentNumber = "";
-            return;
-        }
-        this.documentNumber = documentNumber;
-    }
-
     public Date getDocumentDate() {
         return documentDate;
-    }
-
-    //TODO fix this
-    private void setDocumentDate(String documentDateAsString) {
-        //documentDate = Util.getDateWithCheck(documentDateAsString, "documentDate", isoFormatter);
     }
 
     public String getFirma() {
         return firma;
     }
 
-    private void setFirma(String firma) {
-        Util.requireNonNull(firma, "firma");
-        this.firma = firma;
-    }
-
     public String getStorage() {
         return storage;
-    }
-
-    private void setStorage(String storage) {
-        Util.requireNonNull(storage, "storage");
-        this.storage = storage;
     }
 
     public String getContactName() {
         return contactName;
     }
 
-    private void setContactName(String contactName) {
-        Util.requireNonNull(contactName, "contactName");
-        this.contactName = contactName;
-    }
-
     public String getContactPhone() {
         return contactPhone;
-    }
-
-    private void setContactPhone(String contactPhone) {
-        Util.requireNonNull(contactPhone, "contactPhone");
-        this.contactPhone = contactPhone;
     }
 
     public String getDeliveryOption() {
         return deliveryOption;
     }
 
-    private void setDeliveryOption(String deliveryOption) {
-        Util.requireNonNull(deliveryOption, "deliveryOption");
-        this.deliveryOption = deliveryOption;
-    }
-
     public Date getDeliveryDate() {
         return deliveryDate;
-    }
-
-    private void setDeliveryDate(String deliveryDateAsString) {
-        deliveryDate = Util.getDateWithCheck(deliveryDateAsString, "deliveryDate", isoFormatter);
     }
 
     @Override
@@ -196,18 +151,18 @@ public class RequestsData {
                 "requestId='" + requestId + '\'' +
                 ", requestNumber='" + requestNumber + '\'' +
                 ", requestDate=" + requestDate +
-                ", clientId='" + clientId + '\'' +
-                ", addressId='" + addressId + '\'' +
-                ", traderId='" + traderId + '\'' +
                 ", invoiceNumber='" + invoiceNumber + '\'' +
                 ", invoiceDate=" + invoiceDate +
                 ", documentNumber='" + documentNumber + '\'' +
                 ", documentDate=" + documentDate +
                 ", firma='" + firma + '\'' +
                 ", storage='" + storage + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", addressId='" + addressId + '\'' +
                 ", contactName='" + contactName + '\'' +
                 ", contactPhone='" + contactPhone + '\'' +
                 ", deliveryOption='" + deliveryOption + '\'' +
+                ", traderId='" + traderId + '\'' +
                 ", deliveryDate=" + deliveryDate +
                 '}';
     }

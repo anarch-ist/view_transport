@@ -4,30 +4,28 @@ import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
 
 public class DirectionsData {
+    private static final String FN_DIRECT_ID = "directId";
+    private static final String FN_DIRECT_NAME = "directName";
+
     private String directId;
     private String directName;
 
     public DirectionsData(JSONObject updateDirections) {
-        setDirectId((String) updateDirections.get("directId"));
-        setDirectName((String) updateDirections.get("directName"));
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_DIRECT_ID, updateDirections);
+        Util.checkFieldAvailableAndNotNull           (FN_DIRECT_NAME, updateDirections);
+
+        // set values
+        Util.setStringValue(FN_DIRECT_ID, updateDirections, this, "directId");
+        Util.setStringValue(FN_DIRECT_NAME, updateDirections, this, "directName");
     }
 
     public String getDirectId() {
         return directId;
     }
 
-    private void setDirectId(String directId) {
-        Util.requireNonNullOrEmpty(directId, "directId");
-        this.directId = directId;
-    }
-
     public String getDirectName() {
         return directName;
-    }
-
-    private void setDirectName(String directName) {
-        Util.requireNonNull(directName, "directName");
-        this.directName = directName;
     }
 
     @Override

@@ -7,9 +7,9 @@
 4) содержание файла должно быть JSON объектом с одним атрибутом - "dataFrom1C". ({"dataFrom1C":...data})
 
 5) "dataFrom1C" должен содержать следующие атрибуты:
-"server": строка
-"packageNumber": long, этот номер все время увеличивается от выгрузки к выгрузки, уменьшаться он не может
-"created": дата и время в формате "YYYY-MM-DDTHH:MM:SS"
+"server": строка, NOT EMPTY
+"packageNumber": NOT EMPTY, long >=0, этот номер все время увеличивается от выгрузки к выгрузки, уменьшаться он не может
+"created": NOT EMPTY, дата и время в формате "YYYY-MM-DDTHH:MM:SS"
 "packageData": объект с данными {}
 
 6) "packageData" должен содержать 8 массивов:
@@ -25,9 +25,9 @@
 Если соотвествующих данных нет, то массив должен быть пустым. []
 
 7) pointObject:
-    "pointId": long, UNIQUE, NOT NULL, NOT EMPTY
+    "pointId": строка, UNIQUE, NOT NULL, NOT EMPTY
     "pointName": строка, NOT EMPTY
-    "pointAdress": строка, NOT EMPTY
+    "pointAdress": строка
     "pointType": одно из двух значений "AGENCY" или "WAREHOUSE"
     "pointEmail": строка
     "responsiblePersonId": строка
@@ -40,7 +40,8 @@
     "traderId": строка, UNIQUE, NOT EMPTY
     "traderName": строка,
     "traderEMail": строка,
-    "traderPhone": строка
+    "traderPhone": строка,
+    "traderOffice": строка
 
 10) clientObject:
     "clientId": строка, UNIQUE, NOT EMPTY,
@@ -73,7 +74,7 @@
 
 13) statusObject:
     "requestId": строка, UNIQUE, NOT EMPTY
-    "num_boxes": long или пустая строка
+    "num_boxes": long >= 0 или пустая строка
     "status": один из списка статусов: (
     UNKNOWN,SAVED,APPROVING,RESERVED,APPROVED,STOP_LIST,CREDIT_LIMIT,
     RASH_CREATED,COLLECTING,CHECK,CHECK_PASSED,ADJUSTMENTS_MADE,PACKAGING,CHECK_BOXES,READY,TRANSPORTATION
@@ -90,7 +91,7 @@
     "driverId": строка
     "pointDepartureId": строка, NOT EMPTY
     "pointArrivalId": строка приимает знаение либо "NULL" либо любое не пустое значение
-    "directId": строка приимает знаение либо "NULL" либо любое не пустое значение
+    "directId": строка принимает знаение либо "NULL" либо любое не пустое значение
     если pointArrivalId "NULL", то directId не "NULL" и наоборот
     "status": одно из двух значений "CREATED" или "APPROVED"
     "invoices": JSON массив из invoicesId

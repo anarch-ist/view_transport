@@ -107,7 +107,7 @@ public class InsertOrUpdateTransactionScript {
         preparedStatement.setString(2, dataFrom1C.getServer());
         preparedStatement.setString(3, LOGIST_1C);
         preparedStatement.setDate(4, dataFrom1C.getCreated());
-        preparedStatement.setString(5, dataFrom1C.getRawData());
+        preparedStatement.setString(5, dataFrom1C.getRawJsonObject());
         preparedStatement.executeUpdate();
         logger.info("INSERT INTO exchange table completed packageNumber = [{}]", dataFrom1C.getPackageNumber().intValue());
         return preparedStatement;

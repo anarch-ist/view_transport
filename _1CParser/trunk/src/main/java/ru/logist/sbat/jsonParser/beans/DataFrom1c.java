@@ -4,72 +4,59 @@ import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
 
 import java.sql.Date;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 public class DataFrom1c {
+    private static final String FN_DATA_FROM_1C = "dataFrom1C";
+    private static final String FN_SERVER = "server";
+    private static final String FN_PACKAGE_NUMBER = "packageNumber";
+    private static final String FN_CREATED = "created";
+    private static final String FN_PACKAGE_DATA = "packageData";
     private static final DateTimeFormatter dateTimeSQLFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
 
-    private String server; // CONSTRAINT not empty string not null
-    private Long packageNumber; //CONSTRAINT >=0 not null
-    private Date created; // CONSTRAINT not null
-    private PackageData packageData; // CONSTRAINT not null
-    private String rawData; // CONSTRAINT not null
+    private String server;
+    private Long packageNumber;
+    private Date created;
+    private PackageData packageData;
+    private String rawJsonObject;
 
     public DataFrom1c(JSONObject dataFrom1cAsJsonObject) {
-        JSONObject fieldData = (JSONObject) dataFrom1cAsJsonObject.get("dataFrom1C");
-        setServer((String) fieldData.get("server"));
-        setCreated((String) fieldData.get("created"));
-        setPackageNumber((Long) fieldData.get("packageNumber"));
-        setPackageData((JSONObject) fieldData.get("packageData"));
-        setRawData(dataFrom1cAsJsonObject.toJSONString());
+        // check fields
+        Util.checkFieldAvailableAndNotNull(FN_DATA_FROM_1C, dataFrom1cAsJsonObject);
+        Util.checkCorrectType(dataFrom1cAsJsonObject.get(FN_DATA_FROM_1C), JSONObject.class, dataFrom1cAsJsonObject);
+        JSONObject dataFrom1c = (JSONObject) dataFrom1cAsJsonObject.get(FN_DATA_FROM_1C);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_SERVER, dataFrom1c);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_PACKAGE_NUMBER, dataFrom1c);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CREATED, dataFrom1c);
+        Util.checkFieldAvailableAndNotNull           (FN_PACKAGE_DATA, dataFrom1c);
+        Util.checkCorrectType(dataFrom1c.get(FN_PACKAGE_DATA), JSONObject.class, dataFrom1c);
+
+        //set values
+        Util.setStringValue              (FN_SERVER, dataFrom1c, this, "server");
+        Util.setNullIfEmptyOrSetValueLong(FN_PACKAGE_NUMBER, dataFrom1c, this, "packageNumber");
+        Util.setNullIfEmptyOrSetValueDate(FN_CREATED, dataFrom1c, this, "created", dateTimeSQLFormatter);
+        this.packageData = new PackageData((JSONObject) dataFrom1c.get(FN_PACKAGE_DATA));
+        this.rawJsonObject = dataFrom1cAsJsonObject.toJSONString();
     }
 
-    public String getRawData() {
-        return rawData;
-    }
-
-    public void setRawData(String rawData) {
-        this.rawData = rawData;
+    public String getRawJsonObject() {
+        return rawJsonObject;
     }
 
     public String getServer() {
         return server;
     }
 
-    private void setServer(String server) {
-        Util.requireNonNullOrEmpty(server, "server");
-        this.server = server;
-    }
-
     public Long getPackageNumber() {
         return packageNumber;
-    }
-
-    private void setPackageNumber(Long packageNumber) {
-        Util.requireNonNull(packageNumber, "packageNumber");
-        this.packageNumber = packageNumber;
     }
 
     public Date getCreated() {
         return created;
     }
 
-    private void setCreated(String createdDateAsString) {
-        Util.requireNonNullOrEmpty(createdDateAsString, "createdDate");
-        Util.withValidatorExceptionRedirect(() -> created = Date.valueOf(LocalDate.parse(createdDateAsString, dateTimeSQLFormatter)));
-    }
-
     public PackageData getPackageData() {
         return packageData;
-    }
-
-    private void setPackageData(JSONObject packageDataAsJsonObject) {
-        Util.withValidatorExceptionRedirect(() -> {
-            Objects.requireNonNull(packageDataAsJsonObject, "packageData must not be null");
-            this.packageData = new PackageData(packageDataAsJsonObject);
-        });
     }
 
     @Override

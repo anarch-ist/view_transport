@@ -4,52 +4,44 @@ import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
 
 public class AddressData {
+    private static final String FN_ADDRESS_ID = "addressId";
+    private static final String FN_ADDRESS_SHORT = "addressShot";
+    private static final String FN_ADDRESS_FULL = "addressFull";
+    private static final String FN_DELIVERY_AREA_ID = "deliveryAreaId";
+
     private String addressId; //not null and not empty
     private String addressShot; // not null
     private String addressFull; // not null
     private String deliveryAreaId; // not null
 
     public AddressData(JSONObject updateAddress) {
-        setAddressShot((String) updateAddress.get("addressShot"));
-        setAddressFull((String) updateAddress.get("addressFull"));
-        setAddressId((String) updateAddress.get("addressId"));
-        setDeliveryAreaId((String) updateAddress.get("deliveryAreaId"));
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ADDRESS_ID, updateAddress);
+        Util.checkFieldAvailableAndNotNull           (FN_ADDRESS_SHORT, updateAddress);
+        Util.checkFieldAvailableAndNotNull           (FN_ADDRESS_FULL, updateAddress);
+        Util.checkFieldAvailableAndNotNull           (FN_DELIVERY_AREA_ID, updateAddress);
+
+        // set values
+        Util.setStringValue(FN_ADDRESS_ID, updateAddress, this, "addressId");
+        Util.setStringValue(FN_ADDRESS_SHORT, updateAddress, this, "addressShot");
+        Util.setStringValue(FN_ADDRESS_FULL, updateAddress, this, "addressFull");
+        Util.setStringValue(FN_DELIVERY_AREA_ID, updateAddress, this, "deliveryAreaId");
     }
 
     public String getAddressId() {
         return addressId;
     }
 
-    public void setAddressId(String addressId) {
-        Util.requireNonNullOrEmpty(addressId, "addressId");
-        this.addressId = addressId;
-    }
-
     public String getAddressShot() {
         return addressShot;
-    }
-
-    public void setAddressShot(String addressShot) {
-        Util.requireNonNull(addressShot, "addressShot");
-        this.addressShot = addressShot;
     }
 
     public String getAddressFull() {
         return addressFull;
     }
 
-    public void setAddressFull(String addressFull) {
-        Util.requireNonNull(addressFull, "addressFull");
-        this.addressFull = addressFull;
-    }
-
     public String getDeliveryAreaId() {
         return deliveryAreaId;
-    }
-
-    public void setDeliveryAreaId(String deliveryAreaId) {
-        Util.requireNonNull(deliveryAreaId, "deliveryAreaId");
-        this.deliveryAreaId = deliveryAreaId;
     }
 
     @Override

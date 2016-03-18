@@ -6,86 +6,66 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PointData {
-    private static final String[] POINT_TYPES = {"WAREHOUSE", "AGENCY"};
+
+    private static final String FN_POINT_ID = "pointId";
+    private static final String FN_POINT_NAME = "pointName";
+    private static final String FN_POINT_ADDRESS = "pointAdress";
+    private static final String FN_POINT_TYPE = "pointType";
+    private static final String FN_POINT_EMAIL = "pointEmail";
+    private static final String FN_RESPONSIBLE_PERSON_ID = "responsiblePersonId";
+    private static final Set<String> POINT_TYPES = new HashSet<>(Arrays.asList("WAREHOUSE", "AGENCY"));
 
     private String pointId; //CONSTRAINT not null or empty
-    private String responsiblePersonId; //CONSTRAINT not null
     private String pointName; //CONSTRAINT not null
     private String pointAddress; //CONSTRAINT not null or empty
     private String pointType; //CONSTRAINT one of two values (WAREHOUSE, AGENCY)
     private String pointEmails; //CONSTRAINT not null
+    private String responsiblePersonId; //CONSTRAINT not null
 
     public PointData(JSONObject updatePoint) {
-        setPointId((String)updatePoint.get("pointId"));
-        setResponsiblePersonId((String)updatePoint.get("responsiblePersonId"));
-        setPointName((String)updatePoint.get("pointName"));
-        setPointAddress((String)updatePoint.get("pointAdress"));
-        setPointType((String)updatePoint.get("pointType"));
-        setPointEmails((String)updatePoint.get("pointEmail"));
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_POINT_ID, updatePoint);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_POINT_NAME, updatePoint);
+        Util.checkFieldAvailableAndNotNull           (FN_POINT_ADDRESS, updatePoint);
+        Util.checkFieldAvailableAndNotNull           (FN_POINT_TYPE, updatePoint);
+        Util.checkFieldAvailableAndNotNull           (FN_POINT_EMAIL, updatePoint);
+        Util.checkFieldAvailableAndNotNull           (FN_RESPONSIBLE_PERSON_ID, updatePoint);
+
+        // set values
+        Util.setStringValue(FN_POINT_ID, updatePoint, this, "pointId");
+        Util.setStringValue(FN_POINT_NAME, updatePoint, this, "pointName");
+        Util.setStringValue(FN_POINT_ADDRESS, updatePoint, this, "pointAddress");
+        Util.setStringValue(FN_POINT_TYPE, updatePoint, this, "pointType", POINT_TYPES);
+        Util.setStringValue(FN_POINT_EMAIL, updatePoint, this, "pointEmails");
+        Util.setStringValue(FN_RESPONSIBLE_PERSON_ID, updatePoint, this, "responsiblePersonId");
     }
 
     public String getPointId() {
         return pointId;
     }
 
-    private void setPointId(String pointId) {
-        Util.requireNonNullOrEmpty(pointId, "pointId");
-        this.pointId = pointId;
-    }
-
     public String getResponsiblePersonId() {
         return responsiblePersonId;
-    }
-
-    private void setResponsiblePersonId(String responsiblePersonId) {
-        Util.requireNonNull(responsiblePersonId, "responsiblePersonId");
-        this.responsiblePersonId = responsiblePersonId;
     }
 
     public String getPointName() {
         return pointName;
     }
 
-    private void setPointName(String pointName) {
-        Util.requireNonNull(pointName, "responsiblePersonId");
-        this.pointName = pointName;
-    }
-
     public String getPointAddress() {
         return pointAddress;
-    }
-
-    private void setPointAddress(String pointAddress) {
-        Util.requireNonNull(pointAddress, "pointAddress");
-        this.pointAddress = pointAddress;
     }
 
     public String getPointType() {
         return pointType;
     }
 
-    private void setPointType(String pointType) {
-        boolean isElement = false;
-        for (String pointTypesElement: POINT_TYPES) {
-            if (pointType.equals(pointTypesElement)){
-                isElement = true;
-                break;
-            }
-        }
-        if (!isElement)
-            throw new ValidatorException("point type must be one of values: "+ Arrays.toString(POINT_TYPES));
-        this.pointType = pointType;
-    }
-
     public String getPointEmails() {
         return pointEmails;
-    }
-
-    private void setPointEmails(String pointEmails) {
-        Util.requireNonNull(pointEmails, "pointEmails");
-        this.pointEmails = pointEmails;
     }
 
     @Override

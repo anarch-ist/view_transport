@@ -4,52 +4,53 @@ import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
 
 public class TraderData {
+    private static final String FN_TRADER_ID = "traderId";
+    private static final String FN_TRADER_NAME = "traderName";
+    private static final String FN_TRADER_EMAIL = "traderEMail";
+    private static final String FN_TRADER_PHONE = "traderPhone";
+    private static final String FN_TRADER_OFFICE = "traderOffice";
+
     private String traderId;
     private String traderName;
     private String traderEmails;
     private String traderPhone;
+    private String traderOffice;
 
     public TraderData(JSONObject updateTrader) {
-        setTraderId((String) updateTrader.get("traderId"));
-        setTraderName((String) updateTrader.get("traderName"));
-        setTraderEmails((String) updateTrader.get("traderEMail"));
-        setTraderPhone((String) updateTrader.get("traderPhone"));
+
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_TRADER_ID, updateTrader);
+        Util.checkFieldAvailableAndNotNull           (FN_TRADER_NAME, updateTrader);
+        Util.checkFieldAvailableAndNotNull           (FN_TRADER_EMAIL, updateTrader);
+        Util.checkFieldAvailableAndNotNull           (FN_TRADER_PHONE, updateTrader);
+        Util.checkFieldAvailableAndNotNull           (FN_TRADER_OFFICE, updateTrader);
+
+        //set values
+        Util.setStringValue(FN_TRADER_ID, updateTrader, this, "traderId");
+        Util.setStringValue(FN_TRADER_NAME, updateTrader, this, "traderName");
+        Util.setStringValue(FN_TRADER_EMAIL, updateTrader, this, "traderEmails");
+        Util.setStringValue(FN_TRADER_PHONE, updateTrader, this, "traderPhone");
+        Util.setStringValue(FN_TRADER_OFFICE, updateTrader, this, "traderOffice");
     }
 
     public String getTraderId() {
         return traderId;
     }
 
-    private void setTraderId(String traderId) {
-        Util.requireNonNullOrEmpty(traderId, "traderId");
-        this.traderId = traderId;
-    }
-
     public String getTraderName() {
         return traderName;
-    }
-
-    private void setTraderName(String traderName) {
-        Util.requireNonNull(traderName, "traderName");
-        this.traderName = traderName;
     }
 
     public String getTraderEmails() {
         return traderEmails;
     }
 
-    private void setTraderEmails(String traderEmails) {
-        Util.requireNonNull(traderEmails, "traderEMail");
-        this.traderEmails = traderEmails;
-    }
-
     public String getTraderPhone() {
         return traderPhone;
     }
 
-    private void setTraderPhone(String traderPhone) {
-        Util.requireNonNull(traderPhone, "traderPhone");
-        this.traderPhone = traderPhone;
+    public String getTraderOffice() {
+        return traderOffice;
     }
 
     @Override
@@ -59,6 +60,7 @@ public class TraderData {
                 ", traderName='" + traderName + '\'' +
                 ", traderEmails='" + traderEmails + '\'' +
                 ", traderPhone='" + traderPhone + '\'' +
+                ", traderOffice='" + traderOffice + '\'' +
                 '}';
     }
 }

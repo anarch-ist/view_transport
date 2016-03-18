@@ -4,41 +4,36 @@ import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
 
 public class ClientData {
+    private static final String FN_CLIENT_ID = "clientId";
+    private static final String FN_CLIENT_NAME = "clientName";
+    private static final String FN_CLIENT_INN = "clientINN";
+
     private String clientId;
     private String clientName;
     private String clientINN;
 
     public ClientData(JSONObject updateClient) {
-        setClientId((String) updateClient.get("clientId"));
-        setClientName((String) updateClient.get("clientName"));
-        setClientINN((String) updateClient.get("clientINN"));
+        // check fields
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateClient);
+        Util.checkFieldAvailableAndNotNull           (FN_CLIENT_NAME, updateClient);
+        Util.checkFieldAvailableAndNotNull           (FN_CLIENT_INN, updateClient);
+
+        // set values
+        Util.setStringValue(FN_CLIENT_ID, updateClient, this, "clientId");
+        Util.setStringValue(FN_CLIENT_NAME, updateClient, this, "clientName");
+        Util.setStringValue(FN_CLIENT_INN, updateClient, this, "clientINN");
     }
 
     public String getClientId() {
         return clientId;
     }
 
-    private void setClientId(String clientId) {
-        Util.requireNonNullOrEmpty(clientId, "clientId");
-        this.clientId = clientId;
-    }
-
     public String getClientName() {
         return clientName;
     }
 
-    private void setClientName(String clientName) {
-        Util.requireNonNull(clientName, "clientName");
-        this.clientName = clientName;
-    }
-
     public String getClientINN() {
         return clientINN;
-    }
-
-    private void setClientINN(String clientINN) {
-        Util.requireNonNull(clientINN, "clientINN");
-        this.clientINN = clientINN;
     }
 
     @Override
