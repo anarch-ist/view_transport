@@ -965,7 +965,6 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
     SET $routeStartDate = (SELECT lastStatusUpdated
                            FROM requests_history
                            WHERE _requestID = requestID AND requestStatusID = 'DEPARTURE');
-    -- отсчитывать от времени отправления или от времени начала маршрута?
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;
@@ -1097,7 +1096,7 @@ CREATE VIEW transmaster_transport_db.big_select AS
     route_lists.licensePlate,
     route_lists.palletsQty,
     route_lists.routeListNumber,
-    NULL AS arrivalTime -- TODO FIX IT
+    getArrivalDateTime(routes.routeID, requests.requestID) AS arrivalTime
 
   FROM requests
     INNER JOIN (request_statuses, clients, users)
@@ -1174,12 +1173,13 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       routeListID
     FROM big_select
     ';
-
+    -- TODO big_select.clientID не должен быть равен _userId
     SET @wherePart =
     '
     WHERE (
       (getRoleIDByUserID(?) = \'ADMIN\') OR
       (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
+      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select.clientID = ?) OR
       (getPointIDByUserID(?) = big_select.warehousePointID) OR
       (getPointIDByUserID(?) IN (SELECT pointID
                                  FROM route_points
@@ -1201,9 +1201,8 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @_userID = _userID;
     SET @_startEntry = _startEntry;
     SET @_length = _length;
-
     EXECUTE getDataStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
+    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
     DEALLOCATE PREPARE getDataStm;
 
 

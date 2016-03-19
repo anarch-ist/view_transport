@@ -9,7 +9,6 @@ TRUNCATE tariffs;
 TRUNCATE routes;
 TRUNCATE route_points;
 TRUNCATE route_lists;
-TRUNCATE requests_history;
 TRUNCATE route_list_history;
 TRUNCATE relations_between_route_points;
 TRUNCATE distances_between_points;
@@ -32,9 +31,6 @@ INSERT INTO distances_between_points (pointIDFirst, pointIDSecond, distance) VAL
   (getPointIDByName('point2'), getPointIDByName('point3'), 230),
   (getPointIDByName('point3'), getPointIDByName('point4'), 340);
 
-INSERT INTO users
-  VALUE
-  (1, 'parser', '','', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
 
 INSERT INTO users (login, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
 VALUES
@@ -86,19 +82,4 @@ VALUES
   ('routeListIdExt1', 'LOGIST_1C', '1455668', '2015-11-11', '2015-11-11', 3, 'Дмитрий Лже Первый', 'водила1',
                       '8905347890', 'екх123', 'APPROVED', getRouteIDByRouteName('route1'));
 
-INSERT INTO requests
-VALUES
-  (NULL, 'reqIdExt1', 'LOGIST_1C', '123356', NOW(), getClientIDByINN('1234567890'), getPointIDByName('point2'),
-   getUserIDByLogin('user4'), 'invNumber1', NOW(), 'doc_num1', NOW(), 'firma1', 'storage1', 'Ivan1', '9044343433',
-   '', NOW(), 4, 20, 3000, 21000.00, NOW(), getUserIDByLogin('test'), 'CREATED', 'some_comment123',
-   getPointIDByName('point1'), getRouteListIDByNumber('1455668'), 1),
 
-  (NULL, 'reqIdExt2', 'LOGIST_1C', '123w56', NOW(), getClientIDByINN('8947537893'), getPointIDByName('point1'),
-   getUserIDByLogin('user4'), 'invNumber2', NOW(), 'doc_num2', NOW(), 'firma1', 'storage2', 'Ivan2', '9044347433',
-   '', NOW(), 2, 20, 3000, 26000.00, NOW(), getUserIDByLogin('test'), 'CREATED', 'some_commentwedwdw',
-   getPointIDByName('point1'), getRouteListIDByNumber('1455668'), 2),
-
-  (NULL, 'reqIdExt3', 'LOGIST_1C', '156wrt', NOW(), getClientIDByINN('8947537893'), getPointIDByName('point4'),
-   getUserIDByLogin('user4'), 'invNumber3', NOW(), 'doc_num3', NOW(), 'firma2', 'storage3', 'Ivan3', '9024397433',
-   '', NOW(), 1, 20, 3000, 11000.00, NOW(), getUserIDByLogin('test'), 'CREATED', 'some_commenterfef',
-   getPointIDByName('point1'), NULL, NULL);
