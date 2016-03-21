@@ -6,6 +6,27 @@ import java.util.LinkedList;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
 
+    @Override
+    public boolean containsPoint(Point point, boolean considerLastPoint) {
+        if (considerLastPoint) {
+            for(RoutePoint routePoint: this){
+                if(routePoint.getDeparturePoint().equals(point) && this.indexOf(routePoint) != (this.size() - 1)){
+                    return true;
+                }
+            }
+        }else {
+            for(RoutePoint routePoint: this){
+                this.indexOf(routePoint);
+                if(routePoint.getDeparturePoint().equals(point)){
+                    return true;
+                }
+            }
+        }
+
+
+        return false;
+    }
+
     /** calculates the total distance on the route
      *
      * @return km route
@@ -23,6 +44,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
      *
      * @return minutes of all route
      */
+
     @Override
     public Integer getFullTime() {
         int result = 0;

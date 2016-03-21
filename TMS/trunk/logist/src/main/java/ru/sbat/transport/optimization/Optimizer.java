@@ -8,6 +8,7 @@ import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceType;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
 import java.util.*;
@@ -21,67 +22,108 @@ public class Optimizer implements IOptimizer {
      * @throws RouteNotFoundException
      */
     @Override
-    public Map<Invoice, ArrayList<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
-        Map<Invoice, ArrayList<DeliveryRoute>> result = new HashMap<>();
-        ArrayList<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
+    public Map<Invoice, List<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
+        Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
+        List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
+        Collections.sort(invoiceContainer);
         for (Invoice invoice : invoiceContainer) {
             if (invoice.getDeliveryRoute() != null)
-                throw new IllegalArgumentException("invoice.getDeliveryRoute() should be null");
+                throw new IllegalArgumentException("invoice.getDeliveryRoutesForInvoice() should be null");
                 Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
                 Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
-                for (Route route : plannedSchedule) {
-                    if (route == null) {
-                        throw new RouteNotFoundException("route should not be null");
-                    }
-                    for(RoutePoint routePointDelivery: route){
-                        DeliveryRoute deliveryRoute = new DeliveryRoute();
-                        if(routePointDelivery.getDeparturePoint().equals(deliveryPoint) && route.indexOf(routePointDelivery) != 0){
-                            ArrayList<PairDate> pairDates = getDepartureArrivalDatesBetweenTwoRoutePoints(route, route, invoice, route.get(route.indexOf(routePointDelivery) - 1), routePointDelivery);
-                            if(pairDates.size() > 0){
-                                if((route.get(route.indexOf(routePointDelivery)).getDeparturePoint()).equals(departurePoint)){
-                                    deliveryRoute.add(route);
-                                }else {
-
-                                }
-                            }
-                        }
-                    }
-                }
+                possibleDeliveryRouteForInvoice = getDeliveryRoutesForInvoice(invoice, plannedSchedule);
                 result.put(invoice, possibleDeliveryRouteForInvoice);
             }
         return result;
     }
 
-    /** creates possible delivery routes of one or more routes
+    /** creates possible delivery routes of one or more routes without dates and occupancy cost
      *
      * @param invoice
      * @param plannedSchedule
      * @return array list of delivery routes
      */
-    public ArrayList<DeliveryRoute> getDeliveryRoute(Invoice invoice, PlannedSchedule plannedSchedule, Point point) throws RouteNotFoundException {
-        // at the beginning point is invoice.getRequest.getPlannedDeliveryPoint
-        ArrayList<DeliveryRoute> result = new ArrayList<>();
-        for (Route route : plannedSchedule) {
-            if (route == null) {
-                throw new RouteNotFoundException("route should not be null");
-            }
-            for(RoutePoint routePoint: route){
-                DeliveryRoute deliveryRoute = new DeliveryRoute();
-                if(routePoint.getDeparturePoint().equals(point) && route.indexOf(routePoint) != 0){
-                    for(int i = route.indexOf(routePoint) - 1; i >= 0; i--) {
-                        ArrayList<PairDate> pairDates = getDepartureArrivalDatesBetweenTwoRoutePoints(route, route, invoice, route.get(i), routePoint);
-                        if (pairDates.size() > 0) {
-                            if ((route.get(route.indexOf(routePoint)).getDeparturePoint()).equals(invoice.getAddressOfWarehouse())) {
-                                deliveryRoute.add(route);
-                                result.add(0, deliveryRoute);
-                                System.out.println(result.size());
-                                break;
-                            }
-                        }
+    public List<DeliveryRoute> getDeliveryRoutesForInvoice(final Invoice invoice, final PlannedSchedule plannedSchedule) throws RouteNotFoundException {
+
+        final Point departurePoint = invoice.getAddressOfWarehouse();
+        final Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
+
+        List<DeliveryRoute> result = new ArrayList<>();
+
+        // find all routes with departure point not last
+        Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
+
+// A B C D B K
+
+        for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
+            DeliveryRoute deliveryRoute = new DeliveryRoute();
+            Route route = entry.getKey();
+            List<Integer> indexesOfPoint = entry.getValue();
+
+            if (indexesOfPoint.size() == 1) {
+                for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
+                    if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
+                        deliveryRoute.add(route);
+                        result.add(deliveryRoute);
+                        break;
                     }
-                    point = route.get(0).getDeparturePoint();
-                    getDeliveryRoute(invoice, plannedSchedule, point);
+                    filterRoutesByPoint(plannedSchedule, route.get(indexesOfPoint.get(0) + 1).getDeparturePoint(), true);
                 }
+
+
+
+
+
+            } else if (indexesOfPoint.size() > 1) {
+
+            }
+
+        }
+        return result;
+    }
+
+
+    private void recursive(final PlannedSchedule plannedSchedule, final Point deliveryPoint, Point departurePoint, List<DeliveryRoute> result) {
+
+        Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
+
+        for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
+            DeliveryRoute deliveryRoute = new DeliveryRoute();
+            Route route = entry.getKey();
+            List<Integer> indexesOfPoint = entry.getValue();
+
+            if (indexesOfPoint.size() == 1) {
+                for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
+                    if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
+                        deliveryRoute.add(route);
+                        result.add(deliveryRoute);
+                        break;
+                    }
+                    recursive(plannedSchedule, deliveryPoint, route.get(i).getDeparturePoint(), result);
+                }
+
+            } else if (indexesOfPoint.size() > 1) {
+                throw new NotImplementedException();
+            }
+
+        }
+    }
+
+
+
+    private Map<Route, List<Integer>> filterRoutesByPoint(PlannedSchedule plannedSchedule, Point point, boolean considerLastPoint) {
+        Map<Route, List<Integer>> result = new HashMap<>();
+        for(Route route: plannedSchedule){
+            List<Integer> indexes = new ArrayList<>();
+            boolean wasFound = false;
+            for(RoutePoint routePoint: route){
+                if(route.containsPoint(point, considerLastPoint)){
+                    indexes.add(route.indexOf(routePoint));
+                    wasFound = true;
+                }
+            }
+            if(wasFound) {
+                result.put(route, indexes);
             }
         }
         return result;

@@ -50,9 +50,16 @@ public class TestOptimizer {
     }
 
     @Test
+    public void testFiltrate() throws RouteNotFoundException {
+        Optimizer optimizer = new Optimizer();
+        System.out.println(optimizer.filtrate(plannedSchedule, invoiceContainer).size());
+        System.out.println(optimizer.filtrate(plannedSchedule, invoiceContainer).get(invoiceContainer.get(0)).size());
+    }
+
+    @Test
     public void testGetDeliveryRoute() throws RouteNotFoundException {
         Optimizer optimizer = new Optimizer();
-        optimizer.getDeliveryRoute(invoiceContainer.get(0), plannedSchedule, invoiceContainer.get(0).getRequest().getDeliveryPoint());
+        optimizer.getDeliveryRoutesForInvoice(invoiceContainer.get(0), plannedSchedule, invoiceContainer.get(0).getRequest().getDeliveryPoint());
     }
 
     @Test

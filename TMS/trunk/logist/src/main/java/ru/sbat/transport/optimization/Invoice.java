@@ -10,7 +10,7 @@ import ru.sbat.transport.optimization.utils.InvoiceType;
 
 import java.util.*;
 
-public class Invoice {
+public class Invoice implements Comparable<Invoice>{
     private final ObjectProperty<Request> request = new SimpleObjectProperty<>();
     private final ObjectProperty<Point> addressOfWarehouse = new SimpleObjectProperty<>();
     private final DoubleProperty weight = new SimpleDoubleProperty(); //масса
@@ -195,5 +195,15 @@ public class Invoice {
                 ", invoiceType=" + invoiceType +
                 ", realDepartureDate=" + realDepartureDate +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Invoice o) {
+        if(this.getRequest().getPlannedDeliveryDate().before(o.getRequest().getPlannedDeliveryDate()))
+            return 1;
+        else if(this.getRequest().getPlannedDeliveryDate().equals(o.getRequest().getPlannedDeliveryDate()))
+            return 0;
+        else
+        return 0;
     }
 }

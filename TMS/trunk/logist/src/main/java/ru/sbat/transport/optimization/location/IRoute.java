@@ -4,6 +4,7 @@ package ru.sbat.transport.optimization.location;
 import java.util.Date;
 
 public interface IRoute {
+    boolean containsPoint(Point point, boolean considerLastPoint);
     Double getFullDistance();
     Integer getFullTime();
     Integer getDepartureTime();
