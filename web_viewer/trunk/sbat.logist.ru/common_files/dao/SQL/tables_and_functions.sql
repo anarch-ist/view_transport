@@ -514,7 +514,7 @@ VALUES
   ('COLLECTING', 'Выдана на сборку', 6),
   ('CHECK', 'На контроле', 7),
   ('CHECK_PASSED', 'Контроль пройден', 8),
-  ('ADJUSTMENTS_MADE', 'Сделаны коректировки\распечатаны документы', 9),
+  ('ADJUSTMENTS_MADE', 'Сделаны коргыукытировки\распечатаны документы', 9),
   ('PACKAGING', 'Упаковано', 10),
   ('CHECK_BOXES', 'Проверка коробок в зоне отгрузки', 11),
   ('READY', 'Проверка в зоне отгрузки/Готова к отправке', 12),
@@ -624,15 +624,16 @@ CREATE TABLE requests (
 CREATE TRIGGER check_for_market_agents_and_warehouse_point BEFORE INSERT ON requests
 FOR EACH ROW
   BEGIN
-
-    DECLARE userRole VARCHAR(32);
-    SET userRole = (SELECT userRoleID
-                    FROM users
-                    WHERE userID = NEW.marketAgentUserID);
-    IF (userRole <> 'MARKET_AGENT')
+    (SELECT
+       userRoleID,
+       login
+     INTO @userRoleID, @login
+     FROM users
+     WHERE userID = NEW.marketAgentUserID);
+    IF (@userRoleID <> 'MARKET_AGENT')
     THEN
-      SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only MARKET_AGENT users allowed';
+      SET @message_text = concat('LOGIST ERROR: Can\'t insert row: only MARKET_AGENT users allowed for login = ', @login);
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
     END IF;
 
     SET @pointType = (SELECT pointTypeID
@@ -865,7 +866,7 @@ CREATE FUNCTION getRouteIDByDirectionIDExternal(_directionIDExternal VARCHAR(64)
 
     IF (result IS NULL ) THEN
       BEGIN
-        set @message_text = concat('LOGIST ERROR: getRouteIDByDirectionIDExternal is NULL for directionIdExternal = ', _directionIDExternal);
+        SET @message_text = concat('LOGIST ERROR: getRouteIDByDirectionIDExternal is NULL for directionIdExternal = ', _directionIDExternal);
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
       END ;
 
@@ -1173,13 +1174,12 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       routeListID
     FROM big_select
     ';
-    -- TODO big_select.clientID не должен быть равен _userId
     SET @wherePart =
     '
     WHERE (
       (getRoleIDByUserID(?) = \'ADMIN\') OR
       (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
-      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select.clientID = ?) OR
+      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND CONCAT(big_select.clientIDExternal,\'-client\') = ?) OR
       (getPointIDByUserID(?) = big_select.warehousePointID) OR
       (getPointIDByUserID(?) IN (SELECT pointID
                                  FROM route_points
@@ -1201,10 +1201,11 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @_userID = _userID;
     SET @_startEntry = _startEntry;
     SET @_length = _length;
-    EXECUTE getDataStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
-    DEALLOCATE PREPARE getDataStm;
+    SET @_userLogin = (SELECT login FROM users WHERE userID = _userID);
 
+    EXECUTE getDataStm
+    USING @_userID, @_userID, @_userID, @_userID, @_userLogin, @_userID, @_userID, @_startEntry, @_length;
+    DEALLOCATE PREPARE getDataStm;
 
     -- filtered
     SELECT FOUND_ROWS() as `totalFiltered`;
@@ -1213,7 +1214,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userID;
+    USING @_userID, @_userID, @_userID, @_userID, @_userLogin, @_userID, @_userID;
     DEALLOCATE PREPARE getTotalStm;
 
   END;
