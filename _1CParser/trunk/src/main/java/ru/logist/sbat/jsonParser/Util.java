@@ -13,42 +13,6 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class Util {
-    public static void withValidatorExceptionRedirect(Runnable run) {
-        try {
-            run.run();
-        } catch (Exception e) {
-            throw new ValidatorException(e.getMessage(), e);
-        }
-    }
-
-    public static void requireNonNull(Object obj, String fieldName, JSONObject jsonObject) {
-        withValidatorExceptionRedirect(() -> Objects.requireNonNull(obj, getParameterizedString("{} must not be null in {}", fieldName, jsonObject)));
-    }
-
-    // TODO remove
-    public static void requireNonNull(Object obj, String fieldName) {
-        withValidatorExceptionRedirect(() -> Objects.requireNonNull(obj, getParameterizedString("{} must not be null", fieldName)));
-    }
-
-    public static void requireNonNullOrEmpty(String string, String fieldName) {
-        withValidatorExceptionRedirect(() -> {
-            Objects.requireNonNull(string, "[" + fieldName + "] must not be null");
-            if (string.isEmpty())
-                throw new IllegalArgumentException("[" + fieldName + "] must not be empty");
-        });
-    }
-
-    public static Date getDateWithCheck(String dateAsString, String fieldName, DateTimeFormatter formatter) {
-        final Date[] result = {null};
-        withValidatorExceptionRedirect(() -> {
-            Objects.requireNonNull(dateAsString, fieldName);
-            if (dateAsString.isEmpty())
-                result[0] = null;
-            else
-                result[0] = Date.valueOf(LocalDate.parse(dateAsString, formatter));
-        });
-        return result[0];
-    }
 
     public static String getParameterizedString(String string, Object... parameters) {
         StringBuilder stringBuilder = new StringBuilder();

@@ -76,8 +76,7 @@ public class RequestsData {
         Util.setStringValue              (FN_CONTACT_NAME, updateRequests, this, "contactName");
         Util.setStringValue              (FN_CONTACT_PHONE, updateRequests, this, "contactPhone");
         Util.setStringValue              (FN_DELIVERY_OPTION, updateRequests, this, "deliveryOption");
-        Util.setStringValue              (FN_TRADER_ID, updateRequests, this, "clientId");
-        Util.setStringValue              (FN_CLIENT_ID, updateRequests, this, "traderId");
+        Util.setStringValue              (FN_TRADER_ID, updateRequests, this, "traderId");
         Util.setNullIfEmptyOrSetValueDate(FN_DELIVERY_DATE, updateRequests, this, "deliveryDate", isoFormatter);
     }
 

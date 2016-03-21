@@ -4,6 +4,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.beans.*;
 
 import java.sql.*;
@@ -41,12 +42,39 @@ public class InsertOrUpdateTransactionScript {
         return insertOrUpdateResult;
     }
 
+    /**
+     *
+     * @return All directionIDExternal and routeNames from dataBase as bidimap.
+     * @throws SQLException
+     */
+    private BidiMap<String, String> selectAllRoutes() throws SQLException {
+        //
+        BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
+        while (resultSet.next()) {
+            allRoutes.put(resultSet.getString(1), resultSet.getString(2));
+        }
+        return allRoutes;
+    }
+
+    private Set<String> selectAllClientsIdExternal() throws SQLException {
+        Set<String> result = new HashSet<>();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT clientIDExternal FROM clients;");
+        while (resultSet.next()) {
+            result.add(resultSet.getString(1));
+        }
+        return result;
+    }
+
+
     public void updateData() {
         String server = dataFrom1c.getServer();
-        logger.info(server);
+        logger.info(Util.getParameterizedString("server = {}", server));
         Integer packageNumber = dataFrom1c.getPackageNumber().intValue();
-        logger.info(packageNumber);
-        logger.info(dataFrom1c.getCreated());
+        logger.info(Util.getParameterizedString("packageNumber = {}", packageNumber));
+        logger.info(Util.getParameterizedString("dateCreated = {}", dataFrom1c.getCreated()));
         insertOrUpdateResult = new InsertOrUpdateResult();
         insertOrUpdateResult.setServer(server);
         insertOrUpdateResult.setPackageNumber(packageNumber);
@@ -55,13 +83,13 @@ public class InsertOrUpdateTransactionScript {
                 updateExchangePrepStatement = null,
                 updatePointsPrepStatement = null,
                 updateRoutesPrepStatement = null,
-                updateClientsPrepStatement = null,
                 updateRequestsPrepStatement = null,
                 updateRequestsStatusesPrepStatement = null,
                 newRoutesFromRouteListsStm = null,
                 updateMarketAgentUsersPrepStatement = null;
 
         PreparedStatement[] routeListsInsertPreparedStatements = null;
+        PreparedStatement[] updateClientsPreparedStatements = null;
 
         try {
             PackageData packageData = dataFrom1c.getPackageData();
@@ -69,7 +97,7 @@ public class InsertOrUpdateTransactionScript {
             updatePointsPrepStatement = batchPointsData(packageData.getUpdatePoints(), packageData.getUpdateAddresses());
             updateRoutesPrepStatement = batchRoutesData(packageData.getUpdateDirections());
             updateMarketAgentUsersPrepStatement = batchMarketAgentUser(packageData.getUpdateTraders());
-            updateClientsPrepStatement = batchClients(packageData.getUpdateClients());
+            updateClientsPreparedStatements = batchClients(packageData.getUpdateClients());
             updateRequestsPrepStatement = batchRequests(packageData.getUpdateRequests());
             updateRequestsStatusesPrepStatement = batchRequestStatuses(packageData.getUpdateStatuses());
             newRoutesFromRouteListsStm = batchNewRoutesFromRouteLists(packageData.getUpdateRouteLists());
@@ -88,12 +116,14 @@ public class InsertOrUpdateTransactionScript {
             DBUtils.closeStatementQuietly(updatePointsPrepStatement);
             DBUtils.closeStatementQuietly(updateRoutesPrepStatement);
             DBUtils.closeStatementQuietly(updateMarketAgentUsersPrepStatement);
-            DBUtils.closeStatementQuietly(updateClientsPrepStatement);
+            DBUtils.closeStatementQuietly(updateClientsPreparedStatements != null ? updateClientsPreparedStatements[0] : null);
+            DBUtils.closeStatementQuietly(updateClientsPreparedStatements != null ? updateClientsPreparedStatements[1] : null);
             DBUtils.closeStatementQuietly(updateRequestsPrepStatement);
             DBUtils.closeStatementQuietly(updateRequestsStatusesPrepStatement);
             DBUtils.closeStatementQuietly(newRoutesFromRouteListsStm);
             DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[0] : null);
             DBUtils.closeStatementQuietly(routeListsInsertPreparedStatements != null ? routeListsInsertPreparedStatements[1] : null);
+
         }
     }
 
@@ -200,35 +230,25 @@ public class InsertOrUpdateTransactionScript {
         return preparedStatement;
     }
 
-    /**
-     *
-     * @return All directionIDExternal and routeNames from dataBase as bidimap.
-     * @throws SQLException
-     */
-    private BidiMap<String, String> selectAllRoutes() throws SQLException {
-        //
-        BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
-        while (resultSet.next()) {
-            allRoutes.put(resultSet.getString(1), resultSet.getString(2));
-        }
-        return allRoutes;
-    }
 
-    private static final String userRoleId = "MARKET_AGENT";
-    private PreparedStatement batchMarketAgentUser(List<TraderData> updateMarketAgents) throws SQLException {
-        logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
-        PreparedStatement insertOrUpdateUsersPrSt = connection.prepareStatement(
-                "INSERT INTO users (login, userName, email, phoneNumber, userRoleID)\n" +
-                        "  VALUE (?, ?, ?, ?, ?)\n" +
+    private PreparedStatement getUsersTablePrepStm() throws SQLException {
+        return connection.prepareStatement(
+                "INSERT INTO users (login, userName, phoneNumber, email, position, userRoleID)\n" +
+                        "  VALUE (?, ?, ?, ?, ?, ?)\n" +
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  userName    = VALUES(userName),\n" +
-                        "  email       = VALUES(email),\n" +
                         "  phoneNumber = VALUES(phoneNumber),\n" +
+                        "  email       = VALUES(email),\n" +
+                        "  position    = VALUES(position),\n" +
                         "  userRoleID  = VALUES(userRoleID);\n"
         );
+    }
 
+
+    private static final String MARKET_AGENT = "MARKET_AGENT";
+    private PreparedStatement batchMarketAgentUser(List<TraderData> updateMarketAgents) throws SQLException {
+        logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
+        PreparedStatement result = getUsersTablePrepStm();
         // only insert or update data without passwords
         Utils.UniqueCheck uniqueCheckLogins = Utils.getUniqueCheckObject("traderId");
         // check trader id is unique
@@ -236,23 +256,21 @@ public class InsertOrUpdateTransactionScript {
             String login = updateUser.getTraderId();
             if (!uniqueCheckLogins.isUnique(login))
                 continue;
-            String userName = updateUser.getTraderName();
-            String email = updateUser.getTraderEmails();
-            String phoneNumber = updateUser.getTraderPhone();
-
-            insertOrUpdateUsersPrSt.setString(1, login);
-            insertOrUpdateUsersPrSt.setString(2, userName);
-            insertOrUpdateUsersPrSt.setString(3, email);
-            insertOrUpdateUsersPrSt.setString(4, phoneNumber);
-            insertOrUpdateUsersPrSt.setString(5, userRoleId);
-            insertOrUpdateUsersPrSt.addBatch();
+            result.setString(1, login);
+            result.setString(2, updateUser.getTraderName());
+            result.setString(3, updateUser.getTraderPhone());
+            result.setString(4, updateUser.getTraderEmails());
+            result.setString(5, updateUser.getTraderOffice());
+            result.setString(6, MARKET_AGENT);
+            result.addBatch();
         }
-        int[] insertedOrUpdateRecords = insertOrUpdateUsersPrSt.executeBatch();
+        int[] insertedOrUpdateRecords = result.executeBatch();
         logger.info("INSERT OR UPDATE INTO users completed, affected records size = [{}]", insertedOrUpdateRecords.length);
-        return insertOrUpdateUsersPrSt;
+        return result;
     }
 
-    private PreparedStatement batchClients(List<ClientData> updateClients) throws SQLException {
+    private static final String CLIENT_MANAGER = "CLIENT_MANAGER";
+    private PreparedStatement[] batchClients(List<ClientData> updateClients) throws SQLException {
         logger.info("-----------------START update clients table from JSON object:[clients]-----------------");
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)\n" +
@@ -261,11 +279,15 @@ public class InsertOrUpdateTransactionScript {
                         "  clientName = VALUES(clientName),\n" +
                         "  INN        = VALUES(INN);"
         );
+
+        PreparedStatement usersPrepStatement = getUsersTablePrepStm();
+
         Utils.UniqueCheck uniqueCheckClientId = Utils.getUniqueCheckObject("clientId");
         for (ClientData updateClient : updateClients) {
             String clientIDExternal = updateClient.getClientId();
             if (!uniqueCheckClientId.isUnique(clientIDExternal))
                 continue;
+
             String clientName = updateClient.getClientName();
             String inn = updateClient.getClientINN();
             preparedStatement.setString(1, clientIDExternal);
@@ -273,15 +295,29 @@ public class InsertOrUpdateTransactionScript {
             preparedStatement.setString(3, clientName);
             preparedStatement.setString(4, inn);
             preparedStatement.addBatch();
+            // TODO FIXME
+            usersPrepStatement.setString(1, clientIDExternal + "-client");
+            usersPrepStatement.setString(2, clientName);
+            usersPrepStatement.setString(3, null);
+            usersPrepStatement.setString(4, null);
+            usersPrepStatement.setString(5, null);
+            usersPrepStatement.setString(6, CLIENT_MANAGER);
+            usersPrepStatement.addBatch();
         }
         int[] affectedRecords = preparedStatement.executeBatch();
         logger.info("INSERT OR UPDATE for clients completed, affected records size = [{}]", affectedRecords.length);
-        return preparedStatement;
+
+        int[] insertedOrUpdateRecords = usersPrepStatement.executeBatch();
+        logger.info("INSERT OR UPDATE for users completed, affected records size = [{}]", insertedOrUpdateRecords.length);
+
+        return new PreparedStatement[]{preparedStatement, usersPrepStatement};
     }
 
     private PreparedStatement batchRequests(List<RequestsData> updateRequests) throws SQLException {
         logger.info("-----------------START update requests table from JSON object:[updateRequests]-----------------");
         Map<String, String> allPoints = selectAllPoints();
+        Set<String> allClientsIdExternal = selectAllClientsIdExternal();
+
         PreparedStatement requestsPreparedStatement = connection.prepareStatement(
             "INSERT INTO requests\n" +
                     "  VALUE\n" +
@@ -333,7 +369,11 @@ public class InsertOrUpdateTransactionScript {
             requestsPreparedStatement.setString(2, LOGIST_1C);
             requestsPreparedStatement.setString(3, updateRequest.getRequestNumber());
             requestsPreparedStatement.setDate(4,  updateRequest.getRequestDate());
-            requestsPreparedStatement.setString(5, updateRequest.getClientId());
+            String clientId = updateRequest.getClientId();
+            if (!allClientsIdExternal.contains(clientId)) {
+                throw new DBCohesionException(Util.getParameterizedString("requestId {} has clientId = {} that is not contained in clients table.", updateRequest.getRequestId(), clientId));
+            } else
+                requestsPreparedStatement.setString(5, clientId);
             requestsPreparedStatement.setString(6, LOGIST_1C);
             String addressId = updateRequest.getAddressId();
             if (!allPoints.containsKey(addressId)) {
@@ -365,6 +405,8 @@ public class InsertOrUpdateTransactionScript {
         logger.info("INSERT OR UPDATE INTO requests completed, affected records size = [{}]", requestsAffectedRecords.length);
         return requestsPreparedStatement;
     }
+
+
 
     private PreparedStatement batchRequestStatuses(List<StatusData> updateStatuses) throws SQLException {
         logger.info("-----------------START update requests table from JSON object:[updateStatus]-----------------");
