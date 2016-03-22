@@ -34,6 +34,7 @@
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/requestHistoryDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/statusChangeDialog.js"></script>
+    <script type="text/javascript" language="javascript" src="content/js/columnSelectDialog.js"></script>
 
 </head>
 <body>
@@ -95,6 +96,7 @@
         </tr>
         </thead>
 
+        <!--search containers-->
         <tfoot>
         <tr>
             <th>ID заявки</th>

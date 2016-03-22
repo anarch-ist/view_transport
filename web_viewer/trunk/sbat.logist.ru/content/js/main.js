@@ -13,11 +13,31 @@ $(document).ready(function () {
         var title = $(this).text();
         $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
     });
-    
+    var filterInputs = $('#user-grid tfoot th input');
+
     var dataTable = $('#user-grid').DataTable({
         processing: true,
         serverSide: true,
         colReorder: true,
+        stateSave: true,
+        stateDuration: 0, // 0 a special value as it indicates that the state can be stored and retrieved indefinitely with no time limit
+        // format for data object: https://datatables.net/reference/option/stateSaveCallback
+        // save all but paging
+        stateSaveParams: function (settings, data) {
+            data.start = 0;
+            data.length = dataTable.page.len();
+        },
+        // manually load filters data into filter inputs
+        stateLoaded: function (settings, data) {
+            for (var i = 0; i < data.columns.length; i++) {
+                var column = data.columns[i];
+                var search = column.search.search;
+                if (search) {
+                    $(filterInputs[i]).val(search);
+                }
+            }
+        },
+        pageLength: 10,
         select: {
             style: 'single'
         },
@@ -45,6 +65,12 @@ $(document).ready(function () {
                 dataTable.buttons(1).remove();
         },
         buttons: [
+            {
+                text: 'выбрать столбцы',
+                action: function (e, dt, node, config) {
+                    $.showColumnSelectDialog(dataTable);
+                }
+            },
             {
                 extend: 'selectedSingle',
                 text: 'изменить статус накладной',
