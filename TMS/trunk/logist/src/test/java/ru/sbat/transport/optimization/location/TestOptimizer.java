@@ -50,6 +50,11 @@ public class TestOptimizer {
     }
 
     @Test
+    public static void testRecursive(){
+
+    }
+
+    @Test
     public void testFiltrate() throws RouteNotFoundException {
         Optimizer optimizer = new Optimizer();
         System.out.println(optimizer.filtrate(plannedSchedule, invoiceContainer).size());
@@ -59,7 +64,7 @@ public class TestOptimizer {
     @Test
     public void testGetDeliveryRoute() throws RouteNotFoundException {
         Optimizer optimizer = new Optimizer();
-        optimizer.getDeliveryRoutesForInvoice(invoiceContainer.get(0), plannedSchedule, invoiceContainer.get(0).getRequest().getDeliveryPoint());
+        optimizer.getDeliveryRoutesForInvoice(invoiceContainer.get(0), plannedSchedule);
     }
 
     @Test

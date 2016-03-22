@@ -8,7 +8,6 @@ import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InvoiceType;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
 import java.util.*;
@@ -24,15 +23,15 @@ public class Optimizer implements IOptimizer {
     @Override
     public Map<Invoice, List<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
         Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
-        List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
+
         Collections.sort(invoiceContainer);
         for (Invoice invoice : invoiceContainer) {
             if (invoice.getDeliveryRoute() != null)
                 throw new IllegalArgumentException("invoice.getDeliveryRoutesForInvoice() should be null");
-                Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
-                Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
-                possibleDeliveryRouteForInvoice = getDeliveryRoutesForInvoice(invoice, plannedSchedule);
-                result.put(invoice, possibleDeliveryRouteForInvoice);
+            List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
+            Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
+            Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
+            result = recursive(invoice, plannedSchedule, deliveryPoint, departurePoint, possibleDeliveryRouteForInvoice);
             }
         return result;
     }
@@ -44,49 +43,28 @@ public class Optimizer implements IOptimizer {
      * @return array list of delivery routes
      */
     public List<DeliveryRoute> getDeliveryRoutesForInvoice(final Invoice invoice, final PlannedSchedule plannedSchedule) throws RouteNotFoundException {
-
         final Point departurePoint = invoice.getAddressOfWarehouse();
         final Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
-
         List<DeliveryRoute> result = new ArrayList<>();
-
         // find all routes with departure point not last
         Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
-
-// A B C D B K
-
         for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
             DeliveryRoute deliveryRoute = new DeliveryRoute();
             Route route = entry.getKey();
             List<Integer> indexesOfPoint = entry.getValue();
-
             if (indexesOfPoint.size() == 1) {
-                for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
-                    if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
-                        deliveryRoute.add(route);
-                        result.add(deliveryRoute);
-                        break;
-                    }
-                    filterRoutesByPoint(plannedSchedule, route.get(indexesOfPoint.get(0) + 1).getDeparturePoint(), true);
-                }
-
-
-
-
 
             } else if (indexesOfPoint.size() > 1) {
-
             }
-
         }
         return result;
     }
 
 
-    private void recursive(final PlannedSchedule plannedSchedule, final Point deliveryPoint, Point departurePoint, List<DeliveryRoute> result) {
-
+    private Map<Invoice, List<DeliveryRoute>> recursive(final Invoice invoice, final PlannedSchedule plannedSchedule, final Point deliveryPoint, Point departurePoint, List<DeliveryRoute> deliveryRoutes) {
+        // for each found right track course set start route point, end route point and route
         Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
-
+        Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
         for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
             DeliveryRoute deliveryRoute = new DeliveryRoute();
             Route route = entry.getKey();
@@ -95,22 +73,47 @@ public class Optimizer implements IOptimizer {
             if (indexesOfPoint.size() == 1) {
                 for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
                     if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
-                        deliveryRoute.add(route);
-                        result.add(deliveryRoute);
+                        TrackCourse trackCourse = new TrackCourse();
+                        trackCourse.setRoute(route);
+                        trackCourse.setStartTrackCourse(route.get(i - 1));
+                        trackCourse.setEndTrackCourse(route.get(i));
+                        deliveryRoute.add(trackCourse);
+                        deliveryRoutes.add(deliveryRoute);
+                        result.put(invoice, deliveryRoutes);
                         break;
                     }
-                    recursive(plannedSchedule, deliveryPoint, route.get(i).getDeparturePoint(), result);
+                    recursive(invoice, plannedSchedule, deliveryPoint, route.get(i).getDeparturePoint(), deliveryRoutes);
                 }
 
             } else if (indexesOfPoint.size() > 1) {
-                throw new NotImplementedException();
+                for(int index: indexesOfPoint){
+                    for(int i = index + 1; i < route.size(); i++){
+                        if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
+                            TrackCourse trackCourse = new TrackCourse();
+                            trackCourse.setRoute(route);
+                            trackCourse.setStartTrackCourse(route.get(i - 1));
+                            trackCourse.setEndTrackCourse(route.get(i));
+                            deliveryRoute.add(trackCourse);
+                            deliveryRoutes.add(deliveryRoute);
+                            result.put(invoice, deliveryRoutes);
+                            break;
+                        }
+                        recursive(invoice, plannedSchedule, deliveryPoint, route.get(i).getDeparturePoint(), deliveryRoutes);
+                    }
+                }
             }
-
         }
+        return result;
     }
 
 
-
+    /** filtrates routes with point and shows how much times point occurs in route
+     *
+     * @param plannedSchedule
+     * @param point
+     * @param considerLastPoint
+     * @return map where keys are routes and values are indexes of necessary route points
+     */
     private Map<Route, List<Integer>> filterRoutesByPoint(PlannedSchedule plannedSchedule, Point point, boolean considerLastPoint) {
         Map<Route, List<Integer>> result = new HashMap<>();
         for(Route route: plannedSchedule){
@@ -138,10 +141,11 @@ public class Optimizer implements IOptimizer {
      * @throws RouteNotFoundException
      */
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException {
-        Iterator<Map.Entry<Invoice, ArrayList<DeliveryRoute>>> iterator = routesForInvoice.entrySet().iterator();
-        for(Invoice invoice: invoiceContainer){
-            if(invoice.getInvoiceType().equals(InvoiceType.C)){
+    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, List<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException {
+        Iterator<Map.Entry<Invoice, List<DeliveryRoute>>> iterator = routesForInvoice.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Invoice, List<DeliveryRoute>> entry = iterator.next();
+            if(entry.getValue().size() > 0){
 
             }
         }

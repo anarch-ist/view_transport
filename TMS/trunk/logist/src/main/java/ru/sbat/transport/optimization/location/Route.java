@@ -5,7 +5,14 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
-
+    /** determines if route contains route point with departure point that marked in conditions.
+     * If the 2-nd parameter in conditions is true point should not be the last in route.
+     * If the 2-nd parameter in conditions is false point can be the last in route.
+     *
+     * @param point
+     * @param considerLastPoint
+     * @return true or false route contains point or not
+     */
     @Override
     public boolean containsPoint(Point point, boolean considerLastPoint) {
         if (considerLastPoint) {
