@@ -7,9 +7,11 @@ import org.json.simple.JSONObject;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
+import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.db.DataBase;
 import ru.logist.sbat.db.InsertOrUpdateResult;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
+import ru.logist.sbat.jsonParser.ValidatorException;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.watchService.OnFileChangeListener;
 import ru.logist.sbat.watchService.WatchServiceStarter;
@@ -17,6 +19,7 @@ import ru.logist.sbat.watchService.WatchServiceStarter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +34,8 @@ import java.util.concurrent.Executors;
 
 public class App {
     private static Properties properties;
+    private static final String INCOMING_FILE_EXTENSION = ".pkg";
+    private static final String RESPONSE_FILE_EXTENSION = ".ans";
     static {
         // get All settings from file, logger initialization
         properties = getProperties();
@@ -102,54 +107,80 @@ public class App {
             public void onFileCreate(Path filePath) {
 
                 executorService.submit((Runnable) () -> {
+                    if (!filePath.getFileName().toString().endsWith(INCOMING_FILE_EXTENSION)) {
+                        logger.warn("file [{}] must end with [{}] this file will not be imported", filePath, INCOMING_FILE_EXTENSION);
+                    } else {
+                        File file = filePath.toFile();
 
-                    File file = filePath.toFile();
-
-                    // wait for loading all data
-                    long currentFileSize = -1;
-                    while (currentFileSize != file.length()) {
-                        currentFileSize = file.length();
-                        try {
-                            Thread.currentThread().sleep(1000);
-                        } catch (InterruptedException e) {/*NOPE*/}
-                        logger.info("wait for loading... file size = [{}], size second ago = [{}]", file.length(), currentFileSize);
-                    }
-
-                    try {
-                        logger.info("Start update data from file [{}]", filePath);
-                        DataFrom1c dataFrom1c = JSONReadFromFile.read(filePath);
-                        InsertOrUpdateResult insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
-                        logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
-                        logger.info("Start write result data into response directory");
-                        String responseDir = properties.getProperty("responseDir");
-                        Path responsePath = Paths.get(responseDir).resolve("response.txt");
-                        String resultString = insertOrUpdateResult.toString();
-                        try {
-                            FileUtils.writeStringToFile(responsePath.toFile(), resultString, StandardCharsets.UTF_8);
-                            logger.info("Response data were successfully written");
-                        } catch (IOException e) {
-                            logger.error("Can't write response into [{}]", responsePath);
-                            logger.error(e);
+                        // wait for loading all data
+                        long currentFileSize = -1;
+                        while (currentFileSize != file.length()) {
+                            currentFileSize = file.length();
+                            try {
+                                Thread.currentThread().sleep(1000);
+                            } catch (InterruptedException e) {/*NOPE*/}
+                            logger.info("wait for loading... file [{}] file size = [{}], size second ago = [{}]", file, file.length(), currentFileSize);
                         }
 
-                        logger.info("Delete file: [{}]", filePath);
+                        InsertOrUpdateResult insertOrUpdateResult = null;
                         try {
-                            FileUtils.forceDelete(filePath.toFile());
-                            logger.info("file was deleted: [{}]", filePath);
+                            logger.info("Start update data from file [{}]", filePath);
+                            DataFrom1c dataFrom1c = JSONReadFromFile.read(filePath);
+                            insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
+                            logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
                         } catch (IOException e) {
-                            logger.error("Can't delete [{}]", filePath);
+                            logger.error("Can't read file [{}]", filePath);
                             logger.error(e);
-                        }
+                        } catch (org.json.simple.parser.ParseException e) {
+                            logger.error("Illegal JSON format [{}]", filePath);
+                            logger.error(e);
+                        } catch (ValidatorException e) {
+                            logger.error("Illegal JSON constraint format [{}]", filePath);
+                            logger.error(e);
+                        } catch (DBCohesionException e) {
+                            logger.error("Database conflict with file [{}]", filePath);
+                            logger.error(e);
+                        } finally {
 
-                    } catch (IOException e) {
-                        logger.error("Can't read file [{}]", filePath);
-                        logger.error(e);
-                    } catch (org.json.simple.parser.ParseException e) {
-                        logger.error("Illegal JSON file format [{}]", filePath);
-                        logger.error(e);
+                            // write response into response dir
+                            String responseDir = properties.getProperty("responseDir");
+                            if (insertOrUpdateResult != null) {
+                                logger.info("Start write result data into response directory");
+                                Path responsePath = Paths.get(responseDir).resolve(insertOrUpdateResult.getServer() + RESPONSE_FILE_EXTENSION);
+                                String resultString = insertOrUpdateResult.toString();
+                                try {
+                                    FileUtils.writeStringToFile(responsePath.toFile(), resultString, StandardCharsets.UTF_8);
+                                    logger.info("Response data were successfully written");
+                                } catch (IOException e) {
+                                    logger.error("Can't write response into [{}], exit application", responsePath);
+                                    logger.error(e);
+                                    closeAllAndExit();
+                                }
+                            } else {
+                                Path responsePath = Paths.get(responseDir).resolve(file.getName() + RESPONSE_FILE_EXTENSION);
+                                try {
+                                    FileUtils.writeStringToFile(responsePath.toFile(), "Data format error . The details in the log file.", StandardCharsets.UTF_8);
+                                } catch (IOException e) {
+                                    logger.error("Can't write response into [{}], exit application", responsePath);
+                                    logger.error(e);
+                                    closeAllAndExit();
+                                }
+                            }
+
+                            // delete incoming file
+                            logger.info("Delete file: [{}]", filePath);
+                            try {
+                                FileUtils.forceDelete(filePath.toFile());
+                                logger.info("file was deleted: [{}]", filePath);
+                            } catch (IOException e) {
+                                logger.error("Can't delete [{}], exit application", filePath);
+                                logger.error(e);
+                                closeAllAndExit();
+                            }
+                        }
                     }
+
                 });
-
             }
         });
 

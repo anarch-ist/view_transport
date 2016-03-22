@@ -15,13 +15,14 @@ import java.util.*;
  * В случае, если ID совпали, с уже существующим - то делается UPDATE, если же такого ID нет, то делается INSERT
  */
 public class InsertOrUpdateTransactionScript {
-
-    private static final Logger logger = LogManager.getLogger();
+    private static final String OK_STATUS = "OK";
+    private static final String ERROR_STATUS = "ERROR";
     public static final String LOGIST_1C = "LOGIST_1C";
+    private static final Logger logger = LogManager.getLogger();
     private final Connection connection;
     private final DataFrom1c dataFrom1c;
     private InsertOrUpdateResult insertOrUpdateResult;
-
+    
     public InsertOrUpdateTransactionScript(Connection connection, DataFrom1c dataFrom1c) {
         this.connection = connection;
         try {
@@ -103,14 +104,14 @@ public class InsertOrUpdateTransactionScript {
             newRoutesFromRouteListsStm = batchNewRoutesFromRouteLists(packageData.getUpdateRouteLists());
             routeListsInsertPreparedStatements = batchRouteLists(packageData.getUpdateRouteLists());
             connection.commit();
-            insertOrUpdateResult.setStatus("OK");
+            insertOrUpdateResult.setStatus(OK_STATUS);
         } catch(Exception e) {
             e.printStackTrace();
             logger.error(e);
             logger.error("start ROLLBACK");
             DBUtils.rollbackQuietly(connection);
             logger.error("end ROLLBACK");
-            insertOrUpdateResult.setStatus("ERROR");
+            insertOrUpdateResult.setStatus(ERROR_STATUS);
         } finally {
             DBUtils.closeStatementQuietly(updateExchangePrepStatement);
             DBUtils.closeStatementQuietly(updatePointsPrepStatement);
