@@ -1,10 +1,10 @@
-package ru.sbat.transport.optimization.location;
+package ru.sbat.transport.optimization;
 
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.sbat.transport.optimization.*;
+import ru.sbat.transport.optimization.location.*;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
@@ -13,44 +13,60 @@ import java.util.*;
 public class TestOptimizer {
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
     static InvoiceContainer invoiceContainer = new InvoiceContainer();
-    static WarehousePoint warehousePoint1 = new WarehousePoint();
-    static WarehousePoint warehousePoint2 = new WarehousePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint3 = new TradeRepresentativePoint();
-    static Route route = new Route();
-    static Route nextRoute = new Route();
+    static WarehousePoint b = new WarehousePoint("B");
+    static WarehousePoint c = new WarehousePoint("C");
+    static TradeRepresentativePoint x = new TradeRepresentativePoint("X");
+    static TradeRepresentativePoint p = new TradeRepresentativePoint("P");
+    static TradeRepresentativePoint a = new TradeRepresentativePoint("A");
+    static TradeRepresentativePoint z = new TradeRepresentativePoint("Z");
+    static TradeRepresentativePoint y = new TradeRepresentativePoint("Y");
+    static TradeRepresentativePoint q = new TradeRepresentativePoint("Q");
+    static Route route1 = new Route();
+    static Route route2 = new Route();
+    static Route route3 = new Route();
+    static Route route4 = new Route();
 
     // создание планового расписания
     @BeforeClass
     public static void createPlannedSchedule(){
         initRoute(
-                route,
-                createRoutePoint(warehousePoint2,           2, 930, 600,   0, getCharacteristicsOfCar(10)),
-                createRoutePoint(tradeRepresentativePoint1, 3, 170, 960,  80, getCharacteristicsOfCar(10)),
-                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, getCharacteristicsOfCar(10))
+                route1,
+                createRoutePoint(x, 2, 920, 600,   0, 690, getCharacteristicsOfCar(10)),
+                createRoutePoint(c, 3, 170, 960,  80, 89 , getCharacteristicsOfCar(10)),
+                createRoutePoint(a, 3,   0,   0, 120, 78 , getCharacteristicsOfCar(10))
         );
         initRoute(
-                nextRoute,
-                createRoutePoint(warehousePoint1,           4, 930, 600,   0, getCharacteristicsOfCar(10)),
-                createRoutePoint(tradeRepresentativePoint2, 5, 170, 960,  80, getCharacteristicsOfCar(10)),
-                createRoutePoint(tradeRepresentativePoint3, 5,   0,   0, 120, getCharacteristicsOfCar(10))
+                route2,
+                createRoutePoint(b, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
+                createRoutePoint(p, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
+                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10)),
+                createRoutePoint(q, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
         );
-        plannedSchedule.add(route);
-        plannedSchedule.add(nextRoute);
+        initRoute(
+                route3,
+                createRoutePoint(p, 4, 940, 600,   0, 657 , getCharacteristicsOfCar(10)),
+                createRoutePoint(a, 5, 170, 960,  80, 35  , getCharacteristicsOfCar(10)),
+                createRoutePoint(b, 5, 180, 300, 120, 4535, getCharacteristicsOfCar(10)),
+                createRoutePoint(c, 6, 463, 2353, 90, 345 , getCharacteristicsOfCar(10))
+        );
+        initRoute(
+                route4,
+                createRoutePoint(b, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
+                createRoutePoint(x, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
+                createRoutePoint(y, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+        );
+        plannedSchedule.add(route1);
+        plannedSchedule.add(route2);
+        plannedSchedule.add(route3);
+        plannedSchedule.add(route4);
     }
 
     // создание накладных без маршрутов
     @BeforeClass
     public static void fullInvoiceContainer(){
-        Request request = createRequest(tradeRepresentativePoint3,  createDate(2016, Calendar.FEBRUARY, 16, 20,  45));
-        Invoice invoice = createInvoice(warehousePoint2,  createDate(2016, Calendar.JANUARY, 30, 12, 0),     request, 5);
+        Request request = createRequest(z,  createDate(2016, Calendar.FEBRUARY, 16, 20,  45));
+        Invoice invoice = createInvoice(c,  createDate(2016, Calendar.JANUARY, 30, 12, 0),     request, 5);
         invoiceContainer.add(invoice);
-
-    }
-
-    @Test
-    public static void testRecursive(){
 
     }
 
@@ -62,16 +78,37 @@ public class TestOptimizer {
     }
 
     @Test
-    public void testGetDeliveryRoute() throws RouteNotFoundException {
+    public void testFilterRoutesByPoint() {
         Optimizer optimizer = new Optimizer();
-        optimizer.getDeliveryRoutesForInvoice(invoiceContainer.get(0), plannedSchedule);
+        Map<Route, List<Integer>> result = optimizer.filterRoutesByPoint(plannedSchedule, a, true);
+        System.out.println(result);
+        Assert.assertEquals(2, result.size());
+        Assert.assertEquals(1, result.get(route3).size());
     }
+
+    @Test
+    public void testRecursive() {
+        Optimizer optimizer = new Optimizer();
+        List<DeliveryRoute> result = new ArrayList<>();
+        List<Point> markedPoints = new ArrayList<>();
+        optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
+        System.out.println("MARKED POINTS");
+        for (Point markedPoint : markedPoints) {
+            System.out.println(markedPoint.getPointId());
+        }
+    }
+
+//    @Test
+//    public void testGetDeliveryRoute() throws RouteNotFoundException {
+//        Optimizer optimizer = new Optimizer();
+//        optimizer.getDeliveryRoutesForInvoice(invoiceContainer.get(0), plannedSchedule, invoiceContainer.get(0).getRequest().getDeliveryPoint());
+//    }
 
     @Test
     public void testGetArrivalDateFromEachRoutePointInRoute(){
         Optimizer optimizer = new Optimizer();
-        Map<RoutePoint, ArrayList<Date>> result = optimizer.getArrivalDateInEachRoutePointInRoute(route, invoiceContainer.get(0));
-        for(RoutePoint routePoint: route) {
+        Map<RoutePoint, ArrayList<Date>> result = optimizer.getArrivalDateInEachRoutePointInRoute(route1, invoiceContainer.get(0));
+        for(RoutePoint routePoint: route1) {
             System.out.println(result.get(routePoint) + " дата возможного прибытия в пункт " + routePoint);
         }
         System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
@@ -81,15 +118,15 @@ public class TestOptimizer {
     @Test
     public void testGetDepartureDateFromEachRoutePointInRoute(){
         Optimizer optimizer = new Optimizer();
-        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route, route.get(0), invoiceContainer.get(0));
+        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(0), invoiceContainer.get(0));
         for(Date date: result1) {
             System.out.println(date + " дата возможного отъезда из 1");
         }
-        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route, route.get(1), invoiceContainer.get(0));
+        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(1), invoiceContainer.get(0));
         for(Date date: result2) {
             System.out.println(date + " дата возможного отъезда из 2");
         }
-        ArrayList<Date> result3 = optimizer.getPossibleDepartureDateFromRoutePoint(route, route.get(route.size() - 1), invoiceContainer.get(0));
+        ArrayList<Date> result3 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(route1.size() - 1), invoiceContainer.get(0));
         for(Date date: result3) {
             System.out.println(date + " дата возможного отъезда из 3");
         }
@@ -101,15 +138,15 @@ public class TestOptimizer {
     @Test
     public void testGetDepartureDateFromEachRoutePointInRoute2(){
         Optimizer optimizer = new Optimizer();
-        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(nextRoute, nextRoute.get(0), invoiceContainer.get(0));
+        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(0), invoiceContainer.get(0));
         for(Date date: result1) {
             System.out.println(date + " дата возможного отъезда из 1");
         }
-        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(nextRoute, nextRoute.get(1), invoiceContainer.get(0));
+        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(1), invoiceContainer.get(0));
         for(Date date: result2) {
             System.out.println(date + " дата возможного отъезда из 2");
         }
-        ArrayList<Date> result3 = optimizer.getArrivalDateInEachRoutePointInRoute(nextRoute, invoiceContainer.get(0)).get(nextRoute.get(nextRoute.size() - 1));
+        ArrayList<Date> result3 = optimizer.getArrivalDateInEachRoutePointInRoute(route2, invoiceContainer.get(0)).get(route2.get(route2.size() - 1));
         for(Date date: result3) {
             System.out.println(date + " дата возможного отъезда из 3");
         }
@@ -121,13 +158,13 @@ public class TestOptimizer {
     @Test
     public void testGetDepartureArrivalDatesBetweenTwoRoutePoints(){
         Optimizer optimizer = new Optimizer();
-        ArrayList<PairDate> pairDates = optimizer.getDepartureArrivalDatesBetweenTwoRoutePoints(nextRoute, route, invoiceContainer.get(0), nextRoute.get(nextRoute.size() - 2), route.get(route.size() - 1));
+        ArrayList<PairDate> pairDates = optimizer.getDepartureArrivalDatesBetweenTwoRoutePoints(route2, route1, invoiceContainer.get(0), route2.get(route2.size() - 2), route1.get(route1.size() - 1));
         Assert.assertEquals(2, pairDates.size());
         for(PairDate pairDate: pairDates){
             System.out.println("Отправление из пункта: " + pairDate.getDepartureDate() + " и прибытие в нужный: " + pairDate.getArrivalDate());
         }
-        Assert.assertEquals(3, optimizer.getPossibleDepartureDateFromRoutePoint(nextRoute, nextRoute.get(nextRoute.size() - 2), invoiceContainer.get(0)).size());
-        Assert.assertEquals(3, optimizer.getArrivalDateInEachRoutePointInRoute(route, invoiceContainer.get(0)).get(route.get(route.size() - 1)).size());
+        Assert.assertEquals(3, optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(route2.size() - 2), invoiceContainer.get(0)).size());
+        Assert.assertEquals(3, optimizer.getArrivalDateInEachRoutePointInRoute(route1, invoiceContainer.get(0)).get(route1.get(route1.size() - 1)).size());
     }
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
@@ -158,13 +195,14 @@ public class TestOptimizer {
         Collections.addAll(route, routePoints);
     }
 
-    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, CharacteristicsOfCar characteristicsOfCar) {
+    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint, CharacteristicsOfCar characteristicsOfCar) {
         RoutePoint result = new RoutePoint();
         result.setDeparturePoint(point);
         result.setDayOfWeek(dayOfWeek);
         result.setDepartureTime(departureTime); // в минутах от начала суток
         result.setTimeToNextPoint(timeToNextPoint);
         result.setLoadingOperationsTime(loadingOperationsTime);
+        result.setDistanceToNextPoint(distanceToNextPoint);
         result.setCharacteristicsOfCar(characteristicsOfCar);
         return result;
     }

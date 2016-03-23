@@ -5,33 +5,20 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
-    /** determines if route contains route point with departure point that marked in conditions.
-     * If the 2-nd parameter in conditions is true point should not be the last in route.
-     * If the 2-nd parameter in conditions is false point can be the last in route.
-     *
-     * @param point
-     * @param considerLastPoint
-     * @return true or false route contains point or not
-     */
+
     @Override
-    public boolean containsPoint(Point point, boolean considerLastPoint) {
-        if (considerLastPoint) {
-            for(RoutePoint routePoint: this){
-                if(routePoint.getDeparturePoint().equals(point) && this.indexOf(routePoint) != (this.size() - 1)){
-                    return true;
-                }
-            }
-        }else {
-            for(RoutePoint routePoint: this){
-                this.indexOf(routePoint);
-                if(routePoint.getDeparturePoint().equals(point)){
-                    return true;
-                }
+    public boolean containsPoint(Point point) {
+        for(RoutePoint routePoint: this){
+            if(routePoint.getDeparturePoint().equals(point)){
+                return true;
             }
         }
-
-
         return false;
+    }
+
+    @Override
+    public boolean isLastPoint(Point point) {
+        return (this.get(this.size()-1).getDeparturePoint().equals(point));
     }
 
     /** calculates the total distance on the route
@@ -198,6 +185,15 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     @Override
     public double getStartingOccupancyCost() {
         return this.get(0).getCharacteristicsOfCar().getOccupancyCost();
+    }
+
+    @Override
+    public String getPointsAsString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (RoutePoint routePoint: this) {
+            stringBuilder.append(routePoint.getDeparturePoint().getPointId()).append(" ");
+        }
+        return stringBuilder.toString();
     }
 
     @Override

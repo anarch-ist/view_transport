@@ -9,9 +9,9 @@ public class TestRoute {
 
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
     static Route route = new Route();
-    static WarehousePoint warehousePoint1 = new WarehousePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
+    static WarehousePoint warehousePoint1 = new WarehousePoint("g");
+    static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint("gt");
+    static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint("d");
 
     @BeforeClass
     public static void createPlannedSchedule() {

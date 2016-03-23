@@ -19,7 +19,7 @@ public interface IOptimizer {
 
     List<DeliveryRoute> getDeliveryRoutesForInvoice(Invoice invoice, PlannedSchedule plannedSchedule) throws RouteNotFoundException;
 
-    void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, List<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException;
+    void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException;
 
     ArrayList<Invoice> shift (PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice);
 

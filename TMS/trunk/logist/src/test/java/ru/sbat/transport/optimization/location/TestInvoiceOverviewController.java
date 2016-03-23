@@ -14,15 +14,15 @@ import java.util.Collections;
 import java.util.Date;
 
 public class TestInvoiceOverviewController {
-    static InvoiceContainer invoiceContainer = new InvoiceContainer();
-    static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static TradeRepresentativePoint tradeRepresentativePoint0 = new TradeRepresentativePoint();
-    static WarehousePoint warehousePoint0 = new WarehousePoint();
-    static MarketAgent marketAgent = new MarketAgent();
-    static Route route = new Route();
-    static WarehousePoint warehousePoint1 = new WarehousePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint();
-    static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
+//    static InvoiceContainer invoiceContainer = new InvoiceContainer();
+//    static PlannedSchedule plannedSchedule = new PlannedSchedule();
+//    static TradeRepresentativePoint tradeRepresentativePoint0 = new TradeRepresentativePoint();
+//    static WarehousePoint warehousePoint0 = new WarehousePoint();
+//    static MarketAgent marketAgent = new MarketAgent();
+//    static Route route = new Route();
+//    static WarehousePoint warehousePoint1 = new WarehousePoint();
+//    static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint();
+//    static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint();
 
     //---------------СЛУЖЕБНЫЕ МЕТОДЫ----------------------
     public Invoice createInvoice(Request request, Point addressOfWarehouse, double weight, double volume, int countOfBoxes, MarketAgent marketAgent, int priority, DeliveryRoute deliveryRoute, Date creationDate, double cost){
@@ -80,24 +80,24 @@ public class TestInvoiceOverviewController {
         return result;
     }
     //-------------END СЛУЖЕБНЫЕ МЕТОДЫ---------------------
-    @BeforeClass
-    public static void createPlannedSchedule() {
-        initRoute(
-                route,
-                // данные о машине(грузоподъемность в т., объем, стоимость), пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта, время ПРР, расстояние до следующего пункта
-                createRoutePoint(createCharacteristicsOfCar(10, 15, 13054.5), warehousePoint1,           2, 930, 600,   0, 120),
-                createRoutePoint(createCharacteristicsOfCar(15, 25,   17894), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
-                createRoutePoint(createCharacteristicsOfCar(20, 30,   25040), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
-        );
-        plannedSchedule.add(route);
-    }
-
-    @Test
-    public void testInvoiceOverViewController(){
-        Request request = createRequest(12, 4, tradeRepresentativePoint0, new Date(2016, 1, 27, 12, 30), 7);
-        Invoice invoice = createInvoice(request, warehousePoint0, 15.5, 17.7, 17, marketAgent, 1, initDeliveryRoute(route), new Date(2016, 1, 9, 15, 40), 14546);
-        InvoiceOverviewController invoiceOverviewController = new InvoiceOverviewController(invoiceContainer, plannedSchedule);
-        invoiceContainer.add(invoice);
-        invoice.setVolume(15);
-    }
+//    @BeforeClass
+//    public static void createPlannedSchedule() {
+//        initRoute(
+//                route,
+//                // данные о машине(грузоподъемность в т., объем, стоимость), пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта, время ПРР, расстояние до следующего пункта
+//                createRoutePoint(createCharacteristicsOfCar(10, 15, 13054.5), warehousePoint1,           2, 930, 600,   0, 120),
+//                createRoutePoint(createCharacteristicsOfCar(15, 25,   17894), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
+//                createRoutePoint(createCharacteristicsOfCar(20, 30,   25040), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
+//        );
+//        plannedSchedule.add(route);
+//    }
+//
+//    @Test
+//    public void testInvoiceOverViewController(){
+//        Request request = createRequest(12, 4, tradeRepresentativePoint0, new Date(2016, 1, 27, 12, 30), 7);
+//        Invoice invoice = createInvoice(request, warehousePoint0, 15.5, 17.7, 17, marketAgent, 1, initDeliveryRoute(route), new Date(2016, 1, 9, 15, 40), 14546);
+//        InvoiceOverviewController invoiceOverviewController = new InvoiceOverviewController(invoiceContainer, plannedSchedule);
+//        invoiceContainer.add(invoice);
+//        invoice.setVolume(15);
+//    }
 }
