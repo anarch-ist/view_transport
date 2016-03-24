@@ -1,5 +1,6 @@
 package ru.logist.sbat.db;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,9 @@ class Utils {
 
     private Utils() {}
 
-
+    public static String generateSalt() {
+        return RandomStringUtils.randomAlphanumeric(16);
+    }
 
     public static String generatePassword(String pass, String salt) {
         Objects.requireNonNull(pass);

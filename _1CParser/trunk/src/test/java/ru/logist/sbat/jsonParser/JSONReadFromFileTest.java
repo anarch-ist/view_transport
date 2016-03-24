@@ -14,7 +14,7 @@ public class JSONReadFromFileTest {
 
     @Before
     public void setUp() throws Exception {
-        jsonFile = Paths.get(JSONReadFromFileTest.class.getResource("EKA_fourth.pkg").toURI());
+        jsonFile = Paths.get(JSONReadFromFileTest.class.getResource("EKA1.pkg").toURI());
     }
 
     @Test

@@ -7,21 +7,25 @@ public class ClientData {
     private static final String FN_CLIENT_ID = "clientId";
     private static final String FN_CLIENT_NAME = "clientName";
     private static final String FN_CLIENT_INN = "clientINN";
+    private static final String FN_CLIENT_PASSWORD = "clientPassword";
 
     private String clientId;
     private String clientName;
     private String clientINN;
+    private String clientPassword;
 
     public ClientData(JSONObject updateClient) {
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateClient);
         Util.checkFieldAvailableAndNotNull           (FN_CLIENT_NAME, updateClient);
         Util.checkFieldAvailableAndNotNull           (FN_CLIENT_INN, updateClient);
+        Util.checkFieldAvailableAndNotNull           (FN_CLIENT_PASSWORD, updateClient);
 
         // set values
         Util.setStringValue(FN_CLIENT_ID, updateClient, this, "clientId");
         Util.setStringValue(FN_CLIENT_NAME, updateClient, this, "clientName");
         Util.setStringValue(FN_CLIENT_INN, updateClient, this, "clientINN");
+        Util.setStringValue(FN_CLIENT_PASSWORD, updateClient, this, "clientPassword");
     }
 
     public String getClientId() {
@@ -36,12 +40,21 @@ public class ClientData {
         return clientINN;
     }
 
+    public String getClientPassword() {
+        return clientPassword;
+    }
+
+    public boolean hasValidPassword() {
+        return (clientPassword!= null && !clientPassword.isEmpty());
+    }
+
     @Override
     public String toString() {
         return "ClientData{" +
                 "clientId='" + clientId + '\'' +
                 ", clientName='" + clientName + '\'' +
                 ", clientINN='" + clientINN + '\'' +
+                ", clientPassword='" + clientPassword + '\'' +
                 '}';
     }
 }

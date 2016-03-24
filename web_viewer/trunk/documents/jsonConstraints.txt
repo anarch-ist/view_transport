@@ -42,11 +42,14 @@
     "traderEMail": строка,
     "traderPhone": строка,
     "traderOffice": строка
+    "traderLogin": строка, 
+    "traderPassword": строка
 
 10) clientObject:
     "clientId": строка, UNIQUE, NOT EMPTY,
     "clientName": строка,
-    "clientINN": строка
+    "clientINN": строка,
+    "clientPassword": строка
 
 11) addressObject:
     "addressId": строка, UNIQUE, NOT EMPTY,
