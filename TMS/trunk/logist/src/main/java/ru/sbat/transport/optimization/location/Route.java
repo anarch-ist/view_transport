@@ -1,8 +1,13 @@
 package ru.sbat.transport.optimization.location;
 
 
+import ru.sbat.transport.optimization.LoadCostOfTrackCourse;
+import ru.sbat.transport.optimization.TrackCourse;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
 
@@ -194,6 +199,19 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
             stringBuilder.append(routePoint.getDeparturePoint().getPointId()).append(" ");
         }
         return stringBuilder.toString();
+    }
+
+    public List<TrackCourse> splitRouteIntoTrackCourse() {
+        List<TrackCourse> result = new ArrayList<>();
+        for(int i = 0; i < (this.size() - 1); i++) {
+            TrackCourse trackCourse = new TrackCourse();
+            trackCourse.setStartTrackCourse(this.get(i));
+            trackCourse.setEndTrackCourse(this.get(i + 1));
+            trackCourse.setRoute(this);
+            trackCourse.setLoadCostOfTrackCourse(new LoadCostOfTrackCourse(this.getStartingOccupancyCost()));
+            result.add(trackCourse);
+        }
+        return result;
     }
 
     @Override

@@ -65,7 +65,7 @@ public class Optimizer implements IOptimizer {
             if (indexesOfPoint.size() == 1) {
                 for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
                     if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
-                        deliveryRoute.add(route);
+//                        deliveryRoute.add(route);
                         result.add(deliveryRoute);
                         break;
                     }
@@ -105,9 +105,9 @@ public class Optimizer implements IOptimizer {
                 // last point of route
                 if ((indexOfPointInRoute + 1) == route.size()) {
 
-//                    Point newDeparturePoint = route.get(indexOfPointInRoute).getDeparturePoint();
-//                    Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, newDeparturePoint, false);
-//                    rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, informationStack);
+                    Point newDeparturePoint = route.get(indexOfPointInRoute).getDeparturePoint();
+                    Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, newDeparturePoint, false);
+                    rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, informationStack);
 
                 // if middle point of route
                 } else {
@@ -129,6 +129,16 @@ public class Optimizer implements IOptimizer {
                         if(!markedPoints.contains(point)) {
 
                             if(point.equals(deliveryPoint)){
+                                List<Point> pointsId = new ArrayList<>();
+                                pointsId.addAll(informationStack.getPointsForInvoice());
+                                pointsId.add(point);
+                                List<Route> routesId = new LinkedList<>();
+                                TrackCourse trackCourse = new TrackCourse();
+                                List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(pointsId, routesId);
+                                for(TrackCourse trackCourse1: trackCourses) {
+                                    System.out.print("Track Courses, start point id = " + trackCourse1.getStartTrackCourse().getDeparturePoint().getPointId() + ", end point id = " + trackCourse1.getEndTrackCourse().getDeparturePoint().getPointId());
+                                }
+                                routesId.addAll(informationStack.getRoutesForInvoice());
                                 System.out.println("FIND delivery point!");
                                 break;
                             }
@@ -136,6 +146,8 @@ public class Optimizer implements IOptimizer {
                             InformationStack newInformationStack = new InformationStack(informationStack);
                             newInformationStack.appendPointsHistory(point);
                             newInformationStack.appendRoutesHistory(route);
+                            newInformationStack.addPoint(point);
+                            newInformationStack.addRoute(route);
                             newInformationStack.setDeep(informationStack.getDeep() + 1);
 
                             Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);

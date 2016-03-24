@@ -52,7 +52,7 @@ public class TestInvoiceOverviewController {
 
     public static DeliveryRoute initDeliveryRoute(Route... route) {
         DeliveryRoute result = new DeliveryRoute();
-        Collections.addAll(result, route);
+//        Collections.addAll(result, route);
         return result;
     }
 

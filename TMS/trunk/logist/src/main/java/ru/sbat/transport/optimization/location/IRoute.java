@@ -1,7 +1,10 @@
 package ru.sbat.transport.optimization.location;
 
 
+import ru.sbat.transport.optimization.TrackCourse;
+
 import java.util.Date;
+import java.util.List;
 
 public interface IRoute {
     boolean containsPoint(Point point);
@@ -21,4 +24,5 @@ public interface IRoute {
     double getStartingOccupancyCost();
     double getStartingWeight();
     double getStartingVolume();
+    List<TrackCourse> splitRouteIntoTrackCourse();
 }

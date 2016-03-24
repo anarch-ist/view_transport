@@ -1,16 +1,14 @@
 package ru.sbat.transport.optimization.location;
 
 
+import ru.sbat.transport.optimization.TrackCourse;
+
 import java.util.LinkedList;
 
-public class DeliveryRoute extends LinkedList<Route> implements IDeliveryRoute{
+public class DeliveryRoute extends LinkedList<TrackCourse> implements IDeliveryRoute{
 
     @Override
     public int getCountOfRoutePoint() {
-        int count = 0;
-        for(Route route: this){
-            count += route.size();
-        }
-        return count;
+        return (this.size() + 1);
     }
 }
