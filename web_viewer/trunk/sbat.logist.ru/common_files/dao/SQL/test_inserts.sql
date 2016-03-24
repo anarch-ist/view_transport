@@ -31,26 +31,6 @@ INSERT INTO distances_between_points (pointIDFirst, pointIDSecond, distance) VAL
   (getPointIDByName('point2'), getPointIDByName('point3'), 230),
   (getPointIDByName('point3'), getPointIDByName('point4'), 340);
 
-
-INSERT INTO users (login, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
-VALUES
-  ('test', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16),
-   md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))), '904534356', 'test@test.ru', 'ADMIN',
-   getPointIDByName('point1')),
-  ('user2', 'ivanov i.A.', 'erwgewg', SUBSTRING(MD5(2) FROM 1 FOR 16),
-   md5(CONCAT(md5('esrhgruht'), SUBSTRING(MD5(2) FROM 1 FOR 16))), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
-   getPointIDByName('point2')),
-  ('user3', 'petrov i.A.', 'erfergg', SUBSTRING(MD5(3) FROM 1 FOR 16),
-   md5(CONCAT(md5('wefwgrege'), SUBSTRING(MD5(3) FROM 1 FOR 16))), '904534356', 'ey@irtj.ru', 'DISPATCHER',
-   getPointIDByName('point4')),
-  ('user4', 'sidorov i.A.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
-   md5(CONCAT(md5('wertgrege'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'ey@i45j.ru', 'MARKET_AGENT',
-   getPointIDByName('point3')),
-  ('clientUser', 'wlrfekj.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
-   md5(CONCAT(md5('1111'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'cl@cl.ru', 'CLIENT_MANAGER',
-   getPointIDByName('point2'));
-
-
 INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN, KPP, corAccount, curAccount, BIK, bankName, contractNumber, dateOfSigning, startContractDate, endContractDate)
 VALUES
   ('extClId1', 'LOGIST_1C', 'ИП Иванов', '1234567890', '23674529375734562', 'corAcccc', 'curAxccccc', '34896208375', 'moscowBank', 'erguheru', now(), now(),
@@ -58,6 +38,22 @@ VALUES
   ('extClId2', 'LOGIST_1C', 'ИП Петров', '8947537893', '37549783469587934', 'corAcccc2', 'curAxccccc2', '3324234375', 'moscowBank1', '34guheru', now(), now(),
    now());
 
+INSERT INTO users (login, userIDExternal, dataSourceID, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID, clientID)
+VALUES
+  ('test', '123', 'ADMIN_PAGE','ivanov i.i.', 'position', 'nvuritneg4785231',
+   md5(CONCAT(md5('test'), 'nvuritneg4785231')),  '904534356', 'test@test.ru', 'ADMIN', NULL, NULL),
+  ('user2', '124', 'ADMIN_PAGE', 'ivanov i.A.', 'erwgewg', SUBSTRING(MD5(2) FROM 1 FOR 16),
+   md5(CONCAT(md5('esrhgruht'), SUBSTRING(MD5(2) FROM 1 FOR 16))), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
+   getPointIDByName('point2'), NULL),
+  ('user3', '125', 'ADMIN_PAGE', 'petrov i.A.', 'erfergg', SUBSTRING(MD5(3) FROM 1 FOR 16),
+   md5(CONCAT(md5('wefwgrege'), SUBSTRING(MD5(3) FROM 1 FOR 16))), '904534356', 'ey@irtj.ru', 'DISPATCHER',
+   getPointIDByName('point4'), NULL),
+  ('user4', '126', 'ADMIN_PAGE', 'sidorov i.A.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
+   md5(CONCAT(md5('wertgrege'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'ey@i45j.ru', 'W_DISPATCHER',
+   getPointIDByName('point3'), NULL),
+  ('clientUser', '127', 'ADMIN_PAGE', 'wlrfekj.', 'ergrtgr', SUBSTRING(MD5(4) FROM 1 FOR 16),
+   md5(CONCAT(md5('1111'), SUBSTRING(MD5(4) FROM 1 FOR 16))), '904554356', 'cl@cl.ru', 'CLIENT_MANAGER',
+   NULL , getClientIDByINN('1234567890'));
 
 INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carrier');
 

@@ -5,6 +5,13 @@ CREATE DATABASE `transmaster_transport_db`
   COLLATE utf8_bin;
 USE `transmaster_transport_db`;
 
+-- TODO replace all errors with this function
+-- _errorMessage must be less or equal 110 symbols
+CREATE PROCEDURE generateLogistError(_errorMessage TEXT)
+  BEGIN
+    SET @message_text = concat('LOGIST ERROR: ', _errorMessage);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
+  END;
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                  DATA SOURCES
@@ -13,8 +20,34 @@ USE `transmaster_transport_db`;
 CREATE TABLE data_sources (
   dataSourceID VARCHAR(32) PRIMARY KEY
 );
-INSERT INTO data_sources VALUES ('LOGIST_1C');
+INSERT INTO data_sources
+VALUES
+  ('LOGIST_1C')
+  ,('ADMIN_PAGE');
 
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                 CLIENTS
+-- -------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE clients (
+  clientID          INTEGER AUTO_INCREMENT,
+  clientIDExternal  VARCHAR(255) NOT NULL,
+  dataSourceID      VARCHAR(32)  NOT NULL,
+  INN               VARCHAR(32)  NOT NULL,
+  clientName        VARCHAR(255) NULL,
+  KPP               VARCHAR(64)  NULL,
+  corAccount        VARCHAR(64)  NULL,
+  curAccount        VARCHAR(64)  NULL,
+  BIK               VARCHAR(64)  NULL,
+  bankName          VARCHAR(128) NULL,
+  contractNumber    VARCHAR(64)  NULL,
+  dateOfSigning     DATE         NULL,
+  startContractDate DATE         NULL,
+  endContractDate   DATE         NULL,
+  PRIMARY KEY (clientID),
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
+  UNIQUE(clientIDExternal, dataSourceID)
+);
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                        USERS ROLES PERMISSIONS AND POINTS
@@ -31,19 +64,23 @@ VALUES
   -- администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
   -- имеет право изменить роль пользователя
   ('ADMIN', 'Администратор'),
+  -- показывать заявки, которые проходят через пункт к которому приписан W_DISPATCHER
   -- диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
   ('W_DISPATCHER', 'Диспетчер_склада'),
-  -- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
+  -- показывать заявки, которые проходят через пункт к которому приписан DISPATCHER
+    -- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
   ('DISPATCHER', 'Диспетчер'),
-  -- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента, а не только тех, которые проходят через его пункт.
+  -- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента.
   ('CLIENT_MANAGER', 'Пользователь_клиента'),
   -- торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
-  ('MARKET_AGENT', 'Торговый_представитель'),
+  ('MARKET_AGENT', 'Торговый_представитель')
+
+  -- TODO сделать правильну работу для указанных ниже ролей пользователей, прописать ограничения в таблице users
   -- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
   -- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
-  ('TEMP_REMOVED', 'Временно_удален'),
-
-  ('VIEW_LAST_TEN', 'Последние_десять');
+  -- ('TEMP_REMOVED', 'Временно_удален'),
+  -- ('VIEW_LAST_TEN', 'Последние_десять')
+ ;
 
 CREATE TABLE point_types (
   pointTypeID VARCHAR(32),
@@ -82,7 +119,8 @@ CREATE TABLE points (
   UNIQUE(pointIDExternal, dataSourceID)
 );
 
--- CONSTRAINT pointIDFirst must not be equal pointIDSecond
+
+-- TODO CONSTRAINT pointIDFirst must not be equal pointIDSecond
 CREATE TABLE distances_between_points (
   pointIDFirst  INTEGER,
   pointIDSecond INTEGER,
@@ -96,27 +134,61 @@ CREATE TABLE distances_between_points (
     ON UPDATE CASCADE
 );
 
--- TODO CONSTRAINT у пользователей с определнной ролью обязан быть пункт
--- TODO CONSTRAINT у администратора не может быть пункта
 CREATE TABLE users (
-  userID      INTEGER     AUTO_INCREMENT,
-  login       VARCHAR(255) NOT NULL UNIQUE, -- userIDExternal
-  userName    VARCHAR(255) NULL,
-  phoneNumber VARCHAR(255) NULL,
-  email       VARCHAR(255) NULL,
-  position    VARCHAR(64)  NULL, -- должность
-  salt        VARCHAR(16) DEFAULT 'anqh14dajk4sn2j3', -- соль, нужна для защиты паролей
-  passAndSalt VARCHAR(64)  NOT NULL DEFAULT '5a81a14e9b075499b73f222392a72737', -- соответсвует паролю "12345"
-  userRoleID  VARCHAR(32)  NOT NULL,
-  pointID     INTEGER      NULL, -- у пользователя не обязан быть пункт.
+  userID         INTEGER AUTO_INCREMENT,
+  userIDExternal VARCHAR(255) NOT NULL,
+  dataSourceID   VARCHAR(32)  NOT NULL,
+  login          VARCHAR(255) NOT NULL UNIQUE, -- userIDExternal
+  salt           CHAR(16)     NOT NULL,
+  passAndSalt    VARCHAR(64)  NOT NULL,
+  userRoleID     VARCHAR(32)  NOT NULL,
+  userName       VARCHAR(255) NULL,
+  phoneNumber    VARCHAR(255) NULL,
+  email          VARCHAR(255) NULL,
+  position       VARCHAR(64)  NULL, -- должность
+  pointID        INTEGER      NULL, -- у ADMIN и CLIENT_MANAGER и MARKET_AGENT не может иметь пункта, у W_DISPATCHER и DISPATCHER обязан быть пункт
+  clientID       INTEGER      NULL, -- у CLIENT_MANAGER обязан быть clientID, у ADMIN W_DISPATCHER DISPATCHER и MARKET_AGENT его быть не должно
   PRIMARY KEY (userID),
+  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
     ON DELETE RESTRICT
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (clientID) REFERENCES clients (clientID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  UNIQUE(userIDExternal, dataSourceID)
 );
+
+CREATE PROCEDURE checkUserConstraints(_userRoleID VARCHAR(255), _pointID INTEGER, _clientID INTEGER, _userIDExternal VARCHAR(255), _login VARCHAR(255))
+  BEGIN
+    IF (_userRoleID IN ('ADMIN', 'CLIENT_MANAGER', 'MARKET_AGENT') AND _pointID IS NOT NULL) THEN
+      CALL generateLogistError(CONCAT('ADMIN, CLIENT_MANAGER OR MARKET_AGENT  can\'t have a point. userIDExternal = ', _userIDExternal, ', login = ', _login));
+    END IF;
+
+    IF (_userRoleID IN ('DISPATCHER', 'W_DISPATCHER') AND _pointID IS NULL) THEN
+      CALL generateLogistError(CONCAT('DISPATCHER OR W_DISPATCHER must have a point. userIDExternal = ', _userIDExternal, ', login = ', _login));
+    END IF;
+
+    IF (_userRoleID = 'CLIENT_MANAGER' AND _clientID IS NULL) THEN
+      CALL generateLogistError(CONCAT('CLIENT_MANAGER must have clientID. userIDExternal = ', _userIDExternal, ', login = ', _login));
+    END IF;
+
+    IF (_userRoleID IN('DISPATCHER', 'W_DISPATCHER', 'MARKET_AGENT', 'ADMIN') AND _clientID IS NOT NULL) THEN
+      CALL generateLogistError(CONCAT('clientID must be null for userIDExternal = ', _userIDExternal, ', login = ', _login));
+    END IF;
+  END;
+
+CREATE TRIGGER check_users_constraints_insert BEFORE INSERT ON users
+FOR EACH ROW
+  CALL checkUserConstraints(NEW.userRoleID, NEW.pointID, NEW.clientID, NEW.userIDExternal, NEW.login);
+
+CREATE TRIGGER check_users_constraints_update BEFORE UPDATE ON users
+FOR EACH ROW
+  CALL checkUserConstraints(NEW.userRoleID, NEW.pointID, NEW.clientID, NEW.userIDExternal, NEW.login);
+
 
 CREATE TABLE permissions (
   permissionID VARCHAR(32),
@@ -182,34 +254,13 @@ INSERT INTO points (pointIDExternal, dataSourceID, pointName, region, timeZone, 
 VALUES ('wle', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',
         'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE');
 
-INSERT INTO users
-  VALUE
-  (1, 'parser', '', '', 'fff@fff', '', 'nvuritneg4785', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785')), 'ADMIN', NULL);
+INSERT INTO users (userID, userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)
+  VALUES
+  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', 'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),
+   'ADMIN', 'parser', '', 'fff@fff', '', NULL, NULL),
+  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test',   'nvuritneg4785231', md5(CONCAT(md5('test')         , 'nvuritneg4785231')),
+   'ADMIN', 'ivanov i.i.', '904534356', 'test@test.ru', 'position', NULL, NULL);
 
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                 CLIENTS
--- -------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE clients (
-  clientID          INTEGER AUTO_INCREMENT,
-  clientIDExternal  VARCHAR(255) NOT NULL,
-  dataSourceID      VARCHAR(32)  NOT NULL,
-  INN               VARCHAR(32)  NOT NULL,
-  clientName        VARCHAR(255) NULL,
-  KPP               VARCHAR(64)  NULL,
-  corAccount        VARCHAR(64)  NULL,
-  curAccount        VARCHAR(64)  NULL,
-  BIK               VARCHAR(64)  NULL,
-  bankName          VARCHAR(128) NULL,
-  contractNumber    VARCHAR(64)  NULL,
-  dateOfSigning     DATE         NULL,
-  startContractDate DATE         NULL,
-  endContractDate   DATE         NULL,
-  PRIMARY KEY (clientID),
-  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
-  UNIQUE(clientIDExternal, dataSourceID)
-);
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                          ROUTE AND ROUTE LISTS
@@ -775,14 +826,9 @@ CREATE TABLE requests_history (
 );
 
 -- -------------------------------------------------------------------------------------------------------------------
---                                                   EXCHANGE_TABLES
+--                                                   EXCHANGE_TABLE
 -- -------------------------------------------------------------------------------------------------------------------
 
--- 1) сначала парсер обнаруживает событие появления нового файла, или нескольких новых файлов. Если к примеру парсер в течение суток не работал, то в каталоге набралось некоторое количесвто новых выгрузок,
--- парсер должен обнаружить их все, отсортировать по номеру пакета и начать загрузку.
--- 2) как только начинается загрузка файла, парсер пишет об этом в таблицу exchangeHistory, если в процессе возникли ошибки, то они также пишутся в БД. В случае успешной загрузки делается запись в exchange.
--- 3)
--- when new file comes parser start event and make a try to write data into database. if succeded then
 CREATE TABLE exchange (
   packageNumber INTEGER,
   serverName VARCHAR(32),
@@ -884,6 +930,17 @@ CREATE FUNCTION getRoleIDByUserID(_userID INTEGER)
     RETURN result;
   END;
 
+CREATE FUNCTION getClientIDByClientIDExternal(_clientIDExternal VARCHAR(255), _dataSourceID VARCHAR(32))
+  RETURNS VARCHAR(255)
+  BEGIN
+    DECLARE result VARCHAR(255);
+    SET result = (SELECT clientID
+                  FROM clients
+                  WHERE clientIDExternal = _clientIDExternal AND dataSourceID = _dataSourceID);
+    RETURN result;
+  END;
+
+
 CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
   RETURNS INTEGER
   BEGIN
@@ -969,6 +1026,8 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;
+
+
 
 
 -- startEntry - number of record to start from(0 is first record)
@@ -1330,7 +1389,3 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
   END;
 
 
-INSERT INTO users (login, userName, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID)
-VALUES
-  ('test', 'ivanov i.i.', 'erwgewg', SUBSTRING(MD5(1) FROM 1 FOR 16), md5(CONCAT(md5('test'), SUBSTRING(MD5(1) FROM 1 FOR 16))),
-   '904534356', 'test@test.ru', 'ADMIN', getPointIDByName('point1'));
