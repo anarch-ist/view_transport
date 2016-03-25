@@ -15,7 +15,6 @@ $(document).ready(function () {
         } else {
             $.post("content/getData.php", {login: login, password: password},
                 function (data) {
-                    console.log(data);
                     var result = JSON.parse(data);
 
                     function handleInvalidLogin() {

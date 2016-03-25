@@ -59,9 +59,9 @@ abstract class AuthUser
         }
     }
 
-    private function authorize($email, $md5)
+    private function authorize($login, $md5)
     {
-        $this->user = \DAO\UserEntity::getInstance()->selectUserByEmail($email);
+        $this->user = \DAO\UserEntity::getInstance()->selectUserByLogin($login);
         if (!is_null($this->user) && $this->user->getData('passAndSalt') === md5($md5 . $this->user->getData('salt'))) {
             $this->sessCookieWork->startSession();
             $this->sessCookieWork->setSessionParameter('UserID', $this->user->getData('userID'));

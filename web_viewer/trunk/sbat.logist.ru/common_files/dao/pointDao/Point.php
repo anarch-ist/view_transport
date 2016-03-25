@@ -53,7 +53,12 @@ class PointEntity implements IPointEntity
 
     function selectPointByUserID($userID)
     {
-        return $this->_DAO->select(new SelectPointByUserID($userID))[0]['pointName'];
+
+        $result = $this->_DAO->select(new SelectPointByUserID($userID));
+        if (empty($result))
+            return '';
+        else
+            return $result[0]['pointName'];
     }
 }
 

@@ -56,12 +56,12 @@ class UserEntityTest extends AbstractEntityTestClass
     /**
      * @depends      testCreateUserEntity
      * @dataProvider provideUserEmail
-     * @covers       \DAO\UserEntity::selectUserByEmail
+     * @covers       \DAO\UserEntity::selectUserByLogin
      * @test
      */
     public function testGetUserByEmail($email, $isEmpty, $userID, \DAO\UserEntity $user)
     {
-        $userData = $user->selectUserByEmail($email);
+        $userData = $user->selectUserByLogin($email);
         if ($isEmpty) {
             $this->assertEmpty($userData);
         } else {

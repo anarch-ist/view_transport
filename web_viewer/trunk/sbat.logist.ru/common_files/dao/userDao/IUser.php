@@ -14,7 +14,7 @@ interface IUserEntity
 
     function selectUserByID($id); //covered
 
-    function selectUserByEmail($email); //covered
+    function selectUserByLogin($login); //covered
 
     function updateUser(UserData $newUser, $id); //covered
 

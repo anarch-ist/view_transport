@@ -5,7 +5,6 @@ CREATE DATABASE `transmaster_transport_db`
   COLLATE utf8_bin;
 USE `transmaster_transport_db`;
 
--- TODO replace all errors with this function
 -- _errorMessage must be less or equal 110 symbols
 CREATE PROCEDURE generateLogistError(_errorMessage TEXT)
   BEGIN
@@ -138,7 +137,8 @@ CREATE TABLE users (
   userID         INTEGER AUTO_INCREMENT,
   userIDExternal VARCHAR(255) NOT NULL,
   dataSourceID   VARCHAR(32)  NOT NULL,
-  login          VARCHAR(255) NOT NULL UNIQUE, -- userIDExternal
+  login          VARCHAR(255) NOT NULL,
+  passHash       VARCHAR(64)  NOT NULL,
   salt           CHAR(16)     NOT NULL,
   passAndSalt    VARCHAR(64)  NOT NULL,
   userRoleID     VARCHAR(32)  NOT NULL,
@@ -159,7 +159,8 @@ CREATE TABLE users (
   FOREIGN KEY (clientID) REFERENCES clients (clientID)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  UNIQUE(userIDExternal, dataSourceID)
+  UNIQUE (userIDExternal, dataSourceID),
+  UNIQUE (login, passHash)
 );
 
 CREATE PROCEDURE checkUserConstraints(_userRoleID VARCHAR(255), _pointID INTEGER, _clientID INTEGER, _userIDExternal VARCHAR(255), _login VARCHAR(255))
@@ -254,11 +255,11 @@ INSERT INTO points (pointIDExternal, dataSourceID, pointName, region, timeZone, 
 VALUES ('wle', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',
         'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE');
 
-INSERT INTO users (userID, userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)
+INSERT INTO users (userID, userIDExternal, dataSourceID, login, passHash, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)
   VALUES
-  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', 'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),
+  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', md5('nolpitf43gwer'),'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),
    'ADMIN', 'parser', '', 'fff@fff', '', NULL, NULL),
-  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test',   'nvuritneg4785231', md5(CONCAT(md5('test')         , 'nvuritneg4785231')),
+  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test', md5('test'), 'nvuritneg4785231', md5(CONCAT(md5('test'), 'nvuritneg4785231')),
    'ADMIN', 'ivanov i.i.', '904534356', 'test@test.ru', 'position', NULL, NULL);
 
 
@@ -345,8 +346,7 @@ FOR EACH ROW
         (@nextPointID IS NULL AND (NEW.pointID = @previousPointID)) OR
         (@previousPointID IS NULL AND (NEW.pointID = @nextPointID)))
     THEN
-      SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'LOGIST ERROR: can\'t add new route point because same neighbors';
+      CALL generateLogistError('can\'t add new route point because same neighbors');
     END IF;
   END;
 -- CONSTRAINT routePointIDFirst must not be equal routePointIDSecond
@@ -368,8 +368,7 @@ FOR EACH ROW
         (@nextPointID IS NULL AND (OLD.pointID = @previousPointID)) OR
         (@previousPointID IS NULL AND (OLD.pointID = @nextPointID)))
     THEN
-      SIGNAL SQLSTATE '45000'
-      SET MESSAGE_TEXT = 'LOGIST ERROR: can\'t remove route point because same neighbors';
+      CALL generateLogistError('can\'t remove route point because same neighbors');
     END IF;
   END;
 
@@ -384,7 +383,7 @@ FOR EACH ROW
         SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = NEW.routeID AND route_points.sortOrder > NEW.sortOrder ORDER BY sortOrder ASC LIMIT 1);
         SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = NEW.routeID AND route_points.sortOrder < NEW.sortOrder ORDER BY sortOrder DESC LIMIT 1);
         IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
-          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: nextRoutePointID and previousRoutePointID is NULL';
+          CALL generateLogistError('nextRoutePointID and previousRoutePointID is NULL');
         END IF;
 
         -- если мы добавили новый пункт в начало
@@ -419,7 +418,7 @@ FOR EACH ROW
         SET @nextRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = OLD.routeID AND route_points.sortOrder > OLD.sortOrder ORDER BY sortOrder ASC LIMIT 1);
         SET @previousRoutePointID = (SELECT routePointID FROM route_points WHERE route_points.routeID = OLD.routeID AND route_points.sortOrder < OLD.sortOrder ORDER BY sortOrder DESC LIMIT 1);
         IF (@nextRoutePointID IS NULL AND @previousRoutePointID IS NULL ) THEN
-          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: nextRoutePointID and previousRoutePointID is NULL';
+          CALL generateLogistError('nextRoutePointID and previousRoutePointID is NULL');
         END IF;
 
         -- если мы удалили пункт из начала
@@ -446,7 +445,7 @@ FOR EACH ROW
 CREATE TRIGGER after_route_points_update BEFORE UPDATE ON route_points
 FOR EACH ROW
   BEGIN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: updates on route_points temporally disabled';
+    CALL generateLogistError('updates on route_points temporally disabled');
   END;
 
 CREATE TABLE relations_between_route_points (
@@ -675,16 +674,17 @@ CREATE TABLE requests (
 CREATE TRIGGER check_for_market_agents_and_warehouse_point BEFORE INSERT ON requests
 FOR EACH ROW
   BEGIN
+
     (SELECT
        userRoleID,
        login
      INTO @userRoleID, @login
      FROM users
      WHERE userID = NEW.marketAgentUserID);
+
     IF (@userRoleID <> 'MARKET_AGENT')
     THEN
-      SET @message_text = concat('LOGIST ERROR: Can\'t insert row: only MARKET_AGENT users allowed for login = ', @login);
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
+      CALL generateLogistError(CONCAT('Can\'t insert row: only MARKET_AGENT users allowed for login = ', @login));
     END IF;
 
     SET @pointType = (SELECT pointTypeID
@@ -695,8 +695,7 @@ FOR EACH ROW
       BEGIN
         IF (@pointType <> 'WAREHOUSE')
         THEN
-          SIGNAL SQLSTATE '45000'
-          SET MESSAGE_TEXT = 'LOGIST ERROR: Can\'t insert row: only warehouse points allowed';
+          CALL generateLogistError('Can\'t insert row: only WAREHOUSE points allowed');
         END IF;
       END;
     END IF;
@@ -734,17 +733,12 @@ CREATE TRIGGER before_request_update BEFORE UPDATE ON requests
 FOR EACH ROW
     -- берем пользователя, который изменил статус на один из request statuses, затем находим его пункт маршрута, и этот
     -- пункт записываем в таблицу requests в поле lastVisitedRoutePointID
-#     IF (NEW.routeListID IS NULL) THEN
-#       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'LOGIST ERROR: routeList in requests must not be null';
-#     END IF;
     -- находим маршрут по которому едет накладная.
     IF (NEW.routeListID IS NOT NULL) THEN
       BEGIN
 
         SET @routeID = (SELECT routeID FROM route_lists WHERE NEW.routeListID = route_lists.routeListID);
         -- находим пункт пользователя, который изменил статус накладной.
-        -- SET @pointID = (SELECT pointID FROM users WHERE users.userID = NEW.lastModifiedBy);
-
         -- при появлении маршрутного листа сразу выставляем последний посещенный пункт, как первый пункт маршрута
         IF (NEW.lastVisitedRoutePointID IS NULL) THEN
           -- установка самого первого пункта маршрута
@@ -912,8 +906,7 @@ CREATE FUNCTION getRouteIDByDirectionIDExternal(_directionIDExternal VARCHAR(64)
 
     IF (result IS NULL ) THEN
       BEGIN
-        SET @message_text = concat('LOGIST ERROR: getRouteIDByDirectionIDExternal is NULL for directionIdExternal = ', _directionIDExternal);
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
+        CALL generateLogistError(concat('getRouteIDByDirectionIDExternal is NULL for directionIdExternal = ', _directionIDExternal));
       END ;
 
       END IF ;
@@ -946,6 +939,16 @@ CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
   BEGIN
     DECLARE result INTEGER;
     SET result = (SELECT pointID
+                  FROM users
+                  WHERE userID = _userID);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getClientIDByUserID(_userID INTEGER)
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT clientID
                   FROM users
                   WHERE userID = _userID);
     RETURN result;
@@ -1141,6 +1144,7 @@ CREATE VIEW transmaster_transport_db.big_select AS
     requests.requestStatusID, -- служебное поле
     requests.routeListID, -- служебное поле
     request_statuses.requestStatusRusName,
+    clients.clientID, -- служебное поле
     clients.clientIDExternal,
     clients.INN,
     clients.clientName,
@@ -1238,7 +1242,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     WHERE (
       (getRoleIDByUserID(?) = \'ADMIN\') OR
       (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
-      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND CONCAT(big_select.clientIDExternal,\'-client\') = ?) OR
+      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select.clientID = getClientIDByUserID(?)) OR
       (getPointIDByUserID(?) = big_select.warehousePointID) OR
       (getPointIDByUserID(?) IN (SELECT pointID
                                  FROM route_points
@@ -1260,10 +1264,9 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @_userID = _userID;
     SET @_startEntry = _startEntry;
     SET @_length = _length;
-    SET @_userLogin = (SELECT login FROM users WHERE userID = _userID);
 
     EXECUTE getDataStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userLogin, @_userID, @_userID, @_startEntry, @_length;
+    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
     DEALLOCATE PREPARE getDataStm;
 
     -- filtered
@@ -1273,7 +1276,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userLogin, @_userID, @_userID;
+    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID;
     DEALLOCATE PREPARE getTotalStm;
 
   END;

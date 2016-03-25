@@ -285,7 +285,7 @@ function createNewUser(PrivilegedUser $privUser)
     }
     $userInfo = new \DAO\UserData($_POST['data'][0]);
     if ($privUser->getUserEntity()->addUser($userInfo)) {
-        echo json_encode(array("data" =>array($privUser->getUserEntity()->selectUserByEmail($userInfo->getData('email'))->toArray())));
+        echo json_encode(array("data" =>array($privUser->getUserEntity()->selectUserByLogin($userInfo->getData('login'))->toArray())));
     }
     else {
         $privUser->getDaoEntity()->rollback();
@@ -308,7 +308,7 @@ function updateUsers(PrivilegedUser $privUser)
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
-        $serverAnswer['data'][$i] = $userEntity->selectUserByEmail($userInfo['email'])->toArray();
+        $serverAnswer['data'][$i] = $userEntity->selectUserByLogin($userInfo['login'])->toArray();
         $i++;
     }
     echo json_encode($serverAnswer);

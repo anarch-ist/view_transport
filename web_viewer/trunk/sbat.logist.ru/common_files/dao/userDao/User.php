@@ -54,9 +54,9 @@ class UserEntity implements IUserEntity
         return $this->_DAO->select(new SelectTotalUserCount())[0]['count'];
     }
 
-    function selectUserByEmail($email)
+    function selectUserByLogin($login)
     {
-        $array = $this->_DAO->select(new SelectUserByEmail($email));
+        $array = $this->_DAO->select(new SelectUserByLogin($login));
         if (!count($array)) {
             return null;
         }
@@ -117,18 +117,18 @@ class EntitySelectAllUsers implements IEntitySelect
     }
 }
 
-class SelectUserByEmail implements IEntitySelect
+class SelectUserByLogin implements IEntitySelect
 {
-    private $email;
+    private $login;
 
-    function __construct($email)
+    function __construct($login)
     {
-        $this->email = DAO::getInstance()->checkString($email);
+        $this->login = DAO::getInstance()->checkString($login);
     }
 
     function getSelectQuery()
     {
-        return "select * from `users` where `email` = '$this->email'";
+        return "select * from `users` where `login` = '$this->login'";
     }
 }
 
@@ -205,7 +205,7 @@ class InsertUser implements IEntityInsert
         $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
         $this->email = $dao->checkString($user->getData('email'));
-        $this->login = $dao->checkString($user->getData('email'));
+        $this->login = $dao->checkString($user->getData('login'));
         $this->userRoleID = $dao->checkString($user->getData('userRoleRusName'));
         $this->pointID = $dao->checkString($user->getData('pointName'));
     }
