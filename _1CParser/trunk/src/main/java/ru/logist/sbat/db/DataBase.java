@@ -92,11 +92,11 @@ public class DataBase {
                     "INSERT INTO points VALUE (8888, 'w', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',\n" +
                     "'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE')");
             connection.createStatement().executeUpdate(
-                    "INSERT INTO users (userID, userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
+                    "INSERT INTO users (userID, userIDExternal, dataSourceID, login, passHash, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
                             "  VALUES\n" +
-                            "  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', 'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),\n" +
+                            "  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', md5('nolpitf43gwer'),'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),\n" +
                             "   'ADMIN', 'parser', '', 'fff@fff', '', NULL, NULL),\n" +
-                            "  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test',   'nvuritneg4785231', md5(CONCAT(md5('test')         , 'nvuritneg4785231')),\n" +
+                            "  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test', md5('test'), 'nvuritneg4785231', md5(CONCAT(md5('test'), 'nvuritneg4785231')),\n" +
                             "   'ADMIN', 'ivanov i.i.', '904534356', 'test@test.ru', 'position', NULL, NULL);");
 
             connection.commit();
