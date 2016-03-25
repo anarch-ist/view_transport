@@ -21,10 +21,12 @@ public class TestOptimizer {
     static TradeRepresentativePoint z = new TradeRepresentativePoint("Z");
     static TradeRepresentativePoint y = new TradeRepresentativePoint("Y");
     static TradeRepresentativePoint q = new TradeRepresentativePoint("Q");
+    static TradeRepresentativePoint f = new TradeRepresentativePoint("F");
     static Route route1 = new Route();
     static Route route2 = new Route();
     static Route route3 = new Route();
     static Route route4 = new Route();
+    static Route route5 = new Route();
 
     // создание планового расписания
     @BeforeClass
@@ -55,10 +57,17 @@ public class TestOptimizer {
                 createRoutePoint(x, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
                 createRoutePoint(y, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
         );
+        initRoute(
+                route5,
+                createRoutePoint(c, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
+                createRoutePoint(f, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
+                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+        );
         plannedSchedule.add(route1);
         plannedSchedule.add(route2);
         plannedSchedule.add(route3);
         plannedSchedule.add(route4);
+        plannedSchedule.add(route5);
     }
 
     // создание накладных без маршрутов
@@ -91,18 +100,19 @@ public class TestOptimizer {
         Optimizer optimizer = new Optimizer();
         List<DeliveryRoute> result = new ArrayList<>();
         List<Point> markedPoints = new ArrayList<>();
-        optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
-        System.out.println("MARKED POINTS");
-        for (Point markedPoint : markedPoints) {
-            System.out.println(markedPoint.getPointId());
+        List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
+        for(TrackCourse trackCourse: possibleDeliveryRoutes.get(0)){
+            System.out.println("Track Course: start = " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end = " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
         }
+        System.out.println("");
+        for(TrackCourse trackCourse: possibleDeliveryRoutes.get(1)){
+            System.out.println("Track Course: start = " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end = " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
+        }
+//        System.out.println("MARKED POINTS");
+//        for (Point markedPoint : markedPoints) {
+//            System.out.println(markedPoint.getPointId());
+//        }
     }
-
-//    @Test
-//    public void testGetDeliveryRoute() throws RouteNotFoundException {
-//        Optimizer optimizer = new Optimizer();
-//        optimizer.getDeliveryRoutesForInvoice(invoiceContainer.get(0), plannedSchedule, invoiceContainer.get(0).getRequest().getDeliveryPoint());
-//    }
 
     @Test
     public void testGetArrivalDateFromEachRoutePointInRoute(){
@@ -125,10 +135,6 @@ public class TestOptimizer {
         ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(1), invoiceContainer.get(0));
         for(Date date: result2) {
             System.out.println(date + " дата возможного отъезда из 2");
-        }
-        ArrayList<Date> result3 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(route1.size() - 1), invoiceContainer.get(0));
-        for(Date date: result3) {
-            System.out.println(date + " дата возможного отъезда из 3");
         }
         System.out.println("");
         System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
@@ -158,13 +164,11 @@ public class TestOptimizer {
     @Test
     public void testGetDepartureArrivalDatesBetweenTwoRoutePoints(){
         Optimizer optimizer = new Optimizer();
-        ArrayList<PairDate> pairDates = optimizer.getDepartureArrivalDatesBetweenTwoRoutePoints(route2, route1, invoiceContainer.get(0), route2.get(route2.size() - 2), route1.get(route1.size() - 1));
-        Assert.assertEquals(2, pairDates.size());
+        ArrayList<PairDate> pairDates = optimizer.getDepartureArrivalDatesBetweenTwoRoutePoints(route1, route1, invoiceContainer.get(0), route1.get(route1.size() - 2), route1.get(route1.size() - 1));
+        Assert.assertEquals(3, pairDates.size());
         for(PairDate pairDate: pairDates){
             System.out.println("Отправление из пункта: " + pairDate.getDepartureDate() + " и прибытие в нужный: " + pairDate.getArrivalDate());
         }
-        Assert.assertEquals(3, optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(route2.size() - 2), invoiceContainer.get(0)).size());
-        Assert.assertEquals(3, optimizer.getArrivalDateInEachRoutePointInRoute(route1, invoiceContainer.get(0)).get(route1.get(route1.size() - 1)).size());
     }
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------

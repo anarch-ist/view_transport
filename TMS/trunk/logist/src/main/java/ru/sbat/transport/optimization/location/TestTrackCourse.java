@@ -36,9 +36,10 @@ public class TestTrackCourse {
         points.add(a);
         TrackCourse trackCourse = new TrackCourse();
         List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(points, plannedSchedule);
-        System.out.println(trackCourses.size());
+        System.out.println("Size = " + trackCourses.size());
         for(TrackCourse trackCourse1: trackCourses){
-            System.out.println(trackCourse.getStartTrackCourse().getDeparturePoint().getPointId());
+            System.out.println(trackCourse1.getStartTrackCourse().getDeparturePoint().getPointId());
+            System.out.println(trackCourse1.getEndTrackCourse().getDeparturePoint().getPointId());
         }
     }
 
