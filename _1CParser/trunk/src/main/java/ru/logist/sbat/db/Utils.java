@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-class Utils {
+public class Utils {
     private static final Logger logger = LogManager.getLogger(InsertOrUpdateTransactionScript.class);
 
     private Utils() {}
@@ -65,7 +65,7 @@ class Utils {
             this.parameterName = parameterName;
         }
 
-        boolean isUnique(String string) {
+        public boolean isUnique(String string) {
             if (!uniqueStringSet.add(string)) {
                 logger.warn("{} = [{}] was duplicated", parameterName, string);
                 return false;
