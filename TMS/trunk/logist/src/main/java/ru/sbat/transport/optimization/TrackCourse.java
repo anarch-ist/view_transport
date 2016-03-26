@@ -56,7 +56,6 @@ public class TrackCourse {
     }
 
     public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<Route> routes) {
-        List<TrackCourse> possibleTrackCourses = new ArrayList<>();
         List<TrackCourse> result = new ArrayList<>();
         for(int i = 0; i < points.size() - 1; i++){
         for(Route route: routes){

@@ -1,9 +1,8 @@
-package ru.sbat.transport.optimization.utils;
+package ru.sbat.transport.optimization.utilsForTests;
 
 
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
-import ru.sbat.transport.optimization.location.RoutePoint;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -22,11 +22,14 @@ public class TestOptimizer {
     static TradeRepresentativePoint y = new TradeRepresentativePoint("Y");
     static TradeRepresentativePoint q = new TradeRepresentativePoint("Q");
     static TradeRepresentativePoint f = new TradeRepresentativePoint("F");
+    static TradeRepresentativePoint w = new TradeRepresentativePoint("W");
     static Route route1 = new Route();
     static Route route2 = new Route();
     static Route route3 = new Route();
     static Route route4 = new Route();
     static Route route5 = new Route();
+    static Route route6 = new Route();
+    static Route route7 = new Route();
 
     // создание планового расписания
     @BeforeClass
@@ -63,11 +66,24 @@ public class TestOptimizer {
                 createRoutePoint(f, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
                 createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
         );
+        initRoute(
+                route6,
+                createRoutePoint(y, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
+                createRoutePoint(w, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
+                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+        );
+        initRoute(
+                route7,
+                createRoutePoint(b, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
+                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+        );
         plannedSchedule.add(route1);
         plannedSchedule.add(route2);
         plannedSchedule.add(route3);
         plannedSchedule.add(route4);
         plannedSchedule.add(route5);
+        plannedSchedule.add(route6);
+        plannedSchedule.add(route7);
     }
 
     // создание накладных без маршрутов
@@ -101,13 +117,13 @@ public class TestOptimizer {
         List<DeliveryRoute> result = new ArrayList<>();
         List<Point> markedPoints = new ArrayList<>();
         List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
-        for(TrackCourse trackCourse: possibleDeliveryRoutes.get(0)){
-            System.out.println("Track Course: start = " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end = " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
+        for(DeliveryRoute deliveryRoute: possibleDeliveryRoutes) {
+            for (TrackCourse trackCourse : deliveryRoute) {
+                System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId() + ", route = " + trackCourse.getRoute().getPointsAsString());
+            }
+            System.out.println("_______________________");
         }
-        System.out.println("");
-        for(TrackCourse trackCourse: possibleDeliveryRoutes.get(1)){
-            System.out.println("Track Course: start = " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end = " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
-        }
+
 //        System.out.println("MARKED POINTS");
 //        for (Point markedPoint : markedPoints) {
 //            System.out.println(markedPoint.getPointId());

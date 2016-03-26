@@ -1,4 +1,4 @@
-package ru.sbat.transport.optimization.utils;
+package ru.sbat.transport.optimization.utilsForTests;
 
 
 public enum  DayOfWeek {

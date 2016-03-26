@@ -7,14 +7,15 @@ import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utils.InformationStack;
-import ru.sbat.transport.optimization.utils.InvoiceType;
+import ru.sbat.transport.optimization.utilsForTests.InformationStack;
+import ru.sbat.transport.optimization.utilsForTests.InvoiceType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
 import java.util.*;
 
 public class Optimizer implements IOptimizer {
+    static int count = 0;
     /** Selects for invoice appropriate delivery routes without weight/volume/cost and determines type of invoice B or C
      *
      * @param plannedSchedule
@@ -90,7 +91,7 @@ public class Optimizer implements IOptimizer {
         for(DeliveryRoute deliveryRoute: result){
             for (TrackCourse trackCourse: deliveryRoute){
                 if(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryPoint.getPointId())){
-                    System.out.println(deliveryRoute.size());
+//                    System.out.println(deliveryRoute.size());
                     DeliveryRoute tmp = removeDuplicates(deliveryRoute);
                     possibleDeliveryRoutes.add(tmp);
                     break;
@@ -115,7 +116,6 @@ public class Optimizer implements IOptimizer {
                 result.add(deliveryRoute.get(i));
             }
         }
-        System.out.println(deliveryRoute.get(0).equals(result.get(0)));
         return result;
     }
 
@@ -167,6 +167,7 @@ public class Optimizer implements IOptimizer {
                                 System.out.println(pointsId.size());
                                 List<Route> routesId = new LinkedList<>();
                                 routesId.addAll(informationStack.getRoutesForInvoice());
+                                routesId.add(route);
                                 TrackCourse trackCourse = new TrackCourse();
                                 List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(pointsId, routesId);
                                 for(TrackCourse correctTrackCourse: trackCourses) {
@@ -184,6 +185,7 @@ public class Optimizer implements IOptimizer {
                             newInformationStack.addRoute(route);
                             newInformationStack.setDeep(informationStack.getDeep() + 1);
                             Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);
+                            count++;
                             rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, newInformationStack);
                         }
                     }
@@ -194,6 +196,11 @@ public class Optimizer implements IOptimizer {
             }
         }
     }
+
+    public static int getCount() {
+        return count;
+    }
+
 
     /**
      * find all routes that containes point. if true -> all routes, if false -> without last
@@ -231,7 +238,7 @@ public class Optimizer implements IOptimizer {
         for (Route route : result.keySet()) {
             routes+=route.getPointsAsString()+" ";
         }
-        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
+//        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
         return result;
     }
 

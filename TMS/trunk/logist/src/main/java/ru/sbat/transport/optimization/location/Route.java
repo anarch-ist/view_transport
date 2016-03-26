@@ -214,6 +214,24 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return result;
     }
 
+    public boolean isCorrectRoutePoint(RoutePoint routePoint) {
+        boolean result = true;
+        if(this.size() >= 1) {
+            if (this.get(this.size() - 1).getDeparturePoint().equals(routePoint.getDeparturePoint())) {
+                return false;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean add(RoutePoint routePoint) {
+        if (isCorrectRoutePoint(routePoint))
+            return super.add(routePoint);
+        else
+            return false;
+    }
+
     @Override
     public String toString(){
         return "Route{" +
