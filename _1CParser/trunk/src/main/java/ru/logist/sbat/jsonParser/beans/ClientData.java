@@ -9,6 +9,7 @@ public class ClientData {
     private static final String FN_CLIENT_INN = "clientINN";
     private static final String FN_CLIENT_PASSWORD = "clientPassword";
 
+    @Unique
     private String clientId;
     private String clientName;
     private String clientINN;

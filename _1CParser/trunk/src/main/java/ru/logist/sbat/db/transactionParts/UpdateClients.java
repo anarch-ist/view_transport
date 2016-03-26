@@ -1,6 +1,8 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.ClientData;
 
@@ -9,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UpdateClients extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private List<ClientData> updateClients;
 
     public UpdateClients(List<ClientData> updateClients) {
@@ -16,7 +19,7 @@ public class UpdateClients extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START update clients table from JSON object:[clients]-----------------");
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)\n" +

@@ -1,6 +1,8 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 
@@ -8,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class UpdateExchange extends TransactionPart {
+    private static final Logger logger = LogManager.getLogger();
     private DataFrom1c dataFrom1c;
 
     public UpdateExchange(DataFrom1c dataFrom1c) {
@@ -15,7 +18,7 @@ public class UpdateExchange extends TransactionPart {
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START update exchange table from JSON object:[dataFrom1C]-----------------");
         PreparedStatement preparedStatement =  connection.prepareStatement(
                 "INSERT INTO exchange (packageNumber, serverName, dataSource, packageCreated, packageData)\n" +

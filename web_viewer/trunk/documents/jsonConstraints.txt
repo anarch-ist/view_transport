@@ -42,7 +42,7 @@
     "traderEMail": строка,
     "traderPhone": строка,
     "traderOffice": строка
-    "traderLogin": строка, 
+    "traderLogin": строка, UNIQUE
     "traderPassword": строка
 
 10) clientObject:
@@ -67,12 +67,12 @@
     "documentDate":  дата в формате "YYYYMMDD" или пустая строка ""
     "firma": строка
     "storage": строка
-    "clientId": строка, UNIQUE, NOT EMPTY
-    "addressId": строка, UNIQUE, NOT EMPTY
+    "clientId": строка, NOT EMPTY
+    "addressId": строка, NOT EMPTY
     "contactName": строка
     "contactPhone": строка
     "deliveryOption": строка
-    "traderId": строка, UNIQUE, NOT EMPTY
+    "traderId": строка, NOT EMPTY
     "deliveryDate": дата в формате "YYYYMMDD" или пустая строка ""
 
 13) statusObject:

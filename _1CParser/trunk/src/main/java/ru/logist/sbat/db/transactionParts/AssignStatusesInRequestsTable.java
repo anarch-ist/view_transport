@@ -1,6 +1,8 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.StatusData;
 
@@ -11,6 +13,7 @@ import java.sql.Types;
 import java.util.List;
 
 public class AssignStatusesInRequestsTable extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private List<StatusData> updateStatuses;
 
     public AssignStatusesInRequestsTable(List<StatusData> updateStatuses) {
@@ -18,7 +21,7 @@ public class AssignStatusesInRequestsTable extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START assign statuses in requests table from JSON object:[updateStatus]-----------------");
         PreparedStatement requestsUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET boxQty = ?, requestStatusID = ?, commentForStatus = ?, lastStatusUpdated = ? WHERE requestIDExternal = ? AND dataSourceID = ?;"

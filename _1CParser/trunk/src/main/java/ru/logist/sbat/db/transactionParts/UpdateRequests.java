@@ -1,7 +1,8 @@
 package ru.logist.sbat.db.transactionParts;
 
 
-import ru.logist.sbat.db.DBCohesionException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.beans.RequestsData;
@@ -10,6 +11,7 @@ import java.sql.*;
 import java.util.*;
 
 public class UpdateRequests extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private List<RequestsData> updateRequests;
 
     public UpdateRequests(List<RequestsData> updateRequests) {
@@ -17,11 +19,11 @@ public class UpdateRequests extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException, DBCohesionException {
         logger.info("-----------------START update requests table from JSON object:[updateRequestsTable]-----------------");
-        Map<String, String> allPoints = selectAllPoints();
-        Set<String> allClientsIdExternal = selectAllClientsIdExternal();
-        Set<String> allUsersIDExternal = selectAllUsersIdExternal(InsertOrUpdateTransactionScript.LOGIST_1C);
+        Map<String, String> allPoints = Selects.selectAllPoints();
+        Set<String> allClientsIdExternal = Selects.selectAllClientsIdExternal();
+        Set<String> allUsersIDExternal = Selects.selectAllUsersIdExternal(InsertOrUpdateTransactionScript.LOGIST_1C);
 
         PreparedStatement requestsPreparedStatement = connection.prepareStatement(
                 "INSERT INTO requests\n" +
@@ -121,39 +123,5 @@ public class UpdateRequests extends TransactionPart{
         return requestsPreparedStatement;
     }
 
-    /**
-     *
-     * @return All pointIDExternals and pointNames from dataBase as map.
-     * @throws SQLException
-     */
-    private Map<String, String> selectAllPoints() throws SQLException {
-        Map<String, String> allPoints = new HashMap<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT pointIDExternal, pointName FROM points;");
-        while (resultSet.next()) {
-            allPoints.put(resultSet.getString(1), resultSet.getString(2));
-        }
-        return allPoints;
-    }
 
-    private Set<String> selectAllClientsIdExternal() throws SQLException {
-        Set<String> result = new HashSet<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT clientIDExternal FROM clients;");
-        while (resultSet.next()) {
-            result.add(resultSet.getString(1));
-        }
-        return result;
-    }
-
-    private Set<String> selectAllUsersIdExternal(String dataSourceId) throws SQLException {
-        Set<String> result = new HashSet<>();
-        PreparedStatement statement = connection.prepareStatement("SELECT userIDExternal FROM users WHERE dataSourceID = ?");
-        statement.setString(1, dataSourceId);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            result.add(resultSet.getString(1));
-        }
-        return result;
-    }
 }

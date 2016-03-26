@@ -48,8 +48,7 @@ public class DataBase {
      */
     public InsertOrUpdateResult updateDataFromJSONObject(DataFrom1c dataFrom1c) {
         InsertOrUpdateTransactionScript insertOrUpdateTransactionScript = new InsertOrUpdateTransactionScript(connection, dataFrom1c);
-        insertOrUpdateTransactionScript.updateData();
-        return insertOrUpdateTransactionScript.getResult();
+        return insertOrUpdateTransactionScript.updateData();
     }
 
     /**

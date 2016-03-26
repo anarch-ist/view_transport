@@ -3,10 +3,17 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
+import ru.logist.sbat.routesDataInserter.Point;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PackageData {
     private static final String FN_UPDATE_POINTS = "updatePoints";
@@ -28,6 +35,7 @@ public class PackageData {
     private List<RouteListsData> updateRouteLists = new ArrayList<>();
 
     public PackageData(JSONObject packageDataAsJsonObject) {
+
         // check fields
         Util.checkFieldAvailableAndNotNull(FN_UPDATE_POINTS, packageDataAsJsonObject);
         Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_POINTS), JSONArray.class, packageDataAsJsonObject);
@@ -47,88 +55,85 @@ public class PackageData {
         Util.checkCorrectType(packageDataAsJsonObject.get(FN_UPDATE_ROUTE_LISTS), JSONArray.class, packageDataAsJsonObject);
 
         // set values
-        setUpdatePoints((JSONArray)packageDataAsJsonObject.get("updatePoints"));
-        setUpdateDirections((JSONArray) packageDataAsJsonObject.get("updateDirections"));
-        setUpdateTraders((JSONArray) packageDataAsJsonObject.get("updateTrader"));
-        setUpdateClients((JSONArray) packageDataAsJsonObject.get("updateClients"));
-        setUpdateAddresses((JSONArray)packageDataAsJsonObject.get("updateAddress"));
-        setUpdateRequests((JSONArray) packageDataAsJsonObject.get("updateRequests"));
-        setUpdateStatuses((JSONArray) packageDataAsJsonObject.get("updateStatus"));
-        setUpdateRouteLists((JSONArray) packageDataAsJsonObject.get("updateRouteLists"));
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_POINTS), updatePoints, PointData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_DIRECTIONS), updateDirections, DirectionsData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_TRADER), updateTraders, TraderData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_CLIENTS), updateClients, ClientData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_ADDRESS), updateAddresses, AddressData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_REQUESTS), updateRequests, RequestsData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_STATUS), updateStatuses, StatusData.class);
+        setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_ROUTE_LISTS), updateRouteLists, RouteListsData.class);
+    }
+
+    private <T> void setValue(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) {
+        fillList(jsonArray, updateData, dataClazz);
+        uniqueCheck(updateData, dataClazz);
+    }
+
+    private <T> void fillList(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) {
+        for (Object o : jsonArray) {
+            Util.checkCorrectType(o, JSONObject.class);
+            JSONObject jsonObject = (JSONObject) o;
+            try {
+                Object newInstance = dataClazz.getConstructor(JSONObject.class).newInstance(jsonObject);
+                updateData.add(dataClazz.cast(newInstance));
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                /*NOPE*/
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void uniqueCheck(List<?> updateData, Class clazz) {
+        Field[] declaredFields = clazz.getDeclaredFields();
+        for (Field declaredField : declaredFields) {
+            if (declaredField.getDeclaredAnnotation(Unique.class) != null) {
+                declaredField.setAccessible(true);
+                Set<Object> objectSet = new HashSet<>();
+                for (Object pointData : updateData) {
+                    try {
+                        Object valueOfUniqueField = declaredField.get(pointData);
+                        if (objectSet.contains(valueOfUniqueField))
+                            throw new ValidatorException(Util.getParameterizedString("not unique value {} for field {} in {}", valueOfUniqueField, declaredField.getName(), pointData));
+                        if (!valueOfUniqueField.equals(""))
+                            objectSet.add(valueOfUniqueField);
+                    } catch (IllegalAccessException e) {/*NOPE*/}
+                }
+            }
+        }
     }
 
     public List<TraderData> getUpdateTraders() {
         return updateTraders;
     }
 
-    private void setUpdateTraders(List<JSONObject> updateTradersAsJson) {
-        updateTraders.clear();
-        updateTradersAsJson.forEach(jsonObject -> updateTraders.add(new TraderData(jsonObject)));
-    }
-
     public List<ClientData> getUpdateClients() {
         return updateClients;
-    }
-
-    private void setUpdateClients(List<JSONObject> updateClientsAsJson) {
-        updateClients.clear();
-        updateClientsAsJson.forEach(jsonObject -> updateClients.add(new ClientData(jsonObject)));
     }
 
     public List<RequestsData> getUpdateRequests() {
         return updateRequests;
     }
 
-    private void setUpdateRequests(List<JSONObject> updateRequestsAsJson) {
-        updateRequests.clear();
-        updateRequestsAsJson.forEach(jsonObject -> updateRequests.add(new RequestsData(jsonObject)));
-    }
-
     public List<StatusData> getUpdateStatuses() {
         return updateStatuses;
-    }
-
-    private void setUpdateStatuses(List<JSONObject> updateStatusesAsJson) {
-        updateStatuses.clear();
-        updateStatusesAsJson.forEach(jsonObject -> updateStatuses.add(new StatusData(jsonObject)));
     }
 
     public List<RouteListsData> getUpdateRouteLists() {
         return updateRouteLists;
     }
 
-    private void setUpdateRouteLists(List<JSONObject> updateRouteListsAsJson) {
-        updateRouteLists.clear();
-        updateRouteListsAsJson.forEach(jsonObject -> updateRouteLists.add(new RouteListsData(jsonObject)));
-    }
-
     public List<PointData> getUpdatePoints() {
         return updatePoints;
-    }
-
-    private void setUpdatePoints(List<JSONObject> updatePointsAsJson) {
-        updatePoints.clear();
-        updatePointsAsJson.forEach(jsonObject -> updatePoints.add(new PointData(jsonObject)));
     }
 
     public List<AddressData> getUpdateAddresses() {
         return updateAddresses;
     }
 
-    private void setUpdateAddresses(List<JSONObject> updateAddressesAsJson) {
-        updateAddresses.clear();
-        updateAddressesAsJson.forEach(jsonObject -> updateAddresses.add(new AddressData(jsonObject)));
-    }
-
     public List<DirectionsData> getUpdateDirections() {
         return updateDirections;
     }
-
-    private void setUpdateDirections(List<JSONObject> updateDirectionsAsJson) {
-        updateDirections.clear();
-        updateDirectionsAsJson.forEach(jsonObject -> updateDirections.add(new DirectionsData(jsonObject)));
-    }
-
 
     private String getStringRepr(List<?> data) {
         if (data.size() > 1)

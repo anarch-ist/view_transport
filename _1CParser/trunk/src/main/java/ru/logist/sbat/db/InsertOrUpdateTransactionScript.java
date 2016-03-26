@@ -19,8 +19,7 @@ public class InsertOrUpdateTransactionScript {
     private static final Logger logger = LogManager.getLogger();
     private final Connection connection;
     private final DataFrom1c dataFrom1c;
-    private InsertOrUpdateResult insertOrUpdateResult;
-    
+
     public InsertOrUpdateTransactionScript(Connection connection, DataFrom1c dataFrom1c) {
 
         this.connection = connection;
@@ -32,44 +31,35 @@ public class InsertOrUpdateTransactionScript {
         this.dataFrom1c = dataFrom1c;
     }
 
-    /**
-     * this method may run only after updateData
-     * @return InsertOrUpdateResult
-     */
-    public InsertOrUpdateResult getResult() {
-        if (insertOrUpdateResult == null)
-            throw new IllegalStateException("you must start method updateData() before launch this method");
-        return insertOrUpdateResult;
-    }
+    public InsertOrUpdateResult updateData() {
 
-    public void updateData() {
-        TransactionExecutor transactionExecutor = new TransactionExecutor();
-        TransactionPart.setLogger(logger);
-        TransactionPart.setConnection(connection);
         String server = dataFrom1c.getServer();
         logger.info(Util.getParameterizedString("server = {}", server));
         Integer packageNumber = dataFrom1c.getPackageNumber().intValue();
         logger.info(Util.getParameterizedString("packageNumber = {}", packageNumber));
         logger.info(Util.getParameterizedString("dateCreated = {}", dataFrom1c.getCreated()));
-        insertOrUpdateResult = new InsertOrUpdateResult();
+        InsertOrUpdateResult insertOrUpdateResult = new InsertOrUpdateResult();
         insertOrUpdateResult.setServer(server);
         insertOrUpdateResult.setPackageNumber(packageNumber);
 
-        try {
-            PackageData packageData = dataFrom1c.getPackageData();
-            transactionExecutor.put(1, new UpdateExchange(dataFrom1c));
-            transactionExecutor.put(2, new UpdatePoints(packageData.getUpdatePoints(), packageData.getUpdateAddresses()));
-            transactionExecutor.put(3, new UpdateRoutes(packageData.getUpdateDirections(), packageData.getUpdateRouteLists()));
-            transactionExecutor.put(4, new UpdateClients(packageData.getUpdateClients()));
-            transactionExecutor.put(5, new UpdateUsers(packageData.getUpdateTraders(), packageData.getUpdateClients()));
-            transactionExecutor.put(6, new UpdateRouteListsTable(packageData.getUpdateRouteLists()));
-            transactionExecutor.put(7, new UpdateRequests(packageData.getUpdateRequests()));
-            transactionExecutor.put(8, new AssignStatusesInRequestsTable(packageData.getUpdateStatuses()));
-            transactionExecutor.put(9, new AssignRouteListsInRequestsTable(packageData.getUpdateRouteLists()));
-            transactionExecutor.executeAll();
+        TransactionExecutor transactionExecutor = new TransactionExecutor();
+        transactionExecutor.setConnection(connection);
+        PackageData packageData = dataFrom1c.getPackageData();
+        transactionExecutor.put(1, new UpdateExchange(dataFrom1c));
+        transactionExecutor.put(2, new UpdatePoints(packageData.getUpdatePoints(), packageData.getUpdateAddresses()));
+        transactionExecutor.put(3, new UpdateRoutes(packageData.getUpdateDirections(), packageData.getUpdateRouteLists()));
+        transactionExecutor.put(4, new UpdateClients(packageData.getUpdateClients()));
+        transactionExecutor.put(5, new UpdateUsers(packageData.getUpdateTraders(), packageData.getUpdateClients()));
+        transactionExecutor.put(6, new UpdateRouteListsTable(packageData.getUpdateRouteLists()));
+        transactionExecutor.put(7, new UpdateRequests(packageData.getUpdateRequests()));
+        transactionExecutor.put(8, new AssignStatusesInRequestsTable(packageData.getUpdateStatuses()));
+        transactionExecutor.put(9, new AssignRouteListsInRequestsTable(packageData.getUpdateRouteLists()));
 
+        try {
+            transactionExecutor.executeAll();
             connection.commit();
             insertOrUpdateResult.setStatus(OK_STATUS);
+            return insertOrUpdateResult;
         } catch(Exception e) {
             e.printStackTrace();
             logger.error(e);
@@ -77,8 +67,9 @@ public class InsertOrUpdateTransactionScript {
             DBUtils.rollbackQuietly(connection);
             logger.error("end ROLLBACK");
             insertOrUpdateResult.setStatus(ERROR_STATUS);
+            return insertOrUpdateResult;
         } finally {
-            transactionExecutor.close();
+            transactionExecutor.closeAll();
         }
     }
 }

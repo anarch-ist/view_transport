@@ -29,6 +29,7 @@ public class RouteListsData {
     // внутриузловой или магистральный маршрут
     private enum RouteScopeType{INTRASITE_ROUTE, TRUNK_ROUTE, ERROR}
 
+    @Unique
     private String routeListId;
     private String routeListNumber;
     private Date routeListDate;

@@ -2,6 +2,8 @@ package ru.logist.sbat.db.transactionParts;
 
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.ClientData;
@@ -12,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UpdateUsers extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private static final String MARKET_AGENT = "MARKET_AGENT";
     private static final String CLIENT_MANAGER = "CLIENT_MANAGER";
     public static final String CLIENT_USER_SUFFIX = "-client";
@@ -24,7 +27,7 @@ public class UpdateUsers extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
         PreparedStatement result = connection.prepareStatement(
                 "INSERT INTO users (userIDExternal, dataSourceID, login, passHash, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +

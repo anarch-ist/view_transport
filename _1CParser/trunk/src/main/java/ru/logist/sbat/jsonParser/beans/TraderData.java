@@ -12,11 +12,13 @@ public class TraderData {
     private static final String FN_TRADER_LOGIN = "traderLogin";
     private static final String FN_TRADER_PASSWORD = "traderPassword";
 
+    @Unique
     private String traderId;
     private String traderName;
     private String traderEmails;
     private String traderPhone;
     private String traderOffice;
+    @Unique
     private String traderLogin;
     private String traderPassword;
 

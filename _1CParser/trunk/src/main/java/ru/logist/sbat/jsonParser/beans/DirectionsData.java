@@ -7,6 +7,7 @@ public class DirectionsData {
     private static final String FN_DIRECT_ID = "directId";
     private static final String FN_DIRECT_NAME = "directName";
 
+    @Unique
     private String directId;
     private String directName;
 

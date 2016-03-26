@@ -36,6 +36,11 @@ public class Util {
             throw new ValidatorException(Util.getParameterizedString("fieldContent {} is not type of {} in {} ", fieldContent, fieldContentClazz.getSimpleName(), jsonObject));
     }
 
+    public static void checkCorrectType(Object fieldContent, Class fieldContentClazz) {
+        if (!fieldContent.getClass().equals(fieldContentClazz))
+            throw new ValidatorException(Util.getParameterizedString("fieldContent {} is not type of {}", fieldContent, fieldContentClazz.getSimpleName()));
+    }
+
     public static void checkFieldAvailableAndNotNull(String fieldName, JSONObject jsonObject) {
         checkFieldAvailability(fieldName, jsonObject);
         if (jsonObject.get(fieldName) == null)
@@ -142,4 +147,6 @@ public class Util {
             e.printStackTrace();
         }
     }
+
+
 }

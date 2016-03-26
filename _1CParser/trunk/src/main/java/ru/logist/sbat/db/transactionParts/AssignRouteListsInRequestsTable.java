@@ -1,6 +1,8 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.RouteListsData;
 
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AssignRouteListsInRequestsTable extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private List<RouteListsData> updateRouteLists;
 
     public AssignRouteListsInRequestsTable(List<RouteListsData> updateRouteLists) {
@@ -17,7 +20,7 @@ public class AssignRouteListsInRequestsTable extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException {
         PreparedStatement requestUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET " +
                         "routeListID = (SELECT route_lists.routeListID FROM route_lists WHERE route_lists.routeListIDExternal = ? AND route_lists.dataSourceID = ?)," +

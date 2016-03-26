@@ -1,5 +1,7 @@
 package ru.logist.sbat.db.transactionParts;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.AddressData;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UpdatePoints extends TransactionPart {
+    private static final Logger logger = LogManager.getLogger();
     private final List<PointData> updatePointsArray;
     private final List<AddressData> updateAddresses;
 

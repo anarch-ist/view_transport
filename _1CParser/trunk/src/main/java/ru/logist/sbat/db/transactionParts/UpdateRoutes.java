@@ -3,7 +3,8 @@ package ru.logist.sbat.db.transactionParts;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import ru.logist.sbat.db.DBCohesionException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.DirectionsData;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UpdateRoutes extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private List<DirectionsData> updateRoutesArray;
     private List<RouteListsData> updateRouteLists;
 
@@ -27,14 +29,14 @@ public class UpdateRoutes extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException, DBCohesionException {
         logger.info("-----------------START update routes table from JSON object:[updateDirections]-----------------");
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO routes (directionIDExternal, dataSourceID, routeName) VALUE (?, ?, ?)\n" +
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  routeName = VALUES(routeName);"
         );
-        BidiMap<String, String> allRoutes = selectAllRoutes();
+        BidiMap<String, String> allRoutes = Selects.selectAllRoutes();
 
 
         for (DirectionsData updateRoute : updateRoutesArray) {
@@ -60,7 +62,7 @@ public class UpdateRoutes extends TransactionPart{
         }
 
 
-        Map<String, String> allPoints = selectAllPoints();
+        Map<String, String> allPoints = Selects.selectAllPoints();
 
         for (RouteListsData updateRouteList : updateRouteLists) {
             if (updateRouteList.isTrunkRoute()) {
@@ -92,34 +94,4 @@ public class UpdateRoutes extends TransactionPart{
         return preparedStatement;
     }
 
-    /**
-     *
-     * @return All pointIDExternals and pointNames from dataBase as map.
-     * @throws SQLException
-     */
-    private Map<String, String> selectAllPoints() throws SQLException {
-        Map<String, String> allPoints = new HashMap<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT pointIDExternal, pointName FROM points;");
-        while (resultSet.next()) {
-            allPoints.put(resultSet.getString(1), resultSet.getString(2));
-        }
-        return allPoints;
-    }
-
-    /**
-     *
-     * @return All directionIDExternal and routeNames from dataBase as bidimap.
-     * @throws SQLException
-     */
-    private BidiMap<String, String> selectAllRoutes() throws SQLException {
-        //
-        BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
-        while (resultSet.next()) {
-            allRoutes.put(resultSet.getString(1), resultSet.getString(2));
-        }
-        return allRoutes;
-    }
 }

@@ -25,6 +25,7 @@ public class RequestsData {
     private static final String FN_DELIVERY_DATE = "deliveryDate";
     private static final DateTimeFormatter isoFormatter = DateTimeFormatter.BASIC_ISO_DATE;
 
+    @Unique
     private String requestId;
     private String requestNumber;
     private Date requestDate;

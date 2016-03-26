@@ -1,6 +1,8 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.RouteListsData;
 
@@ -11,6 +13,7 @@ import java.sql.Types;
 import java.util.List;
 
 public class UpdateRouteListsTable extends TransactionPart{
+    private static final Logger logger = LogManager.getLogger();
     private List<RouteListsData> updateRouteLists;
 
     public UpdateRouteListsTable(List<RouteListsData> updateRouteLists) {
@@ -18,7 +21,7 @@ public class UpdateRouteListsTable extends TransactionPart{
     }
 
     @Override
-    PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START update routeLists from JSON object:[updateRouteLists]-----------------");
 
         // create routeLists

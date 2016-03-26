@@ -1,13 +1,11 @@
 package ru.logist.sbat;
-import ru.logist.sbat.cmd.Pair;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.JSONObject;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
-import ru.logist.sbat.db.DBCohesionException;
+import ru.logist.sbat.cmd.Pair;
 import ru.logist.sbat.db.DataBase;
 import ru.logist.sbat.db.InsertOrUpdateResult;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
@@ -19,7 +17,6 @@ import ru.logist.sbat.watchService.WatchServiceStarter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -137,9 +134,9 @@ public class App {
                         } catch (ValidatorException e) {
                             logger.error("Illegal JSON constraint format [{}]", filePath);
                             logger.error(e);
-                        } catch (DBCohesionException e) {
-                            logger.error("Database conflict with file [{}]", filePath);
-                            logger.error(e);
+//                        } catch (DBCohesionException e) {
+//                            logger.error("Database conflict with file [{}]", filePath);
+//                            logger.error(e);
                         } finally {
 
                             // write response into response dir

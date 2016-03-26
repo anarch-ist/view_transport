@@ -24,6 +24,7 @@ public class StatusData {
     ));
     private static final DateTimeFormatter timeOutStatusFormatter = DateTimeFormatter.ofPattern("uu.MM.dd,HH:mm:ss");
 
+    @Unique
     private String requestId;
     private Long numBoxes;
     private String status;
