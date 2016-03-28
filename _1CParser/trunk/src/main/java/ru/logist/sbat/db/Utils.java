@@ -29,7 +29,6 @@ public class Utils {
         return Utils.md5(Utils.md5(pass) + salt);
     }
 
-    //TODO check this algo the same as php use
     // 32 digits like in php
     public static String md5(String md5) {
         try {

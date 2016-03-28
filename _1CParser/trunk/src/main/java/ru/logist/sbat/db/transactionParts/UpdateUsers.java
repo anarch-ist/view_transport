@@ -30,11 +30,10 @@ public class UpdateUsers extends TransactionPart{
     public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
         PreparedStatement result = connection.prepareStatement(
-                "INSERT INTO users (userIDExternal, dataSourceID, login, passHash, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
-                        "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getClientIDByClientIDExternal(?, ?))\n" +
+                "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
+                        "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getClientIDByClientIDExternal(?, ?))\n" +
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  login  = VALUES(login),\n" +
-                        "  passHash  = VALUES(passHash),\n" +
                         "  salt        = VALUES(salt),\n" +
                         "  passAndSalt = VALUES(passAndSalt),\n" +
                         "  userRoleID = VALUES(userRoleID),\n" +
@@ -48,28 +47,26 @@ public class UpdateUsers extends TransactionPart{
         for (TraderData updateUser : updateMarketAgents) {
             result.setString(1, updateUser.getTraderId());
             result.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
-            result.setString(7, MARKET_AGENT);
-            result.setString(8, updateUser.getTraderName());
-            result.setString(9, updateUser.getTraderPhone());
-            result.setString(10, updateUser.getTraderEmails());
-            result.setString(11, updateUser.getTraderOffice()); // position
-            result.setString(12, null); // pointID
-            result.setString(13, null); // clientID
-            result.setString(14, InsertOrUpdateTransactionScript.LOGIST_1C);
+            result.setString(6, MARKET_AGENT);
+            result.setString(7, updateUser.getTraderName());
+            result.setString(8, updateUser.getTraderPhone());
+            result.setString(9, updateUser.getTraderEmails());
+            result.setString(10, updateUser.getTraderOffice()); // position
+            result.setString(11, null); // pointID
+            result.setString(12, null); // clientID
+            result.setString(13, InsertOrUpdateTransactionScript.LOGIST_1C);
 
             if (updateUser.hasValidLoginAndPassword()) {
                 String salt = Utils.generateSalt();
                 result.setString(3, updateUser.getTraderLogin());
-                result.setString(4, Utils.md5(updateUser.getTraderPassword()));
-                result.setString(5, salt);
-                result.setString(6, Utils.generatePassword(updateUser.getTraderPassword(), salt));
+                result.setString(4, salt);
+                result.setString(5, Utils.generatePassword(updateUser.getTraderPassword(), salt));
             }
             else {
                 // random values
                 result.setString(3, RandomStringUtils.randomAscii(16));
-                result.setString(4, RandomStringUtils.randomAscii(16));
-                result.setString(5, Utils.generateSalt());
-                result.setString(6, RandomStringUtils.randomAscii(16));
+                result.setString(4, Utils.generateSalt());
+                result.setString(5, RandomStringUtils.randomAscii(16));
             }
             result.addBatch();
         }
@@ -81,28 +78,26 @@ public class UpdateUsers extends TransactionPart{
             String login = updateClient.getClientId();
             result.setString(1, userIdExternal);
             result.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
-            result.setString(7, CLIENT_MANAGER);
-            result.setString(8, updateClient.getClientName());
+            result.setString(6, CLIENT_MANAGER);
+            result.setString(7, updateClient.getClientName());
+            result.setString(8, null);
             result.setString(9, null);
-            result.setString(10, null);
-            result.setString(11, null); // position
-            result.setString(12, null); // pointID
-            result.setString(13, updateClient.getClientId()); // clientID - foreign key
-            result.setString(14, InsertOrUpdateTransactionScript.LOGIST_1C);
+            result.setString(10, null); // position
+            result.setString(11, null); // pointID
+            result.setString(12, updateClient.getClientId()); // clientID - foreign key
+            result.setString(13, InsertOrUpdateTransactionScript.LOGIST_1C);
 
             if (updateClient.hasValidPassword()) {
                 String salt = Utils.generateSalt();
                 result.setString(3, login);
-                result.setString(4, Utils.md5(updateClient.getClientPassword()));
-                result.setString(5, salt);
-                result.setString(6, Utils.generatePassword(updateClient.getClientPassword(), salt));
+                result.setString(4, salt);
+                result.setString(5, Utils.generatePassword(updateClient.getClientPassword(), salt));
             }
             else {
                 // random values
                 result.setString(3, RandomStringUtils.randomAscii(16));
-                result.setString(4, RandomStringUtils.randomAscii(16));
-                result.setString(5, Utils.generateSalt());
-                result.setString(6, RandomStringUtils.randomAscii(16));
+                result.setString(4, Utils.generateSalt());
+                result.setString(5, RandomStringUtils.randomAscii(16));
             }
             result.addBatch();
         }
