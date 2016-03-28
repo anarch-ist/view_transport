@@ -19,10 +19,20 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         colReorder: true,
-        fixedHeader: {
-            header: true,
-            footer: false
-        },
+       ScrollXInner: "100%",
+        scrollY:        "500px",
+        scrollX:        true,
+     //  autoWidth: false,
+    //   scrollCollapse: true,
+      //  jQueryUI: true,
+     //   paging:         true,
+      //  paginate: false,
+
+        fixedColumns: true,
+      //  fixedHeader: {
+        //   header: true,
+         //   footer: false
+       // },
         stateSave: true,
         stateDuration: 0, // 0 a special value as it indicates that the state can be stored and retrieved indefinitely with no time limit
         // format for data object: https://datatables.net/reference/option/stateSaveCallback
@@ -42,7 +52,7 @@ $(document).ready(function () {
             }
         },
 
-        autoWidth: true,
+      //  autoWidth: true,
         pageLength: 40,
         select: {
             style: 'single'
@@ -212,5 +222,8 @@ $(document).ready(function () {
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
+    $(".dataTables_scrollHeadInner").css({"width":"100%"});
+
+    $(".dataTable ").css({"width":"100%"});
 });
 

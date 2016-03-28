@@ -1,6 +1,7 @@
 /*
  * Table styles
  */
+table.display td { white-space: nowrap; }
 table.dataTable {
     width: 100%;
     margin: 0 auto;
