@@ -471,7 +471,7 @@ CREATE TABLE route_lists (
   departureDate       DATE         NULL,
   palletsQty          INTEGER      NULL,
   forwarderId         VARCHAR(255) NULL,
-  driverId            VARCHAR(255) NULL,
+  driverID            INTEGER      NULL,
   driverPhoneNumber   VARCHAR(12)  NULL,
   licensePlate        VARCHAR(9)   NULL, -- государственный номер автомобиля
   status              VARCHAR(32)  NOT NULL,
@@ -483,6 +483,9 @@ CREATE TABLE route_lists (
   FOREIGN KEY (routeID) REFERENCES routes (routeID)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
+  FOREIGN KEY (driverID) REFERENCES users (userID)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
   UNIQUE (routeListNumber),
   UNIQUE (routeListIDExternal, dataSourceID)
 );
@@ -492,7 +495,7 @@ FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
+     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverID,
      NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
 
 CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
@@ -500,7 +503,7 @@ FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverId,
+     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverID,
      NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
 
 CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
@@ -508,7 +511,7 @@ FOR EACH ROW
   INSERT INTO route_list_history
   VALUES
     (NULL, NOW(), OLD.routeListID, OLD.routeListIDExternal, OLD.dataSourceID, OLD.routeListNumber, OLD.creationDate,
-     OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverId,
+     OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverID,
      OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
 
 CREATE TABLE route_list_history (
@@ -600,7 +603,8 @@ VALUES
   ('DISPATCHER', 'DELIVERED'),
   ('MARKET_AGENT', 'ERROR'),
   ('MARKET_AGENT', 'DELIVERED'),
-  ('CLIENT_MANAGER', 'ERROR');
+  ('CLIENT_MANAGER', 'ERROR'),
+  ('CLIENT_MANAGER', 'DELIVERED');
 
 
 -- request объеденяет в себе внутреннюю заявку и накладную,
@@ -613,19 +617,19 @@ CREATE TABLE requests (
   requestIDExternal       VARCHAR(255)   NOT NULL,
   dataSourceID            VARCHAR(32)    NOT NULL,
   requestNumber           VARCHAR(16)    NOT NULL,
-  requestDate             DATETIME       NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
+  requestDate             DATE           NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
   clientID                INTEGER        NOT NULL,
-  destinationPointID      INTEGER        NULL,     -- пункт доставки (addressId)
+  destinationPointID      INTEGER        NULL, -- пункт доставки (addressId)
   marketAgentUserID       INTEGER        NOT NULL, -- traderId
   invoiceNumber           VARCHAR(255)   NOT NULL,
-  invoiceDate             DATETIME       NULL,
+  invoiceDate             DATE           NULL,
   documentNumber          VARCHAR(255)   NOT NULL,
-  documentDate            DATETIME       NULL,
+  documentDate            DATE           NULL,
   firma                   VARCHAR(255)   NULL,
-  storage                 VARCHAR(255)   NULL,     -- наименование склада на котором собиралась накладная
+  storage                 VARCHAR(255)   NULL, -- наименование склада на котором собиралась накладная
   contactName             VARCHAR(255)   NULL,
   contactPhone            VARCHAR(255)   NULL,
-  deliveryOption          VARCHAR(255)   NULL,     -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
+  deliveryOption          VARCHAR(255)   NULL, -- вариант доставки (с пересчетом/без пересчета/самовывоз/доставка ТП)
   deliveryDate            DATETIME       NULL,
   boxQty                  INTEGER        NULL,
 
@@ -785,14 +789,14 @@ CREATE TABLE requests_history (
   requestIDExternal       VARCHAR(255)   NOT NULL,
   dataSourceID            VARCHAR(32)    NOT NULL,
   requestNumber           VARCHAR(16)    NOT NULL,
-  requestDate             DATETIME       NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
+  requestDate             DATE           NOT NULL, -- дата заявки создаваемой клиентом или торговым представителем
   clientID                INTEGER        NOT NULL,
   destinationPointID      INTEGER        NULL,     -- пункт доставки (addressId)
   marketAgentUserID       INTEGER        NOT NULL, -- traderId
   invoiceNumber           VARCHAR(255)   NOT NULL,
-  invoiceDate             DATETIME       NULL,
+  invoiceDate             DATE           NULL,
   documentNumber          VARCHAR(255)   NOT NULL,
-  documentDate            DATETIME       NULL,
+  documentDate            DATE           NULL,
   firma                   VARCHAR(255)   NULL,
   storage                 VARCHAR(255)   NULL,     -- наименование склада на котором собиралась накладная
   contactName             VARCHAR(255)   NULL,
@@ -953,6 +957,27 @@ CREATE FUNCTION getClientIDByUserID(_userID INTEGER)
                   WHERE userID = _userID);
     RETURN result;
   END;
+
+CREATE FUNCTION getUserIDByUserIDExternal(_userIDExternal VARCHAR(255), _dataSourceID VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    DECLARE result INTEGER;
+    SET result = (SELECT userID
+                  FROM users
+                  WHERE userIDExternal = _userIDExternal AND dataSourceID = _dataSourceID);
+    RETURN result;
+  END;
+
+CREATE FUNCTION getUserNameByID(_userID INTEGER)
+  RETURNS VARCHAR(255)
+  BEGIN
+    DECLARE result VARCHAR(255);
+    SET result = (SELECT userName
+                  FROM users
+                  WHERE userID = _userID);
+    RETURN result;
+  END;
+
 
 CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedRoutePointID INTEGER)
   RETURNS INTEGER
@@ -1126,6 +1151,7 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
     END IF;
   END;
 
+
 -- TODO next route point not working
 CREATE VIEW transmaster_transport_db.big_select AS
   SELECT
@@ -1156,7 +1182,7 @@ CREATE VIEW transmaster_transport_db.big_select AS
     next_route_points.pointName                            AS nextPointName,
     routes.routeID, -- служебное поле
     routes.routeName,
-    route_lists.driverId,
+    getUserNameByID(route_lists.driverID) AS driverId,
     route_lists.licensePlate,
     route_lists.palletsQty,
     route_lists.routeListNumber,

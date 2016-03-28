@@ -47,6 +47,8 @@ function getRequestsForUser(PrivilegedUser $privUser)
     $columnInformation = $_POST['columns'];
     $orderColumnNumber = $_POST['order'][0]['column'];
     $dataArray = $privUser->getRequestsForUser()->selectAllData($columnInformation, $orderColumnNumber, $start, $count);
+    // remove date seconds from
+    // $dataArray['requestDate'] = explode(' ', $dataArray['requestDate'])[0];
     $json_data = array(
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records

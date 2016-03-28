@@ -19,6 +19,10 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         colReorder: true,
+        fixedHeader: {
+            header: true,
+            footer: false
+        },
         stateSave: true,
         stateDuration: 0, // 0 a special value as it indicates that the state can be stored and retrieved indefinitely with no time limit
         // format for data object: https://datatables.net/reference/option/stateSaveCallback
@@ -37,7 +41,9 @@ $(document).ready(function () {
                 }
             }
         },
-        pageLength: 10,
+
+        autoWidth: true,
+        pageLength: 40,
         select: {
             style: 'single'
         },
@@ -62,7 +68,7 @@ $(document).ready(function () {
             });
             // if user role is CLIENT_MANAGER then delete 'изменить статус МЛ' button
             if ($("#userRoleContainer").html().trim() === "Пользователь_клиента")
-                dataTable.buttons(1).remove();
+                dataTable.buttons(2).remove();
         },
         buttons: [
             {
@@ -79,6 +85,7 @@ $(document).ready(function () {
                 }
             },
             {
+                name: 'changeRouteListStatus',
                 extend: 'selectedSingle',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
@@ -151,6 +158,26 @@ $(document).ready(function () {
             {"data": "requestStatusID"},
             {"data": "routeListID"}
         ],
+        //preDrawCallback: function( settings ) {
+        //    dataTable.cells(1, 4).every(function() {
+        //        var data = this.data();
+        //        if (data)
+        //            data = data.split(" ")[0];
+        //        console.log(data);
+        //        dataTable.cell(1, 4).data(data).draw();
+        //    });
+        //},
+        //"columnDefs": [
+        //    {
+        //        "aTargets": [3, 5, 7],
+        //        "sType": 'date',
+        //        "fnRender": function ( oObj ) {
+        //            var javascriptDate = new Date(oObj.aData[0]);
+        //            javascriptDate = javascriptDate.getDate()+"/"+(javascriptDate.getMonth()+1)+"/"+javascriptDate.getFullYear();
+        //            return "<div class='date'>"+javascriptDate+"<div>";
+        //        }
+        //    }
+        //],
         columnDefs: [
             {"name": "requestIDExternal", "searchable": true, "targets": 0},
             {"name": "requestNumber", "searchable": true, "targets": 1},

@@ -46,8 +46,8 @@ VALUES
    MD5(CONCAT(MD5('12345'), '1234567891234567')), '904534356', 'egrt@irtj.ru', 'DISPATCHER',
    getPointIDByName('point2'), NULL),
   ('user3', '125', 'ADMIN_PAGE', 'petrov i.A.', 'erfergg', MD5('12345'), '1234567891234567',
-   MD5(CONCAT(MD5('12345'), '1234567891234567')), '904534356', 'ey@irtj.ru', 'DISPATCHER',
-   getPointIDByName('point4'), NULL),
+   MD5(CONCAT(MD5('12345'), '1234567891234567')), '904534356', 'ey@irtj.ru', 'MARKET_AGENT',
+   NULL, NULL),
   ('user4', '126', 'ADMIN_PAGE', 'sidorov i.A.', 'ergrtgr', MD5('12345'), '1234567891234567',
    MD5(CONCAT(MD5('12345'), '1234567891234567')), '904554356', 'ey@i45j.ru', 'W_DISPATCHER',
    getPointIDByName('point3'), NULL),
@@ -75,7 +75,17 @@ VALUES
 INSERT INTO route_lists (routeListIDExternal, dataSourceID, routeListNumber, creationDate, departureDate, palletsQty,
                          forwarderId, driverId, driverPhoneNumber, licensePlate, status, routeID)
 VALUES
-  ('routeListIdExt1', 'LOGIST_1C', '1455668', '2015-11-11', '2015-11-11', 3, 'Дмитрий Лже Первый', 'водила1',
+  ('routeListIdExt1', 'LOGIST_1C', '1455668', '2015-11-11', '2015-11-11', 3, 'Дмитрий Лже Первый', getUserIDByLogin('user3'),
                       '8905347890', 'екх123', 'APPROVED', getRouteIDByRouteName('route1'));
 
-
+INSERT INTO requests (requestIDExternal, dataSourceID, requestNumber, requestDate, clientID,
+                      destinationPointID, marketAgentUserID, invoiceNumber, invoiceDate,
+                      documentNumber, documentDate, firma, storage, contactName, contactPhone,
+                      deliveryOption, deliveryDate, boxQty, weight, volume, goodsCost,
+                      lastStatusUpdated, lastModifiedBy, requestStatusID, commentForStatus,
+                      warehousePointID, routeListID, lastVisitedRoutePointID)
+    VALUES
+      ('reqIdExt1', 'LOGIST_1C', 'wewef', NOW(), getClientIDByClientIDExternal('extClId1', 'LOGIST_1C'),
+      getPointIDByName('point3'), getUserIDByLogin('user3'), 'wed', NOW(), 'ewdw', NOW(), 'firm1', 'storage1', 'cont_n',
+    '9056784321', 'deliv_opt', NOW(), 2, 123, 123, 123, NOW(), getUserIDByLogin('parser'), 'CREATED', 'wef',
+       getPointIDByName('point1'), 1 , NULL );

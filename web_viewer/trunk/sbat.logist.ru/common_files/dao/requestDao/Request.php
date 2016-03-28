@@ -198,7 +198,8 @@ class UpdateRequestStatuses implements IEntityUpdate
     function getUpdateQuery()
     {
         if ($this->newRequestStatus === 'DEPARTURE') {
-            return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `boxQty` = $this->palletQuantity,`lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
+            // добавить запрос на обновление количесвта паллет в routeLists
+            return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus',`lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
         }
         return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
     }

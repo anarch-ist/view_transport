@@ -24,6 +24,7 @@
     <script src="common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
     <script src="common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
     <script src="common_files/media/ColReorder-1.3.1/js/dataTables.colReorder.min.js"></script>
+    <script src="common_files/media/FixedHeader-3.1.1/js/dataTables.fixedHeader.min.js"></script>
 
     <!--dateTimePicker-->
     <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>
@@ -42,7 +43,7 @@
 <div class="container">
 
     <div id="menu"
-         style="z-index:1;width: 500px;position: absolute;right: 0; height: 41px;  margin-left: -10px;margin-top: -5px;">
+         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: -5px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php
