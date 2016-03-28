@@ -138,7 +138,6 @@ CREATE TABLE users (
   userIDExternal VARCHAR(255) NOT NULL,
   dataSourceID   VARCHAR(32)  NOT NULL,
   login          VARCHAR(255) NOT NULL,
-  passHash       VARCHAR(64)  NOT NULL,
   salt           CHAR(16)     NOT NULL,
   passAndSalt    VARCHAR(64)  NOT NULL,
   userRoleID     VARCHAR(32)  NOT NULL,
@@ -160,7 +159,7 @@ CREATE TABLE users (
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   UNIQUE (userIDExternal, dataSourceID),
-  UNIQUE (login, passHash)
+  UNIQUE (login)
 );
 
 CREATE PROCEDURE checkUserConstraints(_userRoleID VARCHAR(255), _pointID INTEGER, _clientID INTEGER, _userIDExternal VARCHAR(255), _login VARCHAR(255))
@@ -255,11 +254,11 @@ INSERT INTO points (pointIDExternal, dataSourceID, pointName, region, timeZone, 
 VALUES ('wle', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',
         'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE');
 
-INSERT INTO users (userID, userIDExternal, dataSourceID, login, passHash, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)
+INSERT INTO users (userID, userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)
   VALUES
-  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', md5('nolpitf43gwer'),'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),
+  (1, 'eebrfiebreiubritbvritubvriutbv', 'ADMIN_PAGE', 'parser', 'nvuritneg4785231', md5(CONCAT(md5('nolpitf43gwer'), 'nvuritneg4785231')),
    'ADMIN', 'parser', '', 'fff@fff', '', NULL, NULL),
-  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test', md5('test'), 'nvuritneg4785231', md5(CONCAT(md5('test'), 'nvuritneg4785231')),
+  (2, 'eebrfiebreiubrrervritubvriutbv', 'ADMIN_PAGE', 'test', 'nvuritneg4785231', md5(CONCAT(md5('test'), 'nvuritneg4785231')),
    'ADMIN', 'ivanov i.i.', '904534356', 'test@test.ru', 'position', NULL, NULL);
 
 
