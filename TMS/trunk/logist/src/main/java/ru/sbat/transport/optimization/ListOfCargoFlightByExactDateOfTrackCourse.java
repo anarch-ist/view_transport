@@ -6,25 +6,30 @@ import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.*;
 
-public class ListOfCargoFlightByExactDateOfTrackCourse extends ArrayList<TrackCourse>{
+public class ListOfCargoFlightByExactDateOfTrackCourse extends HashMap<DateAndTrackCourse, LoadCostOfTrackCourse>{
 
     /** splits planned schedule's routes into track courses with possible departure dates for the year
      *
-     * @param trackCourses
+     * @param plannedSchedule
      * @return list of track courses with data: start route point, end route point, route, occupancy cost and possible departure date from track course
      */
-    public ListOfCargoFlightByExactDateOfTrackCourse assignTrackCoursesDepartureDates(List<TrackCourse> trackCourses) {
+    public ListOfCargoFlightByExactDateOfTrackCourse assignTrackCoursesDepartureDates(PlannedSchedule plannedSchedule) {
         ListOfCargoFlightByExactDateOfTrackCourse result = new ListOfCargoFlightByExactDateOfTrackCourse();
+        List<TrackCourse> trackCourses = splitRoutesIntoTrackCourses(plannedSchedule);
         for(TrackCourse trackCourse: trackCourses) {
             List<Date> dates = calculateDepartureDatesForTrackCourseAfterCurrentDate(trackCourse);
             for(Date date: dates){
                 TrackCourse tmp = new TrackCourse();
-                tmp.setLoadCostOfTrackCourse(trackCourse.getLoadCostOfTrackCourse());
                 tmp.setStartTrackCourse(trackCourse.getStartTrackCourse());
                 tmp.setEndTrackCourse(trackCourse.getEndTrackCourse());
                 tmp.setRoute(trackCourse.getRoute());
-                tmp.setDepartureDate(date);
-                result.add(tmp);
+                double cost = tmp.getRoute().getCharacteristicsOfCar().getOccupancyCost();
+                LoadCostOfTrackCourse loadCostOfTrackCourse = new LoadCostOfTrackCourse(cost);
+                tmp.setLoadCostOfTrackCourse(trackCourse.getLoadCostOfTrackCourse());
+                DateAndTrackCourse dateAndTrackCourse = new DateAndTrackCourse(tmp, date);
+//                System.out.println(date);
+//                System.out.println("From " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + " to " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId() + " date = " + date);
+                result.put(dateAndTrackCourse, loadCostOfTrackCourse);
             }
         }
         return result;
@@ -43,8 +48,8 @@ public class ListOfCargoFlightByExactDateOfTrackCourse extends ArrayList<TrackCo
                 trackCourse.setStartTrackCourse(route.get(i));
                 trackCourse.setEndTrackCourse(route.get(i + 1));
                 trackCourse.setRoute(route);
-                trackCourse.setLoadCostOfTrackCourse(new LoadCostOfTrackCourse(route.getStartingOccupancyCost()));
-                trackCourse.getLoadCostOfTrackCourse().setLoadCost(route.getStartingOccupancyCost());
+                trackCourse.setLoadCostOfTrackCourse(new LoadCostOfTrackCourse(route.getCharacteristicsOfCar().getOccupancyCost()));
+                trackCourse.getLoadCostOfTrackCourse().setLoadCost(route.getCharacteristicsOfCar().getOccupancyCost());
                 result.add(trackCourse);
             }
         }
@@ -59,7 +64,7 @@ public class ListOfCargoFlightByExactDateOfTrackCourse extends ArrayList<TrackCo
     public List<Date> calculateDepartureDatesForTrackCourseAfterCurrentDate(TrackCourse trackCourse) {
         List<Date> result = new ArrayList<>();
         Date currentDate = new Date();
-        int timeOfCurrentDate = currentDate.getHours() * 60 + currentDate.getMinutes();
+        int timeOfCurrentDate = currentDate.getHours() * 60 + currentDate.getMinutes() + + trackCourse.getStartTrackCourse().getLoadingOperationsTime();
         int[] timeDeparture = trackCourse.getRoute().splitToComponentTime(trackCourse.getStartTrackCourse().getDepartureTime());
         Date date = new Date();
         date.setHours(timeDeparture[0]);
@@ -89,21 +94,52 @@ public class ListOfCargoFlightByExactDateOfTrackCourse extends ArrayList<TrackCo
         return result;
     }
 
+    public List<Date> calculateDepartureDatesForTrackCourseAfterCurrentDateToDeliveryDate(TrackCourse trackCourse, Invoice invoice) {
+        List<Date> result = new ArrayList<>();
+        Date currentDate = new Date();
+        int timeOfCurrentDate = currentDate.getHours() * 60 + currentDate.getMinutes() + trackCourse.getStartTrackCourse().getLoadingOperationsTime();
+        int[] timeDeparture = trackCourse.getRoute().splitToComponentTime(trackCourse.getStartTrackCourse().getDepartureTime());
+        Date date = new Date();
+        date.setHours(timeDeparture[0]);
+        date.setMinutes(timeDeparture[1]);
+        int differenceWeekDays = trackCourse.getStartTrackCourse().getDayOfWeek() - (currentDate.getDay() + 1);
+        if(differenceWeekDays > 0){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
+            date.setTime(calendar.getTimeInMillis());
+        }else if(differenceWeekDays < 0 || (differenceWeekDays == 0 && (timeOfCurrentDate > trackCourse.getStartTrackCourse().getDepartureTime()))){
+            int tmp = 7 - ((currentDate.getDay()+1) - trackCourse.getStartTrackCourse().getDayOfWeek());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, tmp);
+            date.setTime(calendar.getTimeInMillis());
+        }
+        while (date.before(invoice.getRequest().getPlannedDeliveryDate())){
+            result.add(date);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, 7);
+            date = new Date(calendar.getTimeInMillis());
+        }
+        return result;
+    }
+
     /** load track courses invoices that have delivery routes
      *
      * @param invoiceContainer
      * @param listOfCargoFlightByExactDateOfTrackCourse
      */
-    public void loadCostForTrackCourse(InvoiceContainer invoiceContainer, ListOfCargoFlightByExactDateOfTrackCourse listOfCargoFlightByExactDateOfTrackCourse) {
-        invoiceContainer.stream().filter(invoice -> invoice.getDeliveryRoute() != null).forEach(invoice -> {
-            for (TrackCourse trackCourseFromInvoice : invoice.getDeliveryRoute()) {
-                listOfCargoFlightByExactDateOfTrackCourse.stream().filter(trackCourse -> trackCourseFromInvoice.getStartTrackCourse().equals(trackCourse.getStartTrackCourse()) &&
-                        trackCourseFromInvoice.getEndTrackCourse().equals(trackCourse.getEndTrackCourse()) &&
-                        trackCourseFromInvoice.getRoute().equals(trackCourse.getRoute()) &&
-                        trackCourseFromInvoice.getDepartureDate().equals(trackCourse.getDepartureDate())).forEach(trackCourse -> {
-                    trackCourse.setLoadCostOfTrackCourse(trackCourse.getLoadCostOfTrackCourse().getAvailableRestLoadCost(invoice, trackCourse.getLoadCostOfTrackCourse()));
-                });
-            }
-        });
-    }
+//    public void loadCostForTrackCourse(InvoiceContainer invoiceContainer, ListOfCargoFlightByExactDateOfTrackCourse listOfCargoFlightByExactDateOfTrackCourse) {
+//        invoiceContainer.stream().filter(invoice -> invoice.getDeliveryRoute() != null).forEach(invoice -> {
+//            for (TrackCourse trackCourseFromInvoice : invoice.getDeliveryRoute()) {
+//                listOfCargoFlightByExactDateOfTrackCourse.stream().filter(trackCourse -> trackCourseFromInvoice.getStartTrackCourse().equals(trackCourse.getStartTrackCourse()) &&
+//                        trackCourseFromInvoice.getEndTrackCourse().equals(trackCourse.getEndTrackCourse()) &&
+//                        trackCourseFromInvoice.getRoute().equals(trackCourse.getRoute()) &&
+//                        trackCourseFromInvoice.getDepartureDate().equals(trackCourse.getDepartureDate())).forEach(trackCourse -> {
+//                    trackCourse.setLoadCostOfTrackCourse(trackCourse.getLoadCostOfTrackCourse().getAvailableRestLoadCost(invoice, trackCourse.getLoadCostOfTrackCourse()));
+//                });
+//            }
+//        });
+//    }
 }

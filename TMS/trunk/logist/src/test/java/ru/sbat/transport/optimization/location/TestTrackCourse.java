@@ -21,9 +21,10 @@ public class TestTrackCourse {
     public static void createPlannedSchedule() {
         initRoute(
                 route,
-                createRoutePoint(c, 5, 930, 600,   120, 120, getCharacteristicsOfCar(10)),
-                createRoutePoint(x, 6, 150, 960,    60,  50, getCharacteristicsOfCar(10)),
-                createRoutePoint(a, 6,   0,   0,    90, 300, getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(10),
+                createRoutePoint(c, 5, 930, 600,   120, 120),
+                createRoutePoint(x, 6, 150, 960,    60,  50),
+                createRoutePoint(a, 6,   0,   0,    90, 300)
         );
 
         plannedSchedule.add(route);
@@ -46,11 +47,12 @@ public class TestTrackCourse {
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
 
-    private static void initRoute(Route route, RoutePoint... routePoints) {
+    private static void initRoute(Route route, CharacteristicsOfCar characteristicsOfCar, RoutePoint... routePoints) {
+        route.setCharacteristicsOfCar(characteristicsOfCar);
         Collections.addAll(route, routePoints);
     }
 
-    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint, CharacteristicsOfCar characteristicsOfCar) {
+    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
         RoutePoint result = new RoutePoint();
         result.setDeparturePoint(point);
         result.setDayOfWeek(dayOfWeek);
@@ -58,7 +60,6 @@ public class TestTrackCourse {
         result.setTimeToNextPoint(timeToNextPoint);
         result.setLoadingOperationsTime(loadingOperationsTime);
         result.setDistanceToNextPoint(distanceToNextPoint);
-        result.setCharacteristicsOfCar(characteristicsOfCar);
         return result;
     }
 

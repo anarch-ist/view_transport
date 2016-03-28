@@ -21,8 +21,5 @@ public interface IRoute {
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
     int getDaysCountOfRoute();
-    double getStartingOccupancyCost();
-    double getStartingWeight();
-    double getStartingVolume();
     List<TrackCourse> splitRouteIntoTrackCourse();
 }

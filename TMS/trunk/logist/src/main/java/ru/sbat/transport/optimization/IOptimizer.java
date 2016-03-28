@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.DeliveryRoute;
+import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
@@ -17,9 +18,9 @@ public interface IOptimizer {
 
     Map<Invoice, List<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException;
 
-    List<DeliveryRoute> getDeliveryRoutesForInvoice(Invoice invoice, PlannedSchedule plannedSchedule) throws RouteNotFoundException;
+    List<DeliveryRoute> startRecursive(final PlannedSchedule plannedSchedule, final Point departurePoint, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints);
 
-    void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException;
+    void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, List<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException;
 
     ArrayList<Invoice> shift (PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice);
 

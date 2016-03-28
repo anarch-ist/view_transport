@@ -56,13 +56,13 @@ public class TestInvoiceOverviewController {
         return result;
     }
 
-    public static void initRoute(Route route, RoutePoint... routePoints) {
+    public static void initRoute(Route route, CharacteristicsOfCar characteristicsOfCar, RoutePoint... routePoints) {
+        route.setCharacteristicsOfCar(characteristicsOfCar);
         Collections.addAll(route, routePoints);
     }
 
-    public static RoutePoint createRoutePoint(CharacteristicsOfCar characteristicsOfCar, Point departurePoint, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
+    public static RoutePoint createRoutePoint(Point departurePoint, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
         RoutePoint result = new RoutePoint();
-        result.setCharacteristicsOfCar(characteristicsOfCar);
         result.setDepartureTime(departureTime);
         result.setDayOfWeek(dayOfWeek);
         result.setTimeToNextPoint(timeToNextPoint);

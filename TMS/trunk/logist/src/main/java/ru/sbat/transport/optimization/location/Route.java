@@ -10,6 +10,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
+    private CharacteristicsOfCar characteristicsOfCar;
+
+    public CharacteristicsOfCar getCharacteristicsOfCar() {
+        return characteristicsOfCar;
+    }
+
+    public void setCharacteristicsOfCar(CharacteristicsOfCar characteristicsOfCar) {
+        this.characteristicsOfCar = characteristicsOfCar;
+    }
 
     @Override
     public boolean containsPoint(Point point) {
@@ -178,21 +187,6 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
     @Override
-    public double getStartingWeight(){
-        return this.get(0).getCharacteristicsOfCar().getCapacityCar();
-    }
-
-    @Override
-    public double getStartingVolume(){
-        return this.get(0).getCharacteristicsOfCar().getVolumeCar();
-    }
-
-    @Override
-    public double getStartingOccupancyCost() {
-        return this.get(0).getCharacteristicsOfCar().getOccupancyCost();
-    }
-
-    @Override
     public String getPointsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (RoutePoint routePoint: this) {
@@ -208,7 +202,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
             trackCourse.setStartTrackCourse(this.get(i));
             trackCourse.setEndTrackCourse(this.get(i + 1));
             trackCourse.setRoute(this);
-            trackCourse.setLoadCostOfTrackCourse(new LoadCostOfTrackCourse(this.getStartingOccupancyCost()));
+            trackCourse.setLoadCostOfTrackCourse(new LoadCostOfTrackCourse(this.getCharacteristicsOfCar().getOccupancyCost()));
             result.add(trackCourse);
         }
         return result;

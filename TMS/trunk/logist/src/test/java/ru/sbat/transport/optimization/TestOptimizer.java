@@ -36,46 +36,53 @@ public class TestOptimizer {
     public static void createPlannedSchedule(){
         initRoute(
                 route1,
-                createRoutePoint(x, 2, 920, 600,   0, 690, getCharacteristicsOfCar(10)),
-                createRoutePoint(c, 3, 170, 960,  80, 89 , getCharacteristicsOfCar(10)),
-                createRoutePoint(a, 3,   0,   0, 120, 78 , getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(10),
+                createRoutePoint(x, 2, 930, 600,   0, 690),
+                createRoutePoint(c, 3, 170, 960,  80, 789),
+                createRoutePoint(a, 3,   0,   0, 120,   0)
         );
         initRoute(
                 route2,
-                createRoutePoint(b, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
-                createRoutePoint(p, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
-                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10)),
-                createRoutePoint(q, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(15),
+                createRoutePoint(b, 3, 1080, 240,   0, 459),
+                createRoutePoint(p, 3, 1380, 300,  70, 123),
+                createRoutePoint(z, 4,  360, 180, 120, 245),
+                createRoutePoint(q, 4,    0,   0,  30, 245)
         );
         initRoute(
                 route3,
-                createRoutePoint(p, 4, 940, 600,   0, 657 , getCharacteristicsOfCar(10)),
-                createRoutePoint(a, 5, 170, 960,  80, 35  , getCharacteristicsOfCar(10)),
-                createRoutePoint(b, 5, 180, 300, 120, 4535, getCharacteristicsOfCar(10)),
-                createRoutePoint(c, 6, 463, 2353, 90, 345 , getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(20),
+                createRoutePoint(p, 2,  720, 600,   0,  657),
+                createRoutePoint(a, 2, 1380, 480,  60,   35),
+                createRoutePoint(b, 3,  540, 720, 120, 4535),
+                createRoutePoint(c, 3,    0,   0,  90,  345)
         );
         initRoute(
                 route4,
-                createRoutePoint(b, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
-                createRoutePoint(x, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
-                createRoutePoint(y, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(10),
+                createRoutePoint(b, 3,  720, 420,   0, 459),
+                createRoutePoint(x, 3, 1170, 180,  30, 123),
+                createRoutePoint(y, 3,    0,   0,  30, 245)
         );
         initRoute(
                 route5,
-                createRoutePoint(c, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
-                createRoutePoint(f, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
-                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(7),
+                createRoutePoint(c, 4, 900, 480,   0, 459),
+                createRoutePoint(f, 5,   0, 600,  60, 123),
+                createRoutePoint(z, 5,   0,   0,  30, 245)
         );
         initRoute(
                 route6,
-                createRoutePoint(y, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
-                createRoutePoint(w, 5, 170, 960,  80, 123, getCharacteristicsOfCar(10)),
-                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(25),
+                createRoutePoint(y, 5, 1020, 240,   0, 459),
+                createRoutePoint(w, 5, 1320, 420,  60, 123),
+                createRoutePoint(z, 6,    0,   0,  30, 245)
         );
         initRoute(
                 route7,
-                createRoutePoint(b, 4, 930, 600,   0, 459, getCharacteristicsOfCar(10)),
-                createRoutePoint(z, 5,   0,   0, 120, 245, getCharacteristicsOfCar(10))
+                getCharacteristicsOfCar(16),
+                createRoutePoint(b, 6, 600, 360,   0, 459),
+                createRoutePoint(z, 6,   0,   0, 120, 245)
         );
         plannedSchedule.add(route1);
         plannedSchedule.add(route2);
@@ -211,11 +218,12 @@ public class TestOptimizer {
         return new Date(calendar.getTimeInMillis());
     }
 
-    private static void initRoute(Route route, RoutePoint... routePoints) {
+    private static void initRoute(Route route, CharacteristicsOfCar characteristicsOfCar, RoutePoint... routePoints) {
+        route.setCharacteristicsOfCar(characteristicsOfCar);
         Collections.addAll(route, routePoints);
     }
 
-    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint, CharacteristicsOfCar characteristicsOfCar) {
+    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
         RoutePoint result = new RoutePoint();
         result.setDeparturePoint(point);
         result.setDayOfWeek(dayOfWeek);
@@ -223,7 +231,6 @@ public class TestOptimizer {
         result.setTimeToNextPoint(timeToNextPoint);
         result.setLoadingOperationsTime(loadingOperationsTime);
         result.setDistanceToNextPoint(distanceToNextPoint);
-        result.setCharacteristicsOfCar(characteristicsOfCar);
         return result;
     }
 

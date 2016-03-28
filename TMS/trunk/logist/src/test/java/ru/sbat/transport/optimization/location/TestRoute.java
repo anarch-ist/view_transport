@@ -17,22 +17,23 @@ public class TestRoute {
     public static void createPlannedSchedule() {
         initRoute(
                 route,
+                createCharacteristicsOfCar(10, 7, 8),
                 // данные о машине(грузоподъемность в т., объем, стоимость), пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта, время ПРР, расстояние до следующего пункта
-                createRoutePoint(createCharacteristicsOfCar(10, 15, 13054.5), warehousePoint1,           2, 930, 600,   0, 120),
-                createRoutePoint(createCharacteristicsOfCar(15, 25,   17894), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
-                createRoutePoint(createCharacteristicsOfCar(20, 30,   25040), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
+                createRoutePoint(warehousePoint1,           2, 930, 600,   0, 120),
+                createRoutePoint(tradeRepresentativePoint1, 3, 180, 960,  90,  50),
+                createRoutePoint(tradeRepresentativePoint2, 3,   0,   0, 120, 300)
         );
         plannedSchedule.add(route);
     }
 
     //----------СЛУЖЕБНЫЕ МЕТОДЫ--------------
-    public static void initRoute(Route route, RoutePoint... routePoints) {
+    public static void initRoute(Route route, CharacteristicsOfCar characteristicsOfCar, RoutePoint... routePoints) {
+        route.setCharacteristicsOfCar(characteristicsOfCar);
         Collections.addAll(route, routePoints);
     }
 
-    public static RoutePoint createRoutePoint(CharacteristicsOfCar characteristicsOfCar, Point departurePoint, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
+    public static RoutePoint createRoutePoint(Point departurePoint, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
         RoutePoint result = new RoutePoint();
-        result.setCharacteristicsOfCar(characteristicsOfCar);
         result.setDepartureTime(departureTime);
         result.setDayOfWeek(dayOfWeek);
         result.setTimeToNextPoint(timeToNextPoint);
@@ -114,6 +115,6 @@ public class TestRoute {
 
     @Test
     public void testGetStartingCost() {
-        Assert.assertEquals(13054.5, plannedSchedule.get(0).getStartingOccupancyCost(), 0);
+        Assert.assertEquals(13054.5, plannedSchedule.get(0).getCharacteristicsOfCar().getOccupancyCost(), 0);
     }
 }

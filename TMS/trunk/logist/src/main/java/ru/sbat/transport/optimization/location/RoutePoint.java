@@ -8,7 +8,6 @@ public class RoutePoint {
     private Integer loadingOperationsTime;
     private Integer timeToNextPoint;
     private Integer departureTime;
-    private CharacteristicsOfCar characteristicsOfCar;
     private int dayOfWeek;
     private Double distanceToNextPoint ;// km
 
@@ -53,14 +52,6 @@ public class RoutePoint {
         this.departurePoint = departurePoint;
     }
 
-    public CharacteristicsOfCar getCharacteristicsOfCar() {
-        return characteristicsOfCar;
-    }
-
-    public void setCharacteristicsOfCar(CharacteristicsOfCar characteristicsOfCar) {
-        this.characteristicsOfCar = characteristicsOfCar;
-    }
-
     public Integer getLoadingOperationsTime() {
         return loadingOperationsTime;
     }
@@ -73,7 +64,6 @@ public class RoutePoint {
     @Override
     public String toString() {
         return "RoutePoint{" +
-                "characteristicsOfCar=" + characteristicsOfCar +
                 ", departureTime=" + departureTime +
                 ", dayOfWeek=" + dayOfWeek +
                 ", timeToNextPoint=" + timeToNextPoint +
