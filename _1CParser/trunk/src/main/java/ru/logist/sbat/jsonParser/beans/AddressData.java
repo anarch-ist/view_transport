@@ -8,8 +8,8 @@ public class AddressData {
     private static final String FN_ADDRESS_SHORT = "addressShot";
     private static final String FN_ADDRESS_FULL = "addressFull";
     private static final String FN_DELIVERY_AREA_ID = "deliveryAreaId";
-
-    @Unique
+    // TODO временно отключил
+    //@Unique
     private String addressId; //not null and not empty
     private String addressShot; // not null
     private String addressFull; // not null

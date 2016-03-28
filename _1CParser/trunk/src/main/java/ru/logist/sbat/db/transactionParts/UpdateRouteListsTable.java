@@ -27,7 +27,7 @@ public class UpdateRouteListsTable extends TransactionPart{
         // create routeLists
         PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
                 "INSERT INTO route_lists\n" +
-                        "  VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getRouteIDByDirectionIDExternal(?, ?))\n" +
+                        "  VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, getUserIDByUserIDExternal(?, ?), ?, ?, ?, getRouteIDByDirectionIDExternal(?, ?))\n" +
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  routeListNumber   = VALUES(routeListNumber),\n" +
                         "  creationDate      = VALUES(creationDate),\n" +
@@ -67,11 +67,12 @@ public class UpdateRouteListsTable extends TransactionPart{
             routeListsInsertPreparedStatement.setNull(6, Types.INTEGER); // palletsQty
             routeListsInsertPreparedStatement.setString(7, forwarderId);
             routeListsInsertPreparedStatement.setString(8, driverId);
-            routeListsInsertPreparedStatement.setString(9, null); // driverPhoneNumber
-            routeListsInsertPreparedStatement.setString(10, null); // license plate
-            routeListsInsertPreparedStatement.setString(11, status);
-            routeListsInsertPreparedStatement.setString(12, routeIdExternal);
-            routeListsInsertPreparedStatement.setString(13, InsertOrUpdateTransactionScript.LOGIST_1C);
+            routeListsInsertPreparedStatement.setString(9, InsertOrUpdateTransactionScript.LOGIST_1C);
+            routeListsInsertPreparedStatement.setString(10, null); // driverPhoneNumber
+            routeListsInsertPreparedStatement.setString(11, null); // license plate
+            routeListsInsertPreparedStatement.setString(12, status);
+            routeListsInsertPreparedStatement.setString(13, routeIdExternal);
+            routeListsInsertPreparedStatement.setString(14, InsertOrUpdateTransactionScript.LOGIST_1C);
 
             routeListsInsertPreparedStatement.addBatch();
         }
