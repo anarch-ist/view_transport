@@ -8,13 +8,15 @@ $(document).ready(function () {
         window.location.reload();
     });
 
-    // --------DATATABLE INIT--------------
+    // ------SEARCH INPUTS-------------
     $('#user-grid tfoot th').each(function () {
         var title = $(this).text();
         $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
     });
     var filterInputs = $('#user-grid tfoot th input');
+    filterInputs.attr("currentFilter", "");
 
+    // --------DATATABLE INIT--------------
     var dataTable = $('#user-grid').DataTable({
         processing: true,
         serverSide: true,
@@ -33,6 +35,8 @@ $(document).ready(function () {
         //   header: true,
          //   footer: false
        // },
+
+
         stateSave: true,
         stateDuration: 0, // 0 a special value as it indicates that the state can be stored and retrieved indefinitely with no time limit
         // format for data object: https://datatables.net/reference/option/stateSaveCallback
@@ -48,12 +52,13 @@ $(document).ready(function () {
                 var search = column.search.search;
                 if (search) {
                     $(filterInputs[i]).val(search);
+                    $(filterInputs[i]).attr("currentFilter", search);
                 }
             }
         },
 
-      //  autoWidth: true,
-        pageLength: 40,
+        //  autoWidth: true,
+        pageLength: 10,
         select: {
             style: 'single'
         },
@@ -65,17 +70,26 @@ $(document).ready(function () {
         // That is to say that the table will not be drawn until the Ajax request as completed.
         // As such, any actions that require the table to have completed its initialisation should be placed into the initComplete callback.
         initComplete: function(settings, json) {
+
             // Apply the search
             dataTable.columns().every(function () {
                 var that = this;
-                $('input', this.footer()).on('keyup change', function () {
-                    if (that.search() !== this.value) {
+                $('input', this.footer()).on('keyup change', function (e) {
+                    var enterPressed = (e.keyCode == '13');
+                    if (enterPressed && (that.search() !== this.value)) {
                         that
                             .search(this.value)
                             .draw();
+                        $(this)
+                            .attr("currentFilter", this.value);
                     }
+                }).blur(function() {
+                    var filterValue = $(this).attr("currentFilter");
+                    $(this).val(filterValue);
                 });
             });
+
+            //TODO fix it
             // if user role is CLIENT_MANAGER then delete 'изменить статус МЛ' button
             if ($("#userRoleContainer").html().trim() === "Пользователь_клиента")
                 dataTable.buttons(2).remove();
@@ -120,8 +134,10 @@ $(document).ready(function () {
                 text: 'сброс фильтров',
                 action: function (e, dt, node, config) {
                     dataTable.columns().every(function () {
-                        $('input', this.footer())[0].value = '';
-                        this.search('');
+                        var $input = $('input', this.footer());
+                        $input.val("");
+                        $input.attr("currentFilter", "");
+                        this.search("");
                     });
                     dataTable.columns().draw();
                 }
@@ -130,12 +146,13 @@ $(document).ready(function () {
         ajax: {
             url: "content/getData.php", // json datasource
             type: "post",  // method  , by default get
-            data: {"status": "getRequestsForUser"},    // post-parameter for determining type of query
-            error: function () {  // error handling
-                $(".user-grid-error").html("");
-                $("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-                $("#user-grid_processing").css("display", "none");
-            }
+            data: {"status": "getRequestsForUser"}    // post-parameter for determining type of query
+
+            //error: function () {  // error handling
+            //    //$(".user-grid-error").html("");
+            //    //$("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+            //    //$("#user-grid_processing").css("display", "none");
+            //}
         },
         columns: [
             {"data": "requestIDExternal"},
@@ -168,26 +185,6 @@ $(document).ready(function () {
             {"data": "requestStatusID"},
             {"data": "routeListID"}
         ],
-        //preDrawCallback: function( settings ) {
-        //    dataTable.cells(1, 4).every(function() {
-        //        var data = this.data();
-        //        if (data)
-        //            data = data.split(" ")[0];
-        //        console.log(data);
-        //        dataTable.cell(1, 4).data(data).draw();
-        //    });
-        //},
-        //"columnDefs": [
-        //    {
-        //        "aTargets": [3, 5, 7],
-        //        "sType": 'date',
-        //        "fnRender": function ( oObj ) {
-        //            var javascriptDate = new Date(oObj.aData[0]);
-        //            javascriptDate = javascriptDate.getDate()+"/"+(javascriptDate.getMonth()+1)+"/"+javascriptDate.getFullYear();
-        //            return "<div class='date'>"+javascriptDate+"<div>";
-        //        }
-        //    }
-        //],
         columnDefs: [
             {"name": "requestIDExternal", "searchable": true, "targets": 0},
             {"name": "requestNumber", "searchable": true, "targets": 1},

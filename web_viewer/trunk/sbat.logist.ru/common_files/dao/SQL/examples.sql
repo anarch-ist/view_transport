@@ -1,3 +1,6 @@
+
+
+
 # list with only manager Users
 CREATE VIEW manager_users (managerUserID) AS
   SELECT users.userID

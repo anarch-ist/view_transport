@@ -31,6 +31,7 @@ class RequestsForUserEntity implements IRequestsForUserEntity
         }
         $array = $this->_DAO->multiSelect(new EntitySelectAllRequestsForUser($start, $count, $userID, $columnInformation, $orderColumnNumber));
         $arrayResult = array();
+        // TODO возникает ошибка, если в запросе после фильтрации нет данных
         $arrayResult['requests'] = $array[0];
         $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
         $arrayResult['totalCount'] = $array[2][0]['totalCount'];
