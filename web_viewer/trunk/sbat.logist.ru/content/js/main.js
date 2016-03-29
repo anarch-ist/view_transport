@@ -23,7 +23,7 @@ $(document).ready(function () {
         colReorder: true,
        ScrollXInner: "100%",
         scrollY:        "500px",
-        scrollX:        true,
+       // scrollX:        true,
      //  autoWidth: false,
     //   scrollCollapse: true,
       //  jQueryUI: true,
