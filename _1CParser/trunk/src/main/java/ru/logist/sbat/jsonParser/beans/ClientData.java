@@ -17,7 +17,9 @@ public class ClientData {
 
     public ClientData(JSONObject updateClient) {
         // check fields
-        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateClient);
+        //TODO
+        //Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateClient);
+        Util.checkFieldAvailableAndNotNull           (FN_CLIENT_ID, updateClient);
         Util.checkFieldAvailableAndNotNull           (FN_CLIENT_NAME, updateClient);
         Util.checkFieldAvailableAndNotNull           (FN_CLIENT_INN, updateClient);
         Util.checkFieldAvailableAndNotNull           (FN_CLIENT_PASSWORD, updateClient);

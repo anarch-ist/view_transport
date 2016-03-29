@@ -18,13 +18,17 @@ apt-get install mysql-community-server
 
 
 Запуск сервера MySQL:
+service mysqld start
 /etc/init.d/mysql start
 
 Остановка работы сервера MySQL:
+service mysqld stop
 /etc/init.d/mysql stop
 
 Перезапуск сервера MySQL:
+service mysqld restart
 /etc/init.d/mysql restart
+
 
 remoteMysql:
 http://www.debianhelp.co.uk/remotemysql.htm
@@ -50,6 +54,99 @@ http://linuxguru.ru/administration/mysql-konfig-dlya-servera-s-4-8gb-ozu/
 
 ДЛЯ ТОГО, при нажатии ctrl+shift+f10 всплывало окно выбора datasource необходимо найти окно datasources 
 Choose Data Source в статусной строке phpStorm.
+
+-------------------------------оптимизация mysql---------------------------------------
+
+
+Кэширование запросов
+
+    query_cache_limit — максимальный размер кэшируемого запроса.
+    query_cache_min_res_unit — минимальный размер хранимого в кэше блока.
+    query_cache_size — размер кэша. 0 отключает использование кэша. Для выбора оптимального значения необходимо наблюдать за переменной состояния Qcache_lowmem_prunes и добиться, чтобы ее значение увеличивалось незначительно. Также нужно помнить, что излишне большой кэш будет создавать ненужную нагрузку.
+    query_cache_type — (OFF, DEMAND, ON). OFF отключает кэширование, DEMAND – кэширование будет производиться только при наличии директивы SQL_CACHE в запросе, ON включает кэширование.
+    query_cache_wlock_invalidate — определяет будут ли данные браться из кеша, если таблица, к которым они относятся, заблокирована на чтение.
+
+https://habrahabr.ru/post/108418/
+
+
+
+low-priority-updates
+skip-name-resolve
+max_allowed_packet=256M
+max_connections=120
+thread_cache_size = 16
+query_cache_size = 0
+key_buffer_size = 3G
+max_heap_table_size = 512M
+read_buffer_size = 512K
+read_rnd_buffer_size=1M
+sort_buffer_size=10M
+table_open_cache=100
+
+
+innodb_buffer_pool_size=5G
+innodb_flush_log_at_trx_commit=2
+innodb_log_file_size=64M
+
+
+
+
+
+innodb_buffer_pool_size рекомендованное значение 5-6GB (8GB RAM)
+
+innodb_log_file_size = размер redo log(4G или больше)
+
+max_connections — (по умолч - 151)максимальное количество параллельных соединений к серверу. Увеличьте его, если сталкиваетесь с проблемой «Too many connections».
+
+innodb_log_buffer_size   this is the size of the buffer for transactions that have not been committed yet. default 1M. 128M
+
+query_cache_size - лучше всего сразу отключить его и использовать иные способы ускорения запросов. (индексация, дубликаты для расширения пропускной способности для чтения данных, использование внешнего кеша)
+
+log_bin - используется, если сервер используется как реплика. у нас можно выключить.
+
+skip-name-resolve - TRUE (не определять доменные имена для IP-адресов подключающихся клиентов)
+
+low-priority-updates - TRUE ( эта опция снижает приоритет операций INSERT/UPDATE по сравнению с SELECT)
+
+max_allowed_packet - 128МБ(максимальный размер данных, которые могут быть переданы за один запрос)
+
+thread_cache_size = 16 (указывает число кэшируемых потоков, удовенное количество ядер проецессора)
+
+key_buffer              = 1200M
+
+
+НАСТРОЙКИ:
+[mysqld]
+port=3306
+explicit_defaults_for_timestamp = TRUE
+#skip-name-resolve
+low-priority-updates
+max_allowed_packet = 256M
+max_connections = 120
+thread_cache_size = 16
+query_cache_size = 0
+key_buffer_size = 3G
+max_heap_table_size = 512M
+read_buffer_size = 512K
+read_rnd_buffer_size = 1M
+sort_buffer_size = 10M
+table_open_cache = 100
+
+innodb_buffer_pool_size = 5G
+innodb_log_file_size = 1G
+innodb_flush_log_at_trx_commit = 2
+innodb_lock_wait_timeout = 50
+
+#innodb_data_home_dir = C:\mysql\data/
+#innodb_data_file_path = ibdata1:10M:autoextend
+#innodb_log_group_home_dir = C:\mysql\data/
+#innodb_log_arch_dir = C:\mysql\data/
+
+
+
+на уровне php настроить пул соединений к БД
+
+
 
 
 -------------------------------Установка apache 2.4 и PHP 5.6---------------------------------------

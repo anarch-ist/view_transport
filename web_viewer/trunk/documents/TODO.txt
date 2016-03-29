@@ -169,4 +169,30 @@ n    any_point calculate    setByUser setByUser       setByUser
 1) в случае, если массив отфильтрованных данных на сервере - пустой, то на стороне php возникает ошибка
 Notice: Undefined offset: 0 in C:\web\wamp\www\sbat.logist.ru\common_files\dao\requestsForUser\RequestsForUser.php on line <i>34</i>
 
+29.03.2016
+РАБОТЫ ПО ОПТИМИЗАЦИИ
+1) настроить файл mysql.ini под наш сервак
+2) хранить view как materialized view, в парсере добавить инструкцию для обновления этого view
+3) добавить индексы
+4) оптимизировать сам запрос, перенести его на уровень php и использовать prepered statement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
