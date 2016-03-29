@@ -141,12 +141,12 @@ $(document).ready(function () {
                     });
                     dataTable.columns().draw();
                 }
-            },
-
-            {
-                extend: 'pdfHtml5',
-                download: 'open'
             }
+
+          //  {
+          //      extend: 'pdfHtml5',
+          //      download: 'open'
+           // }
         ],
         ajax: {
             url: "content/getData.php", // json datasource
