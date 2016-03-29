@@ -58,7 +58,7 @@ $(document).ready(function () {
         },
 
         //  autoWidth: true,
-        pageLength: 10,
+        pageLength: 40,
         select: {
             style: 'single'
         },
