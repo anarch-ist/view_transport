@@ -1,4 +1,5 @@
-
+SHOW VARIABLES;
+SHOW VARIABLES LIKE '%innodb_log_waits%';
 
 
 # list with only manager Users
