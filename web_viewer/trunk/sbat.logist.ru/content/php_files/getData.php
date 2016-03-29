@@ -76,7 +76,7 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
     if (isset($_POST['palletsQty'])) {
-        return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $requests, $newStatusID, $datetime, $comment, $_POST['palletsQty']);
+        return $privUser->getRequestEntity()->updateRequestStatuses($userID, $requests, $newStatusID, $datetime, $comment, $_POST['palletsQty']);
     }
     return $privUser->getRequestEntity()->updateRequestStatuses($userID, $requests, $newStatusID, $datetime, $comment);
 }

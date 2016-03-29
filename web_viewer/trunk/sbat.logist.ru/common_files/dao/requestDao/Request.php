@@ -53,11 +53,6 @@ class RequestEntity implements IRequestEntity
         return $this->_DAO->update(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment));
     }
 
-    function updateRequestStatuses2($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty)
-    {
-        return $this->_DAO->update(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty));
-    }
-
     function deleteRequest(RequestData $Request)
     {
         // TODO: Implement deleteRequest() method.
