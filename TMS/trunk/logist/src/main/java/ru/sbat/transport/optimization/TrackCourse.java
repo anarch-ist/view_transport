@@ -2,26 +2,19 @@ package ru.sbat.transport.optimization;
 
 
 import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.location.Route;
+import ru.sbat.transport.optimization.location.UpdatedRoute;
 import ru.sbat.transport.optimization.location.RoutePoint;
 
 import java.util.*;
 
 
 public class TrackCourse {
-    private LoadCostOfTrackCourse loadCostOfTrackCourse;
     private RoutePoint startTrackCourse;
     private RoutePoint endTrackCourse;
-    private Route route;
-    private Date departureDate;
-
-    public LoadCostOfTrackCourse getLoadCostOfTrackCourse() {
-        return loadCostOfTrackCourse;
-    }
-
-    public void setLoadCostOfTrackCourse(LoadCostOfTrackCourse loadCostOfTrackCourse) {
-        this.loadCostOfTrackCourse = loadCostOfTrackCourse;
-    }
+    private int travelTime;
+    private UpdatedRoute updatedRoute;
+    private double distanceToNextPoint;
+    private List<LoadUnit> loadUnits = new ArrayList<>();
 
     public RoutePoint getStartTrackCourse() {
         return startTrackCourse;
@@ -39,54 +32,59 @@ public class TrackCourse {
         this.endTrackCourse = endTrackCourse;
     }
 
-    public Route getRoute() {
-        return route;
+    public int getTravelTime() {
+        return travelTime;
     }
 
-    public void setRoute(Route route) {
-        this.route = route;
+    public void setTravelTime(int travelTime) {
+        this.travelTime = travelTime;
     }
 
-    public Date getDepartureDate() {
-        return departureDate;
+    public UpdatedRoute getUpdatedRoute() {
+        return updatedRoute;
     }
 
-    public void setDepartureDate(Date departureDate) {
-        this.departureDate = departureDate;
+    public void setUpdatedRoute(UpdatedRoute updatedRoute) {
+        this.updatedRoute = updatedRoute;
     }
 
-    public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<Route> routes) {
+    public double getDistanceToNextPoint() {
+        return distanceToNextPoint;
+    }
+
+    public void setDistanceToNextPoint(double distanceToNextPoint) {
+        this.distanceToNextPoint = distanceToNextPoint;
+    }
+
+    public List<LoadUnit> getLoadUnits() {
+        return loadUnits;
+    }
+
+    public void setLoadUnits(List<LoadUnit> loadUnits) {
+        this.loadUnits = loadUnits;
+    }
+
+    public List<TrackCourse> sharePointsBetweenTC(List<Point> points, List<UpdatedRoute> updatedRoutes){
         List<TrackCourse> result = new ArrayList<>();
-        for(int i = 0; i < points.size() - 1; i++){
-        for(Route route: routes){
-            List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse();
-            for(TrackCourse trackCourse: trackCoursesForRoute){
-                    if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getDeparturePoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId())){
-                            result.add(trackCourse);
-                    }
-                }
-            }
-        }
-        for(TrackCourse trackCourse: result){
-            for(TrackCourse tmp: result){
-                if (trackCourse.getStartTrackCourse().getDeparturePoint().getPointId().equals(tmp.getStartTrackCourse().getDeparturePoint().getPointId())
-                        && trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(tmp.getEndTrackCourse().getDeparturePoint().getPointId())) {
-
-                }
-            }
-        }
+//        for(int i = 0; i < points.size() - 1; i++){
+//            for(UpdatedRoute route: updatedRoutes){
+//                List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse();
+//                for(TrackCourse trackCourse: trackCoursesForRoute){
+//                    if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getDeparturePoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId())){
+//                        result.add(trackCourse);
+//                    }
+//                }
+//            }
+//        }
+//        for(TrackCourse trackCourse: result){
+//            for(TrackCourse tmp: result){
+//                if (trackCourse.getStartTrackCourse().getDeparturePoint().getPointId().equals(tmp.getStartTrackCourse().getDeparturePoint().getPointId())
+//                        && trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(tmp.getEndTrackCourse().getDeparturePoint().getPointId())) {
+//
+//                }
+//            }
+//        }
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "TrackCourse{" +
-                "loadCost=" + loadCostOfTrackCourse +
-                ", startTrackCourse=" + startTrackCourse +
-                ", endTrackCourse=" + endTrackCourse +
-                ", route=" + route +
-                ", departureDate=" + departureDate +
-                '}';
     }
 
     @Override
@@ -98,7 +96,7 @@ public class TrackCourse {
 
         if (!startTrackCourse.equals(that.startTrackCourse)) return false;
         if (!endTrackCourse.equals(that.endTrackCourse)) return false;
-        return route.equals(that.route);
+        return updatedRoute.equals(that.updatedRoute);
 
     }
 
@@ -106,7 +104,7 @@ public class TrackCourse {
     public int hashCode() {
         int result = startTrackCourse.hashCode();
         result = 31 * result + endTrackCourse.hashCode();
-        result = 31 * result + route.hashCode();
+        result = 31 * result + updatedRoute.hashCode();
         return result;
     }
 }

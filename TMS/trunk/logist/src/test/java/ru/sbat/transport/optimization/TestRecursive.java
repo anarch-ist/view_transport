@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.sbat.transport.optimization.location.*;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utilsForTests.RoutesCreation;
+import ru.sbat.transport.optimization.utils.RoutesCreation;
 
 import java.util.*;
 
@@ -16,7 +16,7 @@ public class TestRecursive {
     // создание планового расписания
     @BeforeClass
     public static void createPlannedSchedule(){
-        plannedSchedule.addAll(routesCreation.getRoutes());
+        plannedSchedule.addAll(routesCreation.getUpdatedRoute());
     }
 
     @Test
@@ -27,7 +27,7 @@ public class TestRecursive {
         List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, routesCreation.getDepartureDeliveryPoints().get(0), routesCreation.getDepartureDeliveryPoints().get(1), result, markedPoints);
         for (DeliveryRoute deliveryRoute : possibleDeliveryRoutes) {
             for (TrackCourse trackCourse : deliveryRoute) {
-                System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getDeparturePoint().getPointId() + ", route = " + trackCourse.getRoute().getPointsAsString());
+                System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getPoint().getPointId() + ", route = " + trackCourse.getUpdatedRoute().getPointsAsString());
             }
             System.out.println("_______________________");
         }

@@ -1,8 +1,8 @@
-package ru.sbat.transport.optimization.utilsForTests;
+package ru.sbat.transport.optimization.utils;
 
 
 import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.location.Route;
+import ru.sbat.transport.optimization.location.UpdatedRoute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.List;
 public class InformationStack {
 
     private List<String> pointsHistory = new ArrayList<>();
-    private List<String> routesHistory = new ArrayList<>();
+    private List<String> updatedRoutesHistory = new ArrayList<>();
     private List<Point> pointsForInvoice = new ArrayList<>();
-    private List<Route> routesForInvoice = new ArrayList<>();
+    private List<UpdatedRoute> updatedRoutesForInvoice = new ArrayList<>();
     private int deep = 0;
 
     public InformationStack() {
@@ -27,20 +27,20 @@ public class InformationStack {
         this.setDeep(informationStack.getDeep());
         this.pointsHistory.clear();
         this.pointsHistory.addAll(informationStack.getPointsHistory());
-        this.routesHistory.clear();
-        this.routesHistory.addAll(informationStack.getRoutesHistory());
+        this.updatedRoutesHistory.clear();
+        this.updatedRoutesHistory.addAll(informationStack.getUpdatedRoutesHistory());
         this.pointsForInvoice.clear();
         this.pointsForInvoice.addAll(informationStack.getPointsForInvoice());
-        this.routesForInvoice.clear();
-        this.routesForInvoice.addAll(informationStack.getRoutesForInvoice());
+        this.updatedRoutesForInvoice.clear();
+        this.updatedRoutesForInvoice.addAll(informationStack.getUpdatedRoutesForInvoice());
     }
 
     public List<String> getPointsHistory() {
         return pointsHistory;
     }
 
-    public List<String> getRoutesHistory() {
-        return routesHistory;
+    public List<String> getUpdatedRoutesHistory() {
+        return updatedRoutesHistory;
     }
 
     public int getDeep() {
@@ -55,15 +55,15 @@ public class InformationStack {
         return pointsForInvoice;
     }
 
-    public List<Route> getRoutesForInvoice() {
-        return routesForInvoice;
+    public List<UpdatedRoute> getUpdatedRoutesForInvoice() {
+        return updatedRoutesForInvoice;
     }
 
     @Override
     public String toString() {
         return "InformationStack{" +
                 "pointsHistory=" + pointsHistory +
-                ", routesHistory=" + routesHistory +
+                ", updatedRoutesHistory=" + updatedRoutesHistory +
                 ", deep=" + deep +
                 '}';
     }
@@ -72,15 +72,15 @@ public class InformationStack {
         pointsHistory.add(point.getPointId());
     }
 
-    public void appendRoutesHistory(Route route) {
-        routesHistory.add(route.getPointsAsString());
+    public void appendUpdatedRoutesHistory(UpdatedRoute updatedRoute) {
+        updatedRoutesHistory.add(updatedRoute.getPointsAsString());
     }
 
     public void addPoint(Point point){
         pointsForInvoice.add(point);
     }
 
-    public void addRoute(Route route){
-        routesForInvoice.add(route);
+    public void addUpdatedRoute(UpdatedRoute updatedRoute){
+        updatedRoutesForInvoice.add(updatedRoute);
     }
 }
