@@ -24,17 +24,17 @@ $(document).ready(function () {
        ScrollXInner: "100%",
         scrollY:        "500px",
        // scrollX:        true,
-     //  autoWidth: false,
-    //   scrollCollapse: true,
+       autoWidth: false,
+       scrollCollapse: true,
       //  jQueryUI: true,
      //   paging:         true,
       //  paginate: false,
 
-        fixedColumns: true,
-      //  fixedHeader: {
-        //   header: true,
+        fixedColumns: false,
+       // fixedHeader: {
+        //  header: true,
          //   footer: false
-       // },
+      //  },
 
 
         stateSave: true,
@@ -141,6 +141,11 @@ $(document).ready(function () {
                     });
                     dataTable.columns().draw();
                 }
+            },
+
+            {
+                extend: 'pdfHtml5',
+                download: 'open'
             }
         ],
         ajax: {
