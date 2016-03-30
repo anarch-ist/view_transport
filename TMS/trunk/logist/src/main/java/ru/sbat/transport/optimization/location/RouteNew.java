@@ -2,6 +2,7 @@ package ru.sbat.transport.optimization.location;
 
 
 import ru.sbat.transport.optimization.TrackCourse;
+import ru.sbat.transport.optimization.utils.LoadCost;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
@@ -54,9 +55,9 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     @Override
     public String getPointsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(this.get(0).getStartTrackCourse().getDeparturePoint().getPointId()).append(" ");
-        for (TrackCourse trackCourse: this) {
-            stringBuilder.append(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId()).append(" ");
+        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
+        for (RoutePoint routePoint: routePoints) {
+            stringBuilder.append(routePoint.getDeparturePoint().getPointId()).append(" ");
         }
         return stringBuilder.toString();
     }
@@ -217,11 +218,6 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         return this.get(0).getStartTrackCourse().getCharacteristicsOfCar().getOccupancyCost();
     }
 
-    @Override
-    public List<TrackCourse> splitRouteIntoTrackCourse() {
-        return this;
-    }
-
     public List<RoutePoint> splitRouteNewIntoRoutePoints(){
         List<RoutePoint> result = new ArrayList<>();
         result.add(this.get(0).getStartTrackCourse());
@@ -292,6 +288,20 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         result.add(this.get(0).getStartTrackCourse());
         for(TrackCourse trackCourse: this){
             result.add(trackCourse.getEndTrackCourse());
+        }
+        return result;
+    }
+
+    public List<TrackCourse> splitRouteIntoTrackCourse(IRoute route) {
+        List<TrackCourse> result = new ArrayList<>();
+        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
+        for(int i = 0; i < (routePoints.size() - 1); i++) {
+            TrackCourse trackCourse = new TrackCourse();
+            trackCourse.setStartTrackCourse(routePoints.get(i));
+            trackCourse.setEndTrackCourse(routePoints.get(i + 1));
+            trackCourse.setRoute(route);
+            trackCourse.setLoadCost(new LoadCost(this.getStartingOccupancyCost()));
+            result.add(trackCourse);
         }
         return result;
     }

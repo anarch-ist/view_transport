@@ -179,6 +179,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return this.get(0).getCharacteristicsOfCar().getOccupancyCost();
     }
 
+
     @Override
     public String getPointsAsString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -188,7 +189,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return stringBuilder.toString();
     }
 
-    public List<TrackCourse> splitRouteIntoTrackCourse() {
+    public List<TrackCourse> splitRouteIntoTrackCourse(IRoute route) {
         List<TrackCourse> result = new ArrayList<>();
         for(int i = 0; i < (this.size() - 1); i++) {
             TrackCourse trackCourse = new TrackCourse();

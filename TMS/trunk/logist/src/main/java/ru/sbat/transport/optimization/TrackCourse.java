@@ -47,7 +47,7 @@ public class TrackCourse {
         return route;
     }
 
-    public void setRoute(Route route) {
+    public void setRoute(IRoute route) {
         this.route = route;
     }
 
@@ -79,7 +79,7 @@ public class TrackCourse {
         List<TrackCourse> result = new ArrayList<>();
         for(int i = 0; i < points.size() - 1; i++){
         for(IRoute route: routes){
-            List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse();
+            List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse(route);
             for(TrackCourse trackCourse: trackCoursesForRoute){
                     if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getDeparturePoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId())){
                             result.add(trackCourse);
@@ -128,7 +128,7 @@ public class TrackCourse {
     public int hashCode() {
         int result = startTrackCourse.hashCode();
         result = 31 * result + endTrackCourse.hashCode();
-        result = 31 * result + route.hashCode();
+        result = 31 * result + 1;
         return result;
     }
 }

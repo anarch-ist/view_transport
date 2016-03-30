@@ -23,13 +23,20 @@ public class TestOptimizer {
     static TradeRepresentativePoint q = new TradeRepresentativePoint("Q");
     static TradeRepresentativePoint f = new TradeRepresentativePoint("F");
     static TradeRepresentativePoint w = new TradeRepresentativePoint("W");
-    static IRoute route1 = new Route();
-    static IRoute route2 = new Route();
-    static IRoute route3 = new Route();
-    static IRoute route4 = new Route();
-    static IRoute route5 = new Route();
-    static IRoute route6 = new Route();
-    static IRoute route7 = new Route();
+    static IRoute route1 = new RouteNew();
+    static IRoute route2 = new RouteNew();
+    static IRoute route3 = new RouteNew();
+    static IRoute route4 = new RouteNew();
+    static IRoute route5 = new RouteNew();
+    static IRoute route6 = new RouteNew();
+    static IRoute route7 = new RouteNew();
+//    static IRoute route1 = new Route();
+//    static IRoute route2 = new Route();
+//    static IRoute route3 = new Route();
+//    static IRoute route4 = new Route();
+//    static IRoute route5 = new Route();
+//    static IRoute route6 = new Route();
+//    static IRoute route7 = new Route();
 
     // создание планового расписания
     @BeforeClass

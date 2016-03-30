@@ -12,7 +12,7 @@ import java.util.List;
 
 public class TestTrackCourse {
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static IRoute route = new Route();
+    static IRoute route = new RouteNew();
     static WarehousePoint c = new WarehousePoint("C");
     static TradeRepresentativePoint x = new TradeRepresentativePoint("X");
     static TradeRepresentativePoint a = new TradeRepresentativePoint("A");

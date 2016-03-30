@@ -84,14 +84,18 @@ public class Optimizer implements IOptimizer {
         informationStack.setDeep(1);
         informationStack.appendPointsHistory(departurePoint);
         informationStack.addPoint(departurePoint);
+        informationStack.addMarkedPoint(departurePoint);
+        informationStack.appendMarkedPointsHistory(departurePoint);
         rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPoint, informationStack);
         for(DeliveryRoute deliveryRoute: result){
             for (TrackCourse trackCourse: deliveryRoute){
                 if(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryPoint.getPointId())){
 //                    System.out.println(deliveryRoute.size());
                     DeliveryRoute tmp = removeDuplicates(deliveryRoute);
-                    possibleDeliveryRoutes.add(tmp);
-                    break;
+                    if(isCorrectDeliveryRoute(tmp, departurePoint, deliveryPoint)){
+                        possibleDeliveryRoutes.add(tmp);
+                        break;
+                    }
                 }
             }
         }
@@ -114,6 +118,19 @@ public class Optimizer implements IOptimizer {
             }
         }
         return result;
+    }
+
+    private boolean isCorrectDeliveryRoute(DeliveryRoute deliveryRoute, Point departurePoint, Point deliveryPoint){
+        if(!deliveryRoute.get(0).getStartTrackCourse().getDeparturePoint().getPointId().equals(departurePoint.getPointId())
+                || !deliveryRoute.get(deliveryRoute.size() - 1).getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryPoint.getPointId())){
+            return false;
+        }
+        for(int i = 0; i < deliveryRoute.size() - 1; i++){
+            if(!deliveryRoute.get(i).getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryRoute.get(i + 1).getStartTrackCourse().getDeparturePoint().getPointId())){
+                return false;
+            }
+        }
+        return true;
     }
 
     private void rec(final PlannedSchedule plannedSchedule, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints, Map<IRoute, List<Integer>> filteredRoutesByPoint, InformationStack informationStack) {
@@ -148,10 +165,14 @@ public class Optimizer implements IOptimizer {
                         for (Point point1: markedPoints) {
                             System.out.print(point1.getPointId() + " ");
                         }
+                        System.out.print("NewmarkedPoints = ");
+//                        for (Point point1: informationStack.getMarkedPoints()) {
+//                            System.out.print(point1.getPointId() + " ");
+//                        }
                         System.out.println("");
                         System.out.println("_______________________");
 
-                        if(!markedPoints.contains(point)) {
+                        if(!informationStack.getMarkedPoints().contains(point)) {
 
                             if(point.equals(deliveryPoint)){
                                 DeliveryRoute deliveryRoute = new DeliveryRoute();
@@ -181,6 +202,8 @@ public class Optimizer implements IOptimizer {
                             newInformationStack.addPoint(point);
                             newInformationStack.addRoute(route);
                             newInformationStack.setDeep(informationStack.getDeep() + 1);
+                            newInformationStack.addMarkedPoint(point);
+                            newInformationStack.appendMarkedPointsHistory(point);
                             Map<IRoute, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);
                             count++;
                             rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, newInformationStack);
@@ -236,7 +259,7 @@ public class Optimizer implements IOptimizer {
         for (IRoute route : result.keySet()) {
             routes+=route.getPointsAsString()+" ";
         }
-//        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
+        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
         return result;
     }
 

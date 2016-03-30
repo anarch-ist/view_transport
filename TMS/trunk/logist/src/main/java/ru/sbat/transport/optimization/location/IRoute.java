@@ -32,6 +32,6 @@ public interface IRoute {
     Integer getIndexOfRoutePoint(RoutePoint routePoint);
     Collection<RoutePoint> asRoutePointCollection();
 
-    List<TrackCourse> splitRouteIntoTrackCourse();
+    List<TrackCourse> splitRouteIntoTrackCourse(IRoute route);
 
 }
