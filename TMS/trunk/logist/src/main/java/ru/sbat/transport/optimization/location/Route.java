@@ -4,10 +4,7 @@ package ru.sbat.transport.optimization.location;
 import ru.sbat.transport.optimization.utils.LoadCost;
 import ru.sbat.transport.optimization.TrackCourse;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Route extends LinkedList<RoutePoint> implements IRoute {
 
@@ -204,6 +201,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
         return result;
     }
 
+    @Override
     public boolean isCorrectRoutePoint(RoutePoint routePoint) {
         boolean result = true;
         if(this.size() >= 1) {
@@ -215,11 +213,28 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
     @Override
-    public boolean add(RoutePoint routePoint) {
-        if (isCorrectRoutePoint(routePoint))
-            return super.add(routePoint);
-        else
-            return false;
+    public boolean addRoutePoint(RoutePoint routePoint) {
+        return isCorrectRoutePoint(routePoint) && super.add(routePoint);
+    }
+
+    @Override
+    public RoutePoint getRoutePoint(Integer routePointNumber) {
+        return get(routePointNumber);
+    }
+
+    @Override
+    public Integer getRouteSize() {
+        return this.size();
+    }
+
+    @Override
+    public Integer getIndexOfRoutePoint(RoutePoint routePoint) {
+        return this.indexOf(routePoint);
+    }
+
+    @Override
+    public Collection<RoutePoint> asRoutePointCollection() {
+        return this;
     }
 
     @Override

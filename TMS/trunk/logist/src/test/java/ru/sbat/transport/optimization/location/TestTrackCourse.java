@@ -12,14 +12,14 @@ import java.util.List;
 
 public class TestTrackCourse {
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static Route route = new Route();
+    static IRoute route = new Route();
     static WarehousePoint c = new WarehousePoint("C");
     static TradeRepresentativePoint x = new TradeRepresentativePoint("X");
     static TradeRepresentativePoint a = new TradeRepresentativePoint("A");
 
     @BeforeClass
     public static void createPlannedSchedule() {
-        initRoute(
+        Util.initRoute(
                 route,
                 createRoutePoint(c, 5, 930, 600,   120, 120, getCharacteristicsOfCar(10)),
                 createRoutePoint(x, 6, 150, 960,    60,  50, getCharacteristicsOfCar(10)),
@@ -45,10 +45,6 @@ public class TestTrackCourse {
 
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
-
-    private static void initRoute(Route route, RoutePoint... routePoints) {
-        Collections.addAll(route, routePoints);
-    }
 
     private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint, CharacteristicsOfCar characteristicsOfCar) {
         RoutePoint result = new RoutePoint();

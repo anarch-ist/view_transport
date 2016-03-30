@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization;
 
 
+import ru.sbat.transport.optimization.location.IRoute;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RoutePoint;
@@ -13,7 +14,7 @@ public class TrackCourse {
     private LoadCost loadCost;
     private RoutePoint startTrackCourse;
     private RoutePoint endTrackCourse;
-    private Route route;
+    private IRoute route;
     private int travelTime;
     private double distanceBetweenRoutePoints;
     private List<LoadUnit> loadUnits = new ArrayList<>();
@@ -42,7 +43,7 @@ public class TrackCourse {
         this.endTrackCourse = endTrackCourse;
     }
 
-    public Route getRoute() {
+    public IRoute getRoute() {
         return route;
     }
 
@@ -51,7 +52,7 @@ public class TrackCourse {
     }
 
     public int getTravelTime() {
-        return travelTime;
+        return this.getStartTrackCourse().getTimeToNextPoint();
     }
 
     public void setTravelTime(int travelTime) {
@@ -67,17 +68,17 @@ public class TrackCourse {
     }
 
     public double getDistanceBetweenRoutePoints() {
-        return distanceBetweenRoutePoints;
+        return this.getStartTrackCourse().getDistanceToNextPoint();
     }
 
     public void setDistanceBetweenRoutePoints(double distanceBetweenRoutePoints) {
         this.distanceBetweenRoutePoints = distanceBetweenRoutePoints;
     }
 
-    public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<Route> routes) {
+    public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<IRoute> routes) {
         List<TrackCourse> result = new ArrayList<>();
         for(int i = 0; i < points.size() - 1; i++){
-        for(Route route: routes){
+        for(IRoute route: routes){
             List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse();
             for(TrackCourse trackCourse: trackCoursesForRoute){
                     if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getDeparturePoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId())){

@@ -1,6 +1,7 @@
 package ru.sbat.transport.optimization.utils;
 
 
+import ru.sbat.transport.optimization.location.IRoute;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 
@@ -12,7 +13,7 @@ public class InformationStack {
     private List<String> pointsHistory = new ArrayList<>();
     private List<String> routesHistory = new ArrayList<>();
     private List<Point> pointsForInvoice = new ArrayList<>();
-    private List<Route> routesForInvoice = new ArrayList<>();
+    private List<IRoute> routesForInvoice = new ArrayList<>();
     private int deep = 0;
 
     public InformationStack() {
@@ -55,7 +56,7 @@ public class InformationStack {
         return pointsForInvoice;
     }
 
-    public List<Route> getRoutesForInvoice() {
+    public List<IRoute> getRoutesForInvoice() {
         return routesForInvoice;
     }
 
@@ -72,7 +73,7 @@ public class InformationStack {
         pointsHistory.add(point.getPointId());
     }
 
-    public void appendRoutesHistory(Route route) {
+    public void appendRoutesHistory(IRoute route) {
         routesHistory.add(route.getPointsAsString());
     }
 
@@ -80,7 +81,7 @@ public class InformationStack {
         pointsForInvoice.add(point);
     }
 
-    public void addRoute(Route route){
+    public void addRoute(IRoute route){
         routesForInvoice.add(route);
     }
 }

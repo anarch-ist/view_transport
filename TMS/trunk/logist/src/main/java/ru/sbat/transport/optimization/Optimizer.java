@@ -1,9 +1,6 @@
 package ru.sbat.transport.optimization;
 
-import ru.sbat.transport.optimization.location.DeliveryRoute;
-import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.location.Route;
-import ru.sbat.transport.optimization.location.RoutePoint;
+import ru.sbat.transport.optimization.location.*;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
@@ -54,23 +51,23 @@ public class Optimizer implements IOptimizer {
         List<DeliveryRoute> result = new ArrayList<>();
 
         // find all routes with departure point not last
-        Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
+        Map<IRoute, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
 
 // A B C D B K
 
-        for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
+        for (Map.Entry<IRoute, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
             DeliveryRoute deliveryRoute = new DeliveryRoute();
-            Route route = entry.getKey();
+            IRoute route = entry.getKey();
             List<Integer> indexesOfPoint = entry.getValue();
 
             if (indexesOfPoint.size() == 1) {
-                for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
-                    if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
+                for (int i = indexesOfPoint.get(0) + 1; i < route.getRouteSize(); i++) {
+                    if(route.getRoutePoint(i).getDeparturePoint().equals(deliveryPoint)){
 //                        deliveryRoute.add(route);
                         result.add(deliveryRoute);
                         break;
                     }
-                    filterRoutesByPoint(plannedSchedule, route.get(indexesOfPoint.get(0) + 1).getDeparturePoint(), true);
+                    filterRoutesByPoint(plannedSchedule, route.getRoutePoint(indexesOfPoint.get(0) + 1).getDeparturePoint(), true);
                 }
             } else if (indexesOfPoint.size() > 1) {
                 throw new NotImplementedException();
@@ -82,7 +79,7 @@ public class Optimizer implements IOptimizer {
 
     protected List<DeliveryRoute> startRecursive(final PlannedSchedule plannedSchedule, final Point departurePoint, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints) {
         List<DeliveryRoute> possibleDeliveryRoutes = new ArrayList<>();
-        Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, false);
+        Map<IRoute, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, false);
         InformationStack informationStack = new InformationStack();
         informationStack.setDeep(1);
         informationStack.appendPointsHistory(departurePoint);
@@ -119,29 +116,29 @@ public class Optimizer implements IOptimizer {
         return result;
     }
 
-    private void rec(final PlannedSchedule plannedSchedule, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints, Map<Route, List<Integer>> filteredRoutesByPoint, InformationStack informationStack) {
-        for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
-            Route route = entry.getKey();
+    private void rec(final PlannedSchedule plannedSchedule, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints, Map<IRoute, List<Integer>> filteredRoutesByPoint, InformationStack informationStack) {
+        for (Map.Entry<IRoute, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
+            IRoute route = entry.getKey();
             List<Integer> indexesOfPoint = entry.getValue();
             // if departure point occurs once
             if (indexesOfPoint.size() == 1) {
 
                 Integer indexOfPointInRoute = indexesOfPoint.get(0);
-                Point pointInRoute = route.get(indexOfPointInRoute).getDeparturePoint();
+                Point pointInRoute = route.getRoutePoint(indexOfPointInRoute).getDeparturePoint();
                 if(!pointInRoute.equals(deliveryPoint)) {
                     markedPoints.add(pointInRoute);
                 }
                 // last point of route
-                if ((indexOfPointInRoute + 1) == route.size()) {
+                if ((indexOfPointInRoute + 1) == route.getRouteSize()) {
 
 //                    Point newDeparturePoint = route.get(indexOfPointInRoute).getDeparturePoint();
 //                    Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, newDeparturePoint, false);
 //                    rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, informationStack);
                 // if middle point of route
                 } else {
-                    for (int i = indexOfPointInRoute + 1; i < route.size(); i++) {
+                    for (int i = indexOfPointInRoute + 1; i < route.getRouteSize(); i++) {
 
-                        Point point = route.get(i).getDeparturePoint();
+                        Point point = route.getRoutePoint(i).getDeparturePoint();
 
                         System.out.println("infStack = " + informationStack);
                         System.out.println("currentRoute = "+route.getPointsAsString());
@@ -165,7 +162,7 @@ public class Optimizer implements IOptimizer {
                                     System.out.print(point1.getPointId() + " ");
                                 }
                                 System.out.println(pointsId.size());
-                                List<Route> routesId = new LinkedList<>();
+                                List<IRoute> routesId = new LinkedList<>();
                                 routesId.addAll(informationStack.getRoutesForInvoice());
                                 routesId.add(route);
                                 TrackCourse trackCourse = new TrackCourse();
@@ -184,7 +181,7 @@ public class Optimizer implements IOptimizer {
                             newInformationStack.addPoint(point);
                             newInformationStack.addRoute(route);
                             newInformationStack.setDeep(informationStack.getDeep() + 1);
-                            Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);
+                            Map<IRoute, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);
                             count++;
                             rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, newInformationStack);
                         }
@@ -209,22 +206,23 @@ public class Optimizer implements IOptimizer {
      * @param considerLastPoint
      * @return
      */
-    protected Map<Route, List<Integer>> filterRoutesByPoint(PlannedSchedule plannedSchedule, Point point, boolean considerLastPoint) {
-        Map<Route, List<Integer>> result = new HashMap<>();
-        for(Route route: plannedSchedule){
+    protected Map<IRoute, List<Integer>> filterRoutesByPoint(PlannedSchedule plannedSchedule, Point point, boolean considerLastPoint) {
+        Map<IRoute, List<Integer>> result = new HashMap<>();
+        for(IRoute route: plannedSchedule){
             List<Integer> indexes = new ArrayList<>();
             boolean wasFound = false;
             if (considerLastPoint) {
-                for(RoutePoint routePoint: route) {
+
+                for(RoutePoint routePoint: route.asRoutePointCollection()) {
                     if(route.containsPoint(point) && routePoint.getDeparturePoint().equals(point)){
-                        indexes.add(route.indexOf(routePoint));
+                        indexes.add(route.getIndexOfRoutePoint(routePoint));
                         wasFound = true;
                     }
                 }
             } else {
-                for(RoutePoint routePoint: route) {
+                for(RoutePoint routePoint: route.asRoutePointCollection()) {
                     if(!route.isLastPoint(point) && route.containsPoint(point) && routePoint.getDeparturePoint().equals(point)){
-                        indexes.add(route.indexOf(routePoint));
+                        indexes.add(route.getIndexOfRoutePoint(routePoint));
                         wasFound = true;
                     }
                 }
@@ -235,7 +233,7 @@ public class Optimizer implements IOptimizer {
             }
         }
         String routes = "";
-        for (Route route : result.keySet()) {
+        for (IRoute route : result.keySet()) {
             routes+=route.getPointsAsString()+" ";
         }
 //        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);

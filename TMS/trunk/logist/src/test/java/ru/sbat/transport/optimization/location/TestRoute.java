@@ -8,50 +8,26 @@ import java.util.Collections;
 public class TestRoute {
 
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static Route route = new Route();
+    static IRoute route = new RouteNew();
     static WarehousePoint warehousePoint1 = new WarehousePoint("g");
     static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint("gt");
     static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint("d");
 
     @BeforeClass
     public static void createPlannedSchedule() {
-        initRoute(
+        Util.initRoute(
                 route,
                 // данные о машине(грузоподъемность в т., объем, стоимость), пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта, время ПРР, расстояние до следующего пункта
-                createRoutePoint(createCharacteristicsOfCar(10), warehousePoint1,           2, 930, 600,   0, 120),
-                createRoutePoint(createCharacteristicsOfCar(15), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
-                createRoutePoint(createCharacteristicsOfCar(20), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
+                Util.createRoutePoint(Util.createCharacteristicsOfCar(10), warehousePoint1,           2, 930, 600,   0, 120),
+                Util.createRoutePoint(Util.createCharacteristicsOfCar(15), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
+                Util.createRoutePoint(Util.createCharacteristicsOfCar(20), tradeRepresentativePoint2, 3,   0,   0, 120,   0)
         );
         plannedSchedule.add(route);
     }
 
-    //----------СЛУЖЕБНЫЕ МЕТОДЫ--------------
-    public static void initRoute(Route route, RoutePoint... routePoints) {
-        Collections.addAll(route, routePoints);
-    }
-
-    public static RoutePoint createRoutePoint(CharacteristicsOfCar characteristicsOfCar, Point departurePoint, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint) {
-        RoutePoint result = new RoutePoint();
-        result.setCharacteristicsOfCar(characteristicsOfCar);
-        result.setDepartureTime(departureTime);
-        result.setDayOfWeek(dayOfWeek);
-        result.setTimeToNextPoint(timeToNextPoint);
-        result.setDistanceToNextPoint(distanceToNextPoint);
-        result.setDeparturePoint(departurePoint);
-        result.setLoadingOperationsTime(loadingOperationsTime);
-        return result;
-    }
-
-    public static CharacteristicsOfCar createCharacteristicsOfCar(double occupancyCost) {
-        CharacteristicsOfCar result = new CharacteristicsOfCar();
-        result.setOccupancyCost(occupancyCost);
-        return result;
-    }
-    //-------------END СЛУЖЕБНЫЕ МЕТОДЫ-------------
-
     @Test
     public void testGetFullDistance() throws Exception {
-        Assert.assertEquals(470, plannedSchedule.get(0).getFullDistance(), 0);
+        Assert.assertEquals(170, plannedSchedule.get(0).getFullDistance(), 0);
     }
 
     @Test
@@ -81,17 +57,17 @@ public class TestRoute {
 
     @Test
     public void testGetWeekDayOfActualDeliveryTime() {
-        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryDateInRoutePoint(route.get(1)));
+        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryDateInRoutePoint(route.getRoutePoint(1)));
     }
 
     @Test
     public void testGetActualDeliveryTime() {
-        Assert.assertEquals(3, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(1)).getHours());
-        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(1)).getMinutes());
-        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(2)).getHours());
-        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(2)).getMinutes());
-        Assert.assertEquals(15, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(0)).getHours());
-        Assert.assertEquals(30, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.get(0)).getMinutes());
+        Assert.assertEquals(3, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(1)).getHours());
+        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(1)).getMinutes());
+        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(2)).getHours());
+        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(2)).getMinutes());
+        Assert.assertEquals(15, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(0)).getHours());
+        Assert.assertEquals(30, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(0)).getMinutes());
     }
 
     @Test
@@ -112,6 +88,6 @@ public class TestRoute {
 
     @Test
     public void testGetStartingCost() {
-        Assert.assertEquals(13054.5, plannedSchedule.get(0).getStartingOccupancyCost(), 0);
+        Assert.assertEquals(10.0, plannedSchedule.get(0).getStartingOccupancyCost(), 0);
     }
 }
