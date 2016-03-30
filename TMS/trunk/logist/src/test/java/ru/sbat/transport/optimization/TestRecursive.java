@@ -5,7 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.sbat.transport.optimization.location.*;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utilsForTests.RoutesFactory;
+import ru.sbat.transport.optimization.utils.RoutesFactory;
 
 import java.util.*;
 

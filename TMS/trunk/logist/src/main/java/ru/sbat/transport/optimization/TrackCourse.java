@@ -4,23 +4,26 @@ package ru.sbat.transport.optimization;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RoutePoint;
+import ru.sbat.transport.optimization.utils.LoadCost;
 
 import java.util.*;
 
 
 public class TrackCourse {
-    private LoadCostOfTrackCourse loadCostOfTrackCourse;
+    private LoadCost loadCost;
     private RoutePoint startTrackCourse;
     private RoutePoint endTrackCourse;
     private Route route;
-    private Date departureDate;
+    private int travelTime;
+    private double distanceBetweenRoutePoints;
+    private List<LoadUnit> loadUnits = new ArrayList<>();
 
-    public LoadCostOfTrackCourse getLoadCostOfTrackCourse() {
-        return loadCostOfTrackCourse;
+    public LoadCost getLoadCost() {
+        return loadCost;
     }
 
-    public void setLoadCostOfTrackCourse(LoadCostOfTrackCourse loadCostOfTrackCourse) {
-        this.loadCostOfTrackCourse = loadCostOfTrackCourse;
+    public void setLoadCost(LoadCost loadCost) {
+        this.loadCost = loadCost;
     }
 
     public RoutePoint getStartTrackCourse() {
@@ -47,12 +50,28 @@ public class TrackCourse {
         this.route = route;
     }
 
-    public Date getDepartureDate() {
-        return departureDate;
+    public int getTravelTime() {
+        return travelTime;
     }
 
-    public void setDepartureDate(Date departureDate) {
-        this.departureDate = departureDate;
+    public void setTravelTime(int travelTime) {
+        this.travelTime = travelTime;
+    }
+
+    public List<LoadUnit> getLoadUnits() {
+        return loadUnits;
+    }
+
+    public void setLoadUnits(List<LoadUnit> loadUnits) {
+        this.loadUnits = loadUnits;
+    }
+
+    public double getDistanceBetweenRoutePoints() {
+        return distanceBetweenRoutePoints;
+    }
+
+    public void setDistanceBetweenRoutePoints(double distanceBetweenRoutePoints) {
+        this.distanceBetweenRoutePoints = distanceBetweenRoutePoints;
     }
 
     public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<Route> routes) {
@@ -81,11 +100,13 @@ public class TrackCourse {
     @Override
     public String toString() {
         return "TrackCourse{" +
-                "loadCost=" + loadCostOfTrackCourse +
+                "loadCost=" + loadCost +
                 ", startTrackCourse=" + startTrackCourse +
                 ", endTrackCourse=" + endTrackCourse +
                 ", route=" + route +
-                ", departureDate=" + departureDate +
+                ", travelTime=" + travelTime +
+                ", loadUnits=" + loadUnits +
+                ", distanceBetweenRoutePoints" + distanceBetweenRoutePoints +
                 '}';
     }
 

@@ -130,62 +130,62 @@ public class TestOptimizer {
 //        }
     }
 
-    @Test
-    public void testGetArrivalDateFromEachRoutePointInRoute(){
-        Optimizer optimizer = new Optimizer();
-        Map<RoutePoint, ArrayList<Date>> result = optimizer.getArrivalDateInEachRoutePointInRoute(route1, invoiceContainer.get(0));
-        for(RoutePoint routePoint: route1) {
-            System.out.println(result.get(routePoint) + " дата возможного прибытия в пункт " + routePoint);
-        }
-        System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
-        System.out.println(invoiceContainer.get(0).getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
-    }
-
-    @Test
-    public void testGetDepartureDateFromEachRoutePointInRoute(){
-        Optimizer optimizer = new Optimizer();
-        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(0), invoiceContainer.get(0));
-        for(Date date: result1) {
-            System.out.println(date + " дата возможного отъезда из 1");
-        }
-        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(1), invoiceContainer.get(0));
-        for(Date date: result2) {
-            System.out.println(date + " дата возможного отъезда из 2");
-        }
-        System.out.println("");
-        System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
-        System.out.println(invoiceContainer.get(0).getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
-    }
-
-    @Test
-    public void testGetDepartureDateFromEachRoutePointInRoute2(){
-        Optimizer optimizer = new Optimizer();
-        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(0), invoiceContainer.get(0));
-        for(Date date: result1) {
-            System.out.println(date + " дата возможного отъезда из 1");
-        }
-        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(1), invoiceContainer.get(0));
-        for(Date date: result2) {
-            System.out.println(date + " дата возможного отъезда из 2");
-        }
-        ArrayList<Date> result3 = optimizer.getArrivalDateInEachRoutePointInRoute(route2, invoiceContainer.get(0)).get(route2.get(route2.size() - 1));
-        for(Date date: result3) {
-            System.out.println(date + " дата возможного отъезда из 3");
-        }
-        System.out.println("");
-        System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
-        System.out.println(invoiceContainer.get(0).getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
-    }
-
-    @Test
-    public void testGetDepartureArrivalDatesBetweenTwoRoutePoints(){
-        Optimizer optimizer = new Optimizer();
-        ArrayList<PairDate> pairDates = optimizer.getDepartureArrivalDatesBetweenTwoRoutePoints(route1, route1, invoiceContainer.get(0), route1.get(route1.size() - 2), route1.get(route1.size() - 1));
-        Assert.assertEquals(3, pairDates.size());
-        for(PairDate pairDate: pairDates){
-            System.out.println("Отправление из пункта: " + pairDate.getDepartureDate() + " и прибытие в нужный: " + pairDate.getArrivalDate());
-        }
-    }
+//    @Test
+//    public void testGetArrivalDateFromEachRoutePointInRoute(){
+//        Optimizer optimizer = new Optimizer();
+//        Map<RoutePoint, ArrayList<Date>> result = optimizer.getArrivalDateInEachRoutePointInRoute(route1, invoiceContainer.get(0));
+//        for(RoutePoint routePoint: route1) {
+//            System.out.println(result.get(routePoint) + " дата возможного прибытия в пункт " + routePoint);
+//        }
+//        System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
+//        System.out.println(invoiceContainer.get(0).getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
+//    }
+//
+//    @Test
+//    public void testGetDepartureDateFromEachRoutePointInRoute(){
+//        Optimizer optimizer = new Optimizer();
+//        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(0), invoiceContainer.get(0));
+//        for(Date date: result1) {
+//            System.out.println(date + " дата возможного отъезда из 1");
+//        }
+//        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route1, route1.get(1), invoiceContainer.get(0));
+//        for(Date date: result2) {
+//            System.out.println(date + " дата возможного отъезда из 2");
+//        }
+//        System.out.println("");
+//        System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
+//        System.out.println(invoiceContainer.get(0).getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
+//    }
+//
+//    @Test
+//    public void testGetDepartureDateFromEachRoutePointInRoute2(){
+//        Optimizer optimizer = new Optimizer();
+//        ArrayList<Date> result1 = optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(0), invoiceContainer.get(0));
+//        for(Date date: result1) {
+//            System.out.println(date + " дата возможного отъезда из 1");
+//        }
+//        ArrayList<Date> result2 = optimizer.getPossibleDepartureDateFromRoutePoint(route2, route2.get(1), invoiceContainer.get(0));
+//        for(Date date: result2) {
+//            System.out.println(date + " дата возможного отъезда из 2");
+//        }
+//        ArrayList<Date> result3 = optimizer.getArrivalDateInEachRoutePointInRoute(route2, invoiceContainer.get(0)).get(route2.get(route2.size() - 1));
+//        for(Date date: result3) {
+//            System.out.println(date + " дата возможного отъезда из 3");
+//        }
+//        System.out.println("");
+//        System.out.println(invoiceContainer.get(0).getCreationDate() + " дата создания накладной");
+//        System.out.println(invoiceContainer.get(0).getRequest().getPlannedDeliveryDate() + " планируемая дата доставки в заявке");
+//    }
+//
+//    @Test
+//    public void testGetDepartureArrivalDatesBetweenTwoRoutePoints(){
+//        Optimizer optimizer = new Optimizer();
+//        ArrayList<PairDate> pairDates = optimizer.getDepartureArrivalDatesBetweenTwoRoutePoints(route1, route1, invoiceContainer.get(0), route1.get(route1.size() - 2), route1.get(route1.size() - 1));
+//        Assert.assertEquals(3, pairDates.size());
+//        for(PairDate pairDate: pairDates){
+//            System.out.println("Отправление из пункта: " + pairDate.getDepartureDate() + " и прибытие в нужный: " + pairDate.getArrivalDate());
+//        }
+//    }
 
     // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
 

@@ -7,8 +7,8 @@ import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utilsForTests.InformationStack;
-import ru.sbat.transport.optimization.utilsForTests.InvoiceType;
+import ru.sbat.transport.optimization.utils.InformationStack;
+import ru.sbat.transport.optimization.utils.InvoiceType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
@@ -285,90 +285,90 @@ public class Optimizer implements IOptimizer {
         return result;
     }
 
-    /** selects possible options of departure date from certain route point
-     *
-     * @param route
-     * @param invoice
-     * @return array of possible departure date from route point
-     */
-    @Override
-    public ArrayList<Date> getPossibleDepartureDateFromRoutePoint(Route route, RoutePoint routePoint, Invoice invoice){
-        ArrayList<Date> result = new ArrayList<>();
-        Date invoiceCreationDateAndLoadingTime = new Date(invoice.getCreationDate().getTime() + routePoint.getLoadingOperationsTime());
-        Date plannedDeliveryDate = invoice.getRequest().getPlannedDeliveryDate();
-        int timeOfCreation = invoiceCreationDateAndLoadingTime.getHours()*60 + invoiceCreationDateAndLoadingTime.getMinutes();
-        int[] timeDeparture = route.splitToComponentTime(routePoint.getDepartureTime());
-        invoiceCreationDateAndLoadingTime.setHours(timeDeparture[0]);
-        invoiceCreationDateAndLoadingTime.setMinutes(timeDeparture[1]);
-        Date date = invoiceCreationDateAndLoadingTime;
-        int differenceWeekDays = routePoint.getDayOfWeek() - (invoiceCreationDateAndLoadingTime.getDay()+1);
-        if(differenceWeekDays > 0){
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
-            date.setTime(calendar.getTimeInMillis());
-        }else if(differenceWeekDays == 0 &&(timeOfCreation < routePoint.getDepartureTime())){
-            date = invoiceCreationDateAndLoadingTime;
-        }else {
-            int tmp = 7 - ((invoiceCreationDateAndLoadingTime.getDay()+1) - routePoint.getDayOfWeek());
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            calendar.add(Calendar.DAY_OF_MONTH, tmp);
-            date.setTime(calendar.getTimeInMillis());
-        }
-        while (date.before(plannedDeliveryDate)){
-            if(route.indexOf(routePoint) == (route.size() - 1)){
+//    /** selects possible options of departure date from certain route point
+//     *
+//     * @param route
+//     * @param invoice
+//     * @return array of possible departure date from route point
+//     */
+//    @Override
+//    public ArrayList<Date> getPossibleDepartureDateFromRoutePoint(Route route, RoutePoint routePoint, Invoice invoice){
+//        ArrayList<Date> result = new ArrayList<>();
+//        Date invoiceCreationDateAndLoadingTime = new Date(invoice.getCreationDate().getTime() + routePoint.getLoadingOperationsTime());
+//        Date plannedDeliveryDate = invoice.getRequest().getPlannedDeliveryDate();
+//        int timeOfCreation = invoiceCreationDateAndLoadingTime.getHours()*60 + invoiceCreationDateAndLoadingTime.getMinutes();
+//        int[] timeDeparture = route.splitToComponentTime(routePoint.getDepartureTime());
+//        invoiceCreationDateAndLoadingTime.setHours(timeDeparture[0]);
+//        invoiceCreationDateAndLoadingTime.setMinutes(timeDeparture[1]);
+//        Date date = invoiceCreationDateAndLoadingTime;
+//        int differenceWeekDays = routePoint.getDayOfWeek() - (invoiceCreationDateAndLoadingTime.getDay()+1);
+//        if(differenceWeekDays > 0){
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTime(date);
+//            calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
+//            date.setTime(calendar.getTimeInMillis());
+//        }else if(differenceWeekDays == 0 &&(timeOfCreation < routePoint.getDepartureTime())){
+//            date = invoiceCreationDateAndLoadingTime;
+//        }else {
+//            int tmp = 7 - ((invoiceCreationDateAndLoadingTime.getDay()+1) - routePoint.getDayOfWeek());
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTime(date);
+//            calendar.add(Calendar.DAY_OF_MONTH, tmp);
+//            date.setTime(calendar.getTimeInMillis());
+//        }
+//        while (date.before(plannedDeliveryDate)){
+//            if(route.indexOf(routePoint) == (route.size() - 1)){
+//
+//                result.add(date);
+//            }else {
+//                result.add(date);
+//                Calendar calendar = Calendar.getInstance();
+//                calendar.setTime(date);
+//                calendar.add(Calendar.DAY_OF_MONTH, 7);
+//                date = new Date(calendar.getTimeInMillis());
+//            }
+//        }
+//        return result;
+//    }
 
-                result.add(date);
-            }else {
-                result.add(date);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(date);
-                calendar.add(Calendar.DAY_OF_MONTH, 7);
-                date = new Date(calendar.getTimeInMillis());
-            }
-        }
-        return result;
-    }
-
-    /** determines date when car arrives in each route point
-     *
-     * @param route
-     * @return map of route point and arrival date
-     */
-    public Map<RoutePoint, ArrayList<Date>> getArrivalDateInEachRoutePointInRoute(Route route, Invoice invoice){
-        Map<RoutePoint, ArrayList<Date>> result = new HashMap<>();
-        if(route != null){
-            result.put(route.get(0), getPossibleDepartureDateFromRoutePoint(route, route.get(0), invoice));
-            for(int i = 1; i < route.size(); i++){
-                ArrayList<Date> newDate = new ArrayList<>();
-                ArrayList<Date> dates = getPossibleDepartureDateFromRoutePoint(route, route.get(i - 1), invoice);
-                for(Date date: dates){
-                    long time = date.getTime() + route.get(i - 1).getTimeToNextPoint() * 60000; // + route.get(i).getLoadingOperationsTime() * 60000 ???
-                    Date tmp = new Date(time);
-                    newDate.add(tmp);
-                }
-                result.put(route.get(i), newDate);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public ArrayList<PairDate> getDepartureArrivalDatesBetweenTwoRoutePoints(Route departureRoute, Route arrivalRoute, Invoice invoice, RoutePoint departureRoutePoint, RoutePoint arrivalRoutePoint){
-        ArrayList<PairDate> result = new ArrayList<>();
-        ArrayList<Date> departureDates = getPossibleDepartureDateFromRoutePoint(departureRoute, departureRoutePoint, invoice);
-        ArrayList<Date> arrivalDates = getArrivalDateInEachRoutePointInRoute(arrivalRoute, invoice).get(arrivalRoutePoint);
-        for(int i = 0; i < arrivalDates.size(); i++){
-            if(arrivalDates.get(i).after(invoice.getRequest().getPlannedDeliveryDate())){
-                break;
-            }else {
-                PairDate pairDate = new PairDate(departureDates.get(i), arrivalDates.get(i));
-                result.add(pairDate);
-            }
-        }
-        return result;
-    }
+//    /** determines date when car arrives in each route point
+//     *
+//     * @param route
+//     * @return map of route point and arrival date
+//     */
+//    public Map<RoutePoint, ArrayList<Date>> getArrivalDateInEachRoutePointInRoute(Route route, Invoice invoice){
+//        Map<RoutePoint, ArrayList<Date>> result = new HashMap<>();
+//        if(route != null){
+//            result.put(route.get(0), getPossibleDepartureDateFromRoutePoint(route, route.get(0), invoice));
+//            for(int i = 1; i < route.size(); i++){
+//                ArrayList<Date> newDate = new ArrayList<>();
+//                ArrayList<Date> dates = getPossibleDepartureDateFromRoutePoint(route, route.get(i - 1), invoice);
+//                for(Date date: dates){
+//                    long time = date.getTime() + route.get(i - 1).getTimeToNextPoint() * 60000; // + route.get(i).getLoadingOperationsTime() * 60000 ???
+//                    Date tmp = new Date(time);
+//                    newDate.add(tmp);
+//                }
+//                result.put(route.get(i), newDate);
+//            }
+//        }
+//        return result;
+//    }
+//
+//    @Override
+//    public ArrayList<PairDate> getDepartureArrivalDatesBetweenTwoRoutePoints(Route departureRoute, Route arrivalRoute, Invoice invoice, RoutePoint departureRoutePoint, RoutePoint arrivalRoutePoint){
+//        ArrayList<PairDate> result = new ArrayList<>();
+//        ArrayList<Date> departureDates = getPossibleDepartureDateFromRoutePoint(departureRoute, departureRoutePoint, invoice);
+//        ArrayList<Date> arrivalDates = getArrivalDateInEachRoutePointInRoute(arrivalRoute, invoice).get(arrivalRoutePoint);
+//        for(int i = 0; i < arrivalDates.size(); i++){
+//            if(arrivalDates.get(i).after(invoice.getRequest().getPlannedDeliveryDate())){
+//                break;
+//            }else {
+//                PairDate pairDate = new PairDate(departureDates.get(i), arrivalDates.get(i));
+//                result.add(pairDate);
+//            }
+//        }
+//        return result;
+//    }
 
 
     /** determines day of week by date where SUNDAY is the 1-st day

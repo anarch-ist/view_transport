@@ -1,4 +1,4 @@
-package ru.sbat.transport.optimization.utilsForTests;
+package ru.sbat.transport.optimization.utils;
 
 
 import ru.sbat.transport.optimization.location.Point;

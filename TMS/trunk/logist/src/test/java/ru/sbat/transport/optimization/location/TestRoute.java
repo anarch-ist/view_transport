@@ -18,9 +18,9 @@ public class TestRoute {
         initRoute(
                 route,
                 // данные о машине(грузоподъемность в т., объем, стоимость), пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта, время ПРР, расстояние до следующего пункта
-                createRoutePoint(createCharacteristicsOfCar(10, 15, 13054.5), warehousePoint1,           2, 930, 600,   0, 120),
-                createRoutePoint(createCharacteristicsOfCar(15, 25,   17894), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
-                createRoutePoint(createCharacteristicsOfCar(20, 30,   25040), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
+                createRoutePoint(createCharacteristicsOfCar(10), warehousePoint1,           2, 930, 600,   0, 120),
+                createRoutePoint(createCharacteristicsOfCar(15), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
+                createRoutePoint(createCharacteristicsOfCar(20), tradeRepresentativePoint2, 3,   0,   0, 120, 300)
         );
         plannedSchedule.add(route);
     }
@@ -42,10 +42,8 @@ public class TestRoute {
         return result;
     }
 
-    public static CharacteristicsOfCar createCharacteristicsOfCar(double capacityCar, double volumeCar, double occupancyCost) {
+    public static CharacteristicsOfCar createCharacteristicsOfCar(double occupancyCost) {
         CharacteristicsOfCar result = new CharacteristicsOfCar();
-        result.setCapacityCar(capacityCar);
-        result.setVolumeCar(volumeCar);
         result.setOccupancyCost(occupancyCost);
         return result;
     }

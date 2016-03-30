@@ -1,7 +1,7 @@
 package ru.sbat.transport.optimization.location;
 
 
-import ru.sbat.transport.optimization.LoadCostOfTrackCourse;
+import ru.sbat.transport.optimization.utils.LoadCost;
 import ru.sbat.transport.optimization.TrackCourse;
 
 import java.util.ArrayList;
@@ -178,16 +178,6 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
     }
 
     @Override
-    public double getStartingWeight(){
-        return this.get(0).getCharacteristicsOfCar().getCapacityCar();
-    }
-
-    @Override
-    public double getStartingVolume(){
-        return this.get(0).getCharacteristicsOfCar().getVolumeCar();
-    }
-
-    @Override
     public double getStartingOccupancyCost() {
         return this.get(0).getCharacteristicsOfCar().getOccupancyCost();
     }
@@ -208,7 +198,7 @@ public class Route extends LinkedList<RoutePoint> implements IRoute {
             trackCourse.setStartTrackCourse(this.get(i));
             trackCourse.setEndTrackCourse(this.get(i + 1));
             trackCourse.setRoute(this);
-            trackCourse.setLoadCostOfTrackCourse(new LoadCostOfTrackCourse(this.getStartingOccupancyCost()));
+            trackCourse.setLoadCost(new LoadCost(this.getStartingOccupancyCost()));
             result.add(trackCourse);
         }
         return result;
