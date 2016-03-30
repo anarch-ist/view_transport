@@ -1047,9 +1047,19 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
     DECLARE $routeStartDate TIMESTAMP;
     DECLARE $arrivalDateTime TIMESTAMP;
 
+
     SET $routeStartDate = (SELECT lastStatusUpdated
                            FROM requests_history
-                           WHERE _requestID = requestID AND requestStatusID = 'DEPARTURE');
+                           WHERE _requestID = requestID AND requestStatusID = 'DEPARTURE'
+                            ORDER BY lastStatusUpdated
+                           LIMIT 1
+    );
+    
+    IF ($routeStartDate IS NULL) THEN
+      RETURN NULL;
+    END IF;
+
+
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;

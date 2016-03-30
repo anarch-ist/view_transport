@@ -57,7 +57,7 @@ GRANT SELECT, UPDATE ON transmaster_transport_db.relations_between_route_points 
 GRANT SELECT ON transmaster_transport_db.requests TO 'andy'@'localhost';
 GRANT SELECT ON transmaster_transport_db.route_list_history TO 'andy'@'localhost';
 GRANT SELECT ON transmaster_transport_db.route_list_statuses TO 'andy'@'localhost';
-GRANT SELECT ON transmaster_transport_db.route_lists TO 'andy'@'localhost';
+GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.route_lists TO 'andy'@'localhost';
 GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.route_points TO 'andy'@'localhost';
 GRANT SELECT, UPDATE ON transmaster_transport_db.routes TO 'andy'@'localhost';
 GRANT SELECT ON transmaster_transport_db.tariffs TO 'andy'@'localhost';
