@@ -5,7 +5,7 @@ import javafx.beans.property.*;
 import ru.sbat.transport.optimization.location.DeliveryRoute;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.user.MarketAgent;
-import ru.sbat.transport.optimization.utils.InvoiceType;
+import ru.sbat.transport.optimization.utilsForTests.InvoiceType;
 
 import java.util.*;
 

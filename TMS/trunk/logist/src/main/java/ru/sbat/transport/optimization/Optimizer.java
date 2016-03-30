@@ -2,18 +2,20 @@ package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.DeliveryRoute;
 import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.location.UpdatedRoute;
+import ru.sbat.transport.optimization.location.Route;
+import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-import ru.sbat.transport.optimization.utils.InformationStack;
-import ru.sbat.transport.optimization.utils.InvoiceType;
+import ru.sbat.transport.optimization.utilsForTests.InformationStack;
+import ru.sbat.transport.optimization.utilsForTests.InvoiceType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
 import java.util.*;
 
 public class Optimizer implements IOptimizer {
+    static int count = 0;
     /** Selects for invoice appropriate delivery routes without weight/volume/cost and determines type of invoice B or C
      *
      * @param plannedSchedule
@@ -21,36 +23,66 @@ public class Optimizer implements IOptimizer {
      * @return map with invoice(key) and delivery routes(values)
      * @throws RouteNotFoundException
      */
+
     @Override
     public Map<Invoice, List<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
         Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
+        List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
         Collections.sort(invoiceContainer);
         for (Invoice invoice : invoiceContainer) {
             if (invoice.getDeliveryRoute() != null)
                 throw new IllegalArgumentException("invoice.getDeliveryRoutesForInvoice() should be null");
-            List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
-            Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во, доставка
-            Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада, отправления накладной
-            List<Point> markedPoints = new ArrayList<>();
-            List<DeliveryRoute> deliveryRoutes = new ArrayList<>();
-            possibleDeliveryRouteForInvoice = startRecursive(plannedSchedule, departurePoint, deliveryPoint, deliveryRoutes, markedPoints);
-            result.put(invoice, possibleDeliveryRouteForInvoice);
+                Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
+                Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
+                possibleDeliveryRouteForInvoice = getDeliveryRoutesForInvoice(invoice, plannedSchedule);
+                result.put(invoice, possibleDeliveryRouteForInvoice);
+            }
+        return result;
+    }
+
+    /** creates possible delivery routes of one or more routes without dates and occupancy cost
+     *
+     * @param invoice
+     * @param plannedSchedule
+     * @return array list of delivery routes
+     */
+    public List<DeliveryRoute> getDeliveryRoutesForInvoice(final Invoice invoice, final PlannedSchedule plannedSchedule) throws RouteNotFoundException {
+
+        final Point departurePoint = invoice.getAddressOfWarehouse();
+        final Point deliveryPoint = invoice.getRequest().getDeliveryPoint();
+
+        List<DeliveryRoute> result = new ArrayList<>();
+
+        // find all routes with departure point not last
+        Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, true);
+
+// A B C D B K
+
+        for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
+            DeliveryRoute deliveryRoute = new DeliveryRoute();
+            Route route = entry.getKey();
+            List<Integer> indexesOfPoint = entry.getValue();
+
+            if (indexesOfPoint.size() == 1) {
+                for (int i = indexesOfPoint.get(0) + 1; i < route.size(); i++) {
+                    if(route.get(i).getDeparturePoint().equals(deliveryPoint)){
+//                        deliveryRoute.add(route);
+                        result.add(deliveryRoute);
+                        break;
+                    }
+                    filterRoutesByPoint(plannedSchedule, route.get(indexesOfPoint.get(0) + 1).getDeparturePoint(), true);
+                }
+            } else if (indexesOfPoint.size() > 1) {
+                throw new NotImplementedException();
+            }
+
         }
         return result;
     }
 
-    /** creates possible delivery routes of one or more routes by departure and delivery points without dates and occupancy cost
-     *
-     * @param plannedSchedule
-     * @param departurePoint
-     * @param deliveryPoint
-     * @param result
-     * @param markedPoints
-     * @return list of possible delivery routes
-     */
-    public List<DeliveryRoute> startRecursive(final PlannedSchedule plannedSchedule, final Point departurePoint, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints) {
+    protected List<DeliveryRoute> startRecursive(final PlannedSchedule plannedSchedule, final Point departurePoint, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints) {
         List<DeliveryRoute> possibleDeliveryRoutes = new ArrayList<>();
-        Map<UpdatedRoute, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, false);
+        Map<Route, List<Integer>> filteredRoutesByPoint = filterRoutesByPoint(plannedSchedule, departurePoint, false);
         InformationStack informationStack = new InformationStack();
         informationStack.setDeep(1);
         informationStack.appendPointsHistory(departurePoint);
@@ -58,7 +90,8 @@ public class Optimizer implements IOptimizer {
         rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPoint, informationStack);
         for(DeliveryRoute deliveryRoute: result){
             for (TrackCourse trackCourse: deliveryRoute){
-                if(trackCourse.getEndTrackCourse().getPoint().getPointId().equals(deliveryPoint.getPointId())){
+                if(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryPoint.getPointId())){
+//                    System.out.println(deliveryRoute.size());
                     DeliveryRoute tmp = removeDuplicates(deliveryRoute);
                     possibleDeliveryRoutes.add(tmp);
                     break;
@@ -86,62 +119,75 @@ public class Optimizer implements IOptimizer {
         return result;
     }
 
-    private void rec(final PlannedSchedule plannedSchedule, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints, Map<UpdatedRoute, List<Integer>> filteredRoutesByPoint, InformationStack informationStack) {
-        for (Map.Entry<UpdatedRoute, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
-            UpdatedRoute route = entry.getKey();
+    private void rec(final PlannedSchedule plannedSchedule, final Point deliveryPoint, List<DeliveryRoute> result, List<Point> markedPoints, Map<Route, List<Integer>> filteredRoutesByPoint, InformationStack informationStack) {
+        for (Map.Entry<Route, List<Integer>> entry: filteredRoutesByPoint.entrySet()) {
+            Route route = entry.getKey();
             List<Integer> indexesOfPoint = entry.getValue();
             // if departure point occurs once
             if (indexesOfPoint.size() == 1) {
+
                 Integer indexOfPointInRoute = indexesOfPoint.get(0);
-                Point pointInRoute = route.makePointsInRoute().get(indexOfPointInRoute);
+                Point pointInRoute = route.get(indexOfPointInRoute).getDeparturePoint();
                 if(!pointInRoute.equals(deliveryPoint)) {
                     markedPoints.add(pointInRoute);
                 }
-                for (int i = indexOfPointInRoute - 1; i < route.size(); i++) {
-                    Point point = route.makePointsInRoute().get(i);
-                    System.out.println("infStack = " + informationStack);
-                    System.out.println("currentRoute = "+route.getPointsAsString());
-                    System.out.println("currentPoint = " + point.getPointId());
-                    //System.out.println("indexOfPointInRoute = " + i);
-                    System.out.print("markedPoints = ");
-                    for (Point point1: markedPoints) {
-                        System.out.print(point1.getPointId() + " ");
-                    }
-                    System.out.println("");
-                    System.out.println("_______________________");
-                    if(!markedPoints.contains(point)) {
-                        if(point.equals(deliveryPoint)){
-                            DeliveryRoute deliveryRoute = new DeliveryRoute();
-//                            deliveryRoute.add(route.makePointsInRoute().get(i));
-                            List<Point> pointsId = new ArrayList<>();
-                            pointsId.addAll(informationStack.getPointsForInvoice());
-                            pointsId.add(deliveryPoint);
-                            for(Point point1: pointsId){
-                                System.out.print(point1.getPointId() + " ");
-                            }
-                            System.out.println(pointsId.size());
-                            List<UpdatedRoute> routesId = new LinkedList<>();
-                            routesId.addAll(informationStack.getUpdatedRoutesForInvoice());
-                            routesId.add(route);
-                            TrackCourse trackCourse = new TrackCourse();
-                            List<TrackCourse> trackCourses = new ArrayList<>(); /// FIX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            trackCourses.add(route.get(i));
-                            for(TrackCourse correctTrackCourse: trackCourses) {
-                                deliveryRoute.add(correctTrackCourse);
-//                                System.out.println("Track Courses, start point id = " + correctTrackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end point id = " + correctTrackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
-                            }
-                            result.add(deliveryRoute);
-                            System.out.println("FIND delivery point!");
-                            break;
+                // last point of route
+                if ((indexOfPointInRoute + 1) == route.size()) {
+
+//                    Point newDeparturePoint = route.get(indexOfPointInRoute).getDeparturePoint();
+//                    Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, newDeparturePoint, false);
+//                    rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, informationStack);
+                // if middle point of route
+                } else {
+                    for (int i = indexOfPointInRoute + 1; i < route.size(); i++) {
+
+                        Point point = route.get(i).getDeparturePoint();
+
+                        System.out.println("infStack = " + informationStack);
+                        System.out.println("currentRoute = "+route.getPointsAsString());
+                        System.out.println("currentPoint = " + point.getPointId());
+                        //System.out.println("indexOfPointInRoute = " + i);
+                        System.out.print("markedPoints = ");
+                        for (Point point1: markedPoints) {
+                            System.out.print(point1.getPointId() + " ");
                         }
-                        InformationStack newInformationStack = new InformationStack(informationStack);
-                        newInformationStack.appendPointsHistory(point);
-                        newInformationStack.appendUpdatedRoutesHistory(route);
-                        newInformationStack.addPoint(point);
-                        newInformationStack.addUpdatedRoute(route);
-                        newInformationStack.setDeep(informationStack.getDeep() + 1);
-                        Map<UpdatedRoute, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);
-                        rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, newInformationStack);
+                        System.out.println("");
+                        System.out.println("_______________________");
+
+                        if(!markedPoints.contains(point)) {
+
+                            if(point.equals(deliveryPoint)){
+                                DeliveryRoute deliveryRoute = new DeliveryRoute();
+                                List<Point> pointsId = new ArrayList<>();
+                                pointsId.addAll(informationStack.getPointsForInvoice());
+                                pointsId.add(deliveryPoint);
+                                for(Point point1: pointsId){
+                                    System.out.print(point1.getPointId() + " ");
+                                }
+                                System.out.println(pointsId.size());
+                                List<Route> routesId = new LinkedList<>();
+                                routesId.addAll(informationStack.getRoutesForInvoice());
+                                routesId.add(route);
+                                TrackCourse trackCourse = new TrackCourse();
+                                List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(pointsId, routesId);
+                                for(TrackCourse correctTrackCourse: trackCourses) {
+                                    deliveryRoute.add(correctTrackCourse);
+                                    System.out.println("Track Courses, start point id = " + correctTrackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end point id = " + correctTrackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
+                                }
+                                result.add(deliveryRoute);
+                                System.out.println("FIND delivery point!");
+                                break;
+                            }
+                            InformationStack newInformationStack = new InformationStack(informationStack);
+                            newInformationStack.appendPointsHistory(point);
+                            newInformationStack.appendRoutesHistory(route);
+                            newInformationStack.addPoint(point);
+                            newInformationStack.addRoute(route);
+                            newInformationStack.setDeep(informationStack.getDeep() + 1);
+                            Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, point, true);
+                            count++;
+                            rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, newInformationStack);
+                        }
                     }
                 }
                 // if departure point occurs more then once
@@ -151,46 +197,45 @@ public class Optimizer implements IOptimizer {
         }
     }
 
-    /** find all routes that contains point. if true -> all routes, if false -> without routes where the point is last
-     *
+    public static int getCount() {
+        return count;
+    }
+
+
+    /**
+     * find all routes that containes point. if true -> all routes, if false -> without last
      * @param plannedSchedule
      * @param point
      * @param considerLastPoint
      * @return
      */
-    protected Map<UpdatedRoute, List<Integer>> filterRoutesByPoint(PlannedSchedule plannedSchedule, Point point, boolean considerLastPoint) {
-        Map<UpdatedRoute, List<Integer>> result = new HashMap<>();
-        for(UpdatedRoute updatedRoute: plannedSchedule){
+    protected Map<Route, List<Integer>> filterRoutesByPoint(PlannedSchedule plannedSchedule, Point point, boolean considerLastPoint) {
+        Map<Route, List<Integer>> result = new HashMap<>();
+        for(Route route: plannedSchedule){
             List<Integer> indexes = new ArrayList<>();
-            List<Point> points = updatedRoute.makePointsInRoute();
             boolean wasFound = false;
             if (considerLastPoint) {
-                for(Point pointFromRoute: points) {
-                    if(updatedRoute.containsPoint(point) && pointFromRoute.equals(point)){
-                        indexes.add(points.indexOf(pointFromRoute));
+                for(RoutePoint routePoint: route) {
+                    if(route.containsPoint(point) && routePoint.getDeparturePoint().equals(point)){
+                        indexes.add(route.indexOf(routePoint));
                         wasFound = true;
                     }
-//                     if((updatedRoute.size() - 1) == updatedRoute.indexOf(trackCourse)){
-//                        if(updatedRoute.containsPoint(point) && trackCourse.getEndTrackCourse().getPoint().equals(point)){
-//                            indexes.add(updatedRoute.indexOf(trackCourse));
-//                            wasFound = true;
-//                        }
-//                    }
                 }
             } else {
-                for(Point pointFromRoute: points) {
-                    if(!updatedRoute.isLastPoint(point) && updatedRoute.containsPoint(point) && pointFromRoute.equals(point)){
-                        indexes.add(points.indexOf(pointFromRoute));
+                for(RoutePoint routePoint: route) {
+                    if(!route.isLastPoint(point) && route.containsPoint(point) && routePoint.getDeparturePoint().equals(point)){
+                        indexes.add(route.indexOf(routePoint));
                         wasFound = true;
                     }
                 }
             }
+
             if(wasFound) {
-                result.put(updatedRoute, indexes);
+                result.put(route, indexes);
             }
         }
         String routes = "";
-        for (UpdatedRoute route : result.keySet()) {
+        for (Route route : result.keySet()) {
             routes+=route.getPointsAsString()+" ";
         }
 //        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
@@ -206,8 +251,8 @@ public class Optimizer implements IOptimizer {
      * @throws RouteNotFoundException
      */
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, List<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException {
-        Iterator<Map.Entry<Invoice, List<DeliveryRoute>>> iterator = routesForInvoice.entrySet().iterator();
+    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException {
+        Iterator<Map.Entry<Invoice, ArrayList<DeliveryRoute>>> iterator = routesForInvoice.entrySet().iterator();
         for(Invoice invoice: invoiceContainer){
             if(invoice.getInvoiceType().equals(InvoiceType.C)){
 
@@ -246,68 +291,84 @@ public class Optimizer implements IOptimizer {
      * @param invoice
      * @return array of possible departure date from route point
      */
-//    @Override
-//    public ArrayList<Date> getPossibleDepartureDateFromRoutePoint(Route route, RoutePoint routePoint, Invoice invoice){
-//        ArrayList<Date> result = new ArrayList<>();
-//        Date invoiceCreationDateAndLoadingTime = new Date(invoice.getCreationDate().getTime() + routePoint.getLoadingOperationsTime());
-//        Date plannedDeliveryDate = invoice.getRequest().getPlannedDeliveryDate();
-//        int timeOfCreation = invoiceCreationDateAndLoadingTime.getHours()*60 + invoiceCreationDateAndLoadingTime.getMinutes();
-//        int[] timeDeparture = route.splitToComponentTime(routePoint.getDepartureTime());
-//        invoiceCreationDateAndLoadingTime.setHours(timeDeparture[0]);
-//        invoiceCreationDateAndLoadingTime.setMinutes(timeDeparture[1]);
-//        Date date = invoiceCreationDateAndLoadingTime;
-//        int differenceWeekDays = routePoint.getDayOfWeek() - (invoiceCreationDateAndLoadingTime.getDay()+1);
-//        if(differenceWeekDays > 0){
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.setTime(date);
-//            calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
-//            date.setTime(calendar.getTimeInMillis());
-//        }else if(differenceWeekDays == 0 &&(timeOfCreation < routePoint.getDepartureTime())){
-//            date = invoiceCreationDateAndLoadingTime;
-//        }else {
-//            int tmp = 7 - ((invoiceCreationDateAndLoadingTime.getDay()+1) - routePoint.getDayOfWeek());
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.setTime(date);
-//            calendar.add(Calendar.DAY_OF_MONTH, tmp);
-//            date.setTime(calendar.getTimeInMillis());
-//        }
-//        while (date.before(plannedDeliveryDate)){
-//            if(route.indexOf(routePoint) == (route.size() - 1)){
-//
-//                result.add(date);
-//            }else {
-//                result.add(date);
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTime(date);
-//                calendar.add(Calendar.DAY_OF_MONTH, 7);
-//                date = new Date(calendar.getTimeInMillis());
-//            }
-//        }
-//        return result;
-//    }
+    @Override
+    public ArrayList<Date> getPossibleDepartureDateFromRoutePoint(Route route, RoutePoint routePoint, Invoice invoice){
+        ArrayList<Date> result = new ArrayList<>();
+        Date invoiceCreationDateAndLoadingTime = new Date(invoice.getCreationDate().getTime() + routePoint.getLoadingOperationsTime());
+        Date plannedDeliveryDate = invoice.getRequest().getPlannedDeliveryDate();
+        int timeOfCreation = invoiceCreationDateAndLoadingTime.getHours()*60 + invoiceCreationDateAndLoadingTime.getMinutes();
+        int[] timeDeparture = route.splitToComponentTime(routePoint.getDepartureTime());
+        invoiceCreationDateAndLoadingTime.setHours(timeDeparture[0]);
+        invoiceCreationDateAndLoadingTime.setMinutes(timeDeparture[1]);
+        Date date = invoiceCreationDateAndLoadingTime;
+        int differenceWeekDays = routePoint.getDayOfWeek() - (invoiceCreationDateAndLoadingTime.getDay()+1);
+        if(differenceWeekDays > 0){
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, differenceWeekDays);
+            date.setTime(calendar.getTimeInMillis());
+        }else if(differenceWeekDays == 0 &&(timeOfCreation < routePoint.getDepartureTime())){
+            date = invoiceCreationDateAndLoadingTime;
+        }else {
+            int tmp = 7 - ((invoiceCreationDateAndLoadingTime.getDay()+1) - routePoint.getDayOfWeek());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, tmp);
+            date.setTime(calendar.getTimeInMillis());
+        }
+        while (date.before(plannedDeliveryDate)){
+            if(route.indexOf(routePoint) == (route.size() - 1)){
 
-//    /** determines date when car arrives in each route point
-//     *
-//     * @param route
-//     * @return map of route point and arrival date
-//     */
-//    public Map<RoutePoint, ArrayList<Date>> getArrivalDateInEachRoutePointInRoute(Route route, Invoice invoice){
-//        Map<RoutePoint, ArrayList<Date>> result = new HashMap<>();
-//        if(route != null){
-//            result.put(route.get(0), getPossibleDepartureDateFromRoutePoint(route, route.get(0), invoice));
-//            for(int i = 1; i < route.size(); i++){
-//                ArrayList<Date> newDate = new ArrayList<>();
-//                ArrayList<Date> dates = getPossibleDepartureDateFromRoutePoint(route, route.get(i - 1), invoice);
-//                for(Date date: dates){
-//                    long time = date.getTime() + route.get(i - 1).getTimeToNextPoint() * 60000; // + route.get(i).getLoadingOperationsTime() * 60000 ???
-//                    Date tmp = new Date(time);
-//                    newDate.add(tmp);
-//                }
-//                result.put(route.get(i), newDate);
-//            }
-//        }
-//        return result;
-//    }
+                result.add(date);
+            }else {
+                result.add(date);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                calendar.add(Calendar.DAY_OF_MONTH, 7);
+                date = new Date(calendar.getTimeInMillis());
+            }
+        }
+        return result;
+    }
+
+    /** determines date when car arrives in each route point
+     *
+     * @param route
+     * @return map of route point and arrival date
+     */
+    public Map<RoutePoint, ArrayList<Date>> getArrivalDateInEachRoutePointInRoute(Route route, Invoice invoice){
+        Map<RoutePoint, ArrayList<Date>> result = new HashMap<>();
+        if(route != null){
+            result.put(route.get(0), getPossibleDepartureDateFromRoutePoint(route, route.get(0), invoice));
+            for(int i = 1; i < route.size(); i++){
+                ArrayList<Date> newDate = new ArrayList<>();
+                ArrayList<Date> dates = getPossibleDepartureDateFromRoutePoint(route, route.get(i - 1), invoice);
+                for(Date date: dates){
+                    long time = date.getTime() + route.get(i - 1).getTimeToNextPoint() * 60000; // + route.get(i).getLoadingOperationsTime() * 60000 ???
+                    Date tmp = new Date(time);
+                    newDate.add(tmp);
+                }
+                result.put(route.get(i), newDate);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public ArrayList<PairDate> getDepartureArrivalDatesBetweenTwoRoutePoints(Route departureRoute, Route arrivalRoute, Invoice invoice, RoutePoint departureRoutePoint, RoutePoint arrivalRoutePoint){
+        ArrayList<PairDate> result = new ArrayList<>();
+        ArrayList<Date> departureDates = getPossibleDepartureDateFromRoutePoint(departureRoute, departureRoutePoint, invoice);
+        ArrayList<Date> arrivalDates = getArrivalDateInEachRoutePointInRoute(arrivalRoute, invoice).get(arrivalRoutePoint);
+        for(int i = 0; i < arrivalDates.size(); i++){
+            if(arrivalDates.get(i).after(invoice.getRequest().getPlannedDeliveryDate())){
+                break;
+            }else {
+                PairDate pairDate = new PairDate(departureDates.get(i), arrivalDates.get(i));
+                result.add(pairDate);
+            }
+        }
+        return result;
+    }
 
 
     /** determines day of week by date where SUNDAY is the 1-st day

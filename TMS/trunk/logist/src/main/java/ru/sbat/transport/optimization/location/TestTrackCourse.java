@@ -1,16 +1,16 @@
 package ru.sbat.transport.optimization.location;
 
 
-
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.sbat.transport.optimization.ListOfCargoFlightByExactDateOfTrackCourse;
 import ru.sbat.transport.optimization.TrackCourse;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class TestTrackCourseAndDate {
+public class TestTrackCourse {
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
     static Route route = new Route();
     static WarehousePoint c = new WarehousePoint("C");
@@ -30,12 +30,16 @@ public class TestTrackCourseAndDate {
     }
 
     @Test
-    public void testGetTrackCoursesAndDates() {
-        ListOfCargoFlightByExactDateOfTrackCourse listOfCargoFlightByExactDateOfTrackCourse = new ListOfCargoFlightByExactDateOfTrackCourse();
-        List<TrackCourse> trackCourses = listOfCargoFlightByExactDateOfTrackCourse.splitRoutesIntoTrackCourses(plannedSchedule);
-        listOfCargoFlightByExactDateOfTrackCourse = listOfCargoFlightByExactDateOfTrackCourse.assignTrackCoursesDepartureDates(trackCourses);
-        for(TrackCourse trackCourse: listOfCargoFlightByExactDateOfTrackCourse){
-            System.out.println("departure date = " + trackCourse.getDepartureDate());
+    public void testShareTrackCourses() {
+        List<Point> points = new ArrayList<>();
+        points.add(x);
+        points.add(a);
+        TrackCourse trackCourse = new TrackCourse();
+        List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(points, plannedSchedule);
+        System.out.println("Size = " + trackCourses.size());
+        for(TrackCourse trackCourse1: trackCourses){
+            System.out.println(trackCourse1.getStartTrackCourse().getDeparturePoint().getPointId());
+            System.out.println(trackCourse1.getEndTrackCourse().getDeparturePoint().getPointId());
         }
     }
 
