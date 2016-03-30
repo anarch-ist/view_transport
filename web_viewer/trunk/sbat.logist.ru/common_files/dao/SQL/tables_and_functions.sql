@@ -993,6 +993,15 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedRoutePointID I
             LIMIT 1);
   END;
 
+CREATE PROCEDURE selectAllRoutesIDWithThatPoint(_pointID INTEGER)
+  BEGIN
+    SELECT routes.routeID
+    FROM routes
+      INNER JOIN (route_points, points)
+        ON (routes.routeID = route_points.routeID AND route_points.pointID = points.pointID)
+    WHERE _pointID = points.pointID;
+  END;
+
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                SELECT_PROCEDURES
 -- -------------------------------------------------------------------------------------------------------------------
@@ -1054,7 +1063,7 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
                             ORDER BY lastStatusUpdated
                            LIMIT 1
     );
-    
+
     IF ($routeStartDate IS NULL) THEN
       RETURN NULL;
     END IF;
@@ -1160,8 +1169,61 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
     END IF;
   END;
 
+-- TODO добавить индексы на те поля где запрос - медленный
+-- materialized view for big select
+CREATE TABLE transmaster_transport_db.big_select_materialized (
+  requestIDExternal    VARCHAR(255),
+  requestNumber        VARCHAR(16),
+  requestDate          DATE,
+  invoiceNumber        VARCHAR(255),
+  invoiceDate          DATE,
+  documentNumber       VARCHAR(255),
+  documentDate         DATE,
+  firma                VARCHAR(255),
+  storage              VARCHAR(255),
+  commentForStatus     LONGTEXT,
+  boxQty               INTEGER,
+  marketAgentUserID    INTEGER, -- служебное поле
+  requestStatusID      VARCHAR(32), -- служебное поле
+  routeListID          INTEGER, -- служебное поле
+  requestStatusRusName VARCHAR(255),
+  clientID             INTEGER, -- служебное поле
+  clientIDExternal     VARCHAR(255),
+  INN                  VARCHAR(32),
+  clientName           VARCHAR(255),
+  userName             VARCHAR(255),
+  deliveryPointName    VARCHAR(128),
+  warehousePointName   VARCHAR(128),
+  warehousePointID     INTEGER, -- служебное поле
+  currentPointName     VARCHAR(128),
+  nextPointName        VARCHAR(128),
+  routeID              INTEGER, -- служебное поле
+  routeName            VARCHAR(255),
+  driverId             VARCHAR(255),
+  licensePlate         VARCHAR(9),
+  palletsQty           INTEGER,
+  routeListNumber      VARCHAR(32),
+  arrivalTime          DATETIME,
+  PRIMARY KEY (requestIDExternal),
+  FULLTEXT (requestIDExternal(10), requestNumber(10))
 
--- TODO next route point not working
+);
+
+# CREATE FULLTEXT INDEX ind1 ON big_select_materialized (requestIDExternal(10));
+# CREATE FULLTEXT INDEX ind2 ON big_select_materialized (requestNumber(10));
+# CREATE FULLTEXT INDEX ind3 ON big_select_materialized (requestDate(10));
+# CREATE FULLTEXT INDEX ind4 ON big_select_materialized (invoiceNumber(10));
+# CREATE FULLTEXT INDEX ind5 ON big_select_materialized (invoiceDate(10));
+# CREATE FULLTEXT INDEX ind6 ON big_select_materialized (documentNumber(10));
+
+
+CREATE PROCEDURE refreshMaterializedView()
+  BEGIN
+  TRUNCATE big_select_materialized;
+    INSERT INTO big_select_materialized SELECT * FROM big_select;
+  END;
+
+
 CREATE VIEW transmaster_transport_db.big_select AS
   SELECT
     requests.requestIDExternal,
@@ -1270,18 +1332,18 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       arrivalTime,
       requestStatusID,
       routeListID
-    FROM big_select
+    FROM big_select_materialized
     ';
     SET @wherePart =
     '
     WHERE (
       (getRoleIDByUserID(?) = \'ADMIN\') OR
-      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
-      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select.clientID = getClientIDByUserID(?)) OR
-      (getPointIDByUserID(?) = big_select.warehousePointID) OR
+      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select_materialized.marketAgentUserID = ?) OR
+      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select_materialized.clientID = getClientIDByUserID(?)) OR
+      (getPointIDByUserID(?) = big_select_materialized.warehousePointID) OR
       (getPointIDByUserID(?) IN (SELECT pointID
                                  FROM route_points
-                                 WHERE big_select.routeID = route_points.routeID))
+                                 WHERE big_select_materialized.routeID = route_points.routeID))
     )
     '
     ;
@@ -1308,7 +1370,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
-    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
+    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select_materialized ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm
     USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID;

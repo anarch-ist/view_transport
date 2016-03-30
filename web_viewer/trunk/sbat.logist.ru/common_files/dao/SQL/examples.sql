@@ -2,122 +2,6 @@ SHOW VARIABLES;
 SHOW VARIABLES LIKE '%innodb_log_waits%';
 
 
-# list with only manager Users
-CREATE VIEW manager_users (managerUserID) AS
-  SELECT users.userID
-  FROM users
-  WHERE users.userRoleID IN (SELECT user_roles.userRoleID
-                             FROM user_roles
-                             WHERE user_roles.userRoleName = 'MANAGER');
-
-
-CREATE FUNCTION getInvoiceStatusIDByName(statusName VARCHAR(255))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT invoiceStatusID FROM invoice_statuses WHERE invoiceStatusName=statusName);
-    RETURN result;
-  END;
-
-CREATE FUNCTION get_route_list_status_id_by_name(statusName VARCHAR(255))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routeListStatusID
-                  FROM route_list_statuses
-                  WHERE routeListStatusID = statusName);
-    RETURN result;
-  END;
-
-
-
-# helper table, contains only manager users. Every time when add or update new user this table sync with users
-CREATE TABLE manager_users (
-  managerUserID INTEGER,
-  PRIMARY KEY (managerUserID),
-  FOREIGN KEY (managerUserID) REFERENCES users (userID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
-
-
-CREATE TRIGGER before_users_insert
-BEFORE INSERT ON users FOR EACH ROW
-  BEGIN
-    IF (is_manager(NEW.userRoleID))
-    THEN
-      INSERT INTO manager_users VALUES (NEW.userRoleID);
-    END IF;
-  END;
-
-CREATE TRIGGER before_users_delete
-BEFORE DELETE ON users FOR EACH ROW
-  BEGIN
-    IF (is_manager(old.userRoleID))
-    THEN
-      DELETE FROM manager_users
-      WHERE manager_users.managerUserID = old.userID;
-    END IF;
-  END;
-
-CREATE TRIGGER before_users_update
-BEFORE UPDATE ON users FOR EACH ROW
-  BEGIN
-
-    IF (NEW.userID != old.userID)
-    THEN
-      UPDATE manager_users
-      SET managerUserID = NEW.userID
-      WHERE old.userID = manager_users.managerUserID;
-    END IF;
-
-    IF (NEW.userRoleID != old.userRoleID)
-    THEN
-      BEGIN
-        IF (is_manager(NEW.userRoleID))
-        THEN
-          INSERT INTO manager_users VALUES (NEW.userRoleID);
-        ELSE IF (is_manager(old.userRoleID))
-        THEN
-          DELETE FROM manager_users
-          WHERE manager_users.managerUserID = old.userID;
-        END IF;
-        END IF;
-      END;
-    END IF;
-  END;
-
-
-
-
-# this table content is a subset of points table
-CREATE TABLE warehouse_points (
-  warehousePointID INTEGER,
-  PRIMARY KEY (warehousePointID),
-  FOREIGN KEY (warehousePointID) REFERENCES points (pointID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
-
-
-CREATE TRIGGER before_points_insert
-BEFORE INSERT ON points FOR EACH ROW
-  BEGIN
-    IF (is_warehouse(NEW.pointTypeID))
-    THEN
-      INSERT INTO warehouse_points VALUES (NEW.pointTypeID);
-    END IF;
-  END;
-
-CREATE TRIGGER before_points_delete
-BEFORE DELETE ON points FOR EACH ROW
-  BEGIN
-    IF (is_warehouse(OLD.pointTypeID))
-    THEN
-      DELETE FROM warehouse_points
-      WHERE warehouse_points.warehousePointID = OLD.pointTypeID;
-    END IF;
-  END;
 
 CREATE PROCEDURE examplePrStatement(id VARCHAR(255), _orderBy VARCHAR(255))
   BEGIN
@@ -131,106 +15,116 @@ CREATE PROCEDURE examplePrStatement(id VARCHAR(255), _orderBy VARCHAR(255))
 
 DROP PROCEDURE selectData;
 
--- _search - array of strings
--- _orderby 'id'  <> - название колонки из файла main.js
--- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
+-- ----------------------------
 
-CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
-                            _isDesc BOOLEAN, _search TEXT)
+USE transmaster_transport_db;
+
+SELECT * FROM big_select LIMIT 10000; -- должен работать мгновенно
+
+CALL refreshMaterializedView();
+
+SELECT COUNT(*) FROM big_select_materialized; -- 14ms
+
+CALL selectData(1, 0, 10000, '', TRUE, 'requestIDExternal,12;');
+
+
+CREATE FULLTEXT INDEX ind1 ON big_select_materialized (requestIDExternal(10));
+CREATE FULLTEXT INDEX ind2 ON big_select_materialized (requestNumber(10));
+CREATE INDEX ind3 ON big_select_materialized (requestDate);
+CREATE FULLTEXT INDEX ind4 ON big_select_materialized (invoiceNumber(10));
+CREATE INDEX ind5 ON big_select_materialized (invoiceDate);
+CREATE FULLTEXT INDEX ind6 ON big_select_materialized (documentNumber(10));
+
+CALL selectDataTest(1, 0, 10000, 'derfreg', TRUE, '12');
+DROP PROCEDURE selectDataTest;
+CREATE PROCEDURE selectDataTest(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
+                                _isDesc BOOLEAN, _reqIDExtSearchString VARCHAR(255))
   BEGIN
-    SET @mainPart =
-    'SELECT
-      requests.requestIDExternal,
-      requests.insiderRequestNumber,
-      requests.requestIDExternal,
-      clients.INN,
-      delivery_points.pointName     AS `deliveryPoint`,
-      w_points.pointName            AS `warehousePoint`,
-      users.lastName,
-      requests.invoiceStatusID,
-      invoice_statuses.invoiceStatusRusName,
-      requests.boxQty,
+    SET @userRoleID = getRoleIDByUserID(_userID);
 
-      route_lists.driver,
-      route_lists.licensePlate,
-      route_lists.palletsQty,
-      route_lists.routeListNumber,
-      route_lists.routeListID,
-      routes.directionName,
+    SET @isAdmin = FALSE;
+    SET @isMarketAgent = FALSE;
+    SET @isClientManager = FALSE;
+    SET @isDispatcherOrWDispatcher = FALSE;
 
-      last_visited_points.pointName AS `currentPoint`,
-      next_route_points.pointName   AS `nextPoint`,
-      \'arrival_Time\'
+    IF (@userRoleID = 'ADMIN') THEN
+      SET @isAdmin = TRUE;
+    ELSEIF (@userRoleID = 'MARKET_AGENT') THEN
+      SET @isMarketAgent = TRUE;
+    ELSEIF (@userRoleID = 'CLIENT_MANAGER') THEN
+      SET @isClientManager = TRUE;
+    ELSEIF (@userRoleID = 'DISPATCHER' OR @userRoleID = 'W_DISPATCHER') THEN
+      SET @isDispatcherOrWDispatcher = TRUE;
+    END IF;
 
-     FROM requests
+    IF (@isClientManager) THEN
+      SET @clientID = getClientIDByUserID(_userID);
+    END IF;
 
-      LEFT JOIN (requests, clients, points AS delivery_points, points AS w_points, users)
-        ON (
-        requests.requestID = requests.requestID AND
-        requests.warehousePointID = w_points.pointID AND
-        requests.clientID = clients.clientID AND
-        requests.destinationPointID = delivery_points.pointID AND
-        requests.marketAgentUserID = users.userID
-        )
-      LEFT JOIN (invoice_statuses)
-        ON (
-          requests.invoiceStatusID = invoice_statuses.invoiceStatusID  -- CHECK IT
-        )
-      -- because routeList in requests table can be null, we use left join.
-      LEFT JOIN (route_lists, routes)
-        ON (
-        requests.routeListID = route_lists.routeListID AND
-        route_lists.routeID = routes.routeID
-        )
-      LEFT JOIN (points AS last_visited_points)
-        ON (
-        requests.lastVisitedUserPointID = last_visited_points.pointID
-        )
-      LEFT JOIN (route_points, points AS next_route_points)
-        ON (
-        route_lists.routeID = routes.routeID AND
-        routes.routeID = route_points.routeID AND
-        route_points.routePointID = getNextRoutePointID(routes.routeID, requests.lastVisitedUserPointID) AND
-        next_route_points.pointID = route_points.pointID
-        ) ';
+    IF (@isDispatcherOrWDispatcher) THEN
+      SET @userPointID = getPointIDByUserID(_userID);
+    END IF;
 
+
+    -- берем из таблицы requests нашего пользователя, оттуда вытаскиваем routeList, оттуда берем маршрут и оттуда все пункты маршрута
 
     -- 1) если у пользователя роль админ, то показываем все записи из БД
     -- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил.
     -- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
-    -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
+    -- 4) если маршрут заявки проходит через пользователя, то показываем ему эти записи
+    SELECT SQL_CALC_FOUND_ROWS
+      requestIDExternal,
+      requestNumber,
+      requestDate,
+      invoiceNumber,
+      invoiceDate,
+      documentNumber,
+      documentDate,
+      firma,
+      storage,
+      commentForStatus,
+      boxQty,
+      requestStatusRusName,
+      clientIDExternal,
+      INN,
+      clientName,
+      userName,
+      deliveryPointName,
+      warehousePointName,
+      currentPointName,
+      nextPointName,
+      routeName,
+      driverId,
+      licensePlate,
+      palletsQty,
+      routeListNumber,
+      arrivalTime,
+      requestStatusID,
+      routeListID
+    FROM big_select_materialized
+    WHERE (
+      (@isAdmin) OR
+      (@isMarketAgent AND big_select_materialized.marketAgentUserID = _userID) OR
+      (@isClientManager AND big_select_materialized.clientID = @clientID) OR
+      (@isDispatcherOrWDispatcher AND big_select_materialized.warehousePointID = @userPointID) OR
+      -- TODO fix it
+      (@isDispatcherOrWDispatcher AND big_select_materialized.routeID IN (SELECT routes.routeID
+                                                                          FROM routes
+                                                                            INNER JOIN (route_points, points)
+                                                                              ON (routes.routeID = route_points.routeID
+                                                                                  AND
+                                                                                  route_points.pointID = points.pointID)
+                                                                          WHERE @userPointID = points.pointID))
 
-    SET @wherePart =
-    'WHERE (
-    (getRoleIDByUserID(?) = \'ADMIN\') OR
-    (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND requests.marketAgentUserID = ?) OR
-    (getPointIDByUserID(?) = w_points.pointID) OR
-    (getPointIDByUserID(?) IN (SELECT pointID FROM route_points WHERE route_lists.routeID = routeID))
-    )';
-    SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
+    )
+    HAVING requestIDExternal LIKE CONCAT('%', _reqIDExtSearchString, '%')
+    ORDER BY requestIDExternal
+    LIMIT _startEntry, _length
+    ;
 
-    IF _orderby <> ''
-    THEN
-      IF _isDesc
-      THEN
-        SET @orderByPart = CONCAT(' ORDER BY ', _orderby, ' DESC');
-      ELSE
-        SET @orderByPart = CONCAT(' ORDER BY ', _orderby);
-      END IF;
-    ELSE
-      SET @orderByPart = '';
-    END IF;
+    -- filtered
+    SELECT FOUND_ROWS() as `totalFiltered`;
 
-    SET @limitPart = ' LIMIT ?, ? ';
-    SET @sqlString = CONCAT(@mainPart, @wherePart, @havingPart, @orderByPart, @limitPart);
-
-    PREPARE statement FROM @sqlString;
-
-    SET @_userID = _userID;
-    SET @_startEntry = _startEntry;
-    SET @_length = _length;
-
-    EXECUTE statement
-    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
-    DEALLOCATE PREPARE statement;
   END;
+
+SELECT * FROM big_select_materialized WHERE firma LIMIT 10000;
