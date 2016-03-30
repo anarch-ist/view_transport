@@ -53,6 +53,11 @@ class RequestEntity implements IRequestEntity
         return $this->_DAO->update(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment));
     }
 
+    function updateRequestStatuses2($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty)
+    {
+        return $this->_DAO->update(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty));
+    }
+
     function deleteRequest(RequestData $Request)
     {
         // TODO: Implement deleteRequest() method.
@@ -199,7 +204,7 @@ class UpdateRequestStatuses implements IEntityUpdate
     {
         if ($this->newRequestStatus === 'DEPARTURE') {
             // добавить запрос на обновление количесвта паллет в routeLists
-            return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus',`lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
+            return "UPDATE `route_lists` SET `palletsQty` = '$this->palletQuantity' WHERE `routeListID` IN ($this->requests);";
         }
         return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
     }
