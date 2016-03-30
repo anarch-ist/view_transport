@@ -51,6 +51,27 @@ public class DataBase {
         return insertOrUpdateTransactionScript.updateData();
     }
 
+    public void refreshMaterializedView() {
+        CallableStatement callableStatement = null;
+        try {
+            logger.info("--------------START refresh materialized view------------------");
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            callableStatement = connection.prepareCall("{CALL refreshMaterializedView()}");
+            callableStatement.execute();
+            connection.commit();
+            logger.info("--------------END refresh materialized view------------------");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.error("start ROLLBACK");
+            DBUtils.rollbackQuietly(connection);
+            logger.error("end ROLLBACK");
+        }
+        finally {
+            DBUtils.closeStatementQuietly(callableStatement);
+        }
+    }
+
     /**
      * this method designed only for tests
      */

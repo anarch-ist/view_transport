@@ -29,6 +29,7 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// TODO refactor this class
 public class App {
     private static Properties properties;
     private static final String INCOMING_FILE_EXTENSION = ".pkg";
@@ -94,6 +95,7 @@ public class App {
         logger.info("Executor service closed");
         System.exit(0);
     }
+    // TODO make start matrialized view refresh after all files executed
 
     private static void createWatchService() {
 
@@ -124,6 +126,8 @@ public class App {
                             logger.info("Start update data from file [{}]", filePath);
                             DataFrom1c dataFrom1c = JSONReadFromFile.read(filePath);
                             insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
+                            dataBase.refreshMaterializedView();
+
                             logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
                         } catch (IOException e) {
                             logger.error("Can't read file [{}]", filePath);
@@ -175,6 +179,7 @@ public class App {
                                 closeAllAndExit();
                             }
                         }
+
                     }
 
                 });

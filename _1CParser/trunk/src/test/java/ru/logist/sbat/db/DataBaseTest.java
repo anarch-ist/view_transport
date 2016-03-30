@@ -23,7 +23,7 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
 
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA.pkg").toURI());
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA1.pkg").toURI());
         dataFrom1c = JSONReadFromFile.read(path);
 
         // get connection to database
@@ -42,17 +42,15 @@ public class DataBaseTest {
         dataBase.truncatePublicTables();
     }
 
+    @Test
+    public void testUpdateDataFromJSONObject() throws Exception {
+        dataBase.updateDataFromJSONObject(dataFrom1c);
+        dataBase.refreshMaterializedView();
+    }
+
     @AfterClass
     public static void tearDown() throws Exception {
         if (dataBase != null)
             dataBase.close();
     }
-
-    @Test
-    public void testUpdateDataFromJSONObject() throws Exception {
-        dataBase.updateDataFromJSONObject(dataFrom1c);
-    }
-
-
-
 }
