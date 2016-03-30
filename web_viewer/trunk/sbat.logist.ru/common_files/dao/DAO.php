@@ -184,6 +184,20 @@ class DAO implements IDAO
         $result = $this->query($newObj->getUpdateQuery());
         return $result;
     }
+    
+
+    function update2(IEntityUpdate $newObj, IEntityInsert $updateTable = null){
+         // TODO: Check update() method.
+
+        $strs = explode(';', $newObj->getUpdateQuery());
+
+        if (!is_null($updateTable)) {
+            $this->query($updateTable->getInsertQuery());
+        }
+        $result1 = $this->query($strs[0]);
+        $result2 = $this->query($strs[1]);
+        return $result2;
+    }
 
     function insert(IEntityInsert $obj, IEntityInsert $updateTable = null)
     {

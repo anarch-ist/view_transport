@@ -50,12 +50,14 @@ class RequestEntity implements IRequestEntity
 
     function updateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment)
     {
+
         return $this->_DAO->update(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment));
     }
 
     function updateRequestStatuses2($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty)
     {
-        return $this->_DAO->update(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty));
+        $routeData =  $this->_DAO->select(new SelectRequestByID($routeListID[0]));
+        return $this->_DAO->update2(new UpdateRequestStatuses($userID, $routeListID, $newRequestStatus, $datetime, $comment, $palletsQty, $routeData[0]['routeListID']));
     }
 
     function deleteRequest(RequestData $Request)
@@ -183,8 +185,9 @@ class UpdateRequestStatuses implements IEntityUpdate
     private $datetime;
     private $comment;
     private $palletQuantity;
+    private $routeID;
 
-    function __construct($userID, $requestListArray, $newRequestStatus, $datetime, $comment, $palletQuantity=0)
+    function __construct($userID, $requestListArray, $newRequestStatus, $datetime, $comment, $palletQuantity=0, $routeID)
     {
         $dao = DAO::getInstance();
 
@@ -195,6 +198,7 @@ class UpdateRequestStatuses implements IEntityUpdate
         $this->datetime = $dao->checkString($datetime);
         $this->comment = $dao->checkString($comment);
         $this->palletQuantity = $dao->checkString($palletQuantity);
+        $this->routeID = $dao->checkString($routeID);
     }
 
     /**
@@ -202,11 +206,14 @@ class UpdateRequestStatuses implements IEntityUpdate
      */
     function getUpdateQuery()
     {
+
+
         if ($this->newRequestStatus === 'DEPARTURE') {
-            // добавить запрос на обновление количесвта паллет в routeLists
-            return "UPDATE `route_lists` SET `palletsQty` = '$this->palletQuantity' WHERE `routeListID` IN ($this->requests);";
+            // РґРѕР±Р°РІРёС‚СЊ Р·Р°РїСЂРѕСЃ РЅР° РѕР±РЅРѕРІР»РµРЅРёРµ РїР°Р»Р»РµС‚ РІ routeLists
+            return "UPDATE `route_lists` SET `palletsQty` = '$this->palletQuantity' WHERE `routeListID` = '$this->routeID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
         }
         return "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestID` IN ($this->requests);";
+        
     }
 }
 
