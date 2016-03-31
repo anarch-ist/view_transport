@@ -1332,18 +1332,18 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       arrivalTime,
       requestStatusID,
       routeListID
-    FROM big_select_materialized
+    FROM big_select
     ';
     SET @wherePart =
     '
     WHERE (
       (getRoleIDByUserID(?) = \'ADMIN\') OR
-      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select_materialized.marketAgentUserID = ?) OR
-      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select_materialized.clientID = getClientIDByUserID(?)) OR
-      (getPointIDByUserID(?) = big_select_materialized.warehousePointID) OR
+      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
+      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select.clientID = getClientIDByUserID(?)) OR
+      (getPointIDByUserID(?) = big_select.warehousePointID) OR
       (getPointIDByUserID(?) IN (SELECT pointID
                                  FROM route_points
-                                 WHERE big_select_materialized.routeID = route_points.routeID))
+                                 WHERE big_select.routeID = route_points.routeID))
     )
     '
     ;
@@ -1370,7 +1370,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
-    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select_materialized ', @wherePart);
+    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm
     USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID;
