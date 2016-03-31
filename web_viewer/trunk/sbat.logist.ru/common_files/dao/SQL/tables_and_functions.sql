@@ -635,7 +635,7 @@ CREATE TABLE requests (
   -- logist fields
   weight                  INTEGER        NULL, -- масса в граммах
   volume                  INTEGER        NULL, -- в кубических сантиметрах
-  goodsCost               DECIMAL(12, 2) NULL, -- цена всех товаров в накладной
+  goodsCost               DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
   lastStatusUpdated       DATETIME       NULL, -- date and time when status was updated by any user
   -- TODO это поле нужно перенести в users, саму таблицу users разбить на три таблицы из-за пункта.
   lastModifiedBy          INTEGER        NULL, -- один из пользователей - это parser.
@@ -993,13 +993,16 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedRoutePointID I
             LIMIT 1);
   END;
 
-CREATE PROCEDURE selectAllRoutesIDWithThatPoint(_pointID INTEGER)
+-- находит все routeID, которые содержат указанный пункт
+CREATE FUNCTION selectAllRoutesIDWithThatPointAsString(_pointID INTEGER)
+  RETURNS TEXT
   BEGIN
-    SELECT routes.routeID
-    FROM routes
-      INNER JOIN (route_points, points)
-        ON (routes.routeID = route_points.routeID AND route_points.pointID = points.pointID)
-    WHERE _pointID = points.pointID;
+    SET @result = (SELECT GROUP_CONCAT(DISTINCT routes.routeID)
+                   FROM routes
+                     INNER JOIN (route_points, points)
+                       ON (routes.routeID = route_points.routeID AND route_points.pointID = points.pointID)
+                   WHERE _pointID = points.pointID);
+    RETURN @result;
   END;
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -1072,9 +1075,6 @@ CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
     SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
     RETURN $arrivalDateTime;
   END;
-
-
-
 
 -- startEntry - number of record to start from(0 is first record)
 -- length - Number of records that the table can display in the current draw
@@ -1172,6 +1172,7 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
 -- TODO добавить индексы на те поля где запрос - медленный
 -- materialized view for big select
 CREATE TABLE transmaster_transport_db.big_select_materialized (
+  requestID            INTEGER,
   requestIDExternal    VARCHAR(255),
   requestNumber        VARCHAR(16),
   requestDate          DATE,
@@ -1181,33 +1182,34 @@ CREATE TABLE transmaster_transport_db.big_select_materialized (
   documentDate         DATE,
   firma                VARCHAR(255),
   storage              VARCHAR(255),
-  commentForStatus     LONGTEXT,
   boxQty               INTEGER,
   marketAgentUserID    INTEGER, -- служебное поле
-  requestStatusID      VARCHAR(32), -- служебное поле
   routeListID          INTEGER, -- служебное поле
-  requestStatusRusName VARCHAR(255),
   clientID             INTEGER, -- служебное поле
   clientIDExternal     VARCHAR(255),
   INN                  VARCHAR(32),
   clientName           VARCHAR(255),
-  userName             VARCHAR(255),
+  userName             VARCHAR(255), -- имя торгового представителя
   deliveryPointName    VARCHAR(128),
   warehousePointName   VARCHAR(128),
   warehousePointID     INTEGER, -- служебное поле
-  currentPointName     VARCHAR(128),
-  nextPointName        VARCHAR(128),
+  -- currentPointName     VARCHAR(128),
+  -- nextPointName        VARCHAR(128),
   routeID              INTEGER, -- служебное поле
   routeName            VARCHAR(255),
   driverId             VARCHAR(255),
-  licensePlate         VARCHAR(9),
-  palletsQty           INTEGER,
+  -- licensePlate         VARCHAR(9),
+  -- palletsQty           INTEGER,
   routeListNumber      VARCHAR(32),
-  arrivalTime          DATETIME,
-  PRIMARY KEY (requestIDExternal),
-  FULLTEXT (requestIDExternal(10), requestNumber(10))
-
+  -- arrivalTime          DATETIME,
+  PRIMARY KEY (requestID)
+  -- FULLTEXT (requestIDExternal(10), requestNumber(10))
 );
+
+
+
+
+
 
 # CREATE FULLTEXT INDEX ind1 ON big_select_materialized (requestIDExternal(10));
 # CREATE FULLTEXT INDEX ind2 ON big_select_materialized (requestNumber(10));
@@ -1216,16 +1218,44 @@ CREATE TABLE transmaster_transport_db.big_select_materialized (
 # CREATE FULLTEXT INDEX ind5 ON big_select_materialized (invoiceDate(10));
 # CREATE FULLTEXT INDEX ind6 ON big_select_materialized (documentNumber(10));
 
-
+-- get all constant data
 CREATE PROCEDURE refreshMaterializedView()
   BEGIN
   TRUNCATE big_select_materialized;
-    INSERT INTO big_select_materialized SELECT * FROM big_select;
+     INSERT INTO big_select_materialized
+       SELECT
+         requestID,
+         requestIDExternal,
+         requestNumber,
+         requestDate,
+         invoiceNumber,
+         invoiceDate,
+         documentNumber,
+         documentDate,
+         firma,
+         storage,
+         boxQty,
+         marketAgentUserID,
+         routeListID,
+         clientID,
+         clientIDExternal,
+         INN,
+         clientName,
+         userName,
+         deliveryPointName,
+         warehousePointName,
+         warehousePointID,
+         routeID,
+         routeName,
+         driverId,
+         routeListNumber
+       FROM big_select;
   END;
 
 
 CREATE VIEW transmaster_transport_db.big_select AS
   SELECT
+    requests.requestID, -- служебное поле
     requests.requestIDExternal,
     requests.requestNumber,
     requests.requestDate,
@@ -1297,6 +1327,33 @@ CREATE VIEW transmaster_transport_db.big_select AS
 CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255),
                             _isDesc BOOLEAN, _search TEXT)
   BEGIN
+
+    SET @userRoleID = getRoleIDByUserID(_userID);
+
+    SET @isAdmin = FALSE;
+    SET @isMarketAgent = FALSE;
+    SET @isClientManager = FALSE;
+    SET @isDispatcherOrWDispatcher = FALSE;
+
+    IF (@userRoleID = 'ADMIN') THEN
+      SET @isAdmin = TRUE;
+    ELSEIF (@userRoleID = 'MARKET_AGENT') THEN
+      SET @isMarketAgent = TRUE;
+    ELSEIF (@userRoleID = 'CLIENT_MANAGER') THEN
+      SET @isClientManager = TRUE;
+    ELSEIF (@userRoleID = 'DISPATCHER' OR @userRoleID = 'W_DISPATCHER') THEN
+      SET @isDispatcherOrWDispatcher = TRUE;
+    END IF;
+
+    IF (@isClientManager) THEN
+      SET @clientID = getClientIDByUserID(_userID);
+    END IF;
+
+    IF (@isDispatcherOrWDispatcher) THEN
+      SET @userPointID = getPointIDByUserID(_userID);
+      SET @allRoutesWithUserPointID = selectAllRoutesIDWithThatPointAsString(@userPointID);
+    END IF;
+
     -- 1) если у пользователя роль админ, то показываем все записи из БД
     -- 2) если статус пользователя - агент, то показываем ему только те заявки которые он породил.
     -- 3) если пользователь находится на складе, на котором формируется заявка, то показываем ему эти записи
@@ -1334,19 +1391,20 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
       routeListID
     FROM big_select
     ';
-    SET @wherePart =
-    '
-    WHERE (
-      (getRoleIDByUserID(?) = \'ADMIN\') OR
-      (getRoleIDByUserID(?) = \'MARKET_AGENT\' AND big_select.marketAgentUserID = ?) OR
-      (getRoleIDByUserID(?) = \'CLIENT_MANAGER\' AND big_select.clientID = getClientIDByUserID(?)) OR
-      (getPointIDByUserID(?) = big_select.warehousePointID) OR
-      (getPointIDByUserID(?) IN (SELECT pointID
-                                 FROM route_points
-                                 WHERE big_select.routeID = route_points.routeID))
-    )
-    '
-    ;
+
+    SET @wherePart = '';
+
+    IF @isAdmin THEN
+      SET @wherePart = '';
+    ELSEIF @isMarketAgent THEN
+      SET @wherePart = CONCAT('WHERE (big_select.marketAgentUserID = ', _userID,')');
+    ELSEIF @isClientManager THEN
+      SET @wherePart = CONCAT('WHERE (big_select.clientID = ', @clientID,')');
+    ELSEIF @isDispatcherOrWDispatcher THEN
+      SET @wherePart = CONCAT('WHERE (big_select.routeID IN (', @allRoutesWithUserPointID,'))');
+    END IF;
+
+
 
     SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
 
@@ -1358,12 +1416,11 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
     PREPARE getDataStm FROM @sqlString;
 
-    SET @_userID = _userID;
     SET @_startEntry = _startEntry;
     SET @_length = _length;
 
     EXECUTE getDataStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_startEntry, @_length;
+    USING @_startEntry, @_length;
     DEALLOCATE PREPARE getDataStm;
 
     -- filtered
@@ -1372,8 +1429,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     -- total
     SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
-    EXECUTE getTotalStm
-    USING @_userID, @_userID, @_userID, @_userID, @_userID, @_userID, @_userID;
+    EXECUTE getTotalStm;
     DEALLOCATE PREPARE getTotalStm;
 
   END;
