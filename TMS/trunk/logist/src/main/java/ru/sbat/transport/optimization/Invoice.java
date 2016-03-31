@@ -4,6 +4,7 @@ package ru.sbat.transport.optimization;
 import javafx.beans.property.*;
 import ru.sbat.transport.optimization.location.DeliveryRoute;
 import ru.sbat.transport.optimization.location.Point;
+import ru.sbat.transport.optimization.location.TrackCourse;
 import ru.sbat.transport.optimization.user.MarketAgent;
 import ru.sbat.transport.optimization.utils.InvoiceType;
 
@@ -204,5 +205,25 @@ public class Invoice implements Comparable<Invoice>{
             return 0;
         else
         return 0;
+    }
+
+//, Invoice invoice, TrackCourse trackCourse
+    public List<Integer> calculateNumbersOfWeeksBetweenDates(Date departureDate, Date deliveryDate){
+        List<Integer> result = new ArrayList<>();
+        Calendar calendarStart = Calendar.getInstance();
+        calendarStart.setTime(departureDate);
+        int numberOfDepartureDate = calendarStart.get(Calendar.WEEK_OF_YEAR);
+        Calendar calendarEnd = Calendar.getInstance();
+        calendarEnd.setTime(deliveryDate);
+        int numberOfDeliveryDate = calendarEnd.get(Calendar.WEEK_OF_YEAR);
+//        if((invoice.getCreationDate().getDay() + 1) > trackCourse.getRoute().getDayOfWeek()){
+////            if(numberOfDeliveryDate )
+//        }
+        while (numberOfDepartureDate != numberOfDeliveryDate){
+            result.add(numberOfDepartureDate);
+            numberOfDepartureDate++;
+        }
+        result.add(numberOfDeliveryDate);
+        return result;
     }
 }

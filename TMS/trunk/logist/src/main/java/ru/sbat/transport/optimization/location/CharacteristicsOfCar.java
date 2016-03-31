@@ -3,13 +3,14 @@ package ru.sbat.transport.optimization.location;
 
 
 public class CharacteristicsOfCar {
-    private double occupancyCost; // вместимость ТС по стоимости
 
-    public CharacteristicsOfCar(){
-    }
+    private double occupancyCost; // вместимость ТС по стоимости
 
     public CharacteristicsOfCar(double occupancyCost) {
         this.occupancyCost = occupancyCost;
+    }
+
+    public CharacteristicsOfCar() {
     }
 
     public double getOccupancyCost() {

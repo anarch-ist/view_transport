@@ -274,13 +274,28 @@ public class Optimizer implements IOptimizer {
      */
     @Override
     public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException {
-        Iterator<Map.Entry<Invoice, ArrayList<DeliveryRoute>>> iterator = routesForInvoice.entrySet().iterator();
         for(Invoice invoice: invoiceContainer){
-            if(invoice.getInvoiceType().equals(InvoiceType.C)){
+            if(!routesForInvoice.get(invoice).isEmpty()){
+                List<DeliveryRoute> deliveryRoutes = routesForInvoice.get(invoice);
+                for(DeliveryRoute deliveryRoute: deliveryRoutes){
 
+                }
             }
         }
     }
+
+//    public boolean isFittingForInvoice(DeliveryRoute deliveryRoute, Invoice invoice){
+//        List<Integer> countOfWeek = invoice.calculateNumbersOfWeeksBetweenDates(new Date(invoice.getCreationDate().getTime()
+//                + deliveryRoute.get(0).getStartTrackCourse().getLoadingOperationsTime() * 60000), invoice.getRequest().getPlannedDeliveryDate());
+//        for(TrackCourse trackCourse: deliveryRoute){
+//            List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
+//            for(int i = 0; i < countOfWeek.size(); i++){
+//                if(!loadUnits.isEmpty()){
+//
+//                }
+//            }
+//        }
+//    }
 
     /** shifts invoices' type B to send the maximum number of invoices on time
      *

@@ -4,6 +4,8 @@ import org.junit.*;
 import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
+import java.util.Calendar;
+
 public class TestRoute {
 
     static PlannedSchedule plannedSchedule = new PlannedSchedule();

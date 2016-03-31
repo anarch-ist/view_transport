@@ -3,7 +3,6 @@ package ru.sbat.transport.optimization.location;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.sbat.transport.optimization.TrackCourse;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.ArrayList;

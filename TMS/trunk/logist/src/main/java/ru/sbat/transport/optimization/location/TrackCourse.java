@@ -1,9 +1,7 @@
-package ru.sbat.transport.optimization;
+package ru.sbat.transport.optimization.location;
 
 
-import ru.sbat.transport.optimization.location.IRoute;
-import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.location.RoutePoint;
+import ru.sbat.transport.optimization.LoadUnit;
 
 import java.util.*;
 
@@ -73,14 +71,6 @@ public class TrackCourse {
                     if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getPoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getPoint().getPointId())){
                             result.add(trackCourse);
                     }
-                }
-            }
-        }
-        for(TrackCourse trackCourse: result){
-            for(TrackCourse tmp: result){
-                if (trackCourse.getStartTrackCourse().getPoint().getPointId().equals(tmp.getStartTrackCourse().getPoint().getPointId())
-                        && trackCourse.getEndTrackCourse().getPoint().getPointId().equals(tmp.getEndTrackCourse().getPoint().getPointId())) {
-
                 }
             }
         }

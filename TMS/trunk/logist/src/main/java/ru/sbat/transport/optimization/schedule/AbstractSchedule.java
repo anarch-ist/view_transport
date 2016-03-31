@@ -1,7 +1,6 @@
 package ru.sbat.transport.optimization.schedule;
 
 import ru.sbat.transport.optimization.location.IRoute;
-//import ru.sbat.transport.optimization.location.Route;
 
 import java.util.ArrayList;
 

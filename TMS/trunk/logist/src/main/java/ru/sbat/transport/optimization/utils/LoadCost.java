@@ -4,12 +4,10 @@ package ru.sbat.transport.optimization.utils;
 import ru.sbat.transport.optimization.Invoice;
 
 public class LoadCost {
-
+    private double loadCost;
     public LoadCost(double loadCost) {
         this.loadCost = loadCost;
     }
-
-    private double loadCost;
 
     public double getLoadCost() {
         return loadCost;

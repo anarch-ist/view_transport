@@ -30,13 +30,6 @@ public class TestOptimizer {
     static RouteNew route5 = new RouteNew();
     static RouteNew route6 = new RouteNew();
     static RouteNew route7 = new RouteNew();
-//    static IRoute route1 = new Route();
-//    static IRoute route2 = new Route();
-//    static IRoute route3 = new Route();
-//    static IRoute route4 = new Route();
-//    static IRoute route5 = new Route();
-//    static IRoute route6 = new Route();
-//    static IRoute route7 = new Route();
 
     // создание планового расписания
     @BeforeClass
@@ -44,7 +37,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route1,
                 2,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 920,
                 Util.createRoutePoint(x,   0),
                 Util.createRoutePoint(c,  80),
@@ -53,7 +46,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route2,
                 4,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 930,
                 Util.createRoutePoint(b,   0),
                 Util.createRoutePoint(p,  80),
@@ -63,7 +56,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route3,
                 4,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 940,
                 Util.createRoutePoint(p,   0),
                 Util.createRoutePoint(a,  80),
@@ -73,7 +66,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route4,
                 4,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 930,
                 Util.createRoutePoint(b,   0),
                 Util.createRoutePoint(x,  80),
@@ -82,7 +75,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route5,
                 4,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 930,
                 Util.createRoutePoint(c,   0),
                 Util.createRoutePoint(f,  80),
@@ -91,7 +84,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route6,
                 4,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 930,
                 Util.createRoutePoint(y,   0),
                 Util.createRoutePoint(w,  80),
@@ -100,7 +93,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route7,
                 4,
-                getCharacteristicsOfCar(10000000),
+                Util.getCharacteristicsOfCar(10000000),
                 930,
                 Util.createRoutePoint(b,   0),
                 Util.createRoutePoint(z, 120)
@@ -170,10 +163,9 @@ public class TestOptimizer {
     // создание накладных без маршрутов
     @BeforeClass
     public static void fullInvoiceContainer(){
-        Request request = createRequest(z,  createDate(2016, Calendar.FEBRUARY, 16, 20,  45));
-        Invoice invoice = createInvoice(c,  createDate(2016, Calendar.JANUARY, 30, 12, 0),     request, 5);
+        Request request = Util.createRequest(z,  Util.createDate(2016, Calendar.FEBRUARY, 16, 20,  45));
+        Invoice invoice = Util.createInvoice(c,  Util.createDate(2016, Calendar.JANUARY, 30, 12, 0),     request, 5);
         invoiceContainer.add(invoice);
-
     }
 
     @Test
@@ -187,6 +179,7 @@ public class TestOptimizer {
     public void testFilterRoutesByPoint() {
         Optimizer optimizer = new Optimizer();
         Map<IRoute, List<Integer>> result = optimizer.filterRoutesByPoint(plannedSchedule, a, true);
+
         System.out.println(result);
         Assert.assertEquals(2, result.size());
         Assert.assertEquals(1, result.get(route3).size());
@@ -205,35 +198,4 @@ public class TestOptimizer {
             System.out.println("_______________________");
         }
     }
-
-    // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
-
-    private static Invoice createInvoice(Point departurePoint, Date creationDate, Request request, double cost){
-        Invoice result = new Invoice();
-        result.setAddressOfWarehouse(departurePoint);
-        result.setCreationDate(creationDate);
-        result.setRequest(request);
-        result.setCost(cost);
-        return result;
-    }
-
-    private static Request createRequest(Point deliveryPoint, Date plannedDeliveryDateTime) {
-        Request result = new Request();
-        result.setDeliveryPoint(deliveryPoint);
-        result.setPlannedDeliveryDate(plannedDeliveryDateTime);
-        return result;
-    }
-
-    private static Date createDate(int year, int month, int day, int hours, int minutes) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, hours, minutes);
-        return new Date(calendar.getTimeInMillis());
-    }
-
-    public static CharacteristicsOfCar getCharacteristicsOfCar(double occupancyCost){
-        CharacteristicsOfCar result = new CharacteristicsOfCar();
-        result.setOccupancyCost(occupancyCost);
-        return result;
-    }
-    // -------------- END СЛУЖЕБНЫЕ МЕТОДЫ ---------------
 }

@@ -1,15 +1,12 @@
 package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.DeliveryRoute;
-//import ru.sbat.transport.optimization.location.Route;
-import ru.sbat.transport.optimization.location.RoutePoint;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
