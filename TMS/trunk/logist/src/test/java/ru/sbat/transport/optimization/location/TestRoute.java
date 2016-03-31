@@ -1,14 +1,13 @@
 package ru.sbat.transport.optimization.location;
 
 import org.junit.*;
+import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
-
-import java.util.Collections;
 
 public class TestRoute {
 
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static IRoute route = new RouteNew();
+    static RouteNew route = new RouteNew();
     static WarehousePoint warehousePoint1 = new WarehousePoint("g");
     static TradeRepresentativePoint tradeRepresentativePoint1 = new TradeRepresentativePoint("gt");
     static TradeRepresentativePoint tradeRepresentativePoint2 = new TradeRepresentativePoint("d");
@@ -17,11 +16,20 @@ public class TestRoute {
     public static void createPlannedSchedule() {
         Util.initRoute(
                 route,
+                3,
+                Util.createCharacteristicsOfCar(10.0),
+                930,
                 // данные о машине(грузоподъемность в т., объем, стоимость), пункт отправления, день недели, время отправления в минутах от начала суток, время до следующего пункта, время ПРР, расстояние до следующего пункта
-                Util.createRoutePoint(Util.createCharacteristicsOfCar(10), warehousePoint1,           2, 930, 600,   0, 120),
-                Util.createRoutePoint(Util.createCharacteristicsOfCar(15), tradeRepresentativePoint1, 3, 180, 960,  90,  50),
-                Util.createRoutePoint(Util.createCharacteristicsOfCar(20), tradeRepresentativePoint2, 3,   0,   0, 120,   0)
+                Util.createRoutePoint(warehousePoint1,             0),
+                Util.createRoutePoint(tradeRepresentativePoint1,  90),
+                Util.createRoutePoint(tradeRepresentativePoint2, 120)
         );
+        route.get(0).setDistanceBetweenRoutePoints(120);
+        route.get(1).setDistanceBetweenRoutePoints(50);
+        route.get(0).setTravelTime(600);
+        route.get(1).setTravelTime(960);
+        route.get(0).setRoute(route);
+        route.get(1).setRoute(route);
         plannedSchedule.add(route);
     }
 
@@ -42,7 +50,7 @@ public class TestRoute {
 
     @Test
     public void testGetArrivalTime() throws Exception {
-        Assert.assertEquals(1260, plannedSchedule.get(0).getArrivalTime(), 0);
+        Assert.assertEquals(1140, plannedSchedule.get(0).getArrivalTime(), 0);
     }
 
     @Test
@@ -56,18 +64,15 @@ public class TestRoute {
     }
 
     @Test
-    public void testGetWeekDayOfActualDeliveryTime() {
-        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualDeliveryDateInRoutePoint(route.getRoutePoint(1)));
+    public void testGetWeekDayOfActualDeliveryTime() throws IncorrectRequirement {
+        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfActualArrivalDateInRoutePoint(route.get(0).getEndTrackCourse()));
+        Assert.assertEquals(4, plannedSchedule.get(0).getWeekDayOfActualArrivalDateInRoutePoint(route.get(1).getEndTrackCourse()));
     }
 
     @Test
-    public void testGetActualDeliveryTime() {
-        Assert.assertEquals(3, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(1)).getHours());
-        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(1)).getMinutes());
-        Assert.assertEquals(21, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(2)).getHours());
-        Assert.assertEquals(0, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(2)).getMinutes());
-        Assert.assertEquals(15, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(0)).getHours());
-        Assert.assertEquals(30, plannedSchedule.get(0).getActualDeliveryTimeInRoutePoint(route.getRoutePoint(0)).getMinutes());
+    public void testGetActualDeliveryTime() throws IncorrectRequirement {
+        Assert.assertEquals(90, plannedSchedule.get(0).getActualArrivalTimeInRoutePoint(route.get(0).getEndTrackCourse()));
+        Assert.assertEquals(1140, plannedSchedule.get(0).getActualArrivalTimeInRoutePoint(route.get(1).getEndTrackCourse()));
     }
 
     @Test
@@ -78,11 +83,11 @@ public class TestRoute {
 
     @Test
     public void testGetWeekDayOfDepartureTime() {
-        Assert.assertEquals(2, plannedSchedule.get(0).getWeekDayOfDepartureTime());
+        Assert.assertEquals(3, plannedSchedule.get(0).getWeekDayOfDepartureTime());
     }
 
     @Test
-    public void testGetDaysCountOfRoute() {
+    public void testGetDaysCountOfRoute() throws IncorrectRequirement {
         Assert.assertEquals(1, plannedSchedule.get(0).getDaysCountOfRoute());
     }
 

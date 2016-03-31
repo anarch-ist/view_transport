@@ -2,6 +2,7 @@ package ru.sbat.transport.optimization.location;
 
 
 import ru.sbat.transport.optimization.TrackCourse;
+import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 
 import java.util.Collection;
 import java.util.Date;
@@ -15,14 +16,14 @@ public interface IRoute {
     Double getFullDistance();
     Integer getFullTime();
     Integer getDepartureTime();
-    Integer getArrivalTime();
+    Integer getArrivalTime() throws IncorrectRequirement;
     Point getArrivalPoint();
     Point getDeparturePoint();
-    int getWeekDayOfActualDeliveryDateInRoutePoint(RoutePoint routePoint);
-    Date getActualDeliveryTimeInRoutePoint(RoutePoint routePoint);
+    int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
+    int getActualArrivalTimeInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
     int[] splitToComponentTime(Integer time);
     int getWeekDayOfDepartureTime();
-    int getDaysCountOfRoute();
+    int getDaysCountOfRoute() throws IncorrectRequirement;
     double getStartingOccupancyCost();
 
     boolean isCorrectRoutePoint(RoutePoint routePoint);

@@ -3,29 +3,18 @@ package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.IRoute;
 import ru.sbat.transport.optimization.location.Point;
-import ru.sbat.transport.optimization.location.Route;
 import ru.sbat.transport.optimization.location.RoutePoint;
-import ru.sbat.transport.optimization.utils.LoadCost;
 
 import java.util.*;
 
 
 public class TrackCourse {
-    private LoadCost loadCost;
     private RoutePoint startTrackCourse;
     private RoutePoint endTrackCourse;
     private IRoute route;
     private int travelTime;
     private double distanceBetweenRoutePoints;
     private List<LoadUnit> loadUnits = new ArrayList<>();
-
-    public LoadCost getLoadCost() {
-        return loadCost;
-    }
-
-    public void setLoadCost(LoadCost loadCost) {
-        this.loadCost = loadCost;
-    }
 
     public RoutePoint getStartTrackCourse() {
         return startTrackCourse;
@@ -52,11 +41,19 @@ public class TrackCourse {
     }
 
     public int getTravelTime() {
-        return this.getStartTrackCourse().getTimeToNextPoint();
+        return travelTime;
     }
 
     public void setTravelTime(int travelTime) {
         this.travelTime = travelTime;
+    }
+
+    public double getDistanceBetweenRoutePoints() {
+        return distanceBetweenRoutePoints;
+    }
+
+    public void setDistanceBetweenRoutePoints(double distanceBetweenRoutePoints) {
+        this.distanceBetweenRoutePoints = distanceBetweenRoutePoints;
     }
 
     public List<LoadUnit> getLoadUnits() {
@@ -67,21 +64,13 @@ public class TrackCourse {
         this.loadUnits = loadUnits;
     }
 
-    public double getDistanceBetweenRoutePoints() {
-        return this.getStartTrackCourse().getDistanceToNextPoint();
-    }
-
-    public void setDistanceBetweenRoutePoints(double distanceBetweenRoutePoints) {
-        this.distanceBetweenRoutePoints = distanceBetweenRoutePoints;
-    }
-
     public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<IRoute> routes) {
         List<TrackCourse> result = new ArrayList<>();
         for(int i = 0; i < points.size() - 1; i++){
         for(IRoute route: routes){
             List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse(route);
             for(TrackCourse trackCourse: trackCoursesForRoute){
-                    if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getDeparturePoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId())){
+                    if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getPoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getPoint().getPointId())){
                             result.add(trackCourse);
                     }
                 }
@@ -89,8 +78,8 @@ public class TrackCourse {
         }
         for(TrackCourse trackCourse: result){
             for(TrackCourse tmp: result){
-                if (trackCourse.getStartTrackCourse().getDeparturePoint().getPointId().equals(tmp.getStartTrackCourse().getDeparturePoint().getPointId())
-                        && trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(tmp.getEndTrackCourse().getDeparturePoint().getPointId())) {
+                if (trackCourse.getStartTrackCourse().getPoint().getPointId().equals(tmp.getStartTrackCourse().getPoint().getPointId())
+                        && trackCourse.getEndTrackCourse().getPoint().getPointId().equals(tmp.getEndTrackCourse().getPoint().getPointId())) {
 
                 }
             }
@@ -101,17 +90,16 @@ public class TrackCourse {
     @Override
     public String toString() {
         return "TrackCourse{" +
-                "loadCost=" + loadCost +
-                ", startTrackCourse=" + startTrackCourse +
+                "startTrackCourse=" + startTrackCourse +
                 ", endTrackCourse=" + endTrackCourse +
                 ", route=" + route +
                 ", travelTime=" + travelTime +
+                ", distanceBetweenRoutePoints=" + distanceBetweenRoutePoints +
                 ", loadUnits=" + loadUnits +
-                ", distanceBetweenRoutePoints" + distanceBetweenRoutePoints +
                 '}';
     }
 
-    @Override
+        @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -121,7 +109,6 @@ public class TrackCourse {
         if (!startTrackCourse.equals(that.startTrackCourse)) return false;
         if (!endTrackCourse.equals(that.endTrackCourse)) return false;
         return route.equals(that.route);
-
     }
 
     @Override

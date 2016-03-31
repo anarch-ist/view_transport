@@ -2,8 +2,7 @@ package ru.sbat.transport.optimization.location;
 
 
 import ru.sbat.transport.optimization.TrackCourse;
-import ru.sbat.transport.optimization.utils.LoadCost;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 
 import java.util.*;
 
@@ -30,7 +29,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     }
 
     public int getDayOfWeek() {
-        return this.get(0).getStartTrackCourse().getDayOfWeek();
+        return dayOfWeek;
     }
 
     public void setDayOfWeek(int dayOfWeek) {
@@ -40,7 +39,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     @Override
     public boolean containsPoint(Point point) {
         for(TrackCourse trackCourse: this){
-            if(trackCourse.getStartTrackCourse().getDeparturePoint().equals(point) || trackCourse.getEndTrackCourse().getDeparturePoint().equals(point)){
+            if(trackCourse.getStartTrackCourse().getPoint().equals(point) || trackCourse.getEndTrackCourse().getPoint().equals(point)){
                 return true;
             }
         }
@@ -49,7 +48,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
 
     @Override
     public boolean isLastPoint(Point point) {
-        return (this.get(this.size()-1).getEndTrackCourse().getDeparturePoint().equals(point));
+        return (this.get(this.size()-1).getEndTrackCourse().getPoint().equals(point));
     }
 
     @Override
@@ -57,7 +56,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         StringBuilder stringBuilder = new StringBuilder();
         List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
         for (RoutePoint routePoint: routePoints) {
-            stringBuilder.append(routePoint.getDeparturePoint().getPointId()).append(" ");
+            stringBuilder.append(routePoint.getPoint().getPointId()).append(" ");
         }
         return stringBuilder.toString();
     }
@@ -93,7 +92,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      * @return minutes from the start of the day
      */
     public Integer getDepartureTime() {
-        return this.get(0).getStartTrackCourse().getDepartureTime();
+        return this.getDepartureTimeFromFirstPoint();
     }
 
     /** determines the arrival time to the final point of the route
@@ -101,14 +100,8 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      * @return minutes from the start of the day
      */
     @Override
-    public Integer getArrivalTime() {
-        int result = 0;
-        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
-        result = routePoints.get(routePoints.size()-2).getDepartureTime() + routePoints.get(routePoints.size()-2).getTimeToNextPoint() + routePoints.get(routePoints.size()-1).getLoadingOperationsTime();
-        if(result >= 1440){
-            result = result - 1440;
-        }
-        return result;
+    public Integer getArrivalTime() throws IncorrectRequirement {
+        return this.getActualArrivalTimeInRoutePoint(this.get(this.size() - 1).getEndTrackCourse());
     }
 
     /** determines the final point of the route
@@ -117,7 +110,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      */
     @Override
     public Point getArrivalPoint() {
-        return this.get(this.size()-1).getEndTrackCourse().getDeparturePoint();
+        return this.get(this.size()-1).getEndTrackCourse().getPoint();
     }
 
     /** determines the first point of the route
@@ -126,7 +119,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      */
     @Override
     public Point getDeparturePoint() {
-        return this.get(0).getStartTrackCourse().getDeparturePoint();
+        return this.get(0).getStartTrackCourse().getPoint();
     }
 
     /** determines day of week of arrival in the point of route
@@ -134,48 +127,60 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      * @return day of week of point
      */
     @Override
-    public int getWeekDayOfActualDeliveryDateInRoutePoint(RoutePoint routePoint) {
-        int result = 0;
-        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
-        for(RoutePoint routePointFromRoute: routePoints){
-            if(routePointFromRoute.equals(routePoint)){
-                result = routePointFromRoute.getDayOfWeek();
+    public int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint endTC) throws IncorrectRequirement {
+        int result = this.getDepartureTimeFromFirstPoint();
+        if(this.get(0).getStartTrackCourse().getPoint().equals(endTC.getPoint())){
+            throw new IncorrectRequirement("arrival day of week in planned schedule can't be in the first point");
+        }
+        for(TrackCourse trackCourse: this) {
+            if (trackCourse.getEndTrackCourse().getPoint().equals(endTC.getPoint())) {
+                int index = this.indexOf(trackCourse);
+                if (index == 0) {
+                    result += trackCourse.getTravelTime();
+                    if (result >= 1440) {
+                        result = (result - 1440);
+                    }
+                }else {
+                    for(int i = 0; i <= index; i++){
+                        result += this.get(i).getTravelTime() + this.get(i).getEndTrackCourse().getLoadingOperationsTime();
+                    }
+                    result -= this.get(index).getEndTrackCourse().getLoadingOperationsTime();
+                }
             }
         }
+        result = (result / (24 * 60)) + this.getDayOfWeek();
         return result;
     }
 
     /** determines time of arrival in the point of route
      *
-     * @return current day, month, year with REAL hours and minutes of arrival in the point
+     * @return minutes of arrival in the point
      */
+    // ARRIVAL TIME
     @Override
-    public Date getActualDeliveryTimeInRoutePoint(RoutePoint routePoint) {
-        Date date = new Date();
-        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
-        for(RoutePoint routePointFromRoute: routePoints) {
-            if (routePointFromRoute.equals(routePoint)) {
-                if (routePoints.indexOf(routePointFromRoute) != 0) {
-                    int index = routePoints.indexOf(routePointFromRoute);
-                    int time = routePoints.get(index - 1).getDepartureTime() + routePoints.get(index - 1).getTimeToNextPoint() + routePoints.get(index).getLoadingOperationsTime();
-                    if (time >= 1440) {
-                        time = (time - 1440);
+    public int getActualArrivalTimeInRoutePoint(RoutePoint endTC) throws IncorrectRequirement {
+        int result = this.getDepartureTimeFromFirstPoint();
+        if(this.get(0).getStartTrackCourse().getPoint().equals(endTC.getPoint())){
+            throw new IncorrectRequirement("arrival time in planned schedule can't be in the first point");
+        }
+        for(TrackCourse trackCourse: this) {
+            if (trackCourse.getEndTrackCourse().getPoint().equals(endTC.getPoint())) {
+                int index = this.indexOf(trackCourse);
+                if (index == 0) {
+                    result += trackCourse.getTravelTime();
+                    if (result >= 1440) {
+                        result = (result - 1440);
                     }
-                    int[] hoursAndMinutes = splitToComponentTime(time);
-                    date.setHours(hoursAndMinutes[0]);
-                    date.setMinutes(hoursAndMinutes[1]);
-                }else if(routePoints.indexOf(routePointFromRoute) == 0){
-                    int time = routePointFromRoute.getDepartureTime();
-                    if (time >= 1440) {
-                        time = (time - 1440);
+                }else {
+                    for(int i = 0; i <= index; i++){
+                        result += this.get(i).getTravelTime() + this.get(i).getEndTrackCourse().getLoadingOperationsTime();
                     }
-                    int[] hoursAndMinutes = splitToComponentTime(time);
-                    date.setHours(hoursAndMinutes[0]);
-                    date.setMinutes(hoursAndMinutes[1]);
+                    result -= this.get(index).getEndTrackCourse().getLoadingOperationsTime();
                 }
             }
         }
-        return date;
+        result = result - ((result / (24 * 60)) * 24 * 60);
+        return result;
     }
 
     /** parts minutes from the start of the day to hours and minutes
@@ -197,7 +202,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      */
     @Override
     public int getWeekDayOfDepartureTime() {
-        return this.get(0).getStartTrackCourse().getDayOfWeek();
+        return this.getDayOfWeek();
     }
 
     /** calculates count of days in route
@@ -205,17 +210,13 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      * @return count of days
      */
     @Override
-    public int getDaysCountOfRoute() {
-        int result = this.get(this.size()-1).getEndTrackCourse().getDayOfWeek() - this.getDayOfWeek();
-        if(result < 0){
-            result = 7 - (this.getDayOfWeek() - this.get(this.size()-1).getEndTrackCourse().getDayOfWeek());
-        }
-        return result;
+    public int getDaysCountOfRoute() throws IncorrectRequirement {
+        return (this.getFullTime() / (60 * 24));
     }
 
     @Override
     public double getStartingOccupancyCost() {
-        return this.get(0).getStartTrackCourse().getCharacteristicsOfCar().getOccupancyCost();
+        return this.getCharacteristicsOfCar().getOccupancyCost();
     }
 
     public List<RoutePoint> splitRouteNewIntoRoutePoints(){
@@ -230,7 +231,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     public boolean isCorrectRoutePoint(RoutePoint routePoint) {
         boolean result = true;
         if(this.size() >= 1) {
-            if (this.splitRouteNewIntoRoutePoints().get(this.size() - 1).getDeparturePoint().equals(routePoint.getDeparturePoint())) {
+            if (this.splitRouteNewIntoRoutePoints().get(this.size() - 1).getPoint().equals(routePoint.getPoint())) {
                 return false;
             }
         }
@@ -300,7 +301,6 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
             trackCourse.setStartTrackCourse(routePoints.get(i));
             trackCourse.setEndTrackCourse(routePoints.get(i + 1));
             trackCourse.setRoute(route);
-            trackCourse.setLoadCost(new LoadCost(this.getStartingOccupancyCost()));
             result.add(trackCourse);
         }
         return result;

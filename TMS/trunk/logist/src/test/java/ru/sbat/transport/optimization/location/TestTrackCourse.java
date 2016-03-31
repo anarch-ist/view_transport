@@ -7,12 +7,11 @@ import ru.sbat.transport.optimization.TrackCourse;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TestTrackCourse {
     static PlannedSchedule plannedSchedule = new PlannedSchedule();
-    static IRoute route = new RouteNew();
+    static RouteNew route = new RouteNew();
     static WarehousePoint c = new WarehousePoint("C");
     static TradeRepresentativePoint x = new TradeRepresentativePoint("X");
     static TradeRepresentativePoint a = new TradeRepresentativePoint("A");
@@ -21,11 +20,19 @@ public class TestTrackCourse {
     public static void createPlannedSchedule() {
         Util.initRoute(
                 route,
-                createRoutePoint(c, 5, 930, 600,   120, 120, getCharacteristicsOfCar(10)),
-                createRoutePoint(x, 6, 150, 960,    60,  50, getCharacteristicsOfCar(10)),
-                createRoutePoint(a, 6,   0,   0,    90, 300, getCharacteristicsOfCar(10))
+                3,
+                Util.createCharacteristicsOfCar(10.0),
+                930,
+                Util.createRoutePoint(c,   0),
+                Util.createRoutePoint(x,  90),
+                Util.createRoutePoint(a, 120)
         );
-
+        route.get(0).setDistanceBetweenRoutePoints(120);
+        route.get(1).setDistanceBetweenRoutePoints(50);
+        route.get(0).setTravelTime(600);
+        route.get(1).setTravelTime(960);
+        route.get(0).setRoute(route);
+        route.get(1).setRoute(route);
         plannedSchedule.add(route);
     }
 
@@ -38,30 +45,8 @@ public class TestTrackCourse {
         List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(points, plannedSchedule);
         System.out.println("Size = " + trackCourses.size());
         for(TrackCourse trackCourse1: trackCourses){
-            System.out.println(trackCourse1.getStartTrackCourse().getDeparturePoint().getPointId());
-            System.out.println(trackCourse1.getEndTrackCourse().getDeparturePoint().getPointId());
+            System.out.println(trackCourse1.getStartTrackCourse().getPoint().getPointId());
+            System.out.println(trackCourse1.getEndTrackCourse().getPoint().getPointId());
         }
     }
-
-
-    // -------- СЛУЖЕБНЫЕ МЕТОДЫ -----------
-
-    private static RoutePoint createRoutePoint(Point point, int dayOfWeek, int departureTime, int timeToNextPoint, int loadingOperationsTime, double distanceToNextPoint, CharacteristicsOfCar characteristicsOfCar) {
-        RoutePoint result = new RoutePoint();
-        result.setDeparturePoint(point);
-        result.setDayOfWeek(dayOfWeek);
-        result.setDepartureTime(departureTime); // в минутах от начала суток
-        result.setTimeToNextPoint(timeToNextPoint);
-        result.setLoadingOperationsTime(loadingOperationsTime);
-        result.setDistanceToNextPoint(distanceToNextPoint);
-        result.setCharacteristicsOfCar(characteristicsOfCar);
-        return result;
-    }
-
-    public static CharacteristicsOfCar getCharacteristicsOfCar(double occupancyCost){
-        CharacteristicsOfCar result = new CharacteristicsOfCar();
-        result.setOccupancyCost(occupancyCost);
-        return result;
-    }
-    // -------------- END СЛУЖЕБНЫЕ МЕТОДЫ ---------------
 }

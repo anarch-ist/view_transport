@@ -25,13 +25,14 @@ public class Optimizer implements IOptimizer {
     public Map<Invoice, List<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
         Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
         List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
+        List<Point> points = new ArrayList<>();
         Collections.sort(invoiceContainer);
         for (Invoice invoice : invoiceContainer) {
             if (invoice.getDeliveryRoute() != null)
                 throw new IllegalArgumentException("invoice.getDeliveryRoutesForInvoice() should be null");
                 Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
                 Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
-                possibleDeliveryRouteForInvoice = getDeliveryRoutesForInvoice(invoice, plannedSchedule);
+                possibleDeliveryRouteForInvoice = startRecursive(plannedSchedule, departurePoint, deliveryPoint, possibleDeliveryRouteForInvoice, points);
                 result.put(invoice, possibleDeliveryRouteForInvoice);
             }
         return result;
@@ -62,12 +63,12 @@ public class Optimizer implements IOptimizer {
 
             if (indexesOfPoint.size() == 1) {
                 for (int i = indexesOfPoint.get(0) + 1; i < route.getRouteSize(); i++) {
-                    if(route.getRoutePoint(i).getDeparturePoint().equals(deliveryPoint)){
+                    if(route.getRoutePoint(i).getPoint().equals(deliveryPoint)){
 //                        deliveryRoute.add(route);
                         result.add(deliveryRoute);
                         break;
                     }
-                    filterRoutesByPoint(plannedSchedule, route.getRoutePoint(indexesOfPoint.get(0) + 1).getDeparturePoint(), true);
+                    filterRoutesByPoint(plannedSchedule, route.getRoutePoint(indexesOfPoint.get(0) + 1).getPoint(), true);
                 }
             } else if (indexesOfPoint.size() > 1) {
                 throw new NotImplementedException();
@@ -89,7 +90,7 @@ public class Optimizer implements IOptimizer {
         rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPoint, informationStack);
         for(DeliveryRoute deliveryRoute: result){
             for (TrackCourse trackCourse: deliveryRoute){
-                if(trackCourse.getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryPoint.getPointId())){
+                if(trackCourse.getEndTrackCourse().getPoint().getPointId().equals(deliveryPoint.getPointId())){
 //                    System.out.println(deliveryRoute.size());
                     DeliveryRoute tmp = removeDuplicates(deliveryRoute);
                     if(isCorrectDeliveryRoute(tmp, departurePoint, deliveryPoint)){
@@ -121,12 +122,12 @@ public class Optimizer implements IOptimizer {
     }
 
     private boolean isCorrectDeliveryRoute(DeliveryRoute deliveryRoute, Point departurePoint, Point deliveryPoint){
-        if(!deliveryRoute.get(0).getStartTrackCourse().getDeparturePoint().getPointId().equals(departurePoint.getPointId())
-                || !deliveryRoute.get(deliveryRoute.size() - 1).getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryPoint.getPointId())){
+        if(!deliveryRoute.get(0).getStartTrackCourse().getPoint().getPointId().equals(departurePoint.getPointId())
+                || !deliveryRoute.get(deliveryRoute.size() - 1).getEndTrackCourse().getPoint().getPointId().equals(deliveryPoint.getPointId())){
             return false;
         }
         for(int i = 0; i < deliveryRoute.size() - 1; i++){
-            if(!deliveryRoute.get(i).getEndTrackCourse().getDeparturePoint().getPointId().equals(deliveryRoute.get(i + 1).getStartTrackCourse().getDeparturePoint().getPointId())){
+            if(!deliveryRoute.get(i).getEndTrackCourse().getPoint().getPointId().equals(deliveryRoute.get(i + 1).getStartTrackCourse().getPoint().getPointId())){
                 return false;
             }
         }
@@ -141,21 +142,21 @@ public class Optimizer implements IOptimizer {
             if (indexesOfPoint.size() == 1) {
 
                 Integer indexOfPointInRoute = indexesOfPoint.get(0);
-                Point pointInRoute = route.getRoutePoint(indexOfPointInRoute).getDeparturePoint();
+                Point pointInRoute = route.getRoutePoint(indexOfPointInRoute).getPoint();
                 if(!pointInRoute.equals(deliveryPoint)) {
                     markedPoints.add(pointInRoute);
                 }
                 // last point of route
                 if ((indexOfPointInRoute + 1) == route.getRouteSize()) {
 
-//                    Point newDeparturePoint = route.get(indexOfPointInRoute).getDeparturePoint();
+//                    Point newDeparturePoint = route.get(indexOfPointInRoute).getPoint();
 //                    Map<Route, List<Integer>> filteredRoutesByPointNew = filterRoutesByPoint(plannedSchedule, newDeparturePoint, false);
 //                    rec(plannedSchedule, deliveryPoint, result, markedPoints, filteredRoutesByPointNew, informationStack);
                 // if middle point of route
                 } else {
                     for (int i = indexOfPointInRoute + 1; i < route.getRouteSize(); i++) {
 
-                        Point point = route.getRoutePoint(i).getDeparturePoint();
+                        Point point = route.getRoutePoint(i).getPoint();
 
                         System.out.println("infStack = " + informationStack);
                         System.out.println("currentRoute = "+route.getPointsAsString());
@@ -190,7 +191,7 @@ public class Optimizer implements IOptimizer {
                                 List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(pointsId, routesId);
                                 for(TrackCourse correctTrackCourse: trackCourses) {
                                     deliveryRoute.add(correctTrackCourse);
-                                    System.out.println("Track Courses, start point id = " + correctTrackCourse.getStartTrackCourse().getDeparturePoint().getPointId() + ", end point id = " + correctTrackCourse.getEndTrackCourse().getDeparturePoint().getPointId());
+                                    System.out.println("Track Courses, start point id = " + correctTrackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point id = " + correctTrackCourse.getEndTrackCourse().getPoint().getPointId());
                                 }
                                 result.add(deliveryRoute);
                                 System.out.println("FIND delivery point!");
@@ -237,14 +238,14 @@ public class Optimizer implements IOptimizer {
             if (considerLastPoint) {
 
                 for(RoutePoint routePoint: route.asRoutePointCollection()) {
-                    if(route.containsPoint(point) && routePoint.getDeparturePoint().equals(point)){
+                    if(route.containsPoint(point) && routePoint.getPoint().equals(point)){
                         indexes.add(route.getIndexOfRoutePoint(routePoint));
                         wasFound = true;
                     }
                 }
             } else {
                 for(RoutePoint routePoint: route.asRoutePointCollection()) {
-                    if(!route.isLastPoint(point) && route.containsPoint(point) && routePoint.getDeparturePoint().equals(point)){
+                    if(!route.isLastPoint(point) && route.containsPoint(point) && routePoint.getPoint().equals(point)){
                         indexes.add(route.getIndexOfRoutePoint(routePoint));
                         wasFound = true;
                     }
