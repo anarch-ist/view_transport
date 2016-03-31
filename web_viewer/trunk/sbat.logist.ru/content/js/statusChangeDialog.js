@@ -13,6 +13,7 @@ $(document).ready(function () {
         '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
+        '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Номер ТС: </label></td><td><input id="vehicleNumberInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
         '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes">aaaaaaaaaa</div></td></tr>' +
         '</table>' +
@@ -115,6 +116,7 @@ $(document).ready(function () {
                 var newStatusID = $statusSelect[0][$statusSelect[0].selectedIndex].value;
                 var date = $('#dateTimePicker')[0].value;
                 var comment = $("#commentInput").val();
+                var vehicleNumber = $("#vehicleNumberInput").val();
 
                 if (dialogType === "changeStatusForRequest") {
 
@@ -127,7 +129,8 @@ $(document).ready(function () {
                                 requestIDExternal: requestIDExternal,
                                 newStatusID: newStatusID,
                                 date: date,
-                                comment: comment
+                                comment: comment,
+                                vehicleNumber: vehicleNumber
                             },
                             function (data) {
                                 if (data === '1') {
@@ -159,6 +162,7 @@ $(document).ready(function () {
                                 newStatusID: newStatusID,
                                 date: date,
                                 comment: comment,
+                                vehicleNumber: vehicleNumber,
                                 palletsQty: palletsQty,
                                 requestIDExternalArray: requests
                             },

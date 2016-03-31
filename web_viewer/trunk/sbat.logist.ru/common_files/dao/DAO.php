@@ -190,7 +190,6 @@ class DAO implements IDAO
          // TODO: Check update() method.
 
         $strs = explode(';', $newObj->getUpdateQuery());
-
         if (!is_null($updateTable)) {
             $this->query($updateTable->getInsertQuery());
         }

@@ -55,6 +55,7 @@ function getRequestsForUser(PrivilegedUser $privUser)
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
         "data" => $dataArray['requests']   // total data array
     );
+    
     return json_encode($json_data);
 }
 
@@ -62,21 +63,23 @@ function changeStatusForRequest(PrivilegedUser $privUser)
 {
     $requestIDExternal = $_POST['requestIDExternal'];
     $newStatusID = $_POST['newStatusID'];
+    $vehicleNumber = $_POST['vehicleNumber'];
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
-    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment);
+    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber);
 }
 
 function changeStatusForSeveralRequests(PrivilegedUser $privUser)
 {
     $requests = $_POST['requestIDExternalArray'];
     $newStatusID = $_POST['newStatusID'];
+    $vehicleNumber = $_POST['vehicleNumber'];
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
     if (isset($_POST['palletsQty'])) {
-        return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $requests, $newStatusID, $datetime, $comment, $_POST['palletsQty']);
+        return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $_POST['palletsQty']);
     }
-    return $privUser->getRequestEntity()->updateRequestStatuses($userID, $requests, $newStatusID, $datetime, $comment);
+    return $privUser->getRequestEntity()->updateRequestStatuses($userID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber);
 }
