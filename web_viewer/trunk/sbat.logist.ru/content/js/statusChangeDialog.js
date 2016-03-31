@@ -77,7 +77,7 @@ $(document).ready(function () {
             $("#palletsQtyTr").hide();
             switch (dialogType) {
                 case "changeStatusForRequest":
-                    $selectRequestsTr.hide();
+                    $selectRequestsTr.show();
                     $statusSelect.off("selectmenuchange");
                     break;
                 case "changeStatusForSeveralRequests":
@@ -121,6 +121,7 @@ $(document).ready(function () {
                 if (dialogType === "changeStatusForRequest") {
 
                     // get specific vars for "changeStatusForRequest" dialogType
+
                     var requestIDExternal = dataTable.row($('#user-grid .selected')).data().requestIDExternal;
                     if (date)
                         $.post("content/getData.php",
