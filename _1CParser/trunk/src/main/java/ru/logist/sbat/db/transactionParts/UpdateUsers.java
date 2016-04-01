@@ -29,10 +29,9 @@ public class UpdateUsers extends TransactionPart{
     @Override
     public PreparedStatement executePart() throws SQLException {
         logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
-        //BidiMap<String, Integer> allUsersAsKeyPairs = Selects.selectAllClientsIdExternal(InsertOrUpdateTransactionScript.LOGIST_1C);
         PreparedStatement result = connection.prepareStatement(
                 "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
-                        "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, getClientIDByClientIDExternal(?, ?))\n" +
+                        "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT clientID FROM clients WHERE clientIDExternal = ? AND dataSourceID = ?))\n" +
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  login  = VALUES(login),\n" +
                         "  salt        = VALUES(salt),\n" +

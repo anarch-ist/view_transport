@@ -35,7 +35,7 @@ public class UpdateRequests extends TransactionPart{
                         "    (SELECT users.userID FROM users WHERE users.userIDExternal = ? AND users.dataSourceID = ?),\n" +
                         "    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,\n" +
                         "   NOW(),\n" +
-                        "   getUserIDByLogin('parser'),\n" +
+                        "   (SELECT userID FROM users WHERE login = 'parser'),\n" +
                         "   'CREATED',\n" +
                         "   ?,\n" +
                         "   NULL,\n" +

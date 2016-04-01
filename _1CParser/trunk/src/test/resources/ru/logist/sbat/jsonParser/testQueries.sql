@@ -13,15 +13,34 @@ INSERT INTO routes (directionIDExternal, dataSourceID, routeName) VALUE ('111', 
 ON DUPLICATE KEY UPDATE
   routeName = VALUES(routeName);
 
-INSERT INTO users (login, userName, email, phoneNumber, salt, passAndSalt, userRoleID)
-  VALUE ('11', 'w', 'w', 'w', 'w', 'w', 'ADMIN')
+INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)
+  SELECT
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, clients.clientID
+  FROM DUAL LEFT JOIN clients ON
+  clientIDExternal = ? AND dataSourceID = ?
 ON DUPLICATE KEY UPDATE
-  userName    = VALUES(userName),
-  email       = VALUES(email),
-  phoneNumber = VALUES(phoneNumber),
+  login       = VALUES(login),
   salt        = VALUES(salt),
   passAndSalt = VALUES(passAndSalt),
-  userRoleID  = VALUES(userRoleID);
+  userRoleID  = VALUES(userRoleID),
+  userName    = VALUES(userName),
+  phoneNumber = VALUES(phoneNumber),
+  email       = VALUES(email),
+  position    = VALUES(position),
+  pointID     = VALUES(pointID),
+  clientID    = VALUES(clientID);
+
+SELECT
+  1, clients.clientID
+FROM DUAL LEFT JOIN clients ON(clientIDExternal = 'dd' AND dataSourceID = 'LOGIST_1C');
+
+SELECT 1 as n1 FROM DUAL JOIN clients ON 1=1;
+
+SELECT
+  1, clients.clientID
+FROM DUAL LEFT JOIN clients ON(clientIDExternal = 'dd' AND dataSourceID = 'LOGIST_1C');
+
+SELECT 1, 2 FROM dual LEFT JOIN clients ON (TRUE);
 
 INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)
   VALUE ('ewd', 'LOGIST_1C', 'e', '123456')
