@@ -2,11 +2,10 @@ package ru.sbat.transport.optimization;
 
 
 import ru.sbat.transport.optimization.utils.LoadCost;
-import ru.sbat.transport.optimization.utils.NumberOfWeek;
 
 public class LoadUnit {
     private LoadCost loadCost;
-    private NumberOfWeek numberOfWeek;
+    private int numberOfWeek;
 
     public LoadCost getLoadCost() {
         return loadCost;
@@ -16,11 +15,11 @@ public class LoadUnit {
         this.loadCost = loadCost;
     }
 
-    public NumberOfWeek getNumberOfWeek() {
+    public int getNumberOfWeek() {
         return numberOfWeek;
     }
 
-    public void setNumberOfWeek(NumberOfWeek numberOfWeek) {
+    public void setNumberOfWeek(int numberOfWeek) {
         this.numberOfWeek = numberOfWeek;
     }
 }

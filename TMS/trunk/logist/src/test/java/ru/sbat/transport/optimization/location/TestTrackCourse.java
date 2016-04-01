@@ -34,18 +34,18 @@ public class TestTrackCourse {
         route.get(1).setRoute(route);
         plannedSchedule.add(route);
     }
-
-    @Test
-    public void testShareTrackCourses() {
-        List<Point> points = new ArrayList<>();
-        points.add(x);
-        points.add(a);
-        TrackCourse trackCourse = new TrackCourse();
-        List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(points, plannedSchedule);
-        System.out.println("Size = " + trackCourses.size());
-        for(TrackCourse trackCourse1: trackCourses){
-            System.out.println(trackCourse1.getStartTrackCourse().getPoint().getPointId());
-            System.out.println(trackCourse1.getEndTrackCourse().getPoint().getPointId());
-        }
-    }
+//
+//    @Test
+//    public void testShareTrackCourses() {
+//        List<Point> points = new ArrayList<>();
+//        points.add(x);
+//        points.add(a);
+//        TrackCourse trackCourse = new TrackCourse();
+//        List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(points, plannedSchedule);
+//        System.out.println("Size = " + trackCourses.size());
+//        for(TrackCourse trackCourse1: trackCourses){
+//            System.out.println(trackCourse1.getStartTrackCourse().getPoint().getPointId());
+//            System.out.println(trackCourse1.getEndTrackCourse().getPoint().getPointId());
+//        }
+//    }
 }

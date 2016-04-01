@@ -7,10 +7,15 @@ import java.util.Collection;
 import java.util.List;
 
 public interface IRoute {
+    CharacteristicsOfCar getCharacteristicsOfCar();
+    int getDayOfWeek();
     Double getFullDistance();
     Integer getFullTime();
     Integer getDepartureTime();
     Integer getArrivalTime() throws IncorrectRequirement;
+    Integer getArrivalDayOfWeek() throws IncorrectRequirement;
+    int getActualDepartureTimeFromRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
+    int getWeekDayOfActualDepartureDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
     Point getArrivalPoint();
     Point getDeparturePoint();
     int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;

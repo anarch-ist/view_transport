@@ -1,11 +1,11 @@
 package ru.sbat.transport.optimization;
 
 import ru.sbat.transport.optimization.location.*;
+import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 import ru.sbat.transport.optimization.optimazerException.RouteNotFoundException;
 import ru.sbat.transport.optimization.schedule.AdditionalSchedule;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 import ru.sbat.transport.optimization.utils.InformationStack;
-import ru.sbat.transport.optimization.utils.InvoiceType;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.text.ParseException;
@@ -267,21 +267,83 @@ public class Optimizer implements IOptimizer {
     /** determines specific delivery route for invoices' type C by occupancy cost, sets delivery route
      *
      * @param plannedSchedule
-     * @param invoiceContainer
      * @param routesForInvoice
      * @throws ParseException
      * @throws RouteNotFoundException
      */
     @Override
-    public void optimize(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException {
-        for(Invoice invoice: invoiceContainer){
-            if(!routesForInvoice.get(invoice).isEmpty()){
+    public void optimize(PlannedSchedule plannedSchedule, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws ParseException, RouteNotFoundException, IncorrectRequirement {
+        Iterator<Map.Entry<Invoice, ArrayList<DeliveryRoute>>> iterator = routesForInvoice.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<Invoice, ArrayList<DeliveryRoute>> entry = iterator.next();
+            Invoice invoice = entry.getKey();
+            if(routesForInvoice.get(invoice).size() == 0){
+                throw new RouteNotFoundException("invoice should have options of delivery routes");
+            }else {
                 List<DeliveryRoute> deliveryRoutes = routesForInvoice.get(invoice);
                 for(DeliveryRoute deliveryRoute: deliveryRoutes){
+                    List<Integer> countOfWeek = invoice.calculateNumbersOfWeeksBetweenDates(invoice.getCreationDate(), invoice.getRequest().getPlannedDeliveryDate(),
+                            invoice, deliveryRoute.get(0), deliveryRoute.get(deliveryRoute.size() - 1));
+                    if(countOfWeek.size() == 0){
+                        continue;
+                    }else {
+                        for(int week: countOfWeek){
+                            for(TrackCourse trackCourse: deliveryRoute){
+                                if(isFittingTrackCourseByLoadCost(invoice, trackCourse, week)){
 
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
+
+    public List<PartOfDeliveryRoute> unitTrackCourseInTime(Invoice invoice, DeliveryRoute deliveryRoute, List<Integer> numberOfWeeks) throws IncorrectRequirement {
+        List<PartOfDeliveryRoute> result = new ArrayList<>();
+        for(int j = 0; j < deliveryRoute.size(); j++){
+            PartOfDeliveryRoute partOfDeliveryRoute = new PartOfDeliveryRoute();
+            for(int i = 0; i < numberOfWeeks.size() - 1; i++){
+                int timeTrackCourse = deliveryRoute.get(j).getRoute().getActualArrivalTimeInRoutePoint(deliveryRoute.get(j).getEndTrackCourse()) + deliveryRoute.get(j).getEndTrackCourse().getLoadingOperationsTime();
+                int trackCourseDayOfWeek = deliveryRoute.get(j).getRoute().getWeekDayOfActualArrivalDateInRoutePoint(deliveryRoute.get(j).getEndTrackCourse());
+                int timeNextTrackCourse = deliveryRoute.get(j +1).getRoute().getActualDepartureTimeFromRoutePoint(deliveryRoute.get(j + 1).getEndTrackCourse()) + deliveryRoute.get(j + 1).getEndTrackCourse().getLoadingOperationsTime();
+                int nextTrackCourseDayOfWeek = deliveryRoute.get(j + 1).getRoute().getWeekDayOfActualDepartureDateInRoutePoint(deliveryRoute.get(j + 1).getEndTrackCourse());
+                if(trackCourseDayOfWeek == 1){
+                    if((nextTrackCourseDayOfWeek == 1 && timeNextTrackCourse < timeTrackCourse) || trackCourseDayOfWeek > nextTrackCourseDayOfWeek){
+//                        ; week should be ++ in next tc
+                    }
+                }else if(trackCourseDayOfWeek != 1){
+                    if (((nextTrackCourseDayOfWeek != 1) && (nextTrackCourseDayOfWeek < trackCourseDayOfWeek)) || (nextTrackCourseDayOfWeek == trackCourseDayOfWeek && timeNextTrackCourse < timeTrackCourse)) {
+
+                    }
+                }
+                if(isFittingTrackCourseByLoadCost(invoice, deliveryRoute.get(j), numberOfWeeks.get(i))){
+                    partOfDeliveryRoute.setNumberOfWeek(numberOfWeeks.get(i));
+                    partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(j));
+                    result.add(partOfDeliveryRoute);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean isFittingTrackCourseByLoadCost(Invoice invoice, TrackCourse trackCourse, int numberOfWeek){
+        double invoiceCost = invoice.getCost();
+        if(trackCourse.getLoadUnits().size() == 0){
+            return true;
+        }else {
+            List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
+            for(LoadUnit loadUnit: loadUnits){
+                if(loadUnit.getNumberOfWeek() == numberOfWeek){
+                    if((loadUnit.getLoadCost().getLoadCost() + invoiceCost) > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
 //    public boolean isFittingForInvoice(DeliveryRoute deliveryRoute, Invoice invoice){

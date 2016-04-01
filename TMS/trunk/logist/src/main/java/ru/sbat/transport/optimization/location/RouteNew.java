@@ -117,6 +117,15 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         return this.getActualArrivalTimeInRoutePoint(this.get(this.size() - 1).getEndTrackCourse());
     }
 
+    /** determines the arrival day of week to the final point of the route
+     *
+     * @return day of week, sunday = 1
+     */
+    @Override
+    public Integer getArrivalDayOfWeek() throws IncorrectRequirement {
+        return this.getWeekDayOfActualArrivalDateInRoutePoint(this.get(this.size() - 1).getEndTrackCourse());
+    }
+
     /** determines the final point of the route
      *
      * @return the final point of the route
@@ -125,6 +134,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     public Point getArrivalPoint() {
         return this.get(this.size()-1).getEndTrackCourse().getPoint();
     }
+
 
     /** determines the first point of the route
      *
@@ -135,6 +145,49 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         return this.get(0).getStartTrackCourse().getPoint();
     }
 
+
+    /** determines day of week of departure from the point of route
+     *
+     * @return day of week when car leaves route point
+     */
+    @Override
+    public int getWeekDayOfActualDepartureDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
+        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
+        int result = 0;
+        if(routePoints.indexOf(routePoint) == 0){
+            result = this.getDayOfWeek();
+        }if(routePoints.indexOf(routePoint) == (routePoints.size() - 1)){
+            throw new IncorrectRequirement("Cannot departure from the last route point");
+        }else {
+            result = calculateArrivalTimeInRoutePoint(routePoint);
+            result = (result / (24 * 60)) + this.getDayOfWeek();
+            if(result > 7){
+                result = result - 7;
+            }
+        }
+        return result;
+    }
+
+    /** determines departure time from the point of route
+     *
+     * @return minutes of arrival in the point with loading operation time in route point
+     */
+    public int getActualDepartureTimeFromRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
+        List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
+        int result = 0;
+        if(routePoints.indexOf(routePoint) == 0){
+            result = this.getDepartureTimeFromFirstPoint();
+        }if(routePoints.indexOf(routePoint) == (routePoints.size() - 1)){
+            throw new IncorrectRequirement("Cannot departure from the last route point");
+        } else {
+            result = calculateArrivalTimeInRoutePoint(routePoint);
+            result = result - ((result / (24 * 60)) * 24 * 60);
+            result = result + routePoint.getLoadingOperationsTime();
+        }
+        return result;
+    }
+
+
     /** determines day of week of arrival in the point of route
      *
      * @return day of week when car arrives in route point without loading operation time in route point
@@ -143,6 +196,9 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     public int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
         int result = calculateArrivalTimeInRoutePoint(routePoint);
         result = (result / (24 * 60)) + this.getDayOfWeek();
+        if(result > 7){
+            result = result - 7;
+        }
         return result;
     }
 
@@ -166,7 +222,8 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     public int calculateArrivalTimeInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
         int result = this.getDepartureTimeFromFirstPoint();
         if(this.get(0).getStartTrackCourse().getPoint().equals(routePoint.getPoint())){
-            throw new IncorrectRequirement("arrival time in planned schedule can't be in the first point");
+//            throw new IncorrectRequirement("arrival time in planned schedule can't be in the first point");
+                result = this.getDepartureTimeFromFirstPoint();
         }
         for(TrackCourse trackCourse: this) {
             if (trackCourse.getEndTrackCourse().getPoint().equals(routePoint.getPoint())) {

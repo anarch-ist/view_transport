@@ -5,6 +5,7 @@ import javafx.beans.property.*;
 import ru.sbat.transport.optimization.location.DeliveryRoute;
 import ru.sbat.transport.optimization.location.Point;
 import ru.sbat.transport.optimization.location.TrackCourse;
+import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 import ru.sbat.transport.optimization.user.MarketAgent;
 import ru.sbat.transport.optimization.utils.InvoiceType;
 
@@ -23,6 +24,7 @@ public class Invoice implements Comparable<Invoice>{
     private final DoubleProperty cost = new SimpleDoubleProperty();
     private final ObjectProperty<InvoiceType> invoiceType = new SimpleObjectProperty<>();
     private final ObjectProperty<Date> realDepartureDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<List<PartOfDeliveryRoute>> partsOfDeliveryRoute = new SimpleObjectProperty<>();
 
     public Invoice() {
     }
@@ -171,6 +173,18 @@ public class Invoice implements Comparable<Invoice>{
         return realDepartureDate;
     }
 
+    public List<PartOfDeliveryRoute> getPartsOfDeliveryRoute() {
+        return partsOfDeliveryRoute.get();
+    }
+
+    public ObjectProperty<List<PartOfDeliveryRoute>> partsOfDeliveryRouteProperty() {
+        return partsOfDeliveryRoute;
+    }
+
+    public void setPartsOfDeliveryRoute(List<PartOfDeliveryRoute> partOfDeliveryRoute) {
+        this.partsOfDeliveryRoute.set(partOfDeliveryRoute);
+    }
+
     /** determines week day of invoice's creation date
      *
      * @return day of week from date
@@ -207,8 +221,7 @@ public class Invoice implements Comparable<Invoice>{
         return 0;
     }
 
-//, Invoice invoice, TrackCourse trackCourse
-    public List<Integer> calculateNumbersOfWeeksBetweenDates(Date departureDate, Date deliveryDate){
+    public List<Integer> calculateNumbersOfWeeksBetweenDates(Date departureDate, Date deliveryDate, Invoice invoice, TrackCourse startTrackCourse, TrackCourse endTrackCourse) throws IncorrectRequirement {
         List<Integer> result = new ArrayList<>();
         Calendar calendarStart = Calendar.getInstance();
         calendarStart.setTime(departureDate);
@@ -216,14 +229,51 @@ public class Invoice implements Comparable<Invoice>{
         Calendar calendarEnd = Calendar.getInstance();
         calendarEnd.setTime(deliveryDate);
         int numberOfDeliveryDate = calendarEnd.get(Calendar.WEEK_OF_YEAR);
-//        if((invoice.getCreationDate().getDay() + 1) > trackCourse.getRoute().getDayOfWeek()){
-////            if(numberOfDeliveryDate )
-//        }
         while (numberOfDepartureDate != numberOfDeliveryDate){
             result.add(numberOfDepartureDate);
             numberOfDepartureDate++;
         }
         result.add(numberOfDeliveryDate);
+        if(!isFittingDateForInvoiceDeparture(invoice.getCreationDate(), startTrackCourse)){
+            result.remove(0);
+        }else if(result.size() != 0 && !isFittingDateForInvoiceDelivery(invoice.getRequest().getPlannedDeliveryDate(), endTrackCourse)){
+            result.remove(result.size() - 1);
+        }
         return result;
+    }
+
+    public boolean isFittingDateForInvoiceDeparture(Date date, TrackCourse trackCourse) throws IncorrectRequirement {
+        int invoiceDayOfWeek = date.getDay() + 1;
+        int routeDayOfWeek = trackCourse.getRoute().getWeekDayOfActualDepartureDateInRoutePoint(trackCourse.getStartTrackCourse());
+        int timeOfInvoice = date.getHours() * 60 + date.getMinutes() + trackCourse.getStartTrackCourse().getLoadingOperationsTime();
+        int departureTime = trackCourse.getRoute().getActualDepartureTimeFromRoutePoint(trackCourse.getStartTrackCourse());
+        if(routeDayOfWeek != 1) {
+            if ((invoiceDayOfWeek > routeDayOfWeek) || (invoiceDayOfWeek == 1) || (invoiceDayOfWeek == routeDayOfWeek && timeOfInvoice >= departureTime)) {
+                return false;
+            }
+        }else if(routeDayOfWeek == 1){
+            if((invoiceDayOfWeek == 1 && timeOfInvoice >= departureTime)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isFittingDateForInvoiceDelivery(Date date, TrackCourse trackCourse) throws IncorrectRequirement {
+        int invoiceDayOfWeek = date.getDay() + 1;
+        int routeDayOfWeek = trackCourse.getRoute().getWeekDayOfActualArrivalDateInRoutePoint(trackCourse.getEndTrackCourse());
+        int timeOfInvoice = date.getHours() * 60 + date.getMinutes();
+        int deliveryTime = trackCourse.getRoute().getActualArrivalTimeInRoutePoint(trackCourse.getEndTrackCourse()) +  + trackCourse.getEndTrackCourse().getLoadingOperationsTime();
+//        System.out.println(deliveryTime + " " + timeOfInvoice + " " + routeDayOfWeek);
+        if(routeDayOfWeek != 1) {
+            if (((invoiceDayOfWeek != 1) && (invoiceDayOfWeek < routeDayOfWeek)) || (invoiceDayOfWeek == routeDayOfWeek && timeOfInvoice < deliveryTime)) {
+                return false;
+            }
+        }else if(routeDayOfWeek == 1){
+            if((invoiceDayOfWeek == 1 && timeOfInvoice < deliveryTime) || invoiceDayOfWeek > routeDayOfWeek){
+                return false;
+            }
+        }
+        return true;
     }
 }
