@@ -241,6 +241,6 @@ class SelectRequestsByRouteList implements IEntitySelect
      */
     function getSelectQuery()
     {
-        return "SELECT requestID, requestIDExternal FROM `requests` WHERE routeListID='$this->routeListID';";
+        return "SELECT r.requestID, r.requestIDExternal, r.invoiceNumber, r.requestStatusID, s.requestStatusRusName  FROM `requests` AS r LEFT JOIN `request_statuses` AS s ON r.requestStatusID = s.requestStatusID WHERE routeListID='$this->routeListID';";
     }
 }
