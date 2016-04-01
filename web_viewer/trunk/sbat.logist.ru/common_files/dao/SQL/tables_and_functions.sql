@@ -145,7 +145,7 @@ CREATE TABLE users (
   phoneNumber    VARCHAR(255) NULL,
   email          VARCHAR(255) NULL,
   position       VARCHAR(64)  NULL, -- должность
-  pointID        INTEGER      NULL, -- у ADMIN и CLIENT_MANAGER и MARKET_AGENT не может иметь пункта, у W_DISPATCHER и DISPATCHER обязан быть пункт
+  pointID        INTEGER      NULL, -- у ADMIN и CLIENT_MANAGER и MARKET_AGENT не может быть пункта, у W_DISPATCHER и DISPATCHER обязан быть пункт
   clientID       INTEGER      NULL, -- у CLIENT_MANAGER обязан быть clientID, у ADMIN W_DISPATCHER DISPATCHER и MARKET_AGENT его быть не должно
   PRIMARY KEY (userID),
   FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
@@ -841,81 +841,6 @@ CREATE TABLE exchange (
 -- -------------------------------------------------------------------------------------------------------------------
 
 
-CREATE FUNCTION getPointIDByName(name VARCHAR(128))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT pointID
-                  FROM points
-                  WHERE name = pointName);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getUserIDByLogin(_login VARCHAR(64))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT userID
-                  FROM users
-                  WHERE login = _login);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getClientIDByINN(_INN VARCHAR(32))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT clientID
-                  FROM clients
-                  WHERE INN = _INN);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getRequestIDByNumber(_requestNumber VARCHAR(16))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT requestID
-                  FROM requests
-                  WHERE requestNumber = _requestNumber);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getRouteIDByRouteName(_routeName VARCHAR(64))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routes.routeID
-                  FROM routes
-                  WHERE routes.routeName = _routeName);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getRouteListIDByNumber(_routeListNumber VARCHAR(32))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routeListID
-                  FROM route_lists
-                  WHERE routeListNumber = _routeListNumber);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getRouteIDByDirectionIDExternal(_directionIDExternal VARCHAR(64), _dataSourceID VARCHAR(32))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT routes.routeID FROM routes WHERE routes.directionIDExternal = _directionIDExternal AND routes.dataSourceID = _dataSourceID);
-
-    IF (result IS NULL ) THEN
-      BEGIN
-        CALL generateLogistError(concat('getRouteIDByDirectionIDExternal is NULL for directionIdExternal = ', _directionIDExternal));
-      END ;
-
-      END IF ;
-    RETURN result;
-  END;
-
 CREATE FUNCTION getRoleIDByUserID(_userID INTEGER)
   RETURNS VARCHAR(32)
   BEGIN
@@ -925,17 +850,6 @@ CREATE FUNCTION getRoleIDByUserID(_userID INTEGER)
                   WHERE userID = _userID);
     RETURN result;
   END;
-
-CREATE FUNCTION getClientIDByClientIDExternal(_clientIDExternal VARCHAR(255), _dataSourceID VARCHAR(32))
-  RETURNS VARCHAR(255)
-  BEGIN
-    DECLARE result VARCHAR(255);
-    SET result = (SELECT clientID
-                  FROM clients
-                  WHERE clientIDExternal = _clientIDExternal AND dataSourceID = _dataSourceID);
-    RETURN result;
-  END;
-
 
 CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
   RETURNS INTEGER
@@ -957,42 +871,6 @@ CREATE FUNCTION getClientIDByUserID(_userID INTEGER)
     RETURN result;
   END;
 
-CREATE FUNCTION getUserIDByUserIDExternal(_userIDExternal VARCHAR(255), _dataSourceID VARCHAR(32))
-  RETURNS INTEGER
-  BEGIN
-    DECLARE result INTEGER;
-    SET result = (SELECT userID
-                  FROM users
-                  WHERE userIDExternal = _userIDExternal AND dataSourceID = _dataSourceID);
-    RETURN result;
-  END;
-
-CREATE FUNCTION getUserNameByID(_userID INTEGER)
-  RETURNS VARCHAR(255)
-  BEGIN
-    DECLARE result VARCHAR(255);
-    SET result = (SELECT userName
-                  FROM users
-                  WHERE userID = _userID);
-    RETURN result;
-  END;
-
-
-CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedRoutePointID INTEGER)
-  RETURNS INTEGER
-  BEGIN
-    -- получаем порядковый номер последнего routePoint
-    SET @lastRoutePointSortOrder = (SELECT sortOrder
-                                    FROM route_points
-                                    WHERE route_points.routePointID = _lastVisitedRoutePointID);
-    -- устанавливаем следующий пункт маршрута
-    RETURN (SELECT routePointID
-            FROM route_points
-            WHERE (routeID = _routeID AND sortOrder > @lastRoutePointSortOrder)
-            ORDER BY sortOrder
-            LIMIT 1);
-  END;
-
 -- находит все routeID, которые содержат указанный пункт
 CREATE FUNCTION selectAllRoutesIDWithThatPointAsString(_pointID INTEGER)
   RETURNS TEXT
@@ -1005,121 +883,98 @@ CREATE FUNCTION selectAllRoutesIDWithThatPointAsString(_pointID INTEGER)
     RETURN @result;
   END;
 
+
 -- -------------------------------------------------------------------------------------------------------------------
---                                                SELECT_PROCEDURES
+--                                                BIG SELECT
 -- -------------------------------------------------------------------------------------------------------------------
 
 
--- get total time in minutes consumed for delivery
-CREATE FUNCTION getDurationForRoute(_routeID INTEGER)
-  RETURNS VARCHAR(255)
+CREATE TABLE transmaster_transport_db.big_select_materialized (
+  requestID            INTEGER,
+  requestIDExternal    VARCHAR(255),
+  requestNumber        VARCHAR(16),
+  requestDate          DATE,
+  invoiceNumber        VARCHAR(255),
+  invoiceDate          DATE,
+  documentNumber       VARCHAR(255),
+  documentDate         DATE,
+  firma                VARCHAR(255),
+  storage              VARCHAR(255),
+  boxQty               INTEGER,
+  marketAgentUserID    INTEGER, -- служебное поле
+  routeListID          INTEGER, -- служебное поле
+  clientID             INTEGER, -- служебное поле
+  clientIDExternal     VARCHAR(255),
+  INN                  VARCHAR(32),
+  clientName           VARCHAR(255),
+  userName             VARCHAR(255), -- имя торгового представителя
+  deliveryPointName    VARCHAR(128),
+  warehousePointName   VARCHAR(128),
+  warehousePointID     INTEGER, -- служебное поле
+  routeID              INTEGER, -- служебное поле
+  routeName            VARCHAR(255),
+  driverId             VARCHAR(255),
+  routeListNumber      VARCHAR(32),
+  PRIMARY KEY (requestID)
+);
+
+-- записываем в эту таблицу все данные, которые не меняются от выгрузки к выгрузке
+CREATE PROCEDURE refreshMaterializedView()
   BEGIN
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE $currentRoutePointID INTEGER;
-    DECLARE $previousRoutePointID INTEGER;
-    DECLARE $timeForLoadingOperations INTEGER;
-    DECLARE $timeCount INTEGER DEFAULT 0;
-    DECLARE $timeResult INTEGER DEFAULT 0;
-    DECLARE cur CURSOR FOR
+
+    TRUNCATE big_select_materialized;
+
+    INSERT INTO big_select_materialized
       SELECT
-        routePointID,
-        timeForLoadingOperations
-      FROM route_points
-      WHERE _routeID = route_points.routeID
-      ORDER BY sortOrder;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-
-    read_loop: LOOP
-      FETCH cur
-      INTO $currentRoutePointID, $timeForLoadingOperations;
-      IF done
-      THEN LEAVE read_loop; END IF;
-      IF $previousRoutePointID IS NOT NULL
-      THEN
-        SET $timeCount = (SELECT timeForDistance
-                          FROM relations_between_route_points
-                          WHERE
-                            routePointIDFirst = $previousRoutePointID AND routePointIDSecond = $currentRoutePointID);
-      END IF;
-      SET $timeResult = $timeResult + $timeCount + $timeForLoadingOperations;
-      SET $previousRoutePointID = $currentRoutePointID;
-    END LOOP;
-
-    CLOSE cur;
-    RETURN $timeResult;
-    -- SELECT firstPointArrivalTime FROM routes WHERE routeID = _routeID;
+        requests.requestID, -- служебное поле
+        requests.requestIDExternal,
+        requests.requestNumber,
+        requests.requestDate,
+        requests.invoiceNumber,
+        requests.invoiceDate,
+        requests.documentNumber,
+        requests.documentDate,
+        requests.firma,
+        requests.storage,
+        requests.boxQty,
+        requests.marketAgentUserID, -- служебное поле
+        requests.routeListID, -- служебное поле
+        clients.clientID, -- служебное поле
+        clients.clientIDExternal,
+        clients.INN,
+        clients.clientName,
+        users.userName,
+        delivery_points.pointName             AS deliveryPointName,
+        w_points.pointName                    AS warehousePointName,
+        w_points.pointID                      AS warehousePointID, -- служебное поле
+        routes.routeID, -- служебное поле
+        routes.routeName,
+        getUserNameByID(route_lists.driverID) AS driverId,
+        route_lists.routeListNumber
+      FROM requests
+        INNER JOIN (request_statuses, clients, users)
+          ON (
+          requests.requestStatusID = request_statuses.requestStatusID AND
+          requests.clientID = clients.clientID AND
+          requests.marketAgentUserID = users.userID
+          )
+        LEFT JOIN (points AS delivery_points, points AS w_points)
+          ON (
+          requests.warehousePointID = w_points.pointID AND
+          requests.destinationPointID = delivery_points.pointID
+          )
+        LEFT JOIN (route_lists, routes)
+          ON (
+          requests.routeListID = route_lists.routeListID AND
+          route_lists.routeID = routes.routeID
+          );
   END;
-
--- get DATE and TIME when route should be finished
-CREATE FUNCTION getArrivalDateTime(_routeID INTEGER, _requestID INTEGER)
-  RETURNS TIMESTAMP
-  BEGIN
-    DECLARE $routeStartDate TIMESTAMP;
-    DECLARE $arrivalDateTime TIMESTAMP;
-
-
-    SET $routeStartDate = (SELECT lastStatusUpdated
-                           FROM requests_history
-                           WHERE _requestID = requestID AND requestStatusID = 'DEPARTURE'
-                            ORDER BY lastStatusUpdated
-                           LIMIT 1
-    );
-
-    IF ($routeStartDate IS NULL) THEN
-      RETURN NULL;
-    END IF;
-
-
-    SET $arrivalDateTime = (SELECT TIMESTAMPADD(MINUTE, getDurationForRoute(_routeID), $routeStartDate));
-    RETURN $arrivalDateTime;
-  END;
-
--- startEntry - number of record to start from(0 is first record)
--- length - Number of records that the table can display in the current draw
-
--- if user Role is ADMIN then show all DATA, if another role then find user point
--- show only those records that contains user point as warehouse point or as route point
--- startEntry index begin with 0;
--- max amount of rows that will be returned
-
--- send request params from datatable
-/*
-draw:"1"                            порядковый номер, в ответе клиенту именно этот номер должен быть
-columns[0][data]:"0"                устанавливает источник данных для колонки из объекта с данными, по умолчанию это просто порядковый номер столбца
-columns[0][name]:""                 имя колонки, используется для удобного доступа к колонкам из datatables API
-columns[0][searchable]:"true"       нужно ли использовать фильтр по этой колонке
-columns[0][orderable]:"true"        запрещает или разрешает пользователю нажимать на кнопки сортировки, при этом из апи можно сортировать
-columns[0][search][value]:""        Search value to apply to this specific column. в datatables можно делать не только глобальный поиск, но также и по отдельным колонкам.
-columns[0][search][regex]:"false"   Flag to indicate if the search term for this column should be treated as regular expression (true) or not (false)
-columns[1][data]:"1"
-columns[1][name]:""
-columns[1][searchable]:"true"
-columns[1][orderable]:"true"
-columns[1][search][value]:""
-columns[1][search][regex]:"false"
-...
-columns[16][data]:"16"
-columns[16][name]:""
-columns[16][searchable]:"true"
-columns[16][orderable]:"true"
-columns[16][search][value]:""
-columns[16][search][regex]:"false"
-order[0][column]:"0"                индекс колонки к которой должен быть прменен ORDER BY
-order[0][dir]:"asc"                 направление сортировки для этой колонки "asc" либо "desc"
-start:"0"                           индекс первой записи из resulSet(startEntry)
-length:"10"                         максимальное количесвто получаемых записей из БД(length)
-search[value]:""                    Global search value. To be applied to all columns which have searchable as true.
-search[regex]:"false"               true if the global filter should be treated as a regular expression for advanced searching, false otherwise
-*/
 
 CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
   RETURNS TEXT
   RETURN REPLACE(SUBSTRING(SUBSTRING_INDEX(stringSpl, delim, pos),
                            CHAR_LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos - 1)) + 1),
                  delim, '');
-
 
 CREATE FUNCTION generateHaving(map TEXT)
   RETURNS TEXT
@@ -1169,157 +1024,6 @@ CREATE FUNCTION generateOrderByPart(_orderby VARCHAR(255),_isDesc BOOLEAN)
     END IF;
   END;
 
--- TODO добавить индексы на те поля где запрос - медленный
--- materialized view for big select
-CREATE TABLE transmaster_transport_db.big_select_materialized (
-  requestID            INTEGER,
-  requestIDExternal    VARCHAR(255),
-  requestNumber        VARCHAR(16),
-  requestDate          DATE,
-  invoiceNumber        VARCHAR(255),
-  invoiceDate          DATE,
-  documentNumber       VARCHAR(255),
-  documentDate         DATE,
-  firma                VARCHAR(255),
-  storage              VARCHAR(255),
-  boxQty               INTEGER,
-  marketAgentUserID    INTEGER, -- служебное поле
-  routeListID          INTEGER, -- служебное поле
-  clientID             INTEGER, -- служебное поле
-  clientIDExternal     VARCHAR(255),
-  INN                  VARCHAR(32),
-  clientName           VARCHAR(255),
-  userName             VARCHAR(255), -- имя торгового представителя
-  deliveryPointName    VARCHAR(128),
-  warehousePointName   VARCHAR(128),
-  warehousePointID     INTEGER, -- служебное поле
-  -- currentPointName     VARCHAR(128),
-  -- nextPointName        VARCHAR(128),
-  routeID              INTEGER, -- служебное поле
-  routeName            VARCHAR(255),
-  driverId             VARCHAR(255),
-  -- licensePlate         VARCHAR(9),
-  -- palletsQty           INTEGER,
-  routeListNumber      VARCHAR(32),
-  -- arrivalTime          DATETIME,
-  PRIMARY KEY (requestID)
-  -- FULLTEXT (requestIDExternal(10), requestNumber(10))
-);
-
-
-
-
-
-
-# CREATE FULLTEXT INDEX ind1 ON big_select_materialized (requestIDExternal(10));
-# CREATE FULLTEXT INDEX ind2 ON big_select_materialized (requestNumber(10));
-# CREATE FULLTEXT INDEX ind3 ON big_select_materialized (requestDate(10));
-# CREATE FULLTEXT INDEX ind4 ON big_select_materialized (invoiceNumber(10));
-# CREATE FULLTEXT INDEX ind5 ON big_select_materialized (invoiceDate(10));
-# CREATE FULLTEXT INDEX ind6 ON big_select_materialized (documentNumber(10));
-
--- get all constant data
-CREATE PROCEDURE refreshMaterializedView()
-  BEGIN
-  TRUNCATE big_select_materialized;
-     INSERT INTO big_select_materialized
-       SELECT
-         requestID,
-         requestIDExternal,
-         requestNumber,
-         requestDate,
-         invoiceNumber,
-         invoiceDate,
-         documentNumber,
-         documentDate,
-         firma,
-         storage,
-         boxQty,
-         marketAgentUserID,
-         routeListID,
-         clientID,
-         clientIDExternal,
-         INN,
-         clientName,
-         userName,
-         deliveryPointName,
-         warehousePointName,
-         warehousePointID,
-         routeID,
-         routeName,
-         driverId,
-         routeListNumber
-       FROM big_select;
-  END;
-
-
-CREATE VIEW transmaster_transport_db.big_select AS
-  SELECT
-    requests.requestID, -- служебное поле
-    requests.requestIDExternal,
-    requests.requestNumber,
-    requests.requestDate,
-    requests.invoiceNumber,
-    requests.invoiceDate,
-    requests.documentNumber,
-    requests.documentDate,
-    requests.firma,
-    requests.storage,
-    requests.commentForStatus,
-    requests.boxQty,
-    requests.marketAgentUserID, -- служебное поле
-    requests.requestStatusID, -- служебное поле
-    requests.routeListID, -- служебное поле
-    request_statuses.requestStatusRusName,
-    clients.clientID, -- служебное поле
-    clients.clientIDExternal,
-    clients.INN,
-    clients.clientName,
-    users.userName,
-    delivery_points.pointName                              AS deliveryPointName,
-    w_points.pointName                                     AS warehousePointName,
-    w_points.pointID                                       AS warehousePointID, -- служебное поле
-    last_visited_points.pointName                          AS currentPointName,
-    next_route_points.pointName                            AS nextPointName,
-    routes.routeID, -- служебное поле
-    routes.routeName,
-    getUserNameByID(route_lists.driverID) AS driverId,
-    route_lists.licensePlate,
-    route_lists.palletsQty,
-    route_lists.routeListNumber,
-    getArrivalDateTime(routes.routeID, requests.requestID) AS arrivalTime
-
-  FROM requests
-    INNER JOIN (request_statuses, clients, users)
-      ON (
-      requests.requestStatusID = request_statuses.requestStatusID AND
-      requests.clientID = clients.clientID AND
-      requests.marketAgentUserID = users.userID
-      )
-    LEFT JOIN (points AS delivery_points, points AS w_points)
-      ON (
-      requests.warehousePointID = w_points.pointID AND
-      requests.destinationPointID = delivery_points.pointID
-      )
-    -- because routeList in requests table can be null, we use left join.
-    LEFT JOIN (route_lists, routes)
-      ON (
-      requests.routeListID = route_lists.routeListID AND
-      route_lists.routeID = routes.routeID
-      )
-    LEFT JOIN (route_points AS rp1, points AS last_visited_points)
-      ON (
-      rp1.routePointID = requests.lastVisitedRoutePointID AND
-      last_visited_points.pointID = rp1.pointID
-      )
-    LEFT JOIN (route_points AS rp2, points AS next_route_points)
-      ON (
-      route_lists.routeID = routes.routeID AND
-      routes.routeID = rp2.routeID AND
-      rp2.routePointID = getNextRoutePointID(routes.routeID, requests.lastVisitedRoutePointID) AND
-      next_route_points.pointID = rp2.pointID
-      );
-
 -- _search - array of strings
 -- _orderby 'id'  <> - название колонки из файла main.js
 -- _search - передача column_name1,search_string1;column_name1,search_string1;... если ничего нет то передавать пустую строку
@@ -1361,35 +1065,104 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @columnsPart =
     '
     SELECT SQL_CALC_FOUND_ROWS
-      requestIDExternal,
-      requestNumber,
-      requestDate,
-      invoiceNumber,
-      invoiceDate,
-      documentNumber,
-      documentDate,
-      firma,
-      storage,
-      commentForStatus,
-      boxQty,
-      requestStatusRusName,
-      clientIDExternal,
-      INN,
-      clientName,
-      userName,
-      deliveryPointName,
-      warehousePointName,
-      currentPointName,
-      nextPointName,
-      routeName,
-      driverId,
-      licensePlate,
-      palletsQty,
-      routeListNumber,
-      arrivalTime,
-      requestStatusID,
-      routeListID
-    FROM big_select
+  big_select_materialized.requestIDExternal,
+  big_select_materialized.requestNumber,
+  big_select_materialized.requestDate,
+  big_select_materialized.invoiceNumber,
+  big_select_materialized.invoiceDate,
+  big_select_materialized.documentNumber,
+  big_select_materialized.documentDate,
+  big_select_materialized.firma,
+  big_select_materialized.storage,
+  requests.commentForStatus,
+  big_select_materialized.boxQty,
+  request_statuses.requestStatusRusName,
+  big_select_materialized.clientIDExternal,
+  big_select_materialized.INN,
+  big_select_materialized.clientName,
+  big_select_materialized.userName,
+  big_select_materialized.deliveryPointName,
+  big_select_materialized.warehousePointName,
+  currentPoints.pointName AS currentPointName,
+  next_points.nextPointName AS nextPointName,
+  big_select_materialized.routeName,
+  big_select_materialized.driverId,
+  route_lists.licensePlate,
+  route_lists.palletsQty,
+  big_select_materialized.routeListNumber,
+  TIMESTAMPADD(MINUTE, time_to_next.timeToNextPoint, departure_date.departureTimeFromLastRoutePoint) AS arrivalTime,
+  requests.requestStatusID,
+  big_select_materialized.routeListID
+FROM big_select_materialized
+  INNER JOIN (requests) ON (
+     requests.requestID = big_select_materialized.requestID
+    )
+  INNER JOIN (request_statuses) ON (
+    request_statuses.requestStatusID = requests.requestStatusID
+    )
+  LEFT JOIN (route_points) ON (
+    route_points.routePointID = requests.lastVisitedRoutePointID
+    )
+  LEFT JOIN (points AS currentPoints) ON (
+    currentPoints.pointID = route_points.pointID
+    )
+  LEFT JOIN (routes) ON (
+    routes.routeID = big_select_materialized.routeID
+    )
+  LEFT JOIN (route_lists) ON (
+    route_lists.routeListID = big_select_materialized.routeListID
+    )
+
+  LEFT JOIN (SELECT
+               mainRP.routePointID,
+               mainRP.routeID,
+               innerRP.routePointID AS nextRoutePoint,
+               innerRP.pointID      AS nextPointID,
+               points.pointName     AS nextPointName
+             FROM route_points mainRP
+               LEFT JOIN route_points innerRP ON (
+                 innerRP.routeID = mainRP.routeID AND
+                 innerRP.sortOrder = (SELECT innerRP2.sortOrder
+                                      FROM route_points innerRP2
+                                      WHERE (innerRP2.routeID = mainRP.routeID AND innerRP2.sortOrder > mainRP.sortOrder)
+                                      ORDER BY innerRP.sortOrder
+                                      LIMIT 1)
+                 )
+               LEFT JOIN points ON points.pointID = innerRP.pointID) AS next_points ON (
+    next_points.routePointID = requests.lastVisitedRoutePointID
+    )
+
+  LEFT JOIN (SELECT
+               mainRP.routePointID,
+               relations_between_route_points.timeForDistance AS timeToNextPoint
+             FROM route_points mainRP
+               INNER JOIN route_points innerRP ON (
+                 innerRP.routeID = mainRP.routeID AND
+                 innerRP.sortOrder = (SELECT innerRP2.sortOrder
+                                      FROM route_points innerRP2
+                                      WHERE
+                                        (innerRP2.routeID = mainRP.routeID AND innerRP2.sortOrder > mainRP.sortOrder)
+                                      ORDER BY innerRP.sortOrder
+                                      LIMIT 1)
+                 )
+               INNER JOIN relations_between_route_points ON (
+                 mainRP.routePointID = relations_between_route_points.routePointIDFirst AND
+                 innerRP.routePointID = relations_between_route_points.routePointIDSecond
+                 )) AS time_to_next ON (
+    time_to_next.routePointID = requests.lastVisitedRoutePointID
+    )
+
+  LEFT JOIN (SELECT
+               requests_history.requestID,
+               requests_history.lastStatusUpdated,
+               MAX(requests_history.lastStatusUpdated) AS departureTimeFromLastRoutePoint
+             FROM requests_history
+             WHERE requests_history.requestStatusID = ''DEPARTURE''
+             GROUP BY requestID
+             ORDER BY NULL
+    ) AS departure_date ON (
+    departure_date.requestID = big_select_materialized.requestID
+    )
     ';
 
     SET @wherePart = '';
@@ -1397,14 +1170,12 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     IF @isAdmin THEN
       SET @wherePart = '';
     ELSEIF @isMarketAgent THEN
-      SET @wherePart = CONCAT('WHERE (big_select.marketAgentUserID = ', _userID,')');
+      SET @wherePart = CONCAT('WHERE (big_select_materialized.marketAgentUserID = ', _userID,')');
     ELSEIF @isClientManager THEN
-      SET @wherePart = CONCAT('WHERE (big_select.clientID = ', @clientID,')');
+      SET @wherePart = CONCAT('WHERE (big_select_materialized.clientID = ', @clientID,')');
     ELSEIF @isDispatcherOrWDispatcher THEN
-      SET @wherePart = CONCAT('WHERE (big_select.routeID IN (', @allRoutesWithUserPointID,'))');
+      SET @wherePart = CONCAT('WHERE (big_select_materialized.routeID IN (', @allRoutesWithUserPointID,'))');
     END IF;
-
-
 
     SET @havingPart = CONCAT(' HAVING ', generateHaving(_search));
 
@@ -1427,12 +1198,16 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
-    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select ', @wherePart);
+    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select_materialized ', @wherePart);
     PREPARE getTotalStm FROM @countTotalSql;
     EXECUTE getTotalStm;
     DEALLOCATE PREPARE getTotalStm;
 
   END;
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                USERS SELECT
+-- -------------------------------------------------------------------------------------------------------------------
 
 CREATE VIEW transmaster_transport_db.all_users AS
   SELECT
@@ -1486,6 +1261,12 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
 
   END;
 
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                    REQUEST STATUS HISTORY SELECT
+-- -------------------------------------------------------------------------------------------------------------------
+
+
 -- get history for some request
 CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(16))
   BEGIN
@@ -1516,6 +1297,12 @@ CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(16))
     ORDER BY lastStatusUpdated;
   END;
 
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                TIME AND DISTANCE BETWEEN ROUTE POINTS SELECT
+-- -------------------------------------------------------------------------------------------------------------------
+
+
 -- procedure for getting time and distance between routePoints
 CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
   BEGIN
@@ -1545,3 +1332,43 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
   END;
 
 
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                 INDEXES
+-- -------------------------------------------------------------------------------------------------------------------
+
+
+--  индекс для поиска последних дат, в которые был статус 'DEPARTURE'
+CREATE INDEX lastStatusUpdatedInd ON requests_history (requestStatusID, lastStatusUpdated);
+
+-- т.к. сортировка может использоваться для любой части  big_select_materialized, то на все поля вешается индекс
+CREATE INDEX ind1 ON big_select_materialized (requestIDExternal);
+CREATE INDEX ind2 ON big_select_materialized (requestNumber);
+CREATE INDEX ind3 ON big_select_materialized (requestDate);
+CREATE INDEX ind4 ON big_select_materialized (invoiceNumber);
+CREATE INDEX ind5 ON big_select_materialized (invoiceDate);
+CREATE INDEX ind6 ON big_select_materialized (documentNumber);
+CREATE INDEX ind7 ON big_select_materialized (documentDate);
+CREATE INDEX ind8 ON big_select_materialized (firma);
+CREATE INDEX ind9 ON big_select_materialized (storage);
+CREATE INDEX ind10 ON big_select_materialized (boxQty);
+CREATE INDEX ind11 ON big_select_materialized (marketAgentUserID);
+CREATE INDEX ind12 ON big_select_materialized (routeListID);
+CREATE INDEX ind13 ON big_select_materialized (clientID);
+CREATE INDEX ind14 ON big_select_materialized (clientIDExternal);
+CREATE INDEX ind15 ON big_select_materialized (INN);
+CREATE INDEX ind16 ON big_select_materialized (clientName);
+CREATE INDEX ind17 ON big_select_materialized (userName);
+CREATE INDEX ind18 ON big_select_materialized (deliveryPointName);
+CREATE INDEX ind19 ON big_select_materialized (warehousePointName);
+CREATE INDEX ind20 ON big_select_materialized (warehousePointID);
+CREATE INDEX ind21 ON big_select_materialized (routeID);
+CREATE INDEX ind22 ON big_select_materialized (routeName);
+CREATE INDEX ind23 ON big_select_materialized (driverId);
+CREATE INDEX ind24 ON big_select_materialized (routeListNumber);
+
+-- также вешаем индекс на те поля, которых нет в big_select_materialized, но которые есть итоговом запросе
+CREATE INDEX ind25 ON requests (commentForStatus(20));
+CREATE INDEX ind26 ON request_statuses (requestStatusRusName(20));
+CREATE INDEX ind27 ON route_lists (licensePlate(3));
+CREATE INDEX ind28 ON route_lists (palletsQty);
+CREATE INDEX ind29 ON points (pointName(20));

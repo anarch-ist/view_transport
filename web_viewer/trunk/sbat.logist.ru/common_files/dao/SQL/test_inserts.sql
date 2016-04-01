@@ -1,4 +1,60 @@
 USE transmaster_transport_db;
+
+DROP FUNCTION getUserNameByID;
+DROP FUNCTION getClientIDByClientIDExternal;
+DROP FUNCTION getRouteIDByRouteName;
+DROP FUNCTION getClientIDByINN;
+DROP FUNCTION getUserIDByLogin;
+DROP FUNCTION getPointIDByName;
+
+CREATE FUNCTION getUserNameByID(_userID INTEGER)
+  RETURNS VARCHAR(255)
+  BEGIN
+    RETURN (SELECT userName
+            FROM users
+            WHERE userID = _userID);
+  END;
+
+CREATE FUNCTION getClientIDByClientIDExternal(_clientIDExternal VARCHAR(255), _dataSourceID VARCHAR(32))
+  RETURNS VARCHAR(255)
+  BEGIN
+    RETURN (SELECT clientID
+            FROM clients
+            WHERE clientIDExternal = _clientIDExternal AND dataSourceID = _dataSourceID);
+  END;
+
+CREATE FUNCTION getRouteIDByRouteName(_routeName VARCHAR(64))
+  RETURNS INTEGER
+  BEGIN
+    RETURN (SELECT routes.routeID
+            FROM routes
+            WHERE routes.routeName = _routeName);
+  END;
+
+CREATE FUNCTION getClientIDByINN(_INN VARCHAR(32))
+  RETURNS INTEGER
+  BEGIN
+    RETURN (SELECT clientID
+            FROM clients
+            WHERE INN = _INN);
+  END;
+
+CREATE FUNCTION getUserIDByLogin(_login VARCHAR(64))
+  RETURNS INTEGER
+  BEGIN
+    RETURN (SELECT userID
+            FROM users
+            WHERE login = _login);
+  END;
+
+CREATE FUNCTION getPointIDByName(name VARCHAR(128))
+  RETURNS INTEGER
+  BEGIN
+    RETURN (SELECT pointID
+            FROM points
+            WHERE name = pointName);
+  END;
+
 SET FOREIGN_KEY_CHECKS = 0;
 -- truncate drop and create table instead of deleting rows one by one
 TRUNCATE points;
