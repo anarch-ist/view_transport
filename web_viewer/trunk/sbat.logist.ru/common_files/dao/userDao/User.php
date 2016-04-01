@@ -200,7 +200,7 @@ class InsertUser implements IEntityInsert
     function __construct(UserData $user)
     {
         $dao = DAO::getInstance();
-        $this->firstName = $dao->checkString($user->getData('userName'));
+        $this->userName = $dao->checkString($user->getData('userName'));
         $this->position = $dao->checkString($user->getData('position'));
         $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
