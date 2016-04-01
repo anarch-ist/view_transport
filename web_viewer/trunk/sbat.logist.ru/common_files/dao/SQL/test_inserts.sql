@@ -1,12 +1,5 @@
 USE transmaster_transport_db;
 
-DROP FUNCTION getUserNameByID;
-DROP FUNCTION getClientIDByClientIDExternal;
-DROP FUNCTION getRouteIDByRouteName;
-DROP FUNCTION getClientIDByINN;
-DROP FUNCTION getUserIDByLogin;
-DROP FUNCTION getPointIDByName;
-
 CREATE FUNCTION getUserNameByID(_userID INTEGER)
   RETURNS VARCHAR(255)
   BEGIN
@@ -145,5 +138,12 @@ INSERT INTO requests (requestIDExternal, dataSourceID, requestNumber, requestDat
       getPointIDByName('point3'), getUserIDByLogin('user3'), 'wed', NOW(), 'ewdw', NOW(), 'firm1', 'storage1', 'cont_n',
     '9056784321', 'deliv_opt', NOW(), 2, 123, 123, 123, NOW(), getUserIDByLogin('parser'), 'CREATED', 'wef',
        getPointIDByName('point1'), 1 ,  getPointIDByName('point1') );
+
+DROP FUNCTION getUserNameByID;
+DROP FUNCTION getClientIDByClientIDExternal;
+DROP FUNCTION getRouteIDByRouteName;
+DROP FUNCTION getClientIDByINN;
+DROP FUNCTION getUserIDByLogin;
+DROP FUNCTION getPointIDByName;
 
 CALL refreshMaterializedView();

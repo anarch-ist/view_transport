@@ -949,7 +949,7 @@ CREATE PROCEDURE refreshMaterializedView()
         w_points.pointID                      AS warehousePointID, -- служебное поле
         routes.routeID, -- служебное поле
         routes.routeName,
-        getUserNameByID(route_lists.driverID) AS driverId,
+        (SELECT userName FROM users WHERE userID = route_lists.driverID) AS driverId,
         route_lists.routeListNumber
       FROM requests
         INNER JOIN (request_statuses, clients, users)
