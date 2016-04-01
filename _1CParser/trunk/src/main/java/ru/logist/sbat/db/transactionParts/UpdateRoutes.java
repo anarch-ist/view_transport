@@ -2,7 +2,6 @@ package ru.logist.sbat.db.transactionParts;
 
 
 import org.apache.commons.collections4.BidiMap;
-import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
@@ -11,10 +10,7 @@ import ru.logist.sbat.jsonParser.beans.DirectionsData;
 import ru.logist.sbat.jsonParser.beans.RouteListsData;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,8 +32,7 @@ public class UpdateRoutes extends TransactionPart{
                         "ON DUPLICATE KEY UPDATE\n" +
                         "  routeName = VALUES(routeName);"
         );
-        BidiMap<String, String> allRoutes = Selects.selectAllRoutes();
-
+        BidiMap<String, String> allRoutes = Selects.selectAllRoutesAsExtKeyAndName(InsertOrUpdateTransactionScript.LOGIST_1C);
 
         for (DirectionsData updateRoute : updateRoutesArray) {
             String directionIDExternal = updateRoute.getDirectId();

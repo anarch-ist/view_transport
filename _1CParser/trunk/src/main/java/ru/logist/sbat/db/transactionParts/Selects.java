@@ -53,15 +53,50 @@ public class Selects {
     }
 
     /**
+     * String is userIdExternal key, Integer is userId
+     * @param dataSourceId
+     * @return
+     * @throws SQLException
+     */
+    static BidiMap<String, Integer> selectAllUsersAsKeyPairs(String dataSourceId) throws SQLException {
+        BidiMap<String, Integer> result = new DualHashBidiMap<>();
+        PreparedStatement statement = connection.prepareStatement("SELECT userIDExternal, userID FROM users WHERE dataSourceID = ?");
+        statement.setString(1, dataSourceId);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            result.put(resultSet.getString(1), resultSet.getInt(2));
+        }
+        return result;
+    }
+
+    /**
+     * String is directionIDExternal key, Integer is routeID
+     * @param dataSourceId
+     * @return
+     * @throws SQLException
+     */
+    static BidiMap<String, Integer> selectAllRoutesAsKeyPairs(String dataSourceId) throws SQLException {
+        BidiMap<String, Integer> result = new DualHashBidiMap<>();
+        PreparedStatement statement = connection.prepareStatement("SELECT directionIDExternal, routeID FROM routes WHERE dataSourceID = ?");
+        statement.setString(1, dataSourceId);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            result.put(resultSet.getString(1), resultSet.getInt(2));
+        }
+        return result;
+    }
+
+    /**
      *
      * @return All directionIDExternal and routeNames from dataBase as bidimap.
      * @throws SQLException
      */
-    static BidiMap<String, String> selectAllRoutes() throws SQLException {
+    static BidiMap<String, String> selectAllRoutesAsExtKeyAndName(String dataSourceId) throws SQLException {
         //
         BidiMap<String, String> allRoutes = new DualHashBidiMap<>();
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT directionIDExternal, routeName FROM routes;");
+        PreparedStatement statement = connection.prepareStatement("SELECT directionIDExternal, routeName FROM routes WHERE dataSourceID = ?");
+        statement.setString(1, dataSourceId);
+        ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             allRoutes.put(resultSet.getString(1), resultSet.getString(2));
         }
