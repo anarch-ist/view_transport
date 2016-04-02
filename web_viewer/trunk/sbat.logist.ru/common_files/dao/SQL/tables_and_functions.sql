@@ -918,11 +918,21 @@ CREATE TABLE transmaster_transport_db.big_select_materialized (
   PRIMARY KEY (requestID)
 );
 
+-- таблица содержащая размеры массива данных с заявками
+CREATE TABLE total_row_counts_for_users (
+  userID      INTEGER,
+  userRole    VARCHAR(32),
+  total_count INTEGER,
+  PRIMARY KEY (userID)
+);
+
+
 -- записываем в эту таблицу все данные, которые не меняются от выгрузки к выгрузке
 CREATE PROCEDURE refreshMaterializedView()
   BEGIN
 
     TRUNCATE big_select_materialized;
+    TRUNCATE total_row_counts_for_users;
 
     INSERT INTO big_select_materialized
       SELECT
@@ -968,6 +978,42 @@ CREATE PROCEDURE refreshMaterializedView()
           requests.routeListID = route_lists.routeListID AND
           route_lists.routeID = routes.routeID
           );
+
+    -- расчет размеров всех результатов для пользователей
+     INSERT INTO total_row_counts_for_users
+     -- MARKET_AGENT
+       (SELECT
+          big_select_materialized.marketAgentUserID,
+          users.userRoleID,
+          COUNT(big_select_materialized.requestID)
+        FROM users
+          INNER JOIN big_select_materialized ON (users.userID = big_select_materialized.marketAgentUserID)
+        GROUP BY big_select_materialized.marketAgentUserID
+        ORDER BY NULL)
+
+       UNION ALL
+       -- CLIENT_MANAGER
+       (SELECT
+          users.userID,
+          users.userRoleID,
+          COUNT(big_select_materialized.requestID)
+        FROM users
+          INNER JOIN big_select_materialized ON (users.clientID = big_select_materialized.clientID)
+        GROUP BY big_select_materialized.clientID
+        ORDER BY NULL)
+
+       UNION ALL
+       -- ADMIN
+       (SELECT
+          users.userID,
+          users.userRoleID,
+          COUNT(big_select_materialized.requestID)
+        FROM users
+          INNER JOIN big_select_materialized
+        WHERE userRoleID = 'ADMIN'
+        GROUP BY users.userID
+        ORDER BY NULL);
+
   END;
 
 CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
@@ -1198,10 +1244,19 @@ FROM big_select_materialized
     SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
-    SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select_materialized ', @wherePart);
-    PREPARE getTotalStm FROM @countTotalSql;
-    EXECUTE getTotalStm;
-    DEALLOCATE PREPARE getTotalStm;
+    IF (@isAdmin OR @isMarketAgent OR @isClientManager)
+    THEN
+      BEGIN
+        SELECT total_count AS totalCount
+        FROM total_row_counts_for_users
+        WHERE total_row_counts_for_users.userID = _userID;
+      END;
+    ELSEIF (@isDispatcherOrWDispatcher) THEN
+      SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM big_select_materialized ', @wherePart);
+      PREPARE getTotalStm FROM @countTotalSql;
+      EXECUTE getTotalStm;
+      DEALLOCATE PREPARE getTotalStm;
+    END IF;
 
   END;
 
