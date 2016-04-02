@@ -28,8 +28,8 @@ public class DataBaseTest {
 
         // get connection to database
         Properties testProperties = new Properties();
-        //testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
-        testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("prod_config.property"));
+        testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
+        //testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("prod_config.property"));
         dataBase = new DataBase(
                 testProperties.getProperty("url"),
                 testProperties.getProperty("dbName"),
