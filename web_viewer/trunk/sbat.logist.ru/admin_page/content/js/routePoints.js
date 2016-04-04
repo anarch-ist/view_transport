@@ -481,6 +481,7 @@ $(document).ready(function () {
 
             fields: [
                 { label: 'ФИО', name: 'userName', type: 'text'},
+                { label: 'Логин', name: 'login', type: 'text'},
                 { label: 'Должность',  name: 'position', type: 'text'},
                 { label: 'Номер телефона',  name: 'phoneNumber', type: 'mask', mask:"(000) 000-00-00", maskOptions: {clearIfNotMatch: true}, placeholder:"(999) 999-99-99"},
                 { label: 'Почта',  name: 'email', type: 'text'},
@@ -561,6 +562,7 @@ $(document).ready(function () {
                 "paging": 10,
                 "columnDefs": [
                     {"name": "userName", "data": "userName", "targets": 0},
+                    {"name": "login", "data": "login", "targets": 0},
                     {"name": "position", "data": "position", "targets": 1},
                     {"name": "phoneNumber", "data": "phoneNumber", "targets": 2},
                     {"name": "email", "data": "email", "targets": 3},
