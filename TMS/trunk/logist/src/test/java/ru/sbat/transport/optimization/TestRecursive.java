@@ -16,7 +16,7 @@ public class TestRecursive {
     // создание планового расписания
     @BeforeClass
     public static void createPlannedSchedule(){
-//        plannedSchedule.addAll(routesFactory.getRoutes());
+        plannedSchedule.addAll(routesFactory.getRoutes());
     }
 
     @Test

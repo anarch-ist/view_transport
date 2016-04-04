@@ -236,7 +236,7 @@ public class Invoice implements Comparable<Invoice>{
         result.add(numberOfDeliveryDate);
         if(!isFittingDateForInvoiceDeparture(invoice.getCreationDate(), startTrackCourse)){
             result.remove(0);
-        }else if(result.size() != 0 && !isFittingDateForInvoiceDelivery(invoice.getRequest().getPlannedDeliveryDate(), endTrackCourse)){
+        }if(result.size() != 0 && !isFittingDateForInvoiceDelivery(invoice.getRequest().getPlannedDeliveryDate(), endTrackCourse)){
             result.remove(result.size() - 1);
         }
         return result;

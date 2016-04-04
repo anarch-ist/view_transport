@@ -1,17 +1,16 @@
 package ru.sbat.transport.optimization;
 
 
-import ru.sbat.transport.optimization.utils.LoadCost;
 
 public class LoadUnit {
-    private LoadCost loadCost;
+    private double loadCost;
     private int numberOfWeek;
 
-    public LoadCost getLoadCost() {
+    public double getLoadCost() {
         return loadCost;
     }
 
-    public void setLoadCost(LoadCost loadCost) {
+    public void setLoadCost(double loadCost) {
         this.loadCost = loadCost;
     }
 

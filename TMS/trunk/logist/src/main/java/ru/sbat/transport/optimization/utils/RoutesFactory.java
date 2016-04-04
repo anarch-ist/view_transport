@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RoutesFactory {
     private final Set<TradeRepresentativePoint> tradeRepresentativePoints;
-    private final Set<IRoute> routes;
+    private final Set<RouteNew> routes;
 
 
     public RoutesFactory(int pointsCount, int routesCount) {
@@ -22,7 +22,7 @@ public class RoutesFactory {
         return tradeRepresentativePoints;
     }
 
-    public Set<IRoute> getRoutes() {
+    public Set<RouteNew> getRoutes() {
         return routes;
     }
 
@@ -35,7 +35,7 @@ public class RoutesFactory {
         return result;
     }
 
-    private IRoute generateRandomRoute() {
+    private RouteNew generateRandomRoute() {
         RouteNew result = new RouteNew();
         List<RoutePoint> routePoints = new ArrayList<>();
         int routeLength = randInt(2, 8);
@@ -76,8 +76,8 @@ public class RoutesFactory {
         return result;
     }
 
-    private Set<IRoute> generateRandomRoutes(int routesCount) {
-        Set<IRoute> result = new HashSet<>();
+    private Set<RouteNew> generateRandomRoutes(int routesCount) {
+        Set<RouteNew> result = new HashSet<>();
         for (int i = 0; i < routesCount; i++) {
             result.add(generateRandomRoute());
         }

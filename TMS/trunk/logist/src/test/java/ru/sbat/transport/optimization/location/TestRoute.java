@@ -52,7 +52,7 @@ public class TestRoute {
 
     @Test
     public void testGetArrivalTime() throws Exception {
-        Assert.assertEquals(1140, plannedSchedule.get(0).getArrivalTime(), 0);
+        Assert.assertEquals(1260, plannedSchedule.get(0).getArrivalTime(), 0);
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TestRoute {
     @Test
     public void testGetActualDeliveryTime() throws IncorrectRequirement {
         Assert.assertEquals(90, plannedSchedule.get(0).getActualArrivalTimeInRoutePoint(route.get(0).getEndTrackCourse()));
-        Assert.assertEquals(1140, plannedSchedule.get(0).getActualArrivalTimeInRoutePoint(route.get(1).getEndTrackCourse()));
+        Assert.assertEquals(1260, plannedSchedule.get(0).getActualArrivalTimeInRoutePoint(route.get(1).getEndTrackCourse()));
     }
 
     @Test

@@ -237,7 +237,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
                     for(int i = 0; i <= index; i++){
                         result += this.get(i).getTravelTime() + this.get(i).getEndTrackCourse().getLoadingOperationsTime();
                     }
-                    result -= this.get(index).getEndTrackCourse().getLoadingOperationsTime();
+//                    result -= this.get(index).getEndTrackCourse().getLoadingOperationsTime();
                 }
             }
         }
