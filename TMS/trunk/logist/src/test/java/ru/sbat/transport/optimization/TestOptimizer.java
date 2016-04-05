@@ -203,10 +203,17 @@ public class TestOptimizer {
 
     @Test
     public void testIsTheSameWeek() throws IncorrectRequirement {
+//        deliveryRoute.add(route3.get(1));
+//        deliveryRoute.add(route4.get(0));
+//        deliveryRoute.add(route1.get(0));
+//        deliveryRoute.add(route5.get(0));
+//        deliveryRoute.add(route5.get(1));
         Optimizer optimizer = new Optimizer();
         DeliveryRoute deliveryRoute = new DeliveryRoute();
-        deliveryRoute.add(route2.get(0));
-        deliveryRoute.add(route2.get(1));
+        deliveryRoute.add(route1.get(0));
+        deliveryRoute.add(route5.get(0));
+//        System.out.println(route5.get(0).getRoute().getActualArrivalTimeInRoutePoint(route5.get(0).getEndTrackCourse()) + " " + route5.get(0).getRoute().getWeekDayOfActualArrivalDateInRoutePoint(route5.get(0).getEndTrackCourse()));
+//        System.out.println(route5.get(1).getRoute().getActualDepartureTimeFromRoutePoint(route5.get(1).getStartTrackCourse()) + " " + route5.get(1).getRoute().getWeekDayOfActualDepartureDateFromRoutePoint(route5.get(1).getStartTrackCourse()));
         Assert.assertTrue(optimizer.isTheSameWeek(deliveryRoute.get(0), deliveryRoute.get(1)));
     }
 
@@ -224,50 +231,33 @@ public class TestOptimizer {
     }
 
     @Test
-    public void testAssignTrackCoursesPossibleWeeksByCost() throws IncorrectRequirement {
+    public void testOptimize() throws ParseException, RouteNotFoundException, IncorrectRequirement {
         Optimizer optimizer = new Optimizer();
-        DeliveryRoute deliveryRoute = new DeliveryRoute();
-        deliveryRoute.add(route3.get(1));
-        deliveryRoute.add(route2.get(0));
-        deliveryRoute.add(route2.get(1));
-        System.out.println(invoiceContainer.get(0).calculateNumbersOfWeeksBetweenDates(invoiceContainer.get(0).getCreationDate(),
-                invoiceContainer.get(0).getRequest().getPlannedDeliveryDate(), invoiceContainer.get(0), deliveryRoute.get(0), deliveryRoute.get(2)));
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes = optimizer.assignTrackCoursesPossibleWeeksByCost(invoiceContainer.get(0), deliveryRoute, invoiceContainer.get(0).calculateNumbersOfWeeksBetweenDates(invoiceContainer.get(0).getCreationDate(),
-                invoiceContainer.get(0).getRequest().getPlannedDeliveryDate(), invoiceContainer.get(0), deliveryRoute.get(0), deliveryRoute.get(2)));
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes){
+        List<DeliveryRoute> result = new ArrayList<>();
+        List<Point> markedPoints = new ArrayList<>();
+        List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
+        Map<Invoice, List<DeliveryRoute>> invoiceListMap = new HashMap<>();
+        invoiceListMap.put(invoiceContainer.get(0), possibleDeliveryRoutes);
+        optimizer.optimize(plannedSchedule, invoiceListMap);
+        List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoiceContainer.get(0).getPartsOfDeliveryRoute();
+        System.out.println(partOfDeliveryRoutes.size());
+        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes) {
             System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " + partOfDeliveryRoute.getNumberOfWeek());
         }
     }
 
     @Test
-    public void testOptimize() throws ParseException, RouteNotFoundException, IncorrectRequirement {
+    public void testIsMadeOfTheChain() throws IncorrectRequirement {
         Optimizer optimizer = new Optimizer();
         DeliveryRoute deliveryRoute = new DeliveryRoute();
-//        deliveryRoute.add(route3.get(1));
-//        deliveryRoute.add(route3.get(2));
-//        deliveryRoute.add(route5.get(0));
-//        deliveryRoute.add(route5.get(1));
-
         deliveryRoute.add(route3.get(1));
         deliveryRoute.add(route4.get(0));
         deliveryRoute.add(route1.get(0));
         deliveryRoute.add(route5.get(0));
         deliveryRoute.add(route5.get(1));
-
-//        deliveryRoute.add(route3.get(1));
-//        deliveryRoute.add(route2.get(0));
-//        deliveryRoute.add(route2.get(1));
-        Map<Invoice, List<DeliveryRoute>> invoiceListMap = new HashMap<>();
-        List<DeliveryRoute> deliveryRoutes = new ArrayList<>();
-        deliveryRoutes.add(deliveryRoute);
-        invoiceListMap.put(invoiceContainer.get(0), deliveryRoutes);
-        optimizer.optimize(plannedSchedule, invoiceListMap);
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoiceContainer.get(0).getPartsOfDeliveryRoute();
-        System.out.println(invoiceContainer.get(0).calculateNumbersOfWeeksBetweenDates(invoiceContainer.get(0).getCreationDate(),
-                invoiceContainer.get(0).getRequest().getPlannedDeliveryDate(), invoiceContainer.get(0), deliveryRoute.get(0), deliveryRoute.get(4)));
-        System.out.println(partOfDeliveryRoutes.size());
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes) {
-            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " + partOfDeliveryRoute.getNumberOfWeek());
-        }
+        List<Integer> numbersOfWeek = invoiceContainer.get(0).calculateNumbersOfWeeksBetweenDates(invoiceContainer.get(0).getCreationDate(),
+                invoiceContainer.get(0).getRequest().getPlannedDeliveryDate(), invoiceContainer.get(0), deliveryRoute.get(0), deliveryRoute.get(deliveryRoute.size() - 1));
+        System.out.println(numbersOfWeek);
+        Assert.assertFalse(optimizer.isMadeChainOfTrackCourses(deliveryRoute, numbersOfWeek));
     }
 }

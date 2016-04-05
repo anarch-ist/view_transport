@@ -15,7 +15,7 @@ public interface IRoute {
     Integer getArrivalTime() throws IncorrectRequirement;
     Integer getArrivalDayOfWeek() throws IncorrectRequirement;
     int getActualDepartureTimeFromRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
-    int getWeekDayOfActualDepartureDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
+    int getWeekDayOfActualDepartureDateFromRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;
     Point getArrivalPoint();
     Point getDeparturePoint();
     int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement;

@@ -62,13 +62,20 @@ public class TrackCourse {
         this.loadUnits = loadUnits;
     }
 
+    /** creates list of track courses from list of points and routes
+     *
+     * @param points
+     * @param routes
+     * @return list of track courses
+     */
     public List<TrackCourse> sharePointsBetweenRoutes(List<Point> points, List<IRoute> routes) {
         List<TrackCourse> result = new ArrayList<>();
         for(int i = 0; i < points.size() - 1; i++){
-        for(IRoute route: routes){
+            for(IRoute route: routes){
             List<TrackCourse> trackCoursesForRoute = route.splitRouteIntoTrackCourse(route);
-            for(TrackCourse trackCourse: trackCoursesForRoute){
-                    if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getPoint().getPointId()) && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getPoint().getPointId())){
+                for(TrackCourse trackCourse: trackCoursesForRoute){
+                    if(points.get(i).getPointId().equals(trackCourse.getStartTrackCourse().getPoint().getPointId())
+                            && points.get(i + 1).getPointId().equals(trackCourse.getEndTrackCourse().getPoint().getPointId())){
                             result.add(trackCourse);
                     }
                 }

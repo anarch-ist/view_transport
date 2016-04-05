@@ -244,7 +244,7 @@ public class Invoice implements Comparable<Invoice>{
 
     public boolean isFittingDateForInvoiceDeparture(Date date, TrackCourse trackCourse) throws IncorrectRequirement {
         int invoiceDayOfWeek = date.getDay() + 1;
-        int routeDayOfWeek = trackCourse.getRoute().getWeekDayOfActualDepartureDateInRoutePoint(trackCourse.getStartTrackCourse());
+        int routeDayOfWeek = trackCourse.getRoute().getWeekDayOfActualDepartureDateFromRoutePoint(trackCourse.getStartTrackCourse());
         int timeOfInvoice = date.getHours() * 60 + date.getMinutes() + trackCourse.getStartTrackCourse().getLoadingOperationsTime();
         int departureTime = trackCourse.getRoute().getActualDepartureTimeFromRoutePoint(trackCourse.getStartTrackCourse());
         if(routeDayOfWeek != 1) {
@@ -264,7 +264,6 @@ public class Invoice implements Comparable<Invoice>{
         int routeDayOfWeek = trackCourse.getRoute().getWeekDayOfActualArrivalDateInRoutePoint(trackCourse.getEndTrackCourse());
         int timeOfInvoice = date.getHours() * 60 + date.getMinutes();
         int deliveryTime = trackCourse.getRoute().getActualArrivalTimeInRoutePoint(trackCourse.getEndTrackCourse()) +  + trackCourse.getEndTrackCourse().getLoadingOperationsTime();
-//        System.out.println(deliveryTime + " " + timeOfInvoice + " " + routeDayOfWeek);
         if(routeDayOfWeek != 1) {
             if (((invoiceDayOfWeek != 1) && (invoiceDayOfWeek < routeDayOfWeek)) || (invoiceDayOfWeek == routeDayOfWeek && timeOfInvoice < deliveryTime)) {
                 return false;

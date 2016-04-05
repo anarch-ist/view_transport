@@ -6,7 +6,6 @@ public class RoutePoint {
     private Point point;
     private Integer loadingOperationsTime;
 
-
     public Point getPoint() {
         return point;
     }

@@ -6,11 +6,11 @@ public class CharacteristicsOfCar {
 
     private double occupancyCost; // вместимость ТС по стоимости
 
-    public CharacteristicsOfCar(double occupancyCost) {
-        this.occupancyCost = occupancyCost;
+    public CharacteristicsOfCar() {
     }
 
-    public CharacteristicsOfCar() {
+    public CharacteristicsOfCar(double occupancyCost) {
+        this.occupancyCost = occupancyCost;
     }
 
     public double getOccupancyCost() {

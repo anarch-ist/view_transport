@@ -65,14 +65,6 @@ public class RoutesFactory {
         for(RoutePoint routePoint: routePoints){
             result.addRoutePoint(routePoint);
         }
-
-
-//        for(int i = 0; i < routePoints.size() - 1; i++){
-//            TrackCourse trackCourse = new TrackCourse();
-//            trackCourse.setStartTrackCourse(routePoints.get(i));
-//            trackCourse.setEndTrackCourse(routePoints.get(i + 1));
-//            result.add(trackCourse);
-//        }
         return result;
     }
 

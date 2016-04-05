@@ -3,7 +3,6 @@ package ru.sbat.transport.optimization.utils;
 
 import ru.sbat.transport.optimization.location.IRoute;
 import ru.sbat.transport.optimization.location.Point;
-//import ru.sbat.transport.optimization.location.Route;
 
 import java.util.ArrayList;
 import java.util.List;

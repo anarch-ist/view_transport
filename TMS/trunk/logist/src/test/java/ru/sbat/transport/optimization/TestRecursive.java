@@ -31,6 +31,5 @@ public class TestRecursive {
             }
             System.out.println("_______________________");
         }
-        System.out.println(optimizer.getCount());
     }
 }

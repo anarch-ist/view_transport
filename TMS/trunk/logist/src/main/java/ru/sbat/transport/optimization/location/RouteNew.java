@@ -151,12 +151,12 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
      * @return day of week when car leaves route point
      */
     @Override
-    public int getWeekDayOfActualDepartureDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
+    public int getWeekDayOfActualDepartureDateFromRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
         List<RoutePoint> routePoints = this.splitRouteNewIntoRoutePoints();
         int result = 0;
         if(routePoints.indexOf(routePoint) == 0){
             result = this.getDayOfWeek();
-        }if(routePoints.indexOf(routePoint) == (routePoints.size() - 1)){
+        }else if(routePoints.indexOf(routePoint) == (routePoints.size() - 1)){
             throw new IncorrectRequirement("Cannot departure from the last route point");
         }else {
             result = calculateArrivalTimeInRoutePoint(routePoint);
@@ -177,12 +177,15 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         int result = 0;
         if(routePoints.indexOf(routePoint) == 0){
             result = this.getDepartureTimeFromFirstPoint();
-        }if(routePoints.indexOf(routePoint) == (routePoints.size() - 1)){
+        }else if(routePoints.indexOf(routePoint) == (routePoints.size() - 1)){
             throw new IncorrectRequirement("Cannot departure from the last route point");
         } else {
             result = calculateArrivalTimeInRoutePoint(routePoint);
             result = result - ((result / (24 * 60)) * 24 * 60);
             result = result + routePoint.getLoadingOperationsTime();
+            if(result >= 1440){
+                result = result - 1440;
+            }
         }
         return result;
     }
@@ -190,7 +193,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
 
     /** determines day of week of arrival in the point of route
      *
-     * @return day of week when car arrives in route point without loading operation time in route point
+     * @return day of week when car arrives in route point with loading operation time in route point
      */
     @Override
     public int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
@@ -204,7 +207,7 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
 
     /** determines time of arrival in the point of route
      *
-     * @return minutes of arrival in the point without loading operation time in route point
+     * @return minutes of arrival in the point with loading operation time in route point
      */
     @Override
     public int getActualArrivalTimeInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
@@ -213,10 +216,10 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
         return result;
     }
 
-    /** determines arrival minutes in route point from departure date
+    /** determines arrival minutes in route point from departure date with loading time in arrival point
      *
      * @param routePoint
-     * @return travel minutes to route point
+     * @return travel minutes to route point with loading time in arrival point
      * @throws IncorrectRequirement
      */
     public int calculateArrivalTimeInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
