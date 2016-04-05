@@ -54,17 +54,19 @@ UNION ALL
  GROUP BY users.userID
  ORDER BY NULL);
 
-
-
-
-
-
-
-CALL selectData(1, 0, 10000, '', TRUE, 'requestIDExternal,12;');
 CREATE INDEX ind3 ON big_select_materialized (requestDate);
 DROP INDEX ind2 ON big_select_materialized;
 CREATE FULLTEXT INDEX ind6 ON big_select_materialized (documentNumber(10));
 
+USE transmaster_transport_db;
+
+-- CREATE FULLTEXT INDEX f_text_index ON big_select_materialized (requestIDExternal(10));
+CALL selectData(1, 120, 40, '', TRUE, 'requestIDExternal,12;');
 
 
-
+CREATE TABLE text_index (
+  colID TINYINT,
+  symbol INTEGER,
+  rowID INTEGER,
+  PRIMARY KEY (colID, symbol, rowID)
+) ENGINE = MYISAM;

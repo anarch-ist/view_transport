@@ -1110,7 +1110,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
     SET @columnsPart =
     '
-    SELECT SQL_CALC_FOUND_ROWS
+    SELECT
   big_select_materialized.requestIDExternal,
   big_select_materialized.requestNumber,
   big_select_materialized.requestDate,
@@ -1240,8 +1240,9 @@ FROM big_select_materialized
     USING @_startEntry, @_length;
     DEALLOCATE PREPARE getDataStm;
 
-    -- filtered
-    SELECT FOUND_ROWS() as `totalFiltered`;
+    -- filtered в случае, если присутвуют фильтры, то возвращается всегда -1.
+    SELECT -1 as `totalFiltered`;
+    -- SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
     IF (@isAdmin OR @isMarketAgent OR @isClientManager)
