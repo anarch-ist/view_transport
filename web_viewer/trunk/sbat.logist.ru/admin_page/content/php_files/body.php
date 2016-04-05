@@ -25,6 +25,7 @@
     <script src="../common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
     <script src="../common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
     <script src="../common_files/media/md5.js"></script>
+    <script src="../common_files/media/Buttons-1.1.0/js/dataTables.buttons.flash.min.js"></script>
 
     <!--custom-->
     <script src="content/js/routePoints.js"></script>

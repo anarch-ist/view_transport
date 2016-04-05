@@ -485,7 +485,6 @@ CREATE TABLE route_lists (
   FOREIGN KEY (driverID) REFERENCES users (userID)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  UNIQUE (routeListNumber),
   UNIQUE (routeListIDExternal, dataSourceID)
 );
 
@@ -1241,7 +1240,7 @@ FROM big_select_materialized
     DEALLOCATE PREPARE getDataStm;
 
     -- filtered в случае, если присутвуют фильтры, то возвращается всегда -1.
-    SELECT -1 as `totalFiltered`;
+    SELECT 200*40 as `totalFiltered`;
     -- SELECT FOUND_ROWS() as `totalFiltered`;
 
     -- total
