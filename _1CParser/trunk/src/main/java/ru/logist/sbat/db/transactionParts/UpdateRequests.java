@@ -20,6 +20,8 @@ public class UpdateRequests extends TransactionPart{
 
     @Override
     public PreparedStatement executePart() throws SQLException, DBCohesionException {
+        if (updateRequests.isEmpty())
+            return null;
         logger.info("-----------------START update requests table from JSON object:[updateRequestsTable]-----------------");
         Map<String, String> allPoints = Selects.selectAllPoints();
         Set<String> allClientsIdExternal = Selects.selectAllClientsIdExternal();

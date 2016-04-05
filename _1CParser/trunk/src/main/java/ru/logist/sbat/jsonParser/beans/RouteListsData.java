@@ -129,7 +129,7 @@ public class RouteListsData {
     private RouteScopeType getRouteState() {
         if (directId.equals(NULL) && !pointArrivalId.isEmpty())
             return RouteScopeType.TRUNK_ROUTE;
-        else if(!directId.isEmpty() && pointArrivalId.equals(NULL))
+        else if(!directId.isEmpty() && !directId.equals(NULL) && pointArrivalId.equals(NULL))
             return RouteScopeType.INTRASITE_ROUTE;
         else
             return RouteScopeType.ERROR;

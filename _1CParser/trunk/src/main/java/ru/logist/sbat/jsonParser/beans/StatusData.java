@@ -22,7 +22,7 @@ public class StatusData {
             "CREDIT_LIMIT", "RASH_CREATED", "COLLECTING", "CHECK", "CHECK_PASSED", "ADJUSTMENTS_MADE",
             "PACKAGING", "CHECK_BOXES", "READY", "TRANSPORTATION"
     ));
-    private static final DateTimeFormatter timeOutStatusFormatter = DateTimeFormatter.ofPattern("uu.MM.dd,HH:mm:ss");
+    private static final DateTimeFormatter timeOutStatusFormatter = DateTimeFormatter.ofPattern("dd.MM.uu,HH:mm:ss");
 
     @Unique
     private String requestId;

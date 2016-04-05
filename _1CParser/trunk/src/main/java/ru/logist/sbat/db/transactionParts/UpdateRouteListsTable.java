@@ -23,6 +23,8 @@ public class UpdateRouteListsTable extends TransactionPart{
 
     @Override
     public PreparedStatement executePart() throws SQLException {
+        if (updateRouteLists.isEmpty())
+            return null;
         logger.info("-----------------START update routeLists from JSON object:[updateRouteLists]-----------------");
         BidiMap<String, Integer> allUsersAsKeyPairs = Selects.selectAllUsersAsKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C);
         BidiMap<String, Integer> allRoutesAsKeyPairs = Selects.selectAllRoutesAsKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C);
@@ -42,7 +44,6 @@ public class UpdateRouteListsTable extends TransactionPart{
                         "  status            = VALUES(status),\n" +
                         "  routeID           = VALUES(routeID);"
         );
-
         for (RouteListsData updateRouteList : updateRouteLists) {
 
             //common values
@@ -53,6 +54,9 @@ public class UpdateRouteListsTable extends TransactionPart{
             } else if (updateRouteList.isTrunkRoute()) {
                 routeIdExternal = updateRouteList.getGeneratedRouteId();
             }
+
+            if (routeIdExternal == null)
+                throw new NullPointerException();
 
             routeListsInsertPreparedStatement.setString(1, updateRouteList.getRouteListId());
             routeListsInsertPreparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);

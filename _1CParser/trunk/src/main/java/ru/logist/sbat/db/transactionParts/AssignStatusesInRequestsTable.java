@@ -22,9 +22,12 @@ public class AssignStatusesInRequestsTable extends TransactionPart{
 
     @Override
     public PreparedStatement executePart() throws SQLException {
+        if (updateStatuses.isEmpty())
+            return null;
+
         logger.info("-----------------START assign statuses in requests table from JSON object:[updateStatus]-----------------");
         PreparedStatement requestsUpdatePreparedStatement = connection.prepareStatement(
-                "UPDATE requests SET boxQty = ?, requestStatusID = ?, commentForStatus = ?, lastStatusUpdated = ? WHERE requestIDExternal = ? AND dataSourceID = ?;"
+                "UPDATE requests SET boxQty = ?, requestStatusID = ?, commentForStatus = ?, lastStatusUpdated = ?, routeListID = VALUES(routeListID) WHERE requestIDExternal = ? AND dataSourceID = ?;"
         );
 
         for (StatusData updateStatus : updateStatuses) {
@@ -47,7 +50,7 @@ public class AssignStatusesInRequestsTable extends TransactionPart{
             requestsUpdatePreparedStatement.setDate(4, timeOutStatus);
             requestsUpdatePreparedStatement.setString(5, requestIdExternal);
             requestsUpdatePreparedStatement.setString(6, InsertOrUpdateTransactionScript.LOGIST_1C);
-
+            System.out.println("updateStatus = " + updateStatus);
             requestsUpdatePreparedStatement.addBatch();
         }
         int[] requestsAffectedRecords = requestsUpdatePreparedStatement.executeBatch();
