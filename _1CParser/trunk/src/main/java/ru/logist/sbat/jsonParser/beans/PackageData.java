@@ -3,10 +3,8 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
-import ru.logist.sbat.routesDataInserter.Point;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

@@ -177,6 +177,28 @@ Notice: Undefined offset: 0 in C:\web\wamp\www\sbat.logist.ru\common_files\dao\r
 4) оптимизировать сам запрос, перенести его на уровень php и использовать prepered statement
 
 
+05.04.2016
+Александру:
+1) когда отображается список всех показываемых столбцов там есть 2 столбца с троеточием. Это возникает из-за того, что реально наша таблица состоит еще из двух столбцов, но они просто не отображаются.
+В этих столбцах Андрей передавал какие-то данные, то ли id заявки то-ли еще что. Datatables имеет 3 формата данных - сущности, массивы и объекты. Соответсвенно нужно передалть передачу данных на объекты и там уже 
+передавать данные этих двух столбцов. 
+https://datatables.net/manual/data/
+
+2) В datatables есть плагин который хранить состояние таблицы. Я его включил, настроил, но он никак не соединен с сессией пользователя. То есть сейчас например оставил фильтры, перелогинился, а фильтры те-же.
+Соответсвенно нужно привязать сохранение состояния таблицы к сессии.
+https://datatables.net/reference/option/stateSave
+
+3) По оптимизации. Datatables может работать автономно, если количество записей для данного пользователя не велико. У нас бОльшая часть пользоватей будет иметь ну максимум по тысяче заявок, это означает,
+ что мы можем просто высылать раз в час всю эту тысячу и не париться. Единственная проблема, что при этом данные о новом статусе заявки также будут раз в час обновляться.
+Processing modes
+
+DataTables has two different modes of processing data (ordering, searching, etc. of data):
+
+    Client-side processing - the full data set is loaded up-front and data processing is done in the browser.
+    Server-side processing - an Ajax request is made for every table redraw, with only the data required for each display returned. The data processing is performed on the server.
+
+То есть если данных мало - ма используем Client-side processing, если данных много(а это будет у маленького количества пользователей) мы используем Server-side processing
+
 
 
 

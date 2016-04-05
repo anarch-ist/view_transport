@@ -17,7 +17,7 @@ public class PointData {
     private static final String FN_POINT_TYPE = "pointType";
     private static final String FN_POINT_EMAIL = "pointEmail";
     private static final String FN_RESPONSIBLE_PERSON_ID = "responsiblePersonId";
-    private static final Set<String> POINT_TYPES = new HashSet<>(Arrays.asList("WAREHOUSE", "AGENCY"));
+    public static final Set<String> POINT_TYPES = new HashSet<>(Arrays.asList("WAREHOUSE", "AGENCY"));
 
     @Unique
     private String pointId; //CONSTRAINT not null or empty
