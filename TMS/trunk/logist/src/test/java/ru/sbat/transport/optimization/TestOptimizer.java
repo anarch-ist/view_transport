@@ -167,7 +167,10 @@ public class TestOptimizer {
     public static void fullInvoiceContainer(){
         Request request = Util.createRequest(z,  Util.createDate(2016, Calendar.FEBRUARY, 16, 20,  45));
         Invoice invoice = Util.createInvoice(c,  Util.createDate(2016, Calendar.JANUARY, 30, 12, 0),     request, 5_000_000);
+        Request request2 = Util.createRequest(z,  Util.createDate(2016, Calendar.APRIL, 10, 20,  45));
+        Invoice invoice2 = Util.createInvoice(x,  Util.createDate(2016, Calendar.APRIL, 4, 12, 0),     request2, 5_000_000);
         invoiceContainer.add(invoice);
+        invoiceContainer.add(invoice2);
     }
 
     @Test
@@ -203,17 +206,10 @@ public class TestOptimizer {
 
     @Test
     public void testIsTheSameWeek() throws IncorrectRequirement {
-//        deliveryRoute.add(route3.get(1));
-//        deliveryRoute.add(route4.get(0));
-//        deliveryRoute.add(route1.get(0));
-//        deliveryRoute.add(route5.get(0));
-//        deliveryRoute.add(route5.get(1));
         Optimizer optimizer = new Optimizer();
         DeliveryRoute deliveryRoute = new DeliveryRoute();
         deliveryRoute.add(route1.get(0));
         deliveryRoute.add(route5.get(0));
-//        System.out.println(route5.get(0).getRoute().getActualArrivalTimeInRoutePoint(route5.get(0).getEndTrackCourse()) + " " + route5.get(0).getRoute().getWeekDayOfActualArrivalDateInRoutePoint(route5.get(0).getEndTrackCourse()));
-//        System.out.println(route5.get(1).getRoute().getActualDepartureTimeFromRoutePoint(route5.get(1).getStartTrackCourse()) + " " + route5.get(1).getRoute().getWeekDayOfActualDepartureDateFromRoutePoint(route5.get(1).getStartTrackCourse()));
         Assert.assertTrue(optimizer.isTheSameWeek(deliveryRoute.get(0), deliveryRoute.get(1)));
     }
 
@@ -240,7 +236,6 @@ public class TestOptimizer {
         invoiceListMap.put(invoiceContainer.get(0), possibleDeliveryRoutes);
         optimizer.optimize(plannedSchedule, invoiceListMap);
         List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoiceContainer.get(0).getPartsOfDeliveryRoute();
-        System.out.println(partOfDeliveryRoutes.size());
         for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes) {
             System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " + partOfDeliveryRoute.getNumberOfWeek());
         }
@@ -259,5 +254,26 @@ public class TestOptimizer {
                 invoiceContainer.get(0).getRequest().getPlannedDeliveryDate(), invoiceContainer.get(0), deliveryRoute.get(0), deliveryRoute.get(deliveryRoute.size() - 1));
         System.out.println(numbersOfWeek);
         Assert.assertFalse(optimizer.isMadeChainOfTrackCourses(deliveryRoute, numbersOfWeek));
+    }
+
+    @Test
+    public void testOptimizeForOneWeek() throws ParseException, RouteNotFoundException, IncorrectRequirement {
+        Optimizer optimizer = new Optimizer();
+        List<DeliveryRoute> result = new ArrayList<>();
+        List<Point> markedPoints = new ArrayList<>();
+        List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, x, z, result, markedPoints);
+        for(DeliveryRoute deliveryRoute: possibleDeliveryRoutes) {
+            for (TrackCourse trackCourse : deliveryRoute) {
+                System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getPoint().getPointId() + ", route = " + trackCourse.getRoute().getPointsAsString());
+            }
+            System.out.println("_______________________");
+        }
+        Map<Invoice, List<DeliveryRoute>> invoiceListMap = new HashMap<>();
+        invoiceListMap.put(invoiceContainer.get(1), possibleDeliveryRoutes);
+        optimizer.optimize(plannedSchedule, invoiceListMap);
+        List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoiceContainer.get(1).getPartsOfDeliveryRoute();
+        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes) {
+            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " + partOfDeliveryRoute.getNumberOfWeek());
+        }
     }
 }

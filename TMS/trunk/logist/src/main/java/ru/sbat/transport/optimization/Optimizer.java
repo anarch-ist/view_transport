@@ -405,7 +405,7 @@ public class Optimizer implements IOptimizer {
      * @param routesForInvoice
      */
     @Override
-    public ArrayList<Invoice> shift (PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice){
+    public List<Invoice> shift (PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, List<DeliveryRoute>> routesForInvoice){
         ArrayList<Invoice> result = new ArrayList<>();
         return result;
     }
@@ -417,9 +417,9 @@ public class Optimizer implements IOptimizer {
      * @throws RouteNotFoundException
      */
     @Override
-    public Map<Invoice, ArrayList<DeliveryRoute>> useAdditionalSchedule(AdditionalSchedule additionalSchedule, PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, ArrayList<DeliveryRoute>> routesForInvoice) throws RouteNotFoundException{
-        Map<Invoice, ArrayList<DeliveryRoute>> result = new HashMap<>();
-        ArrayList<Invoice> unsentInvoicesByPlannedSchedule = shift(plannedSchedule, invoiceContainer, routesForInvoice);
+    public Map<Invoice, List<DeliveryRoute>> useAdditionalSchedule(AdditionalSchedule additionalSchedule, PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer, Map<Invoice, List<DeliveryRoute>> routesForInvoice) throws RouteNotFoundException{
+        Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
+        List<Invoice> unsentInvoicesByPlannedSchedule = shift(plannedSchedule, invoiceContainer, routesForInvoice);
         return result;
     }
 
