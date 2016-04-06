@@ -63,10 +63,5 @@ USE transmaster_transport_db;
 -- CREATE FULLTEXT INDEX f_text_index ON big_select_materialized (requestIDExternal(10));
 CALL selectData(1, 120, 40, '', TRUE, 'requestIDExternal,12;');
 
-
-CREATE TABLE text_index (
-  colID TINYINT,
-  symbol INTEGER,
-  rowID INTEGER,
-  PRIMARY KEY (colID, symbol, rowID)
-) ENGINE = MYISAM;
+-- узнать размер таблицы
+SELECT TABLE_NAME, DATA_LENGTH FROM information_schema.TABLES WHERE TABLE_NAME = 'text_index'; -- 8мб при colID TINYINT

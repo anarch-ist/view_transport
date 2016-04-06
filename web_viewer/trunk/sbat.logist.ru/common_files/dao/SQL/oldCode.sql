@@ -149,3 +149,14 @@ CREATE FUNCTION getNextRoutePointID(_routeID INTEGER, _lastVisitedRoutePointID I
             ORDER BY sortOrder
             LIMIT 1);
   END;
+
+
+SELECT
+  requests_history.requestID,
+  requests_history.lastStatusUpdated,
+  MAX(requests_history.lastStatusUpdated) AS departureTimeFromLastRoutePoint
+FROM requests_history
+WHERE requests_history.requestStatusID = 'DEPARTURE'
+GROUP BY requestID
+ORDER BY NULL;
+

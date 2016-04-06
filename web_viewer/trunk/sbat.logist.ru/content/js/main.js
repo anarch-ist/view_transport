@@ -178,14 +178,14 @@ $(document).ready(function () {
             {"data": "userName"},
             {"data": "deliveryPointName"},
             {"data": "warehousePointName"},
-            {"data": "currentPointName"},
+            {"data": "pointName"},
             {"data": "nextPointName"},
             {"data": "routeName"},
             {"data": "driverId"},
             {"data": "licensePlate"},
             {"data": "palletsQty"},
             {"data": "routeListNumber"},
-            {"data": "arrivalTime"},
+            {"data": "arrivalTimeToNextRoutePoint"},
 
             {"data": "requestStatusID"},
             {"data": "routeListID"}
@@ -209,14 +209,14 @@ $(document).ready(function () {
             {"name": "userName", "searchable": true, "targets": 15},
             {"name": "deliveryPointName", "searchable": true, "targets": 16},
             {"name": "warehousePointName", "searchable": true, "targets": 17},
-            {"name": "currentPointName", "searchable": true, "targets": 18},
+            {"name": "pointName", "searchable": true, "targets": 18},
             {"name": "nextPointName", "searchable": true, "targets": 19},
             {"name": "routeName", "searchable": true, "targets": 20},
             {"name": "driverId", "searchable": true, "targets": 21},
             {"name": "licensePlate", "searchable": true, "targets": 22},
             {"name": "palletsQty", "searchable": true, "targets": 23},
             {"name": "routeListNumber", "searchable": true, "targets": 24},
-            {"name": "arrivalTime", "searchable": true, "targets": 25},
+            {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
 
             {"name": "requestStatusID", "searchable": false, "visible": false, "targets": 26},
             {"name": "routeListID", "searchable": false, "visible": false, "targets": 27}
