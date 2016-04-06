@@ -27,11 +27,10 @@ public class DataInserterTest {
                 testProperties.getProperty("encoding")
         );
         dataInserter = new DataInserter(dataBase);
-        // dataBase.truncatePublicTables();
+        dataBase.truncatePublicTables();
 
     }
 
-    @Ignore
     @Test
     public void testGenerate() throws Exception {
         dataInserter.generatePoints();
@@ -41,11 +40,5 @@ public class DataInserterTest {
         dataInserter.generateRouteLists();
         dataInserter.generateRequests();
         dataInserter.refreshView();
-    }
-
-
-    @Test
-    public void testCreateIndex() throws Exception {
-        dataInserter.createIndex();
     }
 }

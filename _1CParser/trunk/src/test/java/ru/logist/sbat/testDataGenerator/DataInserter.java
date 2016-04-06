@@ -15,9 +15,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class DataInserter {
+    private static final int TOTAL_POINTS = 30_000; // 30_000
+    private static final int TOTAL_ROUTES = 50_000; // 50_000
+    private static final int TOTAL_CLIENTS = 40_000; // 40_000
+    private static final int TOTAL_USERS = 60_000; // 60_000
+    private static final int TOTAL_ROUTE_LISTS = 10_000; // 10_000
+    private static final int TOTAL_REQUESTS = 100_000; // 100_000
+
+
     private static final Set<String> DAYS_OF_WEEK = new HashSet<>(Arrays.asList(new String[]{
             "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
     }));
+
     public static final String ADMIN = "ADMIN";
     public static final String W_DISPATCHER = "W_DISPATCHER";
     public static final String DISPATCHER = "DISPATCHER";
@@ -29,14 +38,6 @@ public class DataInserter {
     private static final Set<String> ROUTE_LIST_STATUSES = new HashSet<>(Arrays.asList(new String[]{
             "APPROVED", "CREATED"
     }));
-
-
-    private static final int TOTAL_POINTS = 1000;
-    private static final int TOTAL_ROUTES = 1000;
-    private static final int TOTAL_CLIENTS = 1000;
-    private static final int TOTAL_USERS = 100;
-    private static final int TOTAL_ROUTE_LISTS = 100;
-    private static final int TOTAL_REQUESTS = 100_000;
 
     private DataBase dataBase;
     private List<Long> generatedClientsId;
@@ -368,58 +369,8 @@ public class DataInserter {
         }
     }
 
-
-
-
     public void refreshView() {
         dataBase.refreshMaterializedView();
     }
 
-
-    public void createIndex() throws SQLException {
-        PreparedStatement insertIntoIndex = dataBase.getConnection().prepareStatement("" +
-                "INSERT INTO text_index (symbol, colID, rowID) VALUES " +
-                "(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?),(?, ?, ?)"
-        );
-
-        Statement statement = dataBase.getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT requestID, requestIDExternal FROM big_select_materialized;");
-        Map<Integer, String> reqIdReqIdExternal = new HashMap<>();
-        while (resultSet != null && resultSet.next()) {
-            reqIdReqIdExternal.put(resultSet.getInt(1), resultSet.getString(2));
-        }
-        statement.close();
-
-        System.out.println("all entries selected");
-        int count = 0;
-        dataBase.getConnection().setAutoCommit(true);
-        dataBase.getConnection().setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-        for (Map.Entry<Integer, String> integerStringEntry : reqIdReqIdExternal.entrySet()) {
-            count++;
-            if (count % 10000 == 0)
-                System.out.println(count);
-            int requestId = integerStringEntry.getKey();
-            String string = integerStringEntry.getValue();
-            char[] symbols = string.toCharArray();
-            Set<Character> uniqueSymbols = new HashSet<>();
-            for (char symbol: symbols) {
-                uniqueSymbols.add(symbol);
-            }
-
-            int insCount = 0;
-
-            for (char symbol : uniqueSymbols) {
-                insertIntoIndex.setInt(1, symbol);
-                insertIntoIndex.setInt(2, 1);
-                insertIntoIndex.setInt(3, requestId);
-                count++;
-
-                insertIntoIndex.addBatch();
-            }
-        }
-        insertIntoIndex.executeLargeBatch();
-        System.out.println("index for requestIDExternal updated");
-        insertIntoIndex.close();
-        dataBase.getConnection().setAutoCommit(false);
-    }
 }
