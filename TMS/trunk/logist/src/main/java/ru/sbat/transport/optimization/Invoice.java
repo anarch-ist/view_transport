@@ -25,6 +25,7 @@ public class Invoice implements Comparable<Invoice>{
     private final ObjectProperty<InvoiceType> invoiceType = new SimpleObjectProperty<>();
     private final ObjectProperty<Date> realDepartureDate = new SimpleObjectProperty<>();
     private final ObjectProperty<List<PartOfDeliveryRoute>> partsOfDeliveryRoute = new SimpleObjectProperty<>();
+    private final StringProperty invoiceId = new SimpleStringProperty();
 
     public Invoice() {
     }
@@ -183,6 +184,18 @@ public class Invoice implements Comparable<Invoice>{
 
     public void setPartsOfDeliveryRoute(List<PartOfDeliveryRoute> partOfDeliveryRoute) {
         this.partsOfDeliveryRoute.set(partOfDeliveryRoute);
+    }
+
+    public String getInvoiceId() {
+        return invoiceId.get();
+    }
+
+    public StringProperty invoiceIdProperty() {
+        return invoiceId;
+    }
+
+    public void setInvoiceId(String invoiceId) {
+        this.invoiceId.set(invoiceId);
     }
 
     /** determines week day of invoice's creation date

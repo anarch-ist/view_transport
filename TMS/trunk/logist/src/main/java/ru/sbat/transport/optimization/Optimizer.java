@@ -341,6 +341,10 @@ public class Optimizer implements IOptimizer {
     public boolean isFittingTrackCourseByLoadCostAndNumberOfWeek(Invoice invoice, TrackCourse trackCourse, int numberOfWeek){
         double invoiceCost = invoice.getCost();
         if(trackCourse.getLoadUnits().size() == 0){
+            LoadUnit loadUnit = new LoadUnit();
+            loadUnit.setNumberOfWeek(numberOfWeek);
+            loadUnit.setLoadCost(invoiceCost);
+            trackCourse.getLoadUnits().add(loadUnit);
             return true;
         }else {
             List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
@@ -348,6 +352,8 @@ public class Optimizer implements IOptimizer {
                 if(loadUnit.getNumberOfWeek() == numberOfWeek){
                     if((loadUnit.getLoadCost() + invoiceCost) > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost()) {
                         return false;
+                    }else {
+                        loadUnit.setLoadCost(loadUnit.getLoadCost() + invoiceCost);
                     }
                 }
             }

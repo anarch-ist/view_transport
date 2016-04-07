@@ -199,9 +199,9 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
     public int getWeekDayOfActualArrivalDateInRoutePoint(RoutePoint routePoint) throws IncorrectRequirement {
         int result = calculateArrivalTimeInRoutePoint(routePoint);
         result = (result / (24 * 60)) + this.getDayOfWeek();
-        if(result > 7){
-            result = result - 7;
-        }
+//        if(result > 7){
+//            result = result - 7;
+//        }
         return result;
     }
 
@@ -232,10 +232,10 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
             if (trackCourse.getEndTrackCourse().getPoint().equals(routePoint.getPoint())) {
                 int index = this.indexOf(trackCourse);
                 if (index == 0) {
-                    result += trackCourse.getTravelTime();
-                    if (result >= 1440) {
-                        result = (result - 1440);
-                    }
+                    result += trackCourse.getTravelTime() + trackCourse.getEndTrackCourse().getLoadingOperationsTime();
+//                    if (result > 1440) {
+//                        result = (result - 1440);
+//                    }
                 }else {
                     for(int i = 0; i <= index; i++){
                         result += this.get(i).getTravelTime() + this.get(i).getEndTrackCourse().getLoadingOperationsTime();
