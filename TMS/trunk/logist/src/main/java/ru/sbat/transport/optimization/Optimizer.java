@@ -94,20 +94,20 @@ public class Optimizer implements IOptimizer {
 
                         Point point = route.getRoutePoint(i).getPoint();
 
-                        System.out.println("infStack = " + informationStack);
-                        System.out.println("currentRoute = "+route.getPointsAsString());
-                        System.out.println("currentPoint = " + point.getPointId());
-                        //System.out.println("indexOfPointInRoute = " + i);
-                        System.out.print("markedPoints = ");
-                        for (Point point1: markedPoints) {
-                            System.out.print(point1.getPointId() + " ");
-                        }
-                        System.out.print("NewmarkedPoints = ");
+//                        System.out.println("infStack = " + informationStack);
+//                        System.out.println("currentRoute = "+route.getPointsAsString());
+//                        System.out.println("currentPoint = " + point.getPointId());
+//                        //System.out.println("indexOfPointInRoute = " + i);
+//                        System.out.print("markedPoints = ");
+//                        for (Point point1: markedPoints) {
+//                            System.out.print(point1.getPointId() + " ");
+//                        }
+//                        System.out.print("NewmarkedPoints = ");
 //                        for (Point point1: informationStack.getMarkedPoints()) {
 //                            System.out.print(point1.getPointId() + " ");
 //                        }
-                        System.out.println("");
-                        System.out.println("_______________________");
+//                        System.out.println("");
+//                        System.out.println("_______________________");
 
                         if(!informationStack.getMarkedPoints().contains(point)) {
 
@@ -116,10 +116,10 @@ public class Optimizer implements IOptimizer {
                                 List<Point> pointsId = new ArrayList<>();
                                 pointsId.addAll(informationStack.getPointsForInvoice());
                                 pointsId.add(deliveryPoint);
-                                for(Point point1: pointsId){
-                                    System.out.print(point1.getPointId() + " ");
-                                }
-                                System.out.println(pointsId.size());
+//                                for(Point point1: pointsId){
+//                                    System.out.print(point1.getPointId() + " ");
+//                                }
+//                                System.out.println(pointsId.size());
                                 List<IRoute> routesId = new LinkedList<>();
                                 routesId.addAll(informationStack.getRoutesForInvoice());
                                 routesId.add(route);
@@ -127,10 +127,10 @@ public class Optimizer implements IOptimizer {
                                 List<TrackCourse> trackCourses = trackCourse.sharePointsBetweenRoutes(pointsId, routesId);
                                 for(TrackCourse correctTrackCourse: trackCourses) {
                                     deliveryRoute.add(correctTrackCourse);
-                                    System.out.println("Track Courses, start point id = " + correctTrackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point id = " + correctTrackCourse.getEndTrackCourse().getPoint().getPointId());
+//                                    System.out.println("Track Courses, start point id = " + correctTrackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point id = " + correctTrackCourse.getEndTrackCourse().getPoint().getPointId());
                                 }
                                 result.add(deliveryRoute);
-                                System.out.println("FIND delivery point!");
+//                                System.out.println("FIND delivery point!");
                                 break;
                             }
                             InformationStack newInformationStack = new InformationStack(informationStack);
@@ -233,7 +233,7 @@ public class Optimizer implements IOptimizer {
         for (IRoute route : result.keySet()) {
             routes+=route.getPointsAsString()+" ";
         }
-        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
+//        System.out.println("filtrated routes for point " + point.getPointId() + " :" + routes);
         return result;
     }
 
@@ -258,6 +258,7 @@ public class Optimizer implements IOptimizer {
                 for(DeliveryRoute deliveryRoute: deliveryRoutes){
                     List<Integer> countOfWeek = invoice.calculateNumbersOfWeeksBetweenDates(invoice.getCreationDate(), invoice.getRequest().getPlannedDeliveryDate(),
                             invoice, deliveryRoute.get(0), deliveryRoute.get(deliveryRoute.size() - 1));
+//                    System.out.println(countOfWeek);
                     if(countOfWeek.size() == 0 || !isMadeChainOfTrackCourses(deliveryRoute, countOfWeek)){
                         continue;
                     }else {
@@ -348,14 +349,26 @@ public class Optimizer implements IOptimizer {
             return true;
         }else {
             List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
+            int count = 0;
             for(LoadUnit loadUnit: loadUnits){
                 if(loadUnit.getNumberOfWeek() == numberOfWeek){
+                    count++;
+                    System.out.println(loadUnit.getLoadCost() + invoiceCost > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost());
                     if((loadUnit.getLoadCost() + invoiceCost) > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost()) {
+                        System.out.println(loadUnit.getLoadCost() + invoiceCost);
+                        System.out.println("I'M HERE");
                         return false;
                     }else {
                         loadUnit.setLoadCost(loadUnit.getLoadCost() + invoiceCost);
+                        System.out.println(loadUnit.getLoadCost() + invoiceCost);
                     }
                 }
+            }
+            if(count == 0){
+                LoadUnit loadUnit = new LoadUnit();
+                loadUnit.setNumberOfWeek(numberOfWeek);
+                loadUnit.setLoadCost(invoiceCost);
+                trackCourse.getLoadUnits().add(loadUnit);
             }
         }
         return true;
