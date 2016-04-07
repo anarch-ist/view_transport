@@ -979,36 +979,6 @@ CREATE FUNCTION selectAllRoutesIDWithThatPointAsString(_pointID INTEGER)
 --                                                BIG SELECT
 -- -------------------------------------------------------------------------------------------------------------------
 
-
-CREATE TABLE transmaster_transport_db.mat_view_parser_data (
-  requestID            INTEGER,
-  requestIDExternal    VARCHAR(255),
-  requestNumber        VARCHAR(255),
-  requestDate          DATE,
-  invoiceNumber        VARCHAR(255),
-  invoiceDate          DATE,
-  documentNumber       VARCHAR(255),
-  documentDate         DATE,
-  firma                VARCHAR(255),
-  storage              VARCHAR(255),
-  boxQty               INTEGER,
-  marketAgentUserID    INTEGER, -- служебное поле
-  routeListID          INTEGER, -- служебное поле
-  clientID             INTEGER, -- служебное поле
-  clientIDExternal     VARCHAR(255),
-  INN                  VARCHAR(255),
-  clientName           VARCHAR(255),
-  userName             VARCHAR(255), -- имя торгового представителя
-  deliveryPointName    VARCHAR(255),
-  warehousePointName   VARCHAR(255),
-  warehousePointID     INTEGER, -- служебное поле
-  routeID              INTEGER, -- служебное поле
-  routeName            VARCHAR(255),
-  driverId             VARCHAR(255),
-  routeListNumber      VARCHAR(255),
-  PRIMARY KEY (requestID)
-);
-
 -- таблица содержащая размеры массива данных с заявками
 CREATE TABLE mat_view_row_count_for_user (
   userID      INTEGER,
@@ -1021,64 +991,18 @@ CREATE TABLE mat_view_row_count_for_user (
 CREATE PROCEDURE refreshMaterializedView()
   BEGIN
 
-    TRUNCATE mat_view_parser_data;
     TRUNCATE mat_view_row_count_for_user;
-
-    INSERT INTO mat_view_parser_data
-      SELECT
-        requests.requestID, -- служебное поле
-        requests.requestIDExternal,
-        requests.requestNumber,
-        requests.requestDate,
-        requests.invoiceNumber,
-        requests.invoiceDate,
-        requests.documentNumber,
-        requests.documentDate,
-        requests.firma,
-        requests.storage,
-        requests.boxQty,
-        requests.marketAgentUserID, -- служебное поле
-        requests.routeListID, -- служебное поле
-        clients.clientID, -- служебное поле
-        clients.clientIDExternal,
-        clients.INN,
-        clients.clientName,
-        users.userName,
-        delivery_points.pointName             AS deliveryPointName,
-        w_points.pointName                    AS warehousePointName,
-        w_points.pointID                      AS warehousePointID, -- служебное поле
-        routes.routeID, -- служебное поле
-        routes.routeName,
-        (SELECT userName FROM users WHERE userID = route_lists.driverID) AS driverId,
-        route_lists.routeListNumber
-      FROM requests
-        INNER JOIN (request_statuses, clients, users)
-          ON (
-          requests.requestStatusID = request_statuses.requestStatusID AND
-          requests.clientID = clients.clientID AND
-          requests.marketAgentUserID = users.userID
-          )
-        LEFT JOIN (points AS delivery_points, points AS w_points)
-          ON (
-          requests.warehousePointID = w_points.pointID AND
-          requests.destinationPointID = delivery_points.pointID
-          )
-        LEFT JOIN (route_lists, routes)
-          ON (
-          requests.routeListID = route_lists.routeListID AND
-          route_lists.routeID = routes.routeID
-          );
 
     -- расчет размеров всех результатов для пользователей
      INSERT INTO mat_view_row_count_for_user
      -- MARKET_AGENT
        (SELECT
-          mat_view_parser_data.marketAgentUserID,
+          requests.marketAgentUserID,
           users.userRoleID,
-          COUNT(mat_view_parser_data.requestID)
+          COUNT(requests.requestID)
         FROM users
-          INNER JOIN mat_view_parser_data ON (users.userID = mat_view_parser_data.marketAgentUserID)
-        GROUP BY mat_view_parser_data.marketAgentUserID
+          INNER JOIN requests ON (users.userID = requests.marketAgentUserID)
+        GROUP BY requests.marketAgentUserID
         ORDER BY NULL)
 
        UNION ALL
@@ -1086,10 +1010,10 @@ CREATE PROCEDURE refreshMaterializedView()
        (SELECT
           users.userID,
           users.userRoleID,
-          COUNT(mat_view_parser_data.requestID)
+          COUNT(requests.requestID)
         FROM users
-          INNER JOIN mat_view_parser_data ON (users.clientID = mat_view_parser_data.clientID)
-        GROUP BY mat_view_parser_data.clientID
+          INNER JOIN requests ON (users.clientID = requests.clientID)
+        GROUP BY requests.clientID
         ORDER BY NULL)
 
        UNION ALL
@@ -1097,9 +1021,9 @@ CREATE PROCEDURE refreshMaterializedView()
        (SELECT
           users.userID,
           users.userRoleID,
-          COUNT(mat_view_parser_data.requestID)
+          COUNT(requests.requestID)
         FROM users
-          INNER JOIN mat_view_parser_data
+          INNER JOIN requests
         WHERE userRoleID = 'ADMIN'
         GROUP BY users.userID
         ORDER BY NULL);
@@ -1112,43 +1036,37 @@ CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
                            CHAR_LENGTH(SUBSTRING_INDEX(stringSpl, delim, pos - 1)) + 1),
                  delim, '');
 
-CREATE FUNCTION getPrefix(_colName VARCHAR(255))
+
+CREATE FUNCTION getFullColName(_colName VARCHAR(255))
   RETURNS VARCHAR(255)
   BEGIN
-    IF (_colName IN ('requestIDExternal',
-                     'requestNumber',
-                     'requestDate',
-                     'invoiceNumber',
-                     'invoiceDate',
-                     'documentNumber',
-                     'documentDate',
-                     'firma',
-                     'storage',
-                     'boxQty',
-                     'INN',
-                     'clientIDExternal',
-                     'clientName',
-                     'userName',
-                     'deliveryPointName',
-                     'warehousePointName',
-                     'routeName',
-                     'driverId',
-                     'routeListNumber',
-                     'routeListID'))
+    IF (_colName IN ('requestIDExternal', 'requestNumber', 'requestDate', 'invoiceNumber', 'invoiceDate',
+                     'documentNumber', 'documentDate', 'firma', 'storage', 'boxQty', 'requestStatusID', 'commentForStatus'))
     THEN
-      RETURN 'mat_view_parser_data';
-    ELSEIF (_colName IN ('requestStatusID', 'commentForStatus'))
-      THEN RETURN 'requests';
+      RETURN CONCAT('requests', '.', _colName);
     ELSEIF (_colName = 'requestStatusRusName')
-      THEN RETURN 'request_statuses';
-    ELSEIF (_colName = 'pointName')
-      THEN RETURN 'points';
+      THEN RETURN CONCAT('request_statuses', '.', _colName);
+    ELSEIF (_colName IN ('clientIDExternal','INN','clientName'))
+      THEN RETURN CONCAT('clients', '.', _colName);
+    ELSEIF (_colName = 'marketAgentUserName')
+      THEN RETURN 'market_agent_users.userName';
+    ELSEIF (_colName = 'driverUserName')
+      THEN RETURN 'driver_users.userName';
+    ELSEIF (_colName = 'deliveryPointName')
+      THEN RETURN 'delivery_points.pointName';
+    ELSEIF (_colName = 'warehousePointName')
+      THEN RETURN 'w_points.pointName';
+    ELSEIF (_colName = 'lastVisitedPointName')
+      THEN RETURN 'last_visited_points.pointName';
     ELSEIF (_colName = 'nextPointName')
-      THEN RETURN 'mat_view_route_points_sequential';
-    ELSEIF (_colName IN ('licensePlate', 'palletsQty'))
-      THEN RETURN 'route_lists';
+      THEN RETURN CONCAT('mat_view_route_points_sequential', '.', _colName);
+    ELSEIF (_colName IN ('routeListNumber', 'licensePlate', 'palletsQty', 'routeListID'))
+      THEN RETURN CONCAT('route_lists', '.', _colName);
+    ELSEIF (_colName = 'routeName')
+      THEN RETURN CONCAT('routes', '.', _colName);
     ELSEIF (_colName = 'arrivalTimeToNextRoutePoint')
-      THEN RETURN 'mat_view_arrival_time_for_request';
+      THEN RETURN CONCAT('mat_view_arrival_time_for_request', '.', _colName);
+
     END IF;
     RETURN '';
   END;
@@ -1172,7 +1090,7 @@ CREATE FUNCTION generateLikeCondition(map TEXT)
       THEN LEAVE wloop;
       END IF;
       SET @columnName = splitString(pair, ',', 1);
-      SET @fullColumnName = CONCAT(getPrefix(@columnName), '.', @columnName);
+      SET @fullColumnName = getFullColName(@columnName);
       SET @searchString = splitString(pair, ',', 2);
       SET @searchString = CONCAT('%', @searchString, '%');
 
@@ -1244,72 +1162,59 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     SET @columnsPart =
     '
 SELECT
-  mat_view_parser_data.requestIDExternal,
-  mat_view_parser_data.requestNumber,
-  mat_view_parser_data.requestDate,
-  mat_view_parser_data.invoiceNumber,
-  mat_view_parser_data.invoiceDate,
-  mat_view_parser_data.documentNumber,
-  mat_view_parser_data.documentDate,
-  mat_view_parser_data.firma,
-  mat_view_parser_data.storage,
-  mat_view_parser_data.boxQty,
-  mat_view_parser_data.INN,
-  mat_view_parser_data.clientIDExternal,
-  mat_view_parser_data.clientName,
-  mat_view_parser_data.userName,
-  mat_view_parser_data.deliveryPointName,
-  mat_view_parser_data.warehousePointName,
-  mat_view_parser_data.routeName,
-  mat_view_parser_data.driverId,
-  mat_view_parser_data.routeListNumber,
-  mat_view_parser_data.routeListID,
+  requests.requestIDExternal,
+  requests.requestNumber,
+  requests.requestDate,
+  requests.invoiceNumber,
+  requests.invoiceDate,
+  requests.documentNumber,
+  requests.documentDate,
+  requests.firma,
+  requests.storage,
+  requests.boxQty,
   requests.requestStatusID,
   requests.commentForStatus,
   request_statuses.requestStatusRusName,
-  points.pointName,
+  clients.clientIDExternal,
+  clients.INN,
+  clients.clientName,
+  market_agent_users.userName   AS marketAgentUserName,
+  driver_users.userName         AS driverUserName,
+  delivery_points.pointName     AS deliveryPointName,
+  w_points.pointName            AS warehousePointName,
+  last_visited_points.pointName AS lastVisitedPointName,
   mat_view_route_points_sequential.nextPointName,
+  route_lists.routeListNumber,
   route_lists.licensePlate,
   route_lists.palletsQty,
+  route_lists.routeListID,
+  routes.routeName,
   mat_view_arrival_time_for_request.arrivalTimeToNextRoutePoint
 
-FROM mat_view_parser_data
-
-  INNER JOIN (requests) ON (
-    requests.requestID = mat_view_parser_data.requestID
-    )
-  INNER JOIN (request_statuses) ON (
-    request_statuses.requestStatusID = requests.requestStatusID
-    )
-  LEFT JOIN (route_points) ON (
-    route_points.routePointID = requests.lastVisitedRoutePointID
-    )
-  LEFT JOIN (points) ON (
-    points.pointID = route_points.pointID
-    )
-  LEFT JOIN (routes) ON (
-    routes.routeID = mat_view_parser_data.routeID
-    )
-  LEFT JOIN (route_lists) ON (
-    route_lists.routeListID = mat_view_parser_data.routeListID
-    )
-  LEFT JOIN (mat_view_route_points_sequential) ON (
-    mat_view_route_points_sequential.routePointID = requests.lastVisitedRoutePointID
-    )
-  LEFT JOIN (mat_view_arrival_time_for_request) ON (
-    mat_view_arrival_time_for_request.requestID = mat_view_parser_data.requestID
-    )
+FROM requests
+  INNER JOIN (request_statuses) USING (requestStatusID)
+  STRAIGHT_JOIN (clients) ON requests.clientID = clients.clientID
+  INNER JOIN (users AS market_agent_users) ON (requests.marketAgentUserID = market_agent_users.userID)
+  LEFT JOIN (route_lists) USING (routeListID)
+  LEFT JOIN (users AS driver_users) ON (route_lists.driverID = driver_users.userID)
+  LEFT JOIN (routes) ON (route_lists.routeID = routes.routeID)
+  LEFT JOIN (route_points AS last_visited_route_points) ON (requests.lastVisitedRoutePointID = last_visited_route_points.routePointID)
+  LEFT JOIN (mat_view_route_points_sequential) ON (requests.lastVisitedRoutePointID = mat_view_route_points_sequential.routePointID)
+  LEFT JOIN (points AS delivery_points) ON (requests.destinationPointID = delivery_points.pointID)
+  LEFT JOIN (points AS w_points) ON (requests.warehousePointID = w_points.pointID)
+  LEFT JOIN (points AS last_visited_points) ON (last_visited_route_points.pointID = last_visited_points.pointID)
+  LEFT JOIN (mat_view_arrival_time_for_request) ON (requests.requestID = mat_view_arrival_time_for_request.requestID)
     ';
     SET @wherePart = '';
 
     IF @isAdmin THEN
       SET @wherePart = CONCAT('WHERE ', generateLikeCondition(_search));
     ELSEIF @isMarketAgent THEN
-      SET @wherePart = CONCAT('WHERE (mat_view_parser_data.marketAgentUserID = ', _userID,') AND ', generateLikeCondition(_search));
+      SET @wherePart = CONCAT('WHERE (requests.marketAgentUserID = ', _userID,') AND ', generateLikeCondition(_search));
     ELSEIF @isClientManager THEN
-      SET @wherePart = CONCAT('WHERE (mat_view_parser_data.clientID = ', @clientID,') AND ', generateLikeCondition(_search));
+      SET @wherePart = CONCAT('WHERE (clients.clientID = ', @clientID,') AND ', generateLikeCondition(_search));
     ELSEIF @isDispatcherOrWDispatcher THEN
-      SET @wherePart = CONCAT('WHERE (mat_view_parser_data.routeID IN (', @allRoutesWithUserPointID,')) AND ', generateLikeCondition(_search));
+      SET @wherePart = CONCAT('WHERE (routes.routeID IN (', @allRoutesWithUserPointID,')) AND ', generateLikeCondition(_search));
     END IF;
 
     SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
@@ -1340,7 +1245,7 @@ FROM mat_view_parser_data
         WHERE mat_view_row_count_for_user.userID = _userID;
       END;
     ELSEIF (@isDispatcherOrWDispatcher) THEN
-      SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM mat_view_parser_data ', @wherePart);
+      SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM requests ', @wherePart);
       PREPARE getTotalStm FROM @countTotalSql;
       EXECUTE getTotalStm;
       DEALLOCATE PREPARE getTotalStm;
@@ -1479,35 +1384,29 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
 --                                                 INDEXES
 -- -------------------------------------------------------------------------------------------------------------------
 
--- т.к. сортировка может использоваться для любой части  mat_view_parser_data, то на все поля вешается индекс
-CREATE INDEX ind1 ON mat_view_parser_data (requestIDExternal(20));
-CREATE INDEX ind2 ON mat_view_parser_data (requestNumber(20));
-CREATE INDEX ind3 ON mat_view_parser_data (requestDate);
-CREATE INDEX ind4 ON mat_view_parser_data (invoiceNumber(20));
-CREATE INDEX ind5 ON mat_view_parser_data (invoiceDate);
-CREATE INDEX ind6 ON mat_view_parser_data (documentNumber(20));
-CREATE INDEX ind7 ON mat_view_parser_data (documentDate);
-CREATE INDEX ind8 ON mat_view_parser_data (firma(20));
-CREATE INDEX ind9 ON mat_view_parser_data (storage(20));
-CREATE INDEX ind10 ON mat_view_parser_data (boxQty);
-CREATE INDEX ind11 ON mat_view_parser_data (INN(20));
-CREATE INDEX ind12 ON mat_view_parser_data (clientIDExternal(20));
-CREATE INDEX ind13 ON mat_view_parser_data (clientName(20));
-CREATE INDEX ind14 ON mat_view_parser_data (userName(20));
-CREATE INDEX ind15 ON mat_view_parser_data (deliveryPointName(20));
-CREATE INDEX ind16 ON mat_view_parser_data (warehousePointName(20));
-CREATE INDEX ind17 ON mat_view_parser_data (routeName(20));
-CREATE INDEX ind18 ON mat_view_parser_data (driverId(20));
-CREATE INDEX ind19 ON mat_view_parser_data (routeListNumber(20));
-CREATE INDEX ind20 ON mat_view_parser_data (routeListID);
-CREATE INDEX ind21 ON requests (requestStatusID(20));
-CREATE INDEX ind22 ON requests (commentForStatus(20));
-CREATE INDEX ind23 ON request_statuses (requestStatusRusName(20));
-CREATE INDEX ind24 ON points (pointName(20));
-CREATE INDEX ind25 ON mat_view_route_points_sequential (nextPointName(20));
-CREATE INDEX ind26 ON route_lists (licensePlate(20));
-CREATE INDEX ind27 ON route_lists (palletsQty);
-CREATE INDEX ind28 ON mat_view_arrival_time_for_request (arrivalTimeToNextRoutePoint);
+
+-- т.к. сортировка может использоваться для любой части  requests, то на все поля вешается индекс
+CREATE INDEX ind1 ON requests (requestIDExternal(20));
+CREATE INDEX ind2 ON requests (requestNumber(20));
+CREATE INDEX ind3 ON requests (requestDate);
+CREATE INDEX ind4 ON requests (invoiceNumber(20));
+CREATE INDEX ind5 ON requests (invoiceDate);
+CREATE INDEX ind6 ON requests (documentNumber(20));
+CREATE INDEX ind7 ON requests (documentDate);
+CREATE INDEX ind8 ON requests (firma(20));
+CREATE INDEX ind9 ON requests (storage(20));
+CREATE INDEX ind11 ON requests (commentForStatus(20));
+CREATE INDEX ind12 ON request_statuses (requestStatusRusName(20));
+CREATE INDEX ind13 ON clients (clientIDExternal(20));
+CREATE INDEX ind14 ON clients (INN(20));
+CREATE INDEX ind15 ON clients (clientName(20));
+CREATE INDEX ind16 ON users (userName(20));
+CREATE INDEX ind17 ON points (pointName(20));
+CREATE INDEX ind18 ON route_lists (routeListNumber(20));
+CREATE INDEX ind19 ON route_lists (licensePlate(20));
+CREATE INDEX ind20 ON route_lists (palletsQty);
+CREATE INDEX ind21 ON routes (routeName(20));
+CREATE INDEX ind22 ON mat_view_arrival_time_for_request (arrivalTimeToNextRoutePoint);
 
 -- индекс для поиска следующего пункта маршрута
 CREATE INDEX ind30 ON mat_view_route_points_sequential (routePointID);
