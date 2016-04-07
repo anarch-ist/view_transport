@@ -1,10 +1,20 @@
 $(document).ready(function () {
     window.localStorage.removeItem("USER_STATUSES");
 
-    $("#loginButton").click(function () {
-        var $loginInput = $("#loginInput");
+    var $loginInput = $("#loginInput");
+    var $passwordInput = $("#passwordInput");
+    var $loginButton = $("#loginButton");
+
+    $passwordInput.add($loginInput).keypress(function(e) {
+        if(e.which == 13) {
+            $loginButton.click();
+        }
+    });
+
+    $loginButton.click(function () {
+
         var login = $loginInput.val();
-        var $passwordInput = $("#passwordInput");
+
         var password = calcMD5($passwordInput.val());
 
         // Checking for blank fields.
