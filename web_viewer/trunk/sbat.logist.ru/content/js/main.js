@@ -26,6 +26,7 @@ $(document).ready(function () {
        // scrollX:        true,
        autoWidth: false,
        scrollCollapse: true,
+        "order": [],
       //  jQueryUI: true,
      //   paging:         true,
       //  paginate: false,

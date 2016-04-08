@@ -811,7 +811,7 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
     SET @columnsPart =
     '
-    SELECT
+    SELECT SQL_CALC_FOUND_ROWS
       requestIDExternal,
       requestNumber,
       requestDate,
@@ -871,8 +871,10 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     DEALLOCATE PREPARE getDataStm;
 
     -- filtered в случае, если присутвуют фильтры, то возвращается всегда -1.
-    SELECT 200*40 as `totalFiltered`;
-    -- SELECT FOUND_ROWS() as `totalFiltered`;
+    -- SELECT 200*40 as `totalFiltered`;
+
+    SELECT FOUND_ROWS() as `totalFiltered`;
+
 
     -- total
     IF (@isAdmin OR @isMarketAgent OR @isClientManager)
@@ -1064,7 +1066,6 @@ CREATE PROCEDURE singleInsertOrUpdateOnMatViewBigSelect(_requestID INTEGER)
       arrivalTimeToNextRoutePoint = VALUES(arrivalTimeToNextRoutePoint);
   END;
 
-
 -- таблица используется для оптимизации запроса big select
 CREATE TABLE mat_view_route_points_sequential (
   routeID          INTEGER,
@@ -1088,7 +1089,6 @@ CREATE TABLE mat_view_route_points_sequential (
     ON UPDATE CASCADE
 );
 
--- записываем в эту таблицу все данные, которые не меняются от выгрузки к выгрузке
 CREATE PROCEDURE refreshMaterializedView()
   BEGIN
 
@@ -1122,16 +1122,14 @@ CREATE PROCEDURE refreshMaterializedView()
       (SELECT
          users.userID,
          users.userRoleID,
-         COUNT(requests.requestID)
+         (SELECT COUNT(requests.requestID)
+          FROM requests)
        FROM users
-         INNER JOIN requests
-       WHERE userRoleID = 'ADMIN'
-       GROUP BY users.userID
-       ORDER BY NULL);
+       WHERE users.userRoleID = 'ADMIN');
 
   END;
 
-CREATE PROCEDURE refreshAdminDataView(_routeID INTEGER)
+CREATE PROCEDURE refreshRoutePointsSequential(_routeID INTEGER)
   BEGIN
 
     DELETE FROM mat_view_route_points_sequential WHERE routeID = _routeID;
@@ -1203,7 +1201,7 @@ FOR EACH ROW
           END;
         END IF;
 
-        CALL refreshAdminDataView(NEW.routeID);
+        CALL refreshRoutePointsSequential(NEW.routeID);
       END;
     END IF;
   END;
@@ -1240,7 +1238,7 @@ FOR EACH ROW
       END;
     END IF;
 
-    CALL refreshAdminDataView(OLD.routeID);
+    CALL refreshRoutePointsSequential(OLD.routeID);
   END;
 
 
@@ -1592,7 +1590,7 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
       LEFT JOIN (`distances_between_points`)
         ON
           (pointIDFirst = routePointFirst.pointID AND pointIDSecond = routePointSecond.pointID) OR (pointIDFirst = routePointSecond.pointID AND pointIDSecond = routePointFirst.pointID)
-    WHERE routes.RouteID = _routeID
+    WHERE routes.routeID = _routeID
     ORDER BY routePointFirst.sortOrder;
   END;
 
@@ -1602,29 +1600,13 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
 -- -------------------------------------------------------------------------------------------------------------------
 
 
--- т.к. сортировка может использоваться для любой части  requests, то на все поля вешается индекс
-# CREATE INDEX ind1 ON requests (requestIDExternal(20));
-# CREATE INDEX ind2 ON requests (requestNumber(20));
-# CREATE INDEX ind3 ON requests (requestDate);
-# CREATE INDEX ind4 ON requests (invoiceNumber(20));
-# CREATE INDEX ind5 ON requests (invoiceDate);
-# CREATE INDEX ind6 ON requests (documentNumber(20));
-# CREATE INDEX ind7 ON requests (documentDate);
-# CREATE INDEX ind8 ON requests (firma(20));
-# CREATE INDEX ind9 ON requests (storage(20));
-# CREATE INDEX ind11 ON requests (commentForStatus(20));
-# CREATE INDEX ind12 ON request_statuses (requestStatusRusName(20));
-# CREATE INDEX ind13 ON clients (clientIDExternal(20));
-# CREATE INDEX ind14 ON clients (INN(20));
-# CREATE INDEX ind15 ON clients (clientName(20));
-# CREATE INDEX ind16 ON users (userName(20));
-# CREATE INDEX ind17 ON points (pointName(20));
-# CREATE INDEX ind18 ON route_lists (routeListNumber(20));
-# CREATE INDEX ind19 ON route_lists (licensePlate(20));
-# CREATE INDEX ind20 ON route_lists (palletsQty);
-# CREATE INDEX ind21 ON routes (routeName(20));
-# CREATE INDEX ind22 ON mat_view_arrival_time_for_request (arrivalTimeToNextRoutePoint);
-#
-# -- индекс для поиска следующего пункта маршрута
-# CREATE INDEX ind30 ON mat_view_route_points_sequential (routePointID);
+-- индексы на фильтры по роли пользователя
+CREATE INDEX ind1 ON mat_view_big_select (marketAgentUserID);
+CREATE INDEX ind2 ON mat_view_big_select (clientID);
+CREATE INDEX ind3 ON mat_view_big_select (routeID);
 
+-- индекс для поиска следующего пункта маршрута
+CREATE INDEX ind4 ON mat_view_route_points_sequential (routePointID);
+
+-- индекс для поиска общего количества записей для конкретного пользователя
+CREATE INDEX ind5 ON mat_view_row_count_for_user (userID);
