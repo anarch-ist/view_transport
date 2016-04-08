@@ -357,28 +357,6 @@ CREATE TRIGGER before_route_points_delete BEFORE DELETE ON route_points
 FOR EACH ROW
     CALL check_route_points_constraints(OLD.routeID, OLD.sortOrder, OLD.pointID);
 
--- таблица используется для оптимизации запроса big select
-CREATE TABLE mat_view_route_points_sequential (
-  routeID          INTEGER,
-  routePointID     INTEGER,
-  nextRoutePointID INTEGER      NULL,
-  nextPointID      INTEGER      NULL,
-  nextPointName    VARCHAR(255) NULL,
-  timeToNextPoint  INTEGER      NULL,
-  PRIMARY KEY (routeID, routePointID),
-  FOREIGN KEY (routeID) REFERENCES routes (routeID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (routePointID) REFERENCES route_points (routePointID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (nextRoutePointID) REFERENCES route_points (routePointID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  FOREIGN KEY (nextPointID) REFERENCES points (pointID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-);
 
 
 CREATE TRIGGER before_route_points_update BEFORE UPDATE ON route_points
@@ -429,29 +407,6 @@ CREATE TABLE route_lists (
   UNIQUE (routeListIDExternal, dataSourceID)
 );
 
-CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
-FOR EACH ROW
-  INSERT INTO route_list_history
-  VALUES
-    (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverID,
-     NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
-
-CREATE TRIGGER after_route_list_update AFTER UPDATE ON route_lists
-FOR EACH ROW
-  INSERT INTO route_list_history
-  VALUES
-    (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
-     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverID,
-     NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
-
-CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
-FOR EACH ROW
-  INSERT INTO route_list_history
-  VALUES
-    (NULL, NOW(), OLD.routeListID, OLD.routeListIDExternal, OLD.dataSourceID, OLD.routeListNumber, OLD.creationDate,
-     OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverID,
-     OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
 
 CREATE TABLE route_list_history (
   routeListHistoryID  BIGINT AUTO_INCREMENT,
@@ -645,25 +600,6 @@ FOR EACH ROW
 
   END;
 
-CREATE TRIGGER after_request_insert AFTER INSERT ON requests
-FOR EACH ROW
-    INSERT INTO requests_history
-      VALUE
-      (NULL, NOW(), NEW.requestID, NEW.requestIDExternal, NEW.dataSourceID, NEW.requestNumber, NEW.requestDate,
-       NEW.clientID, NEW.destinationPointID, NEW.marketAgentUserID, NEW.invoiceNumber, NEW.invoiceDate, NEW.documentNumber, NEW.documentDate,
-       NEW.firma, NEW.storage, NEW.contactName, NEW.contactPhone, NEW.deliveryOption, NEW.deliveryDate, NEW.boxQty, NEW.weight, NEW.volume, NEW.goodsCost,
-       NEW.lastStatusUpdated, NEW.lastModifiedBy, 'CREATED', NEW.commentForStatus, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
-
-
-
-CREATE TRIGGER after_request_delete AFTER DELETE ON requests
-FOR EACH ROW
-  INSERT INTO requests_history
-    VALUE
-    (NULL, NOW(), OLD.requestID, OLD.requestIDExternal, OLD.dataSourceID, OLD.requestNumber, OLD.requestDate,
-     OLD.clientID, OLD.destinationPointID, OLD.marketAgentUserID, OLD.invoiceNumber, OLD.invoiceDate, OLD.documentNumber, OLD.documentDate,
-     OLD.firma, OLD.storage, OLD.contactName, OLD.contactPhone, OLD.deliveryOption, OLD.deliveryDate, OLD.boxQty, OLD.weight, OLD.volume, OLD.goodsCost,
-     OLD.lastStatusUpdated, OLD.lastModifiedBy, 'DELETED', OLD.commentForStatus, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedRoutePointID);
 
 
 
@@ -786,40 +722,6 @@ CREATE FUNCTION splitString(stringSpl TEXT, delim VARCHAR(12), pos INT)
                  delim, '');
 
 
-CREATE FUNCTION getFullColName(_colName VARCHAR(255))
-  RETURNS VARCHAR(255)
-  BEGIN
-    IF (_colName IN ('requestIDExternal', 'requestNumber', 'requestDate', 'invoiceNumber', 'invoiceDate',
-                     'documentNumber', 'documentDate', 'firma', 'storage', 'boxQty', 'requestStatusID', 'commentForStatus'))
-    THEN
-      RETURN CONCAT('requests', '.', _colName);
-    ELSEIF (_colName = 'requestStatusRusName')
-      THEN RETURN CONCAT('request_statuses', '.', _colName);
-    ELSEIF (_colName IN ('clientIDExternal','INN','clientName'))
-      THEN RETURN CONCAT('clients', '.', _colName);
-    ELSEIF (_colName = 'marketAgentUserName')
-      THEN RETURN 'market_agent_users.userName';
-    ELSEIF (_colName = 'driverUserName')
-      THEN RETURN 'driver_users.userName';
-    ELSEIF (_colName = 'deliveryPointName')
-      THEN RETURN 'delivery_points.pointName';
-    ELSEIF (_colName = 'warehousePointName')
-      THEN RETURN 'w_points.pointName';
-    ELSEIF (_colName = 'lastVisitedPointName')
-      THEN RETURN 'last_visited_points.pointName';
-    ELSEIF (_colName = 'nextPointName')
-      THEN RETURN CONCAT('mat_view_route_points_sequential', '.', _colName);
-    ELSEIF (_colName IN ('routeListNumber', 'licensePlate', 'palletsQty', 'routeListID'))
-      THEN RETURN CONCAT('route_lists', '.', _colName);
-    ELSEIF (_colName = 'routeName')
-      THEN RETURN CONCAT('routes', '.', _colName);
-    ELSEIF (_colName = 'arrivalTimeToNextRoutePoint')
-      THEN RETURN CONCAT('mat_view_arrival_time_for_request', '.', _colName);
-
-    END IF;
-    RETURN '';
-  END;
-
 CREATE FUNCTION generateLikeCondition(map TEXT)
   RETURNS TEXT
   BEGIN
@@ -839,11 +741,10 @@ CREATE FUNCTION generateLikeCondition(map TEXT)
       THEN LEAVE wloop;
       END IF;
       SET @columnName = splitString(pair, ',', 1);
-      SET @fullColumnName = getFullColName(@columnName);
       SET @searchString = splitString(pair, ',', 2);
       SET @searchString = CONCAT('%', @searchString, '%');
 
-      SET result = CONCAT(result, @fullColumnName, ' LIKE ', '\'', @searchString, '\'', ' AND ');
+      SET result = CONCAT(result, @columnName, ' LIKE ', '\'', @searchString, '\'', ' AND ');
     END WHILE;
 
     -- remove redundant END
@@ -910,60 +811,48 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
     -- 4) если маршрут накладной проходит через пользователя, то показываем ему эти записи
     SET @columnsPart =
     '
-SELECT
-  requests.requestIDExternal,
-  requests.requestNumber,
-  requests.requestDate,
-  requests.invoiceNumber,
-  requests.invoiceDate,
-  requests.documentNumber,
-  requests.documentDate,
-  requests.firma,
-  requests.storage,
-  requests.boxQty,
-  requests.requestStatusID,
-  requests.commentForStatus,
-  request_statuses.requestStatusRusName,
-  clients.clientIDExternal,
-  clients.INN,
-  clients.clientName,
-  market_agent_users.userName   AS marketAgentUserName,
-  driver_users.userName         AS driverUserName,
-  delivery_points.pointName     AS deliveryPointName,
-  w_points.pointName            AS warehousePointName,
-  last_visited_points.pointName AS lastVisitedPointName,
-  mat_view_route_points_sequential.nextPointName,
-  route_lists.routeListNumber,
-  route_lists.licensePlate,
-  route_lists.palletsQty,
-  route_lists.routeListID,
-  routes.routeName,
-  mat_view_arrival_time_for_request.arrivalTimeToNextRoutePoint
-
-FROM requests
-  INNER JOIN (request_statuses) USING (requestStatusID)
-  STRAIGHT_JOIN (clients) ON requests.clientID = clients.clientID
-  INNER JOIN (users AS market_agent_users) ON (requests.marketAgentUserID = market_agent_users.userID)
-  LEFT JOIN (route_lists) USING (routeListID)
-  LEFT JOIN (users AS driver_users) ON (route_lists.driverID = driver_users.userID)
-  LEFT JOIN (routes) ON (route_lists.routeID = routes.routeID)
-  LEFT JOIN (route_points AS last_visited_route_points) ON (requests.lastVisitedRoutePointID = last_visited_route_points.routePointID)
-  LEFT JOIN (mat_view_route_points_sequential) ON (requests.lastVisitedRoutePointID = mat_view_route_points_sequential.routePointID)
-  LEFT JOIN (points AS delivery_points) ON (requests.destinationPointID = delivery_points.pointID)
-  LEFT JOIN (points AS w_points) ON (requests.warehousePointID = w_points.pointID)
-  LEFT JOIN (points AS last_visited_points) ON (last_visited_route_points.pointID = last_visited_points.pointID)
-  LEFT JOIN (mat_view_arrival_time_for_request) ON (requests.requestID = mat_view_arrival_time_for_request.requestID)
+    SELECT
+      requestIDExternal,
+      requestNumber,
+      requestDate,
+      invoiceNumber,
+      invoiceDate,
+      documentNumber,
+      documentDate,
+      firma,
+      storage,
+      boxQty,
+      requestStatusID,
+      commentForStatus,
+      requestStatusRusName,
+      clientIDExternal,
+      INN,
+      clientName,
+      marketAgentUserName,
+      driverUserName,
+      deliveryPointName,
+      warehousePointName,
+      lastVisitedPointName,
+      nextPointName,
+      routeListNumber,
+      licensePlate,
+      palletsQty,
+      routeListID,
+      routeName,
+      arrivalTimeToNextRoutePoint
+    FROM mat_view_big_select
     ';
+
     SET @wherePart = '';
 
     IF @isAdmin THEN
       SET @wherePart = CONCAT('WHERE ', generateLikeCondition(_search));
     ELSEIF @isMarketAgent THEN
-      SET @wherePart = CONCAT('WHERE (requests.marketAgentUserID = ', _userID,') AND ', generateLikeCondition(_search));
+      SET @wherePart = CONCAT('WHERE (marketAgentUserID = ', _userID,') AND ', generateLikeCondition(_search));
     ELSEIF @isClientManager THEN
-      SET @wherePart = CONCAT('WHERE (clients.clientID = ', @clientID,') AND ', generateLikeCondition(_search));
+      SET @wherePart = CONCAT('WHERE (clientID = ', @clientID,') AND ', generateLikeCondition(_search));
     ELSEIF @isDispatcherOrWDispatcher THEN
-      SET @wherePart = CONCAT('WHERE (routes.routeID IN (', @allRoutesWithUserPointID,')) AND ', generateLikeCondition(_search));
+      SET @wherePart = CONCAT('WHERE (routeID IN (', @allRoutesWithUserPointID,')) AND ', generateLikeCondition(_search));
     END IF;
 
     SET @orderByPart = generateOrderByPart(_orderby, _isDesc);
@@ -994,7 +883,7 @@ FROM requests
         WHERE mat_view_row_count_for_user.userID = _userID;
       END;
     ELSEIF (@isDispatcherOrWDispatcher) THEN
-      SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM requests ', @wherePart);
+      SET @countTotalSql = CONCAT('SELECT COUNT(*) as `totalCount` FROM mat_view_big_select ', CONCAT('WHERE (routeID IN (', @allRoutesWithUserPointID,'))'));
       PREPARE getTotalStm FROM @countTotalSql;
       EXECUTE getTotalStm;
       DEALLOCATE PREPARE getTotalStm;
@@ -1032,7 +921,7 @@ CREATE TABLE mat_view_row_count_for_user (
 -- route_lists - routeListNumber, licensePlate, palletsQty
 -- routes - routeName
 --
-CREATE TABLE mat_view_parser_data (
+CREATE TABLE mat_view_big_select (
   requestID                   INTEGER,
   requestIDExternal           VARCHAR(255),
   requestNumber               VARCHAR(255),
@@ -1047,32 +936,157 @@ CREATE TABLE mat_view_parser_data (
   requestStatusID             VARCHAR(32),
   commentForStatus            TEXT,
   requestStatusRusName        VARCHAR(255),
+  clientID                    INTEGER, -- id field
   clientIDExternal            VARCHAR(255),
   INN                         VARCHAR(255),
   clientName                  VARCHAR(255),
+  marketAgentUserID           INTEGER, -- id field
   marketAgentUserName         VARCHAR(255),
+  driverUserID                INTEGER, -- id field
   driverUserName              VARCHAR(255),
+  deliveryPointID             INTEGER, -- id field
   deliveryPointName           VARCHAR(255),
+  warehousePointID            INTEGER, -- id field
   warehousePointName          VARCHAR(255),
+  lastVisitedPointID          INTEGER, -- id field
   lastVisitedPointName        VARCHAR(255),
+  nextPointID                 INTEGER, -- id field
   nextPointName               VARCHAR(255),
   routeListNumber             VARCHAR(255),
   licensePlate                VARCHAR(255),
   palletsQty                  INTEGER,
-  routeListID                 INTEGER,
+  routeListID                 INTEGER, -- id field
+  routeID                     INTEGER, -- id field
   routeName                   VARCHAR(255),
   arrivalTimeToNextRoutePoint DATETIME,
-  #   marketAgentUserID    INTEGER, -- служебное поле
-  #   routeListID          INTEGER, -- служебное поле
-  #   clientID             INTEGER, -- служебное поле
-  #   warehousePointID     INTEGER, -- служебное поле
-  #   routeID              INTEGER, -- служебное поле
   PRIMARY KEY (requestID),
   FOREIGN KEY (requestID) REFERENCES requests (requestID)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
 
+CREATE PROCEDURE singleInsertOrUpdateOnMatViewBigSelect(_requestID INTEGER)
+  BEGIN
+    INSERT INTO mat_view_big_select
+      SELECT
+        _requestID                    AS requestID,
+        requests.requestIDExternal,
+        requests.requestNumber,
+        requests.requestDate,
+        requests.invoiceNumber,
+        requests.invoiceDate,
+        requests.documentNumber,
+        requests.documentDate,
+        requests.firma,
+        requests.storage,
+        requests.boxQty,
+        requests.requestStatusID,
+        requests.commentForStatus,
+        request_statuses.requestStatusRusName,
+        clients.clientID,
+        clients.clientIDExternal,
+        clients.INN,
+        clients.clientName,
+        market_agent_users.userID     AS marketAgentUserID,
+        market_agent_users.userName   AS marketAgentUserName,
+        driver_users.userID           AS driverUserID,
+        driver_users.userName         AS driverUserName,
+        delivery_points.pointID       AS deliveryPointID,
+        delivery_points.pointName     AS deliveryPointName,
+        w_points.pointID              AS warehousePointID,
+        w_points.pointName            AS warehousePointName,
+        last_visited_points.pointID   AS lastVisitedPointID,
+        last_visited_points.pointName AS lastVisitedPointName,
+        mat_view_route_points_sequential.nextPointID,
+        mat_view_route_points_sequential.nextPointName,
+        route_lists.routeListNumber,
+        route_lists.licensePlate,
+        route_lists.palletsQty,
+        route_lists.routeListID,
+        routes.routeID,
+        routes.routeName,
+        mat_view_arrival_time_for_request.arrivalTimeToNextRoutePoint
+
+      FROM requests
+        INNER JOIN (request_statuses) USING (requestStatusID)
+        INNER JOIN (clients) USING (clientID)
+        INNER JOIN (users AS market_agent_users) ON (requests.marketAgentUserID = market_agent_users.userID)
+        LEFT JOIN (route_lists) USING (routeListID)
+        LEFT JOIN (users AS driver_users) ON (route_lists.driverID = driver_users.userID)
+        LEFT JOIN (routes) ON (route_lists.routeID = routes.routeID)
+        LEFT JOIN (route_points AS last_visited_route_points)
+          ON (requests.lastVisitedRoutePointID = last_visited_route_points.routePointID)
+        LEFT JOIN (mat_view_route_points_sequential)
+          ON (requests.lastVisitedRoutePointID = mat_view_route_points_sequential.routePointID)
+        LEFT JOIN (points AS delivery_points) ON (requests.destinationPointID = delivery_points.pointID)
+        LEFT JOIN (points AS w_points) ON (requests.warehousePointID = w_points.pointID)
+        LEFT JOIN (points AS last_visited_points) ON (last_visited_route_points.pointID = last_visited_points.pointID)
+        LEFT JOIN (mat_view_arrival_time_for_request)
+          ON (requests.requestID = mat_view_arrival_time_for_request.requestID)
+      WHERE requests.requestID = _requestID
+
+    ON DUPLICATE KEY UPDATE
+      requestIDExternal           = VALUES(requestIDExternal),
+      requestNumber               = VALUES(requestNumber),
+      requestDate                 = VALUES(requestDate),
+      invoiceNumber               = VALUES(invoiceNumber),
+      invoiceDate                 = VALUES(invoiceDate),
+      documentNumber              = VALUES(documentNumber),
+      documentDate                = VALUES(documentDate),
+      firma                       = VALUES(firma),
+      storage                     = VALUES(storage),
+      boxQty                      = VALUES(boxQty),
+      requestStatusID             = VALUES(requestStatusID),
+      commentForStatus            = VALUES(commentForStatus),
+      requestStatusRusName        = VALUES(requestStatusRusName),
+      clientID                    = VALUES(clientID),
+      clientIDExternal            = VALUES(clientIDExternal),
+      INN                         = VALUES(INN),
+      clientName                  = VALUES(clientName),
+      marketAgentUserID           = VALUES(marketAgentUserID),
+      marketAgentUserName         = VALUES(marketAgentUserName),
+      driverUserID                = VALUES(driverUserID),
+      driverUserName              = VALUES(driverUserName),
+      deliveryPointID             = VALUES(deliveryPointID),
+      deliveryPointName           = VALUES(deliveryPointName),
+      warehousePointID            = VALUES(warehousePointID),
+      warehousePointName          = VALUES(warehousePointName),
+      lastVisitedPointID          = VALUES(lastVisitedPointID),
+      lastVisitedPointName        = VALUES(lastVisitedPointName),
+      nextPointID                 = VALUES(nextPointID),
+      nextPointName               = VALUES(nextPointName),
+      routeListNumber             = VALUES(routeListNumber),
+      licensePlate                = VALUES(licensePlate),
+      palletsQty                  = VALUES(palletsQty),
+      routeListID                 = VALUES(routeListID),
+      routeID                     = VALUES(routeID),
+      routeName                   = VALUES(routeName),
+      arrivalTimeToNextRoutePoint = VALUES(arrivalTimeToNextRoutePoint);
+  END;
+
+
+-- таблица используется для оптимизации запроса big select
+CREATE TABLE mat_view_route_points_sequential (
+  routeID          INTEGER,
+  routePointID     INTEGER,
+  nextRoutePointID INTEGER      NULL,
+  nextPointID      INTEGER      NULL,
+  nextPointName    VARCHAR(255) NULL,
+  timeToNextPoint  INTEGER      NULL,
+  PRIMARY KEY (routeID, routePointID),
+  FOREIGN KEY (routeID) REFERENCES routes (routeID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (routePointID) REFERENCES route_points (routePointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (nextRoutePointID) REFERENCES route_points (routePointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (nextPointID) REFERENCES points (pointID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
 
 -- записываем в эту таблицу все данные, которые не меняются от выгрузки к выгрузке
 CREATE PROCEDURE refreshMaterializedView()
@@ -1154,6 +1168,11 @@ CREATE PROCEDURE refreshAdminDataView(_routeID INTEGER)
 --                                                UPDATE TRIGGERS
 -- -------------------------------------------------------------------------------------------------------------------
 
+-- 1) при появлении новой заявки в системе появляется новая запись в mat_view_big_select(after INSERT on requests trigger)
+-- 2) при обновлении заявки делается обновление данных в mat_view_big_select(after UPDATE on requests trigger)
+-- 3) при удалении заявки ничего не делаем, т.к. mat_view_big_select ссылается на requestID с каскадным удалением
+-- 4) при изменении имени пункта - надо обновлять его в таблице
+
 CREATE TRIGGER after_route_points_insert AFTER INSERT ON route_points
 FOR EACH ROW
   BEGIN
@@ -1234,6 +1253,30 @@ FOR EACH ROW
       mat_view_route_points_sequential.nextRoutePointID = NEW.routePointIDSecond;
   END;
 
+
+CREATE TRIGGER after_request_insert AFTER INSERT ON requests
+FOR EACH ROW
+  BEGIN
+    INSERT INTO requests_history
+      VALUE
+      (NULL, NOW(), NEW.requestID, NEW.requestIDExternal, NEW.dataSourceID, NEW.requestNumber, NEW.requestDate,
+       NEW.clientID, NEW.destinationPointID, NEW.marketAgentUserID, NEW.invoiceNumber, NEW.invoiceDate, NEW.documentNumber, NEW.documentDate,
+       NEW.firma, NEW.storage, NEW.contactName, NEW.contactPhone, NEW.deliveryOption, NEW.deliveryDate, NEW.boxQty, NEW.weight, NEW.volume, NEW.goodsCost,
+       NEW.lastStatusUpdated, NEW.lastModifiedBy, 'CREATED', NEW.commentForStatus, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
+
+    CALL singleInsertOrUpdateOnMatViewBigSelect(NEW.requestID);
+  END;
+
+
+CREATE TRIGGER after_request_delete AFTER DELETE ON requests
+FOR EACH ROW
+  INSERT INTO requests_history
+    VALUE
+    (NULL, NOW(), OLD.requestID, OLD.requestIDExternal, OLD.dataSourceID, OLD.requestNumber, OLD.requestDate,
+     OLD.clientID, OLD.destinationPointID, OLD.marketAgentUserID, OLD.invoiceNumber, OLD.invoiceDate, OLD.documentNumber, OLD.documentDate,
+     OLD.firma, OLD.storage, OLD.contactName, OLD.contactPhone, OLD.deliveryOption, OLD.deliveryDate, OLD.boxQty, OLD.weight, OLD.volume, OLD.goodsCost,
+     OLD.lastStatusUpdated, OLD.lastModifiedBy, 'DELETED', OLD.commentForStatus, OLD.warehousePointID, OLD.routeListID, OLD.lastVisitedRoutePointID);
+
 CREATE TRIGGER after_request_update AFTER UPDATE ON requests
 FOR EACH ROW
   BEGIN
@@ -1243,6 +1286,13 @@ FOR EACH ROW
        NEW.clientID, NEW.destinationPointID, NEW.marketAgentUserID, NEW.invoiceNumber, NEW.invoiceDate, NEW.documentNumber, NEW.documentDate,
        NEW.firma, NEW.storage, NEW.contactName, NEW.contactPhone, NEW.deliveryOption, NEW.deliveryDate, NEW.boxQty, NEW.weight, NEW.volume, NEW.goodsCost,
        NEW.lastStatusUpdated, NEW.lastModifiedBy, NEW.requestStatusID, NEW.commentForStatus, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
+
+    UPDATE mat_view_big_select SET
+      requestIDExternal = NEW.requestIDExternal, requestNumber = NEW.requestNumber, requestDate = NEW.requestDate,
+      invoiceNumber = NEW.invoiceNumber, invoiceDate = NEW.invoiceDate, documentNumber = NEW.documentNumber,
+      documentDate = NEW.documentDate, firma = NEW.firma, storage = NEW.storage, boxQty = NEW.boxQty,
+      requestStatusID = NEW.requestStatusID, commentForStatus = NEW.commentForStatus, routeListID = NEW.routeListID
+      WHERE mat_view_big_select.requestID = NEW.requestID;
 
     -- расчет времени прибытия заявки в следующий пункт маршрута
     IF (NEW.requestStatusID = 'DEPARTURE') THEN
@@ -1256,6 +1306,7 @@ FOR EACH ROW
       END;
     END IF;
 
+    CALL singleInsertOrUpdateOnMatViewBigSelect(NEW.requestID);
   END;
 
 CREATE TRIGGER before_request_update BEFORE UPDATE ON requests
@@ -1304,7 +1355,120 @@ FOR EACH ROW
     SET NEW.lastVisitedRoutePointID = NULL;
   END IF;
 
+-- синхронизация при изменении имени пункта
+CREATE TRIGGER after_points_update AFTER UPDATE ON points
+FOR EACH ROW
+  IF (NEW.pointName <> OLD.pointName)
+  THEN BEGIN
+    UPDATE mat_view_big_select
+    SET deliveryPointName = NEW.pointName
+    WHERE deliveryPointID = NEW.pointID;
 
+    UPDATE mat_view_big_select
+    SET warehousePointName = NEW.pointName
+    WHERE warehousePointID = NEW.pointID;
+
+    UPDATE mat_view_big_select
+    SET lastVisitedPointName = NEW.pointName
+    WHERE lastVisitedPointID = NEW.pointID;
+
+    UPDATE mat_view_big_select
+    SET nextPointName = NEW.pointName
+    WHERE nextPointID = NEW.pointID;
+  END;
+  END IF;
+
+-- синхронизация при изменении имени clientName или при изменении INN
+CREATE TRIGGER after_clients_update AFTER UPDATE ON clients
+FOR EACH ROW
+  BEGIN
+    IF (NEW.clientName <> OLD.clientName)
+    THEN
+      UPDATE mat_view_big_select
+      SET clientName = NEW.clientName
+      WHERE clientID = NEW.clientID;
+    END IF;
+
+    IF (NEW.INN <> OLD.INN)
+    THEN
+      UPDATE mat_view_big_select
+      SET INN = NEW.INN
+      WHERE clientID = NEW.clientID;
+    END IF;
+  END;
+
+-- синхронизация при изменении имени пользователя для driverName и marketAgentUserName
+CREATE TRIGGER after_users_update AFTER UPDATE ON users
+FOR EACH ROW
+  IF (NEW.userName <> OLD.userName)
+  THEN
+    UPDATE mat_view_big_select
+    SET marketAgentUserName = NEW.userName
+    WHERE marketAgentUserID = NEW.userID;
+
+    UPDATE mat_view_big_select
+    SET driverUserName = NEW.userName
+    WHERE driverUserName = NEW.userID;
+  END IF;
+
+CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
+FOR EACH ROW
+  INSERT INTO route_list_history
+  VALUES
+    (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
+     NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverID,
+     NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'CREATED');
+
+CREATE TRIGGER after_route_list_delete AFTER DELETE ON route_lists
+FOR EACH ROW
+  INSERT INTO route_list_history
+  VALUES
+    (NULL, NOW(), OLD.routeListID, OLD.routeListIDExternal, OLD.dataSourceID, OLD.routeListNumber, OLD.creationDate,
+     OLD.departureDate, OLD.palletsQty, OLD.forwarderId, OLD.driverID,
+     OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.routeID, 'DELETED');
+
+CREATE TRIGGER after_route_lists_update AFTER UPDATE ON route_lists
+FOR EACH ROW
+  BEGIN
+
+    INSERT INTO route_list_history
+    VALUES
+      (NULL, NOW(), NEW.routeListID, NEW.routeListIDExternal, NEW.dataSourceID, NEW.routeListNumber, NEW.creationDate,
+       NEW.departureDate, NEW.palletsQty, NEW.forwarderId, NEW.driverID,
+       NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.routeID, 'UPDATED');
+
+    -- синхронизация при изменении маршрутного листа routeListNumber, licencePlate, palletsQty
+    IF (NEW.routeListNumber <> OLD.routeListNumber)
+    THEN
+      UPDATE mat_view_big_select
+      SET routeListNumber = NEW.routeListNumber
+      WHERE routeListID = NEW.routeListID;
+    END IF;
+
+    IF (NEW.licensePlate <> OLD.licensePlate)
+    THEN
+      UPDATE mat_view_big_select
+      SET licensePlate = NEW.licensePlate
+      WHERE routeListID = NEW.routeListID;
+    END IF;
+
+    IF (NEW.palletsQty <> OLD.palletsQty)
+    THEN
+      UPDATE mat_view_big_select
+      SET palletsQty = NEW.palletsQty
+      WHERE routeListID = NEW.routeListID;
+    END IF;
+  END;
+
+-- синхронизация при изменении имени маршрута
+CREATE TRIGGER after_routes_update AFTER UPDATE ON routes
+FOR EACH ROW
+  IF (NEW.routeName <> OLD.routeName)
+  THEN
+    UPDATE mat_view_big_select
+    SET routeName = NEW.routeName
+    WHERE routeID = NEW.routeID;
+  END IF;
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                USERS SELECT
@@ -1439,28 +1603,28 @@ CREATE PROCEDURE getRelationsBetweenRoutePoints(_routeID INTEGER)
 
 
 -- т.к. сортировка может использоваться для любой части  requests, то на все поля вешается индекс
-CREATE INDEX ind1 ON requests (requestIDExternal(20));
-CREATE INDEX ind2 ON requests (requestNumber(20));
-CREATE INDEX ind3 ON requests (requestDate);
-CREATE INDEX ind4 ON requests (invoiceNumber(20));
-CREATE INDEX ind5 ON requests (invoiceDate);
-CREATE INDEX ind6 ON requests (documentNumber(20));
-CREATE INDEX ind7 ON requests (documentDate);
-CREATE INDEX ind8 ON requests (firma(20));
-CREATE INDEX ind9 ON requests (storage(20));
-CREATE INDEX ind11 ON requests (commentForStatus(20));
-CREATE INDEX ind12 ON request_statuses (requestStatusRusName(20));
-CREATE INDEX ind13 ON clients (clientIDExternal(20));
-CREATE INDEX ind14 ON clients (INN(20));
-CREATE INDEX ind15 ON clients (clientName(20));
-CREATE INDEX ind16 ON users (userName(20));
-CREATE INDEX ind17 ON points (pointName(20));
-CREATE INDEX ind18 ON route_lists (routeListNumber(20));
-CREATE INDEX ind19 ON route_lists (licensePlate(20));
-CREATE INDEX ind20 ON route_lists (palletsQty);
-CREATE INDEX ind21 ON routes (routeName(20));
-CREATE INDEX ind22 ON mat_view_arrival_time_for_request (arrivalTimeToNextRoutePoint);
-
--- индекс для поиска следующего пункта маршрута
-CREATE INDEX ind30 ON mat_view_route_points_sequential (routePointID);
+# CREATE INDEX ind1 ON requests (requestIDExternal(20));
+# CREATE INDEX ind2 ON requests (requestNumber(20));
+# CREATE INDEX ind3 ON requests (requestDate);
+# CREATE INDEX ind4 ON requests (invoiceNumber(20));
+# CREATE INDEX ind5 ON requests (invoiceDate);
+# CREATE INDEX ind6 ON requests (documentNumber(20));
+# CREATE INDEX ind7 ON requests (documentDate);
+# CREATE INDEX ind8 ON requests (firma(20));
+# CREATE INDEX ind9 ON requests (storage(20));
+# CREATE INDEX ind11 ON requests (commentForStatus(20));
+# CREATE INDEX ind12 ON request_statuses (requestStatusRusName(20));
+# CREATE INDEX ind13 ON clients (clientIDExternal(20));
+# CREATE INDEX ind14 ON clients (INN(20));
+# CREATE INDEX ind15 ON clients (clientName(20));
+# CREATE INDEX ind16 ON users (userName(20));
+# CREATE INDEX ind17 ON points (pointName(20));
+# CREATE INDEX ind18 ON route_lists (routeListNumber(20));
+# CREATE INDEX ind19 ON route_lists (licensePlate(20));
+# CREATE INDEX ind20 ON route_lists (palletsQty);
+# CREATE INDEX ind21 ON routes (routeName(20));
+# CREATE INDEX ind22 ON mat_view_arrival_time_for_request (arrivalTimeToNextRoutePoint);
+#
+# -- индекс для поиска следующего пункта маршрута
+# CREATE INDEX ind30 ON mat_view_route_points_sequential (routePointID);
 
