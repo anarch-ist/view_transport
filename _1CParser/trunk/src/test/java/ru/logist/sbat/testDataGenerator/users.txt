@@ -1,207 +1,196 @@
-LOGIN = yeZKSA
-PASS  = yeZKSApass
+LOGIN = JhYOpu
+PASS  = JhYOpupass
+ROLE  = DISPATCHER
+------------------
+LOGIN = hEGsGf
+PASS  = hEGsGfpass
+ROLE  = DISPATCHER
+------------------
+LOGIN = HwAOwP
+PASS  = HwAOwPpass
+ROLE  = MARKET_AGENT
+------------------
+LOGIN = OFVREI
+PASS  = OFVREIpass
+ROLE  = MARKET_AGENT
+------------------
+LOGIN = cXmdcC
+PASS  = cXmdcCpass
+ROLE  = DISPATCHER
+------------------
+LOGIN = rVFCLy
+PASS  = rVFCLypass
 ROLE  = W_DISPATCHER
 ------------------
-LOGIN = hojdgS
-PASS  = hojdgSpass
+LOGIN = rCKBKt
+PASS  = rCKBKtpass
 ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = cqPEJG
-PASS  = cqPEJGpass
-ROLE  = DISPATCHER
-------------------
-LOGIN = Dhfydd
-PASS  = Dhfyddpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = tDXuMf
-PASS  = tDXuMfpass
+LOGIN = lhkCBJ
+PASS  = lhkCBJpass
 ROLE  = ADMIN
 ------------------
-LOGIN = UlUTBM
-PASS  = UlUTBMpass
-ROLE  = MARKET_AGENT
-------------------
-LOGIN = ySpODv
-PASS  = ySpODvpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = ynyfRS
-PASS  = ynyfRSpass
-ROLE  = ADMIN
-------------------
-LOGIN = cCwbJu
-PASS  = cCwbJupass
-ROLE  = DISPATCHER
-------------------
-LOGIN = QdDuzE
-PASS  = QdDuzEpass
-ROLE  = ADMIN
-------------------
-LOGIN = WPRWoB
-PASS  = WPRWoBpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = rBToRy
-PASS  = rBToRypass
-ROLE  = DISPATCHER
-------------------
-LOGIN = UUKpVO
-PASS  = UUKpVOpass
-ROLE  = ADMIN
-------------------
-LOGIN = aVYtda
-PASS  = aVYtdapass
-ROLE  = DISPATCHER
-------------------
-LOGIN = TWaFPk
-PASS  = TWaFPkpass
+LOGIN = ZbFekp
+PASS  = ZbFekppass
 ROLE  = W_DISPATCHER
 ------------------
-LOGIN = aTTJXM
-PASS  = aTTJXMpass
+LOGIN = VNYnIc
+PASS  = VNYnIcpass
+ROLE  = ADMIN
+------------------
+LOGIN = OcmZju
+PASS  = OcmZjupass
 ROLE  = MARKET_AGENT
 ------------------
-LOGIN = IomFAn
-PASS  = IomFAnpass
+LOGIN = pLfzjZ
+PASS  = pLfzjZpass
+ROLE  = MARKET_AGENT
+------------------
+LOGIN = eLCkJP
+PASS  = eLCkJPpass
+ROLE  = MARKET_AGENT
+------------------
+LOGIN = onOTgK
+PASS  = onOTgKpass
 ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = yOadqV
-PASS  = yOadqVpass
-ROLE  = DISPATCHER
-------------------
-LOGIN = EstpRF
-PASS  = EstpRFpass
+LOGIN = zVtNEz
+PASS  = zVtNEzpass
 ROLE  = MARKET_AGENT
 ------------------
-LOGIN = khIBsn
-PASS  = khIBsnpass
+LOGIN = FsudHz
+PASS  = FsudHzpass
+ROLE  = ADMIN
+------------------
+LOGIN = mrPFsT
+PASS  = mrPFsTpass
 ROLE  = W_DISPATCHER
 ------------------
-LOGIN = coNixT
-PASS  = coNixTpass
-ROLE  = ADMIN
-------------------
-LOGIN = NtqFnH
-PASS  = NtqFnHpass
+LOGIN = ZGInKu
+PASS  = ZGInKupass
 ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = UAFtHu
-PASS  = UAFtHupass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = HEsdUD
-PASS  = HEsdUDpass
-ROLE  = DISPATCHER
-------------------
-LOGIN = eHiaMh
-PASS  = eHiaMhpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = umlCOe
-PASS  = umlCOepass
-ROLE  = DISPATCHER
-------------------
-LOGIN = FWKuMo
-PASS  = FWKuMopass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = KUhmGs
-PASS  = KUhmGspass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = eCZmtA
-PASS  = eCZmtApass
+LOGIN = ufVrXo
+PASS  = ufVrXopass
 ROLE  = W_DISPATCHER
 ------------------
-LOGIN = XSaOJe
-PASS  = XSaOJepass
+LOGIN = jtmlbX
+PASS  = jtmlbXpass
+ROLE  = ADMIN
+------------------
+LOGIN = KfNWsk
+PASS  = KfNWskpass
+ROLE  = DISPATCHER
+------------------
+LOGIN = kHjbau
+PASS  = kHjbaupass
+ROLE  = CLIENT_MANAGER
+------------------
+LOGIN = vQWsqg
+PASS  = vQWsqgpass
 ROLE  = W_DISPATCHER
 ------------------
-LOGIN = EETTxO
-PASS  = EETTxOpass
+LOGIN = IwolfT
+PASS  = IwolfTpass
 ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = RZvUpt
-PASS  = RZvUptpass
+LOGIN = ucoexb
+PASS  = ucoexbpass
 ROLE  = MARKET_AGENT
 ------------------
-LOGIN = UQtTZc
-PASS  = UQtTZcpass
-ROLE  = MARKET_AGENT
-------------------
-LOGIN = UIUlam
-PASS  = UIUlampass
-ROLE  = ADMIN
-------------------
-LOGIN = esDBhy
-PASS  = esDBhypass
+LOGIN = QZapta
+PASS  = QZaptapass
 ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = yOqkdm
-PASS  = yOqkdmpass
+LOGIN = WhLaSG
+PASS  = WhLaSGpass
 ROLE  = MARKET_AGENT
 ------------------
-LOGIN = wkSdlq
-PASS  = wkSdlqpass
+LOGIN = pINPHG
+PASS  = pINPHGpass
 ROLE  = DISPATCHER
 ------------------
-LOGIN = GqsoRf
-PASS  = GqsoRfpass
-ROLE  = ADMIN
+LOGIN = GGqblh
+PASS  = GGqblhpass
+ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = IfoFuX
-PASS  = IfoFuXpass
+LOGIN = tzoJDe
+PASS  = tzoJDepass
 ROLE  = DISPATCHER
 ------------------
-LOGIN = UVpuge
-PASS  = UVpugepass
+LOGIN = dyLvKL
+PASS  = dyLvKLpass
 ROLE  = CLIENT_MANAGER
 ------------------
-LOGIN = tlryfC
-PASS  = tlryfCpass
-ROLE  = ADMIN
+LOGIN = WZMyll
+PASS  = WZMyllpass
+ROLE  = MARKET_AGENT
 ------------------
-LOGIN = gtiELl
-PASS  = gtiELlpass
-ROLE  = CLIENT_MANAGER
+LOGIN = vDGAKH
+PASS  = vDGAKHpass
+ROLE  = MARKET_AGENT
 ------------------
-LOGIN = hhqnOd
-PASS  = hhqnOdpass
+LOGIN = ehYkhd
+PASS  = ehYkhdpass
 ROLE  = DISPATCHER
 ------------------
-LOGIN = QddcXq
-PASS  = QddcXqpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = XnEOzp
-PASS  = XnEOzppass
-ROLE  = MARKET_AGENT
-------------------
-LOGIN = vacZVk
-PASS  = vacZVkpass
-ROLE  = MARKET_AGENT
-------------------
-LOGIN = XeZAqG
-PASS  = XeZAqGpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = XgCHlY
-PASS  = XgCHlYpass
-ROLE  = CLIENT_MANAGER
-------------------
-LOGIN = cVnGMh
-PASS  = cVnGMhpass
+LOGIN = Hdcdph
+PASS  = Hdcdphpass
 ROLE  = DISPATCHER
 ------------------
-LOGIN = HAncuu
-PASS  = HAncuupass
-ROLE  = ADMIN
-------------------
-LOGIN = yaQbvU
-PASS  = yaQbvUpass
-ROLE  = ADMIN
-------------------
-LOGIN = OLcmeV
-PASS  = OLcmeVpass
+LOGIN = tRTyUG
+PASS  = tRTyUGpass
 ROLE  = MARKET_AGENT
+------------------
+LOGIN = wUKYic
+PASS  = wUKYicpass
+ROLE  = CLIENT_MANAGER
+------------------
+LOGIN = OqsXTY
+PASS  = OqsXTYpass
+ROLE  = ADMIN
+------------------
+LOGIN = SOkAqf
+PASS  = SOkAqfpass
+ROLE  = MARKET_AGENT
+------------------
+LOGIN = NLFXMZ
+PASS  = NLFXMZpass
+ROLE  = CLIENT_MANAGER
+------------------
+LOGIN = gutXps
+PASS  = gutXpspass
+ROLE  = CLIENT_MANAGER
+------------------
+LOGIN = axoKuZ
+PASS  = axoKuZpass
+ROLE  = ADMIN
+------------------
+LOGIN = hCovmt
+PASS  = hCovmtpass
+ROLE  = W_DISPATCHER
+------------------
+LOGIN = NZjCvv
+PASS  = NZjCvvpass
+ROLE  = W_DISPATCHER
+------------------
+LOGIN = USSgNY
+PASS  = USSgNYpass
+ROLE  = W_DISPATCHER
+------------------
+LOGIN = hnbvlt
+PASS  = hnbvltpass
+ROLE  = CLIENT_MANAGER
+------------------
+LOGIN = wNTUCn
+PASS  = wNTUCnpass
+ROLE  = CLIENT_MANAGER
+------------------
+LOGIN = fncvih
+PASS  = fncvihpass
+ROLE  = MARKET_AGENT
+------------------
+LOGIN = wPfwiy
+PASS  = wPfwiypass
+ROLE  = MARKET_AGENT
+------------------
