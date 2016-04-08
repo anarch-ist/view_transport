@@ -43,14 +43,14 @@ public class TestOptimizer {
 
     // создание планового расписания
     @BeforeClass
-    public static void createPlannedSchedule(){
+    public static void createPlannedSchedule() {
         Util.initRoute(
                 route1,
                 3,
                 Util.getCharacteristicsOfCar(10_000_000),
                 420,
-                Util.createRoutePoint(x,   0),
-                Util.createRoutePoint(c,  60),
+                Util.createRoutePoint(x, 0),
+                Util.createRoutePoint(c, 60),
                 Util.createRoutePoint(a, 120)
         );
         Util.initRoute(
@@ -58,60 +58,60 @@ public class TestOptimizer {
                 3,
                 Util.getCharacteristicsOfCar(10_000_000),
                 1080,
-                Util.createRoutePoint(b,   0),
-                Util.createRoutePoint(p,  60),
+                Util.createRoutePoint(b, 0),
+                Util.createRoutePoint(p, 60),
                 Util.createRoutePoint(z, 120),
-                Util.createRoutePoint(q,  30)
+                Util.createRoutePoint(q, 30)
         );
         Util.initRoute(
                 route3,
                 6,
-                Util.getCharacteristicsOfCar(10_000_000),
+                Util.getCharacteristicsOfCar(7_000_000),
                 720,
-                Util.createRoutePoint(p,   0),
-                Util.createRoutePoint(a,  60),
+                Util.createRoutePoint(p, 0),
+                Util.createRoutePoint(a, 60),
                 Util.createRoutePoint(b, 120),
-                Util.createRoutePoint(c,  90)
+                Util.createRoutePoint(c, 90)
         );
         Util.initRoute(
                 route4,
                 3,
                 Util.getCharacteristicsOfCar(10_000_000),
                 720,
-                Util.createRoutePoint(b,   0),
-                Util.createRoutePoint(x,  30),
-                Util.createRoutePoint(y,  30)
+                Util.createRoutePoint(b, 0),
+                Util.createRoutePoint(x, 30),
+                Util.createRoutePoint(y, 30)
         );
         Util.initRoute(
                 route5,
                 4,
                 Util.getCharacteristicsOfCar(10_000_000),
                 900,
-                Util.createRoutePoint(c,   0),
-                Util.createRoutePoint(f,  60),
-                Util.createRoutePoint(z,  30)
+                Util.createRoutePoint(c, 0),
+                Util.createRoutePoint(f, 60),
+                Util.createRoutePoint(z, 30)
         );
         Util.initRoute(
                 route6,
                 5,
                 Util.getCharacteristicsOfCar(10_000_000),
                 1020,
-                Util.createRoutePoint(y,   0),
-                Util.createRoutePoint(w,  60),
-                Util.createRoutePoint(z,  30)
+                Util.createRoutePoint(y, 0),
+                Util.createRoutePoint(w, 60),
+                Util.createRoutePoint(z, 30)
         );
         Util.initRoute(
                 route7,
                 6,
                 Util.getCharacteristicsOfCar(10_000_000),
                 600,
-                Util.createRoutePoint(b,   0),
+                Util.createRoutePoint(b, 0),
                 Util.createRoutePoint(z, 120)
         );
         Util.initRoute(
                 route8,
                 3,
-                Util.getCharacteristicsOfCar(100_000),
+                Util.getCharacteristicsOfCar(50_000),
                 240,
                 Util.createRoutePoint(moscow, 60),
                 Util.createRoutePoint(kaluga, 60),
@@ -120,7 +120,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route9,
                 5,
-                Util.getCharacteristicsOfCar(100_000),
+                Util.getCharacteristicsOfCar(50_000),
                 240,
                 Util.createRoutePoint(moscow, 60),
                 Util.createRoutePoint(kaluga, 60),
@@ -129,7 +129,7 @@ public class TestOptimizer {
         Util.initRoute(
                 route10,
                 7,
-                Util.getCharacteristicsOfCar(100_000),
+                Util.getCharacteristicsOfCar(50_000),
                 240,
                 Util.createRoutePoint(moscow, 60),
                 Util.createRoutePoint(kaluga, 60),
@@ -224,11 +224,11 @@ public class TestOptimizer {
 
     // создание накладных без маршрутов
     @BeforeClass
-    public static void fullInvoiceContainer(){
-        Request request = Util.createRequest(z,  Util.createDate(2016, Calendar.FEBRUARY, 16, 20,  45));
-        Invoice invoice = Util.createInvoice(c,  Util.createDate(2016, Calendar.JANUARY, 30, 12, 0),     request, 5_000_000);
-        Request request2 = Util.createRequest(z,  Util.createDate(2016, Calendar.APRIL, 10, 20,  45));
-        Invoice invoice2 = Util.createInvoice(x,  Util.createDate(2016, Calendar.APRIL, 4, 12, 0),     request2, 5_000_000);
+    public static void fullInvoiceContainer() {
+        Request request = Util.createRequest(z, Util.createDate(2016, Calendar.FEBRUARY, 16, 20, 45));
+        Invoice invoice = Util.createInvoice(c, Util.createDate(2016, Calendar.JANUARY, 30, 12, 0), request, 7_000_000);
+        Request request2 = Util.createRequest(z, Util.createDate(2016, Calendar.APRIL, 10, 20, 45));
+        Invoice invoice2 = Util.createInvoice(x, Util.createDate(2016, Calendar.APRIL, 4, 12, 0), request2, 1_000_000);
         invoiceContainer.add(invoice);
         invoiceContainer.add(invoice2);
         Request request1 = Util.createRequest(tula, Util.createDate(2016, Calendar.FEBRUARY, 20, 0, 0));
@@ -276,7 +276,7 @@ public class TestOptimizer {
         List<DeliveryRoute> result = new ArrayList<>();
         List<Point> markedPoints = new ArrayList<>();
         List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
-        for(DeliveryRoute deliveryRoute: possibleDeliveryRoutes) {
+        for (DeliveryRoute deliveryRoute : possibleDeliveryRoutes) {
             for (TrackCourse trackCourse : deliveryRoute) {
                 System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getPoint().getPointId() +
                         ", route = " + trackCourse.getRoute().getPointsAsString());
@@ -295,16 +295,17 @@ public class TestOptimizer {
     }
 
     @Test
-    public void testIsFittingTrackCourseByLoadCostAndNumberOfWeek(){
+    public void testIsFittingTrackCourseByLoadCostAndNumberOfWeek() {
         Optimizer optimizer = new Optimizer();
         TrackCourse trackCourse = route3.get(1);
-        List<LoadUnit> loadUnits = new ArrayList<>();
-        LoadUnit loadUnit = new LoadUnit();
-        loadUnit.setNumberOfWeek(11);
-        loadUnit.setLoadCost(5_000_010);
-        loadUnits.add(loadUnit);
-        trackCourse.setLoadUnits(loadUnits);
+//        LoadUnit loadUnit = new LoadUnit();
+//        loadUnit.setNumberOfWeek(10);
+//        loadUnit.setLoadCost(2_000_000);
+//        trackCourse.getLoadUnits().add(loadUnit);
+//        System.out.println(trackCourse.getLoadUnits().get(0).getLoadCost() > invoiceContainer.get(0).getCost());
+        System.out.println(trackCourse.getLoadUnits());
         Assert.assertTrue(optimizer.isFittingTrackCourseByLoadCostAndNumberOfWeek(invoiceContainer.get(0), trackCourse, 10));
+        Assert.assertFalse(optimizer.isFittingTrackCourseByLoadCostAndNumberOfWeek(invoiceContainer.get(1), trackCourse, 10));
     }
 
     @Test
@@ -312,12 +313,12 @@ public class TestOptimizer {
         Optimizer optimizer = new Optimizer();
         List<DeliveryRoute> result = new ArrayList<>();
         List<Point> markedPoints = new ArrayList<>();
-        List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, a, z, result, markedPoints);
+        List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, c, z, result, markedPoints);
         Map<Invoice, List<DeliveryRoute>> invoiceListMap = new HashMap<>();
         invoiceListMap.put(invoiceContainer.get(0), possibleDeliveryRoutes);
         optimizer.optimize(plannedSchedule, invoiceListMap);
         List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoiceContainer.get(0).getPartsOfDeliveryRoute();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes) {
+        for (PartOfDeliveryRoute partOfDeliveryRoute : partOfDeliveryRoutes) {
             System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " +
                     partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " + partOfDeliveryRoute.getNumberOfWeek());
         }
@@ -344,7 +345,7 @@ public class TestOptimizer {
         List<DeliveryRoute> result = new ArrayList<>();
         List<Point> markedPoints = new ArrayList<>();
         List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedSchedule, x, z, result, markedPoints);
-        for(DeliveryRoute deliveryRoute: possibleDeliveryRoutes) {
+        for (DeliveryRoute deliveryRoute : possibleDeliveryRoutes) {
             for (TrackCourse trackCourse : deliveryRoute) {
                 System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getPoint().getPointId() +
                         ", route = " + trackCourse.getRoute().getPointsAsString() + " " + trackCourse.getRoute().getDayOfWeek());
@@ -355,7 +356,7 @@ public class TestOptimizer {
         invoiceListMap.put(invoiceContainer.get(1), possibleDeliveryRoutes);
         optimizer.optimize(plannedSchedule, invoiceListMap);
         List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoiceContainer.get(1).getPartsOfDeliveryRoute();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes) {
+        for (PartOfDeliveryRoute partOfDeliveryRoute : partOfDeliveryRoutes) {
             System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() +
                     ": " + partOfDeliveryRoute.getNumberOfWeek());
         }
@@ -364,102 +365,30 @@ public class TestOptimizer {
     @Test
     public void testOptimizeNew() throws ParseException, RouteNotFoundException, IncorrectRequirement {
         Optimizer optimizer = new Optimizer();
-        List<DeliveryRoute> result = new ArrayList<>();
-        List<Point> markedPoints = new ArrayList<>();
-        List<DeliveryRoute> possibleDeliveryRoutes = optimizer.startRecursive(plannedScheduleNew, moscow, kaluga, result, markedPoints);
-        for(DeliveryRoute deliveryRoute: possibleDeliveryRoutes) {
-            for (TrackCourse trackCourse : deliveryRoute) {
-                System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getPoint().getPointId() +
-                        ", route = " + trackCourse.getRoute().getPointsAsString() + " " + trackCourse.getRoute().getDayOfWeek());
+        Map<Invoice, List<DeliveryRoute>> deliveryRoutesForInvoice = optimizer.filtrate(plannedScheduleNew, invoiceContainerNew);
+        Iterator<Map.Entry<Invoice, List<DeliveryRoute>>> iterator = deliveryRoutesForInvoice.entrySet().iterator();
+        optimizer.optimize(plannedScheduleNew, deliveryRoutesForInvoice);
+        while (iterator.hasNext()) {
+            Map.Entry<Invoice, List<DeliveryRoute>> entry = iterator.next();
+            Invoice invoice = entry.getKey();
+            System.out.println("For invoice id = " + invoice.getInvoiceId());
+            List<PartOfDeliveryRoute> partOfDeliveryRoutes = invoice.getPartsOfDeliveryRoute();
+            for (PartOfDeliveryRoute partOfDeliveryRoute : partOfDeliveryRoutes) {
+                System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " +
+                        partOfDeliveryRoute.getNumberOfWeek() + " day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getDayOfWeek());
+                // +
+//                " arrival time and day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getActualArrivalTimeInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " " +
+//                        partOfDeliveryRoute.getTrackCourse().getRoute().getWeekDayOfActualArrivalDateInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " in " +
+//                        partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId()
+//                for (LoadUnit loadUnit : partOfDeliveryRoute.getTrackCourse().getLoadUnits()) {
+//                    if (loadUnit.getNumberOfWeek() == 8) {
+//                        System.out.println("Cost = " + loadUnit.getLoadCost());
+//                    }
+//                }
             }
-            System.out.println("_______________________");
-        }
-        Map<Invoice, List<DeliveryRoute>> invoiceListMap = new HashMap<>();
-        invoiceListMap.put(invoiceContainerNew.get(3), possibleDeliveryRoutes);
-        invoiceListMap.put(invoiceContainerNew.get(4), possibleDeliveryRoutes);
-        optimizer.optimize(plannedScheduleNew, invoiceListMap);
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes3 = invoiceContainerNew.get(3).getPartsOfDeliveryRoute();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes3) {
-            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " +
-                    partOfDeliveryRoute.getNumberOfWeek() + " day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getDayOfWeek() + " id of invoice:" + invoiceContainerNew.get(3).getInvoiceId() +
-                    " arrival time and day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getActualArrivalTimeInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " " +
-                    partOfDeliveryRoute.getTrackCourse().getRoute().getWeekDayOfActualArrivalDateInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " in " +
-                    partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId());
-            for(LoadUnit loadUnit: partOfDeliveryRoute.getTrackCourse().getLoadUnits()) {
-                if(loadUnit.getNumberOfWeek() == 8) {
-                    System.out.println("Cost = " + loadUnit.getLoadCost());
-                }
-            }
-        }
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes4 = invoiceContainerNew.get(4).getPartsOfDeliveryRoute();
-        System.out.println();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes4) {
-            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " +
-                    partOfDeliveryRoute.getNumberOfWeek() + " day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getDayOfWeek() + " id of invoice:" + invoiceContainerNew.get(4).getInvoiceId() +
-                    " arrival time and day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getActualArrivalTimeInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " " +
-                    partOfDeliveryRoute.getTrackCourse().getRoute().getWeekDayOfActualArrivalDateInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " in " +
-                    partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId());
-            for(LoadUnit loadUnit: partOfDeliveryRoute.getTrackCourse().getLoadUnits()) {
-                if(loadUnit.getNumberOfWeek() == 8) {
-                    System.out.println("Cost = " + loadUnit.getLoadCost());
-                }
-            }
-        }
-        System.out.println("_________________________________________________________________");
+            System.out.println("____________________________________");
 
-        List<DeliveryRoute> result2 = new ArrayList<>();
-        List<Point> markedPoints2 = new ArrayList<>();
-        List<DeliveryRoute> possibleDeliveryRoutes2 = optimizer.startRecursive(plannedScheduleNew, moscow, tula, result2, markedPoints2);
-        for(DeliveryRoute deliveryRoute: possibleDeliveryRoutes2) {
-            for (TrackCourse trackCourse : deliveryRoute) {
-                System.out.println("Track Course: start point = " + trackCourse.getStartTrackCourse().getPoint().getPointId() + ", end point = " + trackCourse.getEndTrackCourse().getPoint().getPointId() +
-                        ", route = " + trackCourse.getRoute().getPointsAsString());
-            }
-            System.out.println("_______________________");
         }
-        Map<Invoice, List<DeliveryRoute>> invoiceListMap2 = new HashMap<>();
-        invoiceListMap2.put(invoiceContainerNew.get(0), possibleDeliveryRoutes2);
-        invoiceListMap2.put(invoiceContainerNew.get(1), possibleDeliveryRoutes2);
-        invoiceListMap2.put(invoiceContainerNew.get(2), possibleDeliveryRoutes2);
-        optimizer.optimize(plannedScheduleNew, invoiceListMap2);
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes0 = invoiceContainerNew.get(0).getPartsOfDeliveryRoute();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes0) {
-            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " +
-                    partOfDeliveryRoute.getNumberOfWeek() + " day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getDayOfWeek() + " id of invoice: " + invoiceContainerNew.get(0).getInvoiceId() +
-                    " arrival time and day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getActualArrivalTimeInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " " +
-                    partOfDeliveryRoute.getTrackCourse().getRoute().getWeekDayOfActualArrivalDateInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " in " +
-                    partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId());
-            for(LoadUnit loadUnit: partOfDeliveryRoute.getTrackCourse().getLoadUnits()) {
-                if(loadUnit.getNumberOfWeek() == 8) {
-                    System.out.println("Cost = " + loadUnit.getLoadCost());
-                }
-            }
-        }
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes1 = invoiceContainerNew.get(1).getPartsOfDeliveryRoute();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes1) {
-            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " +
-                    partOfDeliveryRoute.getNumberOfWeek() + " day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getDayOfWeek() + " id of invoice: " + invoiceContainerNew.get(1).getInvoiceId() +
-                    " arrival time and day of week; " + partOfDeliveryRoute.getTrackCourse().getRoute().getActualArrivalTimeInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " " +
-                    partOfDeliveryRoute.getTrackCourse().getRoute().getWeekDayOfActualArrivalDateInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " in " +
-                    partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId());
-            for(LoadUnit loadUnit: partOfDeliveryRoute.getTrackCourse().getLoadUnits()) {
-                if(loadUnit.getNumberOfWeek() == 8) {
-                    System.out.println("Cost = " + loadUnit.getLoadCost());
-                }
-            }
-        }
-        List<PartOfDeliveryRoute> partOfDeliveryRoutes2 = invoiceContainerNew.get(2).getPartsOfDeliveryRoute();
-        for(PartOfDeliveryRoute partOfDeliveryRoute: partOfDeliveryRoutes2) {
-            System.out.println(partOfDeliveryRoute.getTrackCourse().getStartTrackCourse().getPoint().getPointId() + " " + partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId() + ": " +
-                    partOfDeliveryRoute.getNumberOfWeek() + " day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getDayOfWeek() + " id of invoice: " + invoiceContainerNew.get(2).getInvoiceId()  +
-                    " arrival time and day of week: " + partOfDeliveryRoute.getTrackCourse().getRoute().getActualArrivalTimeInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " " +
-                    partOfDeliveryRoute.getTrackCourse().getRoute().getWeekDayOfActualArrivalDateInRoutePoint(partOfDeliveryRoute.getTrackCourse().getEndTrackCourse()) + " in " +
-                    partOfDeliveryRoute.getTrackCourse().getEndTrackCourse().getPoint().getPointId());
-            for(LoadUnit loadUnit: partOfDeliveryRoute.getTrackCourse().getLoadUnits()) {
-                if(loadUnit.getNumberOfWeek() == 8) {
-                    System.out.println("Cost = " + loadUnit.getLoadCost());
-                }
-            }
-        }
+        System.out.println(plannedScheduleNew);
     }
 }

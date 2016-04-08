@@ -58,9 +58,6 @@ public class TrackCourse {
         return loadUnits;
     }
 
-    public void setLoadUnits(List<LoadUnit> loadUnits) {
-        this.loadUnits = loadUnits;
-    }
 
     /** creates list of track courses from list of points and routes
      *

@@ -21,4 +21,12 @@ public class LoadUnit {
     public void setNumberOfWeek(int numberOfWeek) {
         this.numberOfWeek = numberOfWeek;
     }
+
+    @Override
+    public String toString() {
+        return "LoadUnit{" +
+                "loadCost=" + loadCost +
+                ", numberOfWeek=" + numberOfWeek +
+                '}';
+    }
 }

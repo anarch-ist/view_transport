@@ -4,6 +4,7 @@ package ru.sbat.transport.optimization.location;
 import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
 
@@ -413,10 +414,14 @@ public class RouteNew extends LinkedList<TrackCourse> implements IRoute {
 
     @Override
     public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        this.forEach(trackCourse -> stringBuilder.append(trackCourse.getLoadUnits().toString()).append("  "));
+
         return "RouteNew{" +
                 "characteristicsOfCar=" + characteristicsOfCar +
                 ", departureTimeFromFirstPoint=" + departureTimeFromFirstPoint +
                 ", dayOfWeek=" + dayOfWeek +
+                ", trackCourses=" + stringBuilder.toString() +
                 '}';
     }
 }

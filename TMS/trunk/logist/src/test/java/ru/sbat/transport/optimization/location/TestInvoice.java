@@ -9,6 +9,7 @@ import ru.sbat.transport.optimization.optimazerException.IncorrectRequirement;
 import ru.sbat.transport.optimization.schedule.PlannedSchedule;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +33,11 @@ public class TestInvoice {
     static RouteNew route5 = new RouteNew();
     static RouteNew route6 = new RouteNew();
     static RouteNew route7 = new RouteNew();
+
+    static InvoiceContainer invoiceContainerNew = new InvoiceContainer();
+    static WarehousePoint moscow = new WarehousePoint("Moscow");
+    static TradeRepresentativePoint kaluga = new TradeRepresentativePoint("Kaluga");
+    static TradeRepresentativePoint tula = new TradeRepresentativePoint("Tula");
 
     @BeforeClass
     public static void createPlannedSchedule() {
@@ -193,5 +199,37 @@ public class TestInvoice {
         System.out.println(numberOfWeek);
         Assert.assertEquals(6, numberOfWeek.get(0), 0);
         Assert.assertEquals(7, numberOfWeek.get(numberOfWeek.size() - 1), 0);
+    }
+
+    @Test
+    public void testCompareTo(){
+        Request request1 = Util.createRequest(tula, Util.createDate(2016, Calendar.FEBRUARY, 20, 0, 0));
+        Invoice invoice1 = Util.createInvoice(moscow, Util.createDate(2016, Calendar.FEBRUARY, 15, 0, 0), request1, 50_000);
+        invoice1.setInvoiceId("1");
+        Request request3 = Util.createRequest(tula, Util.createDate(2016, Calendar.MARCH, 19, 0, 0));
+        Invoice invoice3 = Util.createInvoice(moscow, Util.createDate(2016, Calendar.FEBRUARY, 14, 0, 0), request3, 50_000);
+        invoice3.setInvoiceId("3");
+        Request request4 = Util.createRequest(tula, Util.createDate(2016, Calendar.MARCH, 20, 0, 0));
+        Invoice invoice4 = Util.createInvoice(moscow, Util.createDate(2016, Calendar.FEBRUARY, 15, 0, 0), request4, 50_000);
+        invoice4.setInvoiceId("4");
+        Request request5 = Util.createRequest(kaluga, Util.createDate(2016, Calendar.MARCH, 29, 0, 0));
+        Invoice invoice5 = Util.createInvoice(moscow, Util.createDate(2016, Calendar.FEBRUARY, 15, 0, 0), request5, 50_000);
+        invoice5.setInvoiceId("5");
+        Request request6 = Util.createRequest(kaluga, Util.createDate(2016, Calendar.FEBRUARY, 29, 0, 0));
+        Invoice invoice6 = Util.createInvoice(moscow, Util.createDate(2016, Calendar.FEBRUARY, 15, 0, 0), request6, 50_000);
+        invoice6.setInvoiceId("6");
+        invoiceContainerNew.add(invoice1);
+        invoiceContainerNew.add(invoice3);
+        invoiceContainerNew.add(invoice4);
+        invoiceContainerNew.add(invoice5);
+        invoiceContainerNew.add(invoice6);
+        for(Invoice invoice: invoiceContainerNew){
+            System.out.println(invoice.getRequest().getPlannedDeliveryDate());
+        }
+        System.out.println("___________________");
+        Collections.sort(invoiceContainerNew);
+        for(Invoice invoice: invoiceContainerNew){
+            System.out.println(invoice.getRequest().getPlannedDeliveryDate());
+        }
     }
 }

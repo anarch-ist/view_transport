@@ -23,16 +23,16 @@ public class Optimizer implements IOptimizer {
     @Override
     public Map<Invoice, List<DeliveryRoute>> filtrate(PlannedSchedule plannedSchedule, InvoiceContainer invoiceContainer) throws RouteNotFoundException {
         Map<Invoice, List<DeliveryRoute>> result = new HashMap<>();
-        List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
-        List<Point> points = new ArrayList<>();
         Collections.sort(invoiceContainer);
         for (Invoice invoice : invoiceContainer) {
             if (invoice.getDeliveryRoute() != null)
                 throw new IllegalArgumentException("invoice.getDeliveryRoutesForInvoice() should be null");
-                Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
-                Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
-                possibleDeliveryRouteForInvoice = startRecursive(plannedSchedule, departurePoint, deliveryPoint, possibleDeliveryRouteForInvoice, points);
-                result.put(invoice, possibleDeliveryRouteForInvoice);
+            List<DeliveryRoute> possibleDeliveryRouteForInvoice = new ArrayList<>();
+            List<Point> points = new ArrayList<>();
+            Point deliveryPoint = invoice.getRequest().getDeliveryPoint(); // point - торговое пред-во доставка
+            Point departurePoint = invoice.getAddressOfWarehouse(); // point - адрес склада отправления накладной
+            possibleDeliveryRouteForInvoice = startRecursive(plannedSchedule, departurePoint, deliveryPoint, possibleDeliveryRouteForInvoice, points);
+            result.put(invoice, possibleDeliveryRouteForInvoice);
             }
         return result;
     }
@@ -250,15 +250,16 @@ public class Optimizer implements IOptimizer {
         while (iterator.hasNext()){
             Map.Entry<Invoice, List<DeliveryRoute>> entry = iterator.next();
             Invoice invoice = entry.getKey();
-            List<PartOfDeliveryRoute> partOfDeliveryRouteList = new ArrayList<>();
+
             if(routesForInvoice.get(invoice).size() == 0){
                 throw new RouteNotFoundException("invoice should have options of delivery routes");
             }else {
                 List<DeliveryRoute> deliveryRoutes = routesForInvoice.get(invoice);
                 for(DeliveryRoute deliveryRoute: deliveryRoutes){
+                    List<PartOfDeliveryRoute> partOfDeliveryRouteList = new ArrayList<>();
                     List<Integer> countOfWeek = invoice.calculateNumbersOfWeeksBetweenDates(invoice.getCreationDate(), invoice.getRequest().getPlannedDeliveryDate(),
                             invoice, deliveryRoute.get(0), deliveryRoute.get(deliveryRoute.size() - 1));
-//                    System.out.println(countOfWeek);
+                    System.out.println(countOfWeek);
                     if(countOfWeek.size() == 0 || !isMadeChainOfTrackCourses(deliveryRoute, countOfWeek)){
                         continue;
                     }else {
@@ -274,33 +275,36 @@ public class Optimizer implements IOptimizer {
                                 break;
                             }
                         }
-                        for(int i = 1; i < deliveryRoute.size(); i++){
-                            for(int j = index; j < countOfWeek.size(); j++){
-                                PartOfDeliveryRoute partOfDeliveryRoute = new PartOfDeliveryRoute();
-                                if(isTheSameWeek(trackCourseForCompare, deliveryRoute.get(i))){
-                                    if(isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, deliveryRoute.get(i), countOfWeek.get(j))){
-                                        partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(i));
-                                        partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(j));
-                                        partOfDeliveryRouteList.add(partOfDeliveryRoute);
-                                        trackCourseForCompare = deliveryRoute.get(i);
-                                        index = j;
-                                        break;
-                                    }
-                                }else if(!isTheSameWeek(trackCourseForCompare, deliveryRoute.get(i))){
-                                    j++;
-                                    if(isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, deliveryRoute.get(i), countOfWeek.get(j))){
-                                        partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(i));
-                                        partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(j));
-                                        partOfDeliveryRouteList.add(partOfDeliveryRoute);
-                                        trackCourseForCompare = deliveryRoute.get(i);
-                                        index = j;
-                                        break;
+                        if(partOfDeliveryRouteList.size() != 0) {
+                            for (int i = 1; i < deliveryRoute.size(); i++) {
+                                for (int j = index; j < countOfWeek.size(); j++) {
+                                    PartOfDeliveryRoute partOfDeliveryRoute = new PartOfDeliveryRoute();
+                                    if (isTheSameWeek(trackCourseForCompare, deliveryRoute.get(i))) {
+                                        if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, deliveryRoute.get(i), countOfWeek.get(j))) {
+                                            partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(i));
+                                            partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(j));
+                                            partOfDeliveryRouteList.add(partOfDeliveryRoute);
+                                            trackCourseForCompare = deliveryRoute.get(i);
+                                            index = j;
+                                            break;
+                                        }
+                                    } else if (!isTheSameWeek(trackCourseForCompare, deliveryRoute.get(i))) {
+                                        j++;
+                                        if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, deliveryRoute.get(i), countOfWeek.get(j))) {
+                                            partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(i));
+                                            partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(j));
+                                            partOfDeliveryRouteList.add(partOfDeliveryRoute);
+                                            trackCourseForCompare = deliveryRoute.get(i);
+                                            index = j;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    if(partOfDeliveryRouteList.size() != 0){
+                    if(partOfDeliveryRouteList.size() != 0 && partOfDeliveryRouteList.get(0).getTrackCourse().getStartTrackCourse().getPoint().getPointId().equals(invoice.getAddressOfWarehouse().getPointId()) &&
+                            partOfDeliveryRouteList.get(partOfDeliveryRouteList.size() - 1).getTrackCourse().getEndTrackCourse().getPoint().getPointId().equals(invoice.getRequest().getDeliveryPoint().getPointId())){
                         invoice.setPartsOfDeliveryRoute(partOfDeliveryRouteList);
                         break;
                     }
@@ -346,6 +350,9 @@ public class Optimizer implements IOptimizer {
             loadUnit.setNumberOfWeek(numberOfWeek);
             loadUnit.setLoadCost(invoiceCost);
             trackCourse.getLoadUnits().add(loadUnit);
+            System.out.println(trackCourse.getLoadUnits().size());
+            System.out.println(trackCourse);
+            System.out.println("HEY");
             return true;
         }else {
             List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
@@ -356,11 +363,13 @@ public class Optimizer implements IOptimizer {
                     System.out.println(loadUnit.getLoadCost() + invoiceCost > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost());
                     if((loadUnit.getLoadCost() + invoiceCost) > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost()) {
                         System.out.println(loadUnit.getLoadCost() + invoiceCost);
+                        System.out.println(loadUnit.getLoadCost());
                         System.out.println("I'M HERE");
                         return false;
                     }else {
                         loadUnit.setLoadCost(loadUnit.getLoadCost() + invoiceCost);
-                        System.out.println(loadUnit.getLoadCost() + invoiceCost);
+                        System.out.println(loadUnit.getLoadCost());
+                        System.out.println("HEX");
                     }
                 }
             }
@@ -369,6 +378,7 @@ public class Optimizer implements IOptimizer {
                 loadUnit.setNumberOfWeek(numberOfWeek);
                 loadUnit.setLoadCost(invoiceCost);
                 trackCourse.getLoadUnits().add(loadUnit);
+                System.out.println("HEC");
             }
         }
         return true;

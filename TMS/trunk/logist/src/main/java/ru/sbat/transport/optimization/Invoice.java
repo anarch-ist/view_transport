@@ -226,12 +226,12 @@ public class Invoice implements Comparable<Invoice>{
 
     @Override
     public int compareTo(Invoice o) {
-        if(this.getRequest().getPlannedDeliveryDate().before(o.getRequest().getPlannedDeliveryDate()))
-            return 1;
-        else if(this.getRequest().getPlannedDeliveryDate().equals(o.getRequest().getPlannedDeliveryDate()))
-            return 0;
-        else
-        return 0;
+//        if(this.getRequest().getPlannedDeliveryDate().before(o.getRequest().getPlannedDeliveryDate()))
+//            return -1;
+//        else if(this.getRequest().getPlannedDeliveryDate().equals(o.getRequest().getPlannedDeliveryDate()))
+//            return 0;
+//        else
+        return this.getRequest().getPlannedDeliveryDate().compareTo(o.getRequest().getPlannedDeliveryDate());
     }
 
     public List<Integer> calculateNumbersOfWeeksBetweenDates(Date departureDate, Date deliveryDate, Invoice invoice, TrackCourse startTrackCourse, TrackCourse endTrackCourse) throws IncorrectRequirement {

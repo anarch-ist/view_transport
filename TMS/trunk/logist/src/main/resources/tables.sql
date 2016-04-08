@@ -24,6 +24,7 @@ VALUES
 --                                                 CLIENTS
 -- -------------------------------------------------------------------------------------------------------------------
 
+-- entity
 CREATE TABLE suppliers (
   supplierID          SERIAL,
   supplierIDExternal  VARCHAR(255) NOT NULL,
@@ -72,7 +73,7 @@ VALUES
 -- ('TEMP_REMOVED', 'Временно_удален'),
 -- ('VIEW_LAST_TEN', 'Последние_десять')
 ;
-
+-- entity
 CREATE TABLE points (
   pointID             SERIAL,
   pointIDExternal     VARCHAR(128)   NOT NULL,
@@ -119,6 +120,7 @@ INSERT INTO time_diffs VALUES
   (37), (38), (39), (40), (41), (42), (43), (44), (45), (46), (47), (48);
 
 CREATE TYPE DOC_STATE AS ENUM ('FREE', 'OCCUPIED', 'OCCUPIED_BY_BOSS');
+-- entity
 CREATE TABLE docs_container (
   contanerID SERIAL,
   docID      INTEGER,
@@ -173,7 +175,7 @@ EXECUTE PROCEDURE insertHistory();
 CREATE TRIGGER after_docs_container_delete AFTER DELETE ON docs_container
 FOR EACH ROW
 EXECUTE PROCEDURE insertHistoryDelete();
-
+-- entity
 CREATE TABLE users (
   userID         SERIAL,
   userIDExternal VARCHAR(255) NOT NULL,
@@ -254,7 +256,7 @@ VALUES
   ('CANCELLED_S', 'Отмена поставщиком'),
   ('ERROR', 'Ошибка'),
   ('DELIVERED', 'Доставлен');
-
+-- entity
 CREATE TABLE donut_lists (
   donutID           SERIAL,
   creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -318,6 +320,7 @@ CREATE TABLE donut_list_history (
 );
 
 -- листы заказа
+-- entity
 CREATE TABLE wants (
   wantsID                 SERIAL,
 --   wantsIDExternal         VARCHAR(255)   NOT NULL,
