@@ -305,7 +305,7 @@ public class TestOptimizer {
 //        System.out.println(trackCourse.getLoadUnits().get(0).getLoadCost() > invoiceContainer.get(0).getCost());
         System.out.println(trackCourse.getLoadUnits());
         Assert.assertTrue(optimizer.isFittingTrackCourseByLoadCostAndNumberOfWeek(invoiceContainer.get(0), trackCourse, 10));
-        Assert.assertFalse(optimizer.isFittingTrackCourseByLoadCostAndNumberOfWeek(invoiceContainer.get(1), trackCourse, 10));
+        Assert.assertTrue(optimizer.isFittingTrackCourseByLoadCostAndNumberOfWeek(invoiceContainer.get(1), trackCourse, 10));
     }
 
     @Test

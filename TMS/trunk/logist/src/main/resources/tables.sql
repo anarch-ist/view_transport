@@ -100,6 +100,8 @@ CREATE TABLE docs (
   PRIMARY KEY (docID)
 );
 
+INSERT INTO docs VALUES(1, 'test_doc');
+
 CREATE TABLE docs_for_points (
   docID INTEGER,
   pointID INTEGER,
@@ -122,13 +124,13 @@ INSERT INTO time_diffs VALUES
 CREATE TYPE DOC_STATE AS ENUM ('FREE', 'OCCUPIED', 'OCCUPIED_BY_BOSS');
 -- entity
 CREATE TABLE docs_container (
-  contanerID SERIAL,
+  containerID SERIAL,
   docID      INTEGER,
   timeDiffID INTEGER,
   date       TIMESTAMP,
   docState   DOC_STATE DEFAULT 'FREE',
   UNIQUE (docID, timeDiffID, date),
-  PRIMARY KEY (contanerID),
+  PRIMARY KEY (containerID),
   FOREIGN KEY (docID) REFERENCES docs (docID),
   FOREIGN KEY (timeDiffID) REFERENCES time_diffs (timeDiffID)
 );
@@ -138,7 +140,7 @@ CREATE TYPE STATUS AS ENUM ('CREATED','UPDATED','DELETED');
 
 CREATE TABLE docs_container_history(
   docsHistoryID SERIAL8,
-  contanerID    INTEGER,
+  containerID    INTEGER,
   docID         INTEGER,
   timeDiffID    INTEGER,
   date          TIMESTAMP,
@@ -150,9 +152,9 @@ CREATE TABLE docs_container_history(
 CREATE FUNCTION insertHistory() RETURNS trigger AS $emp_stamp$
 BEGIN
   -- Check that empname and salary are given
-  INSERT INTO docs_container_history
+  INSERT INTO docs_container_history (containerID, docID, timeDiffID, date, docState, status)
   VALUES
-    (NULL, NEW.contanerID, NEW.docID, NEW.timeDiffID, NEW.date, NEW.docState, 'UPDATE');
+    (NEW.containerID, NEW.docID, NEW.timeDiffID, NEW.date, NEW.docState, 'UPDATED');
   RETURN NEW;
 END;
 $emp_stamp$ LANGUAGE plpgsql;
@@ -162,7 +164,7 @@ BEGIN
   -- Check that empname and salary are given
   INSERT INTO docs_container_history
   VALUES
-    (NULL, OLD.contanerID, OLD.docID, OLD.timeDiffID, OLD.date, OLD.docState, 'UPDATE');
+    (NULL, OLD.containerID, OLD.docID, OLD.timeDiffID, OLD.date, OLD.docState, 'UPDATED');
   RETURN OLD;
 END;
 $emp_stamp$ LANGUAGE plpgsql;

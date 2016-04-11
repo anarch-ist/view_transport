@@ -257,48 +257,57 @@ public class Optimizer implements IOptimizer {
                 List<DeliveryRoute> deliveryRoutes = routesForInvoice.get(invoice);
                 for(DeliveryRoute deliveryRoute: deliveryRoutes){
                     List<PartOfDeliveryRoute> partOfDeliveryRouteList = new ArrayList<>();
+                    TrackCourse beginOfDeliveryRoute = deliveryRoute.get(0);
                     List<Integer> countOfWeek = invoice.calculateNumbersOfWeeksBetweenDates(invoice.getCreationDate(), invoice.getRequest().getPlannedDeliveryDate(),
-                            invoice, deliveryRoute.get(0), deliveryRoute.get(deliveryRoute.size() - 1));
+                            invoice, beginOfDeliveryRoute, deliveryRoute.get(deliveryRoute.size() - 1));
                     System.out.println(countOfWeek);
                     if(countOfWeek.size() == 0 || !isMadeChainOfTrackCourses(deliveryRoute, countOfWeek)){
                         continue;
-                    }else {
-                        TrackCourse trackCourseForCompare = deliveryRoute.get(0);
-                        int index = 0;
-                        for(int y = 0; y < countOfWeek.size(); y++){
-                            if(isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, trackCourseForCompare, countOfWeek.get(y))){
-                                PartOfDeliveryRoute partOfDeliveryRoute = new PartOfDeliveryRoute();
-                                partOfDeliveryRoute.setTrackCourse(trackCourseForCompare);
-                                partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(y));
-                                partOfDeliveryRouteList.add(partOfDeliveryRoute);
-                                index = y;
-                                break;
-                            }
+                    }
+
+                    double invoiceCost = invoice.getCost();
+                    TrackCourse trackCourseForCompare = beginOfDeliveryRoute;
+                    System.out.println(trackCourseForCompare);
+                    int index = 0;
+                    for(int y = 0; y < countOfWeek.size(); y++) {
+                        int numberOfWeek = countOfWeek.get(y);
+                        if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, trackCourseForCompare, numberOfWeek)) {
+                            loadTrackCourse(trackCourseForCompare, numberOfWeek, invoiceCost);
+                            addPartsOfDeliveryRoute(trackCourseForCompare, numberOfWeek, partOfDeliveryRouteList);
+                            index = y;
+                            break;
                         }
-                        if(partOfDeliveryRouteList.size() != 0) {
-                            for (int i = 1; i < deliveryRoute.size(); i++) {
-                                for (int j = index; j < countOfWeek.size(); j++) {
-                                    PartOfDeliveryRoute partOfDeliveryRoute = new PartOfDeliveryRoute();
-                                    if (isTheSameWeek(trackCourseForCompare, deliveryRoute.get(i))) {
-                                        if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, deliveryRoute.get(i), countOfWeek.get(j))) {
-                                            partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(i));
-                                            partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(j));
-                                            partOfDeliveryRouteList.add(partOfDeliveryRoute);
-                                            trackCourseForCompare = deliveryRoute.get(i);
-                                            index = j;
-                                            break;
-                                        }
-                                    } else if (!isTheSameWeek(trackCourseForCompare, deliveryRoute.get(i))) {
-                                        j++;
-                                        if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, deliveryRoute.get(i), countOfWeek.get(j))) {
-                                            partOfDeliveryRoute.setTrackCourse(deliveryRoute.get(i));
-                                            partOfDeliveryRoute.setNumberOfWeek(countOfWeek.get(j));
-                                            partOfDeliveryRouteList.add(partOfDeliveryRoute);
-                                            trackCourseForCompare = deliveryRoute.get(i);
-                                            index = j;
-                                            break;
-                                        }
+                    }
+                    if(partOfDeliveryRouteList.size() == 0) {
+                        continue;
+                    }
+                    for (int i = 1; i < deliveryRoute.size(); i++) {
+                        TrackCourse currentTrackCourse = deliveryRoute.get(i);
+                        System.out.println(currentTrackCourse);
+                        for(LoadUnit loadUnit: currentTrackCourse.getLoadUnits()) {
+                            System.out.println("loadCost" + loadUnit.getLoadCost());
+                        }
+                        for (int j = index; j < countOfWeek.size(); j++) {
+                            int numberOfWeek = countOfWeek.get(j);
+                            if (isTheSameWeek(trackCourseForCompare, currentTrackCourse)) {
+                                if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, currentTrackCourse, numberOfWeek)) {
+                                    loadTrackCourse(currentTrackCourse, numberOfWeek, invoiceCost);
+                                    addPartsOfDeliveryRoute(currentTrackCourse, numberOfWeek, partOfDeliveryRouteList);
+                                    trackCourseForCompare = currentTrackCourse;
+                                    for(LoadUnit loadUnit: currentTrackCourse.getLoadUnits()) {
+                                        System.out.println("loadCost = " + loadUnit.getLoadCost());
                                     }
+                                    index = j;
+                                    break;
+                                }
+                            }else if (!isTheSameWeek(trackCourseForCompare, currentTrackCourse)) {
+                                j++;
+                                if (isFittingTrackCourseByLoadCostAndNumberOfWeek(invoice, currentTrackCourse, numberOfWeek)) {
+                                    loadTrackCourse(currentTrackCourse, numberOfWeek, invoiceCost);
+                                    addPartsOfDeliveryRoute(currentTrackCourse, numberOfWeek, partOfDeliveryRouteList);
+                                    trackCourseForCompare = currentTrackCourse;
+                                    index = j;
+                                    break;
                                 }
                             }
                         }
@@ -310,6 +319,42 @@ public class Optimizer implements IOptimizer {
                     }
                 }
             }
+        }
+    }
+
+    /** add in invoice's parts of delivery routes track course and number of week
+     *
+     * @param trackCourse
+     * @param numberOfWeek
+     * @param partOfDeliveryRoutes
+     */
+    public void addPartsOfDeliveryRoute(TrackCourse trackCourse, int numberOfWeek, List<PartOfDeliveryRoute> partOfDeliveryRoutes){
+        PartOfDeliveryRoute partOfDeliveryRoute = new PartOfDeliveryRoute();
+        partOfDeliveryRoute.setTrackCourse(trackCourse);
+        partOfDeliveryRoute.setNumberOfWeek(numberOfWeek);
+        partOfDeliveryRoutes.add(partOfDeliveryRoute);
+    }
+
+    /** add cost to load units of track course
+     *
+     * @param trackCourse
+     * @param numberOfWeek
+     * @param invoiceCost
+     */
+    public void loadTrackCourse(TrackCourse trackCourse, int numberOfWeek, double invoiceCost){
+        List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
+        int count = 0;
+        for (LoadUnit loadUnit : loadUnits) {
+            if (loadUnit.getNumberOfWeek() == numberOfWeek) {
+                count++;
+                loadUnit.setLoadCost(loadUnit.getLoadCost() + invoiceCost);
+            }
+        }
+        if (count == 0 || loadUnits.size() == 0) {
+            LoadUnit loadUnit = new LoadUnit();
+            loadUnit.setNumberOfWeek(numberOfWeek);
+            loadUnit.setLoadCost(invoiceCost);
+            trackCourse.getLoadUnits().add(loadUnit);
         }
     }
 
@@ -346,39 +391,15 @@ public class Optimizer implements IOptimizer {
     public boolean isFittingTrackCourseByLoadCostAndNumberOfWeek(Invoice invoice, TrackCourse trackCourse, int numberOfWeek){
         double invoiceCost = invoice.getCost();
         if(trackCourse.getLoadUnits().size() == 0){
-            LoadUnit loadUnit = new LoadUnit();
-            loadUnit.setNumberOfWeek(numberOfWeek);
-            loadUnit.setLoadCost(invoiceCost);
-            trackCourse.getLoadUnits().add(loadUnit);
-            System.out.println(trackCourse.getLoadUnits().size());
-            System.out.println(trackCourse);
-            System.out.println("HEY");
             return true;
         }else {
             List<LoadUnit> loadUnits = trackCourse.getLoadUnits();
-            int count = 0;
             for(LoadUnit loadUnit: loadUnits){
                 if(loadUnit.getNumberOfWeek() == numberOfWeek){
-                    count++;
-                    System.out.println(loadUnit.getLoadCost() + invoiceCost > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost());
                     if((loadUnit.getLoadCost() + invoiceCost) > trackCourse.getRoute().getCharacteristicsOfCar().getOccupancyCost()) {
-                        System.out.println(loadUnit.getLoadCost() + invoiceCost);
-                        System.out.println(loadUnit.getLoadCost());
-                        System.out.println("I'M HERE");
                         return false;
-                    }else {
-                        loadUnit.setLoadCost(loadUnit.getLoadCost() + invoiceCost);
-                        System.out.println(loadUnit.getLoadCost());
-                        System.out.println("HEX");
                     }
                 }
-            }
-            if(count == 0){
-                LoadUnit loadUnit = new LoadUnit();
-                loadUnit.setNumberOfWeek(numberOfWeek);
-                loadUnit.setLoadCost(invoiceCost);
-                trackCourse.getLoadUnits().add(loadUnit);
-                System.out.println("HEC");
             }
         }
         return true;
