@@ -45,6 +45,7 @@ public class InsertOrUpdateTransactionScript {
         TransactionExecutor transactionExecutor = new TransactionExecutor();
         transactionExecutor.setConnection(connection);
         PackageData packageData = dataFrom1c.getPackageData();
+
         transactionExecutor.put(1, new UpdateExchange(dataFrom1c));
         transactionExecutor.put(2, new UpdatePoints(packageData.getUpdatePoints(), packageData.getUpdateAddresses()));
         transactionExecutor.put(3, new UpdateRoutes(packageData.getUpdateDirections(), packageData.getUpdateRouteLists()));

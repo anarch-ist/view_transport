@@ -1,83 +1,35 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
--- _errorMessage must be less or equal 110 symbols
--- CREATE PROCEDURE generateLogistError(_errorMessage TEXT)
--- BEGIN
--- SET @message_text = concat('LOGIST ERROR: ', _errorMessage);
--- SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = @message_text;
--- END;
-
 -- -------------------------------------------------------------------------------------------------------------------
---                                                  DATA SOURCES
--- -------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE data_sources (
-  dataSourceID VARCHAR(32) PRIMARY KEY
-);
-INSERT INTO data_sources
-VALUES
-  ('LOGIST_1C')
-  ,('ADMIN_PAGE');
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                 CLIENTS
+--                                                 SUPPLIERS
 -- -------------------------------------------------------------------------------------------------------------------
 
 -- entity
 CREATE TABLE suppliers (
-  supplierID          SERIAL,
-  supplierIDExternal  VARCHAR(255) NOT NULL,
-  dataSourceID      VARCHAR(32)  NOT NULL,
-  INN               VARCHAR(32)  NOT NULL,
-  clientName        VARCHAR(255) NULL,
-  KPP               VARCHAR(64)  NULL,
-  corAccount        VARCHAR(64)  NULL,
-  curAccount        VARCHAR(64)  NULL,
-  BIK               VARCHAR(64)  NULL,
-  bankName          VARCHAR(128) NULL,
-  contractNumber    VARCHAR(64)  NULL,
-  dateOfSigning     DATE         NULL,
-  startContractDate DATE         NULL,
-  endContractDate   DATE         NULL,
-  PRIMARY KEY (supplierID),
-  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
-  UNIQUE(supplierIDExternal, dataSourceID)
+  supplierID         SERIAL,
+  INN                VARCHAR(32)  NOT NULL,
+  clientName         VARCHAR(255) NULL,
+  KPP                VARCHAR(64)  NULL,
+  corAccount         VARCHAR(64)  NULL,
+  curAccount         VARCHAR(64)  NULL,
+  BIK                VARCHAR(64)  NULL,
+  bankName           VARCHAR(128) NULL,
+  contractNumber     VARCHAR(64)  NULL,
+  dateOfSigning      DATE         NULL,
+  startContractDate  DATE         NULL,
+  endContractDate    DATE         NULL,
+  PRIMARY KEY (supplierID)
 );
 
+
 -- -------------------------------------------------------------------------------------------------------------------
---                                        USERS ROLES PERMISSIONS AND POINTS
+--                                                 POINTS
 -- -------------------------------------------------------------------------------------------------------------------
 
-CREATE TABLE user_roles (
-  userRoleID      VARCHAR(32),
-  userRoleRusName VARCHAR(128),
-  PRIMARY KEY (userRoleID)
-);
-
-INSERT INTO user_roles (userRoleID, userRoleRusName)
-VALUES
-  -- администратор, ему доступен полный графический интерфейс сайта и самые высокие права на изменение в БД:
-  -- имеет право изменить роль пользователя
-  ('W_BOSS', 'Руководитель склада'),
-  -- показывать заявки, которые проходят через пункт к которому приписан W_DISPATCHER
-  -- диспетчер склада, доступна часть GUI и соответсвующие права на изменения в БД  возможность для каждого маршрутного листа или отдельной накладной заносить кол-во паллет и статус убыл
-  ('WH_DISPATCHER', 'Диспетчер_склада'),
-  -- показывать заявки, которые проходят через пункт к которому приписан DISPATCHER
-  -- диспетчер, доступен GUI для установки статуса накладных или маршрутных листов и соответсвующие права на изменения в БД, статус прибыл, и статус убыл, статус "ошибка".
-  ('SUPPLIER_MANAGER', 'Пользователь_поставщика')
-
--- TODO сделать правильну работу для указанных ниже ролей пользователей, прописать ограничения в таблице users
--- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
--- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
--- ('TEMP_REMOVED', 'Временно_удален'),
--- ('VIEW_LAST_TEN', 'Последние_десять')
-;
 -- entity
 CREATE TABLE points (
   pointID             SERIAL,
-  pointIDExternal     VARCHAR(128)   NOT NULL,
-  dataSourceID        VARCHAR(32)    NOT NULL,
   pointName           VARCHAR(128)   NOT NULL,
   region              VARCHAR(128)   NULL,
   district            VARCHAR(64)    NULL,
@@ -87,12 +39,117 @@ CREATE TABLE points (
   email               VARCHAR(255)   NULL,
   phoneNumber         VARCHAR(16)    NULL,
   responsiblePersonId VARCHAR(128)   NULL,
-  PRIMARY KEY (pointID),
-  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID)
+  PRIMARY KEY (pointID)
+);
+
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                 USERS
+-- -------------------------------------------------------------------------------------------------------------------
+
+
+CREATE TABLE user_roles (
+  userRoleID      VARCHAR(32),
+  userRoleRusName VARCHAR(128),
+  PRIMARY KEY (userRoleID)
+);
+
+INSERT INTO user_roles (userRoleID, userRoleRusName)
+VALUES
+  ('W_BOSS', 'Руководитель склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
+  ('WH_DISPATCHER', 'Диспетчер_склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
+  ('SUPPLIER_MANAGER', 'Пользователь_поставщика') -- поставщик, не имеет пункта, но ссылается на поставщика
+;
+
+-- entity
+CREATE TABLE abstract_users (
+  userID      SERIAL,
+  login       VARCHAR(255) NOT NULL,
+  salt        CHAR(16)     NOT NULL,
+  passAndSalt VARCHAR(64)  NOT NULL,
+  userRoleID  VARCHAR(32)  NOT NULL,
+  userName    VARCHAR(255) NULL,
+  phoneNumber VARCHAR(255) NULL,
+  email       VARCHAR(255) NULL,
+  position    VARCHAR(64)  NULL, -- должность
+  PRIMARY KEY (userID),
+  FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE,
-  UNIQUE(pointIDExternal, dataSourceID)
+  UNIQUE (login)
 );
+
+-- W_BOSS  WH_DISPATCHER
+CREATE TABLE point_users (
+  userID  INTEGER,
+  pointID INTEGER NOT NULL,
+  PRIMARY KEY (userID),
+  FOREIGN KEY (userID) REFERENCES abstract_users,
+  FOREIGN KEY (pointID) REFERENCES points (pointID)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE
+);
+
+-- SUPPLIER_MANAGER
+CREATE TABLE suppliers_users (
+  userID  INTEGER,
+  supplierID INTEGER NOT NULL,
+  PRIMARY KEY (userID),
+  FOREIGN KEY (userID) REFERENCES abstract_users,
+  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE
+);
+
+
+CREATE TABLE permissions (
+  permissionID VARCHAR(32),
+  PRIMARY KEY (permissionID)
+);
+
+-- TODO create real permissions
+INSERT INTO permissions (permissionID)
+VALUES
+  ('testPerm1'),
+  ('testPerm2'),
+  ('testPerm3');
+
+CREATE TABLE permissions_for_roles (
+  userRoleID   VARCHAR(32),
+  permissionID VARCHAR(32),
+  PRIMARY KEY (userRoleID, permissionID),
+  FOREIGN KEY (permissionID) REFERENCES permissions (permissionID)
+  ON DELETE RESTRICT
+  ON UPDATE RESTRICT,
+  FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
+  ON DELETE RESTRICT
+  ON UPDATE RESTRICT
+);
+
+CREATE OR REPLACE FUNCTION insert_permission_for_role(_userRoleID VARCHAR(32), _permissionID VARCHAR(32))
+  RETURNS VOID AS
+$$
+BEGIN
+  INSERT INTO permissions_for_roles (userRoleID, permissionID) SELECT
+                                                                 user_roles.userRoleID,
+                                                                 permissions.permissionID
+                                                               FROM user_roles, permissions
+                                                               WHERE user_roles.userRoleID = _userRoleID AND
+                                                                     permissions.permissionID = _permissionID;
+END;
+$$
+LANGUAGE plpgsql;
+
+SELECT insert_permission_for_role('W_BOSS', 'testPerm1');
+SELECT insert_permission_for_role('W_BOSS', 'testPerm2');
+SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
+SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                        USERS ROLES PERMISSIONS AND POINTS
+-- -------------------------------------------------------------------------------------------------------------------
+
+
 
 CREATE TABLE docs (
   docID INTEGER,
@@ -125,10 +182,10 @@ CREATE TYPE DOC_STATE AS ENUM ('FREE', 'OCCUPIED', 'OCCUPIED_BY_BOSS');
 -- entity
 CREATE TABLE docs_container (
   containerID SERIAL,
-  docID      INTEGER,
-  timeDiffID INTEGER,
-  date       TIMESTAMP,
-  docState   DOC_STATE DEFAULT 'FREE',
+  docID       INTEGER,
+  timeDiffID  INTEGER,
+  date        TIMESTAMP,
+  docState    DOC_STATE DEFAULT 'FREE',
   UNIQUE (docID, timeDiffID, date),
   PRIMARY KEY (containerID),
   FOREIGN KEY (docID) REFERENCES docs (docID),
@@ -138,9 +195,9 @@ CREATE TABLE docs_container (
 
 CREATE TYPE STATUS AS ENUM ('CREATED','UPDATED','DELETED');
 
-CREATE TABLE docs_container_history(
-  docsHistoryID SERIAL8,
-  containerID    INTEGER,
+CREATE TABLE docs_container_history (
+  docsHistoryID SERIAL,
+  containerID   INTEGER,
   docID         INTEGER,
   timeDiffID    INTEGER,
   date          TIMESTAMP,
@@ -177,72 +234,11 @@ EXECUTE PROCEDURE insertHistory();
 CREATE TRIGGER after_docs_container_delete AFTER DELETE ON docs_container
 FOR EACH ROW
 EXECUTE PROCEDURE insertHistoryDelete();
--- entity
-CREATE TABLE users (
-  userID         SERIAL,
-  userIDExternal VARCHAR(255) NOT NULL,
-  dataSourceID   VARCHAR(32)  NOT NULL,
-  login          VARCHAR(255) NOT NULL,
-  salt           CHAR(16)     NOT NULL,
-  passAndSalt    VARCHAR(64)  NOT NULL,
-  userRoleID     VARCHAR(32)  NOT NULL,
-  userName       VARCHAR(255) NULL,
-  phoneNumber    VARCHAR(255) NULL,
-  email          VARCHAR(255) NULL,
-  position       VARCHAR(64)  NULL, -- должность
-  pointID        INTEGER      NULL, -- у ADMIN и CLIENT_MANAGER и MARKET_AGENT не может быть пункта, у W_DISPATCHER и DISPATCHER обязан быть пункт
-  supplierID       INTEGER      NULL, -- у CLIENT_MANAGER обязан быть clientID, у ADMIN W_DISPATCHER DISPATCHER и MARKET_AGENT его быть не должно
-  PRIMARY KEY (userID),
-  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
-  FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE,
-  FOREIGN KEY (pointID) REFERENCES points (pointID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE,
-  FOREIGN KEY (supplierID ) REFERENCES suppliers (supplierID )
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE,
-  UNIQUE (userIDExternal, dataSourceID),
-  UNIQUE (login)
-);
-
--- CREATE PROCEDURE checkUserConstraints(_userRoleID VARCHAR(255), _pointID INTEGER, _supplierID INTEGER, _userIDExternal VARCHAR(255), _login VARCHAR(255))
--- BEGIN
--- IF (_userRoleID IN ( 'SUPPLIER_MANAGER') AND _pointID IS NOT NULL) THEN
--- CALL generateLogistError(CONCAT('W_BOSS  can\'t have a point. userIDExternal = ', _userIDExternal, ', login = ', _login));
---     END IF;
---
---     IF (_userRoleID IN ('W_BOSS','WH_DISPATCHER') AND _pointID IS NULL) THEN
---       CALL generateLogistError(CONCAT('WH_DISPATCHER must have a point. userIDExternal = ', _userIDExternal, ', login = ', _login));
---     END IF;
---
---     IF (_userRoleID = 'SUPPLIER_MANAGER' AND _supplierID IS NULL) THEN
---       CALL generateLogistError(CONCAT('SUPPLIER_MANAGER must have clientID. userIDExternal = ', _userIDExternal, ', login = ', _login));
---     END IF;
---   END;
---
--- CREATE TRIGGER check_users_constraints_insert BEFORE INSERT ON users
--- FOR EACH ROW
---   CALL checkUserConstraints(NEW.userRoleID, NEW.pointID, NEW.supplierID, NEW.userIDExternal, NEW.login);
---
--- CREATE TRIGGER check_users_constraints_update BEFORE UPDATE ON users
--- FOR EACH ROW
---   CALL checkUserConstraints(NEW.userRoleID, NEW.pointID, NEW.supplierID, NEW.userIDExternal, NEW.login);
-
-
-CREATE TABLE permissions (
-  permissionID VARCHAR(32),
-  PRIMARY KEY (permissionID)
-);
-
 
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                          ROUTE AND ROUTE LISTS
 -- -------------------------------------------------------------------------------------------------------------------
-
-
 
 
 CREATE TABLE donut_statuses (
@@ -303,7 +299,7 @@ CREATE TABLE donut_lists (
 --      OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.supplierID, OLD.comment, 'DELETED');
 
 CREATE TABLE donut_list_history (
-  donutHistoryID    SERIAL8,
+  donutHistoryID    SERIAL,
   timeMark          TIMESTAMP    NOT NULL,
   donutID           SERIAL,
   creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -325,8 +321,6 @@ CREATE TABLE donut_list_history (
 -- entity
 CREATE TABLE wants (
   wantsID                 SERIAL,
---   wantsIDExternal         VARCHAR(255)   NOT NULL,
---   dataSourceID            VARCHAR(32)    NOT NULL,
   wantsNumber             VARCHAR(16)    NOT NULL,
   wantstDate              DATE           NULL,
   supplierID              INTEGER        NOT NULL,
@@ -350,7 +344,7 @@ CREATE TABLE wants (
   FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
+  FOREIGN KEY (lastModifiedBy) REFERENCES abstract_users (userID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY (wantsStatusID) REFERENCES donut_statuses (donutStatusID)
@@ -363,11 +357,9 @@ CREATE TABLE wants (
 
 
 CREATE TABLE wants_history (
-  wantsHistoryID     SERIAL8,
+  wantsHistoryID     SERIAL,
   autoTimeMark       TIMESTAMP      NOT NULL,
   wantsID                 SERIAL,
-  --   wantsIDExternal         VARCHAR(255)   NOT NULL,
-  --   dataSourceID            VARCHAR(32)    NOT NULL,
   wantsNumber             VARCHAR(16)    NOT NULL,
   wantstDate              DATE           NULL,
   supplierID              INTEGER        NOT NULL,
@@ -399,46 +391,8 @@ CREATE TABLE wants_history (
 CREATE TABLE exchange (
   packageNumber INTEGER,
   serverName VARCHAR(32),
-  dataSource VARCHAR(32),
   packageCreated TIMESTAMP,
   packageData TEXT, -- наличие самих данных в соответсвующем порядке позволяет в любой момент пересоздать всю БД.
-  PRIMARY KEY (packageNumber, serverName, dataSource)
+  PRIMARY KEY (packageNumber, serverName)
 );
--- Rows are compressed as they are inserted, https://dev.mysql.com/doc/refman/5.5/en/archive-storage-engine.html
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                   GETTERS
--- -------------------------------------------------------------------------------------------------------------------
-
-
--- CREATE FUNCTION getRoleIDByUserID(_userID INTEGER)
---   RETURNS VARCHAR(32)
---   BEGIN
---     DECLARE result VARCHAR(32);
---     SET result = (SELECT userRoleID
---                   FROM users
---                   WHERE userID = _userID);
---     RETURN result;
---   END;
---
--- CREATE FUNCTION getPointIDByUserID(_userID INTEGER)
---   RETURNS INTEGER
---   BEGIN
---     DECLARE result INTEGER;
---     SET result = (SELECT pointID
---                   FROM users
---                   WHERE userID = _userID);
---     RETURN result;
---   END;
---
--- CREATE FUNCTION getClientIDByUserID(_userID INTEGER)
---   RETURNS INTEGER
---   BEGIN
---     DECLARE result INTEGER;
---     SET result = (SELECT supplierID
---                   FROM users
---                   WHERE userID = _userID);
---     RETURN result;
---   END;
-
 

@@ -378,5 +378,8 @@ password: aftR179Kp
 
 
 
+----------------------ÓÑÒÀÍÎÂÊÀ redmine------------------------------------------------------------
+
+https://www.redmine.org/projects/redmine/wiki/InstallRedmineOnDebianStableApacheMysqlPassenger
 
 

@@ -23,6 +23,7 @@ public class AssignRouteListsInRequestsTable extends TransactionPart{
     public PreparedStatement executePart() throws SQLException {
         if (updateRouteLists.isEmpty())
             return null;
+
         PreparedStatement requestUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET " +
                         "routeListID = (SELECT route_lists.routeListID FROM route_lists WHERE route_lists.routeListIDExternal = ? AND route_lists.dataSourceID = ?)," +

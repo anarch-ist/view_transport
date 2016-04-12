@@ -1,0 +1,23 @@
+package ru.logistica.tms.dao.usersDao;
+
+import java.util.Set;
+
+public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
+
+    // private AbstactUserDaoImpl abstactUserDao; ??
+
+    @Override
+    public Set<SupplierUser> getAllUsers() {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+
+    @Override
+    public SupplierUser getUserById(Integer id) {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+
+    @Override
+    public Integer saveUser(SupplierUser supplierUser) {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+}

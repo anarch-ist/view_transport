@@ -64,6 +64,10 @@ public class PackageData {
     }
 
     private <T> void setValue(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) {
+
+        if (jsonArray.isEmpty())
+            return;
+
         fillList(jsonArray, updateData, dataClazz);
         uniqueCheck(updateData, dataClazz);
     }

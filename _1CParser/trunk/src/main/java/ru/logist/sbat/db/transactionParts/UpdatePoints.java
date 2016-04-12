@@ -23,6 +23,9 @@ public class UpdatePoints extends TransactionPart {
 
     @Override
     public PreparedStatement executePart() throws SQLException {
+        if (updatePointsArray.isEmpty() && updateAddresses.isEmpty())
+            return null;
+
         logger.info("-----------------START update points table from JSON objects:[updatePointsArray], [updateAddresses]-----------------");
 
         PreparedStatement pointsStatement =  connection.prepareStatement(

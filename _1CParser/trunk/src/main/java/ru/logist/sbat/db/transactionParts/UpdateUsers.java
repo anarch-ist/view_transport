@@ -28,6 +28,9 @@ public class UpdateUsers extends TransactionPart{
 
     @Override
     public PreparedStatement executePart() throws SQLException {
+        if (updateMarketAgents.isEmpty() && updateClients.isEmpty())
+            return null;
+
         logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
         PreparedStatement result = connection.prepareStatement(
                 "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +

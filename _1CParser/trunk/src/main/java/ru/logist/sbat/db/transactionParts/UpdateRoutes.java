@@ -26,6 +26,9 @@ public class UpdateRoutes extends TransactionPart{
 
     @Override
     public PreparedStatement executePart() throws SQLException, DBCohesionException {
+        if (updateRoutesArray.isEmpty() && updateRouteLists.isEmpty())
+            return null;
+
         logger.info("-----------------START update routes table from JSON object:[updateDirections]-----------------");
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO routes (directionIDExternal, dataSourceID, routeName) VALUE (?, ?, ?)\n" +

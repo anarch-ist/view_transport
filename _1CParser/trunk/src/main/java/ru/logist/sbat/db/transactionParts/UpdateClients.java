@@ -20,6 +20,9 @@ public class UpdateClients extends TransactionPart{
 
     @Override
     public PreparedStatement executePart() throws SQLException {
+        if (updateClients.isEmpty())
+            return null;
+
         logger.info("-----------------START update clients table from JSON object:[clients]-----------------");
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)\n" +
