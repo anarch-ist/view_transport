@@ -344,7 +344,7 @@ after screen is terminated you should get a message [screen is terminating].
 
 
 
-запуск персера при помощи screen:
+запуск парсера при помощи screen:
 #su
 #screen
 #cd /home/pigin_s/parser
