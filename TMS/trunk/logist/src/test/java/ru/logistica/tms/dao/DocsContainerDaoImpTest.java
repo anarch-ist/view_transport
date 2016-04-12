@@ -5,8 +5,8 @@ import org.junit.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Date;
+import java.util.Set;
 
-import static org.junit.Assert.*;
 
 
 public class DocsContainerDaoImpTest {
@@ -32,6 +32,8 @@ public class DocsContainerDaoImpTest {
 
     @Test
     public void getAll() throws Exception {
+        DocsContainerDao docsContainerDao = new DocsContainerDaoImp();
+        Set<DocsContainer> sets = docsContainerDao.getAll();
 
     }
 

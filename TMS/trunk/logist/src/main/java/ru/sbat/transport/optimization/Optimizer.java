@@ -283,7 +283,6 @@ public class Optimizer implements IOptimizer {
                     }
                     for (int i = 1; i < deliveryRoute.size(); i++) {
                         TrackCourse currentTrackCourse = deliveryRoute.get(i);
-                        System.out.println(currentTrackCourse);
                         for(LoadUnit loadUnit: currentTrackCourse.getLoadUnits()) {
                             System.out.println("loadCost" + loadUnit.getLoadCost());
                         }

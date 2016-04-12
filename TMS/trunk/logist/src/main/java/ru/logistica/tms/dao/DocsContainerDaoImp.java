@@ -29,7 +29,7 @@ class DocsContainerDaoImp implements DocsContainerDao{
 
     @Override
     public DocsContainer getById(int id) throws SQLException {
-        String sql = "SELECT * from docs_container WHERE id = ?"; // name of table
+        String sql = "SELECT * from docs_container WHERE containerId = ?"; // name of table
         DocsContainer docsContainer = new DocsContainer();
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
             statement.setInt(1, id);
