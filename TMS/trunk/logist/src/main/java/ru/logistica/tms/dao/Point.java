@@ -5,10 +5,9 @@ package ru.logistica.tms.dao;
 //import javax.persistence.Entity;
 //import javax.persistence.Id;
 import java.io.Serializable;
-import java.sql.Time;
 
 //@Entity
-public class Points {
+public class Point {
     private Serializable pointId;
     private String pointIdExternal;
     private DataSources dataSourceId;
@@ -149,7 +148,7 @@ public class Points {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Points points = (Points) o;
+        Point points = (Point) o;
 
         if (pointId != null ? !pointId.equals(points.pointId) : points.pointId != null) return false;
         if (pointIdExternal != null ? !pointIdExternal.equals(points.pointIdExternal) : points.pointIdExternal != null) return false;

@@ -45,7 +45,7 @@
 
         <!-- Drop and re-create the database schema on startup (values = [create, update])-->
         <property name="hbm2ddl.auto">create</property>
-        <mapping class="ru.logistica.tms.dao.Points"/>
+        <mapping class="ru.logistica.tms.dao.Point"/>
 
         <!-- ADD THIS CLASSES IN RUNTIME BY MEANS OF addAnnotatedClass() method in Configuration class for test reason.-->
         <!-- Names the annotated entity class -->

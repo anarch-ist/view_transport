@@ -1,8 +1,8 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.sbat.transport.optimization.location.Point;
+import ru.logistica.tms.dao.Point;
 
-public class PointsUser extends PrivelegedUser {
+public class PointUser extends PrivelegedUser {
     private Point point;
 
     public Point getPoint() {
