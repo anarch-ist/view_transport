@@ -1,5 +1,6 @@
-package ru.logistica.tms.dao;
+package ru.logistica.tms.dao.constantsDao;
 
+import ru.logistica.tms.dao.JdbcUtil;
 import ru.logistica.tms.dao.usersDao.DonutStatus;
 import ru.logistica.tms.dao.usersDao.Permission;
 import ru.logistica.tms.dao.usersDao.TimeDiff;
@@ -11,13 +12,11 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ConstantCollections {
-    private static Set<UserRole> userRoles;
-    private static Set<Permission> permissions;
-    private static Set<TimeDiff> timeDiffs;
-    private static Set<DonutStatus> donutStatuses;
+public class ConstantsDaoImpl implements ConstantsDao {
 
-    public static Set<UserRole> getUserRoles() throws SQLException {
+
+    @Override
+    public Set<UserRole> getUserRoles() throws SQLException {
         String sql = "SELECT * from user_roles";
         Set<UserRole> result = new HashSet<>();
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
@@ -32,11 +31,8 @@ public class ConstantCollections {
         return result;
     }
 
-    public static void setUserRoles(Set<UserRole> userRoles) {
-        ConstantCollections.userRoles = userRoles;
-    }
-
-    public static Set<Permission> getPermissions() throws SQLException {
+    @Override
+    public Set<Permission> getPermissions() throws SQLException {
         String sql = "SELECT * from permissions";
         Set<Permission> result = new HashSet<>();
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
@@ -50,11 +46,8 @@ public class ConstantCollections {
         return result;
     }
 
-    public static void setPermissions(Set<Permission> permissions) {
-        ConstantCollections.permissions = permissions;
-    }
-
-    public static Set<TimeDiff> getTimeDiffs() throws SQLException {
+    @Override
+    public Set<TimeDiff> getTimeDiffs() throws SQLException {
         String sql = "SELECT * from time_diffs";
         Set<TimeDiff> result = new HashSet<>();
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
@@ -68,11 +61,8 @@ public class ConstantCollections {
         return result;
     }
 
-    public static void setTimeDiffs(Set<TimeDiff> timeDiffs) {
-        ConstantCollections.timeDiffs = timeDiffs;
-    }
-
-    public static Set<DonutStatus> getDonutStatuses() throws SQLException {
+    @Override
+    public Set<DonutStatus> getDonutStatuses() throws SQLException {
         String sql = "SELECT * from donut_statuses";
         Set<DonutStatus> result = new HashSet<>();
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
@@ -85,9 +75,5 @@ public class ConstantCollections {
             }
         }
         return result;
-    }
-
-    public static void setDonutStatuses(Set<DonutStatus> donutStatuses) {
-        ConstantCollections.donutStatuses = donutStatuses;
     }
 }

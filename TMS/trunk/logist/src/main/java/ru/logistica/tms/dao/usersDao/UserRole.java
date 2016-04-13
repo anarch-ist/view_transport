@@ -12,6 +12,7 @@ public class UserRole {
                 '}';
     }
 
+
     public String getUserRoleId() {
         return userRoleId;
     }
@@ -27,4 +28,6 @@ public class UserRole {
     public void setUserRoleRusName(String userRoleRusName) {
         this.userRoleRusName = userRoleRusName;
     }
+
+
 }
