@@ -37,17 +37,15 @@
     <script type="text/javascript" language="javascript" src="content/js/statusChangeDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/columnSelectDialog.js"></script>
 
-
-
 </head>
 <body>
 
-<div class="container" style="margin-top:10px">
+<div class="container">
 
     <div id="menu"
-         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: -5px; margin-bottom: -10px;">
+         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: -5px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
-            <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;margin-bottom: 10px;">
+            <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php
                 $data = $privUser->getUserInfo()->toArray();
 
@@ -64,9 +62,7 @@
             <button id="logout">выйти</button>
         </div>
     </div>
-<br>
-    <br>
-    <br>
+
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
         <thead>
         <tr>
