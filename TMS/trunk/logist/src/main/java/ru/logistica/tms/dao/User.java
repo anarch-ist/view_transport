@@ -1,12 +1,12 @@
 package ru.logistica.tms.dao;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+//import javax.persistence.Basic;
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
 import java.io.Serializable;
 
-@Entity
+//@Entity
 public class User {
     private Serializable userId;
     private String userIdExternal;
@@ -22,8 +22,8 @@ public class User {
     private Integer pointId;
     private Integer supplierId;
 
-    @Id
-    @Column(name = "userId")
+//    @Id
+//    @Column(name = "userId")
     public Serializable getUserId() {
         return userId;
     }
@@ -32,8 +32,8 @@ public class User {
         this.userId = userId;
     }
 
-    @Basic
-    @Column(name = "userIdExternal")
+//    @Basic
+//    @Column(name = "userIdExternal")
     public String getUserIdExternal() {
         return userIdExternal;
     }
@@ -42,8 +42,8 @@ public class User {
         this.userIdExternal = userIdExternal;
     }
 
-    @Basic
-    @Column(name = "dataSourceId")
+//    @Basic
+//    @Column(name = "dataSourceId")
     public DataSources getDataSourceId() {
         return dataSourceId;
     }
@@ -52,8 +52,8 @@ public class User {
         this.dataSourceId = dataSourceId;
     }
 
-    @Basic
-    @Column(name = "login")
+//    @Basic
+//    @Column(name = "login")
     public String getLogin() {
         return login;
     }
@@ -62,8 +62,8 @@ public class User {
         this.login = login;
     }
 
-    @Basic
-    @Column(name = "salt")
+//    @Basic
+//    @Column(name = "salt")
     public Character getSalt() {
         return salt;
     }
@@ -72,8 +72,8 @@ public class User {
         this.salt = salt;
     }
 
-    @Basic
-    @Column(name = "passAndSalt")
+//    @Basic
+//    @Column(name = "passAndSalt")
     public String getPassAndSalt() {
         return passAndSalt;
     }
@@ -82,8 +82,8 @@ public class User {
         this.passAndSalt = passAndSalt;
     }
 
-    @Basic
-    @Column(name = "userRoleId")
+//    @Basic
+//    @Column(name = "userRoleId")
     public String getUserRoleId() {
         return userRoleId;
     }
@@ -92,8 +92,8 @@ public class User {
         this.userRoleId = userRoleId;
     }
 
-    @Basic
-    @Column(name = "userName")
+//    @Basic
+//    @Column(name = "userName")
     public String getUserName() {
         return userName;
     }
@@ -102,8 +102,8 @@ public class User {
         this.userName = userName;
     }
 
-    @Basic
-    @Column(name = "phoneNumber")
+//    @Basic
+//    @Column(name = "phoneNumber")
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -112,8 +112,8 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    @Basic
-    @Column(name = "email")
+//    @Basic
+//    @Column(name = "email")
     public String getEmail() {
         return email;
     }
@@ -122,8 +122,8 @@ public class User {
         this.email = email;
     }
 
-    @Basic
-    @Column(name = "position")
+//    @Basic
+//    @Column(name = "position")
     public String getPosition() {
         return position;
     }
@@ -132,8 +132,8 @@ public class User {
         this.position = position;
     }
 
-    @Basic
-    @Column(name = "pointId")
+//    @Basic
+//    @Column(name = "pointId")
     public Integer getPointId() {
         return pointId;
     }
@@ -141,8 +141,8 @@ public class User {
     public void setPointId(Integer pointId) {
         this.pointId = pointId;
     }
-    @Basic
-    @Column(name = "supplierId")
+//    @Basic
+//    @Column(name = "supplierId")
     public Integer getSupplierId() {
         return supplierId;
     }

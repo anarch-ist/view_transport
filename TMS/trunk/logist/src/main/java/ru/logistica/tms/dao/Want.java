@@ -1,13 +1,13 @@
 package ru.logistica.tms.dao;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+//import javax.persistence.Basic;
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
+//@Entity
 public class Want {
     private Serializable wantsID;
     private String wantsNumber;
@@ -27,8 +27,8 @@ public class Want {
     private String commentForStatus;
     private Integer donutId;
 
-    @Id
-    @Column(name = "wantsID")
+//    @Id
+//    @Column(name = "wantsID")
     public Serializable getWantsID() {
         return wantsID;
     }
@@ -37,8 +37,8 @@ public class Want {
         this.wantsID = wantsID;
     }
 
-    @Basic
-    @Column(name = "wantsNumber")
+//    @Basic
+//    @Column(name = "wantsNumber")
     public String getWantsNumber() {
         return wantsNumber;
     }
@@ -47,8 +47,8 @@ public class Want {
         this.wantsNumber = wantsNumber;
     }
 
-    @Basic
-    @Column(name = "wantsDate")
+//    @Basic
+//    @Column(name = "wantsDate")
     public Date getWantsDate() {
         return wantsDate;
     }
@@ -57,8 +57,8 @@ public class Want {
         this.wantsDate = wantsDate;
     }
 
-    @Basic
-    @Column(name = "supplierId")
+//    @Basic
+//    @Column(name = "supplierId")
     public Integer getSupplierId() {
         return supplierId;
     }
@@ -67,8 +67,8 @@ public class Want {
         this.supplierId = supplierId;
     }
 
-    @Basic
-    @Column(name = "destinationPointId")
+//    @Basic
+//    @Column(name = "destinationPointId")
     public Integer getDestinationPointId() {
         return destinationPointId;
     }
@@ -77,8 +77,8 @@ public class Want {
         this.destinationPointId = destinationPointId;
     }
 
-    @Basic
-    @Column(name = "invoiceNumber")
+//    @Basic
+//    @Column(name = "invoiceNumber")
     public String getInvoiceNumber() {
         return invoiceNumber;
     }
@@ -87,8 +87,8 @@ public class Want {
         this.invoiceNumber = invoiceNumber;
     }
 
-    @Basic
-    @Column(name = "invoiceDate")
+//    @Basic
+//    @Column(name = "invoiceDate")
     public Date getInvoiceDate() {
         return invoiceDate;
     }
@@ -97,8 +97,8 @@ public class Want {
         this.invoiceDate = invoiceDate;
     }
 
-    @Basic
-    @Column(name = "deliveryDate")
+//    @Basic
+//    @Column(name = "deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -107,8 +107,8 @@ public class Want {
         this.deliveryDate = deliveryDate;
     }
 
-    @Basic
-    @Column(name = "boxQty")
+//    @Basic
+//    @Column(name = "boxQty")
     public Integer getBoxQty() {
         return boxQty;
     }
@@ -117,8 +117,8 @@ public class Want {
         this.boxQty = boxQty;
     }
 
-    @Basic
-    @Column(name = "weight")
+//    @Basic
+//    @Column(name = "weight")
     public Integer getWeight() {
         return weight;
     }
@@ -127,8 +127,8 @@ public class Want {
         this.weight = weight;
     }
 
-    @Basic
-    @Column(name = "volume")
+//    @Basic
+//    @Column(name = "volume")
     public Integer getVolume() {
         return volume;
     }
@@ -137,8 +137,8 @@ public class Want {
         this.volume = volume;
     }
 
-    @Basic
-    @Column(name = "goodsCost")
+//    @Basic
+//    @Column(name = "goodsCost")
     public Double getGoodsCost() {
         return goodsCost;
     }
@@ -147,8 +147,8 @@ public class Want {
         this.goodsCost = goodsCost;
     }
 
-    @Basic
-    @Column(name = "lastStatusUpdated")
+//    @Basic
+//    @Column(name = "lastStatusUpdated")
     public Date getLastStatusUpdated() {
         return lastStatusUpdated;
     }
@@ -161,8 +161,8 @@ public class Want {
         }
     }
 
-    @Basic
-    @Column(name = "lastModifiedBy")
+//    @Basic
+//    @Column(name = "lastModifiedBy")
     public Integer getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -171,8 +171,8 @@ public class Want {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    @Basic
-    @Column(name = "wantsStatusId")
+//    @Basic
+//    @Column(name = "wantsStatusId")
     public DonutStatuses getWantsStatusId() {
         return wantsStatusId;
     }
@@ -181,8 +181,8 @@ public class Want {
         this.wantsStatusId = wantsStatusId;
     }
 
-    @Basic
-    @Column(name = "commentForStatus")
+//    @Basic
+//    @Column(name = "commentForStatus")
     public String getCommentForStatus() {
         return commentForStatus;
     }
@@ -191,8 +191,8 @@ public class Want {
         this.commentForStatus = commentForStatus;
     }
 
-    @Basic
-    @Column(name = "donutId")
+//    @Basic
+//    @Column(name = "donutId")
     public Integer getDonutId() {
         return donutId;
     }

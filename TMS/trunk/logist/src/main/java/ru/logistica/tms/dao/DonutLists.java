@@ -1,14 +1,14 @@
 package ru.logistica.tms.dao;
 
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+//import javax.persistence.Basic;
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
+//@Entity
 public class DonutLists {
     private Serializable donutId;
     private Date creationDate;
@@ -21,8 +21,8 @@ public class DonutLists {
     private String comment;
     private Integer transitPointId;
 
-    @Id
-    @Column(name = "donutId")
+//    @Id
+//    @Column(name = "donutId")
     public Serializable getDonutId() {
         return donutId;
     }
@@ -31,8 +31,8 @@ public class DonutLists {
         this.donutId = donutId;
     }
 
-    @Basic
-    @Column(name = "creationDate")
+//    @Basic
+//    @Column(name = "creationDate")
     public Date getCreationDate() {
         return creationDate;
     }
@@ -41,8 +41,8 @@ public class DonutLists {
         this.creationDate = creationDate;
     }
 
-    @Basic
-    @Column(name = "palletsQty")
+//    @Basic
+//    @Column(name = "palletsQty")
     public Integer getPalletsQty() {
         return palletsQty;
     }
@@ -51,8 +51,8 @@ public class DonutLists {
         this.palletsQty = palletsQty;
     }
 
-    @Basic
-    @Column(name = "supplierId")
+//    @Basic
+//    @Column(name = "supplierId")
     public Integer getSupplierId() {
         return supplierId;
     }
@@ -61,8 +61,8 @@ public class DonutLists {
         this.supplierId = supplierId;
     }
 
-    @Basic
-    @Column(name = "driver")
+//    @Basic
+//    @Column(name = "driver")
     public String getDriver() {
         return driver;
     }
@@ -71,8 +71,8 @@ public class DonutLists {
         this.driver = driver;
     }
 
-    @Basic
-    @Column(name = "driverPhoneNumber")
+//    @Basic
+//    @Column(name = "driverPhoneNumber")
     public String getDriverPhoneNumber() {
         return driverPhoneNumber;
     }
@@ -81,8 +81,8 @@ public class DonutLists {
         this.driverPhoneNumber = driverPhoneNumber;
     }
 
-    @Basic
-    @Column(name = "licensePlate")
+//    @Basic
+//    @Column(name = "licensePlate")
     public String getLicensePlate() {
         return licensePlate;
     }
@@ -91,8 +91,8 @@ public class DonutLists {
         this.licensePlate = licensePlate;
     }
 
-    @Basic
-    @Column(name = "status")
+//    @Basic
+//    @Column(name = "status")
     public DonutStatuses getStatus() {
         return status;
     }
@@ -101,8 +101,8 @@ public class DonutLists {
         this.status = status;
     }
 
-    @Basic
-    @Column(name = "comment")
+//    @Basic
+//    @Column(name = "comment")
     public String getComment() {
         return comment;
     }
@@ -111,8 +111,8 @@ public class DonutLists {
         this.comment = comment;
     }
 
-    @Basic
-    @Column(name = "transitPointId")
+//    @Basic
+//    @Column(name = "transitPointId")
     public Integer getTransitPointId() {
         return transitPointId;
     }

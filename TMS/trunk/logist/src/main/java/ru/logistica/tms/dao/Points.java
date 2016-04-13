@@ -1,13 +1,13 @@
 package ru.logistica.tms.dao;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+//import javax.persistence.Basic;
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
 import java.io.Serializable;
 import java.sql.Time;
 
-@Entity
+//@Entity
 public class Points {
     private Serializable pointId;
     private String pointIdExternal;
@@ -23,8 +23,8 @@ public class Points {
     private String responsiblePersonId;
 
 
-    @Id
-    @Column(name = "pointId")
+//    @Id
+//    @Column(name = "pointId")
     public Serializable getPointId() {
         return pointId;
     }
@@ -33,8 +33,8 @@ public class Points {
         this.pointId = pointId;
     }
 
-    @Basic
-    @Column(name = "pointIdExternal")
+//    @Basic
+//    @Column(name = "pointIdExternal")
     public String getPointIdExternal() {
         return pointIdExternal;
     }
@@ -43,8 +43,8 @@ public class Points {
         this.pointIdExternal = pointIdExternal;
     }
 
-    @Basic
-    @Column(name = "dataSourcesId")
+//    @Basic
+//    @Column(name = "dataSourcesId")
     public DataSources getDataSourceId() {
         return dataSourceId;
     }
@@ -53,8 +53,8 @@ public class Points {
         this.dataSourceId = dataSourceId;
     }
 
-    @Basic
-    @Column(name = "pointName")
+//    @Basic
+//    @Column(name = "pointName")
     public String getPointName() {
         return pointName;
     }
@@ -63,8 +63,8 @@ public class Points {
         this.pointName = pointName;
     }
 
-    @Basic
-    @Column(name = "region")
+//    @Basic
+//    @Column(name = "region")
     public String getRegion() {
         return region;
     }
@@ -73,8 +73,8 @@ public class Points {
         this.region = region;
     }
 
-    @Basic
-    @Column(name = "district")
+//    @Basic
+//    @Column(name = "district")
     public String getDistrict() {
         return district;
     }
@@ -83,8 +83,8 @@ public class Points {
         this.district = district;
     }
 
-    @Basic
-    @Column(name = "locality")
+//    @Basic
+//    @Column(name = "locality")
     public String getLocality() {
         return locality;
     }
@@ -93,8 +93,8 @@ public class Points {
         this.locality = locality;
     }
 
-    @Basic
-    @Column(name = "mailIndex")
+//    @Basic
+//    @Column(name = "mailIndex")
     public String getMailIndex() {
         return mailIndex;
     }
@@ -103,8 +103,8 @@ public class Points {
         this.mailIndex = mailIndex;
     }
 
-    @Basic
-    @Column(name = "address")
+//    @Basic
+//    @Column(name = "address")
     public String getAddress() {
         return address;
     }
@@ -113,8 +113,8 @@ public class Points {
         this.address = address;
     }
 
-    @Basic
-    @Column(name = "email")
+//    @Basic
+//    @Column(name = "email")
     public String getEmail() {
         return email;
     }
@@ -123,8 +123,8 @@ public class Points {
         this.email = email;
     }
 
-    @Basic
-    @Column(name = "phoneNumber")
+//    @Basic
+//    @Column(name = "phoneNumber")
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -133,8 +133,8 @@ public class Points {
         this.phoneNumber = phoneNumber;
     }
 
-    @Basic
-    @Column(name = "responsiblePersonId")
+//    @Basic
+//    @Column(name = "responsiblePersonId")
     public String getResponsiblePersonId() {
         return responsiblePersonId;
     }

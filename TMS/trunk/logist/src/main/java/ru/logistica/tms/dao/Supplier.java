@@ -1,13 +1,13 @@
 package ru.logistica.tms.dao;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+//import javax.persistence.Basic;
+//import javax.persistence.Column;
+//import javax.persistence.Entity;
+//import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
+//@Entity
 public class Supplier {
     private Serializable supplierID;
     private String supplierIdExternal;
@@ -24,8 +24,8 @@ public class Supplier {
     private Date startContractDate;
     private Date endContractDate;
 
-    @Id
-    @Column(name = "supplierID")
+//    @Id
+//    @Column(name = "supplierID")
     public Serializable getSupplierID() {
         return supplierID;
     }
@@ -34,8 +34,8 @@ public class Supplier {
         this.supplierID = supplierID;
     }
 
-    @Basic
-    @Column(name = "supplierIdExternal")
+//    @Basic
+//    @Column(name = "supplierIdExternal")
     public String getSupplierIdExternal() {
         return supplierIdExternal;
     }
@@ -44,8 +44,8 @@ public class Supplier {
         this.supplierIdExternal = supplierIdExternal;
     }
 
-    @Basic
-    @Column(name = "dataSourceId")
+//    @Basic
+//    @Column(name = "dataSourceId")
     public DataSources getDataSourceId() {
         return dataSourceId;
     }
@@ -54,8 +54,8 @@ public class Supplier {
         this.dataSourceId = dataSourceId;
     }
 
-    @Basic
-    @Column(name = "inn")
+//    @Basic
+//    @Column(name = "inn")
     public String getInn() {
         return inn;
     }
@@ -64,8 +64,8 @@ public class Supplier {
         this.inn = inn;
     }
 
-    @Basic
-    @Column(name = "clientName")
+//    @Basic
+//    @Column(name = "clientName")
     public String getClientName() {
         return clientName;
     }
@@ -74,8 +74,8 @@ public class Supplier {
         this.clientName = clientName;
     }
 
-    @Basic
-    @Column(name = "kpp")
+//    @Basic
+//    @Column(name = "kpp")
     public String getKpp() {
         return kpp;
     }
@@ -84,8 +84,8 @@ public class Supplier {
         this.kpp = kpp;
     }
 
-    @Basic
-    @Column(name = "corAccount")
+//    @Basic
+//    @Column(name = "corAccount")
     public String getCorAccount() {
         return corAccount;
     }
@@ -94,8 +94,8 @@ public class Supplier {
         this.corAccount = corAccount;
     }
 
-    @Basic
-    @Column(name = "curAccount")
+//    @Basic
+//    @Column(name = "curAccount")
     public String getCurAccount() {
         return curAccount;
     }
@@ -104,8 +104,8 @@ public class Supplier {
         this.curAccount = curAccount;
     }
 
-    @Basic
-    @Column(name = "bik")
+//    @Basic
+//    @Column(name = "bik")
     public String getBik() {
         return bik;
     }
@@ -114,8 +114,8 @@ public class Supplier {
         this.bik = bik;
     }
 
-    @Basic
-    @Column(name = "bankName")
+//    @Basic
+//    @Column(name = "bankName")
     public String getBankName() {
         return bankName;
     }
@@ -124,8 +124,8 @@ public class Supplier {
         this.bankName = bankName;
     }
 
-    @Basic
-    @Column(name = "contractNumber")
+//    @Basic
+//    @Column(name = "contractNumber")
     public String getContractNumber() {
         return contractNumber;
     }
@@ -134,8 +134,8 @@ public class Supplier {
         this.contractNumber = contractNumber;
     }
 
-    @Basic
-    @Column(name = "dateOfSigning")
+//    @Basic
+//    @Column(name = "dateOfSigning")
     public Date getDateOfSigning() {
         return dateOfSigning;
     }
@@ -144,8 +144,8 @@ public class Supplier {
         this.dateOfSigning = dateOfSigning;
     }
 
-    @Basic
-    @Column(name = "startContractDate")
+//    @Basic
+//    @Column(name = "startContractDate")
     public Date getStartContractDate() {
         return startContractDate;
     }
@@ -154,8 +154,8 @@ public class Supplier {
         this.startContractDate = startContractDate;
     }
 
-    @Basic
-    @Column(name = "endContractDate")
+//    @Basic
+//    @Column(name = "endContractDate")
     public Date getEndContractDate() {
         return endContractDate;
     }
