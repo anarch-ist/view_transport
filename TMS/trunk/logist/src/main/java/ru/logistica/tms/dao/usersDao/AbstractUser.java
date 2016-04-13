@@ -1,6 +1,8 @@
 package ru.logistica.tms.dao.usersDao;
 
-public abstract class AbstractUser {
+import ru.logistica.tms.dao.constantsDao.UserRole;
+
+public class AbstractUser {
     private Integer userId;
     private String login;
     private String salt;

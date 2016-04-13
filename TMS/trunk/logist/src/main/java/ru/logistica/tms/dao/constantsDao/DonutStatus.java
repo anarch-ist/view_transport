@@ -1,4 +1,4 @@
-package ru.logistica.tms.dao.usersDao;
+package ru.logistica.tms.dao.constantsDao;
 
 
 public class DonutStatus {

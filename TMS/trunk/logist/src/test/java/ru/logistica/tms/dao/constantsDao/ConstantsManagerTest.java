@@ -4,17 +4,11 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.JdbcUtil;
-import ru.logistica.tms.dao.usersDao.DonutStatus;
-import ru.logistica.tms.dao.usersDao.Permission;
-import ru.logistica.tms.dao.usersDao.TimeDiff;
-import ru.logistica.tms.dao.usersDao.UserRole;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Iterator;
 import java.util.Set;
-
-import static org.testng.Assert.*;
 
 
 public class ConstantsManagerTest {

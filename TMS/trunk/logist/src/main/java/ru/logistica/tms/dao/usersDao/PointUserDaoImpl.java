@@ -4,8 +4,11 @@ import java.util.Set;
 
 public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
+    private AbstractUserDao abstractUserDao = new AbstractUserDaoImpl();
+
     @Override
     public Set<PointUser> getAllUsers() {
+        // SELECT users.userID, users.pointID, ... FROM points_users INNER JOIN (users) ON (users.userID = points_users.userID)
         throw new UnsupportedOperationException("not implemented yet");
     }
 
@@ -15,7 +18,10 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     }
 
     @Override
-    public Integer saveUser(PointUser abstractUser) {
+    public Integer saveOrUpdateUser(PointUser abstractUser) {
+        abstractUserDao.saveOrUpdateUser(abstractUser);
+        // "INSERT INTO points_users SET...";
         throw new UnsupportedOperationException("not implemented yet");
+
     }
 }

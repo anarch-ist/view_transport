@@ -1,10 +1,6 @@
 package ru.logistica.tms.dao.constantsDao;
 
 import ru.logistica.tms.dao.JdbcUtil;
-import ru.logistica.tms.dao.usersDao.DonutStatus;
-import ru.logistica.tms.dao.usersDao.Permission;
-import ru.logistica.tms.dao.usersDao.TimeDiff;
-import ru.logistica.tms.dao.usersDao.UserRole;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

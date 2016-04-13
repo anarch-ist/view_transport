@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
-    // private AbstactUserDaoImpl abstactUserDao; ??
+    // private AbstractUserDaoImpl abstactUserDao; ??
 
     @Override
     public Set<SupplierUser> getAllUsers() {
@@ -17,7 +17,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     }
 
     @Override
-    public Integer saveUser(SupplierUser supplierUser) {
+    public Integer saveOrUpdateUser(SupplierUser supplierUser) {
         throw new UnsupportedOperationException("not implemented yet");
     }
 }

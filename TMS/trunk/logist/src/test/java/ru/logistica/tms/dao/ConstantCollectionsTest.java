@@ -4,10 +4,10 @@ import org.testng.annotations.*;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
-import ru.logistica.tms.dao.usersDao.DonutStatus;
-import ru.logistica.tms.dao.usersDao.Permission;
-import ru.logistica.tms.dao.usersDao.TimeDiff;
-import ru.logistica.tms.dao.usersDao.UserRole;
+import ru.logistica.tms.dao.constantsDao.DonutStatus;
+import ru.logistica.tms.dao.constantsDao.Permission;
+import ru.logistica.tms.dao.constantsDao.TimeDiff;
+import ru.logistica.tms.dao.constantsDao.UserRole;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
