@@ -20,4 +20,9 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     public Integer saveOrUpdateUser(SupplierUser supplierUser) {
         throw new UnsupportedOperationException("not implemented yet");
     }
+
+    @Override
+    public SupplierUser getByLogin(String string) {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
 }

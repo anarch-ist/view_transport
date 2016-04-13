@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
-    private AbstractUserDao abstractUserDao = new AbstractUserDaoImpl();
+    private AbstractUserDaoImpl abstractUserDao = new AbstractUserDaoImpl();
 
     @Override
     public Set<PointUser> getAllUsers() {
@@ -23,5 +23,10 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
         // "INSERT INTO points_users SET...";
         throw new UnsupportedOperationException("not implemented yet");
 
+    }
+
+    @Override
+    public PointUser getByLogin(String string) {
+        throw new UnsupportedOperationException("not implemented yet");
     }
 }

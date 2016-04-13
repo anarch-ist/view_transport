@@ -27,8 +27,9 @@ C:\web\apache-tomcat-8.0.33-windows-x64\apache-tomcat-8.0.33
               xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
               version="1.0">
 
-	<role rolename="manager"/>
-	<user username="admin" password="admin" roles="manager"/>
+	<role rolename="manager-gui"/>
+	<role rolename="manager-script"/>
+	<user username="admin" password="admin" roles="manager-gui,manager-script"/>
 
 </tomcat-users>
 
@@ -54,3 +55,30 @@ C:\web\apache-tomcat-8.0.33-windows-x64\apache-tomcat-8.0.33
 	</configuration>
 </plugin>
 
+
+
+Настройка Intellige IDEa
+версия MAVEN 3.3.9 встроенный лучше не использовать
+
+
+Настройка VirtualHost
+в файл:
+C:\Windows\System32\drivers\etc\hosts 
+добавляем 
+127.0.0.1       tms.ru
+
+в файле C:\web\apache-tomcat-8.0.33-windows-x64\apache-tomcat-8.0.33\conf\server.xml нужно добавить содержание
+
+
+<Host name="tms.ru"  appBase="webapps" unpackWARs="true" autoDeploy="true">
+	<Alias>www.tms.ru</Alias>
+		
+	<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+         prefix="localhost_access_log" suffix=".txt"
+         pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+			   
+	<Context path="" docBase="C:\web\apache-tomcat-8.0.33-windows-x64\apache-tomcat-8.0.33\webapps\logist"
+	   debug="0" reloadable="true"/>
+</Host>
+
+добавлять нужно после тега <Host>, который уже есть в файле.
