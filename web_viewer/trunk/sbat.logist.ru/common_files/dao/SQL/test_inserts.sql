@@ -137,7 +137,12 @@ INSERT INTO requests (requestIDExternal, dataSourceID, requestNumber, requestDat
       ('reqIdExt1', 'LOGIST_1C', 'wewef', NOW(), getClientIDByClientIDExternal('extClId1', 'LOGIST_1C'),
       getPointIDByName('point3'), getUserIDByLogin('user3'), 'wed', NOW(), 'ewdw', NOW(), 'firm1', 'storage1', 'cont_n',
     '9056784321', 'deliv_opt', NOW(), 2, 123, 123, 123, NOW(), getUserIDByLogin('parser'), 'CREATED', 'wef',
+       getPointIDByName('point1'), 1 ,  getPointIDByName('point1') ),
+      ('reqIdExt2', 'LOGIST_1C', 'wewef2', NOW(), getClientIDByClientIDExternal('extClId1', 'LOGIST_1C'),
+       getPointIDByName('point3'), getUserIDByLogin('user3'), 'wed', NOW(), 'ewdw', NOW(), 'firm2', 'storage1', 'cont_n',
+       '9056784321', 'deliv_opt', NOW(), 2, 123, 123, 123, NOW(), getUserIDByLogin('parser'), 'CREATED', 'wef',
        getPointIDByName('point1'), 1 ,  getPointIDByName('point1') );
+
 
 DROP FUNCTION getUserNameByID;
 DROP FUNCTION getClientIDByClientIDExternal;
