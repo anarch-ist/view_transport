@@ -7,10 +7,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonReader;
+import javax.json.JsonStructure;
+import javax.json.stream.JsonParsingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.zip.ZipInputStream;
@@ -51,10 +53,19 @@ public class JSONReadFromFile {
     }
 
     private static JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException {
+
+        String jsonFileAsStringWithoutBom = jsonFileAsString.replaceAll("\uFEFF", "");
+        // TODO use JSONP here
+
+        JsonReader reader = Json.createReader(new StringReader(jsonFileAsStringWithoutBom));
+        JsonStructure jsonst = reader.read();
+        // jsonst.getValueType();
+
         JSONParser parser = new JSONParser();
-        // removing BOM if exists
-        Object obj = parser.parse(jsonFileAsString.replaceAll("\uFEFF", ""));
+        Object obj = parser.parse(jsonFileAsStringWithoutBom);
         return (JSONObject) obj;
     }
+
+
 
 }

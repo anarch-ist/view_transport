@@ -23,13 +23,13 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
 
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA/EKAFIXED.pkg").toURI());
-        dataFrom1c = JSONReadFromFile.readPkg(path);
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("LOG.zip").toURI());
+        dataFrom1c = JSONReadFromFile.readZip(path);
 
         // get connection to database
         Properties testProperties = new Properties();
         testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
-        //testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("prod_config.property"));
+        // testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("prod_config.property"));
         dataBase = new DataBase(
                 testProperties.getProperty("url"),
                 testProperties.getProperty("dbName"),
@@ -39,7 +39,7 @@ public class DataBaseTest {
         );
 
         // clean dataBase content
-        dataBase.truncatePublicTables();
+        // dataBase.truncatePublicTables();
     }
 
     @Test
