@@ -50,7 +50,6 @@ public class AssignStatusesInRequestsTable extends TransactionPart{
             requestsUpdatePreparedStatement.setDate(4, timeOutStatus);
             requestsUpdatePreparedStatement.setString(5, requestIdExternal);
             requestsUpdatePreparedStatement.setString(6, InsertOrUpdateTransactionScript.LOGIST_1C);
-            System.out.println("updateStatus = " + updateStatus);
             requestsUpdatePreparedStatement.addBatch();
         }
         int[] requestsAffectedRecords = requestsUpdatePreparedStatement.executeBatch();

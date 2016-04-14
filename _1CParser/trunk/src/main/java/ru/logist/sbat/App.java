@@ -32,7 +32,9 @@ import java.util.concurrent.Executors;
 // TODO refactor this class
 public class App {
     private static Properties properties;
-    private static final String INCOMING_FILE_EXTENSION = ".pkg";
+
+    private static final String INCOMING_FILE_EXTENSION_ZIP = ".zip";
+    private static final String INCOMING_FILE_EXTENSION_PKG = ".pkg";
     private static final String RESPONSE_FILE_EXTENSION = ".ans";
     static {
         // get All settings from file, logger initialization
@@ -106,25 +108,33 @@ public class App {
             public void onFileCreate(Path filePath) {
 
                 executorService.submit((Runnable) () -> {
-                    if (!filePath.getFileName().toString().endsWith(INCOMING_FILE_EXTENSION)) {
-                        logger.warn("file [{}] must end with [{}] this file will not be imported", filePath, INCOMING_FILE_EXTENSION);
+
+                    String fileName = filePath.getFileName().toString();
+                    if (!(fileName.endsWith(INCOMING_FILE_EXTENSION_ZIP) || fileName.endsWith(INCOMING_FILE_EXTENSION_PKG))) {
+                        logger.warn("file [{}] must end with [{}] or [{}] ,file will not be imported", filePath, INCOMING_FILE_EXTENSION_ZIP, INCOMING_FILE_EXTENSION_PKG);
                     } else {
-                        File file = filePath.toFile();
+
+                        File zipFile = filePath.toFile();
 
                         // wait for loading all data
-                        long currentFileSize = -1;
-                        while (currentFileSize != file.length()) {
-                            currentFileSize = file.length();
-                            try {
-                                Thread.currentThread().sleep(1000);
-                            } catch (InterruptedException e) {/*NOPE*/}
-                            logger.info("wait for loading... file [{}] file size = [{}], size second ago = [{}]", file, file.length(), currentFileSize);
-                        }
+//                        long currentFileSize = -1;
+//                        while (currentFileSize != file.length()) {
+//                            currentFileSize = file.length();
+//                            try {
+//                                Thread.currentThread().sleep(1000);
+//                            } catch (InterruptedException e) {/*NOPE*/}
+//                            logger.info("wait for loading... file [{}] file size = [{}], size second ago = [{}]", file, file.length(), currentFileSize);
+//                        }
 
                         InsertOrUpdateResult insertOrUpdateResult = null;
                         try {
                             logger.info("Start update data from file [{}]", filePath);
-                            DataFrom1c dataFrom1c = JSONReadFromFile.read(filePath);
+                            DataFrom1c dataFrom1c = null;
+                            if (fileName.endsWith(INCOMING_FILE_EXTENSION_ZIP)) {
+                                dataFrom1c = JSONReadFromFile.readZip(filePath);
+                            } else if (fileName.endsWith(INCOMING_FILE_EXTENSION_PKG)) {
+                                dataFrom1c = JSONReadFromFile.readPkg(filePath);
+                            }
                             insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
                             dataBase.refreshMaterializedView();
 
@@ -158,7 +168,7 @@ public class App {
                                     closeAllAndExit();
                                 }
                             } else {
-                                Path responsePath = Paths.get(responseDir).resolve(file.getName() + RESPONSE_FILE_EXTENSION);
+                                Path responsePath = Paths.get(responseDir).resolve(zipFile.getName() + RESPONSE_FILE_EXTENSION);
                                 try {
                                     FileUtils.writeStringToFile(responsePath.toFile(), "Data format error . The details in the log file.", StandardCharsets.UTF_8);
                                 } catch (IOException e) {

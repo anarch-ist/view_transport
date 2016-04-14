@@ -2,8 +2,6 @@ package ru.logist.sbat.jsonParser;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ru.logist.sbat.jsonParser.beans.RouteListsData;
-import ru.logist.sbat.jsonParser.beans.StatusData;
 
 import java.lang.reflect.Field;
 import java.sql.Date;
@@ -131,7 +129,7 @@ public class Util {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);
             Object jsonValue = jsonObject.get(fieldName);
-            Util.checkCorrectType(jsonValue, JSONArray.class, jsonObject);
+            Util.checkCorrectType(jsonValue, JSONObject.class, jsonObject);
             JSONArray jsonArray = (JSONArray) jsonValue;
 
             Set<String> result = new HashSet<>();
