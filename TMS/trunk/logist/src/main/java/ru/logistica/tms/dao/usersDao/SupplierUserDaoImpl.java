@@ -1,10 +1,11 @@
 package ru.logistica.tms.dao.usersDao;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
-    // private AbstractUserDaoImpl abstactUserDao; ??
+//     private AbstractUserDaoImpl abstactUserDao; ??
 
     @Override
     public Set<SupplierUser> getAllUsers() {
@@ -22,7 +23,12 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     }
 
     @Override
-    public SupplierUser getByLogin(String string) {
+    public SupplierUser getByLogin(String login) throws SQLException {
+        throw new UnsupportedOperationException("not implemented yet");
+    }
+
+    @Override
+    public void deleteUserByLogin(String login) {
         throw new UnsupportedOperationException("not implemented yet");
     }
 }

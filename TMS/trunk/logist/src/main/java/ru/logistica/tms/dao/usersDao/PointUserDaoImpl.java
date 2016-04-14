@@ -1,10 +1,11 @@
 package ru.logistica.tms.dao.usersDao;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
-    private AbstractUserDaoImpl abstractUserDao = new AbstractUserDaoImpl();
+//    private AbstractUserDao abstractUserDao = new AbstractUserDaoImpl();
 
     @Override
     public Set<PointUser> getAllUsers() {
@@ -19,14 +20,19 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public Integer saveOrUpdateUser(PointUser abstractUser) {
-        abstractUserDao.saveOrUpdateUser(abstractUser);
+//        abstractUserDao.saveOrUpdateUser(abstractUser);
         // "INSERT INTO points_users SET...";
         throw new UnsupportedOperationException("not implemented yet");
 
     }
 
     @Override
-    public PointUser getByLogin(String string) {
-        throw new UnsupportedOperationException("not implemented yet");
+    public PointUser getByLogin(String login) throws SQLException {
+        return null;
+    }
+
+    @Override
+    public void deleteUserByLogin(String login) {
+
     }
 }

@@ -1,6 +1,8 @@
 package ru.logistica.tms.dao.constantsDao;
 
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 public class ConstantCollections {
@@ -12,6 +14,25 @@ public class ConstantCollections {
 
     public static Set<UserRole> getUserRoles() throws SQLException {
         return userRoles;
+    }
+
+    public static UserRole getUserRoleByUserRoleId(String userRoleId) {
+        Objects.requireNonNull(userRoleId, "userRoleId must not be null");
+        for (UserRole userRole : userRoles) {
+            if (userRole.getUserRoleId().equals(userRoleId))
+                return userRole;
+        }
+        throw new IllegalArgumentException("no userRoleId " + userRoleId + " in collection");
+    }
+
+    public static String getUserRoleIdByUserRole(UserRole userRole) {
+        Objects.requireNonNull(userRole, "userRole must not be null");
+        for (UserRole role : userRoles) {
+            if(role.equals(userRole)){
+                return role.getUserRoleId();
+            }
+        }
+        throw new IllegalArgumentException("no UserRole " + userRole + " in collection");
     }
 
     public static void setUserRoles(Set<UserRole> userRoles) {
