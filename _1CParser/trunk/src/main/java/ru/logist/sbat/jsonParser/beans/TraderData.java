@@ -20,6 +20,7 @@ public class TraderData {
     private String traderPhone;
     private String traderOffice;
 
+
     @Unique
     private String traderLogin;
     private String traderPassword;

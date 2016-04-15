@@ -129,7 +129,7 @@ public class Util {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);
             Object jsonValue = jsonObject.get(fieldName);
-            Util.checkCorrectType(jsonValue, JSONObject.class, jsonObject);
+            Util.checkCorrectType(jsonValue, JSONArray.class, jsonObject);
             JSONArray jsonArray = (JSONArray) jsonValue;
 
             Set<String> result = new HashSet<>();
