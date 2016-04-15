@@ -4,7 +4,11 @@ package ru.logistica.tms.dao;
 //import javax.persistence.Column;
 //import javax.persistence.Entity;
 //import javax.persistence.Id;
+
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 //@Entity
 public class Point {
@@ -21,6 +25,27 @@ public class Point {
     private String phoneNumber;
     private String responsiblePersonId;
 
+
+    public Point getPointById(Integer id) throws SQLException {
+        Point point = new Point();
+        String sql = "SELECT * from points WHERE pointID = ?";
+        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            point.setPointId(resultSet.getInt("pointID"));
+            point.setPointName(resultSet.getString("pointName"));
+            point.setRegion(resultSet.getString("region"));
+            point.setDistrict(resultSet.getString("district"));
+            point.setLocality(resultSet.getString("locality"));
+            point.setMailIndex(resultSet.getString("mailIndex"));
+            point.setAddress(resultSet.getString("address"));
+            point.setEmail(resultSet.getString("email"));
+            point.setPhoneNumber(resultSet.getString("phoneNumber"));
+            point.setResponsiblePersonId(resultSet.getString("responsiblePersonId"));
+        }
+        return point;
+    }
 
 //    @Id
 //    @Column(name = "pointId")

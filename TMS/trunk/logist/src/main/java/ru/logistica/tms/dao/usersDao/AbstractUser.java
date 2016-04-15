@@ -98,4 +98,37 @@ public class AbstractUser {
                 ", position='" + position + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractUser that = (AbstractUser) o;
+
+        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+        if (login != null ? !login.equals(that.login) : that.login != null) return false;
+        if (salt != null ? !salt.equals(that.salt) : that.salt != null) return false;
+        if (passAndSalt != null ? !passAndSalt.equals(that.passAndSalt) : that.passAndSalt != null) return false;
+        if (userRole != null ? !userRole.equals(that.userRole) : that.userRole != null) return false;
+        if (userName != null ? !userName.equals(that.userName) : that.userName != null) return false;
+        if (phoneNumber != null ? !phoneNumber.equals(that.phoneNumber) : that.phoneNumber != null) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
+        return position != null ? position.equals(that.position) : that.position == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userId != null ? userId.hashCode() : 0;
+        result = 31 * result + (login != null ? login.hashCode() : 0);
+        result = 31 * result + (salt != null ? salt.hashCode() : 0);
+        result = 31 * result + (passAndSalt != null ? passAndSalt.hashCode() : 0);
+        result = 31 * result + (userRole != null ? userRole.hashCode() : 0);
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (phoneNumber != null ? phoneNumber.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (position != null ? position.hashCode() : 0);
+        return result;
+    }
 }

@@ -5,13 +5,16 @@ package ru.logistica.tms.dao;
 //import javax.persistence.Entity;
 //import javax.persistence.Id;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 
 //@Entity
 public class Supplier {
     private Serializable supplierID;
-    private String supplierIdExternal;
-    private DataSources dataSourceId;
+//    private String supplierIdExternal;
+//    private DataSources dataSourceId;
     private String inn;
     private String clientName;
     private String kpp;
@@ -24,6 +27,30 @@ public class Supplier {
     private Date startContractDate;
     private Date endContractDate;
 
+
+    public Supplier getSupplierById(Integer id) throws SQLException {
+        Supplier supplier = new Supplier();
+        String sql = "SELECT * from points WHERE supplierID = ?";
+        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            supplier.setSupplierID(resultSet.getInt("supplierID"));
+            supplier.setInn(resultSet.getString("INN"));
+            supplier.setClientName(resultSet.getString("clientName"));
+            supplier.setKpp(resultSet.getString("KPP"));
+            supplier.setCorAccount(resultSet.getString("corAccount"));
+            supplier.setCurAccount(resultSet.getString("curAccount"));
+            supplier.setBik(resultSet.getString("BIK"));
+            supplier.setBankName(resultSet.getString("bankName"));
+            supplier.setContractNumber(resultSet.getString("contractNumber"));
+            supplier.setDateOfSigning(resultSet.getDate("dateOfSigning"));
+            supplier.setStartContractDate(resultSet.getDate("startContractDate"));
+            supplier.setEndContractDate(resultSet.getDate("endContractDate"));
+        }
+        return supplier;
+    }
+
 //    @Id
 //    @Column(name = "supplierID")
     public Serializable getSupplierID() {
@@ -32,26 +59,6 @@ public class Supplier {
 
     public void setSupplierID(Serializable supplierID) {
         this.supplierID = supplierID;
-    }
-
-//    @Basic
-//    @Column(name = "supplierIdExternal")
-    public String getSupplierIdExternal() {
-        return supplierIdExternal;
-    }
-
-    public void setSupplierIdExternal(String supplierIdExternal) {
-        this.supplierIdExternal = supplierIdExternal;
-    }
-
-//    @Basic
-//    @Column(name = "dataSourceId")
-    public DataSources getDataSourceId() {
-        return dataSourceId;
-    }
-
-    public void setDataSourceId(DataSources dataSourceId) {
-        this.dataSourceId = dataSourceId;
     }
 
 //    @Basic
@@ -172,8 +179,6 @@ public class Supplier {
         Supplier supplier = (Supplier) o;
 
         if (supplierID != null ? !supplierID.equals(supplier.supplierID) : supplier.supplierID != null) return false;
-        if (supplierIdExternal != null ? !supplierIdExternal.equals(supplier.supplierIdExternal) : supplier.supplierIdExternal != null) return false;
-        if (dataSourceId != supplier.dataSourceId) return false;
         if (inn != null ? !inn.equals(supplier.inn) : supplier.inn != null) return false;
         if (clientName != null ? !clientName.equals(supplier.clientName) : supplier.clientName != null) return false;
         if (kpp != null ? !kpp.equals(supplier.kpp) : supplier.kpp != null) return false;
@@ -192,8 +197,6 @@ public class Supplier {
     @Override
     public int hashCode() {
         int result = supplierID != null ? supplierID.hashCode() : 0;
-        result = 31 * result + (supplierIdExternal != null ? supplierIdExternal.hashCode() : 0);
-        result = 31 * result + (dataSourceId != null ? dataSourceId.hashCode() : 0);
         result = 31 * result + (inn != null ? inn.hashCode() : 0);
         result = 31 * result + (clientName != null ? clientName.hashCode() : 0);
         result = 31 * result + (kpp != null ? kpp.hashCode() : 0);

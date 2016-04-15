@@ -21,7 +21,7 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
             while (resultSet.next()){
                 AbstractUser abstractUser = new AbstractUser();
                 abstractUser.setUserId(resultSet.getInt("userID"));
-                abstractUser.setLogin(resultSet.getString("login"));
+                abstractUser.setLogin(resultSet.getString("userLogin"));
                 abstractUser.setSalt(resultSet.getString("salt"));
                 abstractUser.setPassAndSalt(resultSet.getString("passAndSalt"));
                 String userRoleId = resultSet.getString("userRoleID");
@@ -29,6 +29,7 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
                 abstractUser.setUserName(resultSet.getString("userName"));
                 abstractUser.setPhoneNumber(resultSet.getString("phoneNumber"));
                 abstractUser.setEmail(resultSet.getString("email"));
+                abstractUser.setPosition(resultSet.getString("position"));
                 result.add(abstractUser);
             }
         }
@@ -44,7 +45,7 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             abstractUser.setUserId(resultSet.getInt("userID"));
-            abstractUser.setLogin(resultSet.getString("login"));
+            abstractUser.setLogin(resultSet.getString("userLogin"));
             abstractUser.setSalt(resultSet.getString("salt"));
             abstractUser.setPassAndSalt(resultSet.getString("passAndSalt"));
             String userRoleId = resultSet.getString("userRoleID");
@@ -60,13 +61,13 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public AbstractUser getByLogin(String login) throws SQLException {
         AbstractUser abstractUser = new AbstractUser();
-        String sql = "SELECT * from abstract_users WHERE login = ?";
+        String sql = "SELECT * from abstract_users WHERE userLogin = ?";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
-            statement.setString(2, login);
+            statement.setString(1, login);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             abstractUser.setUserId(resultSet.getInt("userID"));
-            abstractUser.setLogin(resultSet.getString("login"));
+            abstractUser.setLogin(resultSet.getString("userLogin"));
             abstractUser.setSalt(resultSet.getString("salt"));
             abstractUser.setPassAndSalt(resultSet.getString("passAndSalt"));
             abstractUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(resultSet.getString("userRoleID")));
@@ -81,7 +82,9 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public Integer saveOrUpdateUser(AbstractUser user) throws SQLException {
         Integer result = null;
-        String sql = "INSERT INTO abstract_users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (login) DO UPDATE SET userID = abstract_users.userID + EXCLUDED.userID";
+        String sql = "INSERT INTO abstract_users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (userLogin) DO UPDATE SET userID = EXCLUDED.userID, " +
+                "userLogin = EXCLUDED.userLogin, salt = EXCLUDED.salt, passAndSalt = EXCLUDED.passAndSalt, userRoleID = EXCLUDED.userRoleID, userName = EXCLUDED.userName, " +
+                "phoneNumber = EXCLUDED.phoneNumber, email = EXCLUDED.email, position = EXCLUDED.position";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             statement.setInt(1, user.getUserId());
             statement.setString(2, user.getLogin());
@@ -104,11 +107,15 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
 
 
     @Override
-    public void deleteUserByLogin(String login) throws SQLException {
-        String sql = "DELETE from abstract_users where login = ?";
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)) {
-            statement.setString(1, login);
-            statement.executeUpdate(sql);
+    public Integer deleteUserByLogin(String login) throws SQLException {
+        int result = 0;
+        String sql = "DELETE FROM abstract_users WHERE userLogin = ?";
+
+        try (PreparedStatement preparedStatement = JdbcUtil.getConnection().prepareStatement(sql)) {
+            preparedStatement.setString(1, login);
+            result = getByLogin(login).getUserId();
+            preparedStatement.execute();
         }
+        return result;
     }
 }

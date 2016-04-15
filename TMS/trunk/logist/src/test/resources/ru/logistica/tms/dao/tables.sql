@@ -64,7 +64,7 @@ VALUES
 -- entity
 CREATE TABLE abstract_users (
   userID      SERIAL,
-  login       VARCHAR(255) NOT NULL,
+  userLogin       VARCHAR(255) NOT NULL,
   salt        CHAR(16)     NOT NULL,
   passAndSalt VARCHAR(64)  NOT NULL,
   userRoleID  VARCHAR(32)  NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE abstract_users (
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE,
-  UNIQUE (login)
+  UNIQUE (userLogin)
 );
 
 -- W_BOSS  WH_DISPATCHER

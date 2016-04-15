@@ -20,6 +20,12 @@ public class JdbcUtil {
         return connection;
     }
 
-
+    public static void rollbackQuietly() throws SQLException {
+        try {
+            getConnection().rollback();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 
 }

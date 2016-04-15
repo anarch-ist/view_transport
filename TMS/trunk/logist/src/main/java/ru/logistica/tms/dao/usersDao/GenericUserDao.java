@@ -1,6 +1,5 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.logistica.tms.dao.constantsDao.UserRole;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -10,5 +9,5 @@ public interface GenericUserDao<T extends AbstractUser> {
     T getUserById(Integer id) throws SQLException;
     Integer saveOrUpdateUser(T user) throws SQLException;
     T getByLogin(String login) throws SQLException;
-    void deleteUserByLogin(String login) throws SQLException;
+    Integer deleteUserByLogin(String login) throws SQLException;
 }
