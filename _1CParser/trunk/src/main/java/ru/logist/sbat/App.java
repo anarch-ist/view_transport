@@ -1,7 +1,10 @@
 package ru.logist.sbat;
+import com.djdch.log4j.StaticShutdownCallbackRegistry;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configurator;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
@@ -15,10 +18,10 @@ import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.watchService.OnFileChangeListener;
 import ru.logist.sbat.watchService.WatchServiceStarter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -36,6 +39,7 @@ public class App {
 
     private static Properties properties;
     static {
+        System.setProperty("log4j.shutdownCallbackRegistry", "com.djdch.log4j.StaticShutdownCallbackRegistry");
         // get All settings from file, logger initialization
         properties = getProperties();
     }
@@ -54,6 +58,15 @@ public class App {
 
         // create separate thread that observe JsonData directory for new files, and starts if new files appeared
         createWatchService();
+
+        // add shudownhook
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                closeAll();
+                logger.error("SHUTDOWN");
+                StaticShutdownCallbackRegistry.invoke();
+            }
+        });
 
         // create cmd parser and options, blocking method
         createOptionsAndStartScanner();
@@ -79,14 +92,14 @@ public class App {
             Option option = optionListPair.getFirst();
 
             if (option.equals(quit)) {
-                closeAllAndExit();
+                System.exit(0);
             } else if (option.equals(help)) {
                 System.out.println(options);
             }
         }
     }
 
-    public static void closeAllAndExit() {
+    private static synchronized void closeAll() {
         dataBase.close();
         logger.info("Database connection closed");
         watchServiceThread.interrupt();
@@ -94,7 +107,6 @@ public class App {
         logger.info("Watch service closed.");
         executorService.shutdown();
         logger.info("Executor service closed");
-        System.exit(0);
     }
 
     private static void createWatchService() {
@@ -192,6 +204,8 @@ public class App {
 
             executorService.submit((Runnable) () -> {
 
+                waitForFileReleaseLock(filePath);
+
                 DataFrom1c dataFrom1c = null;
                 try {
                     logger.info("Start creating dataFrom1c object from file [{}]", filePath);
@@ -222,6 +236,31 @@ public class App {
             });
         }
 
+        private void waitForFileReleaseLock(Path filePath) {
+            for (int i = 0; i < 10; i++) {
+                BufferedReader bufferedReader = null;
+                try {
+                    bufferedReader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8);
+                    bufferedReader.close();
+                    break;
+                } catch (FileSystemException e) {
+                    logger.warn("file [{}] locked, wait for release...", filePath);
+                    try {
+                        Thread.currentThread().sleep(500);
+                    } catch (InterruptedException e1) {/*NOPE*/}
+
+                } catch (IOException e) {
+                    /*NOPE*/
+                } finally {
+                    try {
+                        if (bufferedReader != null) {
+                            bufferedReader.close();
+                        }
+                    } catch (IOException e) {/*NOPE*/}
+                }
+            }
+        }
+
         private void writeBadFileResponse(Path filePath) {
             String responseDir = properties.getProperty("responseDir");
             Path responsePath = Paths.get(responseDir).resolve(filePath.getFileName() + RESPONSE_FILE_EXTENSION);
@@ -230,7 +269,7 @@ public class App {
             } catch (IOException e) {
                 logger.error("Can't write response into [{}], exit application", responsePath);
                 logger.error(e);
-                closeAllAndExit();
+                System.exit(-1);
             }
         }
 
@@ -245,7 +284,7 @@ public class App {
             } catch (IOException e) {
                 logger.error("Can't write response into [{}], exit application", responsePath);
                 logger.error(e);
-                closeAllAndExit();
+                System.exit(-1);
             }
         }
 
@@ -262,7 +301,7 @@ public class App {
             } catch (IOException e) {
                 logger.error("Can't copy [{}] to [{}], exit application", filePath, backupFilePath);
                 logger.error(e);
-                closeAllAndExit();
+                System.exit(-1);
             }
         }
 
@@ -274,7 +313,7 @@ public class App {
             } catch (IOException e) {
                 logger.error("Can't delete [{}], exit application", filePath);
                 logger.error(e);
-                closeAllAndExit();
+                System.exit(-1);
             }
         }
     }
