@@ -26,7 +26,7 @@ $(document).ready(function () {
        // scrollX:        true,
        autoWidth: false,
        scrollCollapse: true,
-        "order": [],
+        //"order": [],
       //  jQueryUI: true,
      //   paging:         true,
       //  paginate: false,
@@ -187,9 +187,6 @@ $(document).ready(function () {
             {"data": "palletsQty"},
             {"data": "routeListNumber"},
             {"data": "arrivalTimeToNextRoutePoint"},
-
-            {"data": "requestStatusID"},
-            {"data": "routeListID"}
         ],
         columnDefs: [
             {"name": "requestIDExternal", "searchable": true, "targets": 0},
@@ -218,9 +215,6 @@ $(document).ready(function () {
             {"name": "palletsQty", "searchable": true, "targets": 23},
             {"name": "routeListNumber", "searchable": true, "targets": 24},
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
-
-            {"name": "requestStatusID", "searchable": false, "visible": false, "targets": 26},
-            {"name": "routeListID", "searchable": false, "visible": false, "targets": 27}
         ]
     });
     // set padding for dataTable

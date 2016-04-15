@@ -42,6 +42,8 @@ function getRequestsForRouteList(PrivilegedUser $privUser)
 
 function getRequestsForUser(PrivilegedUser $privUser)
 {
+    //exit(print_r($_POST['order']));
+
     $start = (int)$_POST['start'];
     $count = (int)$_POST['length'];
     $columnInformation = $_POST['columns'];
