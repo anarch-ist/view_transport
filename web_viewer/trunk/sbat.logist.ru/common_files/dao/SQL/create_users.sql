@@ -69,4 +69,6 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.users TO 'andy'
 -- Создание пользователя для парсера
 DROP USER 'parser'@'localhost';
 CREATE USER 'parser'@'localhost' IDENTIFIED BY 'refka1203';
-GRANT SELECT, UPDATE, INSERT, DELETE, EXECUTE ON `transmaster_transport_db`.* TO 'parser'@'localhost';
+GRANT ALL ON transmaster_transport_db.* TO 'parser'@'localhost';
+-- GRANT SELECT, UPDATE, INSERT, DELETE, EXECUTE ON `transmaster_transport_db`.* TO 'parser'@'localhost';
+-- GRANT EXECUTE ON PROCEDURE transmaster_transport_db.refreshMaterializedView TO 'parser'@'localhost';
