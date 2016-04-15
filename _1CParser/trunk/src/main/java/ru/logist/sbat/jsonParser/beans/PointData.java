@@ -27,7 +27,7 @@ public class PointData {
     private String pointEmails; //CONSTRAINT not null
     private String responsiblePersonId; //CONSTRAINT not null
 
-    public PointData(JSONObject updatePoint) {
+    public PointData(JSONObject updatePoint) throws ValidatorException {
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_POINT_ID, updatePoint);
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_POINT_NAME, updatePoint);

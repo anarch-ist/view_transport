@@ -10,6 +10,7 @@
 <entry key="encoding">useUnicode=true&amp;characterEncoding=UTF-8</entry>
 
 <entry key="jsonDataDir">C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\data</entry>
+<entry key="backupDir">C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\backup</entry>
 <entry key="responseDir">C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\response</entry>
 <entry key="logsDir">C:\Users\Сергей\Desktop\view_transport\_1CParser\trunk\src\main\resources\exchange\response</entry>
 

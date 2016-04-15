@@ -31,7 +31,7 @@ public class StatusData {
     private Date timeOutStatus;
     private String comment;
 
-    public StatusData(JSONObject updateStatus) {
+    public StatusData(JSONObject updateStatus) throws ValidatorException {
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_REQUEST_ID, updateStatus);
         Util.checkFieldAvailableAndNotNull           (FN_NUM_BOXES, updateStatus);

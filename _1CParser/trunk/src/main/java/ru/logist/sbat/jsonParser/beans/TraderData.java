@@ -2,6 +2,7 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class TraderData {
     private static final String FN_TRADER_ID = "traderId";
@@ -23,7 +24,7 @@ public class TraderData {
     private String traderLogin;
     private String traderPassword;
 
-    public TraderData(JSONObject updateTrader) {
+    public TraderData(JSONObject updateTrader) throws ValidatorException {
 
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_TRADER_ID, updateTrader);

@@ -369,8 +369,4 @@ public class DataInserter {
         }
     }
 
-    public void refreshView() {
-        dataBase.refreshMaterializedView();
-    }
-
 }

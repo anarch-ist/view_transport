@@ -24,28 +24,28 @@ public class Util {
         return stringBuilder.toString();
     }
 
-    public static void checkFieldAvailability(String fieldName, JSONObject jsonObject) {
+    public static void checkFieldAvailability(String fieldName, JSONObject jsonObject) throws ValidatorException {
         if (!jsonObject.containsKey(fieldName))
             throw new ValidatorException(Util.getParameterizedString("can't find field {} in {}", fieldName, jsonObject));
     }
 
-    public static void checkCorrectType(Object fieldContent, Class fieldContentClazz, JSONObject jsonObject) {
+    public static void checkCorrectType(Object fieldContent, Class fieldContentClazz, JSONObject jsonObject) throws ValidatorException {
         if (!fieldContent.getClass().equals(fieldContentClazz))
             throw new ValidatorException(Util.getParameterizedString("fieldContent {} is not type of {} in {} ", fieldContent, fieldContentClazz.getSimpleName(), jsonObject));
     }
 
-    public static void checkCorrectType(Object fieldContent, Class fieldContentClazz) {
+    public static void checkCorrectType(Object fieldContent, Class fieldContentClazz) throws ValidatorException {
         if (!fieldContent.getClass().equals(fieldContentClazz))
             throw new ValidatorException(Util.getParameterizedString("fieldContent {} is not type of {}", fieldContent, fieldContentClazz.getSimpleName()));
     }
 
-    public static void checkFieldAvailableAndNotNull(String fieldName, JSONObject jsonObject) {
+    public static void checkFieldAvailableAndNotNull(String fieldName, JSONObject jsonObject) throws ValidatorException {
         checkFieldAvailability(fieldName, jsonObject);
         if (jsonObject.get(fieldName) == null)
             throw new ValidatorException(Util.getParameterizedString("field {} is null in {}", fieldName, jsonObject));
     }
 
-    public static void checkFieldAvailableAndNotNullAndNotEmpty(String fieldName, JSONObject jsonObject) {
+    public static void checkFieldAvailableAndNotNullAndNotEmpty(String fieldName, JSONObject jsonObject) throws ValidatorException {
         checkFieldAvailableAndNotNull(fieldName, jsonObject);
         if (jsonObject.get(fieldName).equals(""))
             throw new ValidatorException((Util.getParameterizedString("field {} is empty in {}", fieldName, jsonObject)));
@@ -58,7 +58,7 @@ public class Util {
      * @param beanObject
      * @param beanObjectFieldName
      */
-    public static void setNullIfEmptyOrSetValueLong(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) {
+    public static void setNullIfEmptyOrSetValueLong(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) throws ValidatorException {
         try {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);
@@ -76,7 +76,7 @@ public class Util {
         }
     }
 
-    public static void setNullIfEmptyOrSetValueDate(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName, DateTimeFormatter formatter) {
+    public static void setNullIfEmptyOrSetValueDate(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName, DateTimeFormatter formatter) throws ValidatorException {
         try {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);
@@ -97,7 +97,7 @@ public class Util {
         }
     }
 
-    public static void setStringValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) {
+    public static void setStringValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) throws ValidatorException {
         try {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);
@@ -109,7 +109,7 @@ public class Util {
         }
     }
 
-    public static void setStringValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName, Set<String> possibleValues) {
+    public static void setStringValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName, Set<String> possibleValues) throws ValidatorException {
         try {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);
@@ -124,7 +124,7 @@ public class Util {
         }
     }
 
-    public static void setStringSetValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) {
+    public static void setStringSetValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) throws ValidatorException {
         try {
             Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
             field.setAccessible(true);

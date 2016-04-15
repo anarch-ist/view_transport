@@ -16,7 +16,7 @@ public class DataFrom1cTest {
     @BeforeClass
     public static void setUp() throws Exception {
         Path jsonFile = Paths.get(JSONReadFromFileTest.class.getResource("EKA_third.pkg").toURI());
-        dataFrom1c = JSONReadFromFile.readZip(jsonFile);
+        dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(jsonFile);
     }
 
     @Test

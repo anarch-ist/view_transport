@@ -42,7 +42,7 @@ public class RouteListsData {
     private String status;
     private Set<String> invoices;
 
-    public RouteListsData(JSONObject updateRouteLists) {
+    public RouteListsData(JSONObject updateRouteLists) throws ValidatorException {
 
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ROUTE_LIST_ID, updateRouteLists);

@@ -22,7 +22,7 @@ public class DataBase {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(
-                    url + dbName + "?" + encoding,
+                    url + dbName + "?" + encoding + "&" + "noAccessToProcedureBodies=true",
                     user,
                     password
             );
@@ -44,32 +44,12 @@ public class DataBase {
 
     /**
      * write all JSON data into database inside one transaction or ROLLBACK if error.
+     * @return never returns null
      * @param dataFrom1c
      */
     public InsertOrUpdateResult updateDataFromJSONObject(DataFrom1c dataFrom1c) {
         InsertOrUpdateTransactionScript insertOrUpdateTransactionScript = new InsertOrUpdateTransactionScript(connection, dataFrom1c);
         return insertOrUpdateTransactionScript.updateData();
-    }
-
-    public void refreshMaterializedView() {
-        CallableStatement callableStatement = null;
-        try {
-            logger.info("--------------START refresh materialized view------------------");
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            callableStatement = connection.prepareCall("{CALL refreshMaterializedView()}");
-            callableStatement.execute();
-            connection.commit();
-            logger.info("--------------END refresh materialized view------------------");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.error(e);
-            logger.error("start ROLLBACK");
-            DBUtils.rollbackQuietly(connection);
-            logger.error("end ROLLBACK");
-        }
-        finally {
-            DBUtils.closeStatementQuietly(callableStatement);
-        }
     }
 
     /**

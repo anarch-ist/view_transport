@@ -23,8 +23,8 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
 
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("LOG.zip").toURI());
-        dataFrom1c = JSONReadFromFile.readZip(path);
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_old_test_data.pkg").toURI());
+        dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(path);
 
         // get connection to database
         Properties testProperties = new Properties();
@@ -39,13 +39,12 @@ public class DataBaseTest {
         );
 
         // clean dataBase content
-        // dataBase.truncatePublicTables();
+        dataBase.truncatePublicTables();
     }
 
     @Test
     public void testUpdateDataFromJSONObject() throws Exception {
         dataBase.updateDataFromJSONObject(dataFrom1c);
-        dataBase.refreshMaterializedView();
     }
 
     @AfterClass

@@ -2,6 +2,7 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.time.format.DateTimeFormatter;
 import java.sql.Date;
@@ -43,7 +44,7 @@ public class RequestsData {
     private String traderId;
     private Date deliveryDate;
 
-    public RequestsData(JSONObject updateRequests) {
+    public RequestsData(JSONObject updateRequests) throws ValidatorException {
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_REQUEST_ID, updateRequests);
         Util.checkFieldAvailableAndNotNull           (FN_REQUEST_NUMBER, updateRequests);

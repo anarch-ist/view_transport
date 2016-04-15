@@ -2,6 +2,8 @@ package ru.logist.sbat.jsonParser;
 
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,13 +20,17 @@ import java.nio.file.Path;
 import java.util.zip.ZipInputStream;
 
 public class JSONReadFromFile {
+    private static final Logger logger = LogManager.getLogger();
 
-    public static DataFrom1c readZip(Path path) throws IOException, ParseException {
+    private static final String INCOMING_FILE_EXTENSION_ZIP = ".zip";
+    private static final String INCOMING_FILE_EXTENSION_PKG = ".pkg";
+
+    protected static DataFrom1c readZip(Path path) throws IOException, ParseException, ValidatorException, JsonPException {
         String jsonFileAsString = readZipFileToUtf8String(path.toFile());
         return new DataFrom1c(getJsonObjectFromString(jsonFileAsString));
     }
 
-    public static DataFrom1c readPkg(Path path) throws IOException, ParseException {
+    private static DataFrom1c readPkg(Path path) throws IOException, ParseException, ValidatorException, JsonPException {
         String jsonFileAsString = FileUtils.readFileToString(path.toFile(), StandardCharsets.UTF_8);
         return new DataFrom1c(getJsonObjectFromString(jsonFileAsString));
     }
@@ -52,13 +58,18 @@ public class JSONReadFromFile {
         }
     }
 
-    private static JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException {
+    private static JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {
 
         String jsonFileAsStringWithoutBom = jsonFileAsString.replaceAll("\uFEFF", "");
         // TODO use JSONP here
 
         JsonReader reader = Json.createReader(new StringReader(jsonFileAsStringWithoutBom));
-        JsonStructure jsonst = reader.read();
+        try {
+            JsonStructure jsonst = reader.read();
+        } catch (JsonException e) {
+            throw new JsonPException(e);
+        }
+
         // jsonst.getValueType();
 
         JSONParser parser = new JSONParser();
@@ -66,6 +77,26 @@ public class JSONReadFromFile {
         return (JSONObject) obj;
     }
 
-
+    /**
+     *
+     * @param filePath
+     * @return null if file was not imported
+     * @throws ValidatorException
+     * @throws JsonPException
+     * @throws ParseException
+     * @throws IOException
+     */
+    public static DataFrom1c getJsonObjectFromFile(Path filePath) throws ValidatorException, JsonPException, ParseException, IOException {
+        DataFrom1c result = null;
+        if (filePath.toString().endsWith(INCOMING_FILE_EXTENSION_ZIP)) {
+            result = JSONReadFromFile.readZip(filePath);
+            logger.info("Start creating dataFrom1c object from file [{}]", filePath);
+        } else if (filePath.toString().endsWith(INCOMING_FILE_EXTENSION_PKG)) {
+            result = JSONReadFromFile.readPkg(filePath);
+        } else {
+            logger.warn("file [{}] must end with [{}] or [{}] ,file will not be imported", filePath, INCOMING_FILE_EXTENSION_ZIP, INCOMING_FILE_EXTENSION_PKG);
+        }
+        return result;
+    }
 
 }

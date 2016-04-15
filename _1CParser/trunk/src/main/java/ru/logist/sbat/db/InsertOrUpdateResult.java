@@ -1,6 +1,8 @@
 package ru.logist.sbat.db;
 
 public class InsertOrUpdateResult {
+    public static final String OK_STATUS = "OK";
+    public static final String ERROR_STATUS = "ERROR";
 
     private String server;
     private Integer packageNumber;
@@ -28,6 +30,10 @@ public class InsertOrUpdateResult {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isOk() {
+        return getStatus().equals(OK_STATUS);
     }
 
     @Override

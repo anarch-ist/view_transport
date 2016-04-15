@@ -2,6 +2,7 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class ClientData {
     private static final String FN_CLIENT_ID = "clientId";
@@ -15,7 +16,7 @@ public class ClientData {
     private String clientINN;
     private String clientPassword;
 
-    public ClientData(JSONObject updateClient) {
+    public ClientData(JSONObject updateClient) throws ValidatorException {
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateClient);
         Util.checkFieldAvailableAndNotNull           (FN_CLIENT_ID, updateClient);

@@ -9,6 +9,7 @@ import ru.logist.sbat.cmd.Pair;
 import ru.logist.sbat.db.DataBase;
 import ru.logist.sbat.db.InsertOrUpdateResult;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
+import ru.logist.sbat.jsonParser.JsonPException;
 import ru.logist.sbat.jsonParser.ValidatorException;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.watchService.OnFileChangeListener;
@@ -22,20 +23,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // TODO refactor this class
 public class App {
-    private static Properties properties;
-
-    private static final String INCOMING_FILE_EXTENSION_ZIP = ".zip";
-    private static final String INCOMING_FILE_EXTENSION_PKG = ".pkg";
     private static final String RESPONSE_FILE_EXTENSION = ".ans";
+    private static final String TEMP_FILE_EXTENSION = ".tmp";
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
+
+    private static Properties properties;
     static {
         // get All settings from file, logger initialization
         properties = getProperties();
@@ -97,104 +96,12 @@ public class App {
         logger.info("Executor service closed");
         System.exit(0);
     }
-    // TODO make start matrialized view refresh after all files executed
 
     private static void createWatchService() {
 
         watchServiceStarter = new WatchServiceStarter(jsonDataDir);
 
-        watchServiceStarter.setOnFileChanged(new OnFileChangeListener() {
-            @Override
-            public void onFileCreate(Path filePath) {
-
-                executorService.submit((Runnable) () -> {
-
-                    String fileName = filePath.getFileName().toString();
-                    if (!(fileName.endsWith(INCOMING_FILE_EXTENSION_ZIP) || fileName.endsWith(INCOMING_FILE_EXTENSION_PKG))) {
-                        logger.warn("file [{}] must end with [{}] or [{}] ,file will not be imported", filePath, INCOMING_FILE_EXTENSION_ZIP, INCOMING_FILE_EXTENSION_PKG);
-                    } else {
-
-                        File zipFile = filePath.toFile();
-
-                        // wait for loading all data
-//                        long currentFileSize = -1;
-//                        while (currentFileSize != file.length()) {
-//                            currentFileSize = file.length();
-//                            try {
-//                                Thread.currentThread().sleep(1000);
-//                            } catch (InterruptedException e) {/*NOPE*/}
-//                            logger.info("wait for loading... file [{}] file size = [{}], size second ago = [{}]", file, file.length(), currentFileSize);
-//                        }
-
-                        InsertOrUpdateResult insertOrUpdateResult = null;
-                        try {
-                            logger.info("Start update data from file [{}]", filePath);
-                            DataFrom1c dataFrom1c = null;
-                            if (fileName.endsWith(INCOMING_FILE_EXTENSION_ZIP)) {
-                                dataFrom1c = JSONReadFromFile.readZip(filePath);
-                            } else if (fileName.endsWith(INCOMING_FILE_EXTENSION_PKG)) {
-                                dataFrom1c = JSONReadFromFile.readPkg(filePath);
-                            }
-                            insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
-                            dataBase.refreshMaterializedView();
-
-                            logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
-                        } catch (IOException e) {
-                            logger.error("Can't read file [{}]", filePath);
-                            logger.error(e);
-                        } catch (org.json.simple.parser.ParseException e) {
-                            logger.error("Illegal JSON format [{}]", filePath);
-                            logger.error(e);
-                        } catch (ValidatorException e) {
-                            logger.error("Illegal JSON constraint format [{}]", filePath);
-                            logger.error(e);
-//                        } catch (DBCohesionException e) {
-//                            logger.error("Database conflict with file [{}]", filePath);
-//                            logger.error(e);
-                        } finally {
-
-                            // write response into response dir
-                            String responseDir = properties.getProperty("responseDir");
-                            if (insertOrUpdateResult != null) {
-                                logger.info("Start write result data into response directory");
-                                Path responsePath = Paths.get(responseDir).resolve(insertOrUpdateResult.getServer() + RESPONSE_FILE_EXTENSION);
-                                String resultString = insertOrUpdateResult.toString();
-                                try {
-                                    FileUtils.writeStringToFile(responsePath.toFile(), resultString, StandardCharsets.UTF_8);
-                                    logger.info("Response data were successfully written");
-                                } catch (IOException e) {
-                                    logger.error("Can't write response into [{}], exit application", responsePath);
-                                    logger.error(e);
-                                    closeAllAndExit();
-                                }
-                            } else {
-                                Path responsePath = Paths.get(responseDir).resolve(zipFile.getName() + RESPONSE_FILE_EXTENSION);
-                                try {
-                                    FileUtils.writeStringToFile(responsePath.toFile(), "Data format error . The details in the log file.", StandardCharsets.UTF_8);
-                                } catch (IOException e) {
-                                    logger.error("Can't write response into [{}], exit application", responsePath);
-                                    logger.error(e);
-                                    closeAllAndExit();
-                                }
-                            }
-
-                            // delete incoming file
-                            logger.info("Delete file: [{}]", filePath);
-                            try {
-                                FileUtils.forceDelete(filePath.toFile());
-                                logger.info("file was deleted: [{}]", filePath);
-                            } catch (IOException e) {
-                                logger.error("Can't delete [{}], exit application", filePath);
-                                logger.error(e);
-                                closeAllAndExit();
-                            }
-                        }
-
-                    }
-
-                });
-            }
-        });
+        watchServiceStarter.setOnFileChanged(new FileChangeListener());
 
         // create thread for observing exchange directory
         watchServiceThread = new Thread(() -> {
@@ -254,6 +161,10 @@ public class App {
             jsonDataDir = Paths.get(properties.getProperty("jsonDataDir"));
             if (!jsonDataDir.toFile().exists()) throw new IllegalArgumentException("directory is not exist");
 
+            System.out.println("backup directory = [" + properties.getProperty("backupDir") + "]");
+            Path backupDir = Paths.get(properties.getProperty("backupDir"));
+            if (!backupDir.toFile().exists()) throw new IllegalArgumentException("directory is not exist");
+
             System.out.println("response directory = [" + properties.getProperty("responseDir") + "]");
             Path responseDir = Paths.get(properties.getProperty("responseDir"));
             if (!responseDir.toFile().exists()) throw new IllegalArgumentException("directory is not exist");
@@ -270,6 +181,101 @@ public class App {
         }
         return properties;
     }
+
+    private static class FileChangeListener implements OnFileChangeListener {
+        @Override
+        public void onFileCreate(Path filePath) {
+
+            // start executor when downloading finishes
+            if (filePath.toString().endsWith(TEMP_FILE_EXTENSION))
+                return;
+
+            executorService.submit((Runnable) () -> {
+
+                DataFrom1c dataFrom1c = null;
+                try {
+                    logger.info("Start creating dataFrom1c object from file [{}]", filePath);
+                    dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(filePath);
+                    logger.info("dataFrom1c object succefully recieved ");
+                } catch (IOException e) {
+                    logger.error("Can't read file [{}]", filePath);
+                    logger.error(e);
+                } catch (org.json.simple.parser.ParseException | JsonPException e) {
+                    logger.error("Illegal JSON format [{}]", filePath);
+                    logger.error(e);
+                } catch (ValidatorException e) {
+                    logger.error("Illegal JSON constraint format [{}]", filePath);
+                    logger.error(e);
+                }
+
+                copyToBackup(filePath);
+
+                if (dataFrom1c != null) {
+                    InsertOrUpdateResult insertOrUpdateResult = dataBase.updateDataFromJSONObject(dataFrom1c);
+                    logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
+                    writeDbWorkResponse(insertOrUpdateResult);
+                } else {
+                    writeBadFileResponse(filePath);
+                }
+
+                removeIncomingFile(filePath);
+            });
+        }
+
+        private void writeBadFileResponse(Path filePath) {
+            String responseDir = properties.getProperty("responseDir");
+            Path responsePath = Paths.get(responseDir).resolve(filePath.getFileName() + RESPONSE_FILE_EXTENSION);
+            try {
+                FileUtils.writeStringToFile(responsePath.toFile(), "Data format error . The details in the log file.", StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                logger.error("Can't write response into [{}], exit application", responsePath);
+                logger.error(e);
+                closeAllAndExit();
+            }
+        }
+
+        private void writeDbWorkResponse(InsertOrUpdateResult insertOrUpdateResult) {
+            String responseDir = properties.getProperty("responseDir");
+            logger.info("Start write result data into response directory");
+            Path responsePath = Paths.get(responseDir).resolve(insertOrUpdateResult.getServer() + RESPONSE_FILE_EXTENSION);
+            String resultString = insertOrUpdateResult.toString();
+            try {
+                FileUtils.writeStringToFile(responsePath.toFile(), resultString, StandardCharsets.UTF_8);
+                logger.info("Response data were successfully written");
+            } catch (IOException e) {
+                logger.error("Can't write response into [{}], exit application", responsePath);
+                logger.error(e);
+                closeAllAndExit();
+            }
+        }
+
+        private void copyToBackup(Path filePath) {
+            String currentDateString = "_" + dateFormat.format(new Date()) + "_";
+            String backupDir = properties.getProperty("backupDir");
+            String backupFileName = currentDateString + filePath.getFileName();
+            Path backupFilePath = Paths.get(backupDir).resolve(backupFileName);
+
+            logger.info("start backup file: [{}]", filePath);
+            try {
+                FileUtils.copyFile(filePath.toFile(), backupFilePath.toFile());
+                logger.info("file was backuped: [{}]", backupFilePath);
+            } catch (IOException e) {
+                logger.error("Can't copy [{}] to [{}], exit application", filePath, backupFilePath);
+                logger.error(e);
+                closeAllAndExit();
+            }
+        }
+
+        private void removeIncomingFile(Path filePath) {
+            logger.info("start delete file: [{}]", filePath);
+            try {
+                FileUtils.forceDelete(filePath.toFile());
+                logger.info("file was deleted: [{}]", filePath);
+            } catch (IOException e) {
+                logger.error("Can't delete [{}], exit application", filePath);
+                logger.error(e);
+                closeAllAndExit();
+            }
+        }
+    }
 }
-
-

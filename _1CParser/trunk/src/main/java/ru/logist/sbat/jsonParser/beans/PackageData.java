@@ -32,7 +32,7 @@ public class PackageData {
     private List<StatusData> updateStatuses = new ArrayList<>();
     private List<RouteListsData> updateRouteLists = new ArrayList<>();
 
-    public PackageData(JSONObject packageDataAsJsonObject) {
+    public PackageData(JSONObject packageDataAsJsonObject) throws ValidatorException {
 
         // check fields
         Util.checkFieldAvailableAndNotNull(FN_UPDATE_POINTS, packageDataAsJsonObject);
@@ -63,7 +63,7 @@ public class PackageData {
         setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_ROUTE_LISTS), updateRouteLists, RouteListsData.class);
     }
 
-    private <T> void setValue(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) {
+    private <T> void setValue(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) throws ValidatorException {
 
         if (jsonArray.isEmpty())
             return;
@@ -72,7 +72,7 @@ public class PackageData {
         uniqueCheck(updateData, dataClazz);
     }
 
-    private <T> void fillList(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) {
+    private <T> void fillList(JSONArray jsonArray, List<T> updateData, Class<T> dataClazz) throws ValidatorException {
         for (Object o : jsonArray) {
             Util.checkCorrectType(o, JSONObject.class);
             JSONObject jsonObject = (JSONObject) o;
@@ -86,7 +86,7 @@ public class PackageData {
         }
     }
 
-    private void uniqueCheck(List<?> updateData, Class clazz) {
+    private void uniqueCheck(List<?> updateData, Class clazz) throws ValidatorException {
         Field[] declaredFields = clazz.getDeclaredFields();
         for (Field declaredField : declaredFields) {
             if (declaredField.getDeclaredAnnotation(Unique.class) != null) {

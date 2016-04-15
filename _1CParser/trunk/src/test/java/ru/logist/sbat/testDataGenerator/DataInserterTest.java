@@ -39,6 +39,6 @@ public class DataInserterTest {
         dataInserter.generateUsers();
         dataInserter.generateRouteLists();
         dataInserter.generateRequests();
-        dataInserter.refreshView();
+        // TODO call refreshMatView
     }
 }

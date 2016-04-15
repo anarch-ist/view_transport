@@ -13,8 +13,7 @@ import java.sql.*;
  * В случае, если ID совпали, с уже существующим - то делается UPDATE, если же такого ID нет, то делается INSERT
  */
 public class InsertOrUpdateTransactionScript {
-    private static final String OK_STATUS = "OK";
-    private static final String ERROR_STATUS = "ERROR";
+
     public static final String LOGIST_1C = "LOGIST_1C";
     private static final Logger logger = LogManager.getLogger();
     private final Connection connection;
@@ -24,7 +23,7 @@ public class InsertOrUpdateTransactionScript {
 
         this.connection = connection;
         try {
-            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -56,10 +55,17 @@ public class InsertOrUpdateTransactionScript {
         transactionExecutor.put(8, new AssignStatusesInRequestsTable(packageData.getUpdateStatuses()));
         transactionExecutor.put(9, new AssignRouteListsInRequestsTable(packageData.getUpdateRouteLists()));
 
+        CallableStatement callableStatement = null;
         try {
             transactionExecutor.executeAll();
+
+            logger.info("--------------START refresh materialized view------------------");
+            callableStatement = connection.prepareCall("{CALL refreshMaterializedView()}");
+            callableStatement.execute();
+            logger.info("--------------END refresh materialized view------------------");
+
             connection.commit();
-            insertOrUpdateResult.setStatus(OK_STATUS);
+            insertOrUpdateResult.setStatus(InsertOrUpdateResult.OK_STATUS);
             return insertOrUpdateResult;
         } catch(Exception e) {
             e.printStackTrace();
@@ -67,10 +73,11 @@ public class InsertOrUpdateTransactionScript {
             logger.error("start ROLLBACK");
             DBUtils.rollbackQuietly(connection);
             logger.error("end ROLLBACK");
-            insertOrUpdateResult.setStatus(ERROR_STATUS);
+            insertOrUpdateResult.setStatus(InsertOrUpdateResult.ERROR_STATUS);
             return insertOrUpdateResult;
         } finally {
             transactionExecutor.closeAll();
+            DBUtils.closeStatementQuietly(callableStatement);
         }
     }
 }

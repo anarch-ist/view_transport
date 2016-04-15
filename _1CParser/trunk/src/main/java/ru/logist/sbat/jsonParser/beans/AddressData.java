@@ -2,6 +2,7 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class AddressData {
     private static final String FN_ADDRESS_ID = "addressId";
@@ -14,7 +15,7 @@ public class AddressData {
     private String addressFull; // not null
     private String deliveryAreaId; // not null
 
-    public AddressData(JSONObject updateAddress) {
+    public AddressData(JSONObject updateAddress) throws ValidatorException {
         // check fields
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ADDRESS_ID, updateAddress);
         Util.checkFieldAvailableAndNotNull           (FN_ADDRESS_SHORT, updateAddress);

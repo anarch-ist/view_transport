@@ -25,12 +25,12 @@ public class UtilTest {
     }
 
     @Test(expected = ValidatorException.class)
-    public void checkIllegalTypeTest() {
+    public void checkIllegalTypeTest() throws ValidatorException {
         Util.checkCorrectType("ed", Long.class, new JSONObject());
     }
 
     @Test
-    public void checkCorrectTypeTest() {
+    public void checkCorrectTypeTest() throws ValidatorException {
         Util.checkCorrectType(1L, Long.class, new JSONObject());
     }
 }

@@ -2,6 +2,7 @@ package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
 import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +21,7 @@ public class DataFrom1c {
     private PackageData packageData;
     private String rawJsonObject;
 
-    public DataFrom1c(JSONObject dataFrom1cAsJsonObject) {
+    public DataFrom1c(JSONObject dataFrom1cAsJsonObject) throws ValidatorException {
         // check fields
         Util.checkFieldAvailableAndNotNull(FN_DATA_FROM_1C, dataFrom1cAsJsonObject);
         Util.checkCorrectType(dataFrom1cAsJsonObject.get(FN_DATA_FROM_1C), JSONObject.class, dataFrom1cAsJsonObject);

@@ -13,7 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UpdateUsers extends TransactionPart{
+public class UpdateUsers extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
     private static final String MARKET_AGENT = "MARKET_AGENT";
     private static final String CLIENT_MANAGER = "CLIENT_MANAGER";
