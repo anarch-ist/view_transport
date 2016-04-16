@@ -52,13 +52,8 @@ public class UpdatePoints extends TransactionPart {
         }
 
         // create or update points from updateAddresses JSON array
-        // add only unique points
-        Utils.UniqueCheck uniqueCheckAddressId = Utils.getUniqueCheckObject("addressId");
         for (AddressData updateAddress : updateAddresses) {
             String pointIdExternal = updateAddress.getAddressId();
-            if (!uniqueCheckAddressId.isUnique(pointIdExternal))
-                continue;
-
             String pointName = updateAddress.getAddressShot();
             String pointAddress = updateAddress.getAddressFull();
 

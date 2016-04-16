@@ -1,11 +1,15 @@
 package ru.logist.sbat.db;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
 import ru.logist.sbat.jsonParser.JSONReadFromFile;
 import ru.logist.sbat.jsonParser.JSONReadFromFileTest;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
+import ru.logist.sbat.resourcesInit.PropertiesPojo;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,8 +20,9 @@ import java.util.Properties;
  */
 public class DataBaseTest {
 
-    public static DataBase dataBase;
+    public static DBManager DBManager;
     public static DataFrom1c dataFrom1c;
+    private static final Logger logger = LogManager.getLogger();
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -30,26 +35,22 @@ public class DataBaseTest {
         Properties testProperties = new Properties();
         testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
         // testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("prod_config.property"));
-        dataBase = new DataBase(
-                testProperties.getProperty("url"),
-                testProperties.getProperty("dbName"),
-                testProperties.getProperty("user"),
-                testProperties.getProperty("password"),
-                testProperties.getProperty("encoding")
-        );
+        SystemResourcesContainer systemResourcesContainer = new SystemResourcesContainer(new PropertiesPojo(testProperties), logger);
 
-        // clean dataBase content
-        dataBase.truncatePublicTables();
+        DBManager = new DBManager(systemResourcesContainer.getConnection());
+
+        // clean DBManager content
+        DBManager.truncatePublicTables();
     }
 
     @Test
     public void testUpdateDataFromJSONObject() throws Exception {
-        dataBase.updateDataFromJSONObject(dataFrom1c);
+        DBManager.updateDataFromJSONObject(dataFrom1c);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        if (dataBase != null)
-            dataBase.close();
+        if (DBManager != null)
+            DBManager.close();
     }
 }

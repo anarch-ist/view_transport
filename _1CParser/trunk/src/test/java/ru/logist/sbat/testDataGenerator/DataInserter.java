@@ -3,7 +3,6 @@ package ru.logist.sbat.testDataGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import ru.logist.sbat.db.DBUtils;
-import ru.logist.sbat.db.DataBase;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.PointData;
@@ -39,12 +38,12 @@ public class DataInserter {
             "APPROVED", "CREATED"
     }));
 
-    private DataBase dataBase;
     private List<Long> generatedClientsId;
     private List<Long> generatedPointsId;
     private List<Long> generatedRoutesId;
     private List<Long> generatedUsersId;
     private List<Long> generatedRouteListsId;
+    private Connection connection;
 
 
     private List<Long> getGeneratedKeys(PreparedStatement statement) throws SQLException {
@@ -57,7 +56,7 @@ public class DataInserter {
     }
 
     private List<Long> getKeysForMarketAgentUser() throws SQLException {
-        PreparedStatement statement = dataBase.getConnection().prepareStatement("SELECT userID FROM users WHERE userRoleID = ?");
+        PreparedStatement statement = connection.prepareStatement("SELECT userID FROM users WHERE userRoleID = ?");
         statement.setString(1, MARKET_AGENT);
         List<Long> result = new ArrayList<>();
         ResultSet rs = statement.executeQuery();
@@ -69,7 +68,7 @@ public class DataInserter {
     }
 
     private List<Long> getKeysForWarehousePoints() throws SQLException {
-        PreparedStatement statement = dataBase.getConnection().prepareStatement("SELECT pointID FROM points WHERE pointTypeID = ?");
+        PreparedStatement statement = connection.prepareStatement("SELECT pointID FROM points WHERE pointTypeID = ?");
         statement.setString(1, "WAREHOUSE");
         List<Long> result = new ArrayList<>();
         ResultSet rs = statement.executeQuery();
@@ -82,7 +81,7 @@ public class DataInserter {
 
 
     private Integer getParserUserId() throws SQLException {
-        Statement statement = dataBase.getConnection().createStatement();
+        Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT userID FROM users WHERE login = 'parser'");
         if (resultSet!=null && resultSet.next()) {
             return resultSet.getInt(1);
@@ -94,9 +93,8 @@ public class DataInserter {
         throw new NullPointerException();
     }
 
-    public DataInserter(DataBase dataBase) {
-        this.dataBase = dataBase;
-
+    public DataInserter(Connection connection) {
+        this.connection = connection;
     }
 
 
@@ -104,7 +102,7 @@ public class DataInserter {
     public void generatePoints() {
         PreparedStatement pointsStatement = null;
         try {
-            pointsStatement = this.dataBase.getConnection().prepareStatement(
+            pointsStatement = this.connection.prepareStatement(
                     "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId)\n" +
                             "VALUE (?, ?, ?, ?, ?, ?, ?);\n"
             , Statement.RETURN_GENERATED_KEYS);
@@ -122,11 +120,11 @@ public class DataInserter {
             pointsStatement.executeBatch();
             generatedPointsId = getGeneratedKeys(pointsStatement);
 
-            this.dataBase.getConnection().commit();
+            this.connection.commit();
             System.out.println("points generated");
         } catch (SQLException e) {
             e.printStackTrace();
-            DBUtils.rollbackQuietly(this.dataBase.getConnection());
+            DBUtils.rollbackQuietly(this.connection);
         } finally {
             DBUtils.closeStatementQuietly(pointsStatement);
         }
@@ -139,7 +137,7 @@ public class DataInserter {
 
         try {
 
-            routesStatement = this.dataBase.getConnection().prepareStatement(
+            routesStatement = this.connection.prepareStatement(
                     "INSERT INTO routes (directionIDExternal, dataSourceID, routeName, firstPointArrivalTime, daysOfWeek) VALUE (?, ?, ?, ?, ?);"
             , Statement.RETURN_GENERATED_KEYS);
 
@@ -155,7 +153,7 @@ public class DataInserter {
             generatedRoutesId = getGeneratedKeys(routesStatement);
 
             // идти циклом по всем маршрутам
-            PreparedStatement routePointsStatement = this.dataBase.getConnection().prepareStatement("" +
+            PreparedStatement routePointsStatement = this.connection.prepareStatement("" +
                     "INSERT INTO route_points (sortOrder, timeForLoadingOperations, pointID, routeID) " +
                     "VALUES (?, ?, ?, ?), (?, ?, ?, ?)");
             for (Long aGeneratedRoutesId : generatedRoutesId) {
@@ -173,12 +171,12 @@ public class DataInserter {
                 routePointsStatement.addBatch();
             }
             routePointsStatement.executeBatch();
-            this.dataBase.getConnection().commit();
+            this.connection.commit();
             System.out.println("routes and routePoints generated");
 
         } catch (SQLException e) {
             e.printStackTrace();
-            DBUtils.rollbackQuietly(this.dataBase.getConnection());
+            DBUtils.rollbackQuietly(this.connection);
         } finally {
             DBUtils.closeStatementQuietly(routesStatement);
         }
@@ -188,7 +186,7 @@ public class DataInserter {
     public void generateClients() {
         PreparedStatement clientsStatement = null;
         try {
-            clientsStatement = this.dataBase.getConnection().prepareStatement(
+            clientsStatement = this.connection.prepareStatement(
                     "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)\n" +
                             "  VALUE (?, ?, ?, ?);"
             , Statement.RETURN_GENERATED_KEYS);
@@ -202,11 +200,11 @@ public class DataInserter {
             }
             clientsStatement.executeBatch();
             generatedClientsId = getGeneratedKeys(clientsStatement);
-            this.dataBase.getConnection().commit();
+            this.connection.commit();
             System.out.println("clients generated");
         } catch (SQLException e) {
             e.printStackTrace();
-            DBUtils.rollbackQuietly(this.dataBase.getConnection());
+            DBUtils.rollbackQuietly(this.connection);
         } finally {
             DBUtils.closeStatementQuietly(clientsStatement);
         }
@@ -215,7 +213,7 @@ public class DataInserter {
     public void generateUsers() {
         PreparedStatement usersStatement = null;
         try {
-            usersStatement = this.dataBase.getConnection().prepareStatement(
+            usersStatement = this.connection.prepareStatement(
                     "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
                             "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n"
             , Statement.RETURN_GENERATED_KEYS);
@@ -255,11 +253,11 @@ public class DataInserter {
             usersStatement.executeBatch();
             generatedUsersId = getGeneratedKeys(usersStatement);
 
-            this.dataBase.getConnection().commit();
+            this.connection.commit();
             System.out.println("users generated");
         } catch (SQLException e) {
             e.printStackTrace();
-            DBUtils.rollbackQuietly(this.dataBase.getConnection());
+            DBUtils.rollbackQuietly(this.connection);
         } finally {
             DBUtils.closeStatementQuietly(usersStatement);
         }
@@ -270,7 +268,7 @@ public class DataInserter {
     public void generateRouteLists() {
         PreparedStatement routeListsStatement = null;
         try {
-            routeListsStatement = this.dataBase.getConnection().prepareStatement(
+            routeListsStatement = this.connection.prepareStatement(
                     "INSERT INTO route_lists\n" +
                             "  VALUE (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n"
                     , Statement.RETURN_GENERATED_KEYS);
@@ -295,11 +293,11 @@ public class DataInserter {
             }
             routeListsStatement.executeBatch();
             generatedRouteListsId = getGeneratedKeys(routeListsStatement);
-            this.dataBase.getConnection().commit();
+            this.connection.commit();
             System.out.println("route lists generated");
         } catch (SQLException e) {
             e.printStackTrace();
-            DBUtils.rollbackQuietly(this.dataBase.getConnection());
+            DBUtils.rollbackQuietly(this.connection);
         } finally {
             DBUtils.closeStatementQuietly(routeListsStatement);
         }
@@ -316,7 +314,7 @@ public class DataInserter {
             List<Long> keysForWarehousePoints = getKeysForWarehousePoints();
 
             RandomDate randomDate = new RandomDate(LocalDate.of(2015, 1, 1), LocalDate.of(2015, 1, 28));
-            requestsStatement = this.dataBase.getConnection().prepareStatement(
+            requestsStatement = this.connection.prepareStatement(
                     "INSERT INTO requests (requestIDExternal, dataSourceID, requestNumber, requestDate, clientID,\n" +
                             "                      destinationPointID, marketAgentUserID, invoiceNumber, invoiceDate,\n" +
                             "                      documentNumber, documentDate, firma, storage, contactName, contactPhone,\n" +
@@ -359,11 +357,11 @@ public class DataInserter {
                 requestsStatement.addBatch();
             }
             requestsStatement.executeBatch();
-            this.dataBase.getConnection().commit();
+            this.connection.commit();
             System.out.println("requests generated");
         } catch (SQLException e) {
             e.printStackTrace();
-            DBUtils.rollbackQuietly(this.dataBase.getConnection());
+            DBUtils.rollbackQuietly(this.connection);
         } finally {
             DBUtils.closeStatementQuietly(requestsStatement);
         }

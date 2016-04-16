@@ -50,20 +50,15 @@ public class InsertOrUpdateTransactionScript {
         transactionExecutor.put(3, new UpdateRoutes(packageData.getUpdateDirections(), packageData.getUpdateRouteLists()));
         transactionExecutor.put(4, new UpdateClients(packageData.getUpdateClients()));
         transactionExecutor.put(5, new UpdateUsers(packageData.getUpdateTraders(), packageData.getUpdateClients()));
-        transactionExecutor.put(6, new UpdateRouteListsTable(packageData.getUpdateRouteLists()));
+        transactionExecutor.put(6, new UpdateRouteLists(packageData.getUpdateRouteLists()));
         transactionExecutor.put(7, new UpdateRequests(packageData.getUpdateRequests()));
-        transactionExecutor.put(8, new AssignStatusesInRequestsTable(packageData.getUpdateStatuses()));
-        transactionExecutor.put(9, new AssignRouteListsInRequestsTable(packageData.getUpdateRouteLists()));
+        transactionExecutor.put(8, new AssignStatusesInRequests(packageData.getUpdateStatuses()));
+        transactionExecutor.put(9, new AssignRouteListsInRequests(packageData.getUpdateRouteLists()));
+        transactionExecutor.put(10, new RefreshMatView());
 
-        CallableStatement callableStatement = null;
+
         try {
             transactionExecutor.executeAll();
-
-            logger.info("--------------START refresh materialized view------------------");
-            callableStatement = connection.prepareCall("{CALL refreshMaterializedView()}");
-            callableStatement.execute();
-            logger.info("--------------END refresh materialized view------------------");
-
             connection.commit();
             insertOrUpdateResult.setStatus(InsertOrUpdateResult.OK_STATUS);
             return insertOrUpdateResult;
@@ -77,7 +72,6 @@ public class InsertOrUpdateTransactionScript {
             return insertOrUpdateResult;
         } finally {
             transactionExecutor.closeAll();
-            DBUtils.closeStatementQuietly(callableStatement);
         }
     }
 }

@@ -43,36 +43,6 @@ public class Utils {
         return null;
     }
 
-    public static UniqueCheck getUniqueCheckObject(String parameterName) {
-        return new UniqueCheck(parameterName);
-    }
-
-    public static UniqueCheck getUniqueCheckObject(String parameterName, Collection<String> initialStrings) {
-        return new UniqueCheck(parameterName, initialStrings);
-    }
-
-    public static class UniqueCheck {
-        String parameterName;
-        private Set<String> uniqueStringSet = new HashSet<>();
-
-        public UniqueCheck(String parameterName, Collection<String> initialStrings) {
-            this(parameterName);
-            this.uniqueStringSet.addAll(initialStrings);
-        }
-
-        public UniqueCheck(String parameterName) {
-            this.parameterName = parameterName;
-        }
-
-        public boolean isUnique(String string) {
-            if (!uniqueStringSet.add(string)) {
-                logger.warn("{} = [{}] was duplicated", parameterName, string);
-                return false;
-            } else
-                return true;
-        }
-    }
-
     /**
      * if allRouteNames contains routeNameCandidate then direction name changed
      * @param allRouteNames
@@ -86,14 +56,6 @@ public class Utils {
         String generatedDirectionName = duplicatedRouteName + count + "";
         logger.warn("direction name [{}] was duplicated, generated direction name = [{}]", duplicatedRouteName, generatedDirectionName);
         return generatedDirectionName;
-    }
-
-    public static java.sql.Date getSqlDateFromString(String dateString) {
-        if (dateString == null)
-            return null;
-        LocalDate requestDate = LocalDate.parse(dateString, DateTimeFormatter.BASIC_ISO_DATE);
-        Date date = Date.valueOf(requestDate);
-        return new java.sql.Date(date.getTime());
     }
 
 }

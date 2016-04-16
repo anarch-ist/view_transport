@@ -94,7 +94,7 @@ public class UpdateRequests extends TransactionPart{
             else
                 requestsPreparedStatement.setString(7, addressId);
             requestsPreparedStatement.setString(8, InsertOrUpdateTransactionScript.LOGIST_1C);
-
+            // TODO check all foreighn keys!!!!
             String traderId = updateRequest.getTraderId();
             if (!allUsersIDExternal.contains(traderId)) {
                 throw new DBCohesionException(Util.getParameterizedString("requestId {} has traderId = {} that is not contained in users table.", updateRequest.getRequestId(), traderId));

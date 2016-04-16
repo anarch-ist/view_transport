@@ -11,17 +11,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RouteListsData {
-    private static final String FN_ROUTE_LIST_ID = "routerSheetId";
-    private static final String FN_ROUTE_LIST_NUMBER = "routerSheetNumber";
-    private static final String FN_ROUTE_LIST_DATE = "routerSheetDate";
-    private static final String FN_DEPARTURE_DATE = "departureDate";
-    private static final String FN_FORWARDER_ID = "forwarderId";
-    private static final String FN_DRIVER_ID = "driverId";
-    private static final String FN_POINT_DEPARTURE_ID = "pointDepartureId";
-    private static final String FN_POINT_ARRIVAL_ID = "pointArrivalId";
-    private static final String FN_DIRECT_ID = "directId";
-    private static final String FN_STATUS = "status";
-    private static final String FN_INVOICES = "invoices";
+    public static final String FN_ROUTE_LIST_ID = "routerSheetId";
+    public static final String FN_ROUTE_LIST_NUMBER = "routerSheetNumber";
+    public static final String FN_ROUTE_LIST_DATE = "routerSheetDate";
+    public static final String FN_DEPARTURE_DATE = "departureDate";
+    public static final String FN_FORWARDER_ID = "forwarderId";
+    public static final String FN_DRIVER_ID = "driverId";
+    public static final String FN_POINT_DEPARTURE_ID = "pointDepartureId";
+    public static final String FN_POINT_ARRIVAL_ID = "pointArrivalId";
+    public static final String FN_DIRECT_ID = "directId";
+    public static final String FN_STATUS = "status";
+    public static final String FN_INVOICES = "invoices";
     private static final DateTimeFormatter isoFormatter = DateTimeFormatter.BASIC_ISO_DATE;
     private static final Set<String> possibleStatuses = new HashSet<>(Arrays.asList("CREATED", "APPROVED"));
     private static final String NULL = "NULL";

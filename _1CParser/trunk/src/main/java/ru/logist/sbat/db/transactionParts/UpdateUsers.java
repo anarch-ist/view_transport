@@ -74,11 +74,12 @@ public class UpdateUsers extends TransactionPart {
             result.addBatch();
         }
 
-        for (ClientData updateClient : updateClients) {
 
-            // insert into users
+        for (ClientData updateClient : updateClients) {
+            // нужно чтобы избежать возникновения одинаковых userIdExternal(никто не гарантирует, что clientIdExternal и userIdExternal всегда разные)
             String userIdExternal = updateClient.getClientId() + CLIENT_USER_SUFFIX;
             String login = updateClient.getClientId();
+
             result.setString(1, userIdExternal);
             result.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
             result.setString(6, CLIENT_MANAGER);
@@ -87,7 +88,8 @@ public class UpdateUsers extends TransactionPart {
             result.setString(9, null);
             result.setString(10, null); // position
             result.setString(11, null); // pointID
-            result.setString(12, updateClient.getClientId()); // clientID - foreign key
+            // clientID - foreign key   all clients was inserted in UpdateClients transaction part, no need to check
+            result.setString(12, updateClient.getClientId());
             result.setString(13, InsertOrUpdateTransactionScript.LOGIST_1C);
 
             if (updateClient.hasValidPassword()) {

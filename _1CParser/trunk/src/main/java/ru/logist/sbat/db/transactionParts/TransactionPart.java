@@ -1,8 +1,6 @@
 package ru.logist.sbat.db.transactionParts;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public abstract class TransactionPart {
     protected Connection connection;
@@ -15,5 +13,5 @@ public abstract class TransactionPart {
         this.connection = connection;
     }
 
-    public abstract PreparedStatement executePart() throws SQLException, DBCohesionException;
+    public abstract Statement executePart() throws SQLException, DBCohesionException;
 }

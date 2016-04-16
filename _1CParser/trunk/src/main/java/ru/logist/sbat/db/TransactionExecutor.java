@@ -5,12 +5,12 @@ import ru.logist.sbat.db.transactionParts.Selects;
 import ru.logist.sbat.db.transactionParts.TransactionPart;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public class TransactionExecutor extends TreeMap<Integer, TransactionPart> {
-    private List<PreparedStatement> preparedStatements = new ArrayList<>();
+    private List<Statement> statements = new ArrayList<>();
     private Connection connection;
 
     private TransactionExecutor(Comparator<? super Integer> comparator) {
@@ -26,13 +26,13 @@ public class TransactionExecutor extends TreeMap<Integer, TransactionPart> {
         for (Map.Entry<Integer, TransactionPart> entry: this.entrySet()) {
             TransactionPart transactionPart = entry.getValue();
             transactionPart.setConnection(connection);
-            PreparedStatement preparedStatement = transactionPart.executePart();
-            preparedStatements.add(preparedStatement);
+            Statement statement = transactionPart.executePart();
+            statements.add(statement);
         }
     }
 
     public void closeAll() {
-        this.preparedStatements.forEach(DBUtils::closeStatementQuietly);
+        this.statements.forEach(DBUtils::closeStatementQuietly);
     }
 
     public void setConnection(Connection connection) {

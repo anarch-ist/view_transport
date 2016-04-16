@@ -63,6 +63,7 @@ public class UpdateRoutes extends TransactionPart{
         Map<String, String> allPoints = Selects.selectAllPoints();
 
         for (RouteListsData updateRouteList : updateRouteLists) {
+            //???
             if (updateRouteList.isTrunkRoute()) {
                 // insert or update route
                 String generatedRouteId = updateRouteList.getGeneratedRouteId();

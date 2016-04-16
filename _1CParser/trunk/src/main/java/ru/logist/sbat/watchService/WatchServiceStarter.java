@@ -41,7 +41,7 @@ public class WatchServiceStarter {
                 key = watchService.take();
             }
             catch (InterruptedException ex) {
-                logger.error(ex);
+                logger.error("watch thread interrupted");
                 return;
             }
 
@@ -85,7 +85,6 @@ public class WatchServiceStarter {
             }
 
         } // end infinite for loop
-
         closeWatchService();
     }
 
