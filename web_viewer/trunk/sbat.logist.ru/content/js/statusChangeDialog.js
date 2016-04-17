@@ -132,7 +132,7 @@ $(document).ready(function () {
                                 
                                 $('#selectNumbersRequestsTr').show();
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
+                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
                                 $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
 
                             });
@@ -157,12 +157,10 @@ $(document).ready(function () {
                     // get specific vars for "changeStatusForRequest" dialogType
 
                     var requestIDExternal = dataTable.row($('#user-grid .selected')).data().requestIDExternal;
-                    var requestID = dataTable.row($('#user-grid .selected')).data().requestID;
                     if (date)
                         $.post("content/getData.php",
                             {
                                 status: dialogType,
-                                requestID: requestID,
                                 requestIDExternal: requestIDExternal,
                                 newStatusID: newStatusID,
                                 date: date,
@@ -201,7 +199,8 @@ $(document).ready(function () {
                                 comment: comment,
                                 vehicleNumber: vehicleNumber,
                                 palletsQty: palletsQty,
-                                requestIDExternalArray: requests
+                                requestIDExternalArray: requests,
+                                routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
                             },
                             function (data) {
                                 if (data === '1') {
