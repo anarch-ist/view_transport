@@ -39,7 +39,7 @@ public class DataBaseTest {
 
         DBManager = new DBManager(systemResourcesContainer.getConnection());
 
-        // clean DBManager content
+        // clean database content
         DBManager.truncatePublicTables();
     }
 

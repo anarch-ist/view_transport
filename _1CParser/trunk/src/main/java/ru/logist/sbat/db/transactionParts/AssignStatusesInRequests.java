@@ -1,12 +1,13 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.commons.collections4.BidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
+import ru.logist.sbat.db.DBCohesionException;
+import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.StatusData;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -21,39 +22,46 @@ public class AssignStatusesInRequests extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException, DBCohesionException {
         if (updateStatuses.isEmpty())
             return null;
 
+        BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.allRequestsAsKeyPairs();
+
         logger.info("-----------------START assign statuses in requests table from JSON object:[updateStatus]-----------------");
-        PreparedStatement requestsUpdatePreparedStatement = connection.prepareStatement(
-                "UPDATE requests SET boxQty = ?, requestStatusID = ?, commentForStatus = ?, lastStatusUpdated = ?, routeListID = VALUES(routeListID) WHERE requestIDExternal = ? AND dataSourceID = ?;"
+        PreparedStatement requestsUpdatePrSt = connection.prepareStatement(
+                "UPDATE requests SET boxQty = ?, requestStatusID = ?, commentForStatus = ?, lastStatusUpdated = ? WHERE requestID = ?;"
         );
 
         for (StatusData updateStatus : updateStatuses) {
-            String requestIdExternal = updateStatus.getRequestId();
-            Long numBoxes = updateStatus.getNumBoxes();
-            String requestStatus = updateStatus.getStatus();
-            Date timeOutStatus = updateStatus.getTimeOutStatus();
-            String comment = updateStatus.getComment();
-            if (numBoxes == null)
-                requestsUpdatePreparedStatement.setNull(1, Types.INTEGER);
-            else {
-                requestsUpdatePreparedStatement.setLong(1, numBoxes);
-            }
-            if (requestStatus == null) {
-                logger.warn("requestStatus for requestId = [{}] is null, new requestStatus = [CREATED]", requestIdExternal);
-                requestStatus = "CREATED";
-            }
-            requestsUpdatePreparedStatement.setString(2, requestStatus);
-            requestsUpdatePreparedStatement.setString(3, comment);
-            requestsUpdatePreparedStatement.setDate(4, timeOutStatus);
-            requestsUpdatePreparedStatement.setString(5, requestIdExternal);
-            requestsUpdatePreparedStatement.setString(6, InsertOrUpdateTransactionScript.LOGIST_1C);
-            requestsUpdatePreparedStatement.addBatch();
+
+            setNumBoxes(requestsUpdatePrSt, 1, updateStatus.getNumBoxes());
+            requestsUpdatePrSt.setString(2, updateStatus.getStatus());
+            requestsUpdatePrSt.setString(3, updateStatus.getComment());
+            requestsUpdatePrSt.setDate(  4, updateStatus.getTimeOutStatus());
+            setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
+
+            requestsUpdatePrSt.addBatch();
         }
-        int[] requestsAffectedRecords = requestsUpdatePreparedStatement.executeBatch();
+        int[] requestsAffectedRecords = requestsUpdatePrSt.executeBatch();
         logger.info("ASSIGN statuses in requests completed, affected records size = [{}]", requestsAffectedRecords.length);
-        return requestsUpdatePreparedStatement;
+        return requestsUpdatePrSt;
+    }
+
+    private void setNumBoxes(PreparedStatement requestsUpdatePrSt, Integer parameterIndex, Long numBoxes) throws SQLException {
+        if (numBoxes == null)
+            requestsUpdatePrSt.setNull(parameterIndex, Types.INTEGER);
+        else {
+            requestsUpdatePrSt.setInt(parameterIndex, numBoxes.intValue());
+        }
+    }
+
+    private void setRequestId(PreparedStatement requestsUpdatePrSt, Integer parameterIndex, String requestIdExternal, BidiMap<String, Integer> allRequestsAsKeyPairs) throws SQLException, DBCohesionException {
+        Integer requestId = allRequestsAsKeyPairs.get(requestIdExternal);
+        if (requestId == null) {
+            throw new DBCohesionException(this.getClass().getSimpleName(), StatusData.FN_REQUEST_ID, StatusData.FN_REQUEST_ID, requestIdExternal, "requests");
+        } else {
+            requestsUpdatePrSt.setInt(parameterIndex, requestId);
+        }
     }
 }

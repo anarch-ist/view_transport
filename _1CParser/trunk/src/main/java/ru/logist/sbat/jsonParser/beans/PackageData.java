@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Set;
 
 public class PackageData {
-    private static final String FN_UPDATE_POINTS = "updatePoints";
-    private static final String FN_UPDATE_DIRECTIONS = "updateDirections";
-    private static final String FN_UPDATE_TRADER = "updateTrader";
-    private static final String FN_UPDATE_CLIENTS = "updateClients";
-    private static final String FN_UPDATE_ADDRESS = "updateAddress";
-    private static final String FN_UPDATE_REQUESTS = "updateRequests";
-    private static final String FN_UPDATE_STATUS = "updateStatus";
-    private static final String FN_UPDATE_ROUTE_LISTS = "updateRouteLists";
+    public static final String FN_UPDATE_POINTS = "updatePoints";
+    public static final String FN_UPDATE_DIRECTIONS = "updateDirections";
+    public static final String FN_UPDATE_TRADER = "updateTrader";
+    public static final String FN_UPDATE_CLIENTS = "updateClients";
+    public static final String FN_UPDATE_ADDRESS = "updateAddress";
+    public static final String FN_UPDATE_REQUESTS = "updateRequests";
+    public static final String FN_UPDATE_STATUS = "updateStatus";
+    public static final String FN_UPDATE_ROUTE_LISTS = "updateRouteLists";
 
     private List<PointData> updatePoints = new ArrayList<>();
     private List<DirectionsData> updateDirections = new ArrayList<>();

@@ -14,19 +14,17 @@ import java.util.List;
 public class UpdatePoints extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
     private final List<PointData> updatePointsArray;
-    private final List<AddressData> updateAddresses;
 
-    public UpdatePoints(List<PointData> updatePointsArray, List<AddressData> updateAddresses) {
+    public UpdatePoints(List<PointData> updatePointsArray) {
         this.updatePointsArray = updatePointsArray;
-        this.updateAddresses = updateAddresses;
     }
 
     @Override
     public PreparedStatement executePart() throws SQLException {
-        if (updatePointsArray.isEmpty() && updateAddresses.isEmpty())
+        if (updatePointsArray.isEmpty())
             return null;
 
-        logger.info("-----------------START update points table from JSON objects:[updatePointsArray], [updateAddresses]-----------------");
+        logger.info("-----------------START update points table from JSON object:[updatePointsArray]------------------");
 
         PreparedStatement pointsStatement =  connection.prepareStatement(
                 "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId)\n" +
@@ -48,22 +46,6 @@ public class UpdatePoints extends TransactionPart {
             pointsStatement.setString(5, updatePoint.getPointEmails());
             pointsStatement.setString(6, updatePoint.getPointType());
             pointsStatement.setString(7, updatePoint.getResponsiblePersonId());
-            pointsStatement.addBatch();
-        }
-
-        // create or update points from updateAddresses JSON array
-        for (AddressData updateAddress : updateAddresses) {
-            String pointIdExternal = updateAddress.getAddressId();
-            String pointName = updateAddress.getAddressShot();
-            String pointAddress = updateAddress.getAddressFull();
-
-            pointsStatement.setString(1, pointIdExternal);
-            pointsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
-            pointsStatement.setString(3, pointName);
-            pointsStatement.setString(4, pointAddress);
-            pointsStatement.setString(5, "");
-            pointsStatement.setString(6, "AGENCY");
-            pointsStatement.setString(7, "");
             pointsStatement.addBatch();
         }
 

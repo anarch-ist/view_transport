@@ -1,6 +1,5 @@
 package ru.logist.sbat.db;
 
-import ru.logist.sbat.db.transactionParts.DBCohesionException;
 import ru.logist.sbat.db.transactionParts.Selects;
 import ru.logist.sbat.db.transactionParts.TransactionPart;
 

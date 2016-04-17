@@ -8,11 +8,12 @@ import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 
 public class DataFrom1c {
-    private static final String FN_DATA_FROM_1C = "dataFrom1C";
-    private static final String FN_SERVER = "server";
-    private static final String FN_PACKAGE_NUMBER = "packageNumber";
-    private static final String FN_CREATED = "created";
-    private static final String FN_PACKAGE_DATA = "packageData";
+    public static final String FN_DATA_FROM_1C = "dataFrom1C";
+    public static final String FN_SERVER = "server";
+    public static final String FN_PACKAGE_NUMBER = "packageNumber";
+    public static final String FN_CREATED = "created";
+    public static final String FN_PACKAGE_DATA = "packageData";
+
     private static final DateTimeFormatter dateTimeSQLFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss");
 
     private String server;

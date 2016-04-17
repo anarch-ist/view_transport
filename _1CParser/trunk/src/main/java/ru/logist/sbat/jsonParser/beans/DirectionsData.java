@@ -5,8 +5,8 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class DirectionsData {
-    private static final String FN_DIRECT_ID = "directId";
-    private static final String FN_DIRECT_NAME = "directName";
+    public static final String FN_DIRECT_ID = "directId";
+    public static final String FN_DIRECT_NAME = "directName";
 
     @Unique
     private String directId;

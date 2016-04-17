@@ -12,11 +12,11 @@ import java.util.Set;
 
 public class StatusData {
     // field names in JSON file
-    private static final String FN_REQUEST_ID = "requestId";
-    private static final String FN_NUM_BOXES = "num_boxes";
-    private static final String FN_STATUS = "status";
-    private static final String FN_TIME_OUT_STATUS = "timeOutStatus";
-    private static final String FN_COMMENT = "Comment";
+    public static final String FN_REQUEST_ID = "requestId";
+    public static final String FN_NUM_BOXES = "num_boxes";
+    public static final String FN_STATUS = "status";
+    public static final String FN_TIME_OUT_STATUS = "timeOutStatus";
+    public static final String FN_COMMENT = "Comment";
     private static final Set<String> possibleStatuses = new HashSet<>(Arrays.asList(
             "UNKNOWN", "SAVED", "APPROVING", "RESERVED", "APPROVED", "STOP_LIST",
             "CREDIT_LIMIT", "RASH_CREATED", "COLLECTING", "CHECK", "CHECK_PASSED", "ADJUSTMENTS_MADE",

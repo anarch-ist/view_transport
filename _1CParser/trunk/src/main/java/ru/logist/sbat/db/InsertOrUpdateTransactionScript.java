@@ -46,15 +46,17 @@ public class InsertOrUpdateTransactionScript {
         PackageData packageData = dataFrom1c.getPackageData();
 
         transactionExecutor.put(1, new UpdateExchange(dataFrom1c));
-        transactionExecutor.put(2, new UpdatePoints(packageData.getUpdatePoints(), packageData.getUpdateAddresses()));
-        transactionExecutor.put(3, new UpdateRoutes(packageData.getUpdateDirections(), packageData.getUpdateRouteLists()));
-        transactionExecutor.put(4, new UpdateClients(packageData.getUpdateClients()));
-        transactionExecutor.put(5, new UpdateUsers(packageData.getUpdateTraders(), packageData.getUpdateClients()));
-        transactionExecutor.put(6, new UpdateRouteLists(packageData.getUpdateRouteLists()));
-        transactionExecutor.put(7, new UpdateRequests(packageData.getUpdateRequests()));
-        transactionExecutor.put(8, new AssignStatusesInRequests(packageData.getUpdateStatuses()));
-        transactionExecutor.put(9, new AssignRouteListsInRequests(packageData.getUpdateRouteLists()));
-        transactionExecutor.put(10, new RefreshMatView());
+        transactionExecutor.put(2, new UpdatePoints(packageData.getUpdatePoints()));
+        transactionExecutor.put(3, new UpdatePointsFromDirections(packageData.getUpdateAddresses()));
+        transactionExecutor.put(4, new UpdateRoutes(packageData.getUpdateDirections(), packageData.getUpdateRouteLists()));
+        transactionExecutor.put(5, new UpdateClients(packageData.getUpdateClients()));
+        transactionExecutor.put(6, new UpdateUsersFromTraders(packageData.getUpdateTraders()));
+        transactionExecutor.put(7, new UpdateUsersFromClients(packageData.getUpdateClients()));
+        transactionExecutor.put(8, new UpdateRouteLists(packageData.getUpdateRouteLists()));
+        transactionExecutor.put(9, new UpdateRequests(packageData.getUpdateRequests()));
+        transactionExecutor.put(10, new AssignStatusesInRequests(packageData.getUpdateStatuses()));
+        transactionExecutor.put(11, new AssignRouteListsInRequests(packageData.getUpdateRouteLists()));
+        transactionExecutor.put(12, new RefreshMatView());
 
 
         try {

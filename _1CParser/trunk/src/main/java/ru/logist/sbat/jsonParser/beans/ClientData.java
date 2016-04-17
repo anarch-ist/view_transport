@@ -5,10 +5,10 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class ClientData {
-    private static final String FN_CLIENT_ID = "clientId";
-    private static final String FN_CLIENT_NAME = "clientName";
-    private static final String FN_CLIENT_INN = "clientINN";
-    private static final String FN_CLIENT_PASSWORD = "clientPassword";
+    public static final String FN_CLIENT_ID = "clientId";
+    public static final String FN_CLIENT_NAME = "clientName";
+    public static final String FN_CLIENT_INN = "clientINN";
+    public static final String FN_CLIENT_PASSWORD = "clientPassword";
 
     @Unique
     private String clientId;

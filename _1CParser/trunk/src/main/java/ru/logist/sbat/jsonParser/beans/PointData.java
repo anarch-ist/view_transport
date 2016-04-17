@@ -11,12 +11,12 @@ import java.util.Set;
 
 public class PointData {
 
-    private static final String FN_POINT_ID = "pointId";
-    private static final String FN_POINT_NAME = "pointName";
-    private static final String FN_POINT_ADDRESS = "pointAdress";
-    private static final String FN_POINT_TYPE = "pointType";
-    private static final String FN_POINT_EMAIL = "pointEmail";
-    private static final String FN_RESPONSIBLE_PERSON_ID = "responsiblePersonId";
+    public static final String FN_POINT_ID = "pointId";
+    public static final String FN_POINT_NAME = "pointName";
+    public static final String FN_POINT_ADDRESS = "pointAdress";
+    public static final String FN_POINT_TYPE = "pointType";
+    public static final String FN_POINT_EMAIL = "pointEmail";
+    public static final String FN_RESPONSIBLE_PERSON_ID = "responsiblePersonId";
     public static final Set<String> POINT_TYPES = new HashSet<>(Arrays.asList("WAREHOUSE", "AGENCY"));
 
     @Unique

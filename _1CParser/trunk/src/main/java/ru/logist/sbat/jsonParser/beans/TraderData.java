@@ -5,13 +5,13 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class TraderData {
-    private static final String FN_TRADER_ID = "traderId";
-    private static final String FN_TRADER_NAME = "traderName";
-    private static final String FN_TRADER_EMAIL = "traderEMail";
-    private static final String FN_TRADER_PHONE = "traderPhone";
-    private static final String FN_TRADER_OFFICE = "traderOffice";
-    private static final String FN_TRADER_LOGIN = "traderLogin";
-    private static final String FN_TRADER_PASSWORD = "traderPassword";
+    public static final String FN_TRADER_ID = "traderId";
+    public static final String FN_TRADER_NAME = "traderName";
+    public static final String FN_TRADER_EMAIL = "traderEMail";
+    public static final String FN_TRADER_PHONE = "traderPhone";
+    public static final String FN_TRADER_OFFICE = "traderOffice";
+    public static final String FN_TRADER_LOGIN = "traderLogin";
+    public static final String FN_TRADER_PASSWORD = "traderPassword";
 
     @Unique
     private String traderId;

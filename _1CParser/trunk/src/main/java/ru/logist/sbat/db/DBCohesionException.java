@@ -1,4 +1,4 @@
-package ru.logist.sbat.db.transactionParts;
+package ru.logist.sbat.db;
 
 import ru.logist.sbat.jsonParser.Util;
 

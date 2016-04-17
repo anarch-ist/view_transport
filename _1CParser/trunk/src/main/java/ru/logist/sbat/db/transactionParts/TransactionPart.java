@@ -1,5 +1,7 @@
 package ru.logist.sbat.db.transactionParts;
 
+import ru.logist.sbat.db.DBCohesionException;
+
 import java.sql.*;
 
 public abstract class TransactionPart {

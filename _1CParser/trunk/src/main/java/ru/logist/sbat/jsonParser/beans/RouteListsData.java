@@ -22,6 +22,7 @@ public class RouteListsData {
     public static final String FN_DIRECT_ID = "directId";
     public static final String FN_STATUS = "status";
     public static final String FN_INVOICES = "invoices";
+
     private static final DateTimeFormatter isoFormatter = DateTimeFormatter.BASIC_ISO_DATE;
     private static final Set<String> possibleStatuses = new HashSet<>(Arrays.asList("CREATED", "APPROVED"));
     private static final String NULL = "NULL";

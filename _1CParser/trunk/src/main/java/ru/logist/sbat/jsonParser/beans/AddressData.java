@@ -5,10 +5,10 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 public class AddressData {
-    private static final String FN_ADDRESS_ID = "addressId";
-    private static final String FN_ADDRESS_SHORT = "addressShot";
-    private static final String FN_ADDRESS_FULL = "addressFull";
-    private static final String FN_DELIVERY_AREA_ID = "deliveryAreaId";
+    public static final String FN_ADDRESS_ID = "addressId";
+    public static final String FN_ADDRESS_SHORT = "addressShot";
+    public static final String FN_ADDRESS_FULL = "addressFull";
+    public static final String FN_DELIVERY_AREA_ID = "deliveryAreaId";
 
 
     @Unique

@@ -1,9 +1,10 @@
 package ru.logist.sbat.db.transactionParts;
 
 
+import org.apache.commons.collections4.BidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
+import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.jsonParser.beans.RouteListsData;
 
 import java.sql.PreparedStatement;
@@ -20,28 +21,45 @@ public class AssignRouteListsInRequests extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException {
+    public PreparedStatement executePart() throws SQLException, DBCohesionException {
         if (updateRouteLists.isEmpty())
             return null;
 
+        BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.allRequestsAsKeyPairs();
+        BidiMap<String, Integer> allPointsAsKeyPairs = Selects.allPointsAsKeyPairs();
+        BidiMap<String, Integer> allRouteListsAsKeyPairs = Selects.allRouteListsAsKeyPairs();
+
         PreparedStatement requestUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET " +
-                        "routeListID = (SELECT route_lists.routeListID FROM route_lists WHERE route_lists.routeListIDExternal = ? AND route_lists.dataSourceID = ?)," +
-                        "warehousePointID = (SELECT points.pointID FROM points WHERE points.pointIDExternal = ? AND points.dataSourceID = ?)" +
-                        "  WHERE requests.requestIDExternal = ? AND requests.dataSourceID = ?;"
-
+                        "routeListID = ?," +
+                        "warehousePointID = ?" +
+                        "  WHERE requests.requestID = ?;"
         );
 
         for (RouteListsData updateRouteList : updateRouteLists) {
             Set<String> requests = updateRouteList.getRequests(); // list of requests inside routeList
+
+            String pointIdExternal = updateRouteList.getPointDepartureId();
+            Integer warehousePointId = allPointsAsKeyPairs.get(pointIdExternal);
+            if (warehousePointId == null) {
+                throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_POINT_DEPARTURE_ID, pointIdExternal, "points");
+            }
+
+            String routeListIdExternal = updateRouteList.getRouteListId();
+            Integer routeListId = allRouteListsAsKeyPairs.get(routeListIdExternal);
+
             for(Object requestIDExternalAsObject: requests) {
                 String requestIDExternal = (String) requestIDExternalAsObject;
-                requestUpdatePreparedStatement.setString(1, updateRouteList.getRouteListId());
-                requestUpdatePreparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
-                requestUpdatePreparedStatement.setString(3, updateRouteList.getPointDepartureId()); // pointIDExternal
-                requestUpdatePreparedStatement.setString(4, InsertOrUpdateTransactionScript.LOGIST_1C);
-                requestUpdatePreparedStatement.setString(5, requestIDExternal);
-                requestUpdatePreparedStatement.setString(6, InsertOrUpdateTransactionScript.LOGIST_1C);
+
+                Integer requestId = allRequestsAsKeyPairs.get(requestIDExternal);
+                if (requestId == null) {
+                    throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_INVOICES, requestIDExternal, "requests");
+                } else {
+                    requestUpdatePreparedStatement.setInt(1, requestId);
+                }
+
+                requestUpdatePreparedStatement.setInt(2, warehousePointId);
+                requestUpdatePreparedStatement.setInt(3, routeListId);
                 requestUpdatePreparedStatement.addBatch();
             }
 

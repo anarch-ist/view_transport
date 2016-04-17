@@ -8,22 +8,23 @@ import java.time.format.DateTimeFormatter;
 import java.sql.Date;
 
 public class RequestsData {
-    private static final String FN_REQUEST_ID = "requestId";
-    private static final String FN_REQUEST_NUMBER = "requestNumber";
-    private static final String FN_REQUEST_DATE = "requestDate";
-    private static final String FN_INVOICE_NUMBER = "invoiceNumber";
-    private static final String FN_INVOICE_DATE = "invoiceDate";
-    private static final String FN_DOCUMENT_NUMBER = "documentNumber";
-    private static final String FN_DOCUMENT_DATE = "documentDate";
-    private static final String FN_FIRMA = "firma";
-    private static final String FN_STORAGE = "storage";
-    private static final String FN_CLIENT_ID = "clientId";
-    private static final String FN_ADDRESS_ID = "addressId";
-    private static final String FN_CONTACT_NAME = "contactName";
-    private static final String FN_CONTACT_PHONE = "contactPhone";
-    private static final String FN_DELIVERY_OPTION = "deliveryOption";
-    private static final String FN_TRADER_ID = "traderId";
-    private static final String FN_DELIVERY_DATE = "deliveryDate";
+    public static final String FN_REQUEST_ID = "requestId";
+    public static final String FN_REQUEST_NUMBER = "requestNumber";
+    public static final String FN_REQUEST_DATE = "requestDate";
+    public static final String FN_INVOICE_NUMBER = "invoiceNumber";
+    public static final String FN_INVOICE_DATE = "invoiceDate";
+    public static final String FN_DOCUMENT_NUMBER = "documentNumber";
+    public static final String FN_DOCUMENT_DATE = "documentDate";
+    public static final String FN_FIRMA = "firma";
+    public static final String FN_STORAGE = "storage";
+    public static final String FN_CLIENT_ID = "clientId";
+    public static final String FN_ADDRESS_ID = "addressId";
+    public static final String FN_CONTACT_NAME = "contactName";
+    public static final String FN_CONTACT_PHONE = "contactPhone";
+    public static final String FN_DELIVERY_OPTION = "deliveryOption";
+    public static final String FN_TRADER_ID = "traderId";
+    public static final String FN_DELIVERY_DATE = "deliveryDate";
+
     private static final DateTimeFormatter isoFormatter = DateTimeFormatter.BASIC_ISO_DATE;
 
     @Unique
