@@ -447,8 +447,9 @@ CREATE TABLE request_statuses (
 INSERT INTO request_statuses
 VALUES
   -- duty statuses
-  ('CREATED', 'Внутренняя заявка добавлена в БД', 0),
-  ('DELETED', 'Внутренняя заявка удалена из БД', -1),
+  ('CREATED', 'заявка добавлена в БД', 0),
+  ('UPDATED', 'заявка обновлена из 1С', -2),
+  ('DELETED', 'заявка удалена из БД', -1),
   -- insider request statuses
   ('UNKNOWN', 'неизвестный статус', 1),
   ('SAVED', 'Заявка в состоянии черновика', 1),
