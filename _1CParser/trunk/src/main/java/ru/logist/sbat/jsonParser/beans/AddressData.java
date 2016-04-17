@@ -11,7 +11,8 @@ public class AddressData {
     public static final String FN_DELIVERY_AREA_ID = "deliveryAreaId";
 
 
-    @Unique
+    //TODO
+    //@Unique
     private String addressId; //not null and not empty
     private String addressShot; // not null
     private String addressFull; // not null

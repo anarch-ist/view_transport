@@ -39,7 +39,12 @@ public class AssignStatusesInRequests extends TransactionPart{
             requestsUpdatePrSt.setString(2, updateStatus.getStatus());
             requestsUpdatePrSt.setString(3, updateStatus.getComment());
             requestsUpdatePrSt.setDate(  4, updateStatus.getTimeOutStatus());
-            setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
+            // TODO
+            try {
+                setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
+            } catch (DBCohesionException e) {
+                continue;
+            }
 
             requestsUpdatePrSt.addBatch();
         }

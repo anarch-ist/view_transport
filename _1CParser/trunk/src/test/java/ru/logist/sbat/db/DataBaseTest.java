@@ -26,7 +26,7 @@ public class DataBaseTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-
+    
         // get JSON object
         Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_old_test_data.pkg").toURI());
         dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(path);

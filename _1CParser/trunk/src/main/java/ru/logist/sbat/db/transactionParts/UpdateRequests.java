@@ -91,7 +91,12 @@ public class UpdateRequests extends TransactionPart{
             requestsPreparedStatement.setDate  (4,  updateRequest.getRequestDate());
             setClientId(allClientsKeyMap, requestsPreparedStatement, 5, updateRequest.getClientId());
             setDestinationPoint(allPointsKeyMap, requestsPreparedStatement, updateRequest, 6, updateRequest.getAddressId());
-            setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
+            // TODO
+            try {
+                setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
+            } catch (DBCohesionException e) {
+                continue;
+            }
             requestsPreparedStatement.setString(8, updateRequest.getInvoiceNumber());
             requestsPreparedStatement.setDate  (9, updateRequest.getInvoiceDate());
             requestsPreparedStatement.setString(10, updateRequest.getDocumentNumber());
@@ -129,6 +134,7 @@ public class UpdateRequests extends TransactionPart{
 
     private void setMarketAgentUserId(BidiMap<String, Integer> allUsersKeyMap, PreparedStatement requestsPreparedStatement, int parameterIndex, String traderId) throws DBCohesionException, SQLException {
         Integer marketAgentUserId = allUsersKeyMap.get(traderId);
+
         if (marketAgentUserId == null) {
             throw new DBCohesionException(this.getClass().getSimpleName(), RequestsData.FN_REQUEST_ID, RequestsData.FN_TRADER_ID, traderId, "points");
         } else {

@@ -54,8 +54,9 @@ public class InsertOrUpdateTransactionScript {
         transactionExecutor.put(7, new UpdateUsersFromClients(packageData.getUpdateClients()));
         transactionExecutor.put(8, new UpdateRouteLists(packageData.getUpdateRouteLists()));
         transactionExecutor.put(9, new UpdateRequests(packageData.getUpdateRequests()));
-        transactionExecutor.put(10, new AssignStatusesInRequests(packageData.getUpdateStatuses()));
-        transactionExecutor.put(11, new AssignRouteListsInRequests(packageData.getUpdateRouteLists()));
+//TODO
+//        transactionExecutor.put(10, new AssignStatusesInRequests(packageData.getUpdateStatuses()));
+//        transactionExecutor.put(11, new AssignRouteListsInRequests(packageData.getUpdateRouteLists()));
         transactionExecutor.put(12, new RefreshMatView());
 
 

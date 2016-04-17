@@ -8,12 +8,12 @@ public class DBCohesionException extends Exception {
     }
 
     public DBCohesionException(String transactionPart, String rootParameterName, String parameterName, String parameterValue, String tableName) {
-        Util.getParameterizedString(
+        super(Util.getParameterizedString(
                 transactionPart + ": {} has {} = {} that is not contained in {} table.",
                 rootParameterName,
                 parameterName,
                 parameterValue,
                 tableName
-        );
+        ));
     }
 }
