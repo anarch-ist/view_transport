@@ -157,10 +157,12 @@ $(document).ready(function () {
                     // get specific vars for "changeStatusForRequest" dialogType
 
                     var requestIDExternal = dataTable.row($('#user-grid .selected')).data().requestIDExternal;
+                    var requestID = dataTable.row($('#user-grid .selected')).data().requestID;
                     if (date)
                         $.post("content/getData.php",
                             {
                                 status: dialogType,
+                                requestID: requestID,
                                 requestIDExternal: requestIDExternal,
                                 newStatusID: newStatusID,
                                 date: date,

@@ -187,6 +187,7 @@ $(document).ready(function () {
             {"data": "palletsQty"},
             {"data": "routeListNumber"},
             {"data": "arrivalTimeToNextRoutePoint"},
+
         ],
         columnDefs: [
             {"name": "requestIDExternal", "searchable": true, "targets": 0},
@@ -215,6 +216,7 @@ $(document).ready(function () {
             {"name": "palletsQty", "searchable": true, "targets": 23},
             {"name": "routeListNumber", "searchable": true, "targets": 24},
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
+
         ]
     });
     // set padding for dataTable
