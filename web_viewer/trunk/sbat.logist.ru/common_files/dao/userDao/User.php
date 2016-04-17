@@ -218,8 +218,8 @@ class InsertUser implements IEntityInsert
         $salt = substr(md5(rand(0, 100000000)), 0, 16);
         $passAndSalt = md5($this->passMD5 . $salt);
 //        echo "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE ($this->userName, $this->login, $this->position, $salt, $passAndSalt, $this->phoneNumber, $this->email, $this->userRoleID, $this->pointID);";
-        return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE " .
-        "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID);";
+        return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID, userIDExternal, dataSourceID) VALUE " .
+        "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID, '$this->login', 'ADMIN_PAGE');";
     }
 }
 
