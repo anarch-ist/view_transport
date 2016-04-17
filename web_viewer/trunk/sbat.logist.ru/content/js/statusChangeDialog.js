@@ -28,6 +28,7 @@ $(document).ready(function () {
     var $statusesRequest = $("#statusesRequest");
     var $numberRequestCheckBoxes = $("#numberRequestCheckBoxes");
     var $selectRequestsTr = $("#selectRequestsTr");
+    var $selectNumbersRequestsTr = $("#selectNumbersRequestsTr");
 
 
     function populateStatusSelectMenu() {
@@ -102,6 +103,8 @@ $(document).ready(function () {
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
                                 $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
                                 $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
+                                $selectRequestsTr.hide();
+                                $selectNumbersRequestsTr.hide();
 
                             });
                         }
@@ -136,6 +139,8 @@ $(document).ready(function () {
                                 $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
 
                             });
+                            $selectRequestsTr.show();
+                            $selectNumbersRequestsTr.show();
                         }
                     );
                     break;
