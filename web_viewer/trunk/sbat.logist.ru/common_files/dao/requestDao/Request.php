@@ -114,7 +114,7 @@ class SelectRequestByID implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT * FROM `requests` WHERE `requestID` = $this->id";
+        return "SELECT * FROM `requests` WHERE `requestIDExternal` = '$this->id'";
     }
 }
 
