@@ -16,6 +16,9 @@ $(document).ready(function () {
     var filterInputs = $('#user-grid tfoot th input');
     filterInputs.attr("currentFilter", "");
 
+
+
+
     // --------DATATABLE INIT--------------
     var dataTable = $('#user-grid').DataTable({
         processing: true,
@@ -104,6 +107,7 @@ $(document).ready(function () {
             },
             {
                 extend: 'selectedSingle',
+                className: 'changeStatusForRequest',
                 text: 'изменить статус накладной',
                 action: function (e, dt, node, config) {
                     $.showRequestStatusDialog("changeStatusForRequest", dataTable);
@@ -112,6 +116,7 @@ $(document).ready(function () {
             {
                 name: 'changeRouteListStatus',
                 extend: 'selectedSingle',
+                className: 'changeStatusForSeveralRequests',
                 text: 'изменить статус МЛ',
                 action: function (e, dt, node, config) {
                     $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
@@ -119,6 +124,7 @@ $(document).ready(function () {
             },
             {
                 extend: 'selectedSingle',
+                className: 'statusHistory',
                 text: 'история статусов',
                 action: function (e, dt, node, config) {
                     $.post("content/getData.php", {
@@ -224,5 +230,17 @@ $(document).ready(function () {
     $(".dataTables_scrollHeadInner").css({"width":"100%"});
 
     $(".dataTable ").css({"width":"100%"});
+
+    //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
+    dataTable.on( 'select', function ( e, dt, type, indexes ) {
+        var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
+        if(routeListID == null){
+            
+            buttons.disable();
+        }
+    });
+
+
+
 });
 
