@@ -26,7 +26,7 @@ public class AssignStatusesInRequests extends TransactionPart{
         if (updateStatuses.isEmpty())
             return null;
 
-        BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.allRequestsAsKeyPairs();
+        BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.getInstance().allRequestsAsKeyPairs();
 
         logger.info("-----------------START assign statuses in requests table from JSON object:[updateStatus]-----------------");
         PreparedStatement requestsUpdatePrSt = connection.prepareStatement(
@@ -39,13 +39,7 @@ public class AssignStatusesInRequests extends TransactionPart{
             requestsUpdatePrSt.setString(2, updateStatus.getStatus());
             requestsUpdatePrSt.setString(3, updateStatus.getComment());
             requestsUpdatePrSt.setDate(  4, updateStatus.getTimeOutStatus());
-            // TODO
-            try {
-                setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
-            } catch (DBCohesionException e) {
-                continue;
-            }
-
+            setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
             requestsUpdatePrSt.addBatch();
         }
         int[] requestsAffectedRecords = requestsUpdatePrSt.executeBatch();

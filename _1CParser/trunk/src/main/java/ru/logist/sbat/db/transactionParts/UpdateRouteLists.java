@@ -26,8 +26,8 @@ public class UpdateRouteLists extends TransactionPart{
         if (updateRouteLists.isEmpty())
             return null;
         logger.info("-----------------START update routeLists from JSON object:[updateRouteLists]-----------------");
-        BidiMap<String, Integer> allUsersAsKeyPairs = Selects.allUsersAsKeyPairs();
-        BidiMap<String, Integer> allRoutesAsKeyPairs = Selects.allRoutesAsKeyPairs();
+        BidiMap<String, Integer> allUsersAsKeyPairs = Selects.getInstance().allUsersAsKeyPairs();
+        BidiMap<String, Integer> allRoutesAsKeyPairs = Selects.getInstance().allRoutesAsKeyPairs();
         // create routeLists
         PreparedStatement routeListsInsertPreparedStatement = connection.prepareStatement(
                 "INSERT INTO route_lists(" +

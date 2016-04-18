@@ -32,10 +32,11 @@ public class TransactionExecutor extends TreeMap<Integer, TransactionPart> {
 
     public void closeAll() {
         this.statements.forEach(DBUtils::closeStatementQuietly);
+        Selects.getInstance().clearCache();
     }
 
     public void setConnection(Connection connection) {
         this.connection = connection;
-        Selects.setConnection(connection);
+        Selects.getInstance().setConnection(connection);
     }
 }

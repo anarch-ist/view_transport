@@ -19,8 +19,7 @@ public class TraderData {
     private String traderEmails;
     private String traderPhone;
     private String traderOffice;
-    // TODO
-    // @Unique
+    @Unique
     private String traderLogin;
     private String traderPassword;
 

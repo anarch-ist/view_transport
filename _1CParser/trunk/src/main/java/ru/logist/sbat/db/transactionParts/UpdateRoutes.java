@@ -38,7 +38,7 @@ public class UpdateRoutes extends TransactionPart{
                         "  routeName = VALUES(routeName);"
         );
 
-        BidiMap<String, String> allRoutes = Selects.selectAllRoutesAsExtKeyAndName(InsertOrUpdateTransactionScript.LOGIST_1C);
+        BidiMap<String, String> allRoutes = Selects.getInstance().selectAllRoutesAsExtKeyAndName(InsertOrUpdateTransactionScript.LOGIST_1C);
         for (DirectionsData updateRoute : updateRoutesArray) {
             String directionIDExternal = updateRoute.getDirectId();
             String directionName = updateRoute.getDirectName();
@@ -49,7 +49,7 @@ public class UpdateRoutes extends TransactionPart{
             preparedStatement.addBatch();
         }
 
-        Map<String, Integer> allPoints = Selects.allPointsAsKeyPairs();
+        Map<String, Integer> allPoints = Selects.getInstance().allPointsAsKeyPairs();
         for (RouteListsData updateRouteList : updateRouteLists) {
 
             // create new route only for trunk routes

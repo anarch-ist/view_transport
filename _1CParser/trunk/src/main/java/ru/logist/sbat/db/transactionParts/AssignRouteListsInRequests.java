@@ -25,9 +25,9 @@ public class AssignRouteListsInRequests extends TransactionPart{
         if (updateRouteLists.isEmpty())
             return null;
 
-        BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.allRequestsAsKeyPairs();
-        BidiMap<String, Integer> allPointsAsKeyPairs = Selects.allPointsAsKeyPairs();
-        BidiMap<String, Integer> allRouteListsAsKeyPairs = Selects.allRouteListsAsKeyPairs();
+        BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.getInstance().allRequestsAsKeyPairs();
+        BidiMap<String, Integer> allPointsAsKeyPairs = Selects.getInstance().allPointsAsKeyPairs();
+        BidiMap<String, Integer> allRouteListsAsKeyPairs = Selects.getInstance().allRouteListsAsKeyPairs();
 
         PreparedStatement requestUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET " +
@@ -38,40 +38,15 @@ public class AssignRouteListsInRequests extends TransactionPart{
 
         for (RouteListsData updateRouteList : updateRouteLists) {
             Set<String> requests = updateRouteList.getRequests(); // list of requests inside routeList
-
-            String pointIdExternal = updateRouteList.getPointDepartureId();
-            Integer warehousePointId = allPointsAsKeyPairs.get(pointIdExternal);
-            if (warehousePointId == null) {
-                throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_POINT_DEPARTURE_ID, pointIdExternal, "points");
-            }
-
-            String routeListIdExternal = updateRouteList.getRouteListId();
-            Integer routeListId = allRouteListsAsKeyPairs.get(routeListIdExternal);
-            // TODO
-            if (routeListId == null) continue;
+            Integer warehousePointId = getWarehousePointId(allPointsAsKeyPairs, updateRouteList);
+            Integer routeListId = getRouteListId(allRouteListsAsKeyPairs, updateRouteList);
             for(Object requestIDExternalAsObject: requests) {
                 String requestIDExternal = (String) requestIDExternalAsObject;
-
-                // TODO
-                try {
-                    setRequestId(allRequestsAsKeyPairs, requestUpdatePreparedStatement, requestIDExternal);
-                } catch (DBCohesionException e) {
-                    continue;
-                }
-
-
+                setRequestId(requestUpdatePreparedStatement, requestIDExternal, allRequestsAsKeyPairs.get(requestIDExternal), 1);
                 requestUpdatePreparedStatement.setInt(2, warehousePointId);
-                // TODO
-                try {
-                    setRouteListId(requestUpdatePreparedStatement, routeListId);
-                } catch (DBCohesionException e) {
-                    continue;
-                }
-
-
+                requestUpdatePreparedStatement.setInt(3, routeListId);
                 requestUpdatePreparedStatement.addBatch();
             }
-
         }
 
         int[] requestsAffectedRecords = requestUpdatePreparedStatement.executeBatch();
@@ -79,20 +54,28 @@ public class AssignRouteListsInRequests extends TransactionPart{
         return requestUpdatePreparedStatement;
     }
 
-    private void setRouteListId(PreparedStatement requestUpdatePreparedStatement, Integer routeListId) throws DBCohesionException, SQLException {
-        if (routeListId == null) {
-            throw new DBCohesionException("wedwe");
-        } else {
-            requestUpdatePreparedStatement.setInt(3, routeListId);
-        }
+    private Integer getRouteListId(BidiMap<String, Integer> allRouteListsAsKeyPairs, RouteListsData updateRouteList) throws DBCohesionException {
+        String routeListIdExternal = updateRouteList.getRouteListId();
+        Integer routeListId = allRouteListsAsKeyPairs.get(routeListIdExternal);
+        if (routeListId == null)
+            throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_ROUTE_LIST_ID, routeListIdExternal, "route_lists");
+        return routeListId;
     }
 
-    private void setRequestId(BidiMap<String, Integer> allRequestsAsKeyPairs, PreparedStatement requestUpdatePreparedStatement, String requestIDExternal) throws DBCohesionException, SQLException {
-        Integer requestId = allRequestsAsKeyPairs.get(requestIDExternal);
+    private Integer getWarehousePointId(BidiMap<String, Integer> allPointsAsKeyPairs, RouteListsData updateRouteList) throws DBCohesionException {
+        String pointIdExternal = updateRouteList.getPointDepartureId();
+        Integer warehousePointId = allPointsAsKeyPairs.get(pointIdExternal);
+        if (warehousePointId == null) {
+            throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_POINT_DEPARTURE_ID, pointIdExternal, "points");
+        }
+        return warehousePointId;
+    }
+
+    private void setRequestId(PreparedStatement requestUpdatePreparedStatement, String requestIDExternal, Integer requestId, int parameterIndex) throws DBCohesionException, SQLException {
         if (requestId == null) {
             throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_INVOICES, requestIDExternal, "requests");
         } else {
-            requestUpdatePreparedStatement.setInt(1, requestId);
+            requestUpdatePreparedStatement.setInt(parameterIndex, requestId);
         }
     }
 }

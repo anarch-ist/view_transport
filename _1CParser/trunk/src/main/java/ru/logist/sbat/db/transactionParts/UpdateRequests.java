@@ -28,10 +28,10 @@ public class UpdateRequests extends TransactionPart{
         logger.info("-----------------START update requests table from JSON object:[updateRequestsTable]-----------------");
 
         // get All foreign keys that is not null
-        BidiMap<String, Integer> allClientsKeyMap = Selects.allClientsAsKeyPairs();
-        BidiMap<String, Integer> allPointsKeyMap = Selects.allPointsAsKeyPairs();
-        BidiMap<String, Integer> allUsersKeyMap = Selects.allUsersAsKeyPairs();
-        Integer parserUserId = Selects.selectParserId();
+        BidiMap<String, Integer> allClientsKeyMap = Selects.getInstance().allClientsAsKeyPairs();
+        BidiMap<String, Integer> allPointsKeyMap = Selects.getInstance().allPointsAsKeyPairs();
+        BidiMap<String, Integer> allUsersKeyMap = Selects.getInstance().allUsersAsKeyPairs();
+        Integer parserUserId = Selects.getInstance().selectParserId();
 
         PreparedStatement requestsPreparedStatement = connection.prepareStatement(
                 "INSERT INTO requests(requestIDExternal, dataSourceID, requestNumber, requestDate, clientID," +
@@ -91,12 +91,7 @@ public class UpdateRequests extends TransactionPart{
             requestsPreparedStatement.setDate  (4,  updateRequest.getRequestDate());
             setClientId(allClientsKeyMap, requestsPreparedStatement, 5, updateRequest.getClientId());
             setDestinationPoint(allPointsKeyMap, requestsPreparedStatement, updateRequest, 6, updateRequest.getAddressId());
-            // TODO
-            try {
-                setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
-            } catch (DBCohesionException e) {
-                continue;
-            }
+            setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
             requestsPreparedStatement.setString(8, updateRequest.getInvoiceNumber());
             requestsPreparedStatement.setDate  (9, updateRequest.getInvoiceDate());
             requestsPreparedStatement.setString(10, updateRequest.getDocumentNumber());
@@ -126,7 +121,7 @@ public class UpdateRequests extends TransactionPart{
     private void setDestinationPoint(BidiMap<String, Integer> allPointsKeyMap, PreparedStatement requestsPreparedStatement, RequestsData updateRequest, int parameterIndex, String addressId) throws SQLException {
         Integer destinationPointId = allPointsKeyMap.get(addressId);
         if (destinationPointId == null) {
-            logger.warn("[{}]: requestId [{}] has addressId = [{}] that is not contained in points table. Set NULL for pointID", this.getClass().getSimpleName(), updateRequest.getRequestId(), addressId);
+            logger.warn("[{}]: requestId [{}] has addressId = [{}] that is not contained in [points] table. Set NULL for pointID", this.getClass().getSimpleName(), updateRequest.getRequestId(), addressId);
             requestsPreparedStatement.setNull(parameterIndex, Types.INTEGER);
         } else
             requestsPreparedStatement.setInt(parameterIndex, destinationPointId);
@@ -136,7 +131,7 @@ public class UpdateRequests extends TransactionPart{
         Integer marketAgentUserId = allUsersKeyMap.get(traderId);
 
         if (marketAgentUserId == null) {
-            throw new DBCohesionException(this.getClass().getSimpleName(), RequestsData.FN_REQUEST_ID, RequestsData.FN_TRADER_ID, traderId, "points");
+            throw new DBCohesionException(this.getClass().getSimpleName(), RequestsData.FN_REQUEST_ID, RequestsData.FN_TRADER_ID, traderId, "users");
         } else {
             requestsPreparedStatement.setInt(parameterIndex, marketAgentUserId);
         }

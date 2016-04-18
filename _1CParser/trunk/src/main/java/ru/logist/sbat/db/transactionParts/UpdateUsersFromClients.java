@@ -28,7 +28,7 @@ public class UpdateUsersFromClients extends TransactionPart {
     public PreparedStatement executePart() throws SQLException, DBCohesionException {
         if (updateClients.isEmpty())
             return null;
-        BidiMap<String, Integer> allClientsAsKeyPairs = Selects.allClientsAsKeyPairs();
+        BidiMap<String, Integer> allClientsAsKeyPairs = Selects.getInstance().allClientsAsKeyPairs();
         logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
         PreparedStatement result = connection.prepareStatement(
                 "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, clientID)\n" +
