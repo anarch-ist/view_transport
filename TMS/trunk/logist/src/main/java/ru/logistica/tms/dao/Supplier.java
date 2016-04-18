@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 //@Entity
-public class Supplier {
+public class Supplier extends KeyDifference{
     private Serializable supplierID;
 //    private String supplierIdExternal;
 //    private DataSources dataSourceId;
@@ -30,7 +30,7 @@ public class Supplier {
 
     public Supplier getSupplierById(Integer id) throws SQLException {
         Supplier supplier = new Supplier();
-        String sql = "SELECT * from points WHERE supplierID = ?";
+        String sql = "SELECT * from suppliers WHERE supplierID = ?";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();

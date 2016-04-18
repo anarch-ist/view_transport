@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 //@Entity
-public class Point {
+public class Point extends KeyDifference {
     private Serializable pointId;
     private String pointIdExternal;
     private DataSources dataSourceId;
