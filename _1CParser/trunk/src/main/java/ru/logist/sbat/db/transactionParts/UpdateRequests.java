@@ -129,7 +129,6 @@ public class UpdateRequests extends TransactionPart{
 
     private void setMarketAgentUserId(BidiMap<String, Integer> allUsersKeyMap, PreparedStatement requestsPreparedStatement, int parameterIndex, String traderId) throws DBCohesionException, SQLException {
         Integer marketAgentUserId = allUsersKeyMap.get(traderId);
-
         if (marketAgentUserId == null) {
             throw new DBCohesionException(this.getClass().getSimpleName(), RequestsData.FN_REQUEST_ID, RequestsData.FN_TRADER_ID, traderId, "users");
         } else {

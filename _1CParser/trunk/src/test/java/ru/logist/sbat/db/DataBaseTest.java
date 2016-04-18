@@ -28,7 +28,7 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
     
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("MOS/MOS.pkg").toURI());
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("raw_data_18.04.2016/EKA.zip").toURI());
         dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(path);
 
         // get connection to database
