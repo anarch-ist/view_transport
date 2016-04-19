@@ -72,12 +72,12 @@ VALUES
   -- пользователь клиента, доступен GUI для для просмотра всех заявок данного клиента.
   ('CLIENT_MANAGER', 'Пользователь_клиента'),
   -- торговый представитель, доступ только на чтение тех заявок, в которых он числится торговым
-  ('MARKET_AGENT', 'Торговый_представитель')
-
+  ('MARKET_AGENT', 'Торговый_представитель'),
+  ('TEMP_REMOVED', 'Временно_удален');
   -- TODO сделать правильну работу для указанных ниже ролей пользователей, прописать ограничения в таблице users
   -- временно удален, доступен GUI только для страницы авторизации, также после попытки войти необходимо выводить сообщение,
   -- что данный пользователь зарегистрирован в системе, но временно удален. Полный запрет на доступ к БД.
-  -- ('TEMP_REMOVED', 'Временно_удален'),
+
   -- ('VIEW_LAST_TEN', 'Последние_десять')
  ;
 
@@ -156,7 +156,7 @@ CREATE TABLE users (
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (clientID) REFERENCES clients (clientID)
-    ON DELETE RESTRICT
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
   UNIQUE (userIDExternal, dataSourceID),
   UNIQUE (login)
@@ -402,7 +402,7 @@ CREATE TABLE route_lists (
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
   FOREIGN KEY (driverID) REFERENCES users (userID)
-    ON DELETE RESTRICT
+    ON DELETE SET NULL
     ON UPDATE CASCADE,
   UNIQUE (routeListIDExternal, dataSourceID)
 );
@@ -570,36 +570,36 @@ CREATE TABLE requests (
   UNIQUE (requestIDExternal, dataSourceID)
 );
 
-CREATE TRIGGER check_for_market_agents_and_warehouse_point BEFORE INSERT ON requests
-FOR EACH ROW
-  BEGIN
-
-    (SELECT
-       userRoleID,
-       login
-     INTO @userRoleID, @login
-     FROM users
-     WHERE userID = NEW.marketAgentUserID);
-
-    IF (@userRoleID <> 'MARKET_AGENT')
-    THEN
-      CALL generateLogistError(CONCAT('Can\'t insert row: only MARKET_AGENT users allowed for login = ', @login));
-    END IF;
-
-    SET @pointType = (SELECT pointTypeID
-                      FROM points
-                      WHERE pointID = NEW.warehousePointID);
-    IF (@pointType IS NOT NULL)
-    THEN
-      BEGIN
-        IF (@pointType <> 'WAREHOUSE')
-        THEN
-          CALL generateLogistError('Can\'t insert row: only WAREHOUSE points allowed');
-        END IF;
-      END;
-    END IF;
-
-  END;
+# CREATE TRIGGER check_for_market_agents_and_warehouse_point BEFORE INSERT ON requests
+# FOR EACH ROW
+#   BEGIN
+#
+#     (SELECT
+#        userRoleID,
+#        login
+#      INTO @userRoleID, @login
+#      FROM users
+#      WHERE userID = NEW.marketAgentUserID);
+#
+#     IF (@userRoleID <> 'MARKET_AGENT')
+#     THEN
+#       CALL generateLogistError(CONCAT('Can\'t insert row: only MARKET_AGENT users allowed for login = ', @login));
+#     END IF;
+#
+#     SET @pointType = (SELECT pointTypeID
+#                       FROM points
+#                       WHERE pointID = NEW.warehousePointID);
+#     IF (@pointType IS NOT NULL)
+#     THEN
+#       BEGIN
+#         IF (@pointType <> 'WAREHOUSE')
+#         THEN
+#           CALL generateLogistError('Can\'t insert row: only WAREHOUSE points allowed');
+#         END IF;
+#       END;
+#     END IF;
+#
+#   END;
 
 
 
