@@ -93,6 +93,7 @@ public class JSONReadFromFile {
             logger.info("Start creating dataFrom1c object from file [{}]", filePath);
         } else if (filePath.toString().endsWith(INCOMING_FILE_EXTENSION_PKG)) {
             result = JSONReadFromFile.readPkg(filePath);
+            logger.info("Start creating dataFrom1c object from file [{}]", filePath);
         } else {
             logger.warn("file [{}] must end with [{}] or [{}] ,file will not be imported", filePath, INCOMING_FILE_EXTENSION_ZIP, INCOMING_FILE_EXTENSION_PKG);
         }

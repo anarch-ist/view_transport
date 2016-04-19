@@ -28,8 +28,10 @@ public class DataBaseTest {
     public static void setUp() throws Exception {
     
         // get JSON object
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("raw_data_18.04.2016/EKA.zip").toURI());
+        // Path path = Paths.get(JSONReadFromFileTest.class.getResource("testData/raw_data_18.04.2016/EKA.zip").toURI());
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_fixed.pkg").toURI());
         dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(path);
+
 
         // get connection to database
         Properties testProperties = new Properties();

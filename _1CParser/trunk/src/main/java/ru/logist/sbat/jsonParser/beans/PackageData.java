@@ -85,7 +85,7 @@ public class PackageData {
 
     private void checkField(JSONObject packageDataAsJsonObject, String fieldName) throws ValidatorException {
         Util.checkFieldAvailableAndNotNull(fieldName, packageDataAsJsonObject);
-        Util.checkCorrectType(packageDataAsJsonObject.get(fieldName), JSONArray.class, packageDataAsJsonObject);
+        Util.checkCorrectType(packageDataAsJsonObject.get(fieldName), JSONArray.class);
     }
 
     public List<String> getDeleteDirections() {

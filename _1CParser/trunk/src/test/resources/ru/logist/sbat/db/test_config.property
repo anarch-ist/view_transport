@@ -9,9 +9,9 @@
 <entry key="dbName">transmaster_transport_db</entry>
 <entry key="encoding">useUnicode=true&amp;characterEncoding=UTF-8</entry>
 
-<entry key="jsonDataDir">C:\Users\Юлия\parser\exchange\data</entry>
-<entry key="backupDir">C:\Users\Юлия\parser\exchange\backup</entry>
-<entry key="responseDir">C:\Users\Юлия\parser\exchange\response</entry>
-<entry key="logsDir">C:\Users\Юлия\parser\exchange\response</entry>
+<entry key="jsonDataDir">C:\Users\Сергей\parser\exchange\data</entry>
+<entry key="backupDir">C:\Users\Сергей\parser\exchange\backup</entry>
+<entry key="responseDir">C:\Users\Сергей\parser\exchange\response</entry>
+<entry key="logsDir">C:\Users\Сергей\parser\exchange\response</entry>
 
 </properties>

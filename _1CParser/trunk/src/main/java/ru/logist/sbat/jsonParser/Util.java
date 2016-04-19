@@ -20,6 +20,7 @@ public class Util {
         stringBuilder.append(parts[0]);
         for (int i = 0; i < parameters.length; i++) {
             stringBuilder.append("[").append(parameters[i]).append("]").append(parts[i + 1]);
+            if (stringBuilder.length() > 500) break;
         }
         return stringBuilder.toString();
     }
