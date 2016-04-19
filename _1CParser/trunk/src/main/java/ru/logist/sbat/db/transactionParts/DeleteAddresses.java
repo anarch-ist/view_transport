@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-public class DeletePoints extends TransactionPart {
+public class DeleteAddresses extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
-    private List<String> pointsIdExternalsList;
+    private List<String> addressIdExternalsList;
 
-    public DeletePoints(List<String> pointsIdExternalsList) {
-        this.pointsIdExternalsList = pointsIdExternalsList;
+    public DeleteAddresses(List<String> addressIdExternalsList) {
+        this.addressIdExternalsList = addressIdExternalsList;
     }
 
     @Override

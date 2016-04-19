@@ -8,17 +8,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-public class DeletePoints extends TransactionPart {
+public class DeleteRoutes extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
-    private List<String> pointsIdExternalsList;
+    private List<String> directionIdExternals;
 
-    public DeletePoints(List<String> pointsIdExternalsList) {
-        this.pointsIdExternalsList = pointsIdExternalsList;
+    public DeleteRoutes(List<String> directionIdExternals) {
+        this.directionIdExternals = directionIdExternals;
     }
 
     @Override
     public Statement executePart() throws SQLException, DBCohesionException {
-        logger.warn("points are never remove");
+        logger.warn("directions are never remove");
         return null; /*DO NOTHING*/
     }
 }

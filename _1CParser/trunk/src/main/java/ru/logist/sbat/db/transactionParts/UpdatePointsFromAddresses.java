@@ -10,11 +10,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UpdatePointsFromDirections extends TransactionPart {
+public class UpdatePointsFromAddresses extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
     private final List<AddressData> updateAddresses;
 
-    public UpdatePointsFromDirections(List<AddressData> updateAddresses) {
+    public UpdatePointsFromAddresses(List<AddressData> updateAddresses) {
         this.updateAddresses = updateAddresses;
     }
 

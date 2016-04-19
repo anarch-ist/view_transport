@@ -57,7 +57,7 @@ public class RequestsData {
         Util.checkFieldAvailableAndNotNull           (FN_FIRMA, updateRequests);
         Util.checkFieldAvailableAndNotNull           (FN_STORAGE, updateRequests);
         Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_CLIENT_ID, updateRequests);
-        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ADDRESS_ID, updateRequests);
+        Util.checkFieldAvailableAndNotNull           (FN_ADDRESS_ID, updateRequests);
         Util.checkFieldAvailableAndNotNull           (FN_CONTACT_NAME, updateRequests);
         Util.checkFieldAvailableAndNotNull           (FN_CONTACT_PHONE, updateRequests);
         Util.checkFieldAvailableAndNotNull           (FN_DELIVERY_OPTION, updateRequests);
