@@ -52,15 +52,20 @@ public class AbstractUserDaoImplTest {
 
     @Test
     public void testGetAllUsers() throws Exception {
-        Set<AbstractUser> users = genericUserDao.getAllUsers();
-        System.out.println(users.size());
-        JdbcUtil.getConnection().commit();
+        try {
+            fillingData();
+            Set<AbstractUser> users = genericUserDao.getAllUsers();
+            System.out.println(users.size());
+            JdbcUtil.getConnection().commit();
+        }catch (SQLException e){
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testGetUserById() throws Exception {
         try {
-            fillingTable();
+            fillingData();
             AbstractUser abstractUser = genericUserDao.getUserById(2);
             Assert.assertEquals(abstractUser, abstractUser2);
         }catch (SQLException e){
@@ -68,7 +73,7 @@ public class AbstractUserDaoImplTest {
         }
     }
 
-    public void fillingTable() throws SQLException {
+    public void fillingData() throws SQLException {
         try {
             abstractUsers.add(abstractUser1);
             abstractUsers.add(abstractUser2);
@@ -126,7 +131,7 @@ public class AbstractUserDaoImplTest {
     @Test
     public void testSaveUser() throws Exception {
         try{
-            fillingTable();
+            fillingData();
 
             Set<AbstractUser> users = genericUserDao.getAllUsers();
             Iterator<AbstractUser> iterator = users.iterator();
@@ -146,7 +151,7 @@ public class AbstractUserDaoImplTest {
     @Test
     public void testUpdateUser() throws Exception {
         try{
-            fillingTable();
+            fillingData();
             AbstractUser abstractUser = new AbstractUser();
             abstractUser.setUserId(1);
             abstractUser.setLogin("user1");
@@ -180,7 +185,7 @@ public class AbstractUserDaoImplTest {
     @Test
     public void testGetByLogin() throws Exception {
         try {
-            fillingTable();
+            fillingData();
             AbstractUser abstractUser = genericUserDao.getByLogin("user3");
             Assert.assertEquals(abstractUser, abstractUser3);
         }catch (SQLException e){
@@ -191,7 +196,7 @@ public class AbstractUserDaoImplTest {
     @Test
     public void testDeleteUserByLogin() throws Exception {
         try {
-            fillingTable();
+            fillingData();
             genericUserDao.deleteUserByLogin("user3");
             JdbcUtil.getConnection().commit();
             Set<AbstractUser> users = genericUserDao.getAllUsers();

@@ -38,7 +38,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                 "points.email, " +
                 "points.phoneNumber, " +
                 "points.responsiblePersonID FROM point_users " +
-                "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID)\n" +
+                "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID) " +
                 "INNER JOIN points ON (points.pointID = point_users.pointID);";
         Set<PointUser> result = new HashSet<>();
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
@@ -86,26 +86,28 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                 "points.email, " +
                 "points.phoneNumber, " +
                 "points.responsiblePersonID FROM point_users " +
-                "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID)\\n\" +\n" +
+                "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID)" +
                 "INNER JOIN points ON (points.pointID = point_users.pointID)" +
                 "WHERE point_users.userID = ?;";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            pointUser.setUserId(resultSet.getInt("userID"));
-            Integer pointId = resultSet.getInt("pointID");
-            Point point = keyDifferenceDao.getKeyDifferenceById(pointId);
-            pointUser.setLogin(resultSet.getString("userLogin"));
-            pointUser.setSalt(resultSet.getString("salt"));
-            pointUser.setPassAndSalt(resultSet.getString("passAndSalt"));
-            String userRoleId = resultSet.getString("userRoleID");
-            pointUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
-            pointUser.setUserName(resultSet.getString("userName"));
-            pointUser.setPhoneNumber(resultSet.getString("phoneNumber"));
-            pointUser.setEmail(resultSet.getString("email"));
-            pointUser.setPosition(resultSet.getString("position"));
-            pointUser.setPoint(point);
+
+            if (resultSet.next()) {
+                pointUser.setUserId(resultSet.getInt("userID"));
+                Integer pointId = resultSet.getInt("pointID");
+                Point point = keyDifferenceDao.getKeyDifferenceById(pointId);
+                pointUser.setLogin(resultSet.getString("userLogin"));
+                pointUser.setSalt(resultSet.getString("salt"));
+                pointUser.setPassAndSalt(resultSet.getString("passAndSalt"));
+                String userRoleId = resultSet.getString("userRoleID");
+                pointUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                pointUser.setUserName(resultSet.getString("userName"));
+                pointUser.setPhoneNumber(resultSet.getString("phoneNumber"));
+                pointUser.setEmail(resultSet.getString("email"));
+                pointUser.setPosition(resultSet.getString("position"));
+                pointUser.setPoint(point);
+            }
         }
         return pointUser;
     }
@@ -113,11 +115,15 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     @Override
     public Integer saveOrUpdateUser(PointUser pointUser) throws SQLException {
         Integer userId = abstractUserDao.saveOrUpdateUser(pointUser);
-        String sql = "INSERT INTO point_users VALUES (?, ?)";
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
-            statement.setInt(1, userId);
-            statement.setInt(2, (Integer) pointUser.getPoint().getPointId());
-            statement.execute();
+        // if was inserted
+        System.out.println("generated userId = " + userId);
+        if (userId != null) {
+            String sql = "INSERT INTO point_users VALUES (?, ?)";
+            try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                statement.setInt(1, userId);
+                statement.setInt(2, (Integer) pointUser.getPoint().getPointId());
+                statement.execute();
+            }
         }
         return userId;
     }
@@ -130,14 +136,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     }
 
     @Override
-    public Integer deleteUserByLogin(String login) throws SQLException {
-        Integer result = abstractUserDao.deleteUserByLogin(login);
-        String sql = "DELETE FROM point_users WHERE userID = ?";
-
-        try (PreparedStatement preparedStatement = JdbcUtil.getConnection().prepareStatement(sql)) {
-            preparedStatement.setInt(1, result);
-            preparedStatement.execute();
-        }
-        return result;
+    public void deleteUserByLogin(String login) throws SQLException {
+        abstractUserDao.deleteUserByLogin(login);
     }
 }

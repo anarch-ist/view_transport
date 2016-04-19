@@ -12,4 +12,9 @@ public class PointUser extends PrivelegedUser {
     public void setPoint(Point point) {
         this.point = point;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", point='" + point + "\'";
+    }
 }

@@ -35,7 +35,8 @@ public class PointDaoImpl implements KeyDifferenceDao<Point>{
     @Override
     public Integer saveOrUpdateKeyDifference(Point point) throws SQLException {
         Integer result = null;
-        String sql = "INSERT INTO points VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (pointID) DO UPDATE SET pointID = EXCLUDED.pointID, " +
+        String sql = "INSERT INTO points VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT (pointID) DO UPDATE SET pointID = EXCLUDED.pointID, " +
                 "pointName = EXCLUDED.pointName, region = EXCLUDED.region, district = EXCLUDED.district, locality = EXCLUDED.locality, mailIndex = EXCLUDED.mailIndex, " +
                 "address = EXCLUDED.address, email = EXCLUDED.email, phoneNumber = EXCLUDED.phoneNumber, responsiblePersonId = EXCLUDED.responsiblePersonId";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){

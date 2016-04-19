@@ -1,5 +1,6 @@
 package ru.logistica.tms.dao.usersDao;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -21,12 +22,9 @@ public class PointUserDaoImplTest {
     private static KeyDifferenceDao<Point> keyDifferenceDao = new PointDaoImpl();
     private static Point point = new Point();
     private static PointUser pointUser1 = new PointUser();
-    private static GenericUserDao pointUserDao = new PointUserDaoImpl();
-    private static List<AbstractUser> abstractUsers = new ArrayList<>();
-    private static AbstractUser abstractUser1 = new AbstractUser();
-    private static AbstractUser abstractUser2 = new AbstractUser();
-    private static AbstractUser abstractUser3 = new AbstractUser();
-    private static GenericUserDao genericUserDao = new AbstractUserDaoImpl();
+    private static PointUser pointUser2 = new PointUser();
+    private static List<PointUser> pointUsers = new ArrayList<>();
+    private static GenericUserDao<PointUser> pointUserDao = new PointUserDaoImpl();
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -65,7 +63,7 @@ public class PointUserDaoImplTest {
             keyDifferenceDao.saveOrUpdateKeyDifference(point);
 
             pointUser1.setPoint(point);
-            pointUser1.setUserId(4);
+            pointUser1.setUserId(null);
             pointUser1.setLogin("user4");
             pointUser1.setSalt("salt4salt4salt44");
             pointUser1.setPassAndSalt("pass4");
@@ -73,106 +71,112 @@ public class PointUserDaoImplTest {
             pointUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
             pointUser1.setUserName("Kolya");
             pointUser1.setPhoneNumber("8-945-348-34-45");
-            pointUser1.setEmail("k@bl.ru");
+            pointUser1.setEmail("k@bk.ru");
             pointUser1.setPosition("position4");
-        }catch (SQLException e){
-            JdbcUtil.rollbackQuietly();
-        }
-    }
 
-    public void fillingTable() throws SQLException {
-        try {
-            abstractUsers.add(abstractUser1);
-            abstractUsers.add(abstractUser2);
-            abstractUsers.add(abstractUser3);
+            pointUser2.setPoint(point);
+            pointUser2.setUserId(null);
+            pointUser2.setLogin("user5");
+            pointUser2.setSalt("salt5salt5salt55");
+            pointUser2.setPassAndSalt("pass5");
+            String userRoleId2 = "WH_DISPATCHER";
+            pointUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId2));
+            pointUser2.setUserName("Kate");
+            pointUser2.setPhoneNumber("8-945-846-24-15");
+            pointUser2.setEmail("kate@bk.ru");
+            pointUser2.setPosition("position5");
 
-            abstractUser1.setUserId(1);
-            abstractUser2.setUserId(2);
-            abstractUser3.setUserId(3);
+            pointUsers.add(pointUser1);
+            pointUsers.add(pointUser2);
 
-            abstractUser1.setLogin("user1");
-            abstractUser2.setLogin("user2");
-            abstractUser3.setLogin("user3");
-
-            abstractUser1.setSalt("salt1salt1salt11");
-            abstractUser2.setSalt("salt2salt2salt22");
-            abstractUser3.setSalt("salt3salt3salt33");
-
-            abstractUser1.setPassAndSalt("pass1");
-            abstractUser2.setPassAndSalt("pass2");
-            abstractUser3.setPassAndSalt("pass3");
-
-            String userRoleId1 = "W_BOSS";
-            abstractUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
-            String userRoleId2 = "SUPPLIER_MANAGER";
-            abstractUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId2));
-            String userRoleId3 = "WH_DISPATCHER";
-            abstractUser3.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId3));
-
-            abstractUser1.setUserName("Masha");
-            abstractUser2.setUserName("Sasha");
-            abstractUser3.setUserName("Dasha");
-
-            abstractUser1.setPhoneNumber("8-909-675-45-45");
-            abstractUser2.setPhoneNumber("8-903-676-75-40");
-            abstractUser3.setPhoneNumber("8-917-567-48-76");
-
-            abstractUser1.setEmail("masha@mail.ru");
-            abstractUser2.setEmail("sasha@bk.com");
-            abstractUser3.setEmail("dasha@yandex.ru");
-
-            abstractUser1.setPosition("boss");
-            abstractUser2.setPosition("manager");
-            abstractUser3.setPosition("dispatcher");
-
-            genericUserDao.saveOrUpdateUser(abstractUser1);
-            genericUserDao.saveOrUpdateUser(abstractUser2);
-            genericUserDao.saveOrUpdateUser(abstractUser3);
-
+            pointUserDao.saveOrUpdateUser(pointUser1);
+            pointUserDao.saveOrUpdateUser(pointUser2);
             JdbcUtil.getConnection().commit();
         }catch (SQLException e){
             JdbcUtil.rollbackQuietly();
         }
     }
 
+
     @Test
     public void testGetAllUsers() throws Exception {
-
+        try {
+            fillingData();
+            Set<PointUser> users = pointUserDao.getAllUsers();
+            System.out.println(users.size());
+            System.out.println(users);
+            JdbcUtil.getConnection().commit();
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testGetUserById() throws Exception {
-
+        try {
+            fillingData();
+            PointUser user = pointUserDao.getUserById(1);
+            user.setUserId(null);
+            Assert.assertEquals(user, pointUser1);
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testSaveOrUpdateUser() throws Exception {
         try {
-            fillingTable();
             fillingData();
+
             pointUserDao.saveOrUpdateUser(pointUser1);
+            pointUserDao.saveOrUpdateUser(pointUser2);
             JdbcUtil.getConnection().commit();
 
             Set<PointUser> users = pointUserDao.getAllUsers();
             Iterator<PointUser> iterator = users.iterator();
             while (iterator.hasNext()){
                 PointUser pointUser = iterator.next();
-                if(pointUser.getUserId().equals(pointUser1.getUserId())){
-//                    Assert.assertEquals(pointUser1, pointUser);
+                pointUser.setUserId(null);
+                for(PointUser user: pointUsers){
+                    if(user.getLogin().equals(pointUser.getLogin())){
+                        Assert.assertEquals(pointUser, user);
+                    }
                 }
             }
         }catch (SQLException e){
+            e.printStackTrace();
             JdbcUtil.rollbackQuietly();
         }
     }
 
     @Test
     public void testGetByLogin() throws Exception {
-
+        try {
+            fillingData();
+            PointUser user = pointUserDao.getByLogin("user5");
+            user.setUserId(null);
+            Assert.assertEquals(user, pointUser2);
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testDeleteUserByLogin() throws Exception {
-
+        try {
+            fillingData();
+            pointUserDao.deleteUserByLogin("user5");
+            JdbcUtil.getConnection().commit();
+            Set<PointUser> users = pointUserDao.getAllUsers();
+            System.out.println(users.size());
+            Assert.assertTrue(!users.contains(pointUser2));
+            Assert.assertEquals(users.size(), 1);
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 }

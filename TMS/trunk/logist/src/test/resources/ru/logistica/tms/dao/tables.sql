@@ -84,7 +84,9 @@ CREATE TABLE point_users (
   userID  INTEGER,
   pointID INTEGER NOT NULL,
   PRIMARY KEY (userID),
-  FOREIGN KEY (userID) REFERENCES abstract_users,
+  FOREIGN KEY (userID) REFERENCES abstract_users
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE
@@ -95,7 +97,9 @@ CREATE TABLE suppliers_users (
   userID  INTEGER,
   supplierID INTEGER NOT NULL,
   PRIMARY KEY (userID),
-  FOREIGN KEY (userID) REFERENCES abstract_users,
+  FOREIGN KEY (userID) REFERENCES abstract_users
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE

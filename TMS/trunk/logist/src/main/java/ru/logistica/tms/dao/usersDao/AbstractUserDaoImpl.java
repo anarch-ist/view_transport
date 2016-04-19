@@ -82,19 +82,18 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public Integer saveOrUpdateUser(AbstractUser user) throws SQLException {
         Integer result = null;
-        String sql = "INSERT INTO abstract_users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (userLogin) DO UPDATE SET userID = EXCLUDED.userID, " +
+        String sql = "INSERT INTO abstract_users (userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (userLogin) DO UPDATE SET " +
                 "userLogin = EXCLUDED.userLogin, salt = EXCLUDED.salt, passAndSalt = EXCLUDED.passAndSalt, userRoleID = EXCLUDED.userRoleID, userName = EXCLUDED.userName, " +
                 "phoneNumber = EXCLUDED.phoneNumber, email = EXCLUDED.email, position = EXCLUDED.position";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
-            statement.setInt(1, user.getUserId());
-            statement.setString(2, user.getLogin());
-            statement.setString(3, user.getSalt());
-            statement.setString(4, user.getPassAndSalt());
-            statement.setString(5, ConstantCollections.getUserRoleIdByUserRole(user.getUserRole()));
-            statement.setString(6, user.getUserName());
-            statement.setString(7, user.getPhoneNumber());
-            statement.setString(8, user.getEmail());
-            statement.setString(9, user.getPosition());
+            statement.setString(1, user.getLogin());
+            statement.setString(2, user.getSalt());
+            statement.setString(3, user.getPassAndSalt());
+            statement.setString(4, ConstantCollections.getUserRoleIdByUserRole(user.getUserRole()));
+            statement.setString(5, user.getUserName());
+            statement.setString(6, user.getPhoneNumber());
+            statement.setString(7, user.getEmail());
+            statement.setString(8, user.getPosition());
             statement.execute();
 
             ResultSet resultSet = statement.getGeneratedKeys();
@@ -107,15 +106,11 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
 
 
     @Override
-    public Integer deleteUserByLogin(String login) throws SQLException {
-        int result = 0;
+    public void deleteUserByLogin(String login) throws SQLException {
         String sql = "DELETE FROM abstract_users WHERE userLogin = ?";
-
         try (PreparedStatement preparedStatement = JdbcUtil.getConnection().prepareStatement(sql)) {
             preparedStatement.setString(1, login);
-            result = getByLogin(login).getUserId();
             preparedStatement.execute();
         }
-        return result;
     }
 }

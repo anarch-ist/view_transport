@@ -87,7 +87,7 @@ public class AbstractUser {
 
     @Override
     public String toString() {
-        return "AbstractUser{" +
+        return "User " +
                 "userId=" + userId +
                 ", login='" + login + '\'' +
                 ", salt='" + salt + '\'' +
@@ -95,8 +95,7 @@ public class AbstractUser {
                 ", userName='" + userName + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", email='" + email + '\'' +
-                ", position='" + position + '\'' +
-                '}';
+                ", position='" + position;
     }
 
     @Override

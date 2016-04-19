@@ -20,12 +20,9 @@ public class SupplierUserDaoImplTest {
     private static Supplier supplier = new Supplier();
     private static SupplierUser supplierUser1 = new SupplierUser();
     private static SupplierUser supplierUser2 = new SupplierUser();
-    private static GenericUserDao supplierUserDao = new SupplierUserDaoImpl();
-    private static List<AbstractUser> abstractUsers = new ArrayList<>();
-    private static AbstractUser abstractUser1 = new AbstractUser();
-    private static AbstractUser abstractUser2 = new AbstractUser();
-    private static AbstractUser abstractUser3 = new AbstractUser();
-    private static GenericUserDao genericUserDao = new AbstractUserDaoImpl();
+    private static List<SupplierUser> supplierUsers = new ArrayList<>();
+    private static GenericUserDao<SupplierUser> supplierUserDao = new SupplierUserDaoImpl();
+
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -47,9 +44,9 @@ public class SupplierUserDaoImplTest {
     public void fillingData() throws SQLException {
         try{
             supplier.setSupplierID(1);
-            supplier.setInn("inn");
-            supplier.setClientName("Kate");
-            supplier.setKpp("kpp");
+            supplier.setInn("547658768");
+            supplier.setClientName("Roman");
+            supplier.setKpp("74678788436");
             supplier.setCorAccount("89475984567");
             supplier.setCurAccount("239489");
             supplier.setBik("46467676");
@@ -61,81 +58,33 @@ public class SupplierUserDaoImplTest {
             keyDifferenceDao.saveOrUpdateKeyDifference(supplier);
 
             supplierUser1.setSupplier(supplier);
-            supplierUser1.setUserId(5);
-            supplierUser1.setLogin("user5");
-            supplierUser1.setSalt("salt5salt5salt55");
-            supplierUser1.setPassAndSalt("pass5");
+            supplierUser1.setUserId(null);
+            supplierUser1.setLogin("user6");
+            supplierUser1.setSalt("salt6salt6salt66");
+            supplierUser1.setPassAndSalt("pass6");
             String userRoleId1 = "SUPPLIER_MANAGER";
             supplierUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
-            supplierUser1.setUserName("Katya");
-            supplierUser1.setPhoneNumber("8-945-348-34-45");
-            supplierUser1.setEmail("kat@bl.ru");
-            supplierUser1.setPosition("position5");
+            supplierUser1.setUserName("Fedor");
+            supplierUser1.setPhoneNumber("8-916-376-90-43");
+            supplierUser1.setEmail("f@mail.ru");
+            supplierUser1.setPosition("position6");
 
             supplierUser2.setSupplier(supplier);
-            supplierUser2.setUserId(6);
-            supplierUser2.setLogin("user6");
-            supplierUser2.setSalt("salt6salt6salt66");
-            supplierUser2.setPassAndSalt("pass6");
+            supplierUser2.setUserId(null);
+            supplierUser2.setLogin("user7");
+            supplierUser2.setSalt("salt7salt7salt77");
+            supplierUser2.setPassAndSalt("pass7");
             supplierUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
-            supplierUser2.setUserName("Motya");
-            supplierUser2.setPhoneNumber("8-945-348-34-45");
-            supplierUser2.setEmail("m@bl.ru");
-            supplierUser2.setPosition("position6");
-        }catch (SQLException e){
-            JdbcUtil.rollbackQuietly();
-        }
-    }
+            supplierUser2.setUserName("Kirill");
+            supplierUser2.setPhoneNumber("8-909-348-34-45");
+            supplierUser2.setEmail("kira@bk.ru");
+            supplierUser2.setPosition("position7");
 
-    public void fillingTable() throws SQLException {
-        try {
-            abstractUsers.add(abstractUser1);
-            abstractUsers.add(abstractUser2);
-            abstractUsers.add(abstractUser3);
+            supplierUsers.add(supplierUser1);
+            supplierUsers.add(supplierUser2);
 
-            abstractUser1.setUserId(1);
-            abstractUser2.setUserId(2);
-            abstractUser3.setUserId(3);
-
-            abstractUser1.setLogin("user1");
-            abstractUser2.setLogin("user2");
-            abstractUser3.setLogin("user3");
-
-            abstractUser1.setSalt("salt1salt1salt11");
-            abstractUser2.setSalt("salt2salt2salt22");
-            abstractUser3.setSalt("salt3salt3salt33");
-
-            abstractUser1.setPassAndSalt("pass1");
-            abstractUser2.setPassAndSalt("pass2");
-            abstractUser3.setPassAndSalt("pass3");
-
-            String userRoleId1 = "W_BOSS";
-            abstractUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
-            String userRoleId2 = "SUPPLIER_MANAGER";
-            abstractUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId2));
-            String userRoleId3 = "WH_DISPATCHER";
-            abstractUser3.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId3));
-
-            abstractUser1.setUserName("Masha");
-            abstractUser2.setUserName("Sasha");
-            abstractUser3.setUserName("Dasha");
-
-            abstractUser1.setPhoneNumber("8-909-675-45-45");
-            abstractUser2.setPhoneNumber("8-903-676-75-40");
-            abstractUser3.setPhoneNumber("8-917-567-48-76");
-
-            abstractUser1.setEmail("masha@mail.ru");
-            abstractUser2.setEmail("sasha@bk.com");
-            abstractUser3.setEmail("dasha@yandex.ru");
-
-            abstractUser1.setPosition("boss");
-            abstractUser2.setPosition("manager");
-            abstractUser3.setPosition("dispatcher");
-
-            genericUserDao.saveOrUpdateUser(abstractUser1);
-            genericUserDao.saveOrUpdateUser(abstractUser2);
-            genericUserDao.saveOrUpdateUser(abstractUser3);
-
+            supplierUserDao.saveOrUpdateUser(supplierUser1);
+            supplierUserDao.saveOrUpdateUser(supplierUser2);
             JdbcUtil.getConnection().commit();
         }catch (SQLException e){
             JdbcUtil.rollbackQuietly();
@@ -149,19 +98,36 @@ public class SupplierUserDaoImplTest {
 
     @Test
     public void testGetAllUsers() throws Exception {
-
+        try {
+            fillingData();
+            Set<SupplierUser> users = supplierUserDao.getAllUsers();
+            System.out.println(users.size());
+            System.out.println(users);
+            JdbcUtil.getConnection().commit();
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testGetUserById() throws Exception {
-
+        try {
+            fillingData();
+            SupplierUser user = supplierUserDao.getUserById(1);
+            user.setUserId(null);
+            Assert.assertEquals(user, supplierUser1);
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testSaveOrUpdateUser() throws Exception {
         try {
-            fillingTable();
             fillingData();
+
             supplierUserDao.saveOrUpdateUser(supplierUser1);
             supplierUserDao.saveOrUpdateUser(supplierUser2);
             JdbcUtil.getConnection().commit();
@@ -169,22 +135,46 @@ public class SupplierUserDaoImplTest {
             Set<SupplierUser> users = supplierUserDao.getAllUsers();
             Iterator<SupplierUser> iterator = users.iterator();
             while (iterator.hasNext()){
-                SupplierUser supplierUserForCompare = iterator.next();
-                if(supplierUserForCompare.getUserId().equals(supplierUser1.getUserId())){
+                SupplierUser supplierUser = iterator.next();
+                supplierUser.setUserId(null);
+                for(SupplierUser user: supplierUsers){
+                    if(user.getLogin().equals(supplierUser.getLogin())){
+                        Assert.assertEquals(supplierUser, user);
+                    }
                 }
             }
         }catch (SQLException e){
+            e.printStackTrace();
             JdbcUtil.rollbackQuietly();
         }
     }
 
     @Test
     public void testGetByLogin() throws Exception {
-
+        try {
+            fillingData();
+            SupplierUser user = supplierUserDao.getByLogin("user6");
+            user.setUserId(null);
+            Assert.assertEquals(user, supplierUser1);
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 
     @Test
     public void testDeleteUserByLogin() throws Exception {
-
+        try {
+            fillingData();
+            supplierUserDao.deleteUserByLogin("user7");
+            JdbcUtil.getConnection().commit();
+            Set<SupplierUser> users = supplierUserDao.getAllUsers();
+            System.out.println(users.size());
+            Assert.assertTrue(!users.contains(supplierUser2));
+            Assert.assertEquals(users.size(), 1);
+        }catch (SQLException e){
+            e.printStackTrace();
+            JdbcUtil.rollbackQuietly();
+        }
     }
 }

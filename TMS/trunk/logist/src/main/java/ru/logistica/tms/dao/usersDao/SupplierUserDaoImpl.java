@@ -92,26 +92,27 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                 "suppliers.startContractDate, " +
                 "suppliers.endContractDate " +
                 "FROM suppliers_users " +
-                "INNER JOIN abstract_users ON (abstract_users.userID = suppliers_users.userID)\\n\" +\n" +
+                "INNER JOIN abstract_users ON (abstract_users.userID = suppliers_users.userID) " +
                 "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID)" +
                 "WHERE suppliers_users.userID = ?;";
         try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            supplierUser.setUserId(resultSet.getInt("userID"));
-            Integer supplierId = resultSet.getInt("supplierID");
-            Supplier supplier = keyDifferenceDao.getKeyDifferenceById(supplierId);
-            supplierUser.setLogin(resultSet.getString("userLogin"));
-            supplierUser.setSalt(resultSet.getString("salt"));
-            supplierUser.setPassAndSalt(resultSet.getString("passAndSalt"));
-            String userRoleId = resultSet.getString("userRoleID");
-            supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
-            supplierUser.setUserName(resultSet.getString("userName"));
-            supplierUser.setPhoneNumber(resultSet.getString("phoneNumber"));
-            supplierUser.setEmail(resultSet.getString("email"));
-            supplierUser.setPosition(resultSet.getString("position"));
-            supplierUser.setSupplier(supplier);
+            if(resultSet.next()) {
+                supplierUser.setUserId(resultSet.getInt("userID"));
+                Integer supplierId = resultSet.getInt("supplierID");
+                Supplier supplier = keyDifferenceDao.getKeyDifferenceById(supplierId);
+                supplierUser.setLogin(resultSet.getString("userLogin"));
+                supplierUser.setSalt(resultSet.getString("salt"));
+                supplierUser.setPassAndSalt(resultSet.getString("passAndSalt"));
+                String userRoleId = resultSet.getString("userRoleID");
+                supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                supplierUser.setUserName(resultSet.getString("userName"));
+                supplierUser.setPhoneNumber(resultSet.getString("phoneNumber"));
+                supplierUser.setEmail(resultSet.getString("email"));
+                supplierUser.setPosition(resultSet.getString("position"));
+                supplierUser.setSupplier(supplier);
+            }
         }
         return supplierUser;
     }
@@ -119,11 +120,15 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     @Override
     public Integer saveOrUpdateUser(SupplierUser supplierUser) throws SQLException {
         Integer userId = abstractUserDao.saveOrUpdateUser(supplierUser);
-        String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
-            statement.setInt(1, userId);
-            statement.setInt(2, (Integer) supplierUser.getSupplier().getSupplierID());
-            statement.execute();
+        // if was inserted
+        System.out.println("generated userId = " + userId);
+        if (userId != null) {
+            String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
+            try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                statement.setInt(1, userId);
+                statement.setInt(2, (Integer) supplierUser.getSupplier().getSupplierID());
+                statement.execute();
+            }
         }
         return userId;
     }
@@ -136,14 +141,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     }
 
     @Override
-    public Integer deleteUserByLogin(String login) throws SQLException {
-        Integer result = abstractUserDao.deleteUserByLogin(login);
-        String sql = "DELETE FROM suppliers_users WHERE userID = ?";
-
-        try (PreparedStatement preparedStatement = JdbcUtil.getConnection().prepareStatement(sql)) {
-            preparedStatement.setInt(1, result);
-            preparedStatement.execute();
-        }
-        return result;
+    public void deleteUserByLogin(String login) throws SQLException {
+        abstractUserDao.deleteUserByLogin(login);
     }
 }
