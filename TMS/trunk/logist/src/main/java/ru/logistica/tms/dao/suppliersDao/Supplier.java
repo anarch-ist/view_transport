@@ -1,20 +1,10 @@
-package ru.logistica.tms.dao;
+package ru.logistica.tms.dao.suppliersDao;
 
-//import javax.persistence.Basic;
-//import javax.persistence.Column;
-//import javax.persistence.Entity;
-//import javax.persistence.Id;
 import java.io.Serializable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 
-//@Entity
-public class Supplier extends KeyDifference{
+public class Supplier {
     private Serializable supplierID;
-//    private String supplierIdExternal;
-//    private DataSources dataSourceId;
     private String inn;
     private String clientName;
     private String kpp;
@@ -27,32 +17,6 @@ public class Supplier extends KeyDifference{
     private Date startContractDate;
     private Date endContractDate;
 
-
-    public Supplier getSupplierById(Integer id) throws SQLException {
-        Supplier supplier = new Supplier();
-        String sql = "SELECT * from suppliers WHERE supplierID = ?";
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            supplier.setSupplierID(resultSet.getInt("supplierID"));
-            supplier.setInn(resultSet.getString("INN"));
-            supplier.setClientName(resultSet.getString("clientName"));
-            supplier.setKpp(resultSet.getString("KPP"));
-            supplier.setCorAccount(resultSet.getString("corAccount"));
-            supplier.setCurAccount(resultSet.getString("curAccount"));
-            supplier.setBik(resultSet.getString("BIK"));
-            supplier.setBankName(resultSet.getString("bankName"));
-            supplier.setContractNumber(resultSet.getString("contractNumber"));
-            supplier.setDateOfSigning(resultSet.getDate("dateOfSigning"));
-            supplier.setStartContractDate(resultSet.getDate("startContractDate"));
-            supplier.setEndContractDate(resultSet.getDate("endContractDate"));
-        }
-        return supplier;
-    }
-
-//    @Id
-//    @Column(name = "supplierID")
     public Serializable getSupplierID() {
         return supplierID;
     }
@@ -61,8 +25,6 @@ public class Supplier extends KeyDifference{
         this.supplierID = supplierID;
     }
 
-//    @Basic
-//    @Column(name = "inn")
     public String getInn() {
         return inn;
     }
@@ -71,8 +33,6 @@ public class Supplier extends KeyDifference{
         this.inn = inn;
     }
 
-//    @Basic
-//    @Column(name = "clientName")
     public String getClientName() {
         return clientName;
     }
@@ -81,8 +41,6 @@ public class Supplier extends KeyDifference{
         this.clientName = clientName;
     }
 
-//    @Basic
-//    @Column(name = "kpp")
     public String getKpp() {
         return kpp;
     }
@@ -91,8 +49,6 @@ public class Supplier extends KeyDifference{
         this.kpp = kpp;
     }
 
-//    @Basic
-//    @Column(name = "corAccount")
     public String getCorAccount() {
         return corAccount;
     }
@@ -101,8 +57,6 @@ public class Supplier extends KeyDifference{
         this.corAccount = corAccount;
     }
 
-//    @Basic
-//    @Column(name = "curAccount")
     public String getCurAccount() {
         return curAccount;
     }
@@ -111,8 +65,6 @@ public class Supplier extends KeyDifference{
         this.curAccount = curAccount;
     }
 
-//    @Basic
-//    @Column(name = "bik")
     public String getBik() {
         return bik;
     }
@@ -121,8 +73,6 @@ public class Supplier extends KeyDifference{
         this.bik = bik;
     }
 
-//    @Basic
-//    @Column(name = "bankName")
     public String getBankName() {
         return bankName;
     }
@@ -131,8 +81,6 @@ public class Supplier extends KeyDifference{
         this.bankName = bankName;
     }
 
-//    @Basic
-//    @Column(name = "contractNumber")
     public String getContractNumber() {
         return contractNumber;
     }
@@ -141,8 +89,6 @@ public class Supplier extends KeyDifference{
         this.contractNumber = contractNumber;
     }
 
-//    @Basic
-//    @Column(name = "dateOfSigning")
     public Date getDateOfSigning() {
         return dateOfSigning;
     }
@@ -151,8 +97,6 @@ public class Supplier extends KeyDifference{
         this.dateOfSigning = dateOfSigning;
     }
 
-//    @Basic
-//    @Column(name = "startContractDate")
     public Date getStartContractDate() {
         return startContractDate;
     }
@@ -161,8 +105,6 @@ public class Supplier extends KeyDifference{
         this.startContractDate = startContractDate;
     }
 
-//    @Basic
-//    @Column(name = "endContractDate")
     public Date getEndContractDate() {
         return endContractDate;
     }

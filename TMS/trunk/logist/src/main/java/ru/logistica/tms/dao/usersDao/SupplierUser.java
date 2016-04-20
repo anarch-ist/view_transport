@@ -1,6 +1,6 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.logistica.tms.dao.Supplier;
+import ru.logistica.tms.dao.suppliersDao.Supplier;
 
 public class SupplierUser extends PrivelegedUser {
     private Supplier supplier;

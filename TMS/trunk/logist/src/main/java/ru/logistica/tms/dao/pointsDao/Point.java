@@ -1,20 +1,9 @@
-package ru.logistica.tms.dao;
-
-//import javax.persistence.Basic;
-//import javax.persistence.Column;
-//import javax.persistence.Entity;
-//import javax.persistence.Id;
+package ru.logistica.tms.dao.pointsDao;
 
 import java.io.Serializable;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-//@Entity
-public class Point extends KeyDifference {
+public class Point {
     private Serializable pointId;
-    private String pointIdExternal;
-    private DataSources dataSourceId;
     private String pointName;
     private String region;
     private String district;
@@ -25,30 +14,6 @@ public class Point extends KeyDifference {
     private String phoneNumber;
     private String responsiblePersonId;
 
-
-    public Point getPointById(Integer id) throws SQLException {
-        Point point = new Point();
-        String sql = "SELECT * from points WHERE pointID = ?";
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
-            statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            point.setPointId(resultSet.getInt("pointID"));
-            point.setPointName(resultSet.getString("pointName"));
-            point.setRegion(resultSet.getString("region"));
-            point.setDistrict(resultSet.getString("district"));
-            point.setLocality(resultSet.getString("locality"));
-            point.setMailIndex(resultSet.getString("mailIndex"));
-            point.setAddress(resultSet.getString("address"));
-            point.setEmail(resultSet.getString("email"));
-            point.setPhoneNumber(resultSet.getString("phoneNumber"));
-            point.setResponsiblePersonId(resultSet.getString("responsiblePersonId"));
-        }
-        return point;
-    }
-
-//    @Id
-//    @Column(name = "pointId")
     public Serializable getPointId() {
         return pointId;
     }
@@ -57,28 +22,6 @@ public class Point extends KeyDifference {
         this.pointId = pointId;
     }
 
-//    @Basic
-//    @Column(name = "pointIdExternal")
-    public String getPointIdExternal() {
-        return pointIdExternal;
-    }
-
-    public void setPointIdExternal(String pointIdExternal) {
-        this.pointIdExternal = pointIdExternal;
-    }
-
-//    @Basic
-//    @Column(name = "dataSourcesId")
-    public DataSources getDataSourceId() {
-        return dataSourceId;
-    }
-
-    public void setDataSourceId(DataSources dataSourceId) {
-        this.dataSourceId = dataSourceId;
-    }
-
-//    @Basic
-//    @Column(name = "pointName")
     public String getPointName() {
         return pointName;
     }
@@ -87,8 +30,6 @@ public class Point extends KeyDifference {
         this.pointName = pointName;
     }
 
-//    @Basic
-//    @Column(name = "region")
     public String getRegion() {
         return region;
     }
@@ -97,8 +38,6 @@ public class Point extends KeyDifference {
         this.region = region;
     }
 
-//    @Basic
-//    @Column(name = "district")
     public String getDistrict() {
         return district;
     }
@@ -107,8 +46,6 @@ public class Point extends KeyDifference {
         this.district = district;
     }
 
-//    @Basic
-//    @Column(name = "locality")
     public String getLocality() {
         return locality;
     }
@@ -117,8 +54,6 @@ public class Point extends KeyDifference {
         this.locality = locality;
     }
 
-//    @Basic
-//    @Column(name = "mailIndex")
     public String getMailIndex() {
         return mailIndex;
     }
@@ -127,8 +62,6 @@ public class Point extends KeyDifference {
         this.mailIndex = mailIndex;
     }
 
-//    @Basic
-//    @Column(name = "address")
     public String getAddress() {
         return address;
     }
@@ -137,8 +70,6 @@ public class Point extends KeyDifference {
         this.address = address;
     }
 
-//    @Basic
-//    @Column(name = "email")
     public String getEmail() {
         return email;
     }
@@ -147,8 +78,6 @@ public class Point extends KeyDifference {
         this.email = email;
     }
 
-//    @Basic
-//    @Column(name = "phoneNumber")
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -157,8 +86,6 @@ public class Point extends KeyDifference {
         this.phoneNumber = phoneNumber;
     }
 
-//    @Basic
-//    @Column(name = "responsiblePersonId")
     public String getResponsiblePersonId() {
         return responsiblePersonId;
     }
@@ -176,8 +103,6 @@ public class Point extends KeyDifference {
         Point points = (Point) o;
 
         if (pointId != null ? !pointId.equals(points.pointId) : points.pointId != null) return false;
-        if (pointIdExternal != null ? !pointIdExternal.equals(points.pointIdExternal) : points.pointIdExternal != null) return false;
-        if (dataSourceId != null ? !dataSourceId.equals(points.dataSourceId) : points.dataSourceId != null) return false;
         if (pointName != null ? !pointName.equals(points.pointName) : points.pointName != null) return false;
         if (region != null ? !region.equals(points.region) : points.region != null) return false;
         if (district != null ? !district.equals(points.district) : points.district != null) return false;
@@ -193,8 +118,6 @@ public class Point extends KeyDifference {
     @Override
     public int hashCode() {
         int result = pointId != null ? pointId.hashCode() : 0;
-        result = 31 * result + (pointIdExternal != null ? pointIdExternal.hashCode() : 0);
-        result = 31 * result + (dataSourceId != null ? dataSourceId.hashCode() : 0);
         result = 31 * result + (pointName != null ? pointName.hashCode() : 0);
         result = 31 * result + (region != null ? region.hashCode() : 0);
         result = 31 * result + (district != null ? district.hashCode() : 0);

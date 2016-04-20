@@ -3,11 +3,9 @@ package ru.logistica.tms.dao.constantsDao;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import ru.logistica.tms.dao.JdbcUtil;
+import ru.logistica.tms.dao.TestUtil;
+import ru.logistica.tms.dao.utils.JdbcUtil;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.Iterator;
 import java.util.Set;
 
 
@@ -17,14 +15,7 @@ public class ConstantsManagerTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        String url      = "jdbc:postgresql://localhost/postgres?stringtype=unspecified";  //database specific url.
-        String user     = "postgres";
-        String password = "postgres";
-
-        Connection connection = DriverManager.getConnection(url, user, password);
-
-        JdbcUtil.setConnection(connection);
-
+        JdbcUtil.setConnection(TestUtil.createConnection());
         constantsManager.getAllConstants();
     }
 
@@ -34,10 +25,8 @@ public class ConstantsManagerTest {
         Assert.assertTrue(userRoles.size() != 0);
         Assert.assertEquals(userRoles.size(), 3);
         boolean isContainedUserRole = false;
-        Iterator<UserRole> iterator = userRoles.iterator();
-        while (iterator.hasNext()){
-            UserRole userRole = iterator.next();
-            if(userRole.getUserRoleId().equals("SUPPLIER_MANAGER") && userRole.getUserRoleRusName().equals("Пользователь_поставщика")){
+        for (UserRole userRole : userRoles) {
+            if (userRole.getUserRoleId().equals("SUPPLIER_MANAGER") && userRole.getUserRoleRusName().equals("Пользователь_поставщика")) {
                 isContainedUserRole = true;
             }
         }
@@ -50,10 +39,8 @@ public class ConstantsManagerTest {
         Assert.assertTrue(permissions.size() != 0);
         Assert.assertEquals(permissions.size(), 3);
         boolean isContainedPermission = false;
-        Iterator<Permission> iterator = permissions.iterator();
-        while (iterator.hasNext()){
-            Permission permission = iterator.next();
-            if(permission.getPermissionId().equals("testPerm1")){
+        for (Permission permission : permissions) {
+            if (permission.getPermissionId().equals("testPerm1")) {
                 isContainedPermission = true;
             }
         }
@@ -66,10 +53,8 @@ public class ConstantsManagerTest {
         Assert.assertTrue(timeDiffs.size() != 0);
         Assert.assertEquals(timeDiffs.size(), 48);
         boolean isContainedTimeDiff = false;
-        Iterator<TimeDiff> iterator = timeDiffs.iterator();
-        while (iterator.hasNext()){
-            TimeDiff timeDiff = iterator.next();
-            if(timeDiff.getTimeDiffId() == 48){
+        for (TimeDiff timeDiff : timeDiffs) {
+            if (timeDiff.getTimeDiffId() == 48) {
                 isContainedTimeDiff = true;
             }
         }
@@ -82,10 +67,8 @@ public class ConstantsManagerTest {
         Assert.assertTrue(donutStatuses.size() != 0);
         Assert.assertEquals(donutStatuses.size(), 5);
         boolean isContainedDonutStatus = false;
-        Iterator<DonutStatus> iterator = donutStatuses.iterator();
-        while (iterator.hasNext()){
-            DonutStatus donutStatus = iterator.next();
-            if(donutStatus.getDonutStatusId().equals("ERROR") && donutStatus.getDonutStatusRusName().equals("Ошибка")){
+        for (DonutStatus donutStatus : donutStatuses) {
+            if (donutStatus.getDonutStatusId().equals("ERROR") && donutStatus.getDonutStatusRusName().equals("Ошибка")) {
                 isContainedDonutStatus = true;
             }
         }

@@ -1,6 +1,6 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.logistica.tms.dao.Point;
+import ru.logistica.tms.dao.pointsDao.Point;
 
 public class PointUser extends PrivelegedUser {
     private Point point;

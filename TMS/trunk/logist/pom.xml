@@ -18,7 +18,7 @@
         </dependency>
 
         <dependency>
-            <!--tomcat 8.0.33 use Servlet Api 3.1 version-->
+            <!--tomcat 8.0.33 use LoginServlet Api 3.1 version-->
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>

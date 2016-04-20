@@ -1,6 +1,6 @@
 package ru.logistica.tms.dao.constantsDao;
 
-import ru.logistica.tms.dao.JdbcUtil;
+import ru.logistica.tms.dao.utils.JdbcUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

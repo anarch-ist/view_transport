@@ -1,14 +1,9 @@
-package ru.logistica.tms.dao;
+package ru.logistica.tms.dao.docsContainerDao;
 
 
-//import javax.persistence.Basic;
-//import javax.persistence.Column;
-//import javax.persistence.Entity;
-//import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Date;
 
-//@Entity
 public class DocsContainer {
     private Serializable containerId;
     private Integer docId;
@@ -16,8 +11,6 @@ public class DocsContainer {
     private Date date;
     private DocState docState;
 
-//    @Id
-//    @Column(name = "containerId")
     public Serializable getContainerId() {
         return containerId;
     }
@@ -26,8 +19,6 @@ public class DocsContainer {
         this.containerId = containerId;
     }
 
-//    @Basic
-//    @Column(name = "docId")
     public Integer getDocId() {
         return docId;
     }
@@ -36,8 +27,6 @@ public class DocsContainer {
         this.docId = docId;
     }
 
-//    @Basic
-//    @Column(name = "timeDiffId")
     public Integer getTimeDiffId() {
         return timeDiffId;
     }
@@ -46,8 +35,6 @@ public class DocsContainer {
         this.timeDiffId = timeDiffId;
     }
 
-//    @Basic
-//    @Column(name = "date")
     public Date getDate() {
         return date;
     }
@@ -56,8 +43,6 @@ public class DocsContainer {
         this.date = date;
     }
 
-//    @Basic
-//    @Column(name = "docState")
     public DocState getDocState() {
         return docState;
     }

@@ -7,14 +7,14 @@
 
     <!--SERVLETS DEFINITIONS-->
     <servlet>
-        <servlet-name>simpleServlet</servlet-name>
-        <servlet-class>ru.logistica.tms.servlets.SimpleServlet</servlet-class>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>ru.logistica.tms.controller.LoginServlet</servlet-class>
     </servlet>
 
     <!--MAPPINGS-->
     <servlet-mapping>
-        <servlet-name>simpleServlet</servlet-name>
-        <url-pattern>/simple</url-pattern>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/login</url-pattern>
     </servlet-mapping>
 
 </web-app>

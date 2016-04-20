@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class TestUtil {
@@ -45,9 +48,10 @@ public class TestUtil {
     }
 
     public static void cleanDatabase(boolean showOutput) throws URISyntaxException {
-
+        System.out.println("start clean");
         Path pathToSql = Paths.get(TestUtil.class.getResource("tables.sql").toURI());
         try {
+            // executeCommand("cmd /c taskkill -f /IM psql.exe");
             String output = executeCommand("cmd /c psql.exe -U postgres -d postgres -h localhost -f " + pathToSql);
             if (showOutput) System.out.println(output);
         }
@@ -55,5 +59,13 @@ public class TestUtil {
             err.printStackTrace();
         }
         System.out.println("DATABASE RECREATED");
+    }
+
+    public static Connection createConnection() throws SQLException {
+        String url      = "jdbc:postgresql://localhost/postgres?stringtype=unspecified";  //database specific url.
+        String user     = "postgres";
+        String password = "postgres";
+
+        return DriverManager.getConnection(url, user, password);
     }
 }
