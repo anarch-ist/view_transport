@@ -1286,12 +1286,12 @@ FOR EACH ROW
        NEW.firma, NEW.storage, NEW.contactName, NEW.contactPhone, NEW.deliveryOption, NEW.deliveryDate, NEW.boxQty, NEW.weight, NEW.volume, NEW.goodsCost,
        NEW.lastStatusUpdated, NEW.lastModifiedBy, NEW.requestStatusID, NEW.commentForStatus, NEW.warehousePointID, NEW.routeListID, NEW.lastVisitedRoutePointID);
 
-    UPDATE mat_view_big_select SET
-      requestIDExternal = NEW.requestIDExternal, requestNumber = NEW.requestNumber, requestDate = NEW.requestDate,
-      invoiceNumber = NEW.invoiceNumber, invoiceDate = NEW.invoiceDate, documentNumber = NEW.documentNumber,
-      documentDate = NEW.documentDate, firma = NEW.firma, storage = NEW.storage, boxQty = NEW.boxQty,
-      requestStatusID = NEW.requestStatusID, commentForStatus = NEW.commentForStatus, routeListID = NEW.routeListID
-      WHERE mat_view_big_select.requestID = NEW.requestID;
+#     UPDATE mat_view_big_select SET
+#       requestIDExternal = NEW.requestIDExternal, requestNumber = NEW.requestNumber, requestDate = NEW.requestDate,
+#       invoiceNumber = NEW.invoiceNumber, invoiceDate = NEW.invoiceDate, documentNumber = NEW.documentNumber,
+#       documentDate = NEW.documentDate, firma = NEW.firma, storage = NEW.storage, boxQty = NEW.boxQty,
+#       requestStatusID = NEW.requestStatusID, commentForStatus = NEW.commentForStatus, routeListID = NEW.routeListID
+#       WHERE mat_view_big_select.requestID = NEW.requestID;
 
     -- расчет времени прибытия заявки в следующий пункт маршрута
     IF (NEW.requestStatusID = 'DEPARTURE') THEN
@@ -1475,6 +1475,7 @@ FOR EACH ROW
 
 CREATE VIEW transmaster_transport_db.all_users AS
   SELECT
+    users.login,
     users.userName,
     users.position,
     users.phoneNumber,
@@ -1503,12 +1504,14 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
            OR email LIKE @searchString OR pointName LIKE @searchString OR userRoleRusName LIKE @searchString)
     ORDER BY NULL ,
       CASE WHEN _orderby = '' THEN NULL END,
+      CASE WHEN _isDesc AND _orderby = 'login' THEN login END ASC,
       CASE WHEN _isDesc AND _orderby = 'userName' THEN userName END ASC,
       CASE WHEN _isDesc AND _orderby = 'position' THEN position END ASC,
       CASE WHEN _isDesc AND _orderby = 'phoneNumber' THEN phoneNumber END ASC,
       CASE WHEN _isDesc AND _orderby = 'email' THEN email END ASC,
       CASE WHEN _isDesc AND _orderby = 'pointName' THEN pointName END ASC,
       CASE WHEN _isDesc AND _orderby = 'userRoleRusName' THEN userRoleRusName END ASC,
+      CASE WHEN NOT(_isDesc) AND _orderby = 'login' THEN login END DESC,
       CASE WHEN NOT(_isDesc) AND _orderby = 'userName' THEN userName END DESC,
       CASE WHEN NOT(_isDesc) AND _orderby = 'position' THEN position END DESC,
       CASE WHEN NOT(_isDesc) AND _orderby = 'phoneNumber' THEN phoneNumber END DESC,
