@@ -6,6 +6,8 @@ import ru.logist.sbat.db.DBUtils;
 import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Selects {
     public static final String PARSER_LOGIN = "parser";
@@ -22,8 +24,9 @@ public class Selects {
 
     private Integer parserId;
     private BidiMap<String, Integer> allExchangeKeys;
-    private BidiMap<String, String> allRoutesAsExtKeyAndName;
+    private BidiMap<String, String>  allRoutesAsExtKeyAndName;
     private BidiMap<String, Integer> allPointsAsKeyPairs;
+    private Map<Integer, String>     allPointsByName;
     private BidiMap<String, Integer> allClientsAsKeyPairs;
     private BidiMap<String, Integer> allUsersAsKeyPairs;
     private BidiMap<String, Integer> allRoutesAsKeyPairs;
@@ -40,6 +43,7 @@ public class Selects {
         allExchangeKeys = null;
         allRoutesAsExtKeyAndName = null;
         allPointsAsKeyPairs = null;
+        allPointsByName = null;
         allClientsAsKeyPairs = null;
         allUsersAsKeyPairs = null;
         allRoutesAsKeyPairs = null;
@@ -80,6 +84,21 @@ public class Selects {
             }
         }
         return allRoutesAsExtKeyAndName;
+    }
+
+    public Map<Integer, String> allPointNamesById(String dataSourceId) throws SQLException {
+        if (allPointsByName == null) {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT pointID, pointName FROM points WHERE dataSourceID = ?")) {
+                Map<Integer, String> allPoints = new HashMap<>();
+                statement.setString(1, dataSourceId);
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    allPoints.put(resultSet.getInt(1), resultSet.getString(2));
+                }
+                allPointsByName = allPoints;
+            }
+        }
+        return allPointsByName;
     }
 
     BidiMap<String, Integer> allPointsAsKeyPairs() throws SQLException {
@@ -152,4 +171,6 @@ public class Selects {
         }
         return allExchangeKeys;
     }
+
+
 }

@@ -5,7 +5,11 @@ import org.json.simple.JSONObject;
 
 import java.lang.reflect.Field;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -87,7 +91,7 @@ public class Util {
             else {
                 Util.checkCorrectType(dateAsString, String.class, jsonObject);
                 try {
-                    Date date = Date.valueOf(LocalDate.parse((String) dateAsString, formatter));
+                    Date date = getDate(formatter, (String) dateAsString);
                     field.set(beanObject, date);
                 } catch (DateTimeParseException e) {
                     throw new ValidatorException(Util.getParameterizedString("illegal date format {} in {}", dateAsString, jsonObject), e);
@@ -96,6 +100,39 @@ public class Util {
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setNullIfEmptyOrSetValueDateTime(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName, DateTimeFormatter formatter) throws ValidatorException {
+        try {
+            Field field = beanObject.getClass().getDeclaredField(beanObjectFieldName);
+            field.setAccessible(true);
+            Object dateAsString = jsonObject.get(fieldName);
+            if (dateAsString.equals(""))
+                field.set(beanObject, null);
+            else {
+                Util.checkCorrectType(dateAsString, String.class, jsonObject);
+                try {
+                    Timestamp dateTime = getDateTime(formatter, (String) dateAsString);
+                    field.set(beanObject, dateTime);
+                } catch (DateTimeParseException e) {
+                    throw new ValidatorException(Util.getParameterizedString("illegal date format {} in {}", dateAsString, jsonObject), e);
+                }
+            }
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Timestamp getDateTime(DateTimeFormatter formatter, String dateAsString) {
+        LocalDateTime localDateTime = LocalDateTime.parse(dateAsString, formatter);
+        java.util.Date out = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        return new Timestamp(out.getTime());
+    }
+
+    public static Date getDate(DateTimeFormatter formatter, String dateAsString) {
+        LocalDate localDate = LocalDate.parse(dateAsString, formatter);
+        Instant instant = localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        return new Date(Date.from(instant).getTime());
     }
 
     public static void setStringValue(String fieldName, JSONObject jsonObject, Object beanObject, String beanObjectFieldName) throws ValidatorException {

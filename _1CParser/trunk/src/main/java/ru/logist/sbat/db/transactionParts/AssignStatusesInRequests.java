@@ -38,7 +38,7 @@ public class AssignStatusesInRequests extends TransactionPart{
             setNumBoxes(requestsUpdatePrSt, 1, updateStatus.getNumBoxes());
             requestsUpdatePrSt.setString(2, updateStatus.getStatus());
             requestsUpdatePrSt.setString(3, updateStatus.getComment());
-            requestsUpdatePrSt.setDate(  4, updateStatus.getTimeOutStatus());
+            requestsUpdatePrSt.setTimestamp(  4, updateStatus.getTimeOutStatus());
             setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
             requestsUpdatePrSt.addBatch();
         }

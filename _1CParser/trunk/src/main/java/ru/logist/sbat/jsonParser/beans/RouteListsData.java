@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RouteListsData {
-    public static final String FN_ROUTE_LIST_ID = "routerSheetId";
+    public static final String FN_ROUTE_LIST_ID_EXTERNAL = "routerSheetId";
     public static final String FN_ROUTE_LIST_NUMBER = "routerSheetNumber";
     public static final String FN_ROUTE_LIST_DATE = "routerSheetDate";
     public static final String FN_DEPARTURE_DATE = "departureDate";
@@ -31,7 +31,7 @@ public class RouteListsData {
     private enum RouteScopeType{INTRASITE_ROUTE, TRUNK_ROUTE, ERROR}
 
     @Unique
-    private String routeListId;
+    private String routeListIdExternal;
     private String routeListNumber;
     private Date routeListDate;
     private Date departureDate;
@@ -46,7 +46,7 @@ public class RouteListsData {
     public RouteListsData(JSONObject updateRouteLists) throws ValidatorException {
 
         // check fields
-        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ROUTE_LIST_ID, updateRouteLists);
+        Util.checkFieldAvailableAndNotNullAndNotEmpty(FN_ROUTE_LIST_ID_EXTERNAL, updateRouteLists);
         Util.checkFieldAvailableAndNotNull           (FN_ROUTE_LIST_NUMBER, updateRouteLists);
         Util.checkFieldAvailableAndNotNull           (FN_ROUTE_LIST_DATE, updateRouteLists);
         Util.checkFieldAvailableAndNotNull           (FN_DEPARTURE_DATE, updateRouteLists);
@@ -59,7 +59,7 @@ public class RouteListsData {
         Util.checkFieldAvailableAndNotNull           (FN_INVOICES, updateRouteLists);
 
         //set values
-        Util.setStringValue              (FN_ROUTE_LIST_ID, updateRouteLists, this, "routeListId");
+        Util.setStringValue              (FN_ROUTE_LIST_ID_EXTERNAL, updateRouteLists, this, "routeListIdExternal");
         Util.setStringValue              (FN_ROUTE_LIST_NUMBER, updateRouteLists, this, "routeListNumber");
         Util.setNullIfEmptyOrSetValueDate(FN_ROUTE_LIST_DATE, updateRouteLists, this, "routeListDate", isoFormatter);
         Util.setNullIfEmptyOrSetValueDate(FN_DEPARTURE_DATE, updateRouteLists, this, "departureDate", isoFormatter);
@@ -75,8 +75,8 @@ public class RouteListsData {
             throw new ValidatorException(Util.getParameterizedString("Illegal route scope in {}", updateRouteLists));
     }
 
-    public String getRouteListId() {
-        return routeListId;
+    public String getRouteListIdExternal() {
+        return routeListIdExternal;
     }
 
     public String getRouteListNumber() {
@@ -164,7 +164,7 @@ public class RouteListsData {
     @Override
     public String toString() {
         return "RouteListsData{" +
-                "routeListId='" + routeListId + '\'' +
+                "routeListIdExternal='" + routeListIdExternal + '\'' +
                 ", routeListNumber='" + routeListNumber + '\'' +
                 ", routeListDate=" + routeListDate +
                 ", departureDate=" + departureDate +

@@ -38,7 +38,7 @@ public class UpdateExchange extends TransactionPart {
         preparedStatement.setInt   (1, packageNumber);
         preparedStatement.setString(2, server);
         preparedStatement.setString(3, InsertOrUpdateTransactionScript.LOGIST_1C);
-        preparedStatement.setDate  (4, dataFrom1c.getCreated());
+        preparedStatement.setTimestamp(4, dataFrom1c.getCreated());
         preparedStatement.setString(5, dataFrom1c.getRawJsonObject());
         preparedStatement.executeUpdate();
         logger.info("INSERT INTO exchange table completed server = [{}], packageNumber = [{}]", server, packageNumber);

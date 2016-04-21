@@ -79,9 +79,7 @@ public class UpdateRequests extends TransactionPart{
                         "  deliveryOption          = VALUES(deliveryOption),\n" +
                         "  deliveryDate            = VALUES(deliveryDate),\n" +
                         "  lastStatusUpdated       = VALUES(lastStatusUpdated),\n" +
-                        "  lastModifiedBy          = VALUES(lastModifiedBy),\n" +
-                        "  requestStatusID         = 'UPDATED',\n" +
-                        "  commentForStatus        = 'заявка обновлена из 1С';"
+                        "  lastModifiedBy          = VALUES(lastModifiedBy);"
         );
 
         for (RequestsData updateRequest : updateRequests) {

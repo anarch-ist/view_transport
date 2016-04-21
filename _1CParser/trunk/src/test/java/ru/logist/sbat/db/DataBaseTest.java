@@ -26,10 +26,11 @@ public class DataBaseTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-    
         // get JSON object
         // Path path = Paths.get(JSONReadFromFileTest.class.getResource("testData/raw_data_18.04.2016/EKA.zip").toURI());
-        Path path = Paths.get(JSONReadFromFileTest.class.getResource("EKA_fixed.pkg").toURI());
+        //Path path = Paths.get(JSONReadFromFileTest.class.getResource("testData/EKA/EKA.pkg").toURI());
+        //Path path = Paths.get(JSONReadFromFileTest.class.getResource("testData/NOV/NOV.pkg").toURI());
+        Path path = Paths.get(JSONReadFromFileTest.class.getResource("newTest/10.pkg").toURI());
         dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(path);
 
 
@@ -42,7 +43,7 @@ public class DataBaseTest {
         DBManager = new DBManager(systemResourcesContainer.getConnection());
 
         // clean database content
-        DBManager.truncatePublicTables();
+        //DBManager.truncatePublicTables();
     }
 
     @Test

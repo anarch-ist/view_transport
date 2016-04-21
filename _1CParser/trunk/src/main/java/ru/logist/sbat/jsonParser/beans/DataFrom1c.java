@@ -5,6 +5,7 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 
 public class DataFrom1c {
@@ -18,7 +19,7 @@ public class DataFrom1c {
 
     private String server;
     private Long packageNumber;
-    private Date created;
+    private Timestamp created;
     private PackageData packageData;
     private String rawJsonObject;
 
@@ -36,7 +37,7 @@ public class DataFrom1c {
         //set values
         Util.setStringValue              (FN_SERVER, dataFrom1c, this, "server");
         Util.setNullIfEmptyOrSetValueLong(FN_PACKAGE_NUMBER, dataFrom1c, this, "packageNumber");
-        Util.setNullIfEmptyOrSetValueDate(FN_CREATED, dataFrom1c, this, "created", dateTimeSQLFormatter);
+        Util.setNullIfEmptyOrSetValueDateTime(FN_CREATED, dataFrom1c, this, "created", dateTimeSQLFormatter);
         this.packageData = new PackageData((JSONObject) dataFrom1c.get(FN_PACKAGE_DATA));
         this.rawJsonObject = dataFrom1cAsJsonObject.toJSONString();
     }
@@ -53,7 +54,7 @@ public class DataFrom1c {
         return packageNumber;
     }
 
-    public Date getCreated() {
+    public Timestamp getCreated() {
         return created;
     }
 

@@ -63,7 +63,7 @@ public class UpdateRouteLists extends TransactionPart{
             if (routeIdExternal == null)
                 throw new NullPointerException();
 
-            routeListsInsertPreparedStatement.setString(1, updateRouteList.getRouteListId());
+            routeListsInsertPreparedStatement.setString(1, updateRouteList.getRouteListIdExternal());
             routeListsInsertPreparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
             routeListsInsertPreparedStatement.setString(3, updateRouteList.getRouteListNumber());
             routeListsInsertPreparedStatement.setDate(4, updateRouteList.getRouteListDate()); // creationDate
@@ -87,7 +87,7 @@ public class UpdateRouteLists extends TransactionPart{
         if (allRoutesAsKeyPairs.containsKey(routeIdExternal))
             routeListsInsertPreparedStatement.setInt(parameterIndex, allRoutesAsKeyPairs.get(routeIdExternal));
         else
-            throw new DBCohesionException(UpdateRouteLists.class.getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_DIRECT_ID, routeIdExternal, "routes");
+            throw new DBCohesionException(UpdateRouteLists.class.getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, RouteListsData.FN_DIRECT_ID, routeIdExternal, "routes");
     }
     private void setDriver(BidiMap<String, Integer> allUsersAsKeyPairs, PreparedStatement routeListsInsertPreparedStatement, int parameterIndex, String driverId) throws SQLException {
         if (allUsersAsKeyPairs.containsKey(driverId))

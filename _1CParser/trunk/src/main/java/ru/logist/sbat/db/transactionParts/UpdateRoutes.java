@@ -50,6 +50,7 @@ public class UpdateRoutes extends TransactionPart{
         }
 
         Map<String, Integer> allPoints = Selects.getInstance().allPointsAsKeyPairs();
+        Map<Integer, String> allPointNamesById = Selects.getInstance().allPointNamesById(InsertOrUpdateTransactionScript.LOGIST_1C);
         for (RouteListsData updateRouteList : updateRouteLists) {
 
             // create new route only for trunk routes
@@ -57,7 +58,7 @@ public class UpdateRoutes extends TransactionPart{
                 // insert or update route
                 preparedStatement.setString(1, updateRouteList.getGeneratedRouteId());
                 preparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
-                String generatedRouteName = getGeneratedRouteName(allPoints, updateRouteList.getPointArrivalId(), updateRouteList.getPointDepartureId());
+                String generatedRouteName = getGeneratedRouteName(allPoints, allPointNamesById, updateRouteList.getPointArrivalId(), updateRouteList.getPointDepartureId());
                 preparedStatement.setString(3, generatedRouteName);
                 preparedStatement.addBatch();
             }
@@ -70,13 +71,15 @@ public class UpdateRoutes extends TransactionPart{
         return preparedStatement;
     }
 
-    private String getGeneratedRouteName(Map<String, Integer> allPoints, String pointArrivalId, String pointDepartureId) throws DBCohesionException {
+    private String getGeneratedRouteName(Map<String, Integer> allPoints, Map<Integer, String> allPointNamesById, String pointArrivalIdExternal, String pointDepartureIdExternal) throws DBCohesionException {
         // check points
-        if (allPoints.get(pointArrivalId) == null)
-            throw new DBCohesionException(UpdateRoutes.class.getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_POINT_ARRIVAL_ID, pointArrivalId, "points");
-        if (allPoints.get(pointDepartureId) == null)
-            throw new DBCohesionException(UpdateRoutes.class.getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID, RouteListsData.FN_POINT_DEPARTURE_ID, pointDepartureId, "points");
-        return allPoints.get(pointDepartureId) + "-" + allPoints.get(pointArrivalId);
+        Integer pointArrivalId = allPoints.get(pointArrivalIdExternal);
+        if (pointArrivalId == null)
+            throw new DBCohesionException(UpdateRoutes.class.getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, RouteListsData.FN_POINT_ARRIVAL_ID, pointArrivalIdExternal, "points");
+        Integer pointDepartureId = allPoints.get(pointDepartureIdExternal);
+        if (pointDepartureId == null)
+            throw new DBCohesionException(UpdateRoutes.class.getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, RouteListsData.FN_POINT_DEPARTURE_ID, pointDepartureIdExternal, "points");
+        return allPointNamesById.get(pointDepartureId) + "-" + allPointNamesById.get(pointArrivalId);
     }
 
     private String generateNewDirectionNameIfDuplicate(BidiMap<String, String> allRoutes, String directionIDExternal, String directionName) {

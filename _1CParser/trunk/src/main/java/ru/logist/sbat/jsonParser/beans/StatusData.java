@@ -5,6 +5,7 @@ import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.jsonParser.ValidatorException;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,13 +23,13 @@ public class StatusData {
             "CREDIT_LIMIT", "RASH_CREATED", "COLLECTING", "CHECK", "CHECK_PASSED", "ADJUSTMENTS_MADE",
             "PACKAGING", "CHECK_BOXES", "READY", "TRANSPORTATION"
     ));
-    private static final DateTimeFormatter timeOutStatusFormatter = DateTimeFormatter.ofPattern("dd.MM.uu,HH:mm:ss");
+    public static final DateTimeFormatter timeOutStatusFormatter = DateTimeFormatter.ofPattern("dd.MM.uu,HH:mm:ss");
 
     @Unique
     private String requestId;
     private Long numBoxes;
     private String status;
-    private Date timeOutStatus;
+    private Timestamp timeOutStatus;
     private String comment;
 
     public StatusData(JSONObject updateStatus) throws ValidatorException {
@@ -43,7 +44,7 @@ public class StatusData {
         Util.setStringValue              (FN_REQUEST_ID, updateStatus, this, "requestId");
         Util.setNullIfEmptyOrSetValueLong(FN_NUM_BOXES, updateStatus, this, "numBoxes");
         Util.setStringValue              (FN_STATUS, updateStatus, this, "status", possibleStatuses);
-        Util.setNullIfEmptyOrSetValueDate(FN_TIME_OUT_STATUS, updateStatus, this, "timeOutStatus", timeOutStatusFormatter);
+        Util.setNullIfEmptyOrSetValueDateTime(FN_TIME_OUT_STATUS, updateStatus, this, "timeOutStatus", timeOutStatusFormatter);
         Util.setStringValue              (FN_COMMENT, updateStatus, this, "comment");
     }
 
@@ -59,7 +60,7 @@ public class StatusData {
         return status;
     }
 
-    public Date getTimeOutStatus() {
+    public Timestamp getTimeOutStatus() {
         return timeOutStatus;
     }
 
