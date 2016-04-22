@@ -20,9 +20,14 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public PointUser getByLogin(final String login) throws DaoException {
-        Integer userId = abstractUserDao.getByLogin(login).getUserId();
-        PointUser pointUser = getById(userId);
-        return pointUser;
+        AbstractUser abstractUser = abstractUserDao.getByLogin(login);
+        if(abstractUser == null){
+            return null;
+        }else {
+            Integer userId = abstractUserDao.getByLogin(login).getUserId();
+            PointUser pointUser = getById(userId);
+            return pointUser;
+        }
     }
 
     @Override
@@ -32,7 +37,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public PointUser getById(final Integer id) throws DaoException {
-        final PointUser pointUser = new PointUser();
+        final PointUser[] pointUser = {null};
         JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
             @Override
             public void execute() throws Exception {
@@ -63,24 +68,25 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                     ResultSet resultSet = statement.executeQuery();
 
                     if (resultSet.next()) {
-                        pointUser.setUserId(resultSet.getInt("userID"));
+                        pointUser[0] = new PointUser();
+                        pointUser[0].setUserId(resultSet.getInt("userID"));
                         Integer pointId = resultSet.getInt("pointID");
                         Point point = pointDao.getById(pointId);
-                        pointUser.setLogin(resultSet.getString("userLogin"));
-                        pointUser.setSalt(resultSet.getString("salt"));
-                        pointUser.setPassAndSalt(resultSet.getString("passAndSalt"));
+                        pointUser[0].setLogin(resultSet.getString("userLogin"));
+                        pointUser[0].setSalt(resultSet.getString("salt"));
+                        pointUser[0].setPassAndSalt(resultSet.getString("passAndSalt"));
                         String userRoleId = resultSet.getString("userRoleID");
-                        pointUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
-                        pointUser.setUserName(resultSet.getString("userName"));
-                        pointUser.setPhoneNumber(resultSet.getString("phoneNumber"));
-                        pointUser.setEmail(resultSet.getString("email"));
-                        pointUser.setPosition(resultSet.getString("position"));
-                        pointUser.setPoint(point);
+                        pointUser[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        pointUser[0].setUserName(resultSet.getString("userName"));
+                        pointUser[0].setPhoneNumber(resultSet.getString("phoneNumber"));
+                        pointUser[0].setEmail(resultSet.getString("email"));
+                        pointUser[0].setPosition(resultSet.getString("position"));
+                        pointUser[0].setPoint(point);
                     }
                 }
             }
         });
-        return pointUser;
+        return pointUser[0];
     }
 
     @Override

@@ -20,8 +20,13 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
     @Override
     public SupplierUser getByLogin(final String login) throws DaoException {
-        Integer userId = abstractUserDao.getByLogin(login).getUserId();
-        return getById(userId);
+        AbstractUser abstractUser = abstractUserDao.getByLogin(login);
+        if(abstractUser == null){
+            return null;
+        }else {
+            Integer userId = abstractUserDao.getByLogin(login).getUserId();
+            return getById(userId);
+        }
     }
 
     @Override
@@ -31,7 +36,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
     @Override
     public SupplierUser getById(final Integer id) throws DaoException {
-        final SupplierUser supplierUser = new SupplierUser();
+        final SupplierUser[] supplierUser = {null};
         JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
             @Override
             public void execute() throws Exception {
@@ -64,24 +69,25 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
                     if(resultSet.next()) {
-                        supplierUser.setUserId(resultSet.getInt("userID"));
+                        supplierUser[0] = new SupplierUser();
+                        supplierUser[0].setUserId(resultSet.getInt("userID"));
                         Integer supplierId = resultSet.getInt("supplierID");
                         Supplier supplier = supplierDao.getById(supplierId);
-                        supplierUser.setLogin(resultSet.getString("userLogin"));
-                        supplierUser.setSalt(resultSet.getString("salt"));
-                        supplierUser.setPassAndSalt(resultSet.getString("passAndSalt"));
+                        supplierUser[0].setLogin(resultSet.getString("userLogin"));
+                        supplierUser[0].setSalt(resultSet.getString("salt"));
+                        supplierUser[0].setPassAndSalt(resultSet.getString("passAndSalt"));
                         String userRoleId = resultSet.getString("userRoleID");
-                        supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
-                        supplierUser.setUserName(resultSet.getString("userName"));
-                        supplierUser.setPhoneNumber(resultSet.getString("phoneNumber"));
-                        supplierUser.setEmail(resultSet.getString("email"));
-                        supplierUser.setPosition(resultSet.getString("position"));
-                        supplierUser.setSupplier(supplier);
+                        supplierUser[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        supplierUser[0].setUserName(resultSet.getString("userName"));
+                        supplierUser[0].setPhoneNumber(resultSet.getString("phoneNumber"));
+                        supplierUser[0].setEmail(resultSet.getString("email"));
+                        supplierUser[0].setPosition(resultSet.getString("position"));
+                        supplierUser[0].setSupplier(supplier);
                     }
                 }
             }
         });
-        return supplierUser;
+        return supplierUser[0];
     }
 
     @Override

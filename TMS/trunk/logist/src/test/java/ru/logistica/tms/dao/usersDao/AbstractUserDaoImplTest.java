@@ -1,13 +1,12 @@
 package ru.logistica.tms.dao.usersDao;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import ru.logistica.tms.dao.TestUtil;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
+import ru.logistica.tms.dao.utils.DaoException;
 import ru.logistica.tms.dao.utils.JdbcUtil;
 
 import java.net.URISyntaxException;
@@ -24,7 +23,13 @@ public class AbstractUserDaoImplTest {
     private static AbstractUser abstractUser2 = new AbstractUser();
     private static AbstractUser abstractUser3 = new AbstractUser();
 
+    @BeforeClass
     public void fillingData() throws Exception {
+        TestUtil.cleanDatabase(false); // recreate database
+        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConstantsDao constantsDao = new ConstantsDaoImpl();
+        ConstantCollections.setUserRoles(constantsDao.getUserRoles());
+
         abstractUsers.add(abstractUser1);
         abstractUsers.add(abstractUser2);
         abstractUsers.add(abstractUser3);
@@ -75,50 +80,22 @@ public class AbstractUserDaoImplTest {
         JdbcUtil.getConnection().commit();
     }
 
-    @BeforeMethod
-    public void setUp() throws SQLException, URISyntaxException {
-        TestUtil.cleanDatabase(false); // recreate database
-        JdbcUtil.setConnection(TestUtil.createConnection());
-        ConstantsDao constantsDao = new ConstantsDaoImpl();
-        ConstantCollections.setUserRoles(constantsDao.getUserRoles());
-    }
-
-    @AfterMethod
+    @AfterClass
     public void tearDown() throws SQLException {
         JdbcUtil.getConnection().close();
     }
 
-    @Test
-    public void testGetAllUsers() throws Exception {
-        fillingData();
-        Collection<AbstractUser> users = genericUserDao.getAll();
-        JdbcUtil.getConnection().commit();
-    }
-
-    @Test
-    public void testGetUserById() throws Exception {
-        fillingData();
-        AbstractUser abstractUser = genericUserDao.getById(2);
-        Assert.assertEquals(abstractUser, abstractUser2);
-    }
-
-    @Test
-    public void testSaveUser() throws Exception {
-        fillingData();
-
-        Collection<AbstractUser> users = genericUserDao.getAll();
-        for (AbstractUser abstractUser : users) {
-            for (AbstractUser user : abstractUsers) {
-                if (user.getUserId().equals(abstractUser.getUserId())) {
-                    Assert.assertEquals(abstractUser, user);
-                }
-            }
+    @Test(expectedExceptions = DaoException.class)
+    public void testSaveUserExistedUser() throws Exception {
+        try {
+            genericUserDao.save(abstractUser1);
+        }finally {
+            JdbcUtil.getConnection().commit();
         }
     }
 
-    @Test
+    @Test(dependsOnMethods = {"testSaveUserExistedUser"})
     public void testUpdateUser() throws Exception {
-        fillingData();
         AbstractUser abstractUser = new AbstractUser();
         abstractUser.setUserId(1);
         abstractUser.setLogin("user1");
@@ -132,8 +109,6 @@ public class AbstractUserDaoImplTest {
         abstractUser.setPosition("boss");
         genericUserDao.update(abstractUser);
         JdbcUtil.getConnection().commit();
-//        if (integer != null) throw new NullPointerException();
-
         Collection<AbstractUser> users = genericUserDao.getAll();
         for (AbstractUser user : users) {
             if (user.getLogin().equals(abstractUser.getLogin())) {
@@ -142,27 +117,87 @@ public class AbstractUserDaoImplTest {
         }
     }
 
-    @Test
+    @Test(expectedExceptions = DaoException.class, dependsOnMethods = {"testUpdateUser"})
+    public void testUpdateUserNotExistedUser() throws Exception {
+        try {
+            AbstractUser abstractUser = new AbstractUser();
+            abstractUser.setUserId(1);
+            abstractUser.setLogin("user4");
+            abstractUser.setSalt("salt4salt4salt44");
+            abstractUser.setPassAndSalt("pass4");
+            String userRoleId1 = "W_BOSS";
+            abstractUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+            abstractUser.setUserName("Misha");
+            abstractUser.setPhoneNumber("8-916-367-48-76");
+            abstractUser.setEmail("misha@mail.ru");
+            abstractUser.setPosition("boss");
+            genericUserDao.update(abstractUser);
+        }finally {
+            JdbcUtil.getConnection().commit();
+        }
+    }
+
+    @Test(dependsOnMethods = {"testUpdateUserNotExistedUser"})
+    public void testGetAllUsers() throws Exception {
+        Collection<AbstractUser> users = genericUserDao.getAll();
+        System.out.println(users);
+        Assert.assertEquals(users.size(), 3);
+        JdbcUtil.getConnection().commit();
+    }
+
+    @Test(dependsOnMethods = {"testGetAllUsers"})
+    public void testGetUserById() throws Exception {
+        AbstractUser abstractUser = genericUserDao.getById(2);
+        Assert.assertEquals(abstractUser, abstractUser2);
+    }
+
+    @Test(dependsOnMethods = {"testGetUserById"})
+    public void testGetByIdNoResult() throws Exception {
+        AbstractUser abstractUser = genericUserDao.getById(4);
+        Assert.assertEquals(abstractUser, null);
+    }
+
+    @Test(dependsOnMethods = {"testGetByIdNoResult"})
     public void testGetByLogin() throws Exception {
-        fillingData();
         AbstractUser abstractUser = genericUserDao.getByLogin("user3");
         Assert.assertEquals(abstractUser, abstractUser3);
     }
 
-    @Test
+    @Test(dependsOnMethods = {"testGetByLogin"})
     public void testGetByLoginNoResult() throws Exception {
-        fillingData();
         AbstractUser abstractUser = genericUserDao.getByLogin("user5");
         Assert.assertEquals(abstractUser, null);
     }
 
-    @Test
+    @Test(dependsOnMethods = {"testGetByLoginNoResult"})
     public void testDeleteUserByLogin() throws Exception {
-        fillingData();
         genericUserDao.deleteUserByLogin("user3");
         JdbcUtil.getConnection().commit();
         Collection<AbstractUser> users = genericUserDao.getAll();
         Assert.assertTrue(!users.contains(abstractUser3));
         Assert.assertEquals(users.size(), 2);
     }
+
+    @Test(expectedExceptions = DaoException.class, dependsOnMethods = {"testDeleteUserByLogin"})
+    public void testDeleteUserByLoginNotResult() throws Exception {
+        try {
+            genericUserDao.deleteUserByLogin("user9");
+        }finally {
+            JdbcUtil.getConnection().commit();
+        }
+    }
+
+    @Test(dependsOnMethods = {"testDeleteUserByLoginNotResult"})
+    public void testGetAllUsersNoResult() throws Exception {
+        genericUserDao.deleteUserByLogin("user1");
+        genericUserDao.deleteUserByLogin("user2");
+        Collection<AbstractUser> users = genericUserDao.getAll();
+        Assert.assertTrue(users.size() == 0);
+    }
+
+
+
+
+
+
 }
