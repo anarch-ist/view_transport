@@ -30,7 +30,7 @@ public class UpdateRoutes extends TransactionPart{
         if (updateRoutesArray.isEmpty() && updateRouteLists.isEmpty())
             return null;
 
-        logger.info("-----------------START update routes table from JSON object:[updateDirections]-----------------");
+        logger.info("START update routes table from JSON object:[updateDirections]");
 
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO routes (directionIDExternal, dataSourceID, routeName) VALUE (?, ?, ?)\n" +
@@ -62,7 +62,6 @@ public class UpdateRoutes extends TransactionPart{
                 preparedStatement.setString(3, generatedRouteName);
                 preparedStatement.addBatch();
             }
-            connection.commit();
         }
 
         int[] affectedRecords = preparedStatement.executeBatch();

@@ -23,7 +23,7 @@ public class UpdateExchange extends TransactionPart {
 
     @Override
     public PreparedStatement executePart() throws SQLException, DBCohesionException {
-        logger.info("-----------------START update exchange table from JSON object:[dataFrom1C]-----------------");
+        logger.info("START update exchange table from JSON object:[dataFrom1C]");
         BidiMap<String, Integer> allExchangeKeys = Selects.getInstance().allExchangeKeys();
         int packageNumber = dataFrom1c.getPackageNumber().intValue();
         String server = dataFrom1c.getServer();

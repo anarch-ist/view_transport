@@ -25,7 +25,7 @@ public class UpdateRequests extends TransactionPart{
     public PreparedStatement executePart() throws SQLException, DBCohesionException {
         if (updateRequests.isEmpty())
             return null;
-        logger.info("-----------------START update requests table from JSON object:[updateRequestsTable]-----------------");
+        logger.info("START update requests table from JSON object:[updateRequestsTable]");
 
         // get All foreign keys that is not null
         BidiMap<String, Integer> allClientsKeyMap = Selects.getInstance().allClientsAsKeyPairs();

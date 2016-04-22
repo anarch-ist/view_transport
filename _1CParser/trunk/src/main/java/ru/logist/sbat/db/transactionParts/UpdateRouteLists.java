@@ -25,7 +25,7 @@ public class UpdateRouteLists extends TransactionPart{
     public PreparedStatement executePart() throws SQLException, DBCohesionException {
         if (updateRouteLists.isEmpty())
             return null;
-        logger.info("-----------------START update routeLists from JSON object:[updateRouteLists]-----------------");
+        logger.info("START update routeLists from JSON object:[updateRouteLists]");
         BidiMap<String, Integer> allUsersAsKeyPairs = Selects.getInstance().allUsersAsKeyPairs();
         BidiMap<String, Integer> allRoutesAsKeyPairs = Selects.getInstance().allRoutesAsKeyPairs();
         // create routeLists

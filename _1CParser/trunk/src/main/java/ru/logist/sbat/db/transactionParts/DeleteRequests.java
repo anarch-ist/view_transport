@@ -23,7 +23,7 @@ public class DeleteRequests extends TransactionPart {
         if (requestIdExternalList.isEmpty())
             return null;
 
-        logger.info("-----------------START DELETE FROM REQUESTS TABLE from JSON object:[deleteRequests]------------------");
+        logger.info("START DELETE FROM REQUESTS TABLE from JSON object:[deleteRequests]");
         PreparedStatement prepareStatement =  connection.prepareStatement(
                 "DELETE FROM requests WHERE requestIDExternal = ? AND dataSourceID = ?"
         );

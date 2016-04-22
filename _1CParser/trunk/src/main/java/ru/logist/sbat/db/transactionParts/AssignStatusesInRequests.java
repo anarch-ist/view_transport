@@ -28,7 +28,7 @@ public class AssignStatusesInRequests extends TransactionPart{
 
         BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.getInstance().allRequestsAsKeyPairs();
 
-        logger.info("-----------------START assign statuses in requests table from JSON object:[updateStatus]-----------------");
+        logger.info("START assign statuses in requests table from JSON object:[updateStatus]");
         PreparedStatement requestsUpdatePrSt = connection.prepareStatement(
                 "UPDATE requests SET boxQty = ?, requestStatusID = ?, commentForStatus = ?, lastStatusUpdated = ? WHERE requestID = ?;"
         );

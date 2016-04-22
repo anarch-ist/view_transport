@@ -27,7 +27,7 @@ public class UpdateUsersFromTraders extends TransactionPart {
         if (updateMarketAgents.isEmpty())
             return null;
 
-        logger.info("-----------------START update users table from JSON object:[updateTrader]-----------------");
+        logger.info("START update users table from JSON object:[updateTrader]");
         PreparedStatement result = connection.prepareStatement(
                 "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position)\n" +
                         "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n" +

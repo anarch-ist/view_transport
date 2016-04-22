@@ -23,7 +23,7 @@ public class UpdatePointsFromAddresses extends TransactionPart {
         if (updateAddresses.isEmpty())
             return null;
 
-        logger.info("-----------------START update points table from JSON objects: [updateAddresses]-----------------");
+        logger.info("START update points table from JSON objects: [updateAddresses]");
 
         PreparedStatement pointsStatement =  connection.prepareStatement(
                 "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, pointTypeID)\n" +

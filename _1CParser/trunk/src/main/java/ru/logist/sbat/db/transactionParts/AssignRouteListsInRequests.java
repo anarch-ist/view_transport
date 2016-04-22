@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * this method should be executed only after ClearRouteListsInRequests
+ */
 public class AssignRouteListsInRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
     private List<RouteListsData> updateRouteLists;
@@ -28,10 +31,6 @@ public class AssignRouteListsInRequests extends TransactionPart{
         BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.getInstance().allRequestsAsKeyPairs();
         BidiMap<String, Integer> allPointsAsKeyPairs = Selects.getInstance().allPointsAsKeyPairs();
         BidiMap<String, Integer> allRouteListsAsKeyPairs = Selects.getInstance().allRouteListsAsKeyPairs();
-        System.out.println(allRouteListsAsKeyPairs);
-        System.out.println(allRequestsAsKeyPairs.size());
-        System.out.println(allPointsAsKeyPairs.size());
-        System.out.println(allRouteListsAsKeyPairs.size());
 
         PreparedStatement requestUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET " +
@@ -44,17 +43,13 @@ public class AssignRouteListsInRequests extends TransactionPart{
             Set<String> requests = updateRouteList.getRequests(); // list of requests inside routeList
 
             Integer warehousePointId = getWarehousePointId(allPointsAsKeyPairs, updateRouteList.getPointDepartureId());
-            Integer routeListId = getRouteListId(allRouteListsAsKeyPairs, updateRouteList.getRouteListIdExternal());
-            System.out.println("routeListID = " + routeListId);
-            for(Object requestIDExternalAsObject: requests) {
+            Integer routeListId = allRouteListsAsKeyPairs.get(updateRouteList.getRouteListIdExternal());
 
+            for(Object requestIDExternalAsObject: requests) {
                 String requestIDExternal = (String) requestIDExternalAsObject;
                 requestUpdatePreparedStatement.setInt(1, routeListId);
                 requestUpdatePreparedStatement.setInt(2, warehousePointId);
                 setRequestId(requestUpdatePreparedStatement, requestIDExternal, allRequestsAsKeyPairs.get(requestIDExternal), 3);
-                System.out.println("request for assign = " + requestIDExternal);
-                System.out.println("route list = " + routeListId);
-
                 requestUpdatePreparedStatement.addBatch();
             }
         }
@@ -62,14 +57,6 @@ public class AssignRouteListsInRequests extends TransactionPart{
         int[] requestsAffectedRecords = requestUpdatePreparedStatement.executeBatch();
         logger.info("UPDATE requests assign routeLists completed, affected records size = [{}]", requestsAffectedRecords.length);
         return requestUpdatePreparedStatement;
-    }
-
-    private Integer getRouteListId(BidiMap<String, Integer> allRouteListsAsKeyPairs, String routeListIdExternal) throws DBCohesionException {
-        Integer routeListId = allRouteListsAsKeyPairs.get(routeListIdExternal);
-
-        if (routeListId == null)
-            throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, routeListIdExternal, "route_lists");
-        return routeListId;
     }
 
     private Integer getWarehousePointId(BidiMap<String, Integer> allPointsAsKeyPairs, String pointIdExternal) throws DBCohesionException {

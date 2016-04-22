@@ -22,7 +22,7 @@ public class DeleteClients extends TransactionPart {
         if (clientIdExternalList.isEmpty())
             return null;
 
-        logger.info("-----------------START UPDATE USERS TABLE from JSON object:[deleteClients]------------------");
+        logger.info("START UPDATE USERS TABLE from JSON object:[deleteClients]");
         PreparedStatement prepareStatement =  connection.prepareStatement(
                 "UPDATE users SET userRoleID = 'TEMP_REMOVED' WHERE login = ?"
         );

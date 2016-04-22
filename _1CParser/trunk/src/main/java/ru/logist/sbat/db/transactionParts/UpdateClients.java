@@ -23,7 +23,7 @@ public class UpdateClients extends TransactionPart{
         if (updateClients.isEmpty())
             return null;
 
-        logger.info("-----------------START update clients table from JSON object:[clients]-----------------");
+        logger.info("START update clients table from JSON object:[clients]");
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO clients (clientIDExternal, dataSourceID, clientName, INN)\n" +
                         "  VALUE (?, ?, ?, ?)\n" +

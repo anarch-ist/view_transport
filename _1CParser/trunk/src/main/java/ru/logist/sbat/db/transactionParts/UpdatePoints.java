@@ -24,7 +24,7 @@ public class UpdatePoints extends TransactionPart {
         if (updatePointsArray.isEmpty())
             return null;
 
-        logger.info("-----------------START update points table from JSON object:[updatePointsArray]------------------");
+        logger.info("START update points table from JSON object:[updatePointsArray]");
 
         PreparedStatement pointsStatement =  connection.prepareStatement(
                 "INSERT INTO points (pointIDExternal, dataSourceID, pointName, address, email, pointTypeID, responsiblePersonId)\n" +

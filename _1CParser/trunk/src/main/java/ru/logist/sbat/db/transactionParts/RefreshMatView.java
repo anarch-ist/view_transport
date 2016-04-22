@@ -13,10 +13,10 @@ public class RefreshMatView extends TransactionPart {
 
     @Override
     public Statement executePart() throws SQLException, DBCohesionException {
-        logger.info("--------------START refresh materialized view------------------");
+        logger.info("START refresh materialized view");
         CallableStatement callableStatement = connection.prepareCall("{CALL refreshMaterializedView()}");
         callableStatement.execute();
-        logger.info("--------------END refresh materialized view------------------");
+        logger.info("END refresh materialized view");
         return callableStatement;
     }
 }

@@ -23,7 +23,7 @@ public class DeleteRouteLists extends TransactionPart {
         if (routeListIdExternals.isEmpty())
             return null;
 
-        logger.info("-----------------START DELETE FROM route_lists TABLE from JSON object:[deleteRouteLists]------------------");
+        logger.info("START DELETE FROM route_lists TABLE from JSON object:[deleteRouteLists]");
         PreparedStatement prepareStatement =  connection.prepareStatement(
                 "DELETE FROM route_lists WHERE routeListIDExternal = ? AND dataSourceID = ?"
         );
