@@ -647,21 +647,6 @@ CREATE TABLE requests_history (
     ON UPDATE RESTRICT
 );
 
--- -------------------------------------------------------------------------------------------------------------------
---                                                   EXCHANGE_TABLE
--- -------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE exchange (
-  packageNumber  INTEGER,
-  serverName     VARCHAR(32),
-  dataSourceID     VARCHAR(32),
-  packageCreated DATETIME,
-  packageData    LONGTEXT, -- наличие самих данных в соответсвующем порядке позволяет в любой момент пересоздать всю БД.
-  PRIMARY KEY (packageNumber, serverName, dataSourceID),
-  FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT
-);
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                   GETTERS
