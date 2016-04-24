@@ -35,9 +35,6 @@ public class DBManager {
         return insertOrUpdateTransactionScript.updateData();
     }
 
-    /**
-     * this method designed only for tests
-     */
     public void truncatePublicTables(){
         Statement statement = null;
 
@@ -61,7 +58,6 @@ public class DBManager {
                         || tableName.equals("request_statuses_for_user_role")
                         || tableName.equals("data_sources")
                         || tableName.equals("route_list_statuses")
-                        || tableName.equals("big_select")
                         || tableName.equals("all_users")
                         ) continue;
                 statement = connection.createStatement();
@@ -69,11 +65,8 @@ public class DBManager {
                 statement.executeUpdate(sql);
                 System.out.println(sql);
             }
-
             connection.createStatement().executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
-            connection.createStatement().executeUpdate(
-                    "INSERT INTO points VALUE (8888, 'w', 'LOGIST_1C', 'point1', 'moscow', 3, 1, 'some_comment1', '9:00:00', '17:00:00', 'some_district', 'efregrthr', '123456',\n" +
-                    "'ergersghrth', 'srgf@ewuf.ru', '89032343556', 'resp_personID1', 'WAREHOUSE')");
+
             connection.createStatement().executeUpdate(
                     "INSERT INTO users (userID, userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position, pointID, clientID)\n" +
                             "  VALUES\n" +
@@ -85,22 +78,83 @@ public class DBManager {
             connection.commit();
 
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {/*NOPE*/}
-            e.printStackTrace();
+            DBUtils.rollbackQuietly(connection);
         }
         finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {/*NOPE*/}
-            }
+            DBUtils.closeStatementQuietly(statement);
         }
 
 
     }
     public Connection getConnection() {
         return connection;
+    }
+
+
+    public List<String> selectAllFromExchange(Timestamp timestamp) {
+        List<String> allData = new ArrayList<>();
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement("SELECT packageData FROM backup_db.exchange WHERE packageAdded <= ? ORDER BY packageAdded;");
+            preparedStatement.setTimestamp(1, timestamp);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                allData.add(resultSet.getString("packageData"));
+            }
+            connection.commit();
+            return allData;
+        } catch (SQLException e) {
+            DBUtils.rollbackQuietly(connection);
+            logger.error(e);
+        } finally {
+            DBUtils.closeStatementQuietly(preparedStatement);
+        }
+        return null;
+    }
+
+    public void removeFromExchange(Timestamp timestamp) {
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement("DELETE FROM backup_db.exchange WHERE packageAdded < ?;");
+            preparedStatement.setTimestamp(1, timestamp);
+            preparedStatement.execute();
+            connection.commit();
+        } catch (SQLException e) {
+            DBUtils.rollbackQuietly(connection);
+            logger.error(e);
+        } finally {
+            DBUtils.closeStatementQuietly(preparedStatement);
+        }
+    }
+
+    public void createTempTable() {
+        Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            statement.execute("CREATE TABLE backup_db.temp_exchange LIKE backup_db.exchange");
+            statement.execute("INSERT INTO backup_db.temp_exchange SELECT * FROM backup_db.exchange;");
+            connection.commit();
+        } catch (SQLException e) {
+            DBUtils.rollbackQuietly(connection);
+            logger.error(e);
+        } finally {
+            DBUtils.closeStatementQuietly(statement);
+        }
+    }
+
+    public void removeTempTable() {
+        Statement statement = null;
+        try {
+            statement = connection.createStatement();
+            statement.execute(
+                    "DROP TABLE IF EXISTS backup_db.temp_exchange"
+            );
+            connection.commit();
+        } catch (SQLException e) {
+            DBUtils.rollbackQuietly(connection);
+            logger.error(e);
+        } finally {
+            DBUtils.closeStatementQuietly(statement);
+        }
     }
 }

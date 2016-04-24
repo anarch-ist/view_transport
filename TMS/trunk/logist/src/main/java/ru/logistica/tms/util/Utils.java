@@ -1,4 +1,4 @@
-package ru.logist.sbat.db;
+package ru.logistica.tms.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Utils {
-    private static final Logger logger = LogManager.getLogger(InsertOrUpdateTransactionScript.class);
+    private static final Logger logger = LogManager.getLogger();
 
     private Utils() {}
 
@@ -36,21 +36,6 @@ public class Utils {
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {/*NOPE*/}
         return null;
-    }
-
-    /**
-     * if allRouteNames contains routeNameCandidate then direction name changed
-     * @param allRouteNames
-     * @param duplicatedRouteName
-     */
-    public static String getUniqueDirectionName(final Set<String> allRouteNames, final String duplicatedRouteName) {
-        int count = 0;
-        do {
-            count++;
-        } while (allRouteNames.contains(duplicatedRouteName + count + ""));
-        String generatedDirectionName = duplicatedRouteName + count + "";
-        logger.warn("direction name [{}] was duplicated, generated direction name = [{}]", duplicatedRouteName, generatedDirectionName);
-        return generatedDirectionName;
     }
 
 }

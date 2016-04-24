@@ -1,9 +1,9 @@
 package ru.logist.sbat.cmd;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CmdLineParser {
     private Options options;
@@ -18,30 +18,46 @@ public class CmdLineParser {
      * @return Option and parameters
      * @throws ParseException
      */
-    public Pair<Option, List<String>> parse(String line) throws ParseException {
+    public Pair<Option, Map<String, String>> parse(String line) throws ParseException {
 
-        String[] strings = line.split("\\s");
-        String optionName = strings[0];
+        List<String> strings = split(line);
+        if (strings.size() == 0)
+            throw new ParseException("empty string is not argument", 0);
+
+        String optionName = strings.get(0);
         try {
-            Option option = options.stream()
-                    .filter(opt -> opt.getName().equals(optionName))
-                    .findFirst()
-                    .get();
+            Option option = options.getOptionByName(optionName);
             if (option.isNoArgs()) {
                 return new Pair<>(option, null);
-            } else {
-                List<String> params = new ArrayList<>();
-                for (int i = 1; i < strings.length; i++) {
-                    params.add(strings[i]);
-                    if (!option.getParameters().contains(strings[i]))
-                        throw new ParseException("option argument [" + strings[i] + "] does not exist.", 0);
-                }
-                return new Pair<>(option, params);
             }
+
+            Map<String, String> params = new HashMap<>();
+
+            for (int i = 1; i < strings.size(); i+=2) {
+                if (!option.getParameters().contains(strings.get(i)))
+                    throw new ParseException("option argument [" + strings.get(i) + "] does not exist.", 0);
+                if (i + 1 >= strings.size())
+                    throw new ParseException("no argument for parameter[" + strings.get(i) + "]", 0);
+
+                params.put(strings.get(i), strings.get(i + 1));
+            }
+            return new Pair<>(option, params);
 
         } catch (NoSuchElementException e) {
             throw new ParseException("option name [" + optionName + "] does not exist.", 0);
         }
 
+    }
+
+    protected List<String> split(String string) {
+        List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\"([^\"]*)\"|[^\\s]+");
+        Matcher m = pattern.matcher(string);
+        while (m.find()) {
+            String group = m.group();
+            group = group.replaceAll("\"", "");
+            result.add(group);
+        }
+        return result;
     }
 }

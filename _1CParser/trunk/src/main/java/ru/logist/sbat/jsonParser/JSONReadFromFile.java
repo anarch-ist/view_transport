@@ -58,7 +58,7 @@ public class JSONReadFromFile {
         }
     }
 
-    private static JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {
+    public static JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {
 
         String jsonFileAsStringWithoutBom = jsonFileAsString.replaceAll("\uFEFF", "");
         // TODO use JSONP here

@@ -26,7 +26,7 @@ public class FileChangeListener implements OnFileChangeListener {
 
     private static final Logger logger = LogManager.getLogger();
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
-    private static final String RESPONSE_FILE_EXTENSION = ".ans";
+    public static final String RESPONSE_FILE_EXTENSION = ".ans";
     private static final String TEMP_FILE_EXTENSION = ".tmp";
 
     private final DBManager DBManager;

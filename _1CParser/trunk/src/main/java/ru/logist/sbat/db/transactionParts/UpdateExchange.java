@@ -32,14 +32,13 @@ public class UpdateExchange extends TransactionPart {
             throw new DBCohesionException(Util.getParameterizedString("package number {} for {} server must be greater then {}", packageNumber, server, lastReceivedPackageNumber));
 
         PreparedStatement preparedStatement =  connection.prepareStatement(
-                "INSERT INTO exchange (packageNumber, serverName, dataSourceID, packageCreated, packageData)\n" +
-                        "VALUE (?, ?, ?, ?, ?);"
+                "INSERT INTO backup_db.exchange (packageNumber, serverName, packageCreated, packageData)\n" +
+                        "VALUE (?, ?, ?, ?);"
         );
         preparedStatement.setInt   (1, packageNumber);
         preparedStatement.setString(2, server);
-        preparedStatement.setString(3, InsertOrUpdateTransactionScript.LOGIST_1C);
-        preparedStatement.setTimestamp(4, dataFrom1c.getCreated());
-        preparedStatement.setString(5, dataFrom1c.getRawJsonObject());
+        preparedStatement.setTimestamp(3, dataFrom1c.getCreated());
+        preparedStatement.setString(4, dataFrom1c.getRawJsonObject());
         preparedStatement.executeUpdate();
         logger.info("INSERT INTO exchange table completed server = [{}], packageNumber = [{}]", server, packageNumber);
         return preparedStatement;

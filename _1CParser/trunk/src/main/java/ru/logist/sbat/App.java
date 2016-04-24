@@ -1,5 +1,6 @@
 package ru.logist.sbat;
 import com.djdch.log4j.StaticShutdownCallbackRegistry;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.cmd.CmdLineParser;
@@ -7,6 +8,11 @@ import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
 import ru.logist.sbat.cmd.Pair;
 import ru.logist.sbat.db.DBManager;
+import ru.logist.sbat.db.InsertOrUpdateResult;
+import ru.logist.sbat.jsonParser.JSONReadFromFile;
+import ru.logist.sbat.jsonParser.JsonPException;
+import ru.logist.sbat.jsonParser.ValidatorException;
+import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.resourcesInit.ResourceInitException;
 import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
 import ru.logist.sbat.jsonParser.Util;
@@ -17,14 +23,13 @@ import ru.logist.sbat.watchService.WatchServiceStarter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
 public class App {
 
@@ -98,16 +103,18 @@ public class App {
         Options options = new Options();
         Option quit = new Option("quit");
         Option help = new Option("help");
-        options.addAll(Arrays.asList(quit, help));
+        Option rollback = new Option("rollback", "-date");
+
+        options.addAll(Arrays.asList(quit, help, rollback));
 
         CmdLineParser cmdLineParser = new CmdLineParser(options);
         while (true) {
             String nextLine = scanner.nextLine();
-            Pair<Option, List<String>> optionListPair;
+            Pair<Option, Map<String, String>> optionListPair;
             try {
                 optionListPair = cmdLineParser.parse(nextLine);
             } catch (ParseException e) {
-                logger.debug(e.getMessage());
+                logger.error(e.getMessage());
                 continue;
             }
             Option option = optionListPair.getFirst();
@@ -116,9 +123,50 @@ public class App {
                 System.exit(0);
             } else if (option.equals(help)) {
                 System.out.println(options);
+            } else if (option.equals(rollback)) {
+                try {
+                    Map<String, String> parameters = optionListPair.getSecond();
+                    if (parameters.isEmpty()) {
+                        rollback(new Timestamp(new java.util.Date().getTime()));
+                    } else {
+                        String timestampAsString = parameters.get(option.getParameters().get(0));
+                        Timestamp timestamp = Timestamp.valueOf(timestampAsString);
+                        rollback(timestamp);
+                    }
+                } catch (Exception e) {
+                    logger.error(e);
+                    System.exit(-1);
+                }
             }
         }
     }
+
+    private static void rollback(Timestamp timestamp) throws IOException, org.json.simple.parser.ParseException, JsonPException, ValidatorException {
+        logger.info("start copy exchange table");
+        dbManager.createTempTable();
+        logger.info("start select all data from exchange table");
+        List<String> dataStrings = dbManager.selectAllFromExchange(timestamp);
+        logger.info("start clear rows in exchange table before [{}]", timestamp);
+        dbManager.removeFromExchange(timestamp);
+        logger.info("start clear main database");
+        dbManager.truncatePublicTables();
+        Path responseDir = systemResourcesContainer.getResponseDir();
+        FileUtils.cleanDirectory(responseDir.toFile());
+        logger.info("response directory cleaned");
+
+        for (String dataString : dataStrings) {
+            DataFrom1c dataFrom1c = new DataFrom1c(JSONReadFromFile.getJsonObjectFromString(dataString));
+            InsertOrUpdateResult insertOrUpdateResult = dbManager.updateDataFromJSONObject(dataFrom1c);
+            Path responsePath = responseDir.resolve(insertOrUpdateResult.getServer() + FileChangeListener.RESPONSE_FILE_EXTENSION);
+            FileUtils.writeStringToFile(responsePath.toFile(), insertOrUpdateResult.toString(), StandardCharsets.UTF_8);
+        }
+        // remove data from exchange before timestamp
+        dbManager.removeTempTable();
+        logger.info("temp exchange table removed");
+        logger.info("ALL DATA ROLLBACKED SUCCESSFULLY timestamp = [{}]", timestamp);
+    }
+
+
 
     private static synchronized void closeAll() {
         if (dbManager != null) {

@@ -158,8 +158,7 @@ public class Selects {
             PreparedStatement statement = null;
             try {
                 BidiMap<String, Integer> result = new DualHashBidiMap<>();
-                statement = connection.prepareStatement("SELECT serverName, packageNumber FROM exchange WHERE dataSourceID = ?;");
-                statement.setString(1, InsertOrUpdateTransactionScript.LOGIST_1C);
+                statement = connection.prepareStatement("SELECT serverName, packageNumber FROM backup_db.exchange;");
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
                     result.put(resultSet.getString(1), resultSet.getInt(2));

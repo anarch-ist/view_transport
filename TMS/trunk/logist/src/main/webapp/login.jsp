@@ -3,13 +3,13 @@
 <head>
     <title>Login Page</title>
 </head>
-<body>
-<form action="login" method="post">
-    <label for="userLoginId">логин</label>
-    <input type="text" name="userLogin" id="userLoginId"/>
-    <label for="userPasswordId">пароль</label>
-    <input type="password" name="userPassword" id="userPasswordId"/>
-    <input type="submit"/>
-</form>
-</body>
+    <body>
+        <form action="login" method="post">
+            <label for="userLoginId">логин</label>
+            <input type="text" name="userLogin" id="userLoginId"/>
+            <label for="userPasswordId">пароль</label>
+            <input type="password" name="userPassword" id="userPasswordId"/>
+            <input type="submit"/>
+        </form>
+    </body>
 </html>

@@ -39,7 +39,7 @@ public class FunctionalTests {
 
         // clean database content
         dbManager.truncatePublicTables();
-
+        dbManager.removeFromExchange(new Timestamp(new java.util.Date().getTime()));
         // load file with initial data
         loadFile("EKA_fixed.zip");
     }

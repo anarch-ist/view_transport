@@ -11,4 +11,11 @@ public class Options extends ArrayList<Option>{
         }
         return result;
     }
+
+    public Option getOptionByName(String optionName) {
+        return this.stream()
+                .filter(opt -> opt.getName().equals(optionName))
+                .findFirst()
+                .get();
+    }
 }
