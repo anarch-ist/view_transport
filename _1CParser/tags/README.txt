@@ -18,7 +18,7 @@ Java version - 1.8.
 <entry key="jsonDataDir">C:\Users\Сергей\parser\exchange\data</entry>
 <entry key="backupDir">C:\Users\Сергей\parser\exchange\backup</entry>
 <entry key="responseDir">C:\Users\Сергей\parser\exchange\response</entry>
-<entry key="logsDir">C:\Users\Сергей\parser\exchange\response</entry>
+<entry key="logsDir">C:\Users\Сергей\parser\exchange\logs</entry>
 
 </properties>
 
