@@ -1,6 +1,7 @@
 package ru.logistica.tms.dao.constantsDao;
 
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.utils.DaoException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,10 +13,10 @@ public class ConstantsDaoImpl implements ConstantsDao {
 
 
     @Override
-    public Set<UserRole> getUserRoles() throws SQLException {
+    public Set<UserRole> getUserRoles() throws DaoException {
         String sql = "SELECT * from user_roles";
         Set<UserRole> result = new HashSet<>();
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 UserRole userRole = new UserRole();
@@ -28,10 +29,10 @@ public class ConstantsDaoImpl implements ConstantsDao {
     }
 
     @Override
-    public Set<Permission> getPermissions() throws SQLException {
+    public Set<Permission> getPermissions() throws DaoException {
         String sql = "SELECT * from permissions";
         Set<Permission> result = new HashSet<>();
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 Permission permission = new Permission();
@@ -43,10 +44,10 @@ public class ConstantsDaoImpl implements ConstantsDao {
     }
 
     @Override
-    public Set<TimeDiff> getTimeDiffs() throws SQLException {
+    public Set<TimeDiff> getTimeDiffs() throws DaoException {
         String sql = "SELECT * from time_diffs";
         Set<TimeDiff> result = new HashSet<>();
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 TimeDiff timeDiff = new TimeDiff();
@@ -58,10 +59,10 @@ public class ConstantsDaoImpl implements ConstantsDao {
     }
 
     @Override
-    public Set<DonutStatus> getDonutStatuses() throws SQLException {
+    public Set<DonutStatus> getDonutStatuses() throws DaoException {
         String sql = "SELECT * from donut_statuses";
         Set<DonutStatus> result = new HashSet<>();
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 DonutStatus donutStatus = new DonutStatus();

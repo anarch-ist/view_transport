@@ -8,20 +8,17 @@ import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.usersDao.AbstractUser;
 import ru.logistica.tms.dao.usersDao.AbstractUserDaoImpl;
 import ru.logistica.tms.dao.usersDao.GenericUserDao;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 import ru.logistica.tms.dao.utils.SQLConnection;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.io.PrintWriter;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -38,19 +35,44 @@ public class LoginServlet extends HttpServlet {
 
         try {
             SQLConnection sqlConnection = new SQLConnection();
-            JdbcUtil.setConnection(sqlConnection.getConnection());
+            ConnectionManager.setConnection(sqlConnection.getConnection());
 
             ConstantsDao constantsDao = new ConstantsDaoImpl();
             ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
-            String userLogin = request.getParameter("userLogin");
-            String userPassword = request.getParameter("userPassword");
+
+            JsonReader reader = Json.createReader(request.getReader());
+            JsonObject authData = (JsonObject)reader.read();
+            JsonValue login = authData.get("login");
+            if (!login.getValueType().equals(JsonValue.ValueType.STRING) )
+                throw new RuntimeException("bad value type");
+
+            JsonValue passwordMd5 = authData.get("password");
+            if (!passwordMd5.getValueType().equals(JsonValue.ValueType.STRING) )
+                throw new RuntimeException("bad value type");
+
+
             GenericUserDao<AbstractUser> abstractUserDao = new AbstractUserDaoImpl();
-            AbstractUser abstractUser = abstractUserDao.getByLogin(userLogin);
+            AbstractUser abstractUser = abstractUserDao.getByLogin(login.toString());
+            System.out.println(abstractUser);
+            UsersManager
+
+
             if (abstractUser != null) {
                 response.sendRedirect("success.jsp");
             } else {
-                response.sendRedirect("login.jsp");
+                // отвечать по JSON поля: loginErrorText, passwordErrorText
+                //JsonObjectBuilder
+                response.setContentType("application/json");
+                PrintWriter out = response.getWriter();
+                // Assuming your json object is **jsonObject**, perform the following, it will return your json object
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                JsonObject jsonObject = objectBuilder.add("loginErrorText", "").add("passwordErrorText", "").build();
+
+                out.print(jsonObject);
+                out.flush();
+
+                //response.sendRedirect("login.html");
             }
 
         } catch (Exception e) {

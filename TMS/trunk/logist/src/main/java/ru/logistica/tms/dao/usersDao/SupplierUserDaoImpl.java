@@ -2,7 +2,7 @@ package ru.logistica.tms.dao.usersDao;
 
 import ru.logistica.tms.dao.utils.DaoException;
 import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
@@ -37,7 +37,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     @Override
     public SupplierUser getById(final Integer id) throws DaoException {
         final SupplierUser[] supplierUser = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT suppliers_users.userID, " +
@@ -65,7 +65,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         "INNER JOIN abstract_users ON (abstract_users.userID = suppliers_users.userID) " +
                         "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID)" +
                         "WHERE suppliers_users.userID = ?;";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
                     if(resultSet.next()) {
@@ -93,7 +93,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     @Override
     public Collection<SupplierUser> getAll() throws DaoException {
         final Set<SupplierUser> result = new HashSet<>();
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT suppliers_users.userID, " +
@@ -120,7 +120,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         "FROM suppliers_users " +
                         "INNER JOIN abstract_users ON (abstract_users.userID = suppliers_users.userID)\n" +
                         "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID);";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()){
                         SupplierUser supplierUser = new SupplierUser();
@@ -153,13 +153,13 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     @Override
     public Integer saveOrUpdate(final SupplierUser supplierUser) throws DaoException {
         final Integer userId = abstractUserDao.saveOrUpdate(supplierUser);
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 // if was inserted
                 if (userId != null) {
                     String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
-                    try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                    try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                         statement.setInt(1, userId);
                         statement.setInt(2, (Integer) supplierUser.getSupplier().getSupplierID());
                         statement.execute();
@@ -173,11 +173,11 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     @Override
     public Integer save(final SupplierUser supplierUser) throws DaoException {
         final Integer userId = abstractUserDao.save(supplierUser);
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)) {
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     statement.setInt(1, userId);
                     statement.setInt(2, (Integer) supplierUser.getSupplier().getSupplierID());
                     statement.execute();

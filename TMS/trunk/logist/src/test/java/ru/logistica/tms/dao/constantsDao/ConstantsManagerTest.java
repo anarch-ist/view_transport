@@ -4,18 +4,17 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
 import java.util.Set;
 
 
 public class ConstantsManagerTest {
-    private static ConstantsManager constantsManager = new ConstantsManager();
     private static ConstantCollections constantCollections = new ConstantCollections();
 
     @BeforeMethod
     public void setUp() throws Exception {
-        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConnectionManager.setConnection(TestUtil.createConnection());
         constantsManager.getAllConstants();
     }
 

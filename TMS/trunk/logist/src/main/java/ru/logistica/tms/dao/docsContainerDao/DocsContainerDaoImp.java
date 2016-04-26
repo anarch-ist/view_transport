@@ -1,7 +1,7 @@
 package ru.logistica.tms.dao.docsContainerDao;
 
 
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +14,7 @@ class DocsContainerDaoImp implements DocsContainerDao{
     public Set<DocsContainer> getAll() throws SQLException {
         String sql = "SELECT * from docs_container"; // name of table
         Set<DocsContainer> result = new HashSet<>();
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()){
                 DocsContainer docsContainer = new DocsContainer();
@@ -33,7 +33,7 @@ class DocsContainerDaoImp implements DocsContainerDao{
     public DocsContainer getById(int id) throws SQLException {
         String sql = "SELECT * from docs_container WHERE containerId = ?"; // name of table
         DocsContainer docsContainer = new DocsContainer();
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
@@ -49,7 +49,7 @@ class DocsContainerDaoImp implements DocsContainerDao{
     @Override
     public void save(DocsContainer docsContainer) throws SQLException {
         String sql = "INSERT INTO docs_container VALUES (?, ?, ?, ?, ?)"; // name of table
-        try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+        try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
             statement.setInt(1, (int)docsContainer.getContainerId());
             statement.setInt(2, docsContainer.getDocId());
             statement.setInt(3, docsContainer.getTimeDiffId());

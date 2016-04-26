@@ -4,7 +4,7 @@ package ru.logistica.tms.dao.pointsDao;
 
 import ru.logistica.tms.dao.utils.DaoException;
 import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.PreparedStatement;
@@ -17,11 +17,11 @@ public class PointDaoImpl implements GenericDao<Point> {
     @Override
     public Point getById(final Integer id) throws DaoException {
         final Point point = new Point();
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT * from points WHERE pointID = ?";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
                     resultSet.next();
@@ -44,14 +44,14 @@ public class PointDaoImpl implements GenericDao<Point> {
     @Override
     public Integer saveOrUpdate(final Point point) throws DaoException {
         final Integer[] result = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO points VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                         "ON CONFLICT (pointID) DO UPDATE SET pointID = EXCLUDED.pointID, " +
                         "pointName = EXCLUDED.pointName, region = EXCLUDED.region, district = EXCLUDED.district, locality = EXCLUDED.locality, mailIndex = EXCLUDED.mailIndex, " +
                         "address = EXCLUDED.address, email = EXCLUDED.email, phoneNumber = EXCLUDED.phoneNumber, responsiblePersonId = EXCLUDED.responsiblePersonId";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
                     statement.setInt(1, (int)point.getPointId());
                     statement.setString(2, point.getPointName());
                     statement.setString(3, point.getRegion());

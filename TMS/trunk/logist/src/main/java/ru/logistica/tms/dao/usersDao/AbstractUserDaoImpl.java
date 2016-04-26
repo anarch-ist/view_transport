@@ -2,7 +2,7 @@ package ru.logistica.tms.dao.usersDao;
 
 
 import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 
 import java.sql.PreparedStatement;
@@ -17,7 +17,7 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public Integer saveOrUpdate(final AbstractUser user) throws DaoException {
         final Integer[] result = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO abstract_users (userID, userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) " +
@@ -25,7 +25,7 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
                         "userLogin = EXCLUDED.userLogin, salt = EXCLUDED.salt, passAndSalt = EXCLUDED.passAndSalt, " +
                         "userRoleID = EXCLUDED.userRoleID, userName = EXCLUDED.userName, " +
                         "phoneNumber = EXCLUDED.phoneNumber, email = EXCLUDED.email, position = EXCLUDED.position";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
                     statement.setString(1, user.getLogin());
                     statement.setString(2, user.getSalt());
                     statement.setString(3, user.getPassAndSalt());
@@ -50,12 +50,12 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public Integer save(final AbstractUser user) throws DaoException {
         final Integer[] result = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO abstract_users (userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
                     statement.setString(1, user.getLogin());
                     statement.setString(2, user.getSalt());
                     statement.setString(3, user.getPassAndSalt());
@@ -80,12 +80,12 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public void update(final AbstractUser user) throws DaoException {
         final int[] countOfUpdated = {0};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "UPDATE abstract_users SET salt = ?, passAndSalt = ?, userRoleID = ?, userName = ?, " +
                         "phoneNumber = ?, email = ?, position = ? WHERE abstract_users.userLogin = ?";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     statement.setString(1, user.getSalt());
                     statement.setString(2, user.getPassAndSalt());
                     statement.setString(3, ConstantCollections.getUserRoleIdByUserRole(user.getUserRole()));
@@ -108,11 +108,11 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public void deleteUserByLogin(final String login) throws DaoException {
         final int[] countOfUpdated = {0};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "DELETE FROM abstract_users WHERE userLogin = ?";
-                try (PreparedStatement preparedStatement = JdbcUtil.getConnection().prepareStatement(sql)) {
+                try (PreparedStatement preparedStatement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     preparedStatement.setString(1, login);
                     preparedStatement.execute();
                     countOfUpdated[0] = preparedStatement.getUpdateCount();
@@ -128,11 +128,11 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public AbstractUser getById(final Integer id) throws DaoException {
         final AbstractUser[] abstractUser = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT * from abstract_users WHERE userID = ?";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
                     if(resultSet.next()) {
@@ -157,11 +157,11 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     @Override
     public AbstractUser getByLogin(final String login) throws DaoException {
         final AbstractUser[] abstractUser = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT * from abstract_users WHERE userLogin = ?";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setString(1, login);
                     ResultSet resultSet = statement.executeQuery();
                     if (resultSet.next()) {
@@ -186,12 +186,12 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     public Collection<AbstractUser> getAll() throws DaoException {
         final Set<AbstractUser> result = new HashSet<>();
 
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
 
                 String sql = "SELECT * from abstract_users";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)) {
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()) {
                         AbstractUser abstractUser = new AbstractUser();
@@ -217,11 +217,11 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
 
     @Override
     public void deleteById(final Integer id) throws DaoException {
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "DELETE FROM abstract_users WHERE userID = ?";
-                try (PreparedStatement preparedStatement = JdbcUtil.getConnection().prepareStatement(sql)) {
+                try (PreparedStatement preparedStatement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     preparedStatement.setInt(1, id);
                     preparedStatement.execute();
                 }

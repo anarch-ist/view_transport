@@ -2,7 +2,7 @@ package ru.logistica.tms.dao.usersDao;
 
 import ru.logistica.tms.dao.utils.DaoException;
 import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 import ru.logistica.tms.dao.pointsDao.Point;
 import ru.logistica.tms.dao.pointsDao.PointDaoImpl;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
@@ -38,7 +38,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     @Override
     public PointUser getById(final Integer id) throws DaoException {
         final PointUser[] pointUser = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT point_users.userID, " +
@@ -63,7 +63,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                         "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID)" +
                         "INNER JOIN points ON (points.pointID = point_users.pointID)" +
                         "WHERE point_users.userID = ?;";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
 
@@ -92,7 +92,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     @Override
     public Collection<PointUser> getAll() throws DaoException {
         final Set<PointUser> result = new HashSet<>();
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT point_users.userID, " +
@@ -116,7 +116,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                         "points.responsiblePersonID FROM point_users " +
                         "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID) " +
                         "INNER JOIN points ON (points.pointID = point_users.pointID);";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()){
                         PointUser pointUser = new PointUser();
@@ -149,14 +149,14 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     @Override
     public Integer saveOrUpdate(final PointUser pointUser) throws DaoException {
         final Integer[] result = {null};
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 Integer userId = abstractUserDao.saveOrUpdate(pointUser);
                 // if was inserted
                 if (userId != null) {
                     String sql = "INSERT INTO point_users VALUES (?, ?)";
-                    try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)){
+                    try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                         statement.setInt(1, userId);
                         statement.setInt(2, (Integer) pointUser.getPoint().getPointId());
                         statement.execute();
@@ -170,11 +170,11 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     @Override
     public Integer save(final PointUser pointUser) throws DaoException {
         final Integer userId = abstractUserDao.save(pointUser);
-        JdbcUtil.runWithExceptionRedirect(new JdbcUtil.Exec() {
+        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO point_users VALUES (?, ?)";
-                try (PreparedStatement statement = JdbcUtil.getConnection().prepareStatement(sql)) {
+                try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     statement.setInt(1, userId);
                     statement.setInt(2, (Integer) pointUser.getPoint().getPointId());
                     statement.execute();

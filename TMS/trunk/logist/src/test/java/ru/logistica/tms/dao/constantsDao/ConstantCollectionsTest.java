@@ -5,7 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,18 +19,18 @@ public class ConstantCollectionsTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConnectionManager.setConnection(TestUtil.createConnection());
     }
 
     @AfterClass
     public void tearDown() throws Exception {
-        JdbcUtil.getConnection().close();
+        ConnectionManager.getConnection().close();
     }
 
     @Test(dependsOnMethods = {"testGetDonutStatuses"})
     public void testSetUserRoles() throws Exception {
         ConstantCollections.setUserRoles(constantsDao.getUserRoles());
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Set<UserRole> userRoles = ConstantCollections.getUserRoles();
         List<String> userRolesAsList = new ArrayList<>();
         for (UserRole userRole : userRoles) {

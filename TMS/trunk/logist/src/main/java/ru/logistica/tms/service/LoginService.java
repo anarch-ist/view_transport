@@ -4,7 +4,7 @@ import ru.logistica.tms.dao.usersDao.AbstractUser;
 import ru.logistica.tms.dao.usersDao.AbstractUserDaoImpl;
 import ru.logistica.tms.dao.usersDao.GenericUserDao;
 import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 import ru.logistica.tms.dao.utils.SQLConnection;
 
 import javax.naming.NamingException;
@@ -20,7 +20,7 @@ public class LoginService {
         try {
             Connection connection = new SQLConnection().getConnection();
             connection.setAutoCommit(false);
-            JdbcUtil.setConnection(connection);
+            ConnectionManager.setConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (NamingException e) {
@@ -34,7 +34,7 @@ public class LoginService {
         AbstractUser byLogin = abstractUserGenericUserDao.getByLogin(userLogin);
         System.out.println(byLogin);
         try {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }

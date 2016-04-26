@@ -3,16 +3,14 @@ package ru.logistica.tms.dao.utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.concurrent.Callable;
 
-public class JdbcUtil {
+public class ConnectionManager {
     static private Connection connection;
 
     public static void setConnection(Connection connection) {
-        JdbcUtil.connection = connection;
         try {
-            JdbcUtil.connection.setAutoCommit(false);
+            connection.setAutoCommit(false);
+            ConnectionManager.connection = connection;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -22,13 +20,7 @@ public class JdbcUtil {
         return connection;
     }
 
-    public static void rollbackQuietly() {
-        if (connection != null) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {/*NOPE*/}
-        }
-    }
+
 
     public static void runWithExceptionRedirect(Exec exec) throws DaoException {
         try {

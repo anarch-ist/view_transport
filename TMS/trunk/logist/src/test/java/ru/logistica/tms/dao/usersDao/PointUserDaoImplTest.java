@@ -10,7 +10,7 @@ import ru.logistica.tms.dao.pointsDao.Point;
 import ru.logistica.tms.dao.pointsDao.PointDaoImpl;
 import ru.logistica.tms.dao.utils.DaoException;
 import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -30,7 +30,7 @@ public class PointUserDaoImplTest {
     @BeforeClass
     public void fillingData() throws DaoException, SQLException, URISyntaxException {
         TestUtil.cleanDatabase(false);
-        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConnectionManager.setConnection(TestUtil.createConnection());
         ConstantsDao constantsDao = new ConstantsDaoImpl();
         ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
@@ -75,12 +75,12 @@ public class PointUserDaoImplTest {
 
         pointUserDao.save(pointUser1);
         pointUserDao.save(pointUser2);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
     }
 
     @AfterClass
     public void tearDown() throws Exception {
-        JdbcUtil.getConnection().close();
+        ConnectionManager.getConnection().close();
     }
 
     @Test(expectedExceptions = DaoException.class)
@@ -89,7 +89,7 @@ public class PointUserDaoImplTest {
             pointUserDao.save(pointUser1);
         }
         finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 
@@ -108,10 +108,10 @@ public class PointUserDaoImplTest {
         pointUser.setEmail("k@bk.ru");
         pointUser.setPosition("position4");
         pointUserDao.update(pointUser);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
 
         Collection<PointUser> users = pointUserDao.getAll();
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         for (AbstractUser user : users) {
             user.setUserId(null);
             if (user.getLogin().equals(pointUser.getLogin())) {
@@ -137,14 +137,14 @@ public class PointUserDaoImplTest {
             pointUser.setPosition("position4");
             pointUserDao.update(pointUser);
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 
     @Test(dependsOnMethods = {"testUpdateUserNotExistedUser"})
     public void testGetAllUsers() throws Exception {
         Collection<PointUser> users = pointUserDao.getAll();
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Assert.assertEquals(users.size(), 2);
     }
 
@@ -177,7 +177,7 @@ public class PointUserDaoImplTest {
     @Test(dependsOnMethods = {"testGetByLoginNotExistedLogin"})
     public void testDeleteUserByLogin() throws Exception {
         pointUserDao.deleteUserByLogin("user5");
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Collection<PointUser> users = pointUserDao.getAll();
         Assert.assertTrue(!users.contains(pointUser2));
         Assert.assertEquals(users.size(), 1);
@@ -188,7 +188,7 @@ public class PointUserDaoImplTest {
         try {
             pointUserDao.deleteUserByLogin("user9");
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 

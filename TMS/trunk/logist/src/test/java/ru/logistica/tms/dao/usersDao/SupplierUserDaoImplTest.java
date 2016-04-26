@@ -10,7 +10,7 @@ import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
 import ru.logistica.tms.dao.utils.DaoException;
 import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -31,7 +31,7 @@ public class SupplierUserDaoImplTest {
     @BeforeClass
     public void fillingData() throws SQLException, DaoException, URISyntaxException {
         TestUtil.cleanDatabase(false);
-        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConnectionManager.setConnection(TestUtil.createConnection());
         ConstantsDao constantsDao = new ConstantsDaoImpl();
         ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
@@ -77,12 +77,12 @@ public class SupplierUserDaoImplTest {
 
         supplierUserDao.save(supplierUser1);
         supplierUserDao.save(supplierUser2);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
     }
 
     @AfterClass
     public void tearDown() throws Exception {
-        JdbcUtil.getConnection().close();
+        ConnectionManager.getConnection().close();
     }
 
     @Test(expectedExceptions = DaoException.class)
@@ -90,7 +90,7 @@ public class SupplierUserDaoImplTest {
         try {
             supplierUserDao.save(supplierUser1);
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 
@@ -109,7 +109,7 @@ public class SupplierUserDaoImplTest {
         supplierUser.setEmail("f@mail.ru");
         supplierUser.setPosition("position6");
         supplierUserDao.update(supplierUser);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
 
         Collection<SupplierUser> users = supplierUserDao.getAll();
         for (AbstractUser user : users) {
@@ -137,14 +137,14 @@ public class SupplierUserDaoImplTest {
             supplierUser.setPosition("position4");
             supplierUserDao.update(supplierUser);
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 
     @Test(dependsOnMethods = {"testUpdateUserNotExistedUser"})
     public void testGetAllUsers() throws Exception {
         Collection<SupplierUser> users = supplierUserDao.getAll();
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Assert.assertEquals(users.size(), 2);
     }
 
@@ -177,7 +177,7 @@ public class SupplierUserDaoImplTest {
     @Test(dependsOnMethods = {"testGetByLoginNotExistedLogin"})
     public void testDeleteUserByLogin() throws Exception {
         supplierUserDao.deleteUserByLogin("user7");
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Collection<SupplierUser> users = supplierUserDao.getAll();
         Assert.assertTrue(!users.contains(supplierUser2));
         Assert.assertEquals(users.size(), 1);
@@ -188,7 +188,7 @@ public class SupplierUserDaoImplTest {
         try{
             supplierUserDao.deleteUserByLogin("user9");
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 

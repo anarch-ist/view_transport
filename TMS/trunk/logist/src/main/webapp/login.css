@@ -1,0 +1,16 @@
+body {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+.errorText {
+    color: #b81900;
+    text-align: center;
+    font-size: xx-small;
+}
+
+#loginBox {
+    border: 1px solid #6a72ff;
+    margin-top: 200px;
+}

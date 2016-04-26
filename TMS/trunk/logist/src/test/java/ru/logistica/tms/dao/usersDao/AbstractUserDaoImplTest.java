@@ -7,9 +7,8 @@ import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +25,7 @@ public class AbstractUserDaoImplTest {
     @BeforeClass
     public void fillingData() throws Exception {
         TestUtil.cleanDatabase(false); // recreate database
-        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConnectionManager.setConnection(TestUtil.createConnection());
         ConstantsDao constantsDao = new ConstantsDaoImpl();
         ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
@@ -77,12 +76,12 @@ public class AbstractUserDaoImplTest {
         genericUserDao.save(abstractUser2);
         genericUserDao.save(abstractUser3);
 
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
     }
 
     @AfterClass
     public void tearDown() throws SQLException {
-        JdbcUtil.getConnection().close();
+        ConnectionManager.getConnection().close();
     }
 
     @Test(expectedExceptions = DaoException.class)
@@ -90,7 +89,7 @@ public class AbstractUserDaoImplTest {
         try {
             genericUserDao.save(abstractUser1);
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 
@@ -108,7 +107,7 @@ public class AbstractUserDaoImplTest {
         abstractUser.setEmail("misha@mail.ru");
         abstractUser.setPosition("boss");
         genericUserDao.update(abstractUser);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Collection<AbstractUser> users = genericUserDao.getAll();
         for (AbstractUser user : users) {
             if (user.getLogin().equals(abstractUser.getLogin())) {
@@ -133,7 +132,7 @@ public class AbstractUserDaoImplTest {
             abstractUser.setPosition("boss");
             genericUserDao.update(abstractUser);
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 
@@ -142,7 +141,7 @@ public class AbstractUserDaoImplTest {
         Collection<AbstractUser> users = genericUserDao.getAll();
         System.out.println(users);
         Assert.assertEquals(users.size(), 3);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
     }
 
     @Test(dependsOnMethods = {"testGetAllUsers"})
@@ -172,7 +171,7 @@ public class AbstractUserDaoImplTest {
     @Test(dependsOnMethods = {"testGetByLoginNoResult"})
     public void testDeleteUserByLogin() throws Exception {
         genericUserDao.deleteUserByLogin("user3");
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Collection<AbstractUser> users = genericUserDao.getAll();
         Assert.assertTrue(!users.contains(abstractUser3));
         Assert.assertEquals(users.size(), 2);
@@ -183,7 +182,7 @@ public class AbstractUserDaoImplTest {
         try {
             genericUserDao.deleteUserByLogin("user9");
         }finally {
-            JdbcUtil.getConnection().commit();
+            ConnectionManager.getConnection().commit();
         }
     }
 

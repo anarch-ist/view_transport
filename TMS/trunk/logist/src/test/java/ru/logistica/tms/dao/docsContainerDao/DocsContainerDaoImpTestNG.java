@@ -6,7 +6,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.utils.JdbcUtil;
+import ru.logistica.tms.dao.utils.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -21,12 +21,12 @@ public class DocsContainerDaoImpTestNG {
     @BeforeClass
     public static void setUp() throws SQLException, URISyntaxException {
         TestUtil.cleanDatabase(false);
-        JdbcUtil.setConnection(TestUtil.createConnection());
+        ConnectionManager.setConnection(TestUtil.createConnection());
     }
 
     @AfterClass
     public static void tearDown() throws SQLException {
-        JdbcUtil.getConnection().close();
+        ConnectionManager.getConnection().close();
     }
 
     @Test
@@ -49,13 +49,13 @@ public class DocsContainerDaoImpTestNG {
 
         docsContainerDao.save(docsContainer1);
         docsContainerDao.save(docsContainer2);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
     }
 
     @Test(dependsOnMethods = {"testSave"})
     public void testGetById() throws SQLException {
         DocsContainer docsContainerReceived = docsContainerDao.getById(2);
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Assert.assertEquals(docsContainerReceived.getContainerId(), docsContainer2.getContainerId());
         Assert.assertEquals(docsContainerReceived.getDocId(), docsContainer2.getDocId());
         Assert.assertEquals(docsContainerReceived.getDate(), docsContainer2.getDate());
@@ -66,7 +66,7 @@ public class DocsContainerDaoImpTestNG {
     @Test(dependsOnMethods = {"testGetById"})
     public void testGetAll() throws Exception {
         Set<DocsContainer> sets = docsContainerDao.getAll();
-        JdbcUtil.getConnection().commit();
+        ConnectionManager.getConnection().commit();
         Assert.assertEquals(sets.size(), 2);
     }
 
