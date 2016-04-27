@@ -11,6 +11,11 @@ body {
 }
 
 #loginBox {
-    border: 1px solid #6a72ff;
+    border: 1px solid #4682B4;
     margin-top: 200px;
 }
+::-webkit-input-placeholder {color:#A9A9A9;}
+::-moz-placeholder          {color:#A9A9A9;}
+:-moz-placeholder           {color:#A9A9A9;}
+:-ms-input-placeholder      {color:#A9A9A9;}
+
