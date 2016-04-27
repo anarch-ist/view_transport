@@ -1,11 +1,12 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
+import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
+import ru.logistica.tms.dao.utils.Utils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,41 +16,41 @@ import java.util.Set;
 
 public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
-    private GenericUserDao<AbstractUser> abstractUserDao = new AbstractUserDaoImpl();
+    private GenericUserDao<User> userDao = new UserDaoImpl();
     private GenericDao<Supplier> supplierDao = new SupplierDaoImpl();
 
     @Override
     public SupplierUser getByLogin(final String login) throws DaoException {
-        AbstractUser abstractUser = abstractUserDao.getByLogin(login);
-        if(abstractUser == null){
+        User user = userDao.getByLogin(login);
+        if(user == null){
             return null;
         }else {
-            Integer userId = abstractUserDao.getByLogin(login).getUserId();
+            Integer userId = userDao.getByLogin(login).getUserId();
             return getById(userId);
         }
     }
 
     @Override
     public void deleteUserByLogin(final String login) throws DaoException {
-        abstractUserDao.deleteUserByLogin(login);
+        userDao.deleteUserByLogin(login);
     }
 
     @Override
     public SupplierUser getById(final Integer id) throws DaoException {
         final SupplierUser[] supplierUser = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT suppliers_users.userID, " +
                         "suppliers.supplierID, " +
-                        "abstract_users.userLogin, " +
-                        "abstract_users.salt, " +
-                        "abstract_users.passAndSalt, " +
-                        "abstract_users.userRoleID, " +
-                        "abstract_users.userName, " +
-                        "abstract_users.phoneNumber, " +
-                        "abstract_users.email, " +
-                        "abstract_users.position, " +
+                        "users.userLogin, " +
+                        "users.salt, " +
+                        "users.passAndSalt, " +
+                        "users.userRoleID, " +
+                        "users.userName, " +
+                        "users.phoneNumber, " +
+                        "users.email, " +
+                        "users.position, " +
                         "suppliers.INN, " +
                         "suppliers.clientName, " +
                         "suppliers.KPP, " +
@@ -62,7 +63,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         "suppliers.startContractDate, " +
                         "suppliers.endContractDate " +
                         "FROM suppliers_users " +
-                        "INNER JOIN abstract_users ON (abstract_users.userID = suppliers_users.userID) " +
+                        "INNER JOIN users ON (users.userID = suppliers_users.userID) " +
                         "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID)" +
                         "WHERE suppliers_users.userID = ?;";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
@@ -93,19 +94,19 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
     @Override
     public Collection<SupplierUser> getAll() throws DaoException {
         final Set<SupplierUser> result = new HashSet<>();
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT suppliers_users.userID, " +
                         "suppliers.supplierID, " +
-                        "abstract_users.userLogin, " +
-                        "abstract_users.salt, " +
-                        "abstract_users.passAndSalt, " +
-                        "abstract_users.userRoleID, " +
-                        "abstract_users.userName, " +
-                        "abstract_users.phoneNumber, " +
-                        "abstract_users.email, " +
-                        "abstract_users.position, " +
+                        "users.userLogin, " +
+                        "users.salt, " +
+                        "users.passAndSalt, " +
+                        "users.userRoleID, " +
+                        "users.userName, " +
+                        "users.phoneNumber, " +
+                        "users.email, " +
+                        "users.position, " +
                         "suppliers.INN, " +
                         "suppliers.clientName, " +
                         "suppliers.KPP, " +
@@ -118,7 +119,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         "suppliers.startContractDate, " +
                         "suppliers.endContractDate " +
                         "FROM suppliers_users " +
-                        "INNER JOIN abstract_users ON (abstract_users.userID = suppliers_users.userID)\n" +
+                        "INNER JOIN users ON (users.userID = suppliers_users.userID)\n" +
                         "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID);";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     ResultSet resultSet = statement.executeQuery();
@@ -147,13 +148,13 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
     @Override
     public void deleteById(Integer id) throws DaoException {
-        abstractUserDao.deleteById(id);
+        userDao.deleteById(id);
     }
 
     @Override
     public Integer saveOrUpdate(final SupplierUser supplierUser) throws DaoException {
-        final Integer userId = abstractUserDao.saveOrUpdate(supplierUser);
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        final Integer userId = userDao.saveOrUpdate(supplierUser);
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 // if was inserted
@@ -172,8 +173,8 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
     @Override
     public Integer save(final SupplierUser supplierUser) throws DaoException {
-        final Integer userId = abstractUserDao.save(supplierUser);
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        final Integer userId = userDao.save(supplierUser);
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
@@ -189,6 +190,6 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
 
     @Override
     public void update(final SupplierUser supplierUser) throws DaoException {
-        abstractUserDao.update(supplierUser);
+        userDao.update(supplierUser);
     }
 }

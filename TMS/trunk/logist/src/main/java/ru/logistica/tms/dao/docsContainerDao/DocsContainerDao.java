@@ -2,11 +2,12 @@ package ru.logistica.tms.dao.docsContainerDao;
 
 
 
-import java.sql.SQLException;
+import ru.logistica.tms.dao.DaoException;
+
 import java.util.Set;
 
 public interface DocsContainerDao {
-    Set<DocsContainer> getAll() throws SQLException;
-    DocsContainer getById(int id) throws SQLException;
-    void save(DocsContainer docsContainer) throws SQLException;
+    Set<DocsContainer> getAll() throws DaoException;
+    DocsContainer getById(int id) throws DaoException;
+    void save(DocsContainer docsContainer) throws DaoException;
 }

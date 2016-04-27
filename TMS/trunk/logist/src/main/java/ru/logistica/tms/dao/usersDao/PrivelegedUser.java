@@ -2,7 +2,7 @@ package ru.logistica.tms.dao.usersDao;
 
 import java.util.Set;
 
-public class PrivelegedUser extends AbstractUser{
+public class PrivelegedUser extends User {
     private Set<Privelege> privelege;
 
     public Set<Privelege> getPrivelege() {

@@ -2,9 +2,10 @@ package ru.logistica.tms.dao.pointsDao;
 
 
 
-import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
+import ru.logistica.tms.dao.ConnectionManager;
+import ru.logistica.tms.dao.utils.Utils;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ public class PointDaoImpl implements GenericDao<Point> {
     @Override
     public Point getById(final Integer id) throws DaoException {
         final Point point = new Point();
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT * from points WHERE pointID = ?";
@@ -44,7 +45,7 @@ public class PointDaoImpl implements GenericDao<Point> {
     @Override
     public Integer saveOrUpdate(final Point point) throws DaoException {
         final Integer[] result = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO points VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +

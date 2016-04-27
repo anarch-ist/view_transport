@@ -62,9 +62,9 @@ VALUES
 ;
 
 -- entity
-CREATE TABLE abstract_users (
+CREATE TABLE users (
   userID      SERIAL,
-  userLogin       VARCHAR(255) NOT NULL,
+  userLogin   VARCHAR(255) NOT NULL,
   salt        CHAR(16)     NOT NULL,
   passAndSalt VARCHAR(64)  NOT NULL,
   userRoleID  VARCHAR(32)  NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE point_users (
   userID  INTEGER,
   pointID INTEGER NOT NULL,
   PRIMARY KEY (userID),
-  FOREIGN KEY (userID) REFERENCES abstract_users
+  FOREIGN KEY (userID) REFERENCES users
   ON DELETE CASCADE
   ON UPDATE CASCADE,
   FOREIGN KEY (pointID) REFERENCES points (pointID)
@@ -94,10 +94,10 @@ CREATE TABLE point_users (
 
 -- SUPPLIER_MANAGER
 CREATE TABLE suppliers_users (
-  userID  INTEGER,
+  userID     INTEGER,
   supplierID INTEGER NOT NULL,
   PRIMARY KEY (userID),
-  FOREIGN KEY (userID) REFERENCES abstract_users
+  FOREIGN KEY (userID) REFERENCES users
   ON DELETE CASCADE
   ON UPDATE CASCADE,
   FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
@@ -156,19 +156,19 @@ SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
 
 
 CREATE TABLE docs (
-  docID INTEGER,
+  docID   INTEGER,
   docName VARCHAR(255),
   PRIMARY KEY (docID)
 );
 
-INSERT INTO docs VALUES(1, 'test_doc');
+INSERT INTO docs VALUES (1, 'test_doc');
 
 CREATE TABLE docs_for_points (
-  docID INTEGER,
+  docID   INTEGER,
   pointID INTEGER,
   PRIMARY KEY (docID, pointID),
-  FOREIGN KEY (pointID) REFERENCES points(pointID),
-  FOREIGN KEY (docID) REFERENCES docs(docID)
+  FOREIGN KEY (pointID) REFERENCES points (pointID),
+  FOREIGN KEY (docID) REFERENCES docs (docID)
 );
 
 CREATE TABLE time_diffs (
@@ -177,7 +177,7 @@ CREATE TABLE time_diffs (
 );
 
 INSERT INTO time_diffs VALUES
-  (1),  (2),  (3),  (4),  (5),  (6),  (7),  (8),  (9),  (10), (11), (12),
+  (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12),
   (13), (14), (15), (16), (17), (18), (19), (20), (21), (22), (23), (24),
   (25), (26), (27), (28), (29), (30), (31), (32), (33), (34), (35), (36),
   (37), (38), (39), (40), (41), (42), (43), (44), (45), (46), (47), (48);
@@ -348,7 +348,7 @@ CREATE TABLE wants (
   FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  FOREIGN KEY (lastModifiedBy) REFERENCES abstract_users (userID)
+  FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY (wantsStatusID) REFERENCES donut_statuses (donutStatusID)

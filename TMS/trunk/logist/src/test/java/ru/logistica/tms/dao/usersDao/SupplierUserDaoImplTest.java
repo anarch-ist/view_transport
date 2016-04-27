@@ -1,5 +1,6 @@
 package ru.logistica.tms.dao.usersDao;
 
+import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
 import org.testng.annotations.*;
 import ru.logistica.tms.dao.TestUtil;
@@ -8,9 +9,9 @@ import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
-import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
+import ru.logistica.tms.dao.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -19,7 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-
+@Test(singleThreaded = true)
 public class SupplierUserDaoImplTest {
     private static GenericDao<Supplier> supplierDao = new SupplierDaoImpl();
     private static Supplier supplier = new Supplier();
@@ -29,7 +30,7 @@ public class SupplierUserDaoImplTest {
     private static GenericUserDao<SupplierUser> supplierUserDao = new SupplierUserDaoImpl();
 
     @BeforeClass
-    public void fillingData() throws SQLException, DaoException, URISyntaxException {
+    public static void setUp() throws SQLException, DaoException, URISyntaxException {
         TestUtil.cleanDatabase(false);
         ConnectionManager.setConnection(TestUtil.createConnection());
         ConstantsDao constantsDao = new ConstantsDaoImpl();
@@ -47,7 +48,7 @@ public class SupplierUserDaoImplTest {
         supplier.setDateOfSigning(new Date(2016, 4, 22));
         supplier.setStartContractDate(new Date(2016, 4, 24));
         supplier.setEndContractDate(new Date(2016, 7, 24));
-        supplierDao.saveOrUpdate(supplier);
+        supplierDao.saveOrUpdate(supplier); //!!!!!!!!!!!!!!!
 
         supplierUser1.setSupplier(supplier);
         supplierUser1.setUserId(null);
@@ -81,7 +82,7 @@ public class SupplierUserDaoImplTest {
     }
 
     @AfterClass
-    public void tearDown() throws Exception {
+    public static void tearDown() throws Exception {
         ConnectionManager.getConnection().close();
     }
 
@@ -112,7 +113,7 @@ public class SupplierUserDaoImplTest {
         ConnectionManager.getConnection().commit();
 
         Collection<SupplierUser> users = supplierUserDao.getAll();
-        for (AbstractUser user : users) {
+        for (User user : users) {
             user.setUserId(null);
             if (user.getLogin().equals(supplierUser.getLogin())) {
                 Assert.assertEquals(user, supplierUser);
@@ -198,8 +199,5 @@ public class SupplierUserDaoImplTest {
         Collection<SupplierUser> users = supplierUserDao.getAll();
         Assert.assertTrue(users.size() == 0);
     }
-
-
-
 
 }

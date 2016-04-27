@@ -1,11 +1,12 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
+import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.pointsDao.Point;
 import ru.logistica.tms.dao.pointsDao.PointDaoImpl;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
+import ru.logistica.tms.dao.utils.Utils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,16 +16,16 @@ import java.util.Set;
 
 public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
-    private GenericUserDao<AbstractUser> abstractUserDao = new AbstractUserDaoImpl();
+    private GenericUserDao<User> userDao = new UserDaoImpl();
     private GenericDao<Point> pointDao = new PointDaoImpl();
 
     @Override
     public PointUser getByLogin(final String login) throws DaoException {
-        AbstractUser abstractUser = abstractUserDao.getByLogin(login);
-        if(abstractUser == null){
+        User user = userDao.getByLogin(login);
+        if(user == null){
             return null;
         }else {
-            Integer userId = abstractUserDao.getByLogin(login).getUserId();
+            Integer userId = userDao.getByLogin(login).getUserId();
             PointUser pointUser = getById(userId);
             return pointUser;
         }
@@ -32,25 +33,25 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public void deleteUserByLogin(final String login) throws DaoException {
-        abstractUserDao.deleteUserByLogin(login);
+        userDao.deleteUserByLogin(login);
     }
 
     @Override
     public PointUser getById(final Integer id) throws DaoException {
         final PointUser[] pointUser = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT point_users.userID, " +
                         "point_users.pointID, " +
-                        "abstract_users.userLogin, " +
-                        "abstract_users.salt, " +
-                        "abstract_users.passAndSalt, " +
-                        "abstract_users.userRoleID, " +
-                        "abstract_users.userName, " +
-                        "abstract_users.phoneNumber, " +
-                        "abstract_users.email, " +
-                        "abstract_users.position, " +
+                        "users.userLogin, " +
+                        "users.salt, " +
+                        "users.passAndSalt, " +
+                        "users.userRoleID, " +
+                        "users.userName, " +
+                        "users.phoneNumber, " +
+                        "users.email, " +
+                        "users.position, " +
                         "points.pointName, " +
                         "points.region, " +
                         "points.district," +
@@ -60,7 +61,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                         "points.email, " +
                         "points.phoneNumber, " +
                         "points.responsiblePersonID FROM point_users " +
-                        "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID)" +
+                        "INNER JOIN users ON (users.userID = point_users.userID)" +
                         "INNER JOIN points ON (points.pointID = point_users.pointID)" +
                         "WHERE point_users.userID = ?;";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
@@ -92,19 +93,19 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
     @Override
     public Collection<PointUser> getAll() throws DaoException {
         final Set<PointUser> result = new HashSet<>();
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "SELECT point_users.userID, " +
                         "point_users.pointID, " +
-                        "abstract_users.userLogin, " +
-                        "abstract_users.salt, " +
-                        "abstract_users.passAndSalt, " +
-                        "abstract_users.userRoleID, " +
-                        "abstract_users.userName, " +
-                        "abstract_users.phoneNumber, " +
-                        "abstract_users.email, " +
-                        "abstract_users.position, " +
+                        "users.userLogin, " +
+                        "users.salt, " +
+                        "users.passAndSalt, " +
+                        "users.userRoleID, " +
+                        "users.userName, " +
+                        "users.phoneNumber, " +
+                        "users.email, " +
+                        "users.position, " +
                         "points.pointName, " +
                         "points.region, " +
                         "points.district," +
@@ -114,7 +115,7 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
                         "points.email, " +
                         "points.phoneNumber, " +
                         "points.responsiblePersonID FROM point_users " +
-                        "INNER JOIN abstract_users ON (abstract_users.userID = point_users.userID) " +
+                        "INNER JOIN users ON (users.userID = point_users.userID) " +
                         "INNER JOIN points ON (points.pointID = point_users.pointID);";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     ResultSet resultSet = statement.executeQuery();
@@ -143,16 +144,16 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public void deleteById(final Integer id) throws DaoException {
-        abstractUserDao.deleteById(id);
+        userDao.deleteById(id);
     }
 
     @Override
     public Integer saveOrUpdate(final PointUser pointUser) throws DaoException {
         final Integer[] result = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                Integer userId = abstractUserDao.saveOrUpdate(pointUser);
+                Integer userId = userDao.saveOrUpdate(pointUser);
                 // if was inserted
                 if (userId != null) {
                     String sql = "INSERT INTO point_users VALUES (?, ?)";
@@ -169,8 +170,8 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public Integer save(final PointUser pointUser) throws DaoException {
-        final Integer userId = abstractUserDao.save(pointUser);
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        final Integer userId = userDao.save(pointUser);
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
                 String sql = "INSERT INTO point_users VALUES (?, ?)";
@@ -186,6 +187,6 @@ public class PointUserDaoImpl implements GenericUserDao<PointUser> {
 
     @Override
     public void update(final PointUser pointUser) throws DaoException {
-        abstractUserDao.update(pointUser);
+        userDao.update(pointUser);
     }
 }

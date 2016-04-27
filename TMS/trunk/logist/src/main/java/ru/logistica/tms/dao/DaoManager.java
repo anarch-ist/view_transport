@@ -1,8 +1,12 @@
-package ru.logistica.tms.dao.utils;
+package ru.logistica.tms.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logistica.tms.dao.constantsDao.*;
+import ru.logistica.tms.dao.usersDao.GenericUserDao;
+import ru.logistica.tms.dao.usersDao.User;
+import ru.logistica.tms.dao.usersDao.UserDaoImpl;
+import ru.logistica.tms.dao.utils.DBUtils;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -35,13 +39,15 @@ public class DaoManager {
 
     public static boolean checkUser(final String login, final String passMd5) {
 
-        doInTransaction(new DaoScript() {
-            @Override
-            public void execute() throws DaoException {
-
-            }
-        });
-
+//        doInTransaction(new DaoScript() {
+//            @Override
+//            public void execute() throws DaoException {
+//                GenericUserDao<User> userDao = new UserDaoImpl();
+//                userDao.getByLogin(login);
+//
+//            }
+//        });
+    return false;
 
     }
 

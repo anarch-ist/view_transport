@@ -1,4 +1,4 @@
-package ru.logistica.tms.dao.utils;
+package ru.logistica.tms.dao;
 
 
 import java.sql.Connection;
@@ -18,20 +18,6 @@ public class ConnectionManager {
 
     public static Connection getConnection() {
         return connection;
-    }
-
-
-
-    public static void runWithExceptionRedirect(Exec exec) throws DaoException {
-        try {
-            exec.execute();
-        } catch (Exception e) {
-            throw new DaoException(e.getMessage(), e);
-        }
-    }
-
-    public interface Exec {
-        void execute() throws Exception;
     }
 
 }

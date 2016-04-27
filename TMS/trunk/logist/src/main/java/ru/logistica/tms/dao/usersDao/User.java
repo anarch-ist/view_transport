@@ -2,7 +2,7 @@ package ru.logistica.tms.dao.usersDao;
 
 import ru.logistica.tms.dao.constantsDao.UserRole;
 
-public class AbstractUser {
+public class User {
     private Integer userId;
     private String login;
     private String salt;
@@ -103,7 +103,7 @@ public class AbstractUser {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AbstractUser that = (AbstractUser) o;
+        User that = (User) o;
 
         if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
         if (login != null ? !login.equals(that.login) : that.login != null) return false;

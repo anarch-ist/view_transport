@@ -1,4 +1,4 @@
-package ru.logistica.tms.dao.utils;
+package ru.logistica.tms.dao;
 
 public class DaoException extends Exception {
     public DaoException() {

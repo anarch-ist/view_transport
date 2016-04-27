@@ -1,5 +1,6 @@
 package ru.logistica.tms.dao.usersDao;
 
+import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
 import org.testng.annotations.*;
 import ru.logistica.tms.dao.TestUtil;
@@ -8,9 +9,9 @@ import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.pointsDao.Point;
 import ru.logistica.tms.dao.pointsDao.PointDaoImpl;
-import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.GenericDao;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
+import ru.logistica.tms.dao.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+@Test(singleThreaded = true)
 public class PointUserDaoImplTest {
     private static GenericDao<Point> pointDao = new PointDaoImpl();
     private static Point point = new Point();
@@ -27,10 +28,12 @@ public class PointUserDaoImplTest {
     private static List<PointUser> pointUsers = new ArrayList<>();
     private static GenericUserDao<PointUser> pointUserDao = new PointUserDaoImpl();
 
+
     @BeforeClass
-    public void fillingData() throws DaoException, SQLException, URISyntaxException {
+    public static void setUp() throws DaoException, SQLException, URISyntaxException {
         TestUtil.cleanDatabase(false);
         ConnectionManager.setConnection(TestUtil.createConnection());
+
         ConstantsDao constantsDao = new ConstantsDaoImpl();
         ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
@@ -79,7 +82,7 @@ public class PointUserDaoImplTest {
     }
 
     @AfterClass
-    public void tearDown() throws Exception {
+    public static void tearDown() throws Exception {
         ConnectionManager.getConnection().close();
     }
 
@@ -112,7 +115,7 @@ public class PointUserDaoImplTest {
 
         Collection<PointUser> users = pointUserDao.getAll();
         ConnectionManager.getConnection().commit();
-        for (AbstractUser user : users) {
+        for (User user : users) {
             user.setUserId(null);
             if (user.getLogin().equals(pointUser.getLogin())) {
                 Assert.assertEquals(user, pointUser);

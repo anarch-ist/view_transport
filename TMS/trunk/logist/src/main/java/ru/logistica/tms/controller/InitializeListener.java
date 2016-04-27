@@ -2,9 +2,7 @@ package ru.logistica.tms.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.dao.constantsDao.*;
-import ru.logistica.tms.dao.utils.ConnectionManager;
-import ru.logistica.tms.dao.utils.DaoManager;
+import ru.logistica.tms.dao.DaoManager;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -12,8 +10,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.Set;
 
 @WebListener
 public class InitializeListener implements ServletContextListener {

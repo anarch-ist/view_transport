@@ -1,18 +1,19 @@
 package ru.logistica.tms.dao.docsContainerDao;
 
 
+import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Set;
-
+@Test(singleThreaded = true)
 public class DocsContainerDaoImpTestNG {
     private static DocsContainerDao docsContainerDao = new DocsContainerDaoImp();
     private static DocsContainer docsContainer1;
@@ -53,7 +54,7 @@ public class DocsContainerDaoImpTestNG {
     }
 
     @Test(dependsOnMethods = {"testSave"})
-    public void testGetById() throws SQLException {
+    public void testGetById() throws Exception {
         DocsContainer docsContainerReceived = docsContainerDao.getById(2);
         ConnectionManager.getConnection().commit();
         Assert.assertEquals(docsContainerReceived.getContainerId(), docsContainer2.getContainerId());

@@ -1,9 +1,10 @@
 package ru.logistica.tms.dao.usersDao;
 
 
-import ru.logistica.tms.dao.utils.DaoException;
-import ru.logistica.tms.dao.utils.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
+import ru.logistica.tms.dao.utils.Utils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,15 +13,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
+public class UserDaoImpl implements GenericUserDao<User> {
 
     @Override
-    public Integer saveOrUpdate(final AbstractUser user) throws DaoException {
+    public Integer saveOrUpdate(final User user) throws DaoException {
         final Integer[] result = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "INSERT INTO abstract_users (userID, userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) " +
+                String sql = "INSERT INTO users (userID, userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (userLogin) DO UPDATE SET " +
                         "userLogin = EXCLUDED.userLogin, salt = EXCLUDED.salt, passAndSalt = EXCLUDED.passAndSalt, " +
                         "userRoleID = EXCLUDED.userRoleID, userName = EXCLUDED.userName, " +
@@ -48,12 +49,12 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     }
 
     @Override
-    public Integer save(final AbstractUser user) throws DaoException {
+    public Integer save(final User user) throws DaoException {
         final Integer[] result = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "INSERT INTO abstract_users (userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) " +
+                String sql = "INSERT INTO users (userLogin, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
                     statement.setString(1, user.getLogin());
@@ -78,13 +79,13 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
     }
 
     @Override
-    public void update(final AbstractUser user) throws DaoException {
+    public void update(final User user) throws DaoException {
         final int[] countOfUpdated = {0};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "UPDATE abstract_users SET salt = ?, passAndSalt = ?, userRoleID = ?, userName = ?, " +
-                        "phoneNumber = ?, email = ?, position = ? WHERE abstract_users.userLogin = ?";
+                String sql = "UPDATE users SET salt = ?, passAndSalt = ?, userRoleID = ?, userName = ?, " +
+                        "phoneNumber = ?, email = ?, position = ? WHERE users.userLogin = ?";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     statement.setString(1, user.getSalt());
                     statement.setString(2, user.getPassAndSalt());
@@ -101,17 +102,17 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
         });
 
         if(countOfUpdated[0] == 0){
-            throw new DaoException("The update has not occurred, such login '" + user.getLogin() + "' does not exist in table abstract_users");
+            throw new DaoException("The update has not occurred, such login '" + user.getLogin() + "' does not exist in table users");
         }
     }
 
     @Override
     public void deleteUserByLogin(final String login) throws DaoException {
         final int[] countOfUpdated = {0};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "DELETE FROM abstract_users WHERE userLogin = ?";
+                String sql = "DELETE FROM users WHERE userLogin = ?";
                 try (PreparedStatement preparedStatement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     preparedStatement.setString(1, login);
                     preparedStatement.execute();
@@ -121,91 +122,91 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
         });
 
         if(countOfUpdated[0] == 0){
-            throw new DaoException("The delete has not occurred, such login '" + login + "' does not exist in table abstract_users");
+            throw new DaoException("The delete has not occurred, such login '" + login + "' does not exist in table users");
         }
     }
 
     @Override
-    public AbstractUser getById(final Integer id) throws DaoException {
-        final AbstractUser[] abstractUser = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+    public User getById(final Integer id) throws DaoException {
+        final User[] user = {null};
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "SELECT * from abstract_users WHERE userID = ?";
+                String sql = "SELECT * from users WHERE userID = ?";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
                     if(resultSet.next()) {
-                        abstractUser[0] = new AbstractUser();
-                        abstractUser[0].setUserId(resultSet.getInt("userID"));
-                        abstractUser[0].setLogin(resultSet.getString("userLogin"));
-                        abstractUser[0].setSalt(resultSet.getString("salt"));
-                        abstractUser[0].setPassAndSalt(resultSet.getString("passAndSalt"));
+                        user[0] = new User();
+                        user[0].setUserId(resultSet.getInt("userID"));
+                        user[0].setLogin(resultSet.getString("userLogin"));
+                        user[0].setSalt(resultSet.getString("salt"));
+                        user[0].setPassAndSalt(resultSet.getString("passAndSalt"));
                         String userRoleId = resultSet.getString("userRoleID");
-                        abstractUser[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
-                        abstractUser[0].setUserName(resultSet.getString("userName"));
-                        abstractUser[0].setPhoneNumber(resultSet.getString("phoneNumber"));
-                        abstractUser[0].setEmail(resultSet.getString("email"));
-                        abstractUser[0].setPosition(resultSet.getString("position"));
+                        user[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        user[0].setUserName(resultSet.getString("userName"));
+                        user[0].setPhoneNumber(resultSet.getString("phoneNumber"));
+                        user[0].setEmail(resultSet.getString("email"));
+                        user[0].setPosition(resultSet.getString("position"));
                     }
                 }
             }
         });
-        return abstractUser[0];
+        return user[0];
     }
 
     @Override
-    public AbstractUser getByLogin(final String login) throws DaoException {
-        final AbstractUser[] abstractUser = {null};
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+    public User getByLogin(final String login) throws DaoException {
+        final User[] user = {null};
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "SELECT * from abstract_users WHERE userLogin = ?";
+                String sql = "SELECT * from users WHERE userLogin = ?";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     statement.setString(1, login);
                     ResultSet resultSet = statement.executeQuery();
                     if (resultSet.next()) {
-                        abstractUser[0] = new AbstractUser();
-                        abstractUser[0].setUserId(resultSet.getInt("userID"));
-                        abstractUser[0].setLogin(resultSet.getString("userLogin"));
-                        abstractUser[0].setSalt(resultSet.getString("salt"));
-                        abstractUser[0].setPassAndSalt(resultSet.getString("passAndSalt"));
-                        abstractUser[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(resultSet.getString("userRoleID")));
-                        abstractUser[0].setUserName(resultSet.getString("userName"));
-                        abstractUser[0].setPhoneNumber(resultSet.getString("phoneNumber"));
-                        abstractUser[0].setEmail(resultSet.getString("email"));
-                        abstractUser[0].setPosition(resultSet.getString("position"));
+                        user[0] = new User();
+                        user[0].setUserId(resultSet.getInt("userID"));
+                        user[0].setLogin(resultSet.getString("userLogin"));
+                        user[0].setSalt(resultSet.getString("salt"));
+                        user[0].setPassAndSalt(resultSet.getString("passAndSalt"));
+                        user[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(resultSet.getString("userRoleID")));
+                        user[0].setUserName(resultSet.getString("userName"));
+                        user[0].setPhoneNumber(resultSet.getString("phoneNumber"));
+                        user[0].setEmail(resultSet.getString("email"));
+                        user[0].setPosition(resultSet.getString("position"));
                     }
                 }
             }
         });
-        return abstractUser[0];
+        return user[0];
     }
 
     @Override
-    public Collection<AbstractUser> getAll() throws DaoException {
-        final Set<AbstractUser> result = new HashSet<>();
+    public Collection<User> getAll() throws DaoException {
+        final Set<User> result = new HashSet<>();
 
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
 
-                String sql = "SELECT * from abstract_users";
+                String sql = "SELECT * from users";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()) {
-                        AbstractUser abstractUser = new AbstractUser();
-                        abstractUser.setUserId(resultSet.getInt("userID"));
-                        abstractUser.setLogin(resultSet.getString("userLogin"));
-                        abstractUser.setSalt(resultSet.getString("salt"));
-                        abstractUser.setPassAndSalt(resultSet.getString("passAndSalt"));
+                        User user = new User();
+                        user.setUserId(resultSet.getInt("userID"));
+                        user.setLogin(resultSet.getString("userLogin"));
+                        user.setSalt(resultSet.getString("salt"));
+                        user.setPassAndSalt(resultSet.getString("passAndSalt"));
                         String userRoleId = resultSet.getString("userRoleID");
-                        abstractUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
-                        abstractUser.setUserName(resultSet.getString("userName"));
-                        abstractUser.setPhoneNumber(resultSet.getString("phoneNumber"));
-                        abstractUser.setEmail(resultSet.getString("email"));
-                        abstractUser.setPosition(resultSet.getString("position"));
-                        result.add(abstractUser);
+                        user.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        user.setUserName(resultSet.getString("userName"));
+                        user.setPhoneNumber(resultSet.getString("phoneNumber"));
+                        user.setEmail(resultSet.getString("email"));
+                        user.setPosition(resultSet.getString("position"));
+                        result.add(user);
                     }
 
                 }
@@ -217,10 +218,10 @@ public class AbstractUserDaoImpl implements GenericUserDao<AbstractUser> {
 
     @Override
     public void deleteById(final Integer id) throws DaoException {
-        ConnectionManager.runWithExceptionRedirect(new ConnectionManager.Exec() {
+        Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "DELETE FROM abstract_users WHERE userID = ?";
+                String sql = "DELETE FROM users WHERE userID = ?";
                 try (PreparedStatement preparedStatement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     preparedStatement.setInt(1, id);
                     preparedStatement.execute();

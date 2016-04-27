@@ -4,31 +4,30 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.utils.ConnectionManager;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-
+@Test(singleThreaded = true)
 public class ConstantCollectionsTest {
     private static ConstantsDao constantsDao = new ConstantsDaoImpl();
 
     @BeforeClass
-    public void setUp() throws Exception {
+    public static void setUp() throws Exception {
+        TestUtil.cleanDatabase(false);
         ConnectionManager.setConnection(TestUtil.createConnection());
     }
 
     @AfterClass
-    public void tearDown() throws Exception {
+    public static void tearDown() throws Exception {
         ConnectionManager.getConnection().close();
     }
 
-    @Test(dependsOnMethods = {"testGetDonutStatuses"})
-    public void testSetUserRoles() throws Exception {
+    @Test
+    public void testGetUserRoles() throws Exception {
         ConstantCollections.setUserRoles(constantsDao.getUserRoles());
         ConnectionManager.getConnection().commit();
         Set<UserRole> userRoles = ConstantCollections.getUserRoles();
@@ -36,44 +35,57 @@ public class ConstantCollectionsTest {
         for (UserRole userRole : userRoles) {
             userRolesAsList.add(userRole.getUserRoleId());
         }
-        Assert.assertEquals(userRolesAsList, Arrays.asList("WH_DISPATCHER", "W_BOSS", "SUPPLIER_MANAGER"));
-    }
-
-    @Test(dependsOnMethods = {"testSetUserRoles"})
-    public void testSetPermission() throws SQLException {
-        ConstantCollections.setPermissions(constantsDao.getPermissions());
-        Set<Permission> permissions = ConstantCollections.getPermissions();
-    }
-
-    @Test(dependsOnMethods = {"testSetPermission"})
-    public void testSetTimeDiff() throws SQLException {
-        ConstantCollections.setTimeDiffs(constantsDao.getTimeDiffs());
-        Set<TimeDiff> timeDiffs = ConstantCollections.getTimeDiffs();
-    }
-
-    @Test(dependsOnMethods = {"testSetTimeDiff"})
-    public void testSetDonutStatuses() throws SQLException {
-        ConstantCollections.setDonutStatuses(constantsDao.getDonutStatuses());
-        Set<DonutStatus> donutStatuses = ConstantCollections.getDonutStatuses();
+        Assert.assertTrue(userRolesAsList.contains("WH_DISPATCHER"));
+        Assert.assertTrue(userRolesAsList.contains("W_BOSS"));
+        Assert.assertTrue(userRolesAsList.contains("SUPPLIER_MANAGER"));
+        Assert.assertTrue(userRolesAsList.size() == 3);
     }
 
     @Test
-    public void testGetUserRoles() throws Exception {
-        Set<UserRole> userRoles = constantsDao.getUserRoles();
+    public void testGetPermission() throws Exception {
+        ConstantCollections.setPermissions(constantsDao.getPermissions());
+        ConnectionManager.getConnection().commit();
+        Set<Permission> permissions = ConstantCollections.getPermissions();
+        Assert.assertTrue(permissions.size() != 0);
+        Assert.assertEquals(permissions.size(), 3);
+        boolean isContainedPermission = false;
+        for (Permission permission : permissions) {
+            if (permission.getPermissionId().equals("testPerm1")) {
+                isContainedPermission = true;
+            }
+        }
+        Assert.assertTrue(isContainedPermission);
     }
 
-    @Test(dependsOnMethods = {"testGetUserRoles"})
-    public void testGetPermission() throws SQLException {
-        Set<Permission> permissions = constantsDao.getPermissions();
+    @Test
+    public void testGetTimeDiff() throws Exception {
+        ConstantCollections.setTimeDiffs(constantsDao.getTimeDiffs());
+        ConnectionManager.getConnection().commit();
+        Set<TimeDiff> timeDiffs = ConstantCollections.getTimeDiffs();
+        Assert.assertTrue(timeDiffs.size() != 0);
+        Assert.assertEquals(timeDiffs.size(), 48);
+        boolean isContainedTimeDiff = false;
+        for (TimeDiff timeDiff : timeDiffs) {
+            if (timeDiff.getTimeDiffId() == 48) {
+                isContainedTimeDiff = true;
+            }
+        }
+        Assert.assertTrue(isContainedTimeDiff);
     }
 
-    @Test(dependsOnMethods = {"testGetPermission"})
-    public void testGetTimeDiff() throws SQLException {
-        Set<TimeDiff> timeDiffs = constantsDao.getTimeDiffs();
-    }
-
-    @Test(dependsOnMethods = {"testGetTimeDiff"})
-    public void testGetDonutStatuses() throws SQLException {
-        Set<DonutStatus> donutStatuses = constantsDao.getDonutStatuses();
+    @Test
+    public void testGetDonutStatuses() throws Exception {
+        ConstantCollections.setDonutStatuses(constantsDao.getDonutStatuses());
+        ConnectionManager.getConnection().commit();
+        Set<DonutStatus> donutStatuses = ConstantCollections.getDonutStatuses();
+        Assert.assertTrue(donutStatuses.size() != 0);
+        Assert.assertEquals(donutStatuses.size(), 5);
+        boolean isContainedDonutStatus = false;
+        for (DonutStatus donutStatus : donutStatuses) {
+            if (donutStatus.getDonutStatusId().equals("ERROR") && donutStatus.getDonutStatusRusName().equals("Ошибка")) {
+                isContainedDonutStatus = true;
+            }
+        }
+        Assert.assertTrue(isContainedDonutStatus);
     }
 }

@@ -1,4 +1,4 @@
-package ru.logistica.tms.dao.utils;
+package ru.logistica.tms.dao;
 
 import java.util.Collection;
 

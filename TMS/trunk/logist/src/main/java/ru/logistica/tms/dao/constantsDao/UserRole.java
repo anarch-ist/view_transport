@@ -4,15 +4,6 @@ public class UserRole {
     private String userRoleId;
     private String userRoleRusName;
 
-    @Override
-    public String toString() {
-        return "UserRole{" +
-                "userRoleId='" + userRoleId + '\'' +
-                ", userRoleRusName='" + userRoleRusName + '\'' +
-                '}';
-    }
-
-
     public String getUserRoleId() {
         return userRoleId;
     }
@@ -29,5 +20,12 @@ public class UserRole {
         this.userRoleRusName = userRoleRusName;
     }
 
+    @Override
+    public String toString() {
+        return "UserRole{" +
+                "userRoleId='" + userRoleId + '\'' +
+                ", userRoleRusName='" + userRoleRusName + '\'' +
+                '}';
+    }
 
 }
