@@ -1,50 +1,77 @@
 body {
-    color: #000;
     direction: ltr;
-    font-family: "Varela Round","Helvetica Neue","Helvetica","Roboto","Arial",sans-serif;
-    font-size: 18px;
+    font-family: "Trebuchet MS","Myriad Pro",Arial,sans-serif;
+    font-size: large;
     line-height: 1.182;
     font-weight: normal;
-}
-.errorText {
-    color: #b81900;
-    text-align: center;
-    font-size: xx-small;
+    background: #F5F5F5;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
-#loginBox {
-    background: #FFF;
-    margin: 150px auto;
-    padding: 60px 60px;
-    width: 146px;
+.vBox {
+    display: -moz-box;
+    -moz-box-orient: vertical;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+    display: box;
+    box-orient: vertical;
+}
+
+body > #loginBox {
+    background: #F0F8FF;
+    margin-top:200px;
+    padding: 70px 90px 70px 90px;
+    width: 300px;
     color: #45688E;
-    border: 2px solid #C3CBD4;
+    border: 1px solid rgba(147, 184, 189,0.8);
+    box-shadow:
+        0pt 2px 5px rgba(105, 108, 109, 0.7),
+        0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
 }
 
-#loginBox * {
-    padding: auto;
+body > #loginBox > * {
+    width: 100%;
 }
 
-input:focus{
+body > #loginBox > input:focus{
     border: 1px solid #39c;
 }
 
-#userLogin: hover{
-
+#login, #password{
+    margin-bottom: 15px;
 }
 
-#userLoginId{
-    background: url(media/customImages/male.svg) no-repeat left +5px center;
-    background-size: 20px auto;
+.form {
+    position: relative;
+    margin-top: 10px;
 }
 
-input{
-    height: 30px;
-    width: 190px;
+.form > input{
+    height: 40px;
+    padding: 10px 5px 10px 32px;
+    width: 100%;
+    margin-top: 0;
+}
+.form > label{
+    position: absolute;
+    left: 0;
+    -ms-transform: translateX(10px) translateY(11px); /* IE 9 */
+    -webkit-transform: translateX(10px) translateY(11px);    /* Chrome, Safari, Opera */
+    transform: translateX(10px) translateY(11px);
+    z-index: 1;
 }
 
-.lightblue:active{
-    transform: translateZ(0);
+.buttonLogIn:hover{
+    opacity: 0.90;
+    filter: alpha(opacity=90);
+}
+
+.buttonLogIn:active{
+    transform: translateX(0);
     background-image: none;
     background-repeat: repeat;
     background-attachment: scroll;
@@ -55,14 +82,15 @@ input{
     background-color: #6383a8;
 }
 
-.lightblue{
+.buttonLogIn{
     background-image: -moz-linear-gradient(top, #6383a8 0%, #29496B 100%);
     border: 1px solid #537aa7;
     color: #E6E6FA;
-    font-size: 12px;
-    padding: 10px 54px;
-    font-family: "Varela Round","Helvetica Neue","Helvetica","Roboto","Arial",sans-serif;
+    font-size: 14px;
     cursor: pointer;
+    float: right;
+    box-shadow: 0px 1px 1px 1px #B0C4DE;
+    padding: 7px 15px 7px 15px;
 }
 
 ::-webkit-input-placeholder {color:#A9A9A9;}
@@ -70,3 +98,12 @@ input{
 :-moz-placeholder           {color:#A9A9A9;}
 :-ms-input-placeholder      {color:#A9A9A9;}
 
+.errorText {
+    color: red;
+    float: left;
+    margin-left: 3px;
+    font-size: xx-small;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    height: 3px;
+}
