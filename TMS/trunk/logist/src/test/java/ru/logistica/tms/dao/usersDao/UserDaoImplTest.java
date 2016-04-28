@@ -1,14 +1,15 @@
 package ru.logistica.tms.dao.usersDao;
 
-import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import ru.logistica.tms.dao.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.TestUtil;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
-import ru.logistica.tms.dao.DaoException;
-import ru.logistica.tms.dao.ConnectionManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,13 +43,9 @@ public class UserDaoImplTest {
         user2.setLogin("user2");
         user3.setLogin("user3");
 
-        user1.setSalt("salt1salt1salt11");
-        user2.setSalt("salt2salt2salt22");
-        user3.setSalt("salt3salt3salt33");
-
-        user1.setPassAndSalt("pass1");
-        user2.setPassAndSalt("pass2");
-        user3.setPassAndSalt("pass3");
+        user1.setPassword("pass1");
+        user2.setPassword("pass2");
+        user3.setPassword("pass3");
 
         String userRoleId1 = "W_BOSS";
         user1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
@@ -99,8 +96,7 @@ public class UserDaoImplTest {
         User abstractUser = new User();
         abstractUser.setUserId(1);
         abstractUser.setLogin("user1");
-        abstractUser.setSalt("salt4salt4salt44");
-        abstractUser.setPassAndSalt("pass4");
+        abstractUser.setPassword("pass4");
         String userRoleId1 = "W_BOSS";
         abstractUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
         abstractUser.setUserName("Misha");
@@ -123,8 +119,7 @@ public class UserDaoImplTest {
             User user = new User();
             user.setUserId(1);
             user.setLogin("user4");
-            user.setSalt("salt4salt4salt44");
-            user.setPassAndSalt("pass4");
+            user.setPassword("pass4");
             String userRoleId1 = "W_BOSS";
             user.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
             user.setUserName("Misha");

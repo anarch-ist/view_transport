@@ -5,23 +5,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
-import java.util.Set;
 
-public class Utils {
+public class CriptUtils {
     private static final Logger logger = LogManager.getLogger();
 
-    private Utils() {}
+    private CriptUtils() {}
 
     public static String generateSalt() {
         return RandomStringUtils.randomAlphanumeric(16);
     }
 
-    public static String generatePassword(String pass, String salt) {
+    public static String generatePassAndSalt(String pass, String salt) {
         Objects.requireNonNull(pass);
         Objects.requireNonNull(salt);
         if (salt.length() != 16)
             throw new IllegalArgumentException("salt length must be 16");
-        return Utils.md5(Utils.md5(pass) + salt);
+        return CriptUtils.md5(CriptUtils.md5(pass) + salt);
     }
 
     // 32 digits like in php

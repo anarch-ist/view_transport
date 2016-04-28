@@ -1,17 +1,18 @@
 package ru.logistica.tms.dao.usersDao;
 
-import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import ru.logistica.tms.dao.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
 import ru.logistica.tms.dao.TestUtil;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.pointsDao.Point;
 import ru.logistica.tms.dao.pointsDao.PointDaoImpl;
-import ru.logistica.tms.dao.DaoException;
-import ru.logistica.tms.dao.GenericDao;
-import ru.logistica.tms.dao.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -52,8 +53,7 @@ public class PointUserDaoImplTest {
         pointUser1.setPoint(point);
         pointUser1.setUserId(null);
         pointUser1.setLogin("user4");
-        pointUser1.setSalt("salt4salt4salt44");
-        pointUser1.setPassAndSalt("pass4");
+        pointUser1.setPassword("pass4");
         String userRoleId1 = "W_BOSS";
         pointUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
         pointUser1.setUserName("Kolya");
@@ -64,8 +64,7 @@ public class PointUserDaoImplTest {
         pointUser2.setPoint(point);
         pointUser2.setUserId(null);
         pointUser2.setLogin("user5");
-        pointUser2.setSalt("salt5salt5salt55");
-        pointUser2.setPassAndSalt("pass5");
+        pointUser2.setPassword("pass5");
         String userRoleId2 = "WH_DISPATCHER";
         pointUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId2));
         pointUser2.setUserName("Kate");
@@ -102,8 +101,7 @@ public class PointUserDaoImplTest {
         pointUser.setPoint(point);
         pointUser.setUserId(null);
         pointUser.setLogin("user4");
-        pointUser.setSalt("salt8salt8salt88");
-        pointUser.setPassAndSalt("pass8");
+        pointUser.setPassword("pass8");
         String userRoleId1 = "W_BOSS";
         pointUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
         pointUser.setUserName("Kol");
@@ -130,8 +128,7 @@ public class PointUserDaoImplTest {
             pointUser.setPoint(point);
             pointUser.setUserId(null);
             pointUser.setLogin("user9");
-            pointUser.setSalt("salt8salt8salt88");
-            pointUser.setPassAndSalt("pass8");
+            pointUser.setPassword("pass8");
             String userRoleId1 = "W_BOSS";
             pointUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
             pointUser.setUserName("Kol");

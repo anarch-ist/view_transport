@@ -90,8 +90,12 @@
                     data: {login: $loginInput.val(), password: calcMD5($passwordInput.val())},
                     dataType: "json"
                 }).done(function (data) {
-                    $loginError.text(data.loginErrorText);
-                    $passwordError.text(data.passwordErrorText);
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        $loginError.text(data.loginErrorText);
+                        $passwordError.text(data.passwordErrorText);
+                    }
                 })
                   .fail(function () {
                       alert("error");

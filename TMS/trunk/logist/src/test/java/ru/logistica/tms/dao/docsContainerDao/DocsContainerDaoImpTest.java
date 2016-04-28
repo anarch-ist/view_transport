@@ -1,7 +1,6 @@
 package ru.logistica.tms.dao.docsContainerDao;
 
 
-import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -13,8 +12,9 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Set;
+
 @Test(singleThreaded = true)
-public class DocsContainerDaoImpTestNG {
+public class DocsContainerDaoImpTest {
     private static DocsContainerDao docsContainerDao = new DocsContainerDaoImp();
     private static DocsContainer docsContainer1;
     private static DocsContainer docsContainer2;

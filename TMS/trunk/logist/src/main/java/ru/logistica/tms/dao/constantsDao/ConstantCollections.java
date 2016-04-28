@@ -1,7 +1,5 @@
 package ru.logistica.tms.dao.constantsDao;
 
-import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -12,7 +10,7 @@ public class ConstantCollections {
     private static Set<DonutStatus> donutStatuses;
 
 
-    public static Set<UserRole> getUserRoles() throws SQLException {
+    public static Set<UserRole> getUserRoles() {
         return userRoles;
     }
 
@@ -39,7 +37,7 @@ public class ConstantCollections {
         ConstantCollections.userRoles = userRoles;
     }
 
-    public static Set<Permission> getPermissions() throws SQLException {
+    public static Set<Permission> getPermissions() {
         return permissions;
     }
 
@@ -47,7 +45,7 @@ public class ConstantCollections {
         ConstantCollections.permissions = permissions;
     }
 
-    public static Set<TimeDiff> getTimeDiffs() throws SQLException {
+    public static Set<TimeDiff> getTimeDiffs() {
         return timeDiffs;
     }
 
@@ -55,7 +53,7 @@ public class ConstantCollections {
         ConstantCollections.timeDiffs = timeDiffs;
     }
 
-    public static Set<DonutStatus> getDonutStatuses() throws SQLException {
+    public static Set<DonutStatus> getDonutStatuses() {
         return donutStatuses;
     }
 

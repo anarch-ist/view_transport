@@ -66,7 +66,7 @@ CREATE TABLE users (
   userID      SERIAL,
   userLogin   VARCHAR(255) NOT NULL,
   salt        CHAR(16)     NOT NULL,
-  passAndSalt VARCHAR(64)  NOT NULL,
+  passAndSalt CHAR(32)     NOT NULL,
   userRoleID  VARCHAR(32)  NOT NULL,
   userName    VARCHAR(255) NULL,
   phoneNumber VARCHAR(255) NULL,

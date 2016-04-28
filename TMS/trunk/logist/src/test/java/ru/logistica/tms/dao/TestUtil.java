@@ -48,7 +48,6 @@ public class TestUtil {
     }
 
     public static void cleanDatabase(boolean showOutput) throws URISyntaxException {
-        System.out.println("start clean");
         Path pathToSql = Paths.get(TestUtil.class.getResource("tables.sql").toURI());
         try {
             // executeCommand("cmd /c taskkill -f /IM psql.exe");

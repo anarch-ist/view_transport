@@ -1,17 +1,18 @@
 package ru.logistica.tms.dao.usersDao;
 
-import net.jcip.annotations.NotThreadSafe;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import ru.logistica.tms.dao.ConnectionManager;
+import ru.logistica.tms.dao.DaoException;
+import ru.logistica.tms.dao.GenericDao;
 import ru.logistica.tms.dao.TestUtil;
 import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.constantsDao.ConstantsDao;
 import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
-import ru.logistica.tms.dao.DaoException;
-import ru.logistica.tms.dao.GenericDao;
-import ru.logistica.tms.dao.ConnectionManager;
 
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -53,8 +54,7 @@ public class SupplierUserDaoImplTest {
         supplierUser1.setSupplier(supplier);
         supplierUser1.setUserId(null);
         supplierUser1.setLogin("user6");
-        supplierUser1.setSalt("salt6salt6salt66");
-        supplierUser1.setPassAndSalt("pass6");
+        supplierUser1.setPassword("pass6");
         String userRoleId1 = "SUPPLIER_MANAGER";
         supplierUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
         supplierUser1.setUserName("Fedor");
@@ -65,8 +65,7 @@ public class SupplierUserDaoImplTest {
         supplierUser2.setSupplier(supplier);
         supplierUser2.setUserId(null);
         supplierUser2.setLogin("user7");
-        supplierUser2.setSalt("salt7salt7salt77");
-        supplierUser2.setPassAndSalt("pass7");
+        supplierUser2.setPassword("pass7");
         supplierUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
         supplierUser2.setUserName("Kirill");
         supplierUser2.setPhoneNumber("8-909-348-34-45");
@@ -101,8 +100,7 @@ public class SupplierUserDaoImplTest {
         supplierUser.setSupplier(supplier);
         supplierUser.setUserId(null);
         supplierUser.setLogin("user6");
-        supplierUser.setSalt("salt9salt9salt99");
-        supplierUser.setPassAndSalt("pass9");
+        supplierUser.setPassword("testtest");
         String userRoleId1 = "SUPPLIER_MANAGER";
         supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
         supplierUser.setUserName("Fed");
@@ -128,8 +126,7 @@ public class SupplierUserDaoImplTest {
             supplierUser.setSupplier(supplier);
             supplierUser.setUserId(null);
             supplierUser.setLogin("user9");
-            supplierUser.setSalt("salt8salt8salt88");
-            supplierUser.setPassAndSalt("pass8");
+            supplierUser.setPassword("pass8");
             String userRoleId1 = "W_BOSS";
             supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
             supplierUser.setUserName("Kol");

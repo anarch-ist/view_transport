@@ -1,6 +1,7 @@
 package ru.logistica.tms.dao.usersDao;
 
 import ru.logistica.tms.dao.constantsDao.UserRole;
+import ru.logistica.tms.util.CriptUtils;
 
 public class User {
     private Integer userId;
@@ -51,6 +52,16 @@ public class User {
 
     public void setPassAndSalt(String passAndSalt) {
         this.passAndSalt = passAndSalt;
+    }
+
+    /**
+     * take real user password as String and write into salt and passAndSalt
+     * @param password
+     */
+    public void setPassword(String password) {
+        String salt = CriptUtils.generateSalt();
+        setPassAndSalt(CriptUtils.generatePassAndSalt(password, salt));
+        setSalt(salt);
     }
 
     public String getUserName() {
