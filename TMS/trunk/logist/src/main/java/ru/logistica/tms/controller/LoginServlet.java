@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -25,9 +26,16 @@ public class LoginServlet extends HttpServlet {
         String passMd5 = request.getParameter("password");
         AuthResult authResult = DaoManager.checkUser(login, passMd5);
 
+
+
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+
+
+
         if (authResult.isAuthSuccess()) {
             JsonObject jsonObject = objectBuilder.add("redirect", "success.jsp").build();
+            HttpSession session = request.getSession();
+            session.setAttribute("user", authResult.getUser());
             sendJson(response, jsonObject);
         } else if (authResult.isNoSuchLogin()) {
             JsonObject jsonObject = objectBuilder.add("loginErrorText", "логин указан неверно").add("passwordErrorText", "").build();

@@ -6,31 +6,10 @@
     <script type="text/javascript" src="media/jQuery-2.1.4/jquery-2.1.4.min.js" ></script>
     <link rel="stylesheet" href="media/font-awesome-4.6.1/css/font-awesome.min.css" media="all">
     <link rel="stylesheet" href="login.css" media="all">
-
     <script type="text/javascript" src="media/md5.js" ></script>
 
 </head>
 <body>
-    <!--<table id="loginBox">-->
-        <!--<tr>-->
-            <!--<td><label for="userLoginId">логин</label></td>-->
-            <!--<td><input type="text" name="userLogin" id="userLoginId" placeholder="Введите логин"/></td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td colspan="2" id="loginError" class="errorText"></td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td><label for="userPasswordId">пароль</label></td>-->
-            <!--<td><input type="password" name="userPassword" id="userPasswordId" placeholder="Введите пароль"/></td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td colspan="2" id="passwordError" class="errorText"></td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td colspan="2" align="right"><button id="confirmLoginId">подтвердить</button></td>-->
-        <!--</tr>-->
-    <!--</table>-->
-    <!--<p><input type="text" name="userLoginId" id="userLoginId" placeholder="Введите логин"/></p>-->
 
     <div id="loginBox" class="vBox">
 
@@ -47,7 +26,7 @@
             <label id="userPassword" for="userPasswordId"><strong>Пароль</strong></label>
             <div class="form">
                 <label id="passwordIcon" class="fa fa-unlock"></label>
-                <input type="text" name="userPasswordId" id="userPasswordId" placeholder="Введите пароль"/>
+                <input type="password" name="userPasswordId" id="userPasswordId" placeholder="Введите пароль"/>
             </div>
             <div id="passwordError" class="errorText"></div>
         </div>
@@ -67,9 +46,7 @@
         var $passwordError = $("#passwordError");
         var $inputs = $($loginInput).add($passwordInput);
         var $inputErrors = $loginError.add($passwordError);
-        var $confirmLoginBtn = $('#confirmLoginId');
-
-        // make styled view
+        var $confirmLoginBtn = $('#buttonLogIn');
 
         // if enter pressed then submit
         $inputs.on("keypress", function (e) {
@@ -108,17 +85,17 @@
         function checkFields() {
             var loginValue = $loginInput.val();
             if (!loginValue) {
-                $loginError.text("введите логин");
+                $loginError.text("Введите логин");
                 $loginInput.focus();
                 return false;
             }
             var passwordValue = $passwordInput.val();
             if (!passwordValue) {
-                $passwordError.text("введите пароль");
+                $passwordError.text("Введите пароль");
                 $passwordInput.focus();
                 return false;
             } else if (passwordValue.length < MIN_PASSWORD_LENGTH) {
-                $passwordError.text("минимальная длина пароля - " + MIN_PASSWORD_LENGTH + " символов");
+                $passwordError.text("Минимальная длина пароля - " + MIN_PASSWORD_LENGTH + " символов");
                 $passwordInput.focus();
                 return false;
             }
