@@ -28,7 +28,7 @@
                 <label id="passwordIcon" class="fa fa-unlock"></label>
                 <input type="password" name="userPasswordId" id="userPasswordId" placeholder="Введите пароль"/>
             </div>
-            <div id="passwordError" class="errorText"></div>
+            <div id="passwordError" class="errorText">Error</div>
         </div>
 
         <div id="acceptButton">
@@ -101,6 +101,23 @@
             }
             return true;
         }
+
+
+        $('input').addClass("idleField");
+        $('input').focus(function() {
+        $(this).removeClass("idleField").addClass("focusField");
+        if (this.value == this.defaultValue){
+        this.value = '';
+        }
+        if(this.value != this.defaultValue){
+        this.select();
+        }
+        });
+        $('input').blur(function() {
+        $(this).removeClass("focusField").addClass("idleField");
+
+        });
+
 
     </script>
 

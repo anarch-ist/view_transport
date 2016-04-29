@@ -1,13 +1,16 @@
 body {
     direction: ltr;
-    font-family: "Trebuchet MS","Myriad Pro",Arial,sans-serif;
-    font-size: large;
+    font-family: Arial;
+    font-size: medium;
     line-height: 1.182;
     font-weight: normal;
     background: #F5F5F5;
     display: flex;
     flex-direction: row;
     justify-content: center;
+
+    display: -webkit-flex;
+    display: -moz-flex;
 }
 
 .vBox {
@@ -21,24 +24,32 @@ body {
     box-orient: vertical;
 }
 
+
 body > #loginBox {
     background: #F0F8FF;
     margin-top:200px;
     padding: 70px 90px 70px 90px;
     width: 300px;
     color: #45688E;
+    height: 220px;
     border: 1px solid rgba(147, 184, 189,0.8);
     box-shadow:
         0pt 2px 5px rgba(105, 108, 109, 0.7),
         0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    webkit-box-shadow:
+                   0pt 2px 5px rgba(105, 108, 109, 0.7),
+                   0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    moz-box-shadow:
+                0pt 2px 5px rgba(105, 108, 109, 0.7),
+                0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    ms-box-shadow:
+                    0pt 2px 5px rgba(105, 108, 109, 0.7),
+                    0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    border-radius: 1px 1px 1px 1px;
 }
 
 body > #loginBox > * {
     width: 100%;
-}
-
-body > #loginBox > input:focus{
-    border: 1px solid #39c;
 }
 
 #login, #password{
@@ -47,6 +58,8 @@ body > #loginBox > input:focus{
 
 .form {
     position: relative;
+    -webkit-position: relative;
+    -moz-position: relative;
     margin-top: 10px;
 }
 
@@ -55,9 +68,16 @@ body > #loginBox > input:focus{
     padding: 10px 5px 10px 32px;
     width: 100%;
     margin-top: 0;
+    border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2);
+    box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;
+    border: 1px solid rgb(178, 178, 178);
+    border-radius: 1px 1px 1px 1px;
 }
+
 .form > label{
     position: absolute;
+    -webkit-position: absolute;
+    -moz-position: absolute;
     left: 0;
     -ms-transform: translateX(10px) translateY(11px); /* IE 9 */
     -webkit-transform: translateX(10px) translateY(11px);    /* Chrome, Safari, Opera */
@@ -84,13 +104,21 @@ body > #loginBox > input:focus{
 
 .buttonLogIn{
     background-image: -moz-linear-gradient(top, #6383a8 0%, #29496B 100%);
-    border: 1px solid #537aa7;
+    background-image: -webkit-linear-gradient(top, #6383a8 0%, #29496B 100%);
+    background-image: -ms-linear-gradient(top, #6383a8 0%, #29496B 100%);
+    background-image: linear-gradient(top, #6383a8 0%, #29496B 100%);
+    border: 0.5px solid #537aa7;
+    -webkit-border: 0.5px solid #537aa7;
     color: #E6E6FA;
     font-size: 14px;
     cursor: pointer;
     float: right;
     box-shadow: 0px 1px 1px 1px #B0C4DE;
+    -moz-box-shadow: 0px 1px 1px 1px #B0C4DE;
+    -webkit-box-shadow: 0px 1px 1px 1px #B0C4DE;
+    -ms-box-shadow: 0px 1px 1px 1px #B0C4DE;
     padding: 7px 15px 7px 15px;
+    border-radius: 1px 1px 1px 1px;
 }
 
 ::-webkit-input-placeholder {color:#A9A9A9;}
@@ -100,10 +128,29 @@ body > #loginBox > input:focus{
 
 .errorText {
     color: red;
-    float: left;
+    /*float: left;*/
     margin-left: 3px;
-    font-size: xx-small;
+    font-size: 10px;
     margin-top: 3px;
     margin-bottom: 3px;
+    margin-right: 40px;
     height: 3px;
 }
+
+.focusField{
+    border:solid 2px #73A6FF;
+    background:#EFF5FF;
+    color:#000;
+    outline:none;
+}
+.idleField{
+    height: 40px;
+    padding: 10px 5px 10px 32px;
+    width: 100%;
+    margin-top: 0;
+    border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2);
+    box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;
+    border: 1px solid rgb(178, 178, 178);
+    border-radius: 1px 1px 1px 1px;
+}
+
