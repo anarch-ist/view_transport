@@ -6,11 +6,23 @@
                 <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
             </PatternLayout>
         </File>
+        <File name="ERROR_FILE" fileName="${sys:errorLogFilename}">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
+            </PatternLayout>
+        </File>
+
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%m%n"/>
         </Console>
     </Appenders>
+
     <Loggers>
+        <Logger name="dbCohesion" level="DEBUG">
+            <AppenderRef ref="ERROR_FILE" level="TRACE"/>
+            <AppenderRef ref="STDOUT" level="DEBUG"/>
+        </Logger>
+
         <Root level="trace">
             <AppenderRef ref="FILE" level="TRACE"/>
             <AppenderRef ref="STDOUT" level="DEBUG"/>

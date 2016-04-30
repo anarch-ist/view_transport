@@ -16,6 +16,7 @@ public class InsertOrUpdateTransactionScript {
 
     public static final String LOGIST_1C = "LOGIST_1C";
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private final Connection connection;
     private final DataFrom1c dataFrom1c;
 
@@ -33,10 +34,14 @@ public class InsertOrUpdateTransactionScript {
     public InsertOrUpdateResult updateData() {
 
         String server = dataFrom1c.getServer();
-        logger.info(Util.getParameterizedString("server = {}", server));
+        logger.info(Util.getParameterizedString("server = {} \n", server));
+        cohesionLogger.info(Util.getParameterizedString("server = {} \n", server));
         Integer packageNumber = dataFrom1c.getPackageNumber().intValue();
         logger.info(Util.getParameterizedString("packageNumber = {}", packageNumber));
+        cohesionLogger.info(Util.getParameterizedString("packageNumber = {}", packageNumber));
         logger.info(Util.getParameterizedString("dateCreated = {}", dataFrom1c.getCreated()));
+        cohesionLogger.info(Util.getParameterizedString("dateCreated = {} ", dataFrom1c.getCreated()));
+
         InsertOrUpdateResult insertOrUpdateResult = new InsertOrUpdateResult();
         insertOrUpdateResult.setServer(server);
         insertOrUpdateResult.setPackageNumber(packageNumber);

@@ -17,6 +17,7 @@ import java.util.Map;
 
 public class UpdateRoutes extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<DirectionsData> updateRoutesArray;
     private List<RouteListsData> updateRouteLists;
 
@@ -26,7 +27,7 @@ public class UpdateRoutes extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException, DBCohesionException {
+    public PreparedStatement executePart() throws SQLException {
         if (updateRoutesArray.isEmpty() && updateRouteLists.isEmpty())
             return null;
 
@@ -58,8 +59,13 @@ public class UpdateRoutes extends TransactionPart{
                 // insert or update route
                 preparedStatement.setString(1, updateRouteList.getGeneratedRouteId());
                 preparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
-                String generatedRouteName = getGeneratedRouteName(allPoints, allPointNamesById, updateRouteList.getPointArrivalId(), updateRouteList.getPointDepartureId());
-                preparedStatement.setString(3, generatedRouteName);
+                try{
+                    String generatedRouteName = getGeneratedRouteName(allPoints, allPointNamesById, updateRouteList.getPointArrivalId(), updateRouteList.getPointDepartureId());
+                    preparedStatement.setString(3, generatedRouteName);
+                } catch (DBCohesionException e) {
+                    cohesionLogger.warn(e);
+                    continue;
+                }
                 preparedStatement.addBatch();
             }
         }

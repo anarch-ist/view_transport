@@ -233,6 +233,7 @@ public class App {
         Path logsDirPath = SystemResourcesContainer.createPathWithCheck(logsDir);
         System.setProperty("log4j.shutdownCallbackRegistry", "com.djdch.log4j.StaticShutdownCallbackRegistry");
         System.setProperty("logFilename", logsDirPath.resolve("parser.log").toString());
+        System.setProperty("errorLogFilename", logsDirPath.resolve("error.log").toString());
         return LogManager.getLogger();
     }
 

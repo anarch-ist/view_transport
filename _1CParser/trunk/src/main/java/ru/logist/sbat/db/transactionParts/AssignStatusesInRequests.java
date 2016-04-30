@@ -15,6 +15,7 @@ import java.util.List;
 
 public class AssignStatusesInRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<StatusData> updateStatuses;
 
     public AssignStatusesInRequests(List<StatusData> updateStatuses) {
@@ -22,7 +23,7 @@ public class AssignStatusesInRequests extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException, DBCohesionException {
+    public PreparedStatement executePart() throws SQLException {
         if (updateStatuses.isEmpty())
             return null;
 
@@ -39,7 +40,12 @@ public class AssignStatusesInRequests extends TransactionPart{
             requestsUpdatePrSt.setString(2, updateStatus.getStatus());
             requestsUpdatePrSt.setString(3, updateStatus.getComment());
             requestsUpdatePrSt.setTimestamp(  4, updateStatus.getTimeOutStatus());
-            setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
+            try {
+                setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
+            } catch (DBCohesionException e) {
+                cohesionLogger.warn(e);
+                continue;
+            }
             requestsUpdatePrSt.addBatch();
         }
         int[] requestsAffectedRecords = requestsUpdatePrSt.executeBatch();

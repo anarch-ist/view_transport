@@ -15,6 +15,7 @@ import java.util.List;
 
 public class UpdateRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<RequestsData> updateRequests;
 
     public UpdateRequests(List<RequestsData> updateRequests) {
@@ -22,7 +23,7 @@ public class UpdateRequests extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException, DBCohesionException {
+    public PreparedStatement executePart() throws SQLException {
         if (updateRequests.isEmpty())
             return null;
         logger.info("START update requests table from JSON object:[updateRequestsTable]");
@@ -87,9 +88,14 @@ public class UpdateRequests extends TransactionPart{
             requestsPreparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
             requestsPreparedStatement.setString(3, updateRequest.getRequestNumber());
             requestsPreparedStatement.setDate  (4,  updateRequest.getRequestDate());
-            setClientId(allClientsKeyMap, requestsPreparedStatement, 5, updateRequest.getClientId());
-            setDestinationPoint(allPointsKeyMap, requestsPreparedStatement, updateRequest, 6, updateRequest.getAddressId());
-            setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
+            try {
+                setClientId(allClientsKeyMap, requestsPreparedStatement, 5, updateRequest.getClientId());
+                setDestinationPoint(allPointsKeyMap, requestsPreparedStatement, updateRequest, 6, updateRequest.getAddressId());
+                setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
+            } catch (DBCohesionException e) {
+                cohesionLogger.warn(e);
+                continue;
+            }
             requestsPreparedStatement.setString(8, updateRequest.getInvoiceNumber());
             requestsPreparedStatement.setDate  (9, updateRequest.getInvoiceDate());
             requestsPreparedStatement.setString(10, updateRequest.getDocumentNumber());

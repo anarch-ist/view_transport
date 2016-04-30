@@ -20,7 +20,7 @@ public class ClearRouteListsInRequests extends TransactionPart {
     }
 
     @Override
-    public Statement executePart() throws SQLException, DBCohesionException {
+    public Statement executePart() throws SQLException {
         if (updateRouteLists.isEmpty())
             return null;
         logger.info("START UPDATE requests clear routeLists");
@@ -35,8 +35,13 @@ public class ClearRouteListsInRequests extends TransactionPart {
         BidiMap<String, Integer> allRouteListsAsKeyPairs = Selects.getInstance().allRouteListsAsKeyPairs();
 
         for (RouteListsData updateRouteList : updateRouteLists) {
-            Integer routeListId = getRouteListId(allRouteListsAsKeyPairs, updateRouteList.getRouteListIdExternal());
-            requestUpdatePreparedStatement.setInt(1, routeListId);
+            try {
+                Integer routeListId = getRouteListId(allRouteListsAsKeyPairs, updateRouteList.getRouteListIdExternal());
+                requestUpdatePreparedStatement.setInt(1, routeListId);
+            } catch (DBCohesionException e) {
+                logger.warn(e);
+                continue;
+            }
             requestUpdatePreparedStatement.addBatch();
         }
 

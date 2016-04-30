@@ -17,7 +17,7 @@ public class DeleteRoutes extends TransactionPart {
     }
 
     @Override
-    public Statement executePart() throws SQLException, DBCohesionException {
+    public Statement executePart() throws SQLException {
         logger.warn("directions are never remove");
         return null; /*DO NOTHING*/
     }

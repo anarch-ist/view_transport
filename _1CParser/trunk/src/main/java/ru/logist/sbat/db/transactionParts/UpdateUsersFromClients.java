@@ -16,6 +16,7 @@ import java.util.List;
 
 public class UpdateUsersFromClients extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private static final String CLIENT_MANAGER = "CLIENT_MANAGER";
     public static final String CLIENT_USER_SUFFIX = "-client";
     private List<ClientData> updateClients;
@@ -25,7 +26,7 @@ public class UpdateUsersFromClients extends TransactionPart {
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException, DBCohesionException {
+    public PreparedStatement executePart() throws SQLException {
         if (updateClients.isEmpty())
             return null;
         BidiMap<String, Integer> allClientsAsKeyPairs = Selects.getInstance().allClientsAsKeyPairs();
@@ -63,7 +64,13 @@ public class UpdateUsersFromClients extends TransactionPart {
 
             result.setString(6, CLIENT_MANAGER);
             result.setString(7, updateClient.getClientName());
-            setClientId(allClientsAsKeyPairs, result, 8, updateClient.getClientId());
+            try {
+                setClientId(allClientsAsKeyPairs, result, 8, updateClient.getClientId());
+            } catch (DBCohesionException e) {
+                cohesionLogger.warn(e);
+                continue;
+            }
+
 
             result.addBatch();
         }

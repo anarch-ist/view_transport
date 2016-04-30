@@ -15,6 +15,7 @@ import java.util.List;
 
 public class UpdateRouteLists extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<RouteListsData> updateRouteLists;
 
     public UpdateRouteLists(List<RouteListsData> updateRouteLists) {
@@ -22,7 +23,7 @@ public class UpdateRouteLists extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException, DBCohesionException {
+    public PreparedStatement executePart() throws SQLException {
         if (updateRouteLists.isEmpty())
             return null;
         logger.info("START update routeLists from JSON object:[updateRouteLists]");
@@ -69,10 +70,14 @@ public class UpdateRouteLists extends TransactionPart{
             routeListsInsertPreparedStatement.setDate(4, updateRouteList.getRouteListDate()); // creationDate
             routeListsInsertPreparedStatement.setDate(5, updateRouteList.getDepartureDate()); // departureDate
             routeListsInsertPreparedStatement.setString(6, updateRouteList.getForwarderId());
-            setDriver(allUsersAsKeyPairs, routeListsInsertPreparedStatement, 7, updateRouteList.getDriverId());
-            routeListsInsertPreparedStatement.setString(8, updateRouteList.getStatus());
-            setRouteId(allRoutesAsKeyPairs, routeListsInsertPreparedStatement, 9, routeIdExternal);
-
+            try {
+                setDriver(allUsersAsKeyPairs, routeListsInsertPreparedStatement, 7, updateRouteList.getDriverId());
+                routeListsInsertPreparedStatement.setString(8, updateRouteList.getStatus());
+                setRouteId(allRoutesAsKeyPairs, routeListsInsertPreparedStatement, 9, routeIdExternal);
+            } catch (DBCohesionException e) {
+                cohesionLogger.warn(e);
+                continue;
+            }
             routeListsInsertPreparedStatement.addBatch();
         }
 

@@ -1,6 +1,7 @@
 package ru.logist.sbat.jsonParser;
 
 import junit.framework.Assert;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 import ru.logist.sbat.jsonParser.beans.StatusData;
@@ -23,6 +24,12 @@ public class UtilTest {
     @Test(expected = IllegalArgumentException.class)
     public void testGetParameterizedStringIllegalArg() throws Exception {
         Util.getParameterizedString("bla{},{}blabla  {}", "par1");
+    }
+
+    @Test
+    public void testParameterizedStringBigData() throws Exception {
+        String result = Util.getParameterizedString("bla{}", RandomStringUtils.random(10000));
+        Assert.assertTrue(result.length() < (Util.MAX_SYMBOLS_IN_PARAM_STRING + 20));
     }
 
     @Test(expected = ValidatorException.class)

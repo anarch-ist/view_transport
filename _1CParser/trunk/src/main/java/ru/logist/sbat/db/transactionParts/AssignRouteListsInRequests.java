@@ -17,6 +17,7 @@ import java.util.Set;
  */
 public class AssignRouteListsInRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
+    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<RouteListsData> updateRouteLists;
 
     public AssignRouteListsInRequests(List<RouteListsData> updateRouteLists) {
@@ -24,7 +25,7 @@ public class AssignRouteListsInRequests extends TransactionPart{
     }
 
     @Override
-    public PreparedStatement executePart() throws SQLException, DBCohesionException {
+    public PreparedStatement executePart() throws SQLException {
         if (updateRouteLists.isEmpty())
             return null;
         logger.info("START UPDATE requests assign routeLists");
@@ -42,14 +43,25 @@ public class AssignRouteListsInRequests extends TransactionPart{
         for (RouteListsData updateRouteList : updateRouteLists) {
             Set<String> requests = updateRouteList.getRequests(); // list of requests inside routeList
 
-            Integer warehousePointId = getWarehousePointId(allPointsAsKeyPairs, updateRouteList.getPointDepartureId());
             Integer routeListId = allRouteListsAsKeyPairs.get(updateRouteList.getRouteListIdExternal());
+            Integer warehousePointId;
+            try {
+                warehousePointId = getWarehousePointId(allPointsAsKeyPairs, updateRouteList.getPointDepartureId());
+            } catch (DBCohesionException e) {
+                cohesionLogger.warn(e);
+                continue;
+            }
 
             for(Object requestIDExternalAsObject: requests) {
                 String requestIDExternal = (String) requestIDExternalAsObject;
                 requestUpdatePreparedStatement.setInt(1, routeListId);
                 requestUpdatePreparedStatement.setInt(2, warehousePointId);
-                setRequestId(requestUpdatePreparedStatement, requestIDExternal, allRequestsAsKeyPairs.get(requestIDExternal), 3);
+                try {
+                    setRequestId(requestUpdatePreparedStatement, requestIDExternal, allRequestsAsKeyPairs.get(requestIDExternal), 3);
+                } catch (DBCohesionException e) {
+                    cohesionLogger.warn(e);
+                    continue;
+                }
                 requestUpdatePreparedStatement.addBatch();
             }
         }

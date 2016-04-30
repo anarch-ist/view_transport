@@ -7,16 +7,20 @@ import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import ru.logist.sbat.cmd.Pair;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
+import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParsingException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipInputStream;
 
 public class JSONReadFromFile {
@@ -39,7 +43,7 @@ public class JSONReadFromFile {
      *
      * @return zip file with data as decompressed string
      */
-    private static String readZipFileToUtf8String(File file) throws IOException {
+    public static String readZipFileToUtf8String(File file) throws IOException {
         byte[] buffer = new byte[2048];
         ZipInputStream zis = null;
         try {
@@ -57,7 +61,51 @@ public class JSONReadFromFile {
             if (zis != null) zis.close();
         }
     }
+    /**
+     *
+     * @param jsonFileAsString
+     * @return Json object and List of error string.
+     */
+    public static Pair<Map, List<String>> readWithStreamingApi(String jsonFileAsString) {
+        String jsonFileAsStringWithoutBom = jsonFileAsString.replaceAll("\uFEFF", "");
+        JsonParser parser = Json.createParser(new StringReader(jsonFileAsStringWithoutBom));
 
+
+        while (parser.hasNext()) {
+
+            JsonParser.Event event;
+            try {
+                event = parser.next();
+            } catch (JsonParsingException e) {
+                System.out.println(e.getMessage());
+                System.out.println(e.getLocation());
+                parser.next();
+                continue;
+            }
+
+            switch(event) {
+                case START_ARRAY:
+                case END_ARRAY:
+                case START_OBJECT:
+                case END_OBJECT:
+                case VALUE_FALSE:
+                case VALUE_NULL:
+                case VALUE_TRUE:
+                    System.out.println(event.toString());
+                    break;
+                case KEY_NAME:
+                    System.out.println(event.toString() + " " +parser.getString());
+                    break;
+                case VALUE_STRING:
+                case VALUE_NUMBER:
+                    System.out.println(event.toString() + " " +parser.getString());
+                    break;
+            }
+        }
+
+
+        return null;
+    }
     public static JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {
 
         String jsonFileAsStringWithoutBom = jsonFileAsString.replaceAll("\uFEFF", "");
