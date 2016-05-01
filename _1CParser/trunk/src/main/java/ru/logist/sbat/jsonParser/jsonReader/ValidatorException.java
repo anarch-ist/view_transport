@@ -1,4 +1,4 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.jsonReader;
 
 /**
  * If this kind of exception was thrown it means that Json file is not in accordance with JsonConstraints.txt

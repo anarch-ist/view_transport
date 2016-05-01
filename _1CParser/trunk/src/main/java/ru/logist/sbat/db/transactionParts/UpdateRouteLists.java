@@ -5,7 +5,6 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.RouteListsData;
 
 import java.sql.PreparedStatement;
@@ -65,7 +64,7 @@ public class UpdateRouteLists extends TransactionPart{
                 throw new NullPointerException();
 
             routeListsInsertPreparedStatement.setString(1, updateRouteList.getRouteListIdExternal());
-            routeListsInsertPreparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            routeListsInsertPreparedStatement.setString(2, DBManager.LOGIST_1C);
             routeListsInsertPreparedStatement.setString(3, updateRouteList.getRouteListNumber());
             routeListsInsertPreparedStatement.setDate(4, updateRouteList.getRouteListDate()); // creationDate
             routeListsInsertPreparedStatement.setDate(5, updateRouteList.getDepartureDate()); // departureDate

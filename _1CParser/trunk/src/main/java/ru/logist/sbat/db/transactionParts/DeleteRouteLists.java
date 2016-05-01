@@ -3,7 +3,7 @@ package ru.logist.sbat.db.transactionParts;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
+import ru.logist.sbat.db.DBManager;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -30,7 +30,7 @@ public class DeleteRouteLists extends TransactionPart {
 
         for (String routeListIdExternal : routeListIdExternals) {
             prepareStatement.setString(1, routeListIdExternal);
-            prepareStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            prepareStatement.setString(2, DBManager.LOGIST_1C);
             prepareStatement.addBatch();
         }
 

@@ -5,9 +5,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
-import ru.logist.sbat.db.Utils;
-import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.jsonReader.Util;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 
 import java.sql.PreparedStatement;

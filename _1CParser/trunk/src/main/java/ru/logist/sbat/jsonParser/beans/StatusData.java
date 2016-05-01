@@ -1,10 +1,9 @@
 package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
-import ru.logist.sbat.jsonParser.Util;
-import ru.logist.sbat.jsonParser.ValidatorException;
+import ru.logist.sbat.jsonParser.jsonReader.Util;
+import ru.logist.sbat.jsonParser.jsonReader.ValidatorException;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;

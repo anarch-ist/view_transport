@@ -1,4 +1,4 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.jsonReader;
 
 public class JsonPException extends Exception {
 

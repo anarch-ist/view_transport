@@ -1,13 +1,10 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.jsonReader;
 
 import org.apache.commons.io.FileUtils;
 import org.json.simple.parser.ParseException;
-import org.junit.Before;
 import org.junit.Test;
-import ru.logist.sbat.functional.FunctionalTests;
 
 import javax.json.Json;
-import javax.json.JsonException;
 import javax.json.JsonReader;
 import javax.json.JsonStructure;
 import javax.json.stream.JsonParsingException;
@@ -15,7 +12,6 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 public class JSONReadFromFileTest {
 

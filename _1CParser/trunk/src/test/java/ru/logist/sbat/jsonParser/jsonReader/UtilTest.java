@@ -1,10 +1,12 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.jsonReader;
 
 import junit.framework.Assert;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 import ru.logist.sbat.jsonParser.beans.StatusData;
+import ru.logist.sbat.jsonParser.jsonReader.Util;
+import ru.logist.sbat.jsonParser.jsonReader.ValidatorException;
 
 import java.sql.Date;
 import java.sql.Timestamp;

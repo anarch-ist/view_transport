@@ -1,8 +1,8 @@
 package ru.logist.sbat.jsonParser.beans;
 
 import org.json.simple.JSONObject;
-import ru.logist.sbat.jsonParser.Util;
-import ru.logist.sbat.jsonParser.ValidatorException;
+import ru.logist.sbat.jsonParser.jsonReader.Util;
+import ru.logist.sbat.jsonParser.jsonReader.ValidatorException;
 
 public class TraderData {
     public static final String FN_TRADER_ID = "traderId";

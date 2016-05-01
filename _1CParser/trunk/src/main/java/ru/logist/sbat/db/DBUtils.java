@@ -31,8 +31,12 @@ public class DBUtils {
 
     public static void rollbackQuietly(Connection connection) {
         try {
-            if (connection != null)
+            if (connection != null) {
+                logger.error("start ROLLBACK");
                 connection.rollback();
+                logger.error("end ROLLBACK");
+            }
+
         } catch (SQLException e) {
             logger.error(e);
         }

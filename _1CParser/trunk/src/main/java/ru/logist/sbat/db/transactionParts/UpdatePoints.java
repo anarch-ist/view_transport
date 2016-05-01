@@ -2,9 +2,6 @@ package ru.logist.sbat.db.transactionParts;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
-import ru.logist.sbat.db.Utils;
-import ru.logist.sbat.jsonParser.beans.AddressData;
 import ru.logist.sbat.jsonParser.beans.PointData;
 
 import java.sql.PreparedStatement;
@@ -40,7 +37,7 @@ public class UpdatePoints extends TransactionPart {
         // create or update points from updatePoints JSON array
         for (PointData updatePoint : updatePointsArray) {
             pointsStatement.setString(1, updatePoint.getPointId());
-            pointsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            pointsStatement.setString(2, DBManager.LOGIST_1C);
             pointsStatement.setString(3, updatePoint.getPointName());
             pointsStatement.setString(4, updatePoint.getPointAddress());
             pointsStatement.setString(5, updatePoint.getPointEmails());

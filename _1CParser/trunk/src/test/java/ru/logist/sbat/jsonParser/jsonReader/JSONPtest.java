@@ -1,4 +1,4 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.jsonReader;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;

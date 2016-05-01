@@ -6,8 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
-import ru.logist.sbat.jsonParser.JSONReadFromFile;
-import ru.logist.sbat.jsonParser.JSONReadFromFileTest;
+import ru.logist.sbat.jsonParser.jsonReader.JSONReadFromFileTest;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.resourcesInit.PropertiesPojo;
 

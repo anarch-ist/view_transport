@@ -3,8 +3,7 @@ package ru.logist.sbat.jsonParser.beans;
 import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.logist.sbat.jsonParser.JSONReadFromFile;
-import ru.logist.sbat.jsonParser.JSONReadFromFileTest;
+import ru.logist.sbat.jsonParser.jsonReader.JSONReadFromFileTest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

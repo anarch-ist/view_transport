@@ -3,7 +3,6 @@ package ru.logist.sbat.testDataGenerator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import ru.logist.sbat.db.DBUtils;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.PointData;
 
@@ -109,7 +108,7 @@ public class DataInserter {
 
             for (int i = 0; i < TOTAL_POINTS; i++) {
                 pointsStatement.setString(1, RandomStringUtils.randomAlphabetic(10) + "IDExternal");
-                pointsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                pointsStatement.setString(2, DBManager.LOGIST_1C);
                 pointsStatement.setString(3, RandomStringUtils.randomAlphabetic(10) + "PointName");
                 pointsStatement.setString(4, RandomStringUtils.randomAlphabetic(10) + "PointAddress");
                 pointsStatement.setString(5, RandomStringUtils.randomAlphabetic(10) + "PointEmails");
@@ -143,7 +142,7 @@ public class DataInserter {
 
             for (int i = 0; i < TOTAL_ROUTES; i++) {
                 routesStatement.setString(1,  RandomStringUtils.randomAlphabetic(10) + "IDExternal");
-                routesStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                routesStatement.setString(2, DBManager.LOGIST_1C);
                 routesStatement.setString(3,  RandomStringUtils.randomAlphabetic(10) + "DirectionName");
                 routesStatement.setTime(4,  new Time(RandomUtils.nextLong(0, 24*60*60*1000)));
                 routesStatement.setString(5,  Util.getRandomElementFromSet(DAYS_OF_WEEK));
@@ -193,7 +192,7 @@ public class DataInserter {
 
             for (int i = 0; i < TOTAL_CLIENTS; i++) {
                 clientsStatement.setString(1, RandomStringUtils.randomAlphabetic(10) + "clientIDExternal");
-                clientsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                clientsStatement.setString(2, DBManager.LOGIST_1C);
                 clientsStatement.setString(3, RandomStringUtils.randomAlphabetic(10) + "clientName");
                 clientsStatement.setString(4, RandomStringUtils.randomAlphabetic(10) + "INN");
                 clientsStatement.addBatch();
@@ -220,7 +219,7 @@ public class DataInserter {
 
             for (int i = 0; i < TOTAL_USERS; i++) {
                 usersStatement.setString(1, RandomStringUtils.randomAlphabetic(10));
-                usersStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                usersStatement.setString(2, DBManager.LOGIST_1C);
                 String salt = Utils.generateSalt();
                 String userLogin = RandomStringUtils.randomAlphabetic(6);
                 String userPassword = userLogin + "pass";
@@ -276,7 +275,7 @@ public class DataInserter {
             for (int i = 0; i < TOTAL_ROUTE_LISTS; i++) {
                 //common values
                 routeListsStatement.setString(1, RandomStringUtils.randomAlphabetic(10));
-                routeListsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                routeListsStatement.setString(2, DBManager.LOGIST_1C);
                 routeListsStatement.setString(3, RandomStringUtils.randomAlphabetic(10));
                 LocalDate creationDate = randomDate.nextDate();
                 LocalDate departureDate = creationDate.plus(3, ChronoUnit.DAYS);
@@ -327,7 +326,7 @@ public class DataInserter {
 
             for (int i = 0; i < TOTAL_REQUESTS; i++) {
                 requestsStatement.setString(1, RandomStringUtils.randomAlphabetic(10));
-                requestsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                requestsStatement.setString(2, DBManager.LOGIST_1C);
                 requestsStatement.setString(3, RandomStringUtils.randomAlphabetic(10));
                 requestsStatement.setDate(4, randomDate.nextSqlDate());
                 requestsStatement.setInt(5, Util.getRandomElementFromList(generatedClientsId).intValue());

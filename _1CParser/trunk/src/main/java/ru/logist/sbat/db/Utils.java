@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Utils {
-    private static final Logger logger = LogManager.getLogger(InsertOrUpdateTransactionScript.class);
+    private static final Logger logger = LogManager.getLogger(DBManager.class);
 
     private Utils() {}
 

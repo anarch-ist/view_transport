@@ -1,7 +1,8 @@
-package ru.logist.sbat.jsonParser;
+package ru.logist.sbat.jsonParser.jsonReader;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import ru.logist.sbat.GlobalUtils;
 
 import java.lang.reflect.Field;
 import java.sql.Date;
@@ -16,48 +17,33 @@ import java.util.*;
 
 public class Util {
 
-    public static final int MAX_SYMBOLS_IN_PARAM_STRING = 500;
 
-    public static String getParameterizedString(String string, Object... parameters) {
-        StringBuilder stringBuilder = new StringBuilder();
-        String[] parts = string.split("\\{\\}", -1);
-        if ((parts.length - 1) != parameters.length)
-            throw new IllegalArgumentException("number of {} not equal to number of parameters");
-        stringBuilder.append(parts[0]);
-        for (int i = 0; i < parameters.length; i++) {
-            String paramAsString = parameters[i].toString();
-            if (paramAsString.length() > MAX_SYMBOLS_IN_PARAM_STRING)
-                paramAsString = paramAsString.substring(0, MAX_SYMBOLS_IN_PARAM_STRING) + "...";
-            stringBuilder.append("[").append(paramAsString).append("]").append(parts[i + 1]);
-        }
-        return stringBuilder.toString();
-    }
 
     public static void checkFieldAvailability(String fieldName, JSONObject jsonObject) throws ValidatorException {
         if (!jsonObject.containsKey(fieldName))
-            throw new ValidatorException(Util.getParameterizedString("can't find field {} in {}", fieldName, jsonObject));
+            throw new ValidatorException(GlobalUtils.getParameterizedString("can't find field {} in {}", fieldName, jsonObject));
     }
 
     public static void checkCorrectType(Object fieldContent, Class fieldContentClazz, JSONObject jsonObject) throws ValidatorException {
         if (!fieldContent.getClass().equals(fieldContentClazz))
-            throw new ValidatorException(Util.getParameterizedString("fieldContent {} is not type of {} in {} ", fieldContent, fieldContentClazz.getSimpleName(), jsonObject));
+            throw new ValidatorException(GlobalUtils.getParameterizedString("fieldContent {} is not type of {} in {} ", fieldContent, fieldContentClazz.getSimpleName(), jsonObject));
     }
 
     public static void checkCorrectType(Object fieldContent, Class fieldContentClazz) throws ValidatorException {
         if (!fieldContent.getClass().equals(fieldContentClazz))
-            throw new ValidatorException(Util.getParameterizedString("fieldContent {} is not type of {}", fieldContent, fieldContentClazz.getSimpleName()));
+            throw new ValidatorException(GlobalUtils.getParameterizedString("fieldContent {} is not type of {}", fieldContent, fieldContentClazz.getSimpleName()));
     }
 
     public static void checkFieldAvailableAndNotNull(String fieldName, JSONObject jsonObject) throws ValidatorException {
         checkFieldAvailability(fieldName, jsonObject);
         if (jsonObject.get(fieldName) == null)
-            throw new ValidatorException(Util.getParameterizedString("field {} is null in {}", fieldName, jsonObject));
+            throw new ValidatorException(GlobalUtils.getParameterizedString("field {} is null in {}", fieldName, jsonObject));
     }
 
     public static void checkFieldAvailableAndNotNullAndNotEmpty(String fieldName, JSONObject jsonObject) throws ValidatorException {
         checkFieldAvailableAndNotNull(fieldName, jsonObject);
         if (jsonObject.get(fieldName).equals(""))
-            throw new ValidatorException((Util.getParameterizedString("field {} is empty in {}", fieldName, jsonObject)));
+            throw new ValidatorException((GlobalUtils.getParameterizedString("field {} is empty in {}", fieldName, jsonObject)));
     }
 
     /**
@@ -77,7 +63,7 @@ public class Util {
             else {
                 Util.checkCorrectType(jsonValue, Long.class, jsonObject);
                 if (((Long)jsonValue) < 0)
-                    throw new ValidatorException(Util.getParameterizedString("value of {} must be greater or equal to '0' in {} ", fieldName, jsonObject));
+                    throw new ValidatorException(GlobalUtils.getParameterizedString("value of {} must be greater or equal to '0' in {} ", fieldName, jsonObject));
                 field.set(beanObject, jsonValue);
             }
         } catch (ReflectiveOperationException e) {
@@ -98,7 +84,7 @@ public class Util {
                     Date date = getDate(formatter, (String) dateAsString);
                     field.set(beanObject, date);
                 } catch (DateTimeParseException e) {
-                    throw new ValidatorException(Util.getParameterizedString("illegal date format {} in {}", dateAsString, jsonObject), e);
+                    throw new ValidatorException(GlobalUtils.getParameterizedString("illegal date format {} in {}", dateAsString, jsonObject), e);
                 }
             }
         } catch (ReflectiveOperationException e) {
@@ -119,7 +105,7 @@ public class Util {
                     Timestamp dateTime = getDateTime(formatter, (String) dateAsString);
                     field.set(beanObject, dateTime);
                 } catch (DateTimeParseException e) {
-                    throw new ValidatorException(Util.getParameterizedString("illegal date format {} in {}", dateAsString, jsonObject), e);
+                    throw new ValidatorException(GlobalUtils.getParameterizedString("illegal date format {} in {}", dateAsString, jsonObject), e);
                 }
             }
         } catch (ReflectiveOperationException e) {
@@ -159,7 +145,7 @@ public class Util {
             Util.checkCorrectType(jsonValue, String.class, jsonObject);
             String jsonValueAsString = (String) jsonValue;
             if (!possibleValues.contains(jsonValueAsString))
-                throw new ValidatorException(Util.getParameterizedString("status {} is not contained in set of possible statuses in {}", jsonValue, jsonObject));
+                throw new ValidatorException(GlobalUtils.getParameterizedString("status {} is not contained in set of possible statuses in {}", jsonValue, jsonObject));
             field.set(beanObject, jsonValue);
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
@@ -177,7 +163,7 @@ public class Util {
             Set<String> result = new HashSet<>();
             for(Object o: jsonArray) {
                 if (o == null || !(o instanceof String) || o.equals("")) {
-                    throw new ValidatorException(Util.getParameterizedString("illegal invoiceId {} in {}", o, jsonObject));
+                    throw new ValidatorException(GlobalUtils.getParameterizedString("illegal invoiceId {} in {}", o, jsonObject));
                 }
                 result.add((String) o);
             }

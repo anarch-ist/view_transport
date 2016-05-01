@@ -5,7 +5,6 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.DirectionsData;
 import ru.logist.sbat.jsonParser.beans.RouteListsData;
@@ -39,26 +38,26 @@ public class UpdateRoutes extends TransactionPart{
                         "  routeName = VALUES(routeName);"
         );
 
-        BidiMap<String, String> allRoutes = Selects.getInstance().selectAllRoutesAsExtKeyAndName(InsertOrUpdateTransactionScript.LOGIST_1C);
+        BidiMap<String, String> allRoutes = Selects.getInstance().selectAllRoutesAsExtKeyAndName(DBManager.LOGIST_1C);
         for (DirectionsData updateRoute : updateRoutesArray) {
             String directionIDExternal = updateRoute.getDirectId();
             String directionName = updateRoute.getDirectName();
             String uniqueDirectionName = generateNewDirectionNameIfDuplicate(allRoutes, directionIDExternal, directionName);
             preparedStatement.setString(1, directionIDExternal);
-            preparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            preparedStatement.setString(2, DBManager.LOGIST_1C);
             preparedStatement.setString(3, uniqueDirectionName);
             preparedStatement.addBatch();
         }
 
         Map<String, Integer> allPoints = Selects.getInstance().allPointsAsKeyPairs();
-        Map<Integer, String> allPointNamesById = Selects.getInstance().allPointNamesById(InsertOrUpdateTransactionScript.LOGIST_1C);
+        Map<Integer, String> allPointNamesById = Selects.getInstance().allPointNamesById(DBManager.LOGIST_1C);
         for (RouteListsData updateRouteList : updateRouteLists) {
 
             // create new route only for trunk routes
             if (updateRouteList.isTrunkRoute()) {
                 // insert or update route
                 preparedStatement.setString(1, updateRouteList.getGeneratedRouteId());
-                preparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+                preparedStatement.setString(2, DBManager.LOGIST_1C);
                 try{
                     String generatedRouteName = getGeneratedRouteName(allPoints, allPointNamesById, updateRouteList.getPointArrivalId(), updateRouteList.getPointDepartureId());
                     preparedStatement.setString(3, generatedRouteName);

@@ -4,9 +4,7 @@ package ru.logist.sbat.db.transactionParts;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
-import ru.logist.sbat.jsonParser.beans.ClientData;
 import ru.logist.sbat.jsonParser.beans.TraderData;
 
 import java.sql.PreparedStatement;
@@ -44,7 +42,7 @@ public class UpdateUsersFromTraders extends TransactionPart {
 
         for (TraderData updateUser : updateMarketAgents) {
             result.setString(1, updateUser.getTraderId());
-            result.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            result.setString(2, DBManager.LOGIST_1C);
             if (updateUser.hasValidLoginAndPassword()) {
                 String salt = Utils.generateSalt();
                 result.setString(3, updateUser.getTraderLogin());

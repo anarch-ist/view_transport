@@ -3,7 +3,6 @@ package ru.logist.sbat.db.transactionParts;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import ru.logist.sbat.db.DBUtils;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -103,32 +102,32 @@ public class Selects {
 
     BidiMap<String, Integer> allPointsAsKeyPairs() throws SQLException {
         if (allPointsAsKeyPairs == null)
-            allPointsAsKeyPairs = asKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C, "pointIDExternal", "pointID", "points");
+            allPointsAsKeyPairs = asKeyPairs(DBManager.LOGIST_1C, "pointIDExternal", "pointID", "points");
         return allPointsAsKeyPairs;
     }
     BidiMap<String, Integer> allClientsAsKeyPairs() throws SQLException {
         if (allClientsAsKeyPairs == null)
-            allClientsAsKeyPairs = asKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C, "clientIDExternal", "clientID", "clients");
+            allClientsAsKeyPairs = asKeyPairs(DBManager.LOGIST_1C, "clientIDExternal", "clientID", "clients");
         return allClientsAsKeyPairs;
     }
     BidiMap<String, Integer> allUsersAsKeyPairs() throws SQLException {
         if (allUsersAsKeyPairs == null)
-            allUsersAsKeyPairs = asKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C, "userIDExternal", "userID", "users");
+            allUsersAsKeyPairs = asKeyPairs(DBManager.LOGIST_1C, "userIDExternal", "userID", "users");
         return allUsersAsKeyPairs;
     }
     BidiMap<String, Integer> allRoutesAsKeyPairs() throws SQLException {
         if (allRoutesAsKeyPairs == null)
-            allRoutesAsKeyPairs = asKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C, "directionIDExternal", "routeID", "routes");
+            allRoutesAsKeyPairs = asKeyPairs(DBManager.LOGIST_1C, "directionIDExternal", "routeID", "routes");
         return allRoutesAsKeyPairs;
     }
     BidiMap<String, Integer> allRequestsAsKeyPairs() throws SQLException {
         if (allRequestsAsKeyPairs == null)
-            allRequestsAsKeyPairs = asKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C, "requestIDExternal", "requestID", "requests");
+            allRequestsAsKeyPairs = asKeyPairs(DBManager.LOGIST_1C, "requestIDExternal", "requestID", "requests");
         return allRequestsAsKeyPairs;
     }
     BidiMap<String, Integer> allRouteListsAsKeyPairs() throws SQLException {
         if (allRouteListsAsKeyPairs == null)
-            allRouteListsAsKeyPairs = asKeyPairs(InsertOrUpdateTransactionScript.LOGIST_1C, "routeListIDExternal", "routeListID", "route_lists");
+            allRouteListsAsKeyPairs = asKeyPairs(DBManager.LOGIST_1C, "routeListIDExternal", "routeListID", "route_lists");
         return allRouteListsAsKeyPairs;
     }
 

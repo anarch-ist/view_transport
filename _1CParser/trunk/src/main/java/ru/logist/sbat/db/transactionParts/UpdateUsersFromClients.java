@@ -6,7 +6,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.db.Utils;
 import ru.logist.sbat.jsonParser.beans.ClientData;
 
@@ -48,7 +47,7 @@ public class UpdateUsersFromClients extends TransactionPart {
             String login = updateClient.getClientId();
 
             result.setString(1, userIdExternal);
-            result.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            result.setString(2, DBManager.LOGIST_1C);
             if (updateClient.hasValidPassword()) {
                 String salt = Utils.generateSalt();
                 result.setString(3, login);

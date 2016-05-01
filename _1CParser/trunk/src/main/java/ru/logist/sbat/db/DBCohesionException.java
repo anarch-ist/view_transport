@@ -1,6 +1,6 @@
 package ru.logist.sbat.db;
 
-import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.jsonReader.Util;
 
 public class DBCohesionException extends Exception {
     public DBCohesionException(String message) {

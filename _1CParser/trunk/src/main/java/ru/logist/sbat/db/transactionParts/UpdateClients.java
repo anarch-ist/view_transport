@@ -3,7 +3,6 @@ package ru.logist.sbat.db.transactionParts;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.ClientData;
 
 import java.sql.PreparedStatement;
@@ -34,7 +33,7 @@ public class UpdateClients extends TransactionPart{
 
         for (ClientData updateClient : updateClients) {
             preparedStatement.setString(1, updateClient.getClientId()); //clientIDExternal
-            preparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            preparedStatement.setString(2, DBManager.LOGIST_1C);
             preparedStatement.setString(3, updateClient.getClientName());
             preparedStatement.setString(4, updateClient.getClientINN());
             preparedStatement.addBatch();

@@ -5,7 +5,6 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.RequestsData;
 
 import java.sql.PreparedStatement;
@@ -85,7 +84,7 @@ public class UpdateRequests extends TransactionPart{
 
         for (RequestsData updateRequest : updateRequests) {
             requestsPreparedStatement.setString(1, updateRequest.getRequestId());
-            requestsPreparedStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            requestsPreparedStatement.setString(2, DBManager.LOGIST_1C);
             requestsPreparedStatement.setString(3, updateRequest.getRequestNumber());
             requestsPreparedStatement.setDate  (4,  updateRequest.getRequestDate());
             try {

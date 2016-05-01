@@ -2,9 +2,7 @@ package ru.logist.sbat.db.transactionParts;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.db.InsertOrUpdateTransactionScript;
 import ru.logist.sbat.jsonParser.beans.AddressData;
-import ru.logist.sbat.jsonParser.beans.PointData;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -41,7 +39,7 @@ public class UpdatePointsFromAddresses extends TransactionPart {
             String pointAddress = updateAddress.getAddressFull();
 
             pointsStatement.setString(1, pointIdExternal);
-            pointsStatement.setString(2, InsertOrUpdateTransactionScript.LOGIST_1C);
+            pointsStatement.setString(2, DBManager.LOGIST_1C);
             pointsStatement.setString(3, pointName);
             pointsStatement.setString(4, pointAddress);
             pointsStatement.setString(5, "AGENCY");

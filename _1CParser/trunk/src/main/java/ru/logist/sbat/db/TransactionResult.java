@@ -1,6 +1,6 @@
 package ru.logist.sbat.db;
 
-public class InsertOrUpdateResult {
+public class TransactionResult {
     public static final String OK_STATUS = "OK";
     public static final String ERROR_STATUS = "ERROR";
 

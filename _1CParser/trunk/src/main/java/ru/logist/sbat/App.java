@@ -8,14 +8,12 @@ import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
 import ru.logist.sbat.cmd.Pair;
 import ru.logist.sbat.db.DBManager;
-import ru.logist.sbat.db.InsertOrUpdateResult;
-import ru.logist.sbat.jsonParser.JSONReadFromFile;
-import ru.logist.sbat.jsonParser.JsonPException;
-import ru.logist.sbat.jsonParser.ValidatorException;
+import ru.logist.sbat.db.TransactionResult;
+import ru.logist.sbat.jsonParser.jsonReader.JsonPException;
+import ru.logist.sbat.jsonParser.jsonReader.ValidatorException;
 import ru.logist.sbat.jsonParser.beans.DataFrom1c;
 import ru.logist.sbat.resourcesInit.ResourceInitException;
 import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
-import ru.logist.sbat.jsonParser.Util;
 import ru.logist.sbat.watchService.FileChangeListener;
 import ru.logist.sbat.resourcesInit.PropertiesPojo;
 import ru.logist.sbat.watchService.WatchServiceStarter;
@@ -83,7 +81,7 @@ public class App {
         try {
             Files.newDirectoryStream(jsonDataDir).forEach(path -> onFileChangeListener.onFileCreate(path));
         } catch (IOException e) {
-            logger.error(Util.getParameterizedString("can't read directory {}", jsonDataDir));
+            logger.error(GlobalUtils.getParameterizedString("can't read directory {}", jsonDataDir));
             System.exit(-1);
         }
     }
@@ -156,9 +154,9 @@ public class App {
 
         for (String dataString : dataStrings) {
             DataFrom1c dataFrom1c = new DataFrom1c(JSONReadFromFile.getJsonObjectFromString(dataString));
-            InsertOrUpdateResult insertOrUpdateResult = dbManager.updateDataFromJSONObject(dataFrom1c);
-            Path responsePath = responseDir.resolve(insertOrUpdateResult.getServer() + FileChangeListener.RESPONSE_FILE_EXTENSION);
-            FileUtils.writeStringToFile(responsePath.toFile(), insertOrUpdateResult.toString(), StandardCharsets.UTF_8);
+            TransactionResult transactionResult = dbManager.updateDataFromJSONObject(dataFrom1c);
+            Path responsePath = responseDir.resolve(transactionResult.getServer() + FileChangeListener.RESPONSE_FILE_EXTENSION);
+            FileUtils.writeStringToFile(responsePath.toFile(), transactionResult.toString(), StandardCharsets.UTF_8);
         }
         // remove data from exchange before timestamp
         dbManager.removeTempTable();
@@ -216,7 +214,7 @@ public class App {
         Path configPath = Paths.get(System.getProperty("user.home")).resolve("parser").resolve("config.property");
         File configFile = configPath.toFile();
         if (!configFile.exists()) {
-            throw new ResourceInitException(Util.getParameterizedString("config file not exist at path = {}, exit application", configPath));
+            throw new ResourceInitException(GlobalUtils.getParameterizedString("config file not exist at path = {}, exit application", configPath));
         }
         try {
             Properties properties = new Properties();
@@ -225,7 +223,7 @@ public class App {
             System.out.println(propertiesPojo.toString());
             return propertiesPojo;
         } catch (IOException e) {
-            throw new ResourceInitException(Util.getParameterizedString("can't read file = {}, exit application", configFile));
+            throw new ResourceInitException(GlobalUtils.getParameterizedString("can't read file = {}, exit application", configFile));
         }
     }
 

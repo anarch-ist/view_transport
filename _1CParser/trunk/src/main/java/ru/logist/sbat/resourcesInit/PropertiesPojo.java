@@ -1,6 +1,6 @@
 package ru.logist.sbat.resourcesInit;
 
-import ru.logist.sbat.jsonParser.Util;
+import ru.logist.sbat.jsonParser.jsonReader.Util;
 
 import java.util.Objects;
 import java.util.Properties;
