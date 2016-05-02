@@ -1,0 +1,27 @@
+body{
+	background: #eee;
+	font-family: "trebuchet ms", arial, "liberation sans";
+}
+
+a{
+	color: #6495ED;
+}
+
+.dropDownList{
+	padding: 10px 100px 10px 100px;
+}
+
+#mainTable {
+	border-collapse: collapse; 
+    line-height: 1.1;
+    /*background:  radial-gradient(farthest-corner at 50% 50%, white, #FDE4D0);*/
+    background:  #FDE4D0;
+    color: #0C213B;
+    font-weight: 700;
+}
+
+.timePeriod, .company{
+	font-size: 0.8em;
+    padding: 15px 30px;
+    border: 1px solid #FF7F50; 
+}

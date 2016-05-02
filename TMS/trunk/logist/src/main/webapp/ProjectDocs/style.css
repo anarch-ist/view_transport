@@ -5,23 +5,23 @@ body{
 
 a{
 	color: #6495ED;
-	padding: 1500px;
 }
 
 .dropDownList{
-	padding: 10px 300px 10px 300px;
+	padding: 10px 100px 10px 100px;
 }
 
 #mainTable {
 	border-collapse: collapse; 
     line-height: 1.1;
-    background:  radial-gradient(farthest-corner at 50% 50%, white, #FDE4D0);
+    /*background:  radial-gradient(farthest-corner at 50% 50%, white, #FDE4D0);*/
+    background:  #FDE4D0;
     color: #0C213B;
     font-weight: 700;
 }
 
 .timePeriod, .company{
 	font-size: 0.8em;
-    padding: 5px 7px;
-    border: 1px solid #FF7F50;
+    padding: 15px 30px;
+    border: 1px solid #FF7F50; 
 }
