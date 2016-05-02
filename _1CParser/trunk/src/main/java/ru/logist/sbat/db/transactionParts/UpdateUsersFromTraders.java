@@ -4,8 +4,9 @@ package ru.logist.sbat.db.transactionParts;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.db.Utils;
-import ru.logist.sbat.jsonParser.beans.TraderData;
+import ru.logist.sbat.jsonToBean.beans.TraderData;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

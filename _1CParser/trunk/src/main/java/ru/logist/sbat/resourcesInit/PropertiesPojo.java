@@ -1,6 +1,6 @@
 package ru.logist.sbat.resourcesInit;
 
-import ru.logist.sbat.jsonParser.jsonReader.Util;
+import ru.logist.sbat.GlobalUtils;
 
 import java.util.Objects;
 import java.util.Properties;
@@ -71,7 +71,7 @@ public class PropertiesPojo {
     private String getValueWithNotNullCheck(String propertyName) {
         String property = this.properties.getProperty(propertyName);
         if (property == null) {
-            throw new IllegalArgumentException(Util.getParameterizedString("can't find property {}", propertyName));
+            throw new IllegalArgumentException(GlobalUtils.getParameterizedString("can't find property {}", propertyName));
         }
         return property;
     }
@@ -79,15 +79,15 @@ public class PropertiesPojo {
     @Override
     public String toString() {
         return "DATABASE CONNECTION PARAMS:\n" +
-                Util.getParameterizedString("url = {}\n", url) +
-                Util.getParameterizedString("user = {}\n", user) +
-                Util.getParameterizedString("password = {}\n", password) +
-                Util.getParameterizedString("dbName = {}\n", dbName) +
-                Util.getParameterizedString("encoding = {}\n", encoding) +
+                GlobalUtils.getParameterizedString("url = {}\n", url) +
+                GlobalUtils.getParameterizedString("user = {}\n", user) +
+                GlobalUtils.getParameterizedString("password = {}\n", password) +
+                GlobalUtils.getParameterizedString("dbName = {}\n", dbName) +
+                GlobalUtils.getParameterizedString("encoding = {}\n", encoding) +
                 "DIRECTORY PARAMS:\n" +
-                Util.getParameterizedString("json data directory = {}\n", jsonDataDir) +
-                Util.getParameterizedString("backup directory = {}\n", backupDir) +
-                Util.getParameterizedString("response directory = {}\n", responseDir) +
-                Util.getParameterizedString("logs directory = {}", logsDir);
+                GlobalUtils.getParameterizedString("json data directory = {}\n", jsonDataDir) +
+                GlobalUtils.getParameterizedString("backup directory = {}\n", backupDir) +
+                GlobalUtils.getParameterizedString("response directory = {}\n", responseDir) +
+                GlobalUtils.getParameterizedString("logs directory = {}", logsDir);
     }
 }

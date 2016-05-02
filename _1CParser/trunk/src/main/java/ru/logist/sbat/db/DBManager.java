@@ -4,8 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.GlobalUtils;
 import ru.logist.sbat.db.transactionParts.*;
-import ru.logist.sbat.jsonParser.beans.DataFrom1c;
-import ru.logist.sbat.jsonParser.beans.PackageData;
+import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
+import ru.logist.sbat.jsonToBean.beans.PackageData;
 
 import java.sql.*;
 import java.util.ArrayList;

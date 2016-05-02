@@ -7,39 +7,33 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.logist.sbat.fileExecutor.CommandException;
+import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.db.DBManager;
-import ru.logist.sbat.db.DataBaseTest;
-import ru.logist.sbat.jsonParser.jsonReader.JsonPException;
-import ru.logist.sbat.jsonParser.jsonReader.ValidatorException;
-import ru.logist.sbat.jsonParser.beans.DataFrom1c;
-import ru.logist.sbat.resourcesInit.PropertiesPojo;
-import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
+import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;
+import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
+import ru.logist.sbat.testUtils.TestHelper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.Properties;
 
 public class FunctionalTests {
     public static DBManager dbManager;
     private static final Logger logger = LogManager.getLogger();
     private static Connection connection;
+    private static TestHelper testHelper;
+    private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException, CommandException, DBCohesionException, SQLException {
+        Path path = Paths.get(FunctionalTests.class.getResource(fileName).toURI());
+        testHelper.loadFile(path);
+    }
 
     @BeforeClass
     public static void setUp() throws Exception{
-        // get connection to database
-        Properties testProperties = new Properties();
-        testProperties.loadFromXML(DataBaseTest.class.getResourceAsStream("test_config.property"));
-        SystemResourcesContainer systemResourcesContainer = new SystemResourcesContainer(new PropertiesPojo(testProperties), logger);
-        connection = systemResourcesContainer.getConnection();
-        dbManager = new DBManager(connection);
-
-        // clean database content
-        dbManager.truncatePublicTables();
-        dbManager.removeFromExchange(new Timestamp(new java.util.Date().getTime()));
-        // load file with initial data
+        testHelper = new TestHelper();
+        connection = testHelper.prepareDatabase();
         loadFile("EKA_fixed.zip");
     }
 
@@ -49,16 +43,10 @@ public class FunctionalTests {
             dbManager.close();
     }
 
-    private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException {
-        Path path = Paths.get(FunctionalTests.class.getResource(fileName).toURI());
-        DataFrom1c dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(path);
-        dbManager.updateDataFromJSONObject(dataFrom1c);
-    }
-
-
     @Test
     public void createRequestsTest() throws Exception {
         // create two requests
+
         loadFile("1.zip");
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM requests WHERE requestIDExternal IN('5B4BONOV', '5B4BQNOV')");

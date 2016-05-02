@@ -6,8 +6,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.db.DBCohesionException;
+import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.db.Utils;
-import ru.logist.sbat.jsonParser.beans.ClientData;
+import ru.logist.sbat.jsonToBean.beans.ClientData;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

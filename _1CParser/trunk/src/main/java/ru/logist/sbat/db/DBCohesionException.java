@@ -1,6 +1,6 @@
 package ru.logist.sbat.db;
 
-import ru.logist.sbat.jsonParser.jsonReader.Util;
+import ru.logist.sbat.GlobalUtils;
 
 public class DBCohesionException extends Exception {
     public DBCohesionException(String message) {
@@ -8,7 +8,7 @@ public class DBCohesionException extends Exception {
     }
 
     public DBCohesionException(String transactionPart, String rootParameterName, String parameterName, String parameterValue, String tableName) {
-        super(Util.getParameterizedString(
+        super(GlobalUtils.getParameterizedString(
                 transactionPart + ": {} has {} = {} that is not contained in {} table.",
                 rootParameterName,
                 parameterName,

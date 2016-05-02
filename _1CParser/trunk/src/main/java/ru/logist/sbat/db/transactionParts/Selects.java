@@ -2,6 +2,7 @@ package ru.logist.sbat.db.transactionParts;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.db.DBUtils;
 
 import java.sql.*;

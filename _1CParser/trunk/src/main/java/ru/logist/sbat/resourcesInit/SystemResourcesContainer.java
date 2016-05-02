@@ -1,7 +1,7 @@
 package ru.logist.sbat.resourcesInit;
 
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.jsonParser.jsonReader.Util;
+import ru.logist.sbat.GlobalUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,7 +76,7 @@ public class SystemResourcesContainer {
     public static Path createPathWithCheck(String string) throws ResourceInitException {
         Path path = Paths.get(string);
         if (!path.toFile().exists())
-            throw new ResourceInitException(Util.getParameterizedString("directory {} is not exist", path));
+            throw new ResourceInitException(GlobalUtils.getParameterizedString("directory {} is not exist", path));
         return path;
     }
 

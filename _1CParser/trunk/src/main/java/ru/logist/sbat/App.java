@@ -3,15 +3,18 @@ import com.djdch.log4j.StaticShutdownCallbackRegistry;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logist.sbat.fileExecutor.StringToJsonCmd;
+import ru.logist.sbat.fileExecutor.WriteResponseCmd;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
 import ru.logist.sbat.cmd.Pair;
+import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.db.TransactionResult;
-import ru.logist.sbat.jsonParser.jsonReader.JsonPException;
-import ru.logist.sbat.jsonParser.jsonReader.ValidatorException;
-import ru.logist.sbat.jsonParser.beans.DataFrom1c;
+import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;
+import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
+import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
 import ru.logist.sbat.resourcesInit.ResourceInitException;
 import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
 import ru.logist.sbat.watchService.FileChangeListener;
@@ -25,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.*;
@@ -139,7 +143,7 @@ public class App {
         }
     }
 
-    private static void rollback(Timestamp timestamp) throws IOException, org.json.simple.parser.ParseException, JsonPException, ValidatorException {
+    private static void rollback(Timestamp timestamp) throws IOException, JsonPException, org.json.simple.parser.ParseException, DBCohesionException, SQLException, ValidatorException {
         logger.info("start copy exchange table");
         dbManager.createTempTable();
         logger.info("start select all data from exchange table");
@@ -153,9 +157,9 @@ public class App {
         logger.info("response directory cleaned");
 
         for (String dataString : dataStrings) {
-            DataFrom1c dataFrom1c = new DataFrom1c(JSONReadFromFile.getJsonObjectFromString(dataString));
+            DataFrom1c dataFrom1c = new DataFrom1c(new StringToJsonCmd().getJsonObjectFromString(dataString));
             TransactionResult transactionResult = dbManager.updateDataFromJSONObject(dataFrom1c);
-            Path responsePath = responseDir.resolve(transactionResult.getServer() + FileChangeListener.RESPONSE_FILE_EXTENSION);
+            Path responsePath = responseDir.resolve(transactionResult.getServer() + WriteResponseCmd.RESPONSE_FILE_EXTENSION);
             FileUtils.writeStringToFile(responsePath.toFile(), transactionResult.toString(), StandardCharsets.UTF_8);
         }
         // remove data from exchange before timestamp

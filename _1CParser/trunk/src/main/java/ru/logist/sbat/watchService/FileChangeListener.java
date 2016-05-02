@@ -3,7 +3,7 @@ package ru.logist.sbat.watchService;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.FileExecutor.*;
+import ru.logist.sbat.fileExecutor.*;
 import ru.logist.sbat.db.DBManager;
 
 import java.io.BufferedReader;
@@ -44,42 +44,20 @@ public class FileChangeListener implements OnFileChangeListener {
 
             waitForFileReleaseLock(filePath);
 
-            new CommandsBuilder()
-                    .setResources(dbManager, filePath, responseDir, backupDir)
-                    .addZeroCommand(new CopyToBackupCmd())
-                    .addFirstCommand(new FileToStringCmd())
-                    .addSecondCommand(new StringToJsonCmd())
-                    .addThirdCommand(new JsonToBeanCmd())
-                    .addFourthCommand(new BeanIntoDataBaseCmd())
-                    .addFifthsCommand(new WriteResponseCommand())
-                    .addSixCommand(new RemoveFileCommand())
-                    .executeAll();
-
-//            DataFrom1c dataFrom1c = null;
-//            try {
-//                logger.info("Start creating dataFrom1c object from file [{}]", filePath);
-//                dataFrom1c = JSONReadFromFile.getJsonObjectFromFile(filePath);
-//                logger.info("dataFrom1c object succefully recieved ");
-//            } catch (IOException e) {
-//                logger.error("Can't read file [{}]", filePath);
-//                logger.error(e);
-//            } catch (org.json.simple.parser.ParseException | JsonPException e) {
-//                logger.error("Illegal JSON format [{}]", filePath);
-//                logger.error(e);
-//            } catch (ValidatorException e) {
-//                logger.error("Illegal JSON constraint format [{}]", filePath);
-//                logger.error(e);
-//            }
-//
-//            if (dataFrom1c != null) {
-//                TransactionResult insertOrUpdateResult = dbManager.updateDataFromJSONObject(dataFrom1c);
-//                logger.info("Update data finished, status = [{}]", insertOrUpdateResult);
-//                writeDbWorkResponse(insertOrUpdateResult);
-//            } else {
-//                writeBadFileResponse(filePath);
-//            }
-//
-//            removeIncomingFile(filePath);
+            try {
+                new CommandsBuilder()
+                        .setResources(dbManager, filePath, responseDir, backupDir)
+                        .addZeroCommand(new CopyToBackupCmd())
+                        .addFirstCommand(new FileToStringCmd())
+                        .addSecondCommand(new StringToJsonCmd())
+                        .addThirdCommand(new JsonToBeanCmd())
+                        .addFourthCommand(new BeanIntoDataBaseCmd())
+                        .addFifthsCommand(new WriteResponseCmd())
+                        .addSixCommand(new RemoveFileCmd())
+                        .executeAll();
+            } catch (CommandException e) {
+                logger.error(e);
+            }
         });
     }
 
