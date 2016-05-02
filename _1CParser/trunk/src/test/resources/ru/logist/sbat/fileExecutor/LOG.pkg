@@ -1,0 +1,99 @@
+﻿{
+  "dataFrom1C": {
+    "server": "TEST1",
+    "packageNumber": 202,
+    "created": "2016-04-14T08:57:39",
+    "packageData": {
+      "updatePoints": [],
+      "deletePoints": [],
+      "updateDirections": [],
+      "deleteDirections": [],
+      "updateTrader": [],
+      "deleteTrader": [],
+      "updateClients": [
+        {
+          "clientId": "118781",
+          "clientName": "КМ-Сервис",
+          "clientINN": "6672288084",
+          "clientPassword": ""
+        }
+      ],
+      "deleteClients": [],
+      "updateAddress": [
+        {
+          "addressId": "1T5NEKA",
+          "addressShot": "Владимирская обл., г. Покров, ул. Советская, д. 21 А",
+          "deliveryAreaId": "В230",
+          "addressFull": "Владимирская обл., г. Покров, ул. Советская, д. 21 А"
+        },
+        {
+          "addressId": "1XFWMOS",
+          "addressShot": "не собирать,г. Екатеринбург уд. Елизоветское шоссе 29",
+          "deliveryAreaId": "вася",
+          "addressFull": "не собирать,г. Екатеринбург уд. Елизоветское шоссе 29"
+        }
+      ],
+      "deleteAddress": [],
+      "updateRequests": [
+        {
+          "requestId": "1O5N1EKA",
+          "requestNumber": "I01-198665",
+          "requestDate": "20091108",
+          "invoiceNumber": "I01-198665",
+          "invoiceDate": "20091109",
+          "documentNumber": "Сми-332169",
+          "documentDate": "20091109",
+          "firma": "Смирнов бэттериз",
+          "storage": "10 Основной склад",
+          "clientId": "109014",
+          "addressId": "",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка торговым представителем",
+          "traderId": "Тюм15",
+          "deliveryDate": ""
+        }
+      ],
+      "deleteRequests": [],
+      "updateStatus": [
+        {
+          "requestId": "1O5N1EKA",
+          "num_boxes": 999d44,
+          "status": "CHECK_PASSED",
+          "timeOutStatus": "09.11.09,08:07:40",
+          "Comment": ""
+        },
+        {
+          "requestId": "4051HLOG",
+          "num_boxes": 0,
+          "status": "CHECK_PASSED",
+          "timeOutStatus": "07.04.16,14:07:17",
+          "Comment": ""
+        }
+      ],
+      "deleteStatus": [],
+      "updateRouteLists": [
+        {
+          "routerSheetId": "5Q9QPLOG",
+          "routerSheetNumber": "Ек-6022575",
+          "routerSheetDate": "20160314",
+          "departureDate": "",
+          "forwarderId": "",
+          "driverId": "",
+          "pointDepartureId": "01",
+          "pointArrivalId": "NULL",
+          "directId": "Яд41",
+          "status": "CREATED",
+          "invoices": [
+            "5N9H4LOG",
+            "5N9T7LOG",
+            "5OS5NLOG",
+            "5OZ8DLOG",
+            "5OZ8ELOG"
+          ]
+        }
+      ],
+      "deleteRouteLists": []
+    }
+  }
+}

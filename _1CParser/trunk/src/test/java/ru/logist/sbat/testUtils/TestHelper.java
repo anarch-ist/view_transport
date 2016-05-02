@@ -14,11 +14,18 @@ import ru.logist.sbat.resourcesInit.ResourceInitException;
 import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 public class TestHelper {
     private static final Logger logger = LogManager.getLogger();
@@ -37,15 +44,32 @@ public class TestHelper {
         return connection;
     }
 
-    public void loadFile(Path path) throws CommandException, DBCohesionException, SQLException {
+    public DataFrom1c getBeanObjectFromFile(Path path) throws CommandException {
         FileToStringCmd fileToStringCmd = new FileToStringCmd();
         fileToStringCmd.setFilePath(path);
+
         StringToJsonCmd stringToJsonCmd = new StringToJsonCmd();
-        stringToJsonCmd.setFileAsString(fileToStringCmd.execute());
+        String fileAsString = fileToStringCmd.execute();
+        stringToJsonCmd.setFileAsString(fileAsString);
+
         JsonToBeanCmd jsonToBeanCmd = new JsonToBeanCmd();
         jsonToBeanCmd.setJsonObject(stringToJsonCmd.execute());
-        DataFrom1c dataFrom1c = jsonToBeanCmd.execute();
-        dbManager.updateDataFromJSONObject(dataFrom1c);
+        return jsonToBeanCmd.execute();
+    }
+
+    public void loadFileInDatabase(Path path) throws CommandException, DBCohesionException, SQLException {
+        dbManager.updateDataFromJSONObject(getBeanObjectFromFile(path));
+    }
+
+    public List<Path> listBackupFilesInOrder() throws URISyntaxException {
+        List<Path> result = new ArrayList<>();
+        Path backupDir = Paths.get(this.getClass().getResource("backup").toURI());
+        String[] list = backupDir.toFile().list();
+        Arrays.sort(list);
+        for (String fileName : list) {
+            result.add(backupDir.resolve(fileName));
+        }
+        return result;
     }
 
 }

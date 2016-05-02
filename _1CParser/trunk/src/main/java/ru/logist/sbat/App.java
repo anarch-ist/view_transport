@@ -168,8 +168,6 @@ public class App {
         logger.info("ALL DATA ROLLBACKED SUCCESSFULLY timestamp = [{}]", timestamp);
     }
 
-
-
     private static synchronized void closeAll() {
         if (dbManager != null) {
             dbManager.close();

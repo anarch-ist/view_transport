@@ -27,7 +27,7 @@ public class FunctionalTests {
     private static TestHelper testHelper;
     private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException, CommandException, DBCohesionException, SQLException {
         Path path = Paths.get(FunctionalTests.class.getResource(fileName).toURI());
-        testHelper.loadFile(path);
+        testHelper.loadFileInDatabase(path);
     }
 
     @BeforeClass
