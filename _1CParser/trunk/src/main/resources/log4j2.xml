@@ -5,27 +5,35 @@
             <PatternLayout>
                 <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
             </PatternLayout>
+            <Filters>
+
+                <!-- First deny warn, error and fatal messages -->
+                <ThresholdFilter level="warn"  onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
+
+                <!-- Then accept info, warn, error, fatal and deny debug/trace -->
+                <ThresholdFilter level="info"  onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
         </File>
         <File name="ERROR_FILE" fileName="${sys:errorLogFilename}">
             <PatternLayout>
                 <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
             </PatternLayout>
         </File>
-
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%m%n"/>
         </Console>
     </Appenders>
 
     <Loggers>
-        <Logger name="dbCohesion" level="DEBUG">
-            <AppenderRef ref="ERROR_FILE" level="TRACE"/>
-            <AppenderRef ref="STDOUT" level="DEBUG"/>
-        </Logger>
-
         <Root level="trace">
             <AppenderRef ref="FILE" level="TRACE"/>
-            <AppenderRef ref="STDOUT" level="DEBUG"/>
+            <AppenderRef ref="ERROR_FILE" level="WARN"/>
+            <AppenderRef ref="STDOUT" level="INFO"/>
         </Root>
+        <Logger name="ru.logist.sbat.db.DBManager" level="INFO" >
+            <AppenderRef ref="ERROR_FILE" level="INFO"/>
+        </Logger>
     </Loggers>
 </Configuration>

@@ -16,23 +16,18 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringToJsonCmd implements Command<JSONObject> {
+public class StringToJsonCmd {
     private static final Logger logger = LogManager.getLogger();
 
     private String fileAsString;
 
-    public void setFileAsString(String fileAsString) {
+    public StringToJsonCmd(String fileAsString) {
         this.fileAsString = fileAsString;
     }
 
-    @Override
-    public JSONObject execute() throws CommandException {
+    public JSONObject execute() throws JsonPException, ParseException {
         Objects.requireNonNull(fileAsString);
-        try {
-            return getJsonObjectFromString(fileAsString);
-        } catch (ParseException | JsonPException e) {
-            throw new CommandException(e);
-        }
+        return getJsonObjectFromString(fileAsString);
     }
 
     public JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {

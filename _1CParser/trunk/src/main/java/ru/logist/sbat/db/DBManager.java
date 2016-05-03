@@ -13,7 +13,6 @@ import java.util.List;
 
 public class DBManager {
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     public static final String LOGIST_1C = "LOGIST_1C";
     private volatile Connection connection;
 
@@ -38,13 +37,11 @@ public class DBManager {
      */
     public TransactionResult updateDataFromJSONObject(DataFrom1c dataFrom1c) throws DBCohesionException, SQLException {
         String server = dataFrom1c.getServer();
+
         logger.info(GlobalUtils.getParameterizedString("server = {} \n", server));
-        cohesionLogger.info(GlobalUtils.getParameterizedString("server = {} \n", server));
         Integer packageNumber = dataFrom1c.getPackageNumber().intValue();
         logger.info(GlobalUtils.getParameterizedString("packageNumber = {}", packageNumber));
-        cohesionLogger.info(GlobalUtils.getParameterizedString("packageNumber = {}", packageNumber));
         logger.info(GlobalUtils.getParameterizedString("dateCreated = {}", dataFrom1c.getCreated()));
-        cohesionLogger.info(GlobalUtils.getParameterizedString("dateCreated = {} ", dataFrom1c.getCreated()));
 
         TransactionResult transactionResult = new TransactionResult();
         transactionResult.setServer(server);

@@ -15,7 +15,6 @@ import java.util.List;
 
 public class UpdateRouteLists extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<RouteListsData> updateRouteLists;
 
     public UpdateRouteLists(List<RouteListsData> updateRouteLists) {
@@ -75,7 +74,7 @@ public class UpdateRouteLists extends TransactionPart{
                 routeListsInsertPreparedStatement.setString(8, updateRouteList.getStatus());
                 setRouteId(allRoutesAsKeyPairs, routeListsInsertPreparedStatement, 9, routeIdExternal);
             } catch (DBCohesionException e) {
-                cohesionLogger.warn(e);
+                logger.warn(e);
                 continue;
             }
             routeListsInsertPreparedStatement.addBatch();

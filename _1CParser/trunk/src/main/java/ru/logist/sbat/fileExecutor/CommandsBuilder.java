@@ -1,12 +1,17 @@
 package ru.logist.sbat.fileExecutor;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.db.TransactionResult;
 import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
+import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;
+import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class CommandsBuilder {
@@ -27,6 +32,7 @@ public class CommandsBuilder {
     private Path responseDir;
     private Path backupDir;
 
+    private int commandCounter;
 
     public CommandsBuilder setResources(DBManager dbManager, Path filePath, Path responseDir, Path backupDir) {
         this.dbManager = dbManager;
@@ -36,74 +42,79 @@ public class CommandsBuilder {
         return this;
     }
 
-    public CommandsBuilder addZeroCommand(CopyToBackupCmd copyToBackupCmd) {
-        this.copyToBackupCmd = copyToBackupCmd;
-        return this;
-    }
+    public void executeAll() throws FatalException {
 
-
-    public CommandsBuilder addFirstCommand(FileToStringCmd fileToStringCmd) {
-        this.fileToStringCmd = fileToStringCmd;
-        return this;
-    }
-
-    public CommandsBuilder addSecondCommand(StringToJsonCmd stringToJsonCmd) {
-        this.stringToJsonCmd = stringToJsonCmd;
-        return this;
-    }
-
-    public CommandsBuilder addThirdCommand(JsonToBeanCmd jsonToBeanCmd) {
-        this.jsonToBeanCmd = jsonToBeanCmd;
-        return this;
-    }
-
-    public CommandsBuilder addFourthCommand(BeanIntoDataBaseCmd beanIntoDataBaseCmd) {
-        this.beanIntoDataBaseCmd = beanIntoDataBaseCmd;
-        return this;
-    }
-
-    public CommandsBuilder addFifthsCommand(WriteResponseCmd writeResponseCommand) {
-        this.writeResponseCommand = writeResponseCommand;
-        return this;
-    }
-
-    public CommandsBuilder addSixCommand(RemoveFileCmd removeFileCommand) {
-        this.removeFileCommand = removeFileCommand;
-        return this;
-    }
-
-    public void executeAll() throws CommandException {
-
+        commandCounter = 0;
         // copy incoming file to backup directory
-        copyToBackupCmd.setFilePath(filePath);
-        copyToBackupCmd.setBackupDir(backupDir);
-        copyToBackupCmd.execute();
+        copyToBackupCmd = new CopyToBackupCmd(backupDir, filePath);
+        try {
+            copyToBackupCmd.execute();
+        } catch (IOException e) {
+            throw new FatalException("can't copy into backup directory", e);
+        }
+
+        commandCounter = 1;
 
         // read incoming file as string
-        fileToStringCmd.setFilePath(filePath);
-        String fileAsString = fileToStringCmd.execute();
+        fileToStringCmd = new FileToStringCmd(filePath);
+        String fileAsString;
+        try {
+            fileAsString = fileToStringCmd.execute();
+        } catch (ValidatorException e) {
+            logger.warn(e.getMessage());
+            try {
+                FileUtils.forceDelete(filePath.toFile());
+                return;
+            } catch (IOException ex) {
+                throw new FatalException(ex);
+            }
+        } catch (IOException e) {
+            throw new FatalException(e);
+        }
+        commandCounter = 2;
+
+
 
         // read string as JsonObject
-        stringToJsonCmd.setFileAsString(fileAsString);
-        JSONObject jsonObject = stringToJsonCmd.execute();
+        stringToJsonCmd = new StringToJsonCmd(fileAsString);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = stringToJsonCmd.execute();
+        } catch (JsonPException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        commandCounter = 3;
 
         // read JsonObject as bean object
-        jsonToBeanCmd.setJsonObject(jsonObject);
+        jsonToBeanCmd = new JsonToBeanCmd(jsonObject);
         DataFrom1c dataFrom1c = jsonToBeanCmd.execute();
+        commandCounter = 4;
 
         // load data into database
-        beanIntoDataBaseCmd.setDataFrom1c(dataFrom1c);
-        beanIntoDataBaseCmd.setDbManager(dbManager);
+        beanIntoDataBaseCmd = new BeanIntoDataBaseCmd(dataFrom1c, dbManager);
         TransactionResult transactionResult = beanIntoDataBaseCmd.execute();
+        commandCounter = 5;
 
         // write response into response directory
-        writeResponseCommand.setTransactionResult(transactionResult);
-        writeResponseCommand.setFilePath(filePath);
-        writeResponseCommand.setResponseDir(responseDir);
+        writeResponseCommand = new WriteResponseCmd(filePath, responseDir, transactionResult);
         writeResponseCommand.execute();
+        commandCounter = 6;
 
         // remove incoming file
-        removeFileCommand.setFilePath(filePath);
+        removeFileCommand = new RemoveFileCmd(filePath);
         removeFileCommand.execute();
+        commandCounter = 7;
+    }
+
+    public void cleanUp() throws CommandException {
+        switch (commandCounter) {
+            case 0: {
+                //
+            }
+
+        }
+
     }
 }

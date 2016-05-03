@@ -1,6 +1,8 @@
 package ru.logist.sbat.jsonToBean.beans;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import ru.logist.sbat.GlobalUtils;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 public class PackageData {
+    private static final Logger logger = LogManager.getLogger();
+
     public static final String FN_UPDATE_POINTS = "updatePoints";
     public static final String FN_DELETE_POINTS = "deletePoints";
     public static final String FN_UPDATE_DIRECTIONS = "updateDirections";
@@ -166,9 +170,10 @@ public class PackageData {
             try {
                 Object newInstance = dataClazz.getConstructor(JSONObject.class).newInstance(jsonObject);
                 updateData.add(dataClazz.cast(newInstance));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
                 /*NOPE*/
-                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                logger.warn(e.getTargetException().getMessage());
             }
         }
     }

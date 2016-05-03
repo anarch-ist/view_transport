@@ -7,7 +7,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.logist.sbat.fileExecutor.CommandException;
 import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;

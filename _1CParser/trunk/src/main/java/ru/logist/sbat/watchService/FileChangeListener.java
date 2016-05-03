@@ -47,13 +47,6 @@ public class FileChangeListener implements OnFileChangeListener {
             try {
                 new CommandsBuilder()
                         .setResources(dbManager, filePath, responseDir, backupDir)
-                        .addZeroCommand(new CopyToBackupCmd())
-                        .addFirstCommand(new FileToStringCmd())
-                        .addSecondCommand(new StringToJsonCmd())
-                        .addThirdCommand(new JsonToBeanCmd())
-                        .addFourthCommand(new BeanIntoDataBaseCmd())
-                        .addFifthsCommand(new WriteResponseCmd())
-                        .addSixCommand(new RemoveFileCmd())
                         .executeAll();
             } catch (CommandException e) {
                 logger.error(e);

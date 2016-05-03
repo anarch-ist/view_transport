@@ -227,7 +227,7 @@ public class DataInserter {
 
                 usersStatement.setString(3, userLogin);
                 usersStatement.setString(4, salt);
-                usersStatement.setString(5, Utils.generatePassword(userPassword, salt));
+                usersStatement.setString(5, Utils.generatePassAndSalt(userPassword, salt));
                 String userRole = Util.getRandomElementFromSet(USER_ROLES);
                 usersStatement.setString(6, userRole);
                 usersStatement.setString(7, RandomStringUtils.randomAlphabetic(10));

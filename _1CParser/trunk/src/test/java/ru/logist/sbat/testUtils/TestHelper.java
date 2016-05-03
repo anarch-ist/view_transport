@@ -2,7 +2,6 @@ package ru.logist.sbat.testUtils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logist.sbat.fileExecutor.CommandException;
 import ru.logist.sbat.fileExecutor.FileToStringCmd;
 import ru.logist.sbat.fileExecutor.JsonToBeanCmd;
 import ru.logist.sbat.fileExecutor.StringToJsonCmd;
@@ -15,7 +14,6 @@ import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -25,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 public class TestHelper {
     private static final Logger logger = LogManager.getLogger();

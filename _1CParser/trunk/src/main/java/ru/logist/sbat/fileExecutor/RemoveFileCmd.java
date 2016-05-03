@@ -8,24 +8,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class RemoveFileCmd implements Command<Void>{
+public class RemoveFileCmd {
 
     private static final Logger logger = LogManager.getLogger();
     private Path filePath;
 
-    public void setFilePath(Path filePath) {
+    public RemoveFileCmd(Path filePath) {
         this.filePath = filePath;
     }
 
-    @Override
-    public Void execute() throws CommandException {
+    public void execute() throws IOException {
         Objects.requireNonNull(filePath);
-        try {
-            removeIncomingFile(filePath);
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
-        return null;
+        removeIncomingFile(filePath);
     }
 
     private void removeIncomingFile(Path filePath) throws IOException {

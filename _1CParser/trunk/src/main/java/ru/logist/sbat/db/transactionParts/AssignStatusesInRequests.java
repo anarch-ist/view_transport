@@ -14,7 +14,6 @@ import java.util.List;
 
 public class AssignStatusesInRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<StatusData> updateStatuses;
 
     public AssignStatusesInRequests(List<StatusData> updateStatuses) {
@@ -42,7 +41,7 @@ public class AssignStatusesInRequests extends TransactionPart{
             try {
                 setRequestId(requestsUpdatePrSt, 5, updateStatus.getRequestId(), allRequestsAsKeyPairs);
             } catch (DBCohesionException e) {
-                cohesionLogger.warn(e);
+                logger.warn(e);
                 continue;
             }
             requestsUpdatePrSt.addBatch();

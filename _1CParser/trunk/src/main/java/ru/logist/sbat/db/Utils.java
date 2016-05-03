@@ -16,7 +16,7 @@ public class Utils {
         return RandomStringUtils.randomAlphanumeric(16);
     }
 
-    public static String generatePassword(String pass, String salt) {
+    public static String generatePassAndSalt(String pass, String salt) {
         Objects.requireNonNull(pass);
         Objects.requireNonNull(salt);
         if (salt.length() != 16)

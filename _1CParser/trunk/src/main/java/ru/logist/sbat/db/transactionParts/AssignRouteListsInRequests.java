@@ -17,7 +17,6 @@ import java.util.Set;
  */
 public class AssignRouteListsInRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<RouteListsData> updateRouteLists;
 
     public AssignRouteListsInRequests(List<RouteListsData> updateRouteLists) {
@@ -32,7 +31,6 @@ public class AssignRouteListsInRequests extends TransactionPart{
         BidiMap<String, Integer> allRequestsAsKeyPairs = Selects.getInstance().allRequestsAsKeyPairs();
         BidiMap<String, Integer> allPointsAsKeyPairs = Selects.getInstance().allPointsAsKeyPairs();
         BidiMap<String, Integer> allRouteListsAsKeyPairs = Selects.getInstance().allRouteListsAsKeyPairs();
-
         PreparedStatement requestUpdatePreparedStatement = connection.prepareStatement(
                 "UPDATE requests SET " +
                         "routeListID = ?," +
@@ -43,23 +41,24 @@ public class AssignRouteListsInRequests extends TransactionPart{
         for (RouteListsData updateRouteList : updateRouteLists) {
             Set<String> requests = updateRouteList.getRequests(); // list of requests inside routeList
 
-            Integer routeListId = allRouteListsAsKeyPairs.get(updateRouteList.getRouteListIdExternal());
+            Integer routeListId;
             Integer warehousePointId;
             try {
+                routeListId = getRouteListId(allRouteListsAsKeyPairs, updateRouteList.getRouteListIdExternal());
                 warehousePointId = getWarehousePointId(allPointsAsKeyPairs, updateRouteList.getPointDepartureId());
             } catch (DBCohesionException e) {
-                cohesionLogger.warn(e);
+                logger.warn(e);
                 continue;
             }
 
             for(Object requestIDExternalAsObject: requests) {
                 String requestIDExternal = (String) requestIDExternalAsObject;
-                requestUpdatePreparedStatement.setInt(1, routeListId);
-                requestUpdatePreparedStatement.setInt(2, warehousePointId);
                 try {
+                    requestUpdatePreparedStatement.setInt(1, routeListId);
+                    requestUpdatePreparedStatement.setInt(2, warehousePointId);
                     setRequestId(requestUpdatePreparedStatement, requestIDExternal, allRequestsAsKeyPairs.get(requestIDExternal), 3);
                 } catch (DBCohesionException e) {
-                    cohesionLogger.warn(e);
+                    logger.warn(e);
                     continue;
                 }
                 requestUpdatePreparedStatement.addBatch();
@@ -69,6 +68,14 @@ public class AssignRouteListsInRequests extends TransactionPart{
         int[] requestsAffectedRecords = requestUpdatePreparedStatement.executeBatch();
         logger.info("UPDATE requests assign routeLists completed, affected records size = [{}]", requestsAffectedRecords.length);
         return requestUpdatePreparedStatement;
+    }
+
+    private Integer getRouteListId(BidiMap<String, Integer> allRouteListsAsKeyPairs, String routeListIdExternal) throws DBCohesionException {
+        Integer routeListId = allRouteListsAsKeyPairs.get(routeListIdExternal);
+        if (routeListId == null) {
+            throw new DBCohesionException(this.getClass().getSimpleName(), RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, RouteListsData.FN_ROUTE_LIST_ID_EXTERNAL, routeListIdExternal, "route_lists");
+        }
+        return routeListId;
     }
 
     private Integer getWarehousePointId(BidiMap<String, Integer> allPointsAsKeyPairs, String pointIdExternal) throws DBCohesionException {
@@ -86,4 +93,6 @@ public class AssignRouteListsInRequests extends TransactionPart{
             requestUpdatePreparedStatement.setInt(parameterIndex, requestId);
         }
     }
+
+
 }

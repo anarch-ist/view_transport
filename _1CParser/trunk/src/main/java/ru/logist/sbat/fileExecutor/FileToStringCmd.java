@@ -15,20 +15,19 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.zip.ZipInputStream;
 
-public class FileToStringCmd implements Command<String> {
+public class FileToStringCmd {
 
     private static final String INCOMING_FILE_EXTENSION_ZIP = ".zip";
     private static final String INCOMING_FILE_EXTENSION_PKG = ".pkg";
     private Path filePath;
 
-    @Override
-    public String execute() throws CommandException {
+    public FileToStringCmd(Path filePath) {
+        this.filePath = filePath;
+    }
+
+    public String execute() throws IOException, ValidatorException {
         Objects.requireNonNull(filePath);
-        try {
-            return getStringFromFile(filePath);
-        } catch (ValidatorException|IOException e) {
-            throw new CommandException(e);
-        }
+        return getStringFromFile(filePath);
     }
 
     /**
@@ -75,7 +74,4 @@ public class FileToStringCmd implements Command<String> {
         }
     }
 
-    public void setFilePath(Path filePath) {
-        this.filePath = filePath;
-    }
 }

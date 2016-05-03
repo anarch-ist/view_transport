@@ -31,10 +31,10 @@ public class UpdateUsersFromTraders extends TransactionPart {
                 "INSERT INTO users (userIDExternal, dataSourceID, login, salt, passAndSalt, userRoleID, userName, phoneNumber, email, position)\n" +
                         "  VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n" +
                         "ON DUPLICATE KEY UPDATE\n" +
-                        "  login  = VALUES(login),\n" +
+                        "  login       = VALUES(login),\n" +
                         "  salt        = VALUES(salt),\n" +
                         "  passAndSalt = VALUES(passAndSalt),\n" +
-                        "  userRoleID = VALUES(userRoleID),\n" +
+                        "  userRoleID  = VALUES(userRoleID),\n" +
                         "  userName    = VALUES(userName),\n" +
                         "  phoneNumber = VALUES(phoneNumber),\n" +
                         "  email       = VALUES(email),\n" +
@@ -48,7 +48,7 @@ public class UpdateUsersFromTraders extends TransactionPart {
                 String salt = Utils.generateSalt();
                 result.setString(3, updateUser.getTraderLogin());
                 result.setString(4, salt);
-                result.setString(5, Utils.generatePassword(updateUser.getTraderPassword(), salt));
+                result.setString(5, Utils.generatePassAndSalt(updateUser.getTraderPassword(), salt));
             }
             else {
                 // random values

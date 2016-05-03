@@ -13,12 +13,9 @@ public class BeanIntoDataBaseCmd implements Command<TransactionResult> {
     private DataFrom1c dataFrom1c;
     private DBManager dbManager;
 
-    public void setDbManager(DBManager dbManager) {
-        this.dbManager = dbManager;
-    }
-
-    public void setDataFrom1c(DataFrom1c dataFrom1c) {
+    public BeanIntoDataBaseCmd(DataFrom1c dataFrom1c, DBManager dbManager) {
         this.dataFrom1c = dataFrom1c;
+        this.dbManager = dbManager;
     }
 
     @Override

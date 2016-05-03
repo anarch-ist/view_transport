@@ -16,7 +16,6 @@ import java.util.List;
 
 public class UpdateUsersFromClients extends TransactionPart {
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private static final String CLIENT_MANAGER = "CLIENT_MANAGER";
     public static final String CLIENT_USER_SUFFIX = "-client";
     private List<ClientData> updateClients;
@@ -53,7 +52,7 @@ public class UpdateUsersFromClients extends TransactionPart {
                 String salt = Utils.generateSalt();
                 result.setString(3, login);
                 result.setString(4, salt);
-                result.setString(5, Utils.generatePassword(updateClient.getClientPassword(), salt));
+                result.setString(5, Utils.generatePassAndSalt(updateClient.getClientPassword(), salt));
             }
             else {
                 // random values
@@ -67,7 +66,7 @@ public class UpdateUsersFromClients extends TransactionPart {
             try {
                 setClientId(allClientsAsKeyPairs, result, 8, updateClient.getClientId());
             } catch (DBCohesionException e) {
-                cohesionLogger.warn(e);
+                logger.warn(e);
                 continue;
             }
 

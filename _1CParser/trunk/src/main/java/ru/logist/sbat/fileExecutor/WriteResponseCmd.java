@@ -10,38 +10,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class WriteResponseCmd implements Command<Void> {
+public class WriteResponseCmd {
     public static final String RESPONSE_FILE_EXTENSION = ".ans";
     private static final Logger logger = LogManager.getLogger();
     private Path filePath;
     private Path responseDir;
     private TransactionResult transactionResult;
 
-    public void setFilePath(Path filePath) {
+    public WriteResponseCmd(Path filePath, Path responseDir, TransactionResult transactionResult) {
         this.filePath = filePath;
-    }
-    public void setResponseDir(Path responseDir) {
         this.responseDir = responseDir;
-    }
-    public void setTransactionResult(TransactionResult transactionResult) {
         this.transactionResult = transactionResult;
     }
 
-    @Override
-    public Void execute() throws CommandException {
+    public void execute() throws IOException {
         Objects.requireNonNull(filePath);
         Objects.requireNonNull(responseDir);
         Objects.requireNonNull(transactionResult);
-        try {
-            if (transactionResult == null) {
-                writeBadFileResponse(filePath);
-            } else {
-                writeDbWorkResponse(transactionResult);
-            }
-        } catch (IOException e ) {
-            throw new CommandException(e);
+
+        if (transactionResult == null) {
+            writeBadFileResponse(filePath);
+        } else {
+            writeDbWorkResponse(transactionResult);
         }
-        return null;
     }
 
     private void writeBadFileResponse(Path filePath) throws IOException {

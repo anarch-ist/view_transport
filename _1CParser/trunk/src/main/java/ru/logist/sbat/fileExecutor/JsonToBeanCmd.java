@@ -6,20 +6,16 @@ import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
 
 import java.util.Objects;
 
-public class JsonToBeanCmd implements Command<DataFrom1c> {
+public class JsonToBeanCmd {
     private JSONObject jsonObject;
-    public void setJsonObject(JSONObject jsonObject) {
+
+    public JsonToBeanCmd(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
     }
 
-    @Override
-    public DataFrom1c execute() throws CommandException {
+    public DataFrom1c execute() throws ValidatorException {
         Objects.requireNonNull(jsonObject);
-        try {
-            return new DataFrom1c(jsonObject);
-        } catch (ValidatorException e) {
-            throw new CommandException(e);
-        }
+        return new DataFrom1c(jsonObject);
     }
 
 }

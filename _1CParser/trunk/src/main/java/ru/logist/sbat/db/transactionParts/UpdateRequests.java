@@ -15,7 +15,6 @@ import java.util.List;
 
 public class UpdateRequests extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<RequestsData> updateRequests;
 
     public UpdateRequests(List<RequestsData> updateRequests) {
@@ -93,7 +92,7 @@ public class UpdateRequests extends TransactionPart{
                 setDestinationPoint(allPointsKeyMap, requestsPreparedStatement, updateRequest, 6, updateRequest.getAddressId());
                 setMarketAgentUserId(allUsersKeyMap, requestsPreparedStatement, 7, updateRequest.getTraderId());
             } catch (DBCohesionException e) {
-                cohesionLogger.warn(e);
+                logger.warn(e);
                 continue;
             }
             requestsPreparedStatement.setString(8, updateRequest.getInvoiceNumber());

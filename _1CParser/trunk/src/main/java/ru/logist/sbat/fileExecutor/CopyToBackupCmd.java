@@ -10,30 +10,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-public class CopyToBackupCmd implements Command<Void>{
+public class CopyToBackupCmd {
     private static final Logger logger = LogManager.getLogger();
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss") ;
 
     private Path backupDir;
     private Path filePath;
 
-    public void setBackupDir(Path backupDir) {
+    public CopyToBackupCmd(Path backupDir, Path filePath) {
         this.backupDir = backupDir;
-    }
-    public void setFilePath(Path filePath) {
         this.filePath = filePath;
     }
 
-    @Override
-    public Void execute() throws CommandException {
+    public void execute() throws IOException {
         Objects.requireNonNull(filePath);
         Objects.requireNonNull(backupDir);
-        try {
-            copyToBackup(filePath);
-        } catch (IOException e) {
-            throw new CommandException(e);
-        }
-        return null;
+        copyToBackup(filePath);
     }
 
     private void copyToBackup(Path filePath) throws IOException {

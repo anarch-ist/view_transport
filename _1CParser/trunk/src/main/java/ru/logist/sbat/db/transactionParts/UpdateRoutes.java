@@ -17,7 +17,6 @@ import java.util.Map;
 
 public class UpdateRoutes extends TransactionPart{
     private static final Logger logger = LogManager.getLogger();
-    private static final Logger cohesionLogger = LogManager.getLogger("dbCohesion");
     private List<DirectionsData> updateRoutesArray;
     private List<RouteListsData> updateRouteLists;
 
@@ -63,7 +62,7 @@ public class UpdateRoutes extends TransactionPart{
                     String generatedRouteName = getGeneratedRouteName(allPoints, allPointNamesById, updateRouteList.getPointArrivalId(), updateRouteList.getPointDepartureId());
                     preparedStatement.setString(3, generatedRouteName);
                 } catch (DBCohesionException e) {
-                    cohesionLogger.warn(e);
+                    logger.warn(e);
                     continue;
                 }
                 preparedStatement.addBatch();
