@@ -21,7 +21,7 @@ public class DBManager {
         try {
             connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.fatal(e);
             System.exit(-1);
         }
     }
@@ -35,17 +35,13 @@ public class DBManager {
      * @return never returns null
      * @param dataFrom1c
      */
-    public TransactionResult updateDataFromJSONObject(DataFrom1c dataFrom1c) throws DBCohesionException, SQLException {
+    public void updateDataFromJSONObject(DataFrom1c dataFrom1c) throws DBCohesionException, SQLException {
         String server = dataFrom1c.getServer();
 
-        logger.info(GlobalUtils.getParameterizedString("server = {} \n", server));
+        logger.info(GlobalUtils.getParameterizedString("\nserver = {}", server));
         Integer packageNumber = dataFrom1c.getPackageNumber().intValue();
         logger.info(GlobalUtils.getParameterizedString("packageNumber = {}", packageNumber));
         logger.info(GlobalUtils.getParameterizedString("dateCreated = {}", dataFrom1c.getCreated()));
-
-        TransactionResult transactionResult = new TransactionResult();
-        transactionResult.setServer(server);
-        transactionResult.setPackageNumber(packageNumber);
 
         TransactionExecutor transactionExecutor = new TransactionExecutor();
         transactionExecutor.setConnection(connection);
@@ -84,8 +80,6 @@ public class DBManager {
         try {
             transactionExecutor.executeAll();
             connection.commit();
-            transactionResult.setStatus(TransactionResult.OK_STATUS);
-            return transactionResult;
         } finally {
             transactionExecutor.closeAll();
         }

@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logist.sbat.fileExecutor.StringToJsonCmd;
-import ru.logist.sbat.fileExecutor.WriteResponseCmd;
+import ru.logist.sbat.fileExecutor.WriteDbWorkResponseCmd;
 import ru.logist.sbat.cmd.CmdLineParser;
 import ru.logist.sbat.cmd.Option;
 import ru.logist.sbat.cmd.Options;
@@ -51,7 +51,7 @@ public class App {
         try {
             systemResourcesContainer = new SystemResourcesContainer(propertiesPojo, logger);
         } catch (ResourceInitException e) {
-            logger.error(e.getMessage());
+            logger.fatal(e.getMessage());
             System.exit(-1);
         }
 
@@ -136,7 +136,7 @@ public class App {
                         rollback(timestamp);
                     }
                 } catch (Exception e) {
-                    logger.error(e);
+                    logger.fatal(e);
                     System.exit(-1);
                 }
             }
@@ -157,9 +157,13 @@ public class App {
         logger.info("response directory cleaned");
 
         for (String dataString : dataStrings) {
-            DataFrom1c dataFrom1c = new DataFrom1c(new StringToJsonCmd().getJsonObjectFromString(dataString));
-            TransactionResult transactionResult = dbManager.updateDataFromJSONObject(dataFrom1c);
-            Path responsePath = responseDir.resolve(transactionResult.getServer() + WriteResponseCmd.RESPONSE_FILE_EXTENSION);
+            DataFrom1c dataFrom1c = new DataFrom1c(new StringToJsonCmd(dataString).execute());
+            TransactionResult transactionResult = new TransactionResult();
+            transactionResult.setServer(dataFrom1c.getServer());
+            transactionResult.setPackageNumber(dataFrom1c.getPackageNumber().intValue());
+            transactionResult.setStatus(TransactionResult.OK_STATUS);
+            dbManager.updateDataFromJSONObject(dataFrom1c);
+            Path responsePath = responseDir.resolve(transactionResult.getServer() + WriteDbWorkResponseCmd.RESPONSE_FILE_EXTENSION);
             FileUtils.writeStringToFile(responsePath.toFile(), transactionResult.toString(), StandardCharsets.UTF_8);
         }
         // remove data from exchange before timestamp

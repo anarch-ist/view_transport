@@ -9,7 +9,7 @@ import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
 import java.sql.SQLException;
 import java.util.Objects;
 
-public class BeanIntoDataBaseCmd implements Command<TransactionResult> {
+public class BeanIntoDataBaseCmd {
     private DataFrom1c dataFrom1c;
     private DBManager dbManager;
 
@@ -18,15 +18,9 @@ public class BeanIntoDataBaseCmd implements Command<TransactionResult> {
         this.dbManager = dbManager;
     }
 
-    @Override
-    public TransactionResult execute() throws CommandException {
+    public void execute() throws DBCohesionException, SQLException {
         Objects.requireNonNull(dataFrom1c);
         Objects.requireNonNull(dbManager);
-        try {
-            return dbManager.updateDataFromJSONObject(dataFrom1c);
-        } catch (DBCohesionException|SQLException e) {
-            DBUtils.rollbackQuietly(dbManager.getConnection());
-            throw new CommandException(e);
-        }
+        dbManager.updateDataFromJSONObject(dataFrom1c);
     }
 }

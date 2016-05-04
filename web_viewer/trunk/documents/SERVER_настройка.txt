@@ -114,6 +114,7 @@ thread_cache_size = 16 (указывает число кэшируемых потоков, удовенное количество
 
 key_buffer              = 1200M
 
+wait_timeout  - время в секундах в течение которого mysql будет поддерживать неактивное соединение
 
 НАСТРОЙКИ:
 [mysqld]
@@ -131,6 +132,7 @@ read_buffer_size = 512K
 read_rnd_buffer_size = 1M
 sort_buffer_size = 10M
 table_open_cache = 100
+wait_timeout = 2147483
 
 innodb_buffer_pool_size = 5G
 innodb_log_file_size = 1G

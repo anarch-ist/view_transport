@@ -30,7 +30,7 @@ public class StringToJsonCmd {
         return getJsonObjectFromString(fileAsString);
     }
 
-    public JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {
+    protected JSONObject getJsonObjectFromString(String jsonFileAsString) throws ParseException, JsonPException {
         // идти по файлу используя regex и исправлять все ошибки
         String jsonFileAsStringWithoutBom = jsonFileAsString.replaceAll("\uFEFF", "");
         String fixedString = fixString(jsonFileAsStringWithoutBom);

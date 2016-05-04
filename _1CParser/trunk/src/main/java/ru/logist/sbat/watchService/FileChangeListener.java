@@ -18,8 +18,6 @@ import java.util.concurrent.Executors;
 public class FileChangeListener implements OnFileChangeListener {
 
     private static final Logger logger = LogManager.getLogger();
-
-
     private static final String TEMP_FILE_EXTENSION = ".tmp";
 
     private final DBManager dbManager;
@@ -45,12 +43,12 @@ public class FileChangeListener implements OnFileChangeListener {
             waitForFileReleaseLock(filePath);
 
             try {
-                new CommandsBuilder()
-                        .setResources(dbManager, filePath, responseDir, backupDir)
-                        .executeAll();
-            } catch (CommandException e) {
-                logger.error(e);
+                new CommandsExecutor(dbManager, filePath, responseDir, backupDir).executeAll();
+            } catch (FatalException e) {
+                logger.fatal(e);
+                System.exit(-1);
             }
+
         });
     }
 

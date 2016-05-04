@@ -24,7 +24,7 @@ public class FunctionalTests {
     private static final Logger logger = LogManager.getLogger();
     private static Connection connection;
     private static TestHelper testHelper;
-    private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException, CommandException, DBCohesionException, SQLException {
+    private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException, DBCohesionException, SQLException {
         Path path = Paths.get(FunctionalTests.class.getResource(fileName).toURI());
         testHelper.loadFileInDatabase(path);
     }

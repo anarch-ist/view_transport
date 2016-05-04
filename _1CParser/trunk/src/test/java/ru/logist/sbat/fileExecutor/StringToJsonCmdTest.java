@@ -1,15 +1,12 @@
 package ru.logist.sbat.fileExecutor;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
-
-import static org.testng.Assert.*;
 
 public class StringToJsonCmdTest {
 
@@ -21,7 +18,7 @@ public class StringToJsonCmdTest {
     @Test
     public void testFixString() throws Exception {
         String string = read(this.getClass().getResource("LOG.pkg").openStream());
-        StringToJsonCmd stringToJsonCmd = new StringToJsonCmd();
+        StringToJsonCmd stringToJsonCmd = new StringToJsonCmd(string);
         String fixedString = stringToJsonCmd.fixString(string);
         System.out.println(fixedString);
         stringToJsonCmd.fixString(fixedString);

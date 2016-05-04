@@ -2,12 +2,15 @@ package ru.logist.sbat.testUtils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.parser.ParseException;
 import ru.logist.sbat.fileExecutor.FileToStringCmd;
 import ru.logist.sbat.fileExecutor.JsonToBeanCmd;
 import ru.logist.sbat.fileExecutor.StringToJsonCmd;
 import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
+import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;
+import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
 import ru.logist.sbat.resourcesInit.PropertiesPojo;
 import ru.logist.sbat.resourcesInit.ResourceInitException;
 import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
@@ -41,20 +44,14 @@ public class TestHelper {
         return connection;
     }
 
-    public DataFrom1c getBeanObjectFromFile(Path path) throws CommandException {
-        FileToStringCmd fileToStringCmd = new FileToStringCmd();
-        fileToStringCmd.setFilePath(path);
-
-        StringToJsonCmd stringToJsonCmd = new StringToJsonCmd();
-        String fileAsString = fileToStringCmd.execute();
-        stringToJsonCmd.setFileAsString(fileAsString);
-
-        JsonToBeanCmd jsonToBeanCmd = new JsonToBeanCmd();
-        jsonToBeanCmd.setJsonObject(stringToJsonCmd.execute());
+    public DataFrom1c getBeanObjectFromFile(Path path) throws IOException, ValidatorException, JsonPException, ParseException {
+        FileToStringCmd fileToStringCmd = new FileToStringCmd(path);
+        StringToJsonCmd stringToJsonCmd = new StringToJsonCmd(fileToStringCmd.execute());
+        JsonToBeanCmd jsonToBeanCmd = new JsonToBeanCmd(stringToJsonCmd.execute());
         return jsonToBeanCmd.execute();
     }
 
-    public void loadFileInDatabase(Path path) throws CommandException, DBCohesionException, SQLException {
+    public void loadFileInDatabase(Path path) throws DBCohesionException, SQLException, ValidatorException, JsonPException, ParseException, IOException {
         dbManager.updateDataFromJSONObject(getBeanObjectFromFile(path));
     }
 
