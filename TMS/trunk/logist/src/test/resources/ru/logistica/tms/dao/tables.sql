@@ -186,14 +186,16 @@ CREATE TYPE DOC_STATE AS ENUM ('FREE', 'OCCUPIED', 'OCCUPIED_BY_BOSS');
 -- entity
 CREATE TABLE docs_container (
   containerID SERIAL,
-  docID       INTEGER,
-  timeDiffID  INTEGER,
-  date        TIMESTAMP,
-  docState    DOC_STATE DEFAULT 'FREE',
+  docID       INTEGER NOT NULL,
+  timeDiffID  INTEGER NOT NULL,
+  date        TIMESTAMP NOT NULL,
+  docState    DOC_STATE DEFAULT 'FREE' NOT NULL,
+  donutID     INTEGER NULL,
   UNIQUE (docID, timeDiffID, date),
   PRIMARY KEY (containerID),
   FOREIGN KEY (docID) REFERENCES docs (docID),
-  FOREIGN KEY (timeDiffID) REFERENCES time_diffs (timeDiffID)
+  FOREIGN KEY (timeDiffID) REFERENCES time_diffs (timeDiffID),
+  FOREIGN KEY (donutID) REFERENCES donut_lists (donutID)
 );
 
 
@@ -245,13 +247,13 @@ EXECUTE PROCEDURE insertHistoryDelete();
 -- -------------------------------------------------------------------------------------------------------------------
 
 
-CREATE TABLE donut_statuses (
-  donutStatusID      VARCHAR(32),
-  donutStatusRusName VARCHAR(255),
-  PRIMARY KEY (donutStatusID)
+CREATE TABLE wants_statuses (
+  wantStatusID      VARCHAR(32),
+  wantStatusRusName VARCHAR(255),
+  PRIMARY KEY (wantStatusID)
 );
 
-INSERT INTO donut_statuses
+INSERT INTO wants_statuses
 VALUES
   ('CREATED', 'Создан пакет для отправки'),
   ('CANCELLED_WH', 'Отменен складом'),
@@ -259,6 +261,9 @@ VALUES
   ('ERROR', 'Ошибка'),
   ('DELIVERED', 'Доставлен');
 -- entity
+
+
+-- содержит в себе список всех заказов с указанием дока - в который привозится товар, и временных промежутков(timeDiff)
 CREATE TABLE donut_lists (
   donutID           SERIAL,
   creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -267,15 +272,9 @@ CREATE TABLE donut_lists (
   driver            VARCHAR(255) NULL,
   driverPhoneNumber VARCHAR(12)  NULL,
   licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  status            VARCHAR(32)  NOT NULL,
-  comment           VARCHAR(255) NULL,
-  transitPointID    INTEGER      NOT NULL, -- пункт доставки (куда привезут сначала) - перенести на уровень пончика
+  comment           TEXT         NULL,
   PRIMARY KEY (donutID),
-  FOREIGN KEY (status) REFERENCES donut_statuses (donutStatusID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE,
-  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID),
-  FOREIGN KEY (transitPointID) REFERENCES points (pointID)
+  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
 );
 
 -- CREATE TRIGGER after_donut_list_insert AFTER INSERT ON donut_lists
@@ -312,13 +311,9 @@ CREATE TABLE donut_list_history (
   driver            VARCHAR(255) NULL,
   driverPhoneNumber VARCHAR(12)  NULL,
   licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  status            VARCHAR(32)  NOT NULL,
   comment           VARCHAR(255) NULL,
   transitPointID    INTEGER      NOT NULL, -- пункт доставки (куда привезут сначала) - перенести на уровень пончика
-  PRIMARY KEY (donutHistoryID),
-  FOREIGN KEY (status) REFERENCES donut_statuses (donutStatusID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE
+  PRIMARY KEY (donutHistoryID)
 );
 
 -- листы заказа
@@ -351,7 +346,7 @@ CREATE TABLE wants (
   FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
     ON DELETE SET NULL
     ON UPDATE CASCADE,
-  FOREIGN KEY (wantsStatusID) REFERENCES donut_statuses (donutStatusID)
+  FOREIGN KEY (wantsStatusID) REFERENCES wants_statuses (wantsStatusID)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
   FOREIGN KEY (donutID) REFERENCES donut_lists (donutID)
@@ -382,7 +377,7 @@ CREATE TABLE wants_history (
   donutID                 INTEGER        NULL,
 
   PRIMARY KEY (wantsHistoryID),
-  FOREIGN KEY (wantsStatusID) REFERENCES donut_statuses (donutStatusID)
+  FOREIGN KEY (wantsStatusID) REFERENCES wants_statuses (wantsStatusID)
   ON DELETE RESTRICT
   ON UPDATE RESTRICT
 );
