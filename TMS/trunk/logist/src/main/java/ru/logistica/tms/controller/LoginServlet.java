@@ -20,20 +20,21 @@ public class LoginServlet extends HttpServlet {
 
     private static final Logger logger = LogManager.getLogger();
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/login.html").forward(request, response);
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String login = request.getParameter("login");
         String passMd5 = request.getParameter("password");
         AuthResult authResult = DaoManager.checkUser(login, passMd5);
 
-
-
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
 
-
-
         if (authResult.isAuthSuccess()) {
-            JsonObject jsonObject = objectBuilder.add("redirect", "success.jsp").build();
+            JsonObject jsonObject = objectBuilder.add("redirect", "main").build();
             HttpSession session = request.getSession();
             session.setAttribute("user", authResult.getUser());
             sendJson(response, jsonObject);

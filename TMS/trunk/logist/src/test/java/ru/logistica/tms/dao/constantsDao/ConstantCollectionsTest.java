@@ -75,14 +75,14 @@ public class ConstantCollectionsTest {
 
     @Test
     public void testGetDonutStatuses() throws Exception {
-        ConstantCollections.setDonutStatuses(constantsDao.getDonutStatuses());
+        ConstantCollections.setWantStatuses(constantsDao.getWantStatuses());
         ConnectionManager.getConnection().commit();
-        Set<DonutStatus> donutStatuses = ConstantCollections.getDonutStatuses();
-        Assert.assertTrue(donutStatuses.size() != 0);
-        Assert.assertEquals(donutStatuses.size(), 5);
+        Set<WantStatus> wantStatuses = ConstantCollections.getWantStatuses();
+        Assert.assertTrue(wantStatuses.size() != 0);
+        Assert.assertEquals(wantStatuses.size(), 5);
         boolean isContainedDonutStatus = false;
-        for (DonutStatus donutStatus : donutStatuses) {
-            if (donutStatus.getDonutStatusId().equals("ERROR") && donutStatus.getDonutStatusRusName().equals("Ошибка")) {
+        for (WantStatus wantStatus : wantStatuses) {
+            if (wantStatus.getWantStatusId().equals("ERROR") && wantStatus.getWantStatusRusName().equals("Ошибка")) {
                 isContainedDonutStatus = true;
             }
         }

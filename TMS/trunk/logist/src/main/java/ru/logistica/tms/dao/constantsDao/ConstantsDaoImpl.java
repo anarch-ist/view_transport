@@ -74,19 +74,19 @@ public class ConstantsDaoImpl implements ConstantsDao {
     }
 
     @Override
-    public Set<DonutStatus> getDonutStatuses() throws DaoException {
-        final Set<DonutStatus> result = new HashSet<>();
+    public Set<WantStatus> getWantStatuses() throws DaoException {
+        final Set<WantStatus> result = new HashSet<>();
         Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "SELECT * from donut_statuses";
+                String sql = "SELECT * from wants_statuses";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()){
-                        DonutStatus donutStatus = new DonutStatus();
-                        donutStatus.setDonutStatusId(resultSet.getString("donutStatusID"));
-                        donutStatus.setDonutStatusRusName(resultSet.getString("donutStatusRusName"));
-                        result.add(donutStatus);
+                        WantStatus wantStatus = new WantStatus();
+                        wantStatus.setWantStatusId(resultSet.getString("wantStatusID"));
+                        wantStatus.setWantStatusRusName(resultSet.getString("wantStatusRusName"));
+                        result.add(wantStatus);
                     }
                 }
             }

@@ -49,8 +49,8 @@ public class DaoManager {
                 ConstantCollections.setPermissions(permissions);
                 Set<TimeDiff> timeDiffs = constantsDao.getTimeDiffs();
                 ConstantCollections.setTimeDiffs(timeDiffs);
-                Set<DonutStatus> donutStatuses = constantsDao.getDonutStatuses();
-                ConstantCollections.setDonutStatuses(donutStatuses);
+                Set<WantStatus> wantStatuses = constantsDao.getWantStatuses();
+                ConstantCollections.setWantStatuses(wantStatuses);
             }
         });
     }

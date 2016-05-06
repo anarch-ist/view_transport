@@ -24,6 +24,24 @@ CREATE TABLE suppliers (
 
 
 -- -------------------------------------------------------------------------------------------------------------------
+--                                                 DONUTS
+-- -------------------------------------------------------------------------------------------------------------------
+
+-- содержит в себе список всех заказов с указанием дока - в который привозится товар, и временных промежутков(timeDiff)
+CREATE TABLE donut_lists (
+  donutID           SERIAL,
+  creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  palletsQty        INTEGER      NULL,
+  supplierID        INTEGER      NOT NULL,
+  driver            VARCHAR(255) NULL,
+  driverPhoneNumber VARCHAR(12)  NULL,
+  licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
+  comment           TEXT         NULL,
+  PRIMARY KEY (donutID),
+  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
+);
+
+-- -------------------------------------------------------------------------------------------------------------------
 --                                                 POINTS
 -- -------------------------------------------------------------------------------------------------------------------
 
@@ -183,14 +201,15 @@ INSERT INTO time_diffs VALUES
   (37), (38), (39), (40), (41), (42), (43), (44), (45), (46), (47), (48);
 
 CREATE TYPE DOC_STATE AS ENUM ('FREE', 'OCCUPIED', 'OCCUPIED_BY_BOSS');
+
 -- entity
 CREATE TABLE docs_container (
   containerID SERIAL,
-  docID       INTEGER NOT NULL,
-  timeDiffID  INTEGER NOT NULL,
-  date        TIMESTAMP NOT NULL,
+  docID       INTEGER                  NOT NULL,
+  timeDiffID  INTEGER                  NOT NULL,
+  date        TIMESTAMP                NOT NULL,
   docState    DOC_STATE DEFAULT 'FREE' NOT NULL,
-  donutID     INTEGER NULL,
+  donutID     INTEGER                  NULL,
   UNIQUE (docID, timeDiffID, date),
   PRIMARY KEY (containerID),
   FOREIGN KEY (docID) REFERENCES docs (docID),
@@ -262,21 +281,6 @@ VALUES
   ('DELIVERED', 'Доставлен');
 -- entity
 
-
--- содержит в себе список всех заказов с указанием дока - в который привозится товар, и временных промежутков(timeDiff)
-CREATE TABLE donut_lists (
-  donutID           SERIAL,
-  creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  palletsQty        INTEGER      NULL,
-  supplierID        INTEGER      NOT NULL,
-  driver            VARCHAR(255) NULL,
-  driverPhoneNumber VARCHAR(12)  NULL,
-  licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  comment           TEXT         NULL,
-  PRIMARY KEY (donutID),
-  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
-);
-
 -- CREATE TRIGGER after_donut_list_insert AFTER INSERT ON donut_lists
 -- FOR EACH ROW
 --   INSERT INTO donut_list_history
@@ -319,65 +323,65 @@ CREATE TABLE donut_list_history (
 -- листы заказа
 -- entity
 CREATE TABLE wants (
-  wantsID                 SERIAL,
-  wantsNumber             VARCHAR(16)    NOT NULL,
-  wantstDate              DATE           NULL,
-  supplierID              INTEGER        NOT NULL,
-  destinationPointID      INTEGER        NULL, -- пункт доставки (конечный)
-  invoiceNumber           VARCHAR(255)   NULL,
-  invoiceDate             DATE           NULL,
-  deliveryDate            TIMESTAMP      NULL,
-  boxQty                  INTEGER        NULL,
-  weight                  INTEGER        NULL, -- масса в граммах
-  volume                  INTEGER        NULL, -- в кубических сантиметрах
-  goodsCost               DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
-  lastStatusUpdated       TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user
-  lastModifiedBy          INTEGER        NULL, -- один из пользователей - это parser.
-  wantsStatusID           VARCHAR(32)    NOT NULL,
-  commentForStatus        TEXT           NULL,
-  donutID                 INTEGER        NULL,
+  wantsID            SERIAL,
+  wantsNumber        VARCHAR(16)    NOT NULL,
+  wantstDate         DATE           NULL,
+  supplierID         INTEGER        NOT NULL,
+  destinationPointID INTEGER        NULL, -- пункт доставки (конечный)
+  invoiceNumber      VARCHAR(255)   NULL,
+  invoiceDate        DATE           NULL,
+  deliveryDate       TIMESTAMP      NULL,
+  boxQty             INTEGER        NULL,
+  weight             INTEGER        NULL, -- масса в граммах
+  volume             INTEGER        NULL, -- в кубических сантиметрах
+  goodsCost          DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
+  lastStatusUpdated  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user
+  lastModifiedBy     INTEGER        NULL, -- один из пользователей - это parser.
+  wantStatusID       VARCHAR(32)    NOT NULL,
+  commentForStatus   TEXT           NULL,
+  donutID            INTEGER        NULL,
   PRIMARY KEY (wantsID),
   FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE,
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE,
   FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
-    ON DELETE RESTRICT
-    ON UPDATE CASCADE,
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE,
   FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE,
-  FOREIGN KEY (wantsStatusID) REFERENCES wants_statuses (wantsStatusID)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
+  ON DELETE SET NULL
+  ON UPDATE CASCADE,
+  FOREIGN KEY (wantStatusID) REFERENCES wants_statuses (wantStatusID)
+  ON DELETE RESTRICT
+  ON UPDATE RESTRICT,
   FOREIGN KEY (donutID) REFERENCES donut_lists (donutID)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE
+  ON DELETE SET NULL
+  ON UPDATE CASCADE
 );
 
 
 CREATE TABLE wants_history (
   wantsHistoryID     SERIAL,
   autoTimeMark       TIMESTAMP      NOT NULL,
-  wantsID                 SERIAL,
-  wantsNumber             VARCHAR(16)    NOT NULL,
-  wantstDate              DATE           NULL,
-  supplierID              INTEGER        NOT NULL,
-  destinationPointID      INTEGER        NULL, -- пункт доставки (конечный)
-  invoiceNumber           VARCHAR(255)   NULL,
-  invoiceDate             DATE           NULL,
-  deliveryDate            TIMESTAMP      NULL,
-  boxQty                  INTEGER        NULL,
-  weight                  INTEGER        NULL, -- масса в граммах
-  volume                  INTEGER        NULL, -- в кубических сантиметрах
-  goodsCost               DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
-  lastStatusUpdated       TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user
-  lastModifiedBy          INTEGER        NULL, -- один из пользователей - это parser.
-  wantsStatusID           VARCHAR(32)    NOT NULL,
-  commentForStatus        TEXT           NULL,
-  donutID                 INTEGER        NULL,
+  wantsID            SERIAL,
+  wantsNumber        VARCHAR(16)    NOT NULL,
+  wantstDate         DATE           NULL,
+  supplierID         INTEGER        NOT NULL,
+  destinationPointID INTEGER        NULL, -- пункт доставки (конечный)
+  invoiceNumber      VARCHAR(255)   NULL,
+  invoiceDate        DATE           NULL,
+  deliveryDate       TIMESTAMP      NULL,
+  boxQty             INTEGER        NULL,
+  weight             INTEGER        NULL, -- масса в граммах
+  volume             INTEGER        NULL, -- в кубических сантиметрах
+  goodsCost          DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
+  lastStatusUpdated  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user
+  lastModifiedBy     INTEGER        NULL, -- один из пользователей - это parser.
+  wantStatusID       VARCHAR(32)    NOT NULL,
+  commentForStatus   TEXT           NULL,
+  donutID            INTEGER        NULL,
 
   PRIMARY KEY (wantsHistoryID),
-  FOREIGN KEY (wantsStatusID) REFERENCES wants_statuses (wantsStatusID)
+  FOREIGN KEY (wantStatusID) REFERENCES wants_statuses (wantStatusID)
   ON DELETE RESTRICT
   ON UPDATE RESTRICT
 );

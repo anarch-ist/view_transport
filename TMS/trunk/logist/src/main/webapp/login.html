@@ -3,10 +3,11 @@
     <meta charset="UTF-8">
     <title>Login Page</title>
 
-    <script type="text/javascript" src="media/jQuery-2.1.4/jquery-2.1.4.min.js" ></script>
+    <script src="media/jQuery-2.1.4/jquery-2.1.4.min.js" ></script>
     <link rel="stylesheet" href="media/font-awesome-4.6.1/css/font-awesome.min.css" media="all">
-    <link rel="stylesheet" href="login.css" media="all">
-    <script type="text/javascript" src="media/md5.js" ></script>
+    <link rel="stylesheet" href="media/custom/loginPage/login.css" media="all">
+    <script src="media/md5.js" ></script>
+    <script src="media/custom/loginPage/login.js"></script>
 
 </head>
 <body>
@@ -36,90 +37,6 @@
         </div>
 
     </div>
-
-
-    <script>
-        const MIN_PASSWORD_LENGTH = 6;
-        var $loginInput = $("#userLoginId");
-        var $loginError = $("#loginError");
-        var $passwordInput = $("#userPasswordId");
-        var $passwordError = $("#passwordError");
-        var $inputs = $($loginInput).add($passwordInput);
-        var $inputErrors = $loginError.add($passwordError);
-        var $confirmLoginBtn = $('#buttonLogIn');
-
-        // if enter pressed then submit
-        $inputs.on("keypress", function (e) {
-            if (e.which === 13) {
-                $confirmLoginBtn.click();
-            } else {
-                $inputErrors.text("");
-            }
-        });
-
-        $confirmLoginBtn.on("click", function(e) {
-            e.preventDefault();
-
-            if (checkFields()) {
-
-                $.ajax({
-                    url: "login",
-                    method: "POST",
-                    data: {login: $loginInput.val(), password: calcMD5($passwordInput.val())},
-                    dataType: "json"
-                }).done(function (data) {
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        $loginError.text(data.loginErrorText);
-                        $passwordError.text(data.passwordErrorText);
-                    }
-                })
-                  .fail(function () {
-                      alert("error");
-                });
-            }
-        });
-
-        // return true or false
-        function checkFields() {
-            var loginValue = $loginInput.val();
-            if (!loginValue) {
-                $loginError.text("Введите логин");
-                $loginInput.focus();
-                return false;
-            }
-            var passwordValue = $passwordInput.val();
-            if (!passwordValue) {
-                $passwordError.text("Введите пароль");
-                $passwordInput.focus();
-                return false;
-            } else if (passwordValue.length < MIN_PASSWORD_LENGTH) {
-                $passwordError.text("Минимальная длина пароля - " + MIN_PASSWORD_LENGTH + " символов");
-                $passwordInput.focus();
-                return false;
-            }
-            return true;
-        }
-
-
-        $('input').addClass("idleField");
-        $('input').focus(function() {
-        $(this).removeClass("idleField").addClass("focusField");
-        if (this.value == this.defaultValue){
-        this.value = '';
-        }
-        if(this.value != this.defaultValue){
-        this.select();
-        }
-        });
-        $('input').blur(function() {
-        $(this).removeClass("focusField").addClass("idleField");
-
-        });
-
-
-    </script>
 
 </body>
 </html>

@@ -7,7 +7,7 @@ public class ConstantCollections {
     private static Set<UserRole> userRoles;
     private static Set<Permission> permissions;
     private static Set<TimeDiff> timeDiffs;
-    private static Set<DonutStatus> donutStatuses;
+    private static Set<WantStatus> wantStatuses;
 
 
     public static Set<UserRole> getUserRoles() {
@@ -53,11 +53,11 @@ public class ConstantCollections {
         ConstantCollections.timeDiffs = timeDiffs;
     }
 
-    public static Set<DonutStatus> getDonutStatuses() {
-        return donutStatuses;
+    public static Set<WantStatus> getWantStatuses() {
+        return wantStatuses;
     }
 
-    public static void setDonutStatuses(Set<DonutStatus> donutStatuses) {
-        ConstantCollections.donutStatuses = donutStatuses;
+    public static void setWantStatuses(Set<WantStatus> wantStatuses) {
+        ConstantCollections.wantStatuses = wantStatuses;
     }
 }

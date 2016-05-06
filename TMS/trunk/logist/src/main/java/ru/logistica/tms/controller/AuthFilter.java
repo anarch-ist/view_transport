@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-// TODO доделать
-@WebFilter("/AuthenticationFilter")
+
+@WebFilter("/*")
 public class AuthFilter implements Filter {
     private ServletContext context;
 
@@ -18,21 +18,29 @@ public class AuthFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest req = (HttpServletRequest) request;
-        HttpServletResponse res = (HttpServletResponse) response;
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
 
-        String uri = req.getRequestURI();
-        this.context.log("Requested Resource::"+uri);
+        // make avaliable all js and css
+        String requestURI = request.getRequestURI();
+        System.out.println("URI = " + requestURI);
 
-        HttpSession session = req.getSession(false);
-
-        if(session == null && !(uri.endsWith("html") || uri.endsWith("login"))){
-            this.context.log("Unauthorized access request");
-            res.sendRedirect("login.html");
-        }else{
-            // pass the request along the filter chain
+        if (requestURI.startsWith(request.getContextPath()+"/media/")) {
             chain.doFilter(request, response);
+            return;
+        }
+
+        HttpSession session = request.getSession(false);
+        String loginURI = request.getContextPath() + "/login";
+
+        boolean loggedIn = session != null && session.getAttribute("user") != null;
+        boolean loginRequest = requestURI.equals(loginURI);
+
+        if (loggedIn || loginRequest) {
+            chain.doFilter(request, response);
+        } else {
+            response.sendRedirect(loginURI);
         }
     }
 

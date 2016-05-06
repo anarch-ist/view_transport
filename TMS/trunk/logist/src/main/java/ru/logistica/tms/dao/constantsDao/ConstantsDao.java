@@ -8,5 +8,5 @@ public interface ConstantsDao {
     Set<UserRole> getUserRoles() throws DaoException;
     Set<Permission> getPermissions() throws DaoException;
     Set<TimeDiff> getTimeDiffs() throws DaoException;
-    Set<DonutStatus> getDonutStatuses() throws DaoException;
+    Set<WantStatus> getWantStatuses() throws DaoException;
 }
