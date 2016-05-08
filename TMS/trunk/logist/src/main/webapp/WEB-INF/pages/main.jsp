@@ -1,4 +1,3 @@
-<%@ page import="ru.logistica.tms.dao.usersDao.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page session="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -8,14 +7,14 @@
     <meta charset="UTF-8">
     <title>Редактирование доков</title>
 
-    <link rel="stylesheet" type="text/css" href="media/dateTimePicker/jquery.filthypillow.css">
-    <link rel="shortcut icon" href="media/custom/mainPage/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="media/custom/mainPage/main.css">
+    <link rel="shortcut icon" type="image/x-icon" href="<c:url value="/media/custom/mainPage/favicon.ico"/>" >
+    <link rel="stylesheet" type="text/css"        href="<c:url value="/media/dateTimePicker/jquery.filthypillow.css"/>">
+    <link rel="stylesheet" type="text/css"        href="<c:url value="/media/custom/mainPage/main.css"/>">
 
-    <script src="media/jQuery-2.1.4/jquery-2.1.4.min.js"></script>
-    <script src="media/dateTimePicker/moment.js"></script>
-    <script src="media/dateTimePicker/jquery.filthypillow.min.js"></script>
-    <script src="media/custom/mainPage/main.js"></script>
+    <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
+    <script src="<c:url value="/media/dateTimePicker/moment.js"/>"></script>
+    <script src="<c:url value="/media/dateTimePicker/jquery.filthypillow.min.js"/>"></script>
+    <script src="<c:url value="/media/custom/mainPage/main.js"/>"></script>
 
 </head>
 <body>
@@ -24,17 +23,17 @@
     <form action="logout" method="post">
         <input id="exit" type="submit" value="выйти"/>
     </form>
-
-    <% User user = (User) request.getSession().getAttribute("user");%>
+    <c:set var="userRole" scope="session" value="${sessionScope.user.userRole.userRoleId}"/>
+    <c:out value="${userRole}"/>
     <table>
         <tr>
-            <td>имя</td><td><% out.println(user.getUserName()); %></td>
+            <td>имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
         </tr>
         <tr>
-            <td>роль</td><td><% out.println(user.getUserRole().getUserRoleRusName()); %></td>
+            <td>роль</td><td><c:out value="${sessionScope.user.userRole.userRoleRusName}"/></td>
         </tr>
         <tr>
-            <td>должность</td><td><% out.println(user.getPosition()); %></td>
+            <td>должность</td><td><c:out value="${sessionScope.user.position}"/></td>
         </tr>
     </table>
 </div>
@@ -47,6 +46,18 @@
             <label for="date">Выберите дату </label>
             <input id="date" class="filthypillow-1" />
         </div>
+
+        <c:choose>
+            <c:when test="${userRole == 'SUPPLIER_MANAGER'}">
+                <%--select tag нужно вызвать метод из DAO, получить все склады--%>
+                <c:out value="FFFFFFFFFFFFFFFUUUUUUUUUUUU"/>
+            </c:when>
+
+            <c:when test="${userRole == 'W_BOSS' || userRole == 'WH_DISPATCHER'}">
+                <%--label tag нужно вызвать метод из DAO, получить склад пользователя--%>
+                <c:out value="AAAAAAAAAAAAAAAAAAAAAA"/>
+            </c:when>
+        </c:choose>
 
         <%--<div id="warehousePicker">--%>
             <%--<select id="warehousePicker" name="warehouse"></select>--%>

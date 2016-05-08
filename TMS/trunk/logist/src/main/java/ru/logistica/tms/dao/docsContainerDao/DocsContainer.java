@@ -1,21 +1,20 @@
 package ru.logistica.tms.dao.docsContainerDao;
 
 
-import java.io.Serializable;
 import java.util.Date;
 
 public class DocsContainer {
-    private Serializable containerId;
+    private Integer containerId;
     private Integer docId;
     private Integer timeDiffId;
     private Date date;
     private DocState docState;
 
-    public Serializable getContainerId() {
+    public Integer getContainerId() {
         return containerId;
     }
 
-    public void setContainerId(Serializable containerId) {
+    public void setContainerId(Integer containerId) {
         this.containerId = containerId;
     }
 

@@ -1,10 +1,9 @@
 package ru.logistica.tms.dao.suppliersDao;
 
-import java.io.Serializable;
 import java.util.Date;
 
 public class Supplier {
-    private Serializable supplierID;
+    private Integer supplierID;
     private String inn;
     private String clientName;
     private String kpp;
@@ -17,11 +16,11 @@ public class Supplier {
     private Date startContractDate;
     private Date endContractDate;
 
-    public Serializable getSupplierID() {
+    public Integer getSupplierID() {
         return supplierID;
     }
 
-    public void setSupplierID(Serializable supplierID) {
+    public void setSupplierID(Integer supplierID) {
         this.supplierID = supplierID;
     }
 

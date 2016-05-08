@@ -66,7 +66,7 @@ class DocsContainerDaoImp implements DocsContainerDao{
             public void execute() throws Exception {
                 String sql = "INSERT INTO docs_container VALUES (?, ?, ?, ?, ?)"; // name of table
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
-                    statement.setInt(1, (int)docsContainer.getContainerId());
+                    statement.setInt(1, docsContainer.getContainerId());
                     statement.setInt(2, docsContainer.getDocId());
                     statement.setInt(3, docsContainer.getTimeDiffId());
                     statement.setDate(4, new java.sql.Date(docsContainer.getDate().getTime()));

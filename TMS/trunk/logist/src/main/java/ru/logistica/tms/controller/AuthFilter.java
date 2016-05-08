@@ -24,7 +24,6 @@ public class AuthFilter implements Filter {
 
         // make avaliable all js and css
         String requestURI = request.getRequestURI();
-        System.out.println("URI = " + requestURI);
 
         if (requestURI.startsWith(request.getContextPath()+"/media/")) {
             chain.doFilter(request, response);

@@ -79,7 +79,7 @@ public class ConstantsDaoImpl implements ConstantsDao {
         Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
-                String sql = "SELECT * from wants_statuses";
+                String sql = "SELECT * from want_statuses";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                     ResultSet resultSet = statement.executeQuery();
                     while (resultSet.next()){

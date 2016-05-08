@@ -3,6 +3,8 @@ package ru.logistica.tms.dao;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logistica.tms.dao.constantsDao.*;
+import ru.logistica.tms.dao.warehouseDao.Warehouse;
+import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dao.usersDao.GenericUserDao;
 import ru.logistica.tms.dao.usersDao.User;
 import ru.logistica.tms.dao.usersDao.UserDaoImpl;
@@ -12,6 +14,7 @@ import ru.logistica.tms.util.CriptUtils;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Set;
 
 public class DaoManager {
@@ -76,5 +79,16 @@ public class DaoManager {
         });
         return authResult;
     }
+
+//    public static Map<Integer, String> getAllPointsAsIdAndNameMap() {
+//        // Map<Integer, String> result =
+//        doInTransaction(new DaoScript() {
+//            @Override
+//            public void execute() throws DaoException {
+//                GenericDao<Warehouse> warehouseGenericDao = new WarehouseDaoImpl();
+//                warehouseGenericDao.getAll();
+//            }
+//        });
+//    }
 
 }

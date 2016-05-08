@@ -6,7 +6,7 @@
             <class name="ru.logistica.tms.dao.constantsDao.ConstantCollectionsTest" />
             <class name="ru.logistica.tms.dao.docsContainerDao.DocsContainerDaoImpTest" />
             <class name="ru.logistica.tms.dao.usersDao.UserDaoImplTest" />
-            <class name="ru.logistica.tms.dao.usersDao.PointUserDaoImplTest" />
+            <class name="ru.logistica.tms.dao.usersDao.WarehouseUserDaoImplTest" />
             <class name="ru.logistica.tms.dao.usersDao.SupplierUserDaoImplTest" />
         </classes>
     </test>

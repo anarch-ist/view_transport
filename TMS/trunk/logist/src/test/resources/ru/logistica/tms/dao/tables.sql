@@ -5,7 +5,6 @@ CREATE SCHEMA public;
 --                                                 SUPPLIERS
 -- -------------------------------------------------------------------------------------------------------------------
 
--- entity
 CREATE TABLE suppliers (
   supplierID         SERIAL,
   INN                VARCHAR(32)  NOT NULL,
@@ -22,13 +21,12 @@ CREATE TABLE suppliers (
   PRIMARY KEY (supplierID)
 );
 
-
 -- -------------------------------------------------------------------------------------------------------------------
---                                                 DONUTS
+--                                                 DONUTS(route lists)
 -- -------------------------------------------------------------------------------------------------------------------
 
 -- содержит в себе список всех заказов с указанием дока - в который привозится товар, и временных промежутков(timeDiff)
-CREATE TABLE donut_lists (
+CREATE TABLE donuts (
   donutID           SERIAL,
   creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
   palletsQty        INTEGER      NULL,
@@ -41,23 +39,48 @@ CREATE TABLE donut_lists (
   FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
 );
 
+
 -- -------------------------------------------------------------------------------------------------------------------
---                                                 POINTS
+--                                                 WAREHOUSES
 -- -------------------------------------------------------------------------------------------------------------------
 
--- entity
-CREATE TABLE points (
-  pointID             SERIAL,
-  pointName           VARCHAR(128)   NOT NULL,
-  region              VARCHAR(128)   NULL,
-  district            VARCHAR(64)    NULL,
-  locality            VARCHAR(64)    NULL,
-  mailIndex           VARCHAR(6)     NULL,
-  address             TEXT           NULL,
-  email               VARCHAR(255)   NULL,
-  phoneNumber         VARCHAR(16)    NULL,
-  responsiblePersonId VARCHAR(128)   NULL,
-  PRIMARY KEY (pointID)
+CREATE TABLE warehouses (
+  warehouseID         SERIAL,
+  warehouseName       VARCHAR(128) NOT NULL,
+  region              VARCHAR(128) NULL,
+  district            VARCHAR(64)  NULL,
+  locality            VARCHAR(64)  NULL,
+  mailIndex           VARCHAR(6)   NULL,
+  address             TEXT         NULL,
+  email               VARCHAR(255) NULL,
+  phoneNumber         VARCHAR(16)  NULL,
+  responsiblePersonId VARCHAR(128) NULL,
+  PRIMARY KEY (warehouseID)
+);
+
+CREATE TABLE docs (
+  docID       SERIAL,
+  docName     VARCHAR(255) NOT NULL,
+  warehouseID INTEGER      NOT NULL,
+  PRIMARY KEY (docID),
+  FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
+);
+
+CREATE TYPE PERIOD_STATE AS ENUM ('OPENED', 'CLOSED', 'OCCUPIED');
+
+CREATE TABLE periods (
+  periodID    BIGSERIAL,
+  docID       INTEGER      NOT NULL,
+  periodBegin TIMESTAMP    NOT NULL,
+  periodEnd   TIMESTAMP    NOT NULL,
+  state       PERIOD_STATE NOT NULL,
+  donutID     INTEGER      NULL,
+  CHECK (periodEnd > periodBegin AND (EXTRACT(EPOCH FROM (periodEnd - periodBegin))::INTEGER % 1800) = 0),
+  -- маршрутный лист приклепляется только к периодам с состоянием 'OCCUPIED'
+  CHECK (donutID IS NOT NULL AND state::TEXT = 'OCCUPIED' || donutID IS NULL AND state::TEXT <> 'OCCUPIED'),
+  PRIMARY KEY (periodID),
+  FOREIGN KEY (docID) REFERENCES docs (docID),
+  FOREIGN KEY (donutID) REFERENCES donuts (donutID)
 );
 
 
@@ -75,8 +98,8 @@ CREATE TABLE user_roles (
 INSERT INTO user_roles (userRoleID, userRoleRusName)
 VALUES
   ('W_BOSS', 'Руководитель склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
-  ('WH_DISPATCHER', 'Диспетчер_склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
-  ('SUPPLIER_MANAGER', 'Пользователь_поставщика') -- поставщик, не имеет пункта, но ссылается на поставщика
+  ('WH_DISPATCHER', 'Диспетчер склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
+  ('SUPPLIER_MANAGER', 'Пользователь поставщика') -- поставщик, не имеет пункта, но ссылается на поставщика
 ;
 
 -- entity
@@ -98,14 +121,14 @@ CREATE TABLE users (
 );
 
 -- W_BOSS  WH_DISPATCHER
-CREATE TABLE point_users (
-  userID  INTEGER,
-  pointID INTEGER NOT NULL,
+CREATE TABLE warehouse_users (
+  userID      INTEGER,
+  warehouseID INTEGER NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userID) REFERENCES users
   ON DELETE CASCADE
   ON UPDATE CASCADE,
-  FOREIGN KEY (pointID) REFERENCES points (pointID)
+  FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE
 );
@@ -167,165 +190,30 @@ SELECT insert_permission_for_role('W_BOSS', 'testPerm2');
 SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
 
--- -------------------------------------------------------------------------------------------------------------------
---                                        USERS ROLES PERMISSIONS AND POINTS
--- -------------------------------------------------------------------------------------------------------------------
-
-
-
-CREATE TABLE docs (
-  docID   INTEGER,
-  docName VARCHAR(255),
-  PRIMARY KEY (docID)
-);
-
-INSERT INTO docs VALUES (1, 'test_doc');
-
-CREATE TABLE docs_for_points (
-  docID   INTEGER,
-  pointID INTEGER,
-  PRIMARY KEY (docID, pointID),
-  FOREIGN KEY (pointID) REFERENCES points (pointID),
-  FOREIGN KEY (docID) REFERENCES docs (docID)
-);
-
-CREATE TABLE time_diffs (
-  timeDiffID SMALLINT,
-  PRIMARY KEY (timeDiffID)
-);
-
-INSERT INTO time_diffs VALUES
-  (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12),
-  (13), (14), (15), (16), (17), (18), (19), (20), (21), (22), (23), (24),
-  (25), (26), (27), (28), (29), (30), (31), (32), (33), (34), (35), (36),
-  (37), (38), (39), (40), (41), (42), (43), (44), (45), (46), (47), (48);
-
-CREATE TYPE DOC_STATE AS ENUM ('FREE', 'OCCUPIED', 'OCCUPIED_BY_BOSS');
-
--- entity
-CREATE TABLE docs_container (
-  containerID SERIAL,
-  docID       INTEGER                  NOT NULL,
-  timeDiffID  INTEGER                  NOT NULL,
-  date        TIMESTAMP                NOT NULL,
-  docState    DOC_STATE DEFAULT 'FREE' NOT NULL,
-  donutID     INTEGER                  NULL,
-  UNIQUE (docID, timeDiffID, date),
-  PRIMARY KEY (containerID),
-  FOREIGN KEY (docID) REFERENCES docs (docID),
-  FOREIGN KEY (timeDiffID) REFERENCES time_diffs (timeDiffID),
-  FOREIGN KEY (donutID) REFERENCES donut_lists (donutID)
-);
-
-
-CREATE TYPE STATUS AS ENUM ('CREATED','UPDATED','DELETED');
-
-CREATE TABLE docs_container_history (
-  docsHistoryID SERIAL,
-  containerID   INTEGER,
-  docID         INTEGER,
-  timeDiffID    INTEGER,
-  date          TIMESTAMP,
-  docState      DOC_STATE DEFAULT 'FREE',
-  status        STATUS,
-  PRIMARY KEY (docsHistoryID)
-);
-
-CREATE FUNCTION insertHistory() RETURNS trigger AS $emp_stamp$
-BEGIN
-  -- Check that empname and salary are given
-  INSERT INTO docs_container_history (containerID, docID, timeDiffID, date, docState, status)
-  VALUES
-    (NEW.containerID, NEW.docID, NEW.timeDiffID, NEW.date, NEW.docState, 'UPDATED');
-  RETURN NEW;
-END;
-$emp_stamp$ LANGUAGE plpgsql;
-
-CREATE FUNCTION insertHistoryDelete() RETURNS trigger AS $emp_stamp$
-BEGIN
-  -- Check that empname and salary are given
-  INSERT INTO docs_container_history
-  VALUES
-    (NULL, OLD.containerID, OLD.docID, OLD.timeDiffID, OLD.date, OLD.docState, 'UPDATED');
-  RETURN OLD;
-END;
-$emp_stamp$ LANGUAGE plpgsql;
-
-
-CREATE TRIGGER after_docs_container_insert AFTER INSERT OR UPDATE ON docs_container
-FOR EACH ROW
-EXECUTE PROCEDURE insertHistory();
-
-CREATE TRIGGER after_docs_container_delete AFTER DELETE ON docs_container
-FOR EACH ROW
-EXECUTE PROCEDURE insertHistoryDelete();
-
 
 -- -------------------------------------------------------------------------------------------------------------------
---                                          ROUTE AND ROUTE LISTS
+--                                          WANTS(requests)
 -- -------------------------------------------------------------------------------------------------------------------
 
 
-CREATE TABLE wants_statuses (
+CREATE TABLE want_statuses (
   wantStatusID      VARCHAR(32),
   wantStatusRusName VARCHAR(255),
   PRIMARY KEY (wantStatusID)
 );
 
-INSERT INTO wants_statuses
+INSERT INTO want_statuses
 VALUES
   ('CREATED', 'Создан пакет для отправки'),
   ('CANCELLED_WH', 'Отменен складом'),
   ('CANCELLED_S', 'Отмена поставщиком'),
   ('ERROR', 'Ошибка'),
   ('DELIVERED', 'Доставлен');
--- entity
 
--- CREATE TRIGGER after_donut_list_insert AFTER INSERT ON donut_lists
--- FOR EACH ROW
---   INSERT INTO donut_list_history
---   VALUES
---     (NULL, NOW(), NEW. donutID, NEW.donutIDExternal, NEW.dataSourceID, NEW.donutNumber, NEW.creationDate,
---      NEW.palletsQty, NEW.boxQty, NEW.driver,
---      NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.supplierId, NEW.comment, 'CREATED');
---
--- CREATE TRIGGER after_donut_list_update AFTER UPDATE ON donut_lists
--- FOR EACH ROW
---   INSERT INTO donut_list_history
---   VALUES
---     (NULL, NOW(), NEW. donutID, NEW.donutIDExternal, NEW.dataSourceID, NEW.donutNumber, NEW.creationDate,
---      NEW.palletsQty, NEW.boxQty, NEW.driver,
---      NEW.driverPhoneNumber, NEW.licensePlate, NEW.status, NEW.supplierId, NEW.comment, 'UPDATED');
---
--- CREATE TRIGGER after_donut_list_delete AFTER DELETE ON donut_lists
--- FOR EACH ROW
---   INSERT INTO donut_list_history
---   VALUES
---     (NULL, NOW(), OLD.donutID, OLD.donutIDExternal, OLD.dataSourceID, OLD.donutNumber, OLD.creationDate,
---      OLD.palletsQty, OLD.boxQty, OLD.driver,
---      OLD.driverPhoneNumber, OLD.licensePlate, OLD.status, OLD.supplierID, OLD.comment, 'DELETED');
-
-CREATE TABLE donut_list_history (
-  donutHistoryID    SERIAL,
-  timeMark          TIMESTAMP    NOT NULL,
-  donutID           SERIAL,
-  creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  palletsQty        INTEGER      NULL,
-  supplierID        INTEGER      NOT NULL,
-  driver            VARCHAR(255) NULL,
-  driverPhoneNumber VARCHAR(12)  NULL,
-  licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  comment           VARCHAR(255) NULL,
-  transitPointID    INTEGER      NOT NULL, -- пункт доставки (куда привезут сначала) - перенести на уровень пончика
-  PRIMARY KEY (donutHistoryID)
-);
-
--- листы заказа
--- entity
 CREATE TABLE wants (
-  wantsID            SERIAL,
-  wantsNumber        VARCHAR(16)    NOT NULL,
-  wantstDate         DATE           NULL,
+  wantID             SERIAL,
+  wantNumber         VARCHAR(16)    NOT NULL,
+  wantDate           DATE           NULL,
   supplierID         INTEGER        NOT NULL,
   destinationPointID INTEGER        NULL, -- пункт доставки (конечный)
   invoiceNumber      VARCHAR(255)   NULL,
@@ -340,62 +228,20 @@ CREATE TABLE wants (
   wantStatusID       VARCHAR(32)    NOT NULL,
   commentForStatus   TEXT           NULL,
   donutID            INTEGER        NULL,
-  PRIMARY KEY (wantsID),
+  PRIMARY KEY (wantID),
   FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE,
-  FOREIGN KEY (destinationPointID) REFERENCES points (pointID)
+  FOREIGN KEY (destinationPointID) REFERENCES warehouses (warehouseID)
   ON DELETE RESTRICT
   ON UPDATE CASCADE,
   FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
   ON DELETE SET NULL
   ON UPDATE CASCADE,
-  FOREIGN KEY (wantStatusID) REFERENCES wants_statuses (wantStatusID)
+  FOREIGN KEY (wantStatusID) REFERENCES want_statuses (wantStatusID)
   ON DELETE RESTRICT
   ON UPDATE RESTRICT,
-  FOREIGN KEY (donutID) REFERENCES donut_lists (donutID)
+  FOREIGN KEY (donutID) REFERENCES donuts (donutID)
   ON DELETE SET NULL
   ON UPDATE CASCADE
 );
-
-
-CREATE TABLE wants_history (
-  wantsHistoryID     SERIAL,
-  autoTimeMark       TIMESTAMP      NOT NULL,
-  wantsID            SERIAL,
-  wantsNumber        VARCHAR(16)    NOT NULL,
-  wantstDate         DATE           NULL,
-  supplierID         INTEGER        NOT NULL,
-  destinationPointID INTEGER        NULL, -- пункт доставки (конечный)
-  invoiceNumber      VARCHAR(255)   NULL,
-  invoiceDate        DATE           NULL,
-  deliveryDate       TIMESTAMP      NULL,
-  boxQty             INTEGER        NULL,
-  weight             INTEGER        NULL, -- масса в граммах
-  volume             INTEGER        NULL, -- в кубических сантиметрах
-  goodsCost          DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
-  lastStatusUpdated  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user
-  lastModifiedBy     INTEGER        NULL, -- один из пользователей - это parser.
-  wantStatusID       VARCHAR(32)    NOT NULL,
-  commentForStatus   TEXT           NULL,
-  donutID            INTEGER        NULL,
-
-  PRIMARY KEY (wantsHistoryID),
-  FOREIGN KEY (wantStatusID) REFERENCES wants_statuses (wantStatusID)
-  ON DELETE RESTRICT
-  ON UPDATE RESTRICT
-);
-
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                   EXCHANGE_TABLE
--- -------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE exchange (
-  packageNumber INTEGER,
-  serverName VARCHAR(32),
-  packageCreated TIMESTAMP,
-  packageData TEXT, -- наличие самих данных в соответсвующем порядке позволяет в любой момент пересоздать всю БД.
-  PRIMARY KEY (packageNumber, serverName)
-);
-
