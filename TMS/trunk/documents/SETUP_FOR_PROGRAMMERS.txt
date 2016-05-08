@@ -7,6 +7,10 @@
 желательно на рабочий стол вынести ярлык на pgAdmin3
 добавить в переменную окружения path значение C:\Program Files\PostgreSQL\9.5\bin;
 
+в файле C:\Program Files\PostgreSQL\9.5\data\postgresql.conf
+timezone = 'UTC'
+
+
 установка TOMCAT 8.0.33:
 1) скачать соответсвующую версию
 2) разархивировать и выложить в каталог c:/web, путь должен быть примерно таким

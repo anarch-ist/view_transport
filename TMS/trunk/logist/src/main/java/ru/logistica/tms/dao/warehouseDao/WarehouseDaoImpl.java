@@ -1,7 +1,5 @@
 package ru.logistica.tms.dao.warehouseDao;
 
-
-
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.GenericDao;
 import ru.logistica.tms.dao.ConnectionManager;

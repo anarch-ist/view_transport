@@ -1,40 +1,28 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
+
 -- -------------------------------------------------------------------------------------------------------------------
---                                                 SUPPLIERS
+--                                                 SUPPLIERS AND DONUTS(route lists)
 -- -------------------------------------------------------------------------------------------------------------------
+
 
 CREATE TABLE suppliers (
   supplierID         SERIAL,
   INN                VARCHAR(32)  NOT NULL,
-  clientName         VARCHAR(255) NULL,
-  KPP                VARCHAR(64)  NULL,
-  corAccount         VARCHAR(64)  NULL,
-  curAccount         VARCHAR(64)  NULL,
-  BIK                VARCHAR(64)  NULL,
-  bankName           VARCHAR(128) NULL,
-  contractNumber     VARCHAR(64)  NULL,
-  dateOfSigning      DATE         NULL,
-  startContractDate  DATE         NULL,
-  endContractDate    DATE         NULL,
   PRIMARY KEY (supplierID)
 );
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                 DONUTS(route lists)
--- -------------------------------------------------------------------------------------------------------------------
 
 -- содержит в себе список всех заказов с указанием дока - в который привозится товар, и временных промежутков(timeDiff)
 CREATE TABLE donuts (
   donutID           SERIAL,
-  creationDate      DATE         NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  palletsQty        INTEGER      NULL,
+  creationDate      DATE         NOT NULL DEFAULT NOW(),
+  comment           TEXT         NOT NULL,
+  driver            VARCHAR(255) NOT NULL,
+  driverPhoneNumber VARCHAR(12)  NOT NULL,
+  licensePlate      VARCHAR(9)   NOT NULL, -- государственный номер автомобиля
+  palletsQty        INTEGER      NOT NULL CONSTRAINT positive_pallets_qty CHECK (palletsQty >= 0),
   supplierID        INTEGER      NOT NULL,
-  driver            VARCHAR(255) NULL,
-  driverPhoneNumber VARCHAR(12)  NULL,
-  licensePlate      VARCHAR(9)   NULL, -- государственный номер автомобиля
-  comment           TEXT         NULL,
   PRIMARY KEY (donutID),
   FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
 );
@@ -44,17 +32,10 @@ CREATE TABLE donuts (
 --                                                 WAREHOUSES
 -- -------------------------------------------------------------------------------------------------------------------
 
+
 CREATE TABLE warehouses (
   warehouseID         SERIAL,
   warehouseName       VARCHAR(128) NOT NULL,
-  region              VARCHAR(128) NULL,
-  district            VARCHAR(64)  NULL,
-  locality            VARCHAR(64)  NULL,
-  mailIndex           VARCHAR(6)   NULL,
-  address             TEXT         NULL,
-  email               VARCHAR(255) NULL,
-  phoneNumber         VARCHAR(16)  NULL,
-  responsiblePersonId VARCHAR(128) NULL,
   PRIMARY KEY (warehouseID)
 );
 
@@ -66,23 +47,71 @@ CREATE TABLE docs (
   FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
 );
 
-CREATE TYPE PERIOD_STATE AS ENUM ('OPENED', 'CLOSED', 'OCCUPIED');
-
 CREATE TABLE periods (
   periodID    BIGSERIAL,
-  docID       INTEGER      NOT NULL,
-  periodBegin TIMESTAMP    NOT NULL,
-  periodEnd   TIMESTAMP    NOT NULL,
-  state       PERIOD_STATE NOT NULL,
-  donutID     INTEGER      NULL,
-  CHECK (periodEnd > periodBegin AND (EXTRACT(EPOCH FROM (periodEnd - periodBegin))::INTEGER % 1800) = 0),
-  -- маршрутный лист приклепляется только к периодам с состоянием 'OCCUPIED'
-  CHECK (donutID IS NOT NULL AND state::TEXT = 'OCCUPIED' || donutID IS NULL AND state::TEXT <> 'OCCUPIED'),
+  docID       INTEGER                  NOT NULL,
+  periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- NOT UPDATEABLE
+  periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- NOT UPDATEABLE
+  -- длина периода кратна 30 минутам
+  CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
+                                               (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
   PRIMARY KEY (periodID),
-  FOREIGN KEY (docID) REFERENCES docs (docID),
+  FOREIGN KEY (docID) REFERENCES docs (docID)
+);
+
+CREATE TYPE PERIOD_STATE AS ENUM ('OPENED', 'CLOSED', 'OCCUPIED');
+CREATE TABLE periods_progress (
+  periodID        BIGINT,
+  changeTimeStamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() CHECK (EXTRACT(TIMEZONE FROM changeTimeStamp) = '0'), -- NOT UPDATEABLE
+  state           PERIOD_STATE             NOT NULL, -- NOT UPDATEABLE
+  donutID         INTEGER                  NULL,     -- NOT UPDATEABLE
+  -- маршрутный лист приклепляется только к периодам с состоянием 'OCCUPIED'
+  CONSTRAINT occupied_has_donut CHECK (donutID IS NOT NULL AND state :: TEXT = 'OCCUPIED' || donutID IS NULL AND
+                                       state :: TEXT <> 'OCCUPIED'),
+  PRIMARY KEY (periodID, changeTimeStamp),
   FOREIGN KEY (donutID) REFERENCES donuts (donutID)
 );
 
+-- -------------------------------------------------------------------------------------------------------------------
+--                                          WANTS(requests)
+-- -------------------------------------------------------------------------------------------------------------------
+
+
+CREATE TABLE want_statuses (
+  wantStatusID      VARCHAR(32),
+  wantStatusRusName VARCHAR(255),
+  PRIMARY KEY (wantStatusID)
+);
+
+INSERT INTO want_statuses
+VALUES
+  ('CREATED', 'Создан пакет для отправки'),
+  ('CANCELLED_BY_WAREHOUSE_USER', 'Отменен складом'),
+  ('CANCELLED_BY_SUPPLIER_USER', 'Отмена поставщиком'),
+  ('ERROR', 'Ошибка'),
+  ('DELIVERED', 'Доставлен');
+
+CREATE TABLE wants (
+  wantID                      SERIAL,
+  wantNumber                  VARCHAR(16) NOT NULL,
+  boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty > 0),
+  finalDestinationWarehouseID INTEGER     NOT NULL, -- конечный пункт доставки
+  PRIMARY KEY (wantID),
+  FOREIGN KEY (finalDestinationWarehouseID) REFERENCES warehouses (warehouseID)
+);
+
+-- NOT UPDATEABLE
+CREATE TABLE wants_progress (
+  wantID           INTEGER,
+  changeTimeStamp  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() CHECK (EXTRACT(TIMEZONE FROM changeTimeStamp) = '0'),
+  wantStatusID     VARCHAR(32)              NOT NULL,
+  commentForStatus TEXT                     NOT NULL,
+  donutID          INTEGER                  NOT NULL, -- заявка создается синхронно с пончиком(списком заявок), по ходу движения заявки от склада к складу пончик меняется.
+  PRIMARY KEY (wantID, changeTimeStamp),
+  FOREIGN KEY (wantID) REFERENCES wants (wantID),
+  FOREIGN KEY (wantStatusID) REFERENCES want_statuses (wantStatusID),
+  FOREIGN KEY (donutID) REFERENCES donuts (donutID)
+);
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                 USERS
@@ -109,10 +138,10 @@ CREATE TABLE users (
   salt        CHAR(16)     NOT NULL,
   passAndSalt CHAR(32)     NOT NULL,
   userRoleID  VARCHAR(32)  NOT NULL,
-  userName    VARCHAR(255) NULL,
-  phoneNumber VARCHAR(255) NULL,
-  email       VARCHAR(255) NULL,
-  position    VARCHAR(64)  NULL, -- должность
+  userName    VARCHAR(255) NOT NULL,
+  phoneNumber VARCHAR(255) NOT NULL,
+  email       VARCHAR(255) NOT NULL,
+  position    VARCHAR(64)  NOT NULL, -- должность
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID)
   ON DELETE RESTRICT
@@ -189,59 +218,3 @@ SELECT insert_permission_for_role('W_BOSS', 'testPerm1');
 SELECT insert_permission_for_role('W_BOSS', 'testPerm2');
 SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
-
-
--- -------------------------------------------------------------------------------------------------------------------
---                                          WANTS(requests)
--- -------------------------------------------------------------------------------------------------------------------
-
-
-CREATE TABLE want_statuses (
-  wantStatusID      VARCHAR(32),
-  wantStatusRusName VARCHAR(255),
-  PRIMARY KEY (wantStatusID)
-);
-
-INSERT INTO want_statuses
-VALUES
-  ('CREATED', 'Создан пакет для отправки'),
-  ('CANCELLED_WH', 'Отменен складом'),
-  ('CANCELLED_S', 'Отмена поставщиком'),
-  ('ERROR', 'Ошибка'),
-  ('DELIVERED', 'Доставлен');
-
-CREATE TABLE wants (
-  wantID             SERIAL,
-  wantNumber         VARCHAR(16)    NOT NULL,
-  wantDate           DATE           NULL,
-  supplierID         INTEGER        NOT NULL,
-  destinationPointID INTEGER        NULL, -- пункт доставки (конечный)
-  invoiceNumber      VARCHAR(255)   NULL,
-  invoiceDate        DATE           NULL,
-  deliveryDate       TIMESTAMP      NULL,
-  boxQty             INTEGER        NULL,
-  weight             INTEGER        NULL, -- масса в граммах
-  volume             INTEGER        NULL, -- в кубических сантиметрах
-  goodsCost          DECIMAL(12, 2) NULL, -- цена всех товаров в заявке
-  lastStatusUpdated  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user
-  lastModifiedBy     INTEGER        NULL, -- один из пользователей - это parser.
-  wantStatusID       VARCHAR(32)    NOT NULL,
-  commentForStatus   TEXT           NULL,
-  donutID            INTEGER        NULL,
-  PRIMARY KEY (wantID),
-  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE,
-  FOREIGN KEY (destinationPointID) REFERENCES warehouses (warehouseID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE,
-  FOREIGN KEY (lastModifiedBy) REFERENCES users (userID)
-  ON DELETE SET NULL
-  ON UPDATE CASCADE,
-  FOREIGN KEY (wantStatusID) REFERENCES want_statuses (wantStatusID)
-  ON DELETE RESTRICT
-  ON UPDATE RESTRICT,
-  FOREIGN KEY (donutID) REFERENCES donuts (donutID)
-  ON DELETE SET NULL
-  ON UPDATE CASCADE
-);
