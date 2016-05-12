@@ -1,7 +1,9 @@
 package ru.logistica.tms.dao.warehouseDao;
 
+import ru.logistica.tms.dao.Binding;
 import ru.logistica.tms.dao.donutsDao.Donut;
 
+import javax.xml.ws.BindingType;
 import java.sql.Timestamp;
 
 public class Period {
@@ -60,8 +62,8 @@ public class Period {
         this.donut = donut;
     }
 
+    @Binding(sqlObject = "period_states")
     enum State {
-        // BINDING this string representations bound with database values
         OPENED("OPENED"), CLOSED("CLOSED"), OCCUPIED("OCCUPIED");
         private String name;
         State(String name) {this.name = name;}

@@ -1,4 +1,4 @@
-DROP SCHEMA public CASCADE;
+DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
 
 
@@ -59,57 +59,68 @@ CREATE TABLE periods (
   FOREIGN KEY (docID) REFERENCES docs (docID)
 );
 
-CREATE TYPE PERIOD_STATE AS ENUM ('OPENED', 'CLOSED', 'OCCUPIED');
+
+CREATE TABLE period_states (
+  periodStateID VARCHAR(32),
+  PRIMARY KEY (periodStateID)
+);
+
+-- BINDING ru.logistica.tms.dao.warehouseDao.Period.States
+INSERT INTO period_states VALUES
+  ('OPENED'),
+  ('CLOSED'),
+  ('OCCUPIED');
+
 CREATE TABLE periods_progress (
   periodID        BIGINT,
   changeTimeStamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() CHECK (EXTRACT(TIMEZONE FROM changeTimeStamp) = '0'), -- NOT UPDATEABLE
-  state           PERIOD_STATE             NOT NULL, -- NOT UPDATEABLE
+  state           VARCHAR(32)              NOT NULL, -- NOT UPDATEABLE
   donutID         INTEGER                  NULL,     -- NOT UPDATEABLE
   -- маршрутный лист приклепляется только к периодам с состоянием 'OCCUPIED'
-  CONSTRAINT occupied_has_donut CHECK (donutID IS NOT NULL AND state :: TEXT = 'OCCUPIED' || donutID IS NULL AND
-                                       state :: TEXT <> 'OCCUPIED'),
+  CONSTRAINT occupied_has_donut CHECK (donutID IS NOT NULL AND state = 'OCCUPIED' || donutID IS NULL AND
+                                       state <> 'OCCUPIED'),
   PRIMARY KEY (periodID, changeTimeStamp),
   FOREIGN KEY (donutID) REFERENCES donuts (donutID)
 );
 
 -- -------------------------------------------------------------------------------------------------------------------
---                                          WANTS(requests)
+--                                                    ORDERS
 -- -------------------------------------------------------------------------------------------------------------------
 
 
-CREATE TABLE want_statuses (
-  wantStatusID      VARCHAR(32),
-  wantStatusRusName VARCHAR(255),
-  PRIMARY KEY (wantStatusID)
+CREATE TABLE order_statuses (
+  orderStatusID VARCHAR(32),
+  PRIMARY KEY (orderStatusID)
 );
 
-INSERT INTO want_statuses
+-- BINDING ru.logistica.tms.dao.ordersDao.OrderState.OrderStatus
+INSERT INTO order_statuses
 VALUES
-  ('CREATED', 'Создан пакет для отправки'),
-  ('CANCELLED_BY_WAREHOUSE_USER', 'Отменен складом'),
-  ('CANCELLED_BY_SUPPLIER_USER', 'Отмена поставщиком'),
-  ('ERROR', 'Ошибка'),
-  ('DELIVERED', 'Доставлен');
+  ('CREATED'),
+  ('CANCELLED_BY_WAREHOUSE_USER'),
+  ('CANCELLED_BY_SUPPLIER_USER'),
+  ('ERROR'),
+  ('DELIVERED');
 
-CREATE TABLE wants (
-  wantID                      SERIAL,
-  wantNumber                  VARCHAR(16) NOT NULL,
+CREATE TABLE orders (
+  orderID                     SERIAL,
+  orderNumber                 VARCHAR(16) NOT NULL,
   boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty > 0),
   finalDestinationWarehouseID INTEGER     NOT NULL, -- конечный пункт доставки
-  PRIMARY KEY (wantID),
+  PRIMARY KEY (orderID),
   FOREIGN KEY (finalDestinationWarehouseID) REFERENCES warehouses (warehouseID)
 );
 
 -- NOT UPDATEABLE
-CREATE TABLE wants_progress (
-  wantID           INTEGER,
+CREATE TABLE orders_progress (
+  orderID          INTEGER,
   changeTimeStamp  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() CHECK (EXTRACT(TIMEZONE FROM changeTimeStamp) = '0'),
-  wantStatusID     VARCHAR(32)              NOT NULL,
+  orderStatusID    VARCHAR(32)              NOT NULL,
   commentForStatus TEXT                     NOT NULL,
   donutID          INTEGER                  NOT NULL, -- заявка создается синхронно с пончиком(списком заявок), по ходу движения заявки от склада к складу пончик меняется.
-  PRIMARY KEY (wantID, changeTimeStamp),
-  FOREIGN KEY (wantID) REFERENCES wants (wantID),
-  FOREIGN KEY (wantStatusID) REFERENCES want_statuses (wantStatusID),
+  PRIMARY KEY (orderID, changeTimeStamp),
+  FOREIGN KEY (orderID) REFERENCES orders (orderID),
+  FOREIGN KEY (orderStatusID) REFERENCES order_statuses (orderStatusID),
   FOREIGN KEY (donutID) REFERENCES donuts (donutID)
 );
 
@@ -119,16 +130,16 @@ CREATE TABLE wants_progress (
 
 
 CREATE TABLE user_roles (
-  userRoleID      VARCHAR(32),
-  userRoleRusName VARCHAR(128),
+  userRoleID VARCHAR(32),
   PRIMARY KEY (userRoleID)
 );
 
-INSERT INTO user_roles (userRoleID, userRoleRusName)
+-- BINDING ru.logistica.tms.dao.usersDao.User.UserRole
+INSERT INTO user_roles (userRoleID)
 VALUES
-  ('W_BOSS', 'Руководитель склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
-  ('WH_DISPATCHER', 'Диспетчер склада'), -- обязан иметь пункт, но у него нет ссылки на поставщика
-  ('SUPPLIER_MANAGER', 'Пользователь поставщика') -- поставщик, не имеет пункта, но ссылается на поставщика
+  ('W_BOSS'), -- обязан иметь пункт, но у него нет ссылки на поставщика
+  ('WH_DISPATCHER'), -- обязан иметь пункт, но у него нет ссылки на поставщика
+  ('SUPPLIER_MANAGER') -- поставщик, не имеет пункта, но ссылается на поставщика
 ;
 
 -- entity
@@ -218,3 +229,19 @@ SELECT insert_permission_for_role('W_BOSS', 'testPerm1');
 SELECT insert_permission_for_role('W_BOSS', 'testPerm2');
 SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
+
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                 DB USERS
+-- -------------------------------------------------------------------------------------------------------------------
+
+-- create user if not exist
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM app_user;
+DROP ROLE IF EXISTS app_user;
+CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
+
+-- application user privileges:
+GRANT CONNECT ON DATABASE postgres TO app_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
+GRANT INSERT, UPDATE, DELETE ON TABLE donuts, orders TO app_user;
+GRANT INSERT, DELETE ON TABLE periods, periods_progress, orders_progress TO app_user;

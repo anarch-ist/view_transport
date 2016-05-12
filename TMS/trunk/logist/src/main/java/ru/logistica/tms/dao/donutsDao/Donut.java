@@ -1,8 +1,10 @@
 package ru.logistica.tms.dao.donutsDao;
 
+import ru.logistica.tms.dao.ordersDao.Order;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 
 import java.sql.Date;
+import java.util.Set;
 
 public class Donut {
     private Integer donutId;
@@ -13,5 +15,5 @@ public class Donut {
     private String licensePlate;
     private Integer palletsQty;
     private Supplier supplier;
-    private
+    private Set<Order> orders;
 }

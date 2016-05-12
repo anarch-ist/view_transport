@@ -1,12 +1,11 @@
 package ru.logistica.tms.dao.usersDao;
 
+import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.GenericDao;
-import ru.logistica.tms.dao.ConnectionManager;
+import ru.logistica.tms.dao.utils.Utils;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
-import ru.logistica.tms.dao.utils.Utils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,8 +75,7 @@ public class WarehouseUserDaoImpl implements GenericUserDao<WarehouseUser> {
                         warehouseUser[0].setLogin(resultSet.getString("userLogin"));
                         warehouseUser[0].setSalt(resultSet.getString("salt"));
                         warehouseUser[0].setPassAndSalt(resultSet.getString("passAndSalt"));
-                        String userRoleId = resultSet.getString("userRoleID");
-                        warehouseUser[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        warehouseUser[0].setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         warehouseUser[0].setUserName(resultSet.getString("userName"));
                         warehouseUser[0].setPhoneNumber(resultSet.getString("phoneNumber"));
                         warehouseUser[0].setEmail(resultSet.getString("email"));
@@ -127,8 +125,7 @@ public class WarehouseUserDaoImpl implements GenericUserDao<WarehouseUser> {
                         warehouseUser.setLogin(resultSet.getString("userLogin"));
                         warehouseUser.setSalt(resultSet.getString("salt"));
                         warehouseUser.setPassAndSalt(resultSet.getString("passAndSalt"));
-                        String userRoleId = resultSet.getString("userRoleID");
-                        warehouseUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        warehouseUser.setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         warehouseUser.setUserName(resultSet.getString("userName"));
                         warehouseUser.setPhoneNumber(resultSet.getString("phoneNumber"));
                         warehouseUser.setEmail(resultSet.getString("email"));
@@ -159,7 +156,7 @@ public class WarehouseUserDaoImpl implements GenericUserDao<WarehouseUser> {
                     String sql = "INSERT INTO warehouse_users VALUES (?, ?)";
                     try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                         statement.setInt(1, userId);
-                        statement.setInt(2, (Integer) warehouseUser.getWarehouse().getWarehouseId());
+                        statement.setInt(2, warehouseUser.getWarehouse().getWarehouseId());
                         statement.execute();
                     }
                 }
@@ -177,7 +174,7 @@ public class WarehouseUserDaoImpl implements GenericUserDao<WarehouseUser> {
                 String sql = "INSERT INTO warehouse_users VALUES (?, ?)";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     statement.setInt(1, userId);
-                    statement.setInt(2, (Integer) warehouseUser.getWarehouse().getWarehouseId());
+                    statement.setInt(2, warehouseUser.getWarehouse().getWarehouseId());
                     statement.execute();
                 }
             }

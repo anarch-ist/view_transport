@@ -1,11 +1,10 @@
 package ru.logistica.tms.dao.usersDao;
 
+import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.GenericDao;
-import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
 import ru.logistica.tms.dao.utils.Utils;
 
 import java.sql.PreparedStatement;
@@ -51,17 +50,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         "users.phoneNumber, " +
                         "users.email, " +
                         "users.position, " +
-                        "suppliers.INN, " +
-                        "suppliers.clientName, " +
-                        "suppliers.KPP, " +
-                        "suppliers.corAccount, " +
-                        "suppliers.curAccount, " +
-                        "suppliers.BIK, " +
-                        "suppliers.bankName, " +
-                        "suppliers.contractNumber, " +
-                        "suppliers.dateOfSigning, " +
-                        "suppliers.startContractDate, " +
-                        "suppliers.endContractDate " +
+                        "suppliers.INN " +
                         "FROM suppliers_users " +
                         "INNER JOIN users ON (users.userID = suppliers_users.userID) " +
                         "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID)" +
@@ -77,8 +66,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         supplierUser[0].setLogin(resultSet.getString("userLogin"));
                         supplierUser[0].setSalt(resultSet.getString("salt"));
                         supplierUser[0].setPassAndSalt(resultSet.getString("passAndSalt"));
-                        String userRoleId = resultSet.getString("userRoleID");
-                        supplierUser[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        supplierUser[0].setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         supplierUser[0].setUserName(resultSet.getString("userName"));
                         supplierUser[0].setPhoneNumber(resultSet.getString("phoneNumber"));
                         supplierUser[0].setEmail(resultSet.getString("email"));
@@ -107,17 +95,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         "users.phoneNumber, " +
                         "users.email, " +
                         "users.position, " +
-                        "suppliers.INN, " +
-                        "suppliers.clientName, " +
-                        "suppliers.KPP, " +
-                        "suppliers.corAccount, " +
-                        "suppliers.curAccount, " +
-                        "suppliers.BIK, " +
-                        "suppliers.bankName, " +
-                        "suppliers.contractNumber, " +
-                        "suppliers.dateOfSigning, " +
-                        "suppliers.startContractDate, " +
-                        "suppliers.endContractDate " +
+                        "suppliers.INN " +
                         "FROM suppliers_users " +
                         "INNER JOIN users ON (users.userID = suppliers_users.userID)\n" +
                         "INNER JOIN suppliers ON (suppliers.supplierID = suppliers_users.supplierID);";
@@ -131,8 +109,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                         supplierUser.setLogin(resultSet.getString("userLogin"));
                         supplierUser.setSalt(resultSet.getString("salt"));
                         supplierUser.setPassAndSalt(resultSet.getString("passAndSalt"));
-                        String userRoleId = resultSet.getString("userRoleID");
-                        supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        supplierUser.setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         supplierUser.setUserName(resultSet.getString("userName"));
                         supplierUser.setPhoneNumber(resultSet.getString("phoneNumber"));
                         supplierUser.setEmail(resultSet.getString("email"));
@@ -162,7 +139,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                     String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
                     try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){
                         statement.setInt(1, userId);
-                        statement.setInt(2, (Integer) supplierUser.getSupplier().getSupplierID());
+                        statement.setInt(2, supplierUser.getSupplier().getSupplierID());
                         statement.execute();
                     }
                 }
@@ -180,7 +157,7 @@ public class SupplierUserDaoImpl implements GenericUserDao<SupplierUser> {
                 String sql = "INSERT INTO suppliers_users VALUES (?, ?)";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)) {
                     statement.setInt(1, userId);
-                    statement.setInt(2, (Integer) supplierUser.getSupplier().getSupplierID());
+                    statement.setInt(2, supplierUser.getSupplier().getSupplierID());
                     statement.execute();
                 }
             }

@@ -1,6 +1,6 @@
 package ru.logistica.tms.dao.usersDao;
 
-import ru.logistica.tms.dao.constantsDao.UserRole;
+import ru.logistica.tms.dao.Binding;
 import ru.logistica.tms.util.CriptUtils;
 
 public class User {
@@ -13,6 +13,17 @@ public class User {
     private String phoneNumber;
     private String email;
     private String position;
+
+    @Binding(sqlObject = "user_roles")
+    enum UserRole {
+        W_BOSS("W_BOSS"), WH_DISPATCHER("WH_DISPATCHER"), SUPPLIER_MANAGER("SUPPLIER_MANAGER");
+        private String name;
+        UserRole(String name) {this.name = name;}
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     public UserRole getUserRole() {
         return userRole;

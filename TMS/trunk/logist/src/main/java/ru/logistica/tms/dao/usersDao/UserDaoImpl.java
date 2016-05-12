@@ -1,9 +1,8 @@
 package ru.logistica.tms.dao.usersDao;
 
 
-import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.ConnectionManager;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
+import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.utils.Utils;
 
 import java.sql.PreparedStatement;
@@ -30,7 +29,7 @@ public class UserDaoImpl implements GenericUserDao<User> {
                     statement.setString(1, user.getLogin());
                     statement.setString(2, user.getSalt());
                     statement.setString(3, user.getPassAndSalt());
-                    statement.setString(4, ConstantCollections.getUserRoleIdByUserRole(user.getUserRole()));
+                    statement.setString(4, user.getUserRole().toString());
                     statement.setString(5, user.getUserName());
                     statement.setString(6, user.getPhoneNumber());
                     statement.setString(7, user.getEmail());
@@ -60,7 +59,7 @@ public class UserDaoImpl implements GenericUserDao<User> {
                     statement.setString(1, user.getLogin());
                     statement.setString(2, user.getSalt());
                     statement.setString(3, user.getPassAndSalt());
-                    statement.setString(4, ConstantCollections.getUserRoleIdByUserRole(user.getUserRole()));
+                    statement.setString(4, user.getUserRole().toString());
                     statement.setString(5, user.getUserName());
                     statement.setString(6, user.getPhoneNumber());
                     statement.setString(7, user.getEmail());
@@ -89,7 +88,7 @@ public class UserDaoImpl implements GenericUserDao<User> {
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                     statement.setString(1, user.getSalt());
                     statement.setString(2, user.getPassAndSalt());
-                    statement.setString(3, ConstantCollections.getUserRoleIdByUserRole(user.getUserRole()));
+                    statement.setString(3, user.getUserRole().toString());
                     statement.setString(4, user.getUserName());
                     statement.setString(5, user.getPhoneNumber());
                     statement.setString(6, user.getEmail());
@@ -142,8 +141,7 @@ public class UserDaoImpl implements GenericUserDao<User> {
                         user[0].setLogin(resultSet.getString("userLogin"));
                         user[0].setSalt(resultSet.getString("salt"));
                         user[0].setPassAndSalt(resultSet.getString("passAndSalt"));
-                        String userRoleId = resultSet.getString("userRoleID");
-                        user[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        user[0].setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         user[0].setUserName(resultSet.getString("userName"));
                         user[0].setPhoneNumber(resultSet.getString("phoneNumber"));
                         user[0].setEmail(resultSet.getString("email"));
@@ -171,7 +169,7 @@ public class UserDaoImpl implements GenericUserDao<User> {
                         user[0].setLogin(resultSet.getString("userLogin"));
                         user[0].setSalt(resultSet.getString("salt"));
                         user[0].setPassAndSalt(resultSet.getString("passAndSalt"));
-                        user[0].setUserRole(ConstantCollections.getUserRoleByUserRoleId(resultSet.getString("userRoleID")));
+                        user[0].setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         user[0].setUserName(resultSet.getString("userName"));
                         user[0].setPhoneNumber(resultSet.getString("phoneNumber"));
                         user[0].setEmail(resultSet.getString("email"));
@@ -200,8 +198,7 @@ public class UserDaoImpl implements GenericUserDao<User> {
                         user.setLogin(resultSet.getString("userLogin"));
                         user.setSalt(resultSet.getString("salt"));
                         user.setPassAndSalt(resultSet.getString("passAndSalt"));
-                        String userRoleId = resultSet.getString("userRoleID");
-                        user.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId));
+                        user.setUserRole(User.UserRole.valueOf(resultSet.getString("userRoleID")));
                         user.setUserName(resultSet.getString("userName"));
                         user.setPhoneNumber(resultSet.getString("phoneNumber"));
                         user.setEmail(resultSet.getString("email"));

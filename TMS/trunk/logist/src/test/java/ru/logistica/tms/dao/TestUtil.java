@@ -48,9 +48,9 @@ public class TestUtil {
     }
 
     public static void cleanDatabase(boolean showOutput) throws URISyntaxException {
-        Path pathToSql = Paths.get(TestUtil.class.getResource("tables.sql").toURI());
+        Path pathToSql = Paths.get(TestUtil.class.getResource("ddl.sql").toURI());
         try {
-            // executeCommand("cmd /c taskkill -f /IM psql.exe");
+            executeCommand("cmd /c taskkill -f /IM psql.exe");
             String output = executeCommand("cmd /c psql.exe -U postgres -d postgres -h localhost -f " + pathToSql);
             if (showOutput) System.out.println(output);
         }

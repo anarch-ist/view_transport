@@ -3,8 +3,6 @@ package ru.logistica.tms.dao;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logistica.tms.dao.constantsDao.*;
-import ru.logistica.tms.dao.warehouseDao.Warehouse;
-import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dao.usersDao.GenericUserDao;
 import ru.logistica.tms.dao.usersDao.User;
 import ru.logistica.tms.dao.usersDao.UserDaoImpl;
@@ -14,7 +12,6 @@ import ru.logistica.tms.util.CriptUtils;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Set;
 
 public class DaoManager {
@@ -50,10 +47,8 @@ public class DaoManager {
                 ConstantCollections.setUserRoles(userRoles);
                 Set<Permission> permissions = constantsDao.getPermissions();
                 ConstantCollections.setPermissions(permissions);
-                Set<TimeDiff> timeDiffs = constantsDao.getTimeDiffs();
-                ConstantCollections.setTimeDiffs(timeDiffs);
-                Set<WantStatus> wantStatuses = constantsDao.getWantStatuses();
-                ConstantCollections.setWantStatuses(wantStatuses);
+                Set<OrderStatus> orderStatuses = constantsDao.getOrderStatuses();
+                ConstantCollections.setOrderStatuses(orderStatuses);
             }
         });
     }

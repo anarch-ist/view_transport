@@ -39,17 +39,7 @@ public class SupplierUserDaoImplTest {
 
         supplier.setSupplierID(1);
         supplier.setInn("547658768");
-        supplier.setClientName("Roman");
-        supplier.setKpp("74678788436");
-        supplier.setCorAccount("89475984567");
-        supplier.setCurAccount("239489");
-        supplier.setBik("46467676");
-        supplier.setBankName("ural");
-        supplier.setContractNumber("8989");
-        supplier.setDateOfSigning(new Date(2016, 4, 22));
-        supplier.setStartContractDate(new Date(2016, 4, 24));
-        supplier.setEndContractDate(new Date(2016, 7, 24));
-        supplierDao.saveOrUpdate(supplier); //!!!!!!!!!!!!!!!
+        supplierDao.save(supplier); //!!!!!!!!!!!!!!!
 
         supplierUser1.setSupplier(supplier);
         supplierUser1.setUserId(null);
