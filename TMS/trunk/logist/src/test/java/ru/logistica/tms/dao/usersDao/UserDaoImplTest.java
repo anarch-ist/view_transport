@@ -7,9 +7,6 @@ import org.testng.annotations.Test;
 import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
-import ru.logistica.tms.dao.constantsDao.ConstantsDao;
-import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,8 +25,6 @@ public class UserDaoImplTest {
     public static void setUp() throws Exception {
         TestUtil.cleanDatabase(false); // recreate database
         ConnectionManager.setConnection(TestUtil.createConnection());
-        ConstantsDao constantsDao = new ConstantsDaoImpl();
-        ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
         users.add(user1);
         users.add(user2);
@@ -47,12 +42,9 @@ public class UserDaoImplTest {
         user2.setPassword("pass2");
         user3.setPassword("pass3");
 
-        String userRoleId1 = "W_BOSS";
-        user1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
-        String userRoleId2 = "SUPPLIER_MANAGER";
-        user2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId2));
-        String userRoleId3 = "WH_DISPATCHER";
-        user3.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId3));
+        user1.setUserRole(User.UserRole.W_BOSS);
+        user2.setUserRole(User.UserRole.SUPPLIER_MANAGER);
+        user3.setUserRole(User.UserRole.WH_DISPATCHER);
 
         user1.setUserName("Masha");
         user2.setUserName("Sasha");
@@ -97,8 +89,7 @@ public class UserDaoImplTest {
         abstractUser.setUserId(1);
         abstractUser.setLogin("user1");
         abstractUser.setPassword("pass4");
-        String userRoleId1 = "W_BOSS";
-        abstractUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+        abstractUser.setUserRole(User.UserRole.W_BOSS);
         abstractUser.setUserName("Misha");
         abstractUser.setPhoneNumber("8-916-367-48-76");
         abstractUser.setEmail("misha@mail.ru");
@@ -120,8 +111,7 @@ public class UserDaoImplTest {
             user.setUserId(1);
             user.setLogin("user4");
             user.setPassword("pass4");
-            String userRoleId1 = "W_BOSS";
-            user.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+            user.setUserRole(User.UserRole.W_BOSS);
             user.setUserName("Misha");
             user.setPhoneNumber("8-916-367-48-76");
             user.setEmail("misha@mail.ru");

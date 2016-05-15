@@ -8,9 +8,6 @@ import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.GenericDao;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
-import ru.logistica.tms.dao.constantsDao.ConstantsDao;
-import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 
@@ -35,27 +32,15 @@ public class WarehouseUserDaoImplTest {
         TestUtil.cleanDatabase(false);
         ConnectionManager.setConnection(TestUtil.createConnection());
 
-        ConstantsDao constantsDao = new ConstantsDaoImpl();
-        ConstantCollections.setUserRoles(constantsDao.getUserRoles());
-
         warehouse.setWarehouseId(1);
         warehouse.setWarehouseName("warehouse");
-        warehouse.setRegion("EKT");
-        warehouse.setDistrict("Sverd");
-        warehouse.setLocality("Ural");
-        warehouse.setMailIndex("454363");
-        warehouse.setAddress("EKT, street Lenina, 3, 4");
-        warehouse.setEmail("ural@yandex.ru");
-        warehouse.setPhoneNumber("8-989-535-34-21");
-        warehouse.setResponsiblePersonId("person");
         pointDao.saveOrUpdate(warehouse);
 
         warehouseUser1.setWarehouse(warehouse);
         warehouseUser1.setUserId(null);
         warehouseUser1.setLogin("user4");
         warehouseUser1.setPassword("pass4");
-        String userRoleId1 = "W_BOSS";
-        warehouseUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+        warehouseUser1.setUserRole(User.UserRole.W_BOSS);
         warehouseUser1.setUserName("Kolya");
         warehouseUser1.setPhoneNumber("8-945-348-34-45");
         warehouseUser1.setEmail("k@bk.ru");
@@ -65,8 +50,7 @@ public class WarehouseUserDaoImplTest {
         warehouseUser2.setUserId(null);
         warehouseUser2.setLogin("user5");
         warehouseUser2.setPassword("pass5");
-        String userRoleId2 = "WH_DISPATCHER";
-        warehouseUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId2));
+        warehouseUser2.setUserRole(User.UserRole.WH_DISPATCHER);
         warehouseUser2.setUserName("Kate");
         warehouseUser2.setPhoneNumber("8-945-846-24-15");
         warehouseUser2.setEmail("kate@bk.ru");
@@ -102,8 +86,7 @@ public class WarehouseUserDaoImplTest {
         warehouseUser.setUserId(null);
         warehouseUser.setLogin("user4");
         warehouseUser.setPassword("pass8");
-        String userRoleId1 = "W_BOSS";
-        warehouseUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+        warehouseUser.setUserRole(User.UserRole.W_BOSS);
         warehouseUser.setUserName("Kol");
         warehouseUser.setPhoneNumber("8-945-348-34-45");
         warehouseUser.setEmail("k@bk.ru");
@@ -129,8 +112,7 @@ public class WarehouseUserDaoImplTest {
             warehouseUser.setUserId(null);
             warehouseUser.setLogin("user9");
             warehouseUser.setPassword("pass8");
-            String userRoleId1 = "W_BOSS";
-            warehouseUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+            warehouseUser.setUserRole(User.UserRole.W_BOSS);
             warehouseUser.setUserName("Kol");
             warehouseUser.setPhoneNumber("8-945-348-34-45");
             warehouseUser.setEmail("k@bk.ru");

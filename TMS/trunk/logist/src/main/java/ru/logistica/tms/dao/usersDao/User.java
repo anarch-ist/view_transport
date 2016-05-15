@@ -15,7 +15,7 @@ public class User {
     private String position;
 
     @Binding(sqlObject = "user_roles")
-    enum UserRole {
+    public enum UserRole {
         W_BOSS("W_BOSS"), WH_DISPATCHER("WH_DISPATCHER"), SUPPLIER_MANAGER("SUPPLIER_MANAGER");
         private String name;
         UserRole(String name) {this.name = name;}

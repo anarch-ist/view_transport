@@ -8,9 +8,6 @@ import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.GenericDao;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
-import ru.logistica.tms.dao.constantsDao.ConstantsDao;
-import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
 
@@ -18,7 +15,6 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Test(singleThreaded = true)
@@ -34,19 +30,16 @@ public class SupplierUserDaoImplTest {
     public static void setUp() throws SQLException, DaoException, URISyntaxException {
         TestUtil.cleanDatabase(false);
         ConnectionManager.setConnection(TestUtil.createConnection());
-        ConstantsDao constantsDao = new ConstantsDaoImpl();
-        ConstantCollections.setUserRoles(constantsDao.getUserRoles());
 
         supplier.setSupplierID(1);
         supplier.setInn("547658768");
-        supplierDao.save(supplier); //!!!!!!!!!!!!!!!
+        supplierDao.save(supplier);
 
         supplierUser1.setSupplier(supplier);
         supplierUser1.setUserId(null);
         supplierUser1.setLogin("user6");
         supplierUser1.setPassword("pass6");
-        String userRoleId1 = "SUPPLIER_MANAGER";
-        supplierUser1.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+        supplierUser1.setUserRole(User.UserRole.SUPPLIER_MANAGER);
         supplierUser1.setUserName("Fedor");
         supplierUser1.setPhoneNumber("8-916-376-90-43");
         supplierUser1.setEmail("f@mail.ru");
@@ -56,7 +49,7 @@ public class SupplierUserDaoImplTest {
         supplierUser2.setUserId(null);
         supplierUser2.setLogin("user7");
         supplierUser2.setPassword("pass7");
-        supplierUser2.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+        supplierUser2.setUserRole(User.UserRole.SUPPLIER_MANAGER);
         supplierUser2.setUserName("Kirill");
         supplierUser2.setPhoneNumber("8-909-348-34-45");
         supplierUser2.setEmail("kira@bk.ru");
@@ -91,8 +84,7 @@ public class SupplierUserDaoImplTest {
         supplierUser.setUserId(null);
         supplierUser.setLogin("user6");
         supplierUser.setPassword("testtest");
-        String userRoleId1 = "SUPPLIER_MANAGER";
-        supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+        supplierUser.setUserRole(User.UserRole.SUPPLIER_MANAGER);
         supplierUser.setUserName("Fed");
         supplierUser.setPhoneNumber("8-916-376-90-43");
         supplierUser.setEmail("f@mail.ru");
@@ -117,8 +109,7 @@ public class SupplierUserDaoImplTest {
             supplierUser.setUserId(null);
             supplierUser.setLogin("user9");
             supplierUser.setPassword("pass8");
-            String userRoleId1 = "W_BOSS";
-            supplierUser.setUserRole(ConstantCollections.getUserRoleByUserRoleId(userRoleId1));
+            supplierUser.setUserRole(User.UserRole.W_BOSS);
             supplierUser.setUserName("Kol");
             supplierUser.setPhoneNumber("8-945-348-34-45");
             supplierUser.setEmail("k@bk.ru");

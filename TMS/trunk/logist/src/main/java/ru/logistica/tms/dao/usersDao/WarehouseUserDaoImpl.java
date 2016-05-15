@@ -51,15 +51,8 @@ public class WarehouseUserDaoImpl implements GenericUserDao<WarehouseUser> {
                         "users.phoneNumber, " +
                         "users.email, " +
                         "users.position, " +
-                        "warehouses.warehouseName, " +
-                        "warehouses.region, " +
-                        "warehouses.district," +
-                        "warehouses.locality, " +
-                        "warehouses.mailIndex, " +
-                        "warehouses.address, " +
-                        "warehouses.email, " +
-                        "warehouses.phoneNumber, " +
-                        "warehouses.responsiblePersonID FROM warehouse_users " +
+                        "warehouses.warehouseName " +
+                        "FROM warehouse_users " +
                         "INNER JOIN users ON (users.userID = warehouse_users.userID)" +
                         "INNER JOIN warehouses ON (warehouses.warehouseID = warehouse_users.warehouseID)" +
                         "WHERE warehouse_users.userID = ?;";
@@ -104,15 +97,8 @@ public class WarehouseUserDaoImpl implements GenericUserDao<WarehouseUser> {
                         "users.phoneNumber, " +
                         "users.email, " +
                         "users.position, " +
-                        "warehouses.warehouseName, " +
-                        "warehouses.region, " +
-                        "warehouses.district," +
-                        "warehouses.locality, " +
-                        "warehouses.mailIndex, " +
-                        "warehouses.address, " +
-                        "warehouses.email, " +
-                        "warehouses.phoneNumber, " +
-                        "warehouses.responsiblePersonID FROM warehouse_users " +
+                        "warehouses.warehouseName " +
+                        "FROM warehouse_users " +
                         "INNER JOIN users ON (users.userID = warehouse_users.userID) " +
                         "INNER JOIN warehouses ON (warehouses.warehouseID = warehouse_users.warehouseID);";
                 try (PreparedStatement statement = ConnectionManager.getConnection().prepareStatement(sql)){

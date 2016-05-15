@@ -2,7 +2,6 @@ package ru.logistica.tms.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.dao.constantsDao.*;
 import ru.logistica.tms.dao.usersDao.GenericUserDao;
 import ru.logistica.tms.dao.usersDao.User;
 import ru.logistica.tms.dao.usersDao.UserDaoImpl;
@@ -12,7 +11,6 @@ import ru.logistica.tms.util.CriptUtils;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Set;
 
 public class DaoManager {
     private static final Logger logger = LogManager.getLogger();
@@ -36,21 +34,6 @@ public class DaoManager {
     }
     private interface DaoScript {
         void execute() throws DaoException;
-    }
-
-    public static void loadAllConstantsInMemory() {
-        doInTransaction(new DaoScript() {
-            @Override
-            public void execute() throws DaoException {
-                ConstantsDao constantsDao = new ConstantsDaoImpl();
-                Set<UserRole> userRoles = constantsDao.getUserRoles();
-                ConstantCollections.setUserRoles(userRoles);
-                Set<Permission> permissions = constantsDao.getPermissions();
-                ConstantCollections.setPermissions(permissions);
-                Set<OrderStatus> orderStatuses = constantsDao.getOrderStatuses();
-                ConstantCollections.setOrderStatuses(orderStatuses);
-            }
-        });
     }
 
     public static AuthResult checkUser(final String login, final String passMd5) {

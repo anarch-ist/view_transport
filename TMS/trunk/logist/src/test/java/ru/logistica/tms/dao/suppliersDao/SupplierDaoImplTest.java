@@ -1,14 +1,11 @@
 package ru.logistica.tms.dao.suppliersDao;
 
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.TestUtil;
-import ru.logistica.tms.dao.constantsDao.ConstantCollections;
-import ru.logistica.tms.dao.constantsDao.ConstantsDao;
-import ru.logistica.tms.dao.constantsDao.ConstantsDaoImpl;
-
-import static org.testng.Assert.*;
 
 public class SupplierDaoImplTest {
 
@@ -31,10 +28,9 @@ public class SupplierDaoImplTest {
     @Test
     public void testSave() throws Exception {
         supplier.setInn("12323435");
-        Integer prKey = supplierDao.save(supplier);
+        supplierDao.save(supplier);
         ConnectionManager.getConnection().commit();
-        supplier.setSupplierID(prKey);
-        Assert.assertTrue(prKey == 1);
+        Assert.assertTrue(supplier.getSupplierID() == 1);
     }
 
     @Test(dependsOnMethods = {"testSave"})

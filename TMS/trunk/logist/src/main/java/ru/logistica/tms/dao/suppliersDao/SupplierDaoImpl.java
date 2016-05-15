@@ -15,7 +15,7 @@ public class SupplierDaoImpl implements SupplierDao {
 
     @Override
     public Supplier getById(final Integer id) throws DaoException {
-        final Supplier supplier = new Supplier();
+        final Supplier[] result = {null};
         Utils.runWithExceptionRedirect(new Utils.Exec() {
             @Override
             public void execute() throws Exception {
@@ -24,12 +24,13 @@ public class SupplierDaoImpl implements SupplierDao {
                     statement.setInt(1, id);
                     ResultSet resultSet = statement.executeQuery();
                     resultSet.next();
-                    supplier.setSupplierID(resultSet.getInt("supplierID"));
-                    supplier.setInn(resultSet.getString("INN"));
+                    result[0] = new Supplier();
+                    result[0].setSupplierID(resultSet.getInt("supplierID"));
+                    result[0].setInn(resultSet.getString("INN"));
                 }
             }
         });
-        return supplier;
+        return result[0];
     }
 
     @Override
@@ -50,6 +51,7 @@ public class SupplierDaoImpl implements SupplierDao {
                     ResultSet resultSet = statement.getGeneratedKeys();
                     if(resultSet.next()) {
                         result[0] = resultSet.getInt(1);
+                        supplier.setSupplierID(result[0]);
                     }
                 }
             }

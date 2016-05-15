@@ -1,6 +1,5 @@
 package ru.logistica.tms.controller;
 
-import ru.logistica.tms.dao.DaoManager;
 import ru.logistica.tms.dao.usersDao.User;
 
 import javax.servlet.ServletException;
@@ -13,9 +12,6 @@ import java.io.IOException;
 
 @WebServlet("/main")
 public class MainServlet extends HttpServlet {
-    public static final String SUPPLIER_MANAGER = "SUPPLIER_MANAGER";
-    public static final String W_BOSS = "W_BOSS";
-    public static final String WH_DISPATCHER = "WH_DISPATCHER";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -26,8 +22,9 @@ public class MainServlet extends HttpServlet {
         //
         HttpSession session = request.getSession(false);
         User user = (User)session.getAttribute("user");
-        String userRoleId = user.getUserRole().getUserRoleId();
-        if (userRoleId.equals(SUPPLIER_MANAGER)) {
+        User.UserRole userRole = user.getUserRole();
+
+        if (userRole == User.UserRole.SUPPLIER_MANAGER) {
             //DaoManager.
         }
 

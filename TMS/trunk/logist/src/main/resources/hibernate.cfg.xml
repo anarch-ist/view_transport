@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<!--xsi:schemaLocation="http://www.hibernate.org/xsd/hibernate-configuration/hibernate-configuration-4.0.xsd"-->
+
+<!--https://docs.jboss.org/hibernate/orm/5.0/manual/en-US/html/ch03.html-->
+<hibernate-configuration>
+
+    <session-factory>
+
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL94Dialect</property>
+        <!--Connections source from built-in tomcat connection pool-->
+        <property name="hibernate.connection.datasource">java:/comp/env/jdbc/postgres</property>
+        <!-- Enable Hibernate's automatic session context management -->
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.connection.autocommit">false</property>
+        <property name="hibernate.show_sql">true</property>
+        <!-- Drop and re-create the database schema on startup (values = [create, update])-->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+
+        <!-- ADD THIS CLASSES IN RUNTIME BY MEANS OF addAnnotatedClass() method in Configuration class for test reason.-->
+        <!-- Names the annotated entity class -->
+        <!--<mapping class="ru.mipt.applied_mechanics.dao.wellDao.Well" />-->
+        <!--<mapping class="ru.mipt.applied_mechanics.dao.functionNamesDao.FunctionName" />-->
+        <!--<mapping class="ru.mipt.applied_mechanics.dao.measurementTypeDao.MeasurementType" />-->
+        <!--<mapping class="ru.mipt.applied_mechanics.dao.wellDao.WellFunctionMeasureGroup" />-->
+
+    </session-factory>
+</hibernate-configuration>
