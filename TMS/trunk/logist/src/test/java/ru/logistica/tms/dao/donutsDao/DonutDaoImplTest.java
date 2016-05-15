@@ -3,7 +3,7 @@ package ru.logistica.tms.dao.donutsDao;
 import org.testng.Assert;
 import org.testng.annotations.*;
 import ru.logistica.tms.dao.ConnectionManager;
-import ru.logistica.tms.dao.TestUtil;
+import ru.logistica.tms.TestUtil;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDao;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;

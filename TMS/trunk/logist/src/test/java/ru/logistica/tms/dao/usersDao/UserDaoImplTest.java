@@ -6,7 +6,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
-import ru.logistica.tms.dao.TestUtil;
+import ru.logistica.tms.TestUtil;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

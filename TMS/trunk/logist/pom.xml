@@ -24,11 +24,11 @@
         </dependency>
 
         <!-- for JPA, use hibernate-entitymanager instead of hibernate-core -->
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-entitymanager</artifactId>-->
-            <!--<version>5.0.0.Final</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.0.0.Final</version>
+        </dependency>
 
         <dependency>
             <!--tomcat 8.0.33 use LoginServlet Api 3.1 version-->

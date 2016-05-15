@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import ru.logistica.tms.dao.ConnectionManager;
 import ru.logistica.tms.dao.DaoException;
 import ru.logistica.tms.dao.GenericDao;
-import ru.logistica.tms.dao.TestUtil;
+import ru.logistica.tms.TestUtil;
 import ru.logistica.tms.dao.suppliersDao.Supplier;
 import ru.logistica.tms.dao.suppliersDao.SupplierDaoImpl;
 

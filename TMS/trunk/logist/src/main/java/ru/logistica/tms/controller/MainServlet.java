@@ -1,6 +1,7 @@
 package ru.logistica.tms.controller;
 
-import ru.logistica.tms.dao.usersDao.User;
+
+import ru.logistica.tms.dao2.userDao.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,9 +25,9 @@ public class MainServlet extends HttpServlet {
         User user = (User)session.getAttribute("user");
         User.UserRole userRole = user.getUserRole();
 
-        if (userRole == User.UserRole.SUPPLIER_MANAGER) {
-            //DaoManager.
-        }
+//        if (userRole == User.UserRole.SUPPLIER_MANAGER) {
+//            //DaoManager.
+//        }
 
 
         request.getRequestDispatcher("/WEB-INF/pages/main.jsp").forward(request, response);

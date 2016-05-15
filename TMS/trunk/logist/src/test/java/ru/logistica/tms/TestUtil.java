@@ -1,4 +1,4 @@
-package ru.logistica.tms.dao;
+package ru.logistica.tms;
 
 import java.io.BufferedReader;
 import java.io.File;

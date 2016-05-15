@@ -2,10 +2,12 @@ package ru.logistica.tms.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.dao.DaoManager;
+import ru.logistica.tms.dao2.DaoManager;
 import ru.logistica.tms.dto.AuthResult;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

@@ -1,5 +1,5 @@
 user: postgres
-pass: ehbruygbwruebg34574
+pass: postgres
 
 port: 5432
 

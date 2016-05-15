@@ -1,4 +1,4 @@
-package ru.logistica.tms.dao2.suppliersDao;
+package ru.logistica.tms.dao2.supplierDao;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -6,8 +6,12 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.logistica.tms.dao.TestUtil;
+import ru.logistica.tms.TestUtil;
 import ru.logistica.tms.dao2.HibernateUtils;
+import ru.logistica.tms.dao2.docDao.Doc;
+import ru.logistica.tms.dao2.docPeriodDao.DonutDocPeriod;
+import ru.logistica.tms.dao2.orderDao.Order;
+import ru.logistica.tms.dao2.warehouseDao.Warehouse;
 
 public class SuppliersDaoImplTest {
 
@@ -16,7 +20,11 @@ public class SuppliersDaoImplTest {
         TestUtil.cleanDatabase(false);
         // setup the session factory
         Configuration configuration = new Configuration();
-        configuration.addAnnotatedClass(SuppliersEntity.class);
+        configuration.addAnnotatedClass(Supplier.class);
+        configuration.addAnnotatedClass(DonutDocPeriod.class);
+        configuration.addAnnotatedClass(Doc.class);
+        configuration.addAnnotatedClass(Warehouse.class);
+        configuration.addAnnotatedClass(Order.class);
         configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL94Dialect");
         configuration.setProperty("hibernate.connection.driver_class","org.postgresql.Driver");
         configuration.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres");
@@ -40,9 +48,9 @@ public class SuppliersDaoImplTest {
     @Test
     public void testSave() throws Exception {
         HibernateUtils.beginTransaction();
-        SuppliersEntity suppliersEntity = new SuppliersEntity();
+        Supplier suppliersEntity = new Supplier();
         suppliersEntity.setInn("1223445");
-        SuppliersDao suppliersDao = new SuppliersDaoImpl();
+        SupplierDao suppliersDao = new SupplierDaoImpl();
         Integer generatedKey = suppliersDao.save(suppliersEntity);
         HibernateUtils.commitTransaction();
         Assert.assertTrue(generatedKey == 1);
@@ -52,22 +60,22 @@ public class SuppliersDaoImplTest {
     @Test(dependsOnMethods = {"testSave"})
     public void testFindById() throws Exception {
         HibernateUtils.beginTransaction();
-        SuppliersDao suppliersDao = new SuppliersDaoImpl();
-        SuppliersEntity supplier = suppliersDao.findById(SuppliersEntity.class, 1);
+        SupplierDao suppliersDao = new SupplierDaoImpl();
+        Supplier supplier = suppliersDao.findById(Supplier.class, 1);
         HibernateUtils.commitTransaction();
         Assert.assertEquals(supplier.getInn(), "1223445");
-        Assert.assertEquals(supplier.getSupplierid().intValue(), 1);
+        Assert.assertEquals(supplier.getSupplierId().intValue(), 1);
     }
 
     @Test(dependsOnMethods = {"testFindById"})
     public void testUpdate() throws Exception {
         HibernateUtils.beginTransaction();
-        SuppliersDao suppliersDao = new SuppliersDaoImpl();
-        SuppliersEntity suppliersEntity = new SuppliersEntity();
+        SupplierDao suppliersDao = new SupplierDaoImpl();
+        Supplier suppliersEntity = new Supplier();
         suppliersEntity.setInn("11111111");
-        suppliersEntity.setSupplierid(1);
+        suppliersEntity.setSupplierId(1);
         suppliersDao.update(suppliersEntity);
-        SuppliersEntity updatedSupplier = suppliersDao.findById(SuppliersEntity.class, 1);
+        Supplier updatedSupplier = suppliersDao.findById(Supplier.class, 1);
         HibernateUtils.commitTransaction();
         Assert.assertEquals(updatedSupplier, suppliersEntity);
     }

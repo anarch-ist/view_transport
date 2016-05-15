@@ -5,7 +5,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.ConnectionManager;
-import ru.logistica.tms.dao.TestUtil;
+import ru.logistica.tms.TestUtil;
 
 public class SupplierDaoImplTest {
 
