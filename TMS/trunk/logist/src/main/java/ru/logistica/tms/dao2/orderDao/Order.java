@@ -11,14 +11,24 @@ public class Order {
     private Integer orderId;
     private String orderNumber;
     private Short boxQty;
-    private String orderStatus;
+    private OrderStatuses orderStatus;
     private String commentForStatus;
     private DonutDocPeriod donutDocPeriod;
     private Warehouse finalDestinationWarehouse;
 
+    @Id
+    @Column(name = "orderid", nullable = false)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
     @ManyToOne
     @JoinColumn(name = "donutdocperiodid")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     public DonutDocPeriod getDonutDocPeriod() {
         return donutDocPeriod;
     }
@@ -35,16 +45,6 @@ public class Order {
 
     public void setFinalDestinationWarehouse(Warehouse finalDestinationWarehouse) {
         this.finalDestinationWarehouse = finalDestinationWarehouse;
-    }
-
-    @Id
-    @Column(name = "orderid", nullable = false)
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
     }
 
     @Basic
@@ -69,11 +69,12 @@ public class Order {
 
     @Basic
     @Column(name = "orderstatus", nullable = false, length = 32)
-    public String getOrderStatus() {
+    @Enumerated(EnumType.STRING)
+    public OrderStatuses getOrderStatus() {
         return orderStatus;
     }
 
-    public void setOrderStatus(String orderStatus) {
+    public void setOrderStatus(OrderStatuses orderStatus) {
         this.orderStatus = orderStatus;
     }
 

@@ -43,6 +43,15 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
     }
 
     @Override
+    public void persist(T entity) throws DAOException {
+        try {
+            getSession().persist(entity);
+        } catch (Exception e) {
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
     public List<T> findAll(Class clazz) throws DAOException {
         try {
             Session hibernateSession = this.getSession();

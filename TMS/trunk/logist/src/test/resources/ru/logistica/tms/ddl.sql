@@ -20,16 +20,14 @@ CREATE TABLE docs (
   PRIMARY KEY (docID),
   FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
 );
--- if no period => OPENED, if
+-- if no period => OPENED, if doc_period => OCCUPIED, if
 CREATE TABLE doc_periods (
   docPeriodID BIGSERIAL, -- Static
   docID       INTEGER                  NOT NULL, -- Static
   periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
   periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
-  periodState VARCHAR(32)              NOT NULL, -- Dynamic
-  -- BINDING
-  CONSTRAINT period_statuses CHECK (periodState IN ('CLOSED', 'OCCUPIED')),
   -- длина периода кратна 30 минутам
+  -- BINDING
   CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
                                                (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
   PRIMARY KEY (docPeriodID),
@@ -70,7 +68,7 @@ CREATE TABLE orders (
   donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
   orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
   commentForStatus            TEXT        NOT NULL, -- Dynamic
-  -- BINDING
+  -- BINDING ru.logistica.tms.dao2.orderDao.OrderStatuses
   CONSTRAINT order_statuses CHECK (orderStatus IN
                                    ('CREATED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
   PRIMARY KEY (orderID),
@@ -89,7 +87,7 @@ CREATE TABLE user_roles (
   PRIMARY KEY (userRoleID)
 );
 
--- BINDING ru.logistica.tms.dao.usersDao.User.UserRole
+-- BINDING ru.logistica.tms.dao2.userDao.UserRoles
 INSERT INTO user_roles (userRoleID)
 VALUES
   ('W_BOSS'), -- обязан иметь склад, но у него нет ссылки на поставщика

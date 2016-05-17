@@ -3,16 +3,15 @@ package ru.logistica.tms.dao2.docPeriodDao;
 import ru.logistica.tms.dao2.docDao.Doc;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Table(name = "doc_periods", schema = "public", catalog = "postgres")
 @Inheritance(strategy=InheritanceType.JOINED)
 public class DocPeriod {
     private Long docPeriodId;
-    private Timestamp periodBegin;
-    private Timestamp periodEnd;
-    private String periodState;
+    private Date periodBegin;
+    private Date periodEnd;
     private Doc doc;
 
     @Id
@@ -28,32 +27,24 @@ public class DocPeriod {
 
     @Basic
     @Column(name = "periodbegin", nullable = false)
-    public Timestamp getPeriodBegin() {
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getPeriodBegin() {
         return periodBegin;
     }
 
-    public void setPeriodBegin(Timestamp periodBegin) {
+    public void setPeriodBegin(Date periodBegin) {
         this.periodBegin = periodBegin;
     }
 
     @Basic
     @Column(name = "periodend", nullable = false)
-    public Timestamp getPeriodEnd() {
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getPeriodEnd() {
         return periodEnd;
     }
 
-    public void setPeriodEnd(Timestamp periodEnd) {
+    public void setPeriodEnd(Date periodEnd) {
         this.periodEnd = periodEnd;
-    }
-
-    @Basic
-    @Column(name = "periodstate", nullable = false, length = 32)
-    public String getPeriodState() {
-        return periodState;
-    }
-
-    public void setPeriodState(String periodState) {
-        this.periodState = periodState;
     }
 
     @ManyToOne
@@ -78,10 +69,8 @@ public class DocPeriod {
         if (periodBegin != null ? !periodBegin.equals(docPeriod.periodBegin) : docPeriod.periodBegin != null)
             return false;
         if (periodEnd != null ? !periodEnd.equals(docPeriod.periodEnd) : docPeriod.periodEnd != null) return false;
-        if (periodState != null ? !periodState.equals(docPeriod.periodState) : docPeriod.periodState != null)
-            return false;
+        return doc != null ? doc.equals(docPeriod.doc) : docPeriod.doc == null;
 
-        return true;
     }
 
     @Override
@@ -89,9 +78,7 @@ public class DocPeriod {
         int result = docPeriodId != null ? docPeriodId.hashCode() : 0;
         result = 31 * result + (periodBegin != null ? periodBegin.hashCode() : 0);
         result = 31 * result + (periodEnd != null ? periodEnd.hashCode() : 0);
-        result = 31 * result + (periodState != null ? periodState.hashCode() : 0);
+        result = 31 * result + (doc != null ? doc.hashCode() : 0);
         return result;
     }
-
-
 }

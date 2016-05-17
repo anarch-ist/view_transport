@@ -8,13 +8,17 @@ public interface GenericDao<T, Id extends Serializable> {
 
     /**
      * sync save data into database
+     *
      * @param entity
      * @return primary key for saved object
      */
-     Id save(T entity) throws DAOException;
+    Id save(T entity) throws DAOException;
+
+    void persist(T entity) throws DAOException;
 
     /**
      * entity become managed and invoking any setter reflected in database
+     *
      * @param entity
      */
     void update(T entity) throws DAOException;
@@ -24,4 +28,6 @@ public interface GenericDao<T, Id extends Serializable> {
     List<T> findAll(Class clazz) throws DAOException;
 
     T findById(Class clazz, Id id) throws DAOException;
+
+
 }

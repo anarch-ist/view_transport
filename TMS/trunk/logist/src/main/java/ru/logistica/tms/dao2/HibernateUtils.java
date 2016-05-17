@@ -33,7 +33,9 @@ public class HibernateUtils {
     }
 
     public static void rollbackTransaction() {
+        logger.error("START ROLLBACK");
         sessionFactory.getCurrentSession().getTransaction().rollback();
+        logger.error("END ROLLBACK");
     }
 
     public static Session getCurrentSession() {

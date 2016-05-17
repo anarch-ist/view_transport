@@ -35,7 +35,7 @@ public class Warehouse {
         this.warehouseName = warehouseName;
     }
 
-    @OneToMany(mappedBy="warehouse")
+    @OneToMany(mappedBy="warehouse", fetch = FetchType.EAGER)
     public Set<Doc> getDocs() {
         return docs;
     }
@@ -60,20 +60,12 @@ public class Warehouse {
 
         Warehouse warehouse = (Warehouse) o;
 
-        if (warehouseId != null ? !warehouseId.equals(warehouse.warehouseId) : warehouse.warehouseId != null)
-            return false;
-        if (warehouseName != null ? !warehouseName.equals(warehouse.warehouseName) : warehouse.warehouseName != null)
-            return false;
+        return warehouseId != null ? warehouseId.equals(warehouse.warehouseId) : warehouse.warehouseId == null;
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = warehouseId != null ? warehouseId.hashCode() : 0;
-        result = 31 * result + (warehouseName != null ? warehouseName.hashCode() : 0);
-        return result;
+        return warehouseId != null ? warehouseId.hashCode() : 0;
     }
-
-
 }

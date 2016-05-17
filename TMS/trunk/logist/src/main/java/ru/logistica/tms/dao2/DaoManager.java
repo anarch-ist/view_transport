@@ -2,54 +2,49 @@ package ru.logistica.tms.dao2;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logistica.tms.dao2.userDao.User;
+import ru.logistica.tms.dao2.userDao.UserDao;
+import ru.logistica.tms.dao2.userDao.UserDaoImpl;
 import ru.logistica.tms.dto.AuthResult;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
+import ru.logistica.tms.util.CriptUtils;
 
 public class DaoManager {
     private static final Logger logger = LogManager.getLogger();
-    private static DataSource dataSource;
 
-    public static void setDataSource(DataSource dataSource) {
-        DaoManager.dataSource = dataSource;
+    private static void doInTransaction(DaoScript daoScript) {
+        try {
+            HibernateUtils.beginTransaction();
+            daoScript.execute();
+            HibernateUtils.commitTransaction();
+        } catch (DAOException e) {
+            logger.error(e.getMessage());
+            HibernateUtils.rollbackTransaction();
+        } finally {
+            HibernateUtils.getCurrentSession().close();
+        }
     }
-
-//    private static void doInTransaction(DaoScript daoScript) {
-//        try {
-//            ConnectionManager.setConnection(dataSource.getConnection()); // get connection from the pool
-//            daoScript.execute();
-//            ConnectionManager.getConnection().commit();
-//        } catch (DaoException | SQLException e) {
-//            logger.error(e.getMessage());
-//            DBUtils.rollbackQuietly(ConnectionManager.getConnection());
-//        } finally {
-//            DBUtils.closeConnectionQuietly(ConnectionManager.getConnection()); // return connection back to the pool
-//        }
-//    }
-//    private interface DaoScript {
-//        void execute() throws DaoException;
-//    }
+    private interface DaoScript {
+        void execute() throws DAOException;
+    }
 
     public static AuthResult checkUser(final String login, final String passMd5) {
         final AuthResult authResult = new AuthResult();
-//        // md5(md5(pass)+salt)
-//        doInTransaction(new DaoScript() {
-//            @Override
-//            public void execute() throws DaoException {
-//                GenericUserDao<User> userDao = new UserDaoImpl();
-//                User user = userDao.getByLogin(login);
-//                if (user == null) {
-//                    authResult.setNoSuchLogin();
-//                } else if (!user.getPassAndSalt().equals(CriptUtils.md5(passMd5 + user.getSalt())))
-//                    authResult.setNoSuchPassword();
-//                else {
-//                    authResult.setAuthSuccess();
-//                    authResult.setUser(user);
-//                }
-//
-//            }
-//        });
+        // md5(md5(pass)+salt)
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                UserDao userDao = new UserDaoImpl();
+                User user = userDao.findByLogin(login);
+                if (user == null) {
+                    authResult.setNoSuchLogin();
+                } else if (!user.getPassAndSalt().equals(CriptUtils.md5(passMd5 + user.getSalt())))
+                    authResult.setNoSuchPassword();
+                else {
+                    authResult.setAuthSuccess();
+                    authResult.setUser(user);
+                }
+            }
+        });
         return authResult;
     }
 
