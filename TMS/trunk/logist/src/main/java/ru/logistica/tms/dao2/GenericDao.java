@@ -25,9 +25,9 @@ public interface GenericDao<T, Id extends Serializable> {
 
     void delete(T entity) throws DAOException;
 
-    List<T> findAll(Class clazz) throws DAOException;
+    List<T> findAll(Class<T> clazz) throws DAOException;
 
-    T findById(Class clazz, Id id) throws DAOException;
+    T findById(Class<T> clazz, Id id) throws DAOException;
 
 
 }

@@ -34,7 +34,7 @@ public class DaoManager {
             @Override
             public void execute() throws DAOException {
                 UserDao userDao = new UserDaoImpl();
-                User user = userDao.findByLogin(login);
+                User user = userDao.findByLogin(User.class, login);
                 if (user == null) {
                     authResult.setNoSuchLogin();
                 } else if (!user.getPassAndSalt().equals(CriptUtils.md5(passMd5 + user.getSalt())))

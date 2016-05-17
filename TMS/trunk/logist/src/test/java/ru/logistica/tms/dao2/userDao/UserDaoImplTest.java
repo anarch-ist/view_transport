@@ -31,9 +31,13 @@ public class UserDaoImplTest extends HibernateTest {
         HibernateUtils.commitTransaction();
     }
 
-    @Test
+    @Test(dependsOnMethods = {"testSave"})
     public void testFindByLogin() throws Exception {
         HibernateUtils.beginTransaction();
+        UserDao userDao = new UserDaoImpl();
+        User user6 = userDao.findByLogin(User.class, "user6");
+        System.out.println(user6);
+
         HibernateUtils.commitTransaction();
     }
 

@@ -5,7 +5,7 @@ import ru.logistica.tms.dao2.supplierDao.Supplier;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "suppliers_users", schema = "public", catalog = "postgres")
+@Table(name = "supplier_users", schema = "public", catalog = "postgres")
 @PrimaryKeyJoinColumn(name="userid")
 public class SupplierUser extends User {
 

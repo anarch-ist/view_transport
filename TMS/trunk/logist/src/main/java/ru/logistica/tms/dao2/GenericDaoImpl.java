@@ -52,7 +52,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
     }
 
     @Override
-    public List<T> findAll(Class clazz) throws DAOException {
+    public List<T> findAll(Class<T> clazz) throws DAOException {
         try {
             Session hibernateSession = this.getSession();
             Query query = hibernateSession.createQuery("from " + clazz.getName());
@@ -64,10 +64,10 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
     }
 
     @Override
-    public T findById(Class clazz, Id id) throws DAOException {
+    public T findById(Class<T> clazz, Id id) throws DAOException {
         try {
             Session hibernateSession = this.getSession();
-            return (T)hibernateSession.get(clazz, id);
+            return hibernateSession.get(clazz, id);
         } catch (Exception e) {
             throw new DAOException(e);
         }

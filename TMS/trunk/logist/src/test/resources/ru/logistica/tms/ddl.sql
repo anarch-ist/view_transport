@@ -90,27 +90,28 @@ CREATE TABLE user_roles (
 -- BINDING ru.logistica.tms.dao2.userDao.UserRoles
 INSERT INTO user_roles (userRoleID)
 VALUES
-  ('W_BOSS'), -- обязан иметь склад, но у него нет ссылки на поставщика
+  ('WH_BOSS'), -- обязан иметь склад, но у него нет ссылки на поставщика
   ('WH_DISPATCHER'), -- обязан иметь склад, но у него нет ссылки на поставщика
   ('SUPPLIER_MANAGER') -- поставщик, не имеет склада, но ссылается на поставщика
 ;
 
 CREATE TABLE users (
-  userID      SERIAL, -- Static
-  userLogin   VARCHAR(255) NOT NULL, -- Dynamic
-  salt        CHAR(16)     NOT NULL, -- Dynamic
-  passAndSalt CHAR(32)     NOT NULL, -- Dynamic
-  userRoleID  VARCHAR(32)  NOT NULL, -- Static
-  userName    VARCHAR(255) NOT NULL, -- Dynamic
-  phoneNumber VARCHAR(255) NOT NULL, -- Dynamic
-  email       VARCHAR(255) NOT NULL, -- Dynamic
-  position    VARCHAR(64)  NOT NULL, -- Static
+  userID        SERIAL, -- Static
+  userLogin     VARCHAR(255) NOT NULL, -- Dynamic
+  salt          CHAR(16)     NOT NULL, -- Dynamic
+  passAndSalt   CHAR(32)     NOT NULL, -- Dynamic
+  userRoleID    VARCHAR(32)  NOT NULL, -- Static
+  userName      VARCHAR(255) NOT NULL, -- Dynamic
+  phoneNumber   VARCHAR(255) NOT NULL, -- Dynamic
+  email         VARCHAR(255) NOT NULL, -- Dynamic
+  position      VARCHAR(64)  NOT NULL, -- Static
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID),
   UNIQUE (userLogin)
 );
 
--- W_BOSS  WH_DISPATCHER
+
+-- WH_BOSS  WH_DISPATCHER
 CREATE TABLE warehouse_users (
   userID      INTEGER, -- Static
   warehouseID INTEGER NOT NULL, -- Static
@@ -124,7 +125,7 @@ CREATE TABLE warehouse_users (
 );
 
 -- SUPPLIER_MANAGER
-CREATE TABLE suppliers_users (
+CREATE TABLE supplier_users (
   userID     INTEGER, -- Static
   supplierID INTEGER NOT NULL, -- Static
   PRIMARY KEY (userID),

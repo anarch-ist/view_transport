@@ -30,7 +30,7 @@
             <td>имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
         </tr>
         <tr>
-            <td>роль</td><td><c:out value="${sessionScope.user.userRole.userRoleRusName}"/></td>
+            <td>роль</td><td><c:out value="${sessionScope.user.userRole.userRoleId}"/></td>
         </tr>
         <tr>
             <td>должность</td><td><c:out value="${sessionScope.user.position}"/></td>

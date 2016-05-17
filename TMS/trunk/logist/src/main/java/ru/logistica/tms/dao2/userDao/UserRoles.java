@@ -1,5 +1,8 @@
 package ru.logistica.tms.dao2.userDao;
 
+import ru.logistica.tms.dao2.Binding;
+
+@Binding(sqlObject = "user_roles")
 public enum UserRoles {
-    W_BOSS, WH_DISPATCHER, SUPPLIER_MANAGER
+    WH_BOSS, WH_DISPATCHER, SUPPLIER_MANAGER, TEMP_REMOVED
 }
