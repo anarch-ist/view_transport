@@ -19,8 +19,8 @@ public class DataInserterStarter {
         Properties testProperties = new Properties();
         testProperties.loadFromXML(TestHelper.class.getResourceAsStream("test_config.property"));
         SystemResourcesContainer systemResourcesContainer = new SystemResourcesContainer(new PropertiesPojo(testProperties), logger);
-        DBManager DBManager = new DBManager(systemResourcesContainer.getConnection());
-        DataInserter dataInserter = new DataInserter(systemResourcesContainer.getConnection());
+        DBManager DBManager = new DBManager(systemResourcesContainer);
+        DataInserter dataInserter = new DataInserter(systemResourcesContainer.createConnection());
         DBManager.truncatePublicTables();
 
         dataInserter.generatePoints();

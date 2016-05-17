@@ -11,6 +11,7 @@ import ru.logist.sbat.db.DBCohesionException;
 import ru.logist.sbat.db.DBManager;
 import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;
 import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
+import ru.logist.sbat.resourcesInit.ResourceInitException;
 import ru.logist.sbat.testUtils.TestHelper;
 
 import java.io.IOException;
@@ -24,15 +25,16 @@ public class FunctionalTests {
     private static final Logger logger = LogManager.getLogger();
     private static Connection connection;
     private static TestHelper testHelper;
-    private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException, DBCohesionException, SQLException {
+    private static void loadFile(String fileName) throws URISyntaxException, IOException, JsonPException, ParseException, ValidatorException, DBCohesionException, SQLException, ResourceInitException {
         Path path = Paths.get(FunctionalTests.class.getResource(fileName).toURI());
         testHelper.loadFileInDatabase(path);
+        connection = testHelper.getConnection();
     }
 
     @BeforeClass
     public static void setUp() throws Exception{
         testHelper = new TestHelper();
-        connection = testHelper.prepareDatabase();
+        testHelper.prepareDatabase();
         loadFile("EKA_fixed.zip");
     }
 

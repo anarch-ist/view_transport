@@ -10,6 +10,7 @@ import ru.logist.sbat.db.TransactionResult;
 import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
 import ru.logist.sbat.jsonToBean.jsonReader.JsonPException;
 import ru.logist.sbat.jsonToBean.jsonReader.ValidatorException;
+import ru.logist.sbat.resourcesInit.ResourceInitException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -101,7 +102,7 @@ public class CommandsExecutor {
             transactionResult.setStatus(TransactionResult.ERROR_STATUS);
             writeDbFileResponse(transactionResult);
             return;
-        } catch (SQLException e) {
+        } catch (SQLException | ResourceInitException e) {
             logger.error(e);
             rollbackWithFatalEx();
             deleteIncomingFile();

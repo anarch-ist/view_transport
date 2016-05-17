@@ -6,6 +6,8 @@ import ru.logist.sbat.GlobalUtils;
 import ru.logist.sbat.db.transactionParts.*;
 import ru.logist.sbat.jsonToBean.beans.DataFrom1c;
 import ru.logist.sbat.jsonToBean.beans.PackageData;
+import ru.logist.sbat.resourcesInit.ResourceInitException;
+import ru.logist.sbat.resourcesInit.SystemResourcesContainer;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,16 +16,28 @@ import java.util.List;
 public class DBManager {
     private static final Logger logger = LogManager.getLogger();
     public static final String LOGIST_1C = "LOGIST_1C";
+    private SystemResourcesContainer systemResourcesContainer;
     private volatile Connection connection;
 
-    public DBManager(Connection connection) {
-        this.connection = connection;
-        try {
-            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-        } catch (SQLException e) {
-            logger.fatal(e);
-            System.exit(-1);
-        }
+//    public DBManager(Connection connection) {
+//        this.connection = connection;
+//        try {
+//            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+//        } catch (SQLException e) {
+//            logger.fatal(e);
+//            System.exit(-1);
+//        }
+//    }
+
+    private void recreateConnection() throws SQLException, ResourceInitException {
+        DBUtils.closeConnectionQuietly(connection);
+        this.connection = systemResourcesContainer.createConnection();
+
+    }
+
+    public DBManager(SystemResourcesContainer systemResourcesContainer) {
+        this.systemResourcesContainer = systemResourcesContainer;
+
     }
 
     public void close() {
@@ -35,9 +49,10 @@ public class DBManager {
      * @return never returns null
      * @param dataFrom1c
      */
-    public void updateDataFromJSONObject(DataFrom1c dataFrom1c) throws DBCohesionException, SQLException {
-        String server = dataFrom1c.getServer();
+    public void updateDataFromJSONObject(DataFrom1c dataFrom1c) throws DBCohesionException, SQLException, ResourceInitException {
+        recreateConnection();
 
+        String server = dataFrom1c.getServer();
         logger.info(GlobalUtils.getParameterizedString("\nserver = {}", server));
         Integer packageNumber = dataFrom1c.getPackageNumber().intValue();
         logger.info(GlobalUtils.getParameterizedString("packageNumber = {}", packageNumber));
@@ -91,6 +106,7 @@ public class DBManager {
         // get All public table names
         DatabaseMetaData md = null;
         try {
+            recreateConnection();
             md = connection.getMetaData();
             ResultSet rs = md.getTables(null, null, "%", null);
             List<String> tableNames = new ArrayList<>();
@@ -129,8 +145,9 @@ public class DBManager {
 
         } catch (SQLException e) {
             DBUtils.rollbackQuietly(connection);
-        }
-        finally {
+        } catch (ResourceInitException e) {
+            e.printStackTrace();
+        } finally {
             DBUtils.closeStatementQuietly(statement);
         }
 

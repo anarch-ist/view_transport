@@ -14,7 +14,6 @@ import java.sql.SQLException;
  */
 public class SystemResourcesContainer {
     private final PropertiesPojo propertiesPojo;
-    private Connection connection;
     private Path jsonDataDir;
     private Path backupDir;
     private Path responseDir;
@@ -27,10 +26,6 @@ public class SystemResourcesContainer {
         logger.info("connection recieved");
         createPaths();
         logger.info("directory paths checked");
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public Path getJsonDataDir() {
@@ -49,19 +44,18 @@ public class SystemResourcesContainer {
         return logsDir;
     }
 
-    public void createConnection() throws ResourceInitException {
+    public Connection createConnection() throws ResourceInitException {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(
+            Connection connection = DriverManager.getConnection(
                     propertiesPojo.getUrl() + propertiesPojo.getDbName() + "?" + propertiesPojo.getEncoding() + "&" + "noAccessToProcedureBodies=true",
                     propertiesPojo.getUser(),
                     propertiesPojo.getPassword()
             );
+            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
             connection.setAutoCommit(false);
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+            return connection;
+        } catch (ClassNotFoundException | SQLException e) {
             throw new ResourceInitException("can't get connection to database", e);
         }
     }

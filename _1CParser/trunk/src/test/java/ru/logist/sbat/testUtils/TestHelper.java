@@ -31,17 +31,15 @@ public class TestHelper {
     private static final Logger logger = LogManager.getLogger();
     private DBManager dbManager;
 
-    public Connection prepareDatabase() throws IOException, ResourceInitException {
+    public void prepareDatabase() throws IOException, ResourceInitException {
         // get connection to database
         Properties testProperties = new Properties();
         testProperties.loadFromXML(TestHelper.class.getResourceAsStream("test_config.property"));
         SystemResourcesContainer systemResourcesContainer = new SystemResourcesContainer(new PropertiesPojo(testProperties), logger);
-        Connection connection = systemResourcesContainer.getConnection();
-        dbManager = new DBManager(connection);
+        dbManager = new DBManager(systemResourcesContainer);
         // clean database content
         dbManager.truncatePublicTables();
         dbManager.removeFromExchange(new Timestamp(new java.util.Date().getTime()));
-        return connection;
     }
 
     public DataFrom1c getBeanObjectFromFile(Path path) throws IOException, ValidatorException, JsonPException, ParseException {
@@ -51,7 +49,7 @@ public class TestHelper {
         return jsonToBeanCmd.execute();
     }
 
-    public void loadFileInDatabase(Path path) throws DBCohesionException, SQLException, ValidatorException, JsonPException, ParseException, IOException {
+    public void loadFileInDatabase(Path path) throws DBCohesionException, SQLException, ValidatorException, JsonPException, ParseException, IOException, ResourceInitException {
         dbManager.updateDataFromJSONObject(getBeanObjectFromFile(path));
     }
 
@@ -66,4 +64,7 @@ public class TestHelper {
         return result;
     }
 
+    public Connection getConnection() {
+        return dbManager.getConnection();
+    }
 }

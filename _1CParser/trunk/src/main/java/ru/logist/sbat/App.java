@@ -65,7 +65,7 @@ public class App {
     public static void main(String[] args) {
 
         // create database helper object
-        dbManager = new DBManager(systemResourcesContainer.getConnection());
+        dbManager = new DBManager(systemResourcesContainer);
 
         // create separate thread that observe JsonData directory for new files, and starts handler if new files appeared
         createWatchService();
@@ -143,7 +143,7 @@ public class App {
         }
     }
 
-    private static void rollback(Timestamp timestamp) throws IOException, JsonPException, org.json.simple.parser.ParseException, DBCohesionException, SQLException, ValidatorException {
+    private static void rollback(Timestamp timestamp) throws IOException, JsonPException, org.json.simple.parser.ParseException, DBCohesionException, SQLException, ValidatorException, ResourceInitException {
         logger.info("start copy exchange table");
         dbManager.createTempTable();
         logger.info("start select all data from exchange table");
