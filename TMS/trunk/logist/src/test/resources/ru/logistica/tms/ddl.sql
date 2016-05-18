@@ -10,6 +10,7 @@ CREATE SCHEMA public;
 CREATE TABLE warehouses (
   warehouseID   SERIAL, -- Static
   warehouseName VARCHAR(128) NOT NULL, -- Dynamic
+  rusTimeZoneAbbr VARCHAR(6) NOT NULL, -- Dynamic
   PRIMARY KEY (warehouseID)
 );
 

@@ -4,5 +4,5 @@ import ru.logistica.tms.dao2.Binding;
 
 @Binding(sqlObject = "user_roles")
 public enum UserRoles {
-    WH_BOSS, WH_DISPATCHER, SUPPLIER_MANAGER, TEMP_REMOVED
+    WH_BOSS, WH_DISPATCHER, SUPPLIER_MANAGER
 }

@@ -14,6 +14,7 @@ import ru.logistica.tms.dao2.orderDao.OrderStatuses;
 import ru.logistica.tms.dao2.supplierDao.Supplier;
 import ru.logistica.tms.dao2.supplierDao.SupplierDao;
 import ru.logistica.tms.dao2.supplierDao.SupplierDaoImpl;
+import ru.logistica.tms.dao2.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao2.warehouseDao.Warehouse;
 import ru.logistica.tms.dao2.warehouseDao.WarehouseDao;
 import ru.logistica.tms.dao2.warehouseDao.WarehouseDaoImpl;
@@ -41,17 +42,16 @@ public class TestRelations extends HibernateTest {
 
         warehouse = new Warehouse();
         warehouse.setWarehouseName("warehouse1");
+        warehouse.setRusTimeZoneAbbr(RusTimeZoneAbbr.MSK);
 
         doc = new Doc();
         doc.setDocName("doc1");
 
         emptyDocPeriod = new DocPeriod();
-        emptyDocPeriod.setPeriodBegin(new Date(BASE_PERIOD *3));
-        emptyDocPeriod.setPeriodEnd(new Date(BASE_PERIOD *4));
+        emptyDocPeriod.setPeriod(new Period(new Date(BASE_PERIOD *3), new Date(BASE_PERIOD *4)));
 
         donutDocPeriod = new DonutDocPeriod();
-        donutDocPeriod.setPeriodBegin(new Date(BASE_PERIOD *5));
-        donutDocPeriod.setPeriodEnd(new Date(BASE_PERIOD *6));
+        donutDocPeriod.setPeriod(new Period(new Date(BASE_PERIOD *5), new Date(BASE_PERIOD *6)));
         donutDocPeriod.setComment("donutComment");
         donutDocPeriod.setCreationDate(new Date(java.sql.Date.valueOf("2016-02-13").getTime()));
         donutDocPeriod.setDriver("someDriver");
