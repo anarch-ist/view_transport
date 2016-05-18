@@ -7,5 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 public interface DocPeriodDao extends GenericDao<DocPeriod, Long> {
-    List<Period> findAllPeriodsBetweenTimeStamps(Date timeStampBegin, Date timeStampEnd) throws DAOException;
+    /**
+     *
+     * @param utcTimestampBegin begin point in time
+     * @param utcTimestampEnd end point in time
+     * @return ASC sorted list of Periods between utcTimestampBegin and utcTimestampEnd.
+     * @throws DAOException
+     */
+    List<DocPeriod> findAllPeriodsBetweenTimeStamps(Date utcTimestampBegin, Date utcTimestampEnd) throws DAOException;
 }

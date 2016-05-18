@@ -58,4 +58,13 @@ public class DocPeriod {
     public int hashCode() {
         return docPeriodId != null ? docPeriodId.hashCode() : 0;
     }
+
+    @Override
+    public String toString() {
+        return "DocPeriod{" +
+                "docPeriodId=" + docPeriodId +
+                ", period=" + period +
+                ", doc=" + doc +
+                '}';
+    }
 }

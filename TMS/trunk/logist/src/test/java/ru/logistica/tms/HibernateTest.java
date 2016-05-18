@@ -5,6 +5,7 @@ import org.hibernate.cfg.Configuration;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import ru.logistica.tms.dao2.HibernateUtils;
+import ru.logistica.tms.dao2.UtcTimestampType;
 import ru.logistica.tms.dao2.docDao.Doc;
 import ru.logistica.tms.dao2.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao2.docPeriodDao.DonutDocPeriod;
@@ -18,11 +19,12 @@ import java.util.TimeZone;
 public abstract class HibernateTest {
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public void setUp() throws Exception {
         TestUtil.cleanDatabase(false);
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         // setup the session factory
         Configuration configuration = new Configuration();
+        configuration.registerTypeOverride(new UtcTimestampType());
         configuration.addAnnotatedClass(Supplier.class);
         configuration.addAnnotatedClass(DocPeriod.class);
         configuration.addAnnotatedClass(DonutDocPeriod.class);
@@ -50,7 +52,7 @@ public abstract class HibernateTest {
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         HibernateUtils.getSessionFactory().close();
     }
 
