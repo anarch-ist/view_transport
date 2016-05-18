@@ -11,6 +11,7 @@ import java.util.Set;
 public class Warehouse {
     private Integer warehouseId;
     private String warehouseName;
+    private RusTimeZoneAbbr rusTimeZoneAbbr;
     private Set<Doc> docs;
     private Set<Order> finalDestinationOrders;
 
@@ -33,6 +34,18 @@ public class Warehouse {
 
     public void setWarehouseName(String warehouseName) {
         this.warehouseName = warehouseName;
+    }
+
+
+    @Basic
+    @Column(name = "rustimezoneabbr", nullable = false, length = 6)
+    @Enumerated(EnumType.STRING)
+    public RusTimeZoneAbbr getRusTimeZoneAbbr() {
+        return rusTimeZoneAbbr;
+    }
+
+    public void setRusTimeZoneAbbr(RusTimeZoneAbbr rusTimeZoneAbbr) {
+        this.rusTimeZoneAbbr = rusTimeZoneAbbr;
     }
 
     @OneToMany(mappedBy="warehouse", fetch = FetchType.EAGER)
@@ -68,4 +81,6 @@ public class Warehouse {
     public int hashCode() {
         return warehouseId != null ? warehouseId.hashCode() : 0;
     }
+
+
 }
