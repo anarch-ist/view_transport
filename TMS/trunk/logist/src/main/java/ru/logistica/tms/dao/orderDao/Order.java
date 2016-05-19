@@ -112,7 +112,6 @@ public class Order {
                 ", boxQty=" + boxQty +
                 ", orderStatus=" + orderStatus +
                 ", commentForStatus='" + commentForStatus + '\'' +
-                ", donutDocPeriod=" + donutDocPeriod +
                 ", finalDestinationWarehouse=" + finalDestinationWarehouse +
                 '}';
     }

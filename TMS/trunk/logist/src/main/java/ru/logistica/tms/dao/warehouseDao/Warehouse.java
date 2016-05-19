@@ -88,8 +88,6 @@ public class Warehouse {
                 "warehouseId=" + warehouseId +
                 ", warehouseName='" + warehouseName + '\'' +
                 ", rusTimeZoneAbbr=" + rusTimeZoneAbbr +
-                ", docs=" + docs +
-                ", finalDestinationOrders=" + finalDestinationOrders +
                 '}';
     }
 }

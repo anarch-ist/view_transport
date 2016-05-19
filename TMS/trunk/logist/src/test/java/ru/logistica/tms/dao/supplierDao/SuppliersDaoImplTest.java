@@ -5,7 +5,7 @@ import ru.logistica.tms.HibernateStandardTest;
 
 import java.util.List;
 
-public class SuppliersDaoImplTest extends HibernateStandardTest{
+public class SuppliersDaoImplTest extends HibernateStandardTest {
 
     @Override
     protected void testSaveImpl() throws Exception {

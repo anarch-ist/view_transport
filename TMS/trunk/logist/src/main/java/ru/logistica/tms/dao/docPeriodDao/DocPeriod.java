@@ -63,7 +63,6 @@ public class DocPeriod {
         return "DocPeriod{" +
                 "docPeriodId=" + docPeriodId +
                 ", period=" + period +
-                ", doc=" + doc +
                 '}';
     }
 }

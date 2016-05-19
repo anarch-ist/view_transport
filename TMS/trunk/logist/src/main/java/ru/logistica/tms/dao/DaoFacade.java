@@ -2,14 +2,26 @@ package ru.logistica.tms.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.dao.userDao.User;
-import ru.logistica.tms.dao.userDao.UserDao;
-import ru.logistica.tms.dao.userDao.UserDaoImpl;
+import ru.logistica.tms.dao.docDao.Doc;
+import ru.logistica.tms.dao.docDao.DocDao;
+import ru.logistica.tms.dao.docDao.DocDaoImpl;
+import ru.logistica.tms.dao.userDao.*;
+import ru.logistica.tms.dao.warehouseDao.Warehouse;
+import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
+import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.AuthResult;
 import ru.logistica.tms.util.CriptUtils;
 
-public class DaoManager {
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
+
+    private interface DaoScript {
+        void execute() throws DAOException;
+    }
 
     private static void doInTransaction(DaoScript daoScript) {
         try {
@@ -23,9 +35,35 @@ public class DaoManager {
             HibernateUtils.getCurrentSession().close();
         }
     }
-    private interface DaoScript {
-        void execute() throws DAOException;
+
+    public static Set<Warehouse> getAllWarehousesWithDocs() {
+        final Set<Warehouse> result = new HashSet<>();
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                List<Warehouse> warehouses = warehouseDao.findAll(Warehouse.class);
+                for (Warehouse warehouse : warehouses) {
+                    result.add(warehouse);
+                }
+            }
+        });
+        return result;
     }
+
+    public static Set<Doc> getAllDocsForWarehouseUserId(final Integer userId) {
+        final Set<Doc> result = new HashSet<>();
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseUserDao warehouseUserDao = new WarehouseUserDaoImpl();
+                WarehouseUser warehouseUser = warehouseUserDao.findById(WarehouseUser.class, userId);
+                result.addAll(warehouseUser.getWarehouse().getDocs());
+            }
+        });
+        return result;
+    }
+
 
     public static AuthResult checkUser(final String login, final String passMd5) {
         final AuthResult authResult = new AuthResult();

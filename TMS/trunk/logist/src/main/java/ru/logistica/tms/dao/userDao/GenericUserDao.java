@@ -5,6 +5,6 @@ import ru.logistica.tms.dao.GenericDao;
 
 import java.io.Serializable;
 
-public interface GenericUserDao<T, Id extends Serializable> extends GenericDao {
+public interface GenericUserDao<T, Id extends Serializable> extends GenericDao<T, Id> {
     T findByLogin(Class<T> clazz, String login) throws DAOException;
 }

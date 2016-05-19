@@ -2,7 +2,7 @@ package ru.logistica.tms.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.dao.DaoManager;
+import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dto.AuthResult;
 
 import javax.json.Json;
@@ -31,7 +31,7 @@ public class LoginServlet extends HttpServlet {
 
         String login = request.getParameter("login");
         String passMd5 = request.getParameter("password");
-        AuthResult authResult = DaoManager.checkUser(login, passMd5);
+        AuthResult authResult = DaoFacade.checkUser(login, passMd5);
 
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
 

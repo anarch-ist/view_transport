@@ -71,8 +71,6 @@ public class Doc {
         return "Doc{" +
                 "docId=" + docId +
                 ", docName='" + docName + '\'' +
-                ", warehouse=" + warehouse +
-                ", docPeriods=" + docPeriods +
                 '}';
     }
 }

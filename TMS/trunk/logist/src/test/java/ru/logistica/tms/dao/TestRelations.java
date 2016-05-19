@@ -1,5 +1,6 @@
 package ru.logistica.tms.dao;
 
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.HibernateTest;
@@ -33,9 +34,9 @@ public class TestRelations extends HibernateTest {
     private DonutDocPeriod donutDocPeriod;
     private Order order;
 
-    @BeforeMethod
-    private void createAllBeans() {
-
+    @BeforeClass
+    public void setUp() throws Exception {
+        super.setUp();
         // CREATE ENTITIES
         supplier = new Supplier();
         supplier.setInn("123456");
@@ -112,7 +113,5 @@ public class TestRelations extends HibernateTest {
 
         HibernateUtils.commitTransaction();
     }
-
-
 
 }

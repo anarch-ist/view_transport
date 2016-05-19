@@ -63,7 +63,6 @@ public class Supplier {
         return "Supplier{" +
                 "supplierId=" + supplierId +
                 ", inn='" + inn + '\'' +
-                ", donutDocPeriods=" + donutDocPeriods +
                 '}';
     }
 }

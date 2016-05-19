@@ -20,7 +20,7 @@ public abstract class HibernateTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        TestUtil.cleanDatabase(false);
+        TestUtil.recreateDatabase();
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         // setup the session factory
         Configuration configuration = new Configuration();

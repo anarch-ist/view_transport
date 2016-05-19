@@ -12,7 +12,15 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 public class TestUtil {
-
+    public static void recreateDatabase() throws URISyntaxException {
+        executeFiles(false, "ddl.sql");
+    }
+    public static void fillWithSampleData() throws URISyntaxException {
+        executeFiles(false, "test_inserts.sql");
+    }
+    public static void recreateDatabaseAndFillWithSampleData() {
+        executeFiles(false, "ddl.sql", "test_inserts.sql");
+    }
     private static String executeCommand(String command) {
 
         StringBuilder output = new StringBuilder();
@@ -47,24 +55,17 @@ public class TestUtil {
         return output.toString();
     }
 
-    public static void cleanDatabase(boolean showOutput) throws URISyntaxException {
-        Path pathToSql = Paths.get(TestUtil.class.getResource("ddl.sql").toURI());
-        try {
-            executeCommand("cmd /c taskkill -f /IM psql.exe");
-            String output = executeCommand("cmd /c psql.exe -U postgres -d postgres -h localhost -f " + pathToSql);
-            if (showOutput) System.out.println(output);
+    private static void executeFiles(boolean showOutput, String... fileNames) {
+        executeCommand("cmd /c taskkill -f /IM psql.exe");
+        for (String fileName : fileNames) {
+            try {
+                Path pathToSql = Paths.get(TestUtil.class.getResource(fileName).toURI());
+                String output = executeCommand("cmd /c psql.exe -U postgres -d postgres -h localhost -f " + pathToSql);
+                if (showOutput) System.out.println(output);
+            }
+            catch (Exception err) {
+                err.printStackTrace();
+            }
         }
-        catch (Exception err) {
-            err.printStackTrace();
-        }
-        System.out.println("DATABASE RECREATED");
-    }
-
-    public static Connection createConnection() throws SQLException {
-        String url      = "jdbc:postgresql://localhost/postgres?stringtype=unspecified";  //database specific url.
-        String user     = "postgres";
-        String password = "postgres";
-
-        return DriverManager.getConnection(url, user, password);
     }
 }

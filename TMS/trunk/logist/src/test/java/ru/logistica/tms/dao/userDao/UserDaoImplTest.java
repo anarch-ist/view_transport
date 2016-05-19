@@ -34,8 +34,6 @@ public class UserDaoImplTest extends HibernateTest {
         HibernateUtils.beginTransaction();
         UserDao userDao = new UserDaoImpl();
         User user6 = userDao.findByLogin(User.class, "user6");
-        System.out.println(user6);
-
         HibernateUtils.commitTransaction();
     }
 
