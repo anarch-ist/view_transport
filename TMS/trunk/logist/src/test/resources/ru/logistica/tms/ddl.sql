@@ -177,8 +177,8 @@ END;
 $$
 LANGUAGE plpgsql;
 
-SELECT insert_permission_for_role('W_BOSS', 'testPerm1');
-SELECT insert_permission_for_role('W_BOSS', 'testPerm2');
+SELECT insert_permission_for_role('WH_BOSS', 'testPerm1');
+SELECT insert_permission_for_role('WH_BOSS', 'testPerm2');
 SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
 
@@ -226,6 +226,6 @@ CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
 -- TODO fix app privileges and create admin user with privileges
 -- application user privileges:
 GRANT CONNECT ON DATABASE postgres TO app_user;
+GRANT USAGE ON SCHEMA public TO app_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
-GRANT INSERT, UPDATE, DELETE ON TABLE orders TO app_user;
-GRANT INSERT, DELETE ON TABLE suppliers, doc_periods TO app_user;
+GRANT INSERT, UPDATE ON TABLE doc_periods, donut_doc_periods, orders TO app_user;

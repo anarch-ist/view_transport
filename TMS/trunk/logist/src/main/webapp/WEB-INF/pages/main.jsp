@@ -53,7 +53,7 @@
                 <c:out value="FFFFFFFFFFFFFFFUUUUUUUUUUUU"/>
             </c:when>
 
-            <c:when test="${userRole == 'W_BOSS' || userRole == 'WH_DISPATCHER'}">
+            <c:when test="${userRole == 'WH_BOSS' || userRole == 'WH_DISPATCHER'}">
                 <%--label tag нужно вызвать метод из DAO, получить склад пользователя--%>
                 <c:out value="AAAAAAAAAAAAAAAAAAAAAA"/>
             </c:when>
