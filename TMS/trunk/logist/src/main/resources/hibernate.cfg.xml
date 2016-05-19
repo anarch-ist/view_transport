@@ -19,17 +19,17 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
         <!--<property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>-->
 
-        <mapping class="ru.logistica.tms.dao2.docDao.Doc"/>
-        <mapping class="ru.logistica.tms.dao2.warehouseDao.Warehouse"/>
-        <mapping class="ru.logistica.tms.dao2.docPeriodDao.DocPeriod"/>
-        <mapping class="ru.logistica.tms.dao2.docPeriodDao.DonutDocPeriod"/>
-        <mapping class="ru.logistica.tms.dao2.supplierDao.Supplier"/>
-        <mapping class="ru.logistica.tms.dao2.orderDao.Order"/>
-        <mapping class="ru.logistica.tms.dao2.userDao.Permission"/>
-        <mapping class="ru.logistica.tms.dao2.userDao.SupplierUser"/>
-        <mapping class="ru.logistica.tms.dao2.userDao.UserRole"/>
-        <mapping class="ru.logistica.tms.dao2.userDao.User"/>
-        <mapping class="ru.logistica.tms.dao2.userDao.WarehouseUser"/>
+        <mapping class="ru.logistica.tms.dao.docDao.Doc"/>
+        <mapping class="ru.logistica.tms.dao.warehouseDao.Warehouse"/>
+        <mapping class="ru.logistica.tms.dao.docPeriodDao.DocPeriod"/>
+        <mapping class="ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod"/>
+        <mapping class="ru.logistica.tms.dao.supplierDao.Supplier"/>
+        <mapping class="ru.logistica.tms.dao.orderDao.Order"/>
+        <mapping class="ru.logistica.tms.dao.userDao.Permission"/>
+        <mapping class="ru.logistica.tms.dao.userDao.SupplierUser"/>
+        <mapping class="ru.logistica.tms.dao.userDao.UserRole"/>
+        <mapping class="ru.logistica.tms.dao.userDao.User"/>
+        <mapping class="ru.logistica.tms.dao.userDao.WarehouseUser"/>
 
     </session-factory>
 </hibernate-configuration>

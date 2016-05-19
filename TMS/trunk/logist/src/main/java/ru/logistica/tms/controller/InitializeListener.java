@@ -8,16 +8,12 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
-import ru.logistica.tms.dao2.HibernateUtils;
-import ru.logistica.tms.dao2.userDao.User;
+import ru.logistica.tms.dao.HibernateUtils;
+import ru.logistica.tms.dao.userDao.User;
 
-import javax.naming.InitialContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.sql.DataSource;
 import java.util.TimeZone;
 
 @WebListener

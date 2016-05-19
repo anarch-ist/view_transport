@@ -2,7 +2,7 @@ package ru.logistica.tms.controller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.dao2.DaoManager;
+import ru.logistica.tms.dao.DaoManager;
 import ru.logistica.tms.dto.AuthResult;
 
 import javax.json.Json;

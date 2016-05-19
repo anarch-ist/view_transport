@@ -3,11 +3,10 @@
 <suite name="Suite1" verbose="1" >
     <test name="Dao">
         <classes>
-            <class name="ru.logistica.tms.dao.constantsDao.ConstantCollectionsTest" />
-            <class name="ru.logistica.tms.dao.docsContainerDao.DocsContainerDaoImpTest" />
-            <class name="ru.logistica.tms.dao.usersDao.UserDaoImplTest" />
-            <class name="ru.logistica.tms.dao.usersDao.WarehouseUserDaoImplTest" />
-            <class name="ru.logistica.tms.dao.usersDao.SupplierUserDaoImplTest" />
+            <class name="ru.logistica.tms.dao.docPeriodDao.DocPeriodImplTest" />
+            <class name="ru.logistica.tms.dao.supplierDao.SuppliersDaoImplTest" />
+            <class name="ru.logistica.tms.dao.userDao.UserDaoImplTest" />
+            <class name="ru.logistica.tms.dao.TestRelations" />
         </classes>
     </test>
 </suite>

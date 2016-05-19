@@ -69,7 +69,7 @@ CREATE TABLE orders (
   donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
   orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
   commentForStatus            TEXT        NOT NULL, -- Dynamic
-  -- BINDING ru.logistica.tms.dao2.orderDao.OrderStatuses
+  -- BINDING ru.logistica.tms.daoorderDao.OrderStatuses
   CONSTRAINT order_statuses CHECK (orderStatus IN
                                    ('CREATED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
   PRIMARY KEY (orderID),
@@ -88,7 +88,7 @@ CREATE TABLE user_roles (
   PRIMARY KEY (userRoleID)
 );
 
--- BINDING ru.logistica.tms.dao2.userDao.UserRoles
+-- BINDING ru.logistica.tms.daouserDao.UserRoles
 INSERT INTO user_roles (userRoleID)
 VALUES
   ('WH_BOSS'), -- обязан иметь склад, но у него нет ссылки на поставщика

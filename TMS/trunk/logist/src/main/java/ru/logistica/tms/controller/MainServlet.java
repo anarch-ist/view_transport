@@ -1,8 +1,8 @@
 package ru.logistica.tms.controller;
 
 
-import ru.logistica.tms.dao2.userDao.User;
-import ru.logistica.tms.dao2.userDao.UserRole;
+import ru.logistica.tms.dao.userDao.User;
+import ru.logistica.tms.dao.userDao.UserRole;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

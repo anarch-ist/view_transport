@@ -1,7 +1,7 @@
 package ru.logistica.tms.dto;
 
 
-import ru.logistica.tms.dao2.userDao.User;
+import ru.logistica.tms.dao.userDao.User;
 
 public class AuthResult {
     private int state = -3;

@@ -1,7 +1,7 @@
 package ru.logistica.tms;
 
 import org.testng.annotations.Test;
-import ru.logistica.tms.dao2.HibernateUtils;
+import ru.logistica.tms.dao.HibernateUtils;
 
 public abstract class HibernateStandardTest extends HibernateTest {
     @Test

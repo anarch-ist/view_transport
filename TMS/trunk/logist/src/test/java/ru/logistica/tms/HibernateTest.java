@@ -4,15 +4,15 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import ru.logistica.tms.dao2.HibernateUtils;
-import ru.logistica.tms.dao2.UtcTimestampType;
-import ru.logistica.tms.dao2.docDao.Doc;
-import ru.logistica.tms.dao2.docPeriodDao.DocPeriod;
-import ru.logistica.tms.dao2.docPeriodDao.DonutDocPeriod;
-import ru.logistica.tms.dao2.orderDao.Order;
-import ru.logistica.tms.dao2.supplierDao.Supplier;
-import ru.logistica.tms.dao2.userDao.*;
-import ru.logistica.tms.dao2.warehouseDao.Warehouse;
+import ru.logistica.tms.dao.HibernateUtils;
+import ru.logistica.tms.dao.UtcTimestampType;
+import ru.logistica.tms.dao.docDao.Doc;
+import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
+import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
+import ru.logistica.tms.dao.orderDao.Order;
+import ru.logistica.tms.dao.supplierDao.Supplier;
+import ru.logistica.tms.dao.userDao.*;
+import ru.logistica.tms.dao.warehouseDao.Warehouse;
 
 import java.util.TimeZone;
 
