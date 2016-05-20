@@ -8,12 +8,9 @@
     <title>Редактирование доков</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="<c:url value="/media/custom/mainPage/favicon.ico"/>" >
-    <link rel="stylesheet" type="text/css"        href="<c:url value="/media/dateTimePicker/jquery.filthypillow.css"/>">
     <link rel="stylesheet" type="text/css"        href="<c:url value="/media/custom/mainPage/main.css"/>">
 
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
-    <script src="<c:url value="/media/dateTimePicker/moment.js"/>"></script>
-    <script src="<c:url value="/media/dateTimePicker/jquery.filthypillow.min.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/main.js"/>"></script>
 
 </head>
