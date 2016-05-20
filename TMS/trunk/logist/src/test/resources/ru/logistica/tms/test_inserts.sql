@@ -27,6 +27,8 @@ INSERT INTO orders VALUES (1, 'orderNumber1', 2, 1, 2, 'CREATED', 'commentForSta
 INSERT INTO users VALUES (1, 'user1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'ivanov ivan', '9260943566', 'ivan@s.ru', 'manager');
 INSERT INTO supplier_users VALUES (1, 1);
 
+INSERT INTO users VALUES (2, 'user2', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_BOSS', 'сидоров петр', '9260943566', 'sidor@s.ru', 'boss');
+INSERT INTO warehouse_users VALUES (2, 1);
 
 
 

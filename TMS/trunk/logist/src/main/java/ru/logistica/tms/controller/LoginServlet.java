@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @WebServlet("/login")
-public class LoginServlet extends HttpServlet {
+public class LoginServlet extends JsonSendHttpServlet {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -51,11 +51,4 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private void sendJson(HttpServletResponse response, JsonObject jsonObject) throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-        out.print(jsonObject);
-        out.flush();
-    }
 }

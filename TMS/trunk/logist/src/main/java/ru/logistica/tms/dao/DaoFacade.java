@@ -22,9 +22,6 @@ import java.util.Set;
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
 
-
-
-
     private interface DaoScript {
         void execute() throws DAOException;
     }
