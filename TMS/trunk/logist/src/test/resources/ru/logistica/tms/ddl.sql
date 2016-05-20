@@ -227,5 +227,7 @@ CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
 -- application user privileges:
 GRANT CONNECT ON DATABASE postgres TO app_user;
 GRANT USAGE ON SCHEMA public TO app_user;
+GRANT USAGE ON SCHEMA pg_catalog TO app_user;
+GRANT SELECT ON pg_timezone_names TO app_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
 GRANT INSERT, UPDATE ON TABLE doc_periods, donut_doc_periods, orders TO app_user;

@@ -2,10 +2,12 @@ package ru.logistica.tms.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
 import ru.logistica.tms.dao.docDao.DocDaoImpl;
 import ru.logistica.tms.dao.userDao.*;
+import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
@@ -14,10 +16,14 @@ import ru.logistica.tms.util.CriptUtils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
+
+
+
 
     private interface DaoScript {
         void execute() throws DAOException;
@@ -51,20 +57,6 @@ public class DaoFacade {
         return result;
     }
 
-    public static Set<Doc> getAllDocsForWarehouseUserId(final Integer userId) {
-        final Set<Doc> result = new HashSet<>();
-        doInTransaction(new DaoScript() {
-            @Override
-            public void execute() throws DAOException {
-                WarehouseUserDao warehouseUserDao = new WarehouseUserDaoImpl();
-                WarehouseUser warehouseUser = warehouseUserDao.findById(WarehouseUser.class, userId);
-                result.addAll(warehouseUser.getWarehouse().getDocs());
-            }
-        });
-        return result;
-    }
-
-
     public static AuthResult checkUser(final String login, final String passMd5) {
         final AuthResult authResult = new AuthResult();
         // md5(md5(pass)+salt)
@@ -84,6 +76,33 @@ public class DaoFacade {
             }
         });
         return authResult;
+    }
+
+    public static Warehouse getWarehouseWithDocsForUser(final Integer userId) {
+        final Warehouse[] result = new Warehouse[1];
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseUserDao warehouseUserDao = new WarehouseUserDaoImpl();
+                WarehouseUser warehouseUser = warehouseUserDao.findById(WarehouseUser.class, userId);
+                result[0] = warehouseUser.getWarehouse();
+            }
+        });
+        return result[0];
+    }
+
+    public static void fillOffsetsForAbbreviations() {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                RusTimeZoneAbbr[] rusTimeZoneAbbrs = RusTimeZoneAbbr.values();
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                for (RusTimeZoneAbbr value : rusTimeZoneAbbrs) {
+                    AppContextCache.timeZoneAbbrIntegerMap.put(value, warehouseDao.findOffsetByAbbreviation(value));
+                }
+                warehouseDao.findAll(Warehouse.class);
+            }
+        });
     }
 
 //    public static Map<Integer, String> getAllPointsAsIdAndNameMap() {

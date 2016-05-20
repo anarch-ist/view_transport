@@ -34,12 +34,17 @@ public class MainServlet extends HttpServlet {
 
         // список всех складов(пары ключ-имя)
         // список всех доков для всех складов(id склада, id дока, имя дока)
+
+
         if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
             Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
 
+
             //allWarehousesWithDocs.
         } else if (userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.WH_DISPATCHER) {
-            Set<Doc> allDocsForWarehouseUserId = DaoFacade.getAllDocsForWarehouseUserId(user.getUserId());
+            Warehouse warehouse = DaoFacade.getWarehouseWithDocsForUser(user.getUserId());
+            warehouse.getRusTimeZoneAbbr();
+
         }
 
 
