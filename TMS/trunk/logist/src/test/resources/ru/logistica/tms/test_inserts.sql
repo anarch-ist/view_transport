@@ -8,13 +8,17 @@ TRUNCATE orders CASCADE;
 TRUNCATE users CASCADE;
 TRUNCATE warehouse_users CASCADE;
 TRUNCATE supplier_users CASCADE;
-
+-- EET, MSK, SAMT, YEKT, OMST, KRAT, IRKT, YAKT, VLAT, MAGT, PETT
 INSERT INTO suppliers VALUES (1, 'supplier1Inn');
 INSERT INTO warehouses VALUES (1, 'msk_warehouse', 'MSK');
+INSERT INTO warehouses VALUES (2, 'ekt_warehouse', 'YEKT');
 INSERT INTO docs VALUES
   (1, 'msk_warehouse_doc1', 1),
   (2, 'msk_warehouse_doc2', 1),
-  (3, 'msk_warehouse_doc3', 1)
+  (3, 'msk_warehouse_doc3', 1),
+  (4, 'ekt_warehouse_doc1', 2),
+  (5, 'ekt_warehouse_doc2', 2),
+  (6, 'ekt_warehouse_doc3', 2)
 ;
 
 INSERT INTO doc_periods VALUES (1, 1, '2016-10-19 10:00:00 Z', '2016-10-19 10:30:00 Z');

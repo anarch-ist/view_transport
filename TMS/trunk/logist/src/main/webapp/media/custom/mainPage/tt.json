@@ -1,0 +1,55 @@
+{
+  "warehouses": [
+    {
+      "warehouseId": 1,
+      "warehouseName": "msk_warehouse",
+      "rusTimeZoneAbbr": "MSK",
+      "docs": [
+        {
+          "docId": 1,
+          "docName": "msk_warehouse_doc1"
+        },
+        {
+          "docId": 2,
+          "docName": "msk_warehouse_doc2"
+        },
+        {
+          "docId": 3,
+          "docName": "msk_warehouse_doc3"
+        }
+      ]
+    },
+    {
+      "warehouseId": 2,
+      "warehouseName": "ekt_warehouse",
+      "rusTimeZoneAbbr": "YEKT",
+      "docs": [
+        {
+          "docId": 4,
+          "docName": "ekt_warehouse_doc1"
+        },
+        {
+          "docId": 5,
+          "docName": "ekt_warehouse_doc2"
+        },
+        {
+          "docId": 6,
+          "docName": "ekt_warehouse_doc3"
+        }
+      ]
+    }
+  ],
+  "timeZones": {
+    "VLAT": 10.0,
+    "EET": 2.0,
+    "YEKT": 5.0,
+    "PETT": 12.0,
+    "SAMT": 4.0,
+    "IRKT": 8.0,
+    "MAGT": 10.0,
+    "OMST": 6.0,
+    "MSK": 3.0,
+    "KRAT": 7.0,
+    "YAKT": 9.0
+  }
+}
