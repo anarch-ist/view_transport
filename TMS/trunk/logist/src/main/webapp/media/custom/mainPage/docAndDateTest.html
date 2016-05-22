@@ -5,6 +5,7 @@
     <title>Title</title>
     <link rel="stylesheet" href="../../datePicker/pickmeup.css">
     <link rel="stylesheet" href="../../chosen_v1.5.1/chosen.css">
+    <link rel="stylesheet" href="docAndDateSelector.css">
     <script src="../../jQuery-2.1.4/jquery-2.1.4.min.js"></script>
     <script src="../../datePicker/jquery.pickmeup.min.js"></script>
     <script src="../../chosen_v1.5.1/chosen.jquery.min.js"></script>
@@ -15,8 +16,73 @@
 
     <script>
         $(document).ready(function(){
-            var obj = $("#container").docAndDateSelector();
-            obj.testMethod();
+            var exampleData = {
+                "warehouses": [
+                    {
+                        "warehouseId": 1,
+                        "warehouseName": "msk_warehouse",
+                        "rusTimeZoneAbbr": "MSK",
+                        "docs": [
+                            {
+                                "docId": 1,
+                                "docName": "msk_warehouse_doc1"
+                            },
+                            {
+                                "docId": 2,
+                                "docName": "msk_warehouse_doc2"
+                            },
+                            {
+                                "docId": 3,
+                                "docName": "msk_warehouse_doc3"
+                            }
+                        ]
+                    },
+                    {
+                        "warehouseId": 2,
+                        "warehouseName": "ekt_warehouse",
+                        "rusTimeZoneAbbr": "YEKT",
+                        "docs": [
+                            {
+                                "docId": 4,
+                                "docName": "ekt_warehouse_doc1"
+                            },
+                            {
+                                "docId": 5,
+                                "docName": "ekt_warehouse_doc2"
+                            },
+                            {
+                                "docId": 6,
+                                "docName": "ekt_warehouse_doc3"
+                            }
+                        ]
+                    }
+                ],
+                "timeZones": {
+                    "VLAT": 10.0,
+                    "EET": 2.0,
+                    "YEKT": 5.0,
+                    "PETT": 12.0,
+                    "SAMT": 4.0,
+                    "IRKT": 8.0,
+                    "MAGT": 10.0,
+                    "OMST": 6.0,
+                    "MSK": 3.0,
+                    "KRAT": 7.0,
+                    "YAKT": 9.0
+                }
+            };
+            var obj = $("#container").docAndDateSelector({
+                useWarehouseRole:true,
+                data: exampleData
+            });
+            obj.setOnSelected(function(event, date, warehouseId, docId) {
+                window.console.log("SELECTED EVENT");
+                window.console.log(date);
+                window.console.log(warehouseId);
+                window.console.log(docId);
+            })
+
+
         });
     </script>
 </head>

@@ -1,96 +1,96 @@
-(function ( $ ) {
+(function ($) {
     "use strict";
     //https://harvesthq.github.io/chosen/options.html
     //https://harvesthq.github.io/chosen/
     //https://github.com/nazar-pc/PickMeUp
-    $.fn.docAndDateSelector = function( options ) {
+    $.fn.docAndDateSelector = function (options) {
 
-        // This is the easiest way to have default options.
         var settings = $.extend({
-            // These are the defaults.
-            color: "#556b2f",
-            backgroundColor: "white"
-        }, options );
+            useWarehouseRole: true,
+            data: {}
+        }, options);
 
-        var exampleData = {
-            "warehouses": [
-                {
-                    "warehouseId": 1,
-                    "warehouseName": "msk_warehouse",
-                    "rusTimeZoneAbbr": "MSK",
-                    "docs": [
-                        {
-                            "docId": 1,
-                            "docName": "msk_warehouse_doc1"
-                        },
-                        {
-                            "docId": 2,
-                            "docName": "msk_warehouse_doc2"
-                        },
-                        {
-                            "docId": 3,
-                            "docName": "msk_warehouse_doc3"
-                        }
-                    ]
-                },
-                {
-                    "warehouseId": 2,
-                    "warehouseName": "ekt_warehouse",
-                    "rusTimeZoneAbbr": "YEKT",
-                    "docs": [
-                        {
-                            "docId": 4,
-                            "docName": "ekt_warehouse_doc1"
-                        },
-                        {
-                            "docId": 5,
-                            "docName": "ekt_warehouse_doc2"
-                        },
-                        {
-                            "docId": 6,
-                            "docName": "ekt_warehouse_doc3"
-                        }
-                    ]
-                }
-            ],
-            "timeZones": {
-                "VLAT": 10.0,
-                "EET": 2.0,
-                "YEKT": 5.0,
-                "PETT": 12.0,
-                "SAMT": 4.0,
-                "IRKT": 8.0,
-                "MAGT": 10.0,
-                "OMST": 6.0,
-                "MSK": 3.0,
-                "KRAT": 7.0,
-                "YAKT": 9.0
-            }
-        };
+        var data = settings.data;
+        var useWarehouseRole = settings.useWarehouseRole;
 
         // sort all data
-        sortByStringCompare(exampleData.warehouses, "warehouseName");
-        exampleData.warehouses.forEach(function(warehouse) {
+        sortByStringCompare(data.warehouses, "warehouseName");
+        data.warehouses.forEach(function (warehouse) {
             sortByStringCompare(warehouse.docs, "docName");
         });
 
-        // clean all inside container
         this.empty();
 
         this.append(
-            "<div id='datePicker'><input type='text'></div>" +
-            "<div id='warehousePicker'><select style='width:350px;'></select></div>" +
-            "<div id='docPicker'><select style='width:350px;'></select></div>"
+            "<div id='docAndDateSelector'>"+
+            "<div id='datePicker'><input type='text' readonly='readonly'></div>" +
+            "<div id='warehousePicker'></div>" +
+            "<div id='docPicker'><select></select></div>"+
+            "</div>"
         );
+
+        // create docSelect
         var docSelect = $("#docPicker").find("select");
-        docSelect.chosen({});
-        docSelect.on('change', function(evt, params) {
-            $(document).trigger( "docDateSelected", [ "bim", "baz" ] );
+        docSelect.append($("<option>"));
+        if (useWarehouseRole) {
+            docSelect.prop('disabled', true);
+        }
+        docSelect.chosen({
+            allow_single_deselect: true,
+            placeholder_text_single: "Выберите док"
+        });
+        docSelect.on('change', function (evt, params) {
+            generateEventIfValidState();
         });
 
-        var warehouseSelect = $("#warehousePicker").find("select");
-        var dateSelect = $("#datePicker").find("input");
+        // create Warehouse component
+        if (useWarehouseRole) {
+            var $warehouseSelect = $("<select></select>");
+            $("#warehousePicker").append($warehouseSelect);
+            // add data to warehouse select
+            var warehouses = data.warehouses;
+            $warehouseSelect.append($("<option>"));
+            for (var i = 0; i < warehouses.length; i++) {
+                $warehouseSelect.append($("<option>").attr("value", warehouses[i].warehouseId).text(warehouses[i].warehouseName));
+            }
+            $warehouseSelect.chosen({
+                allow_single_deselect: true,
+                placeholder_text_single: "Выберите склад"
+            });
+            $warehouseSelect.on('change', function (evt, params) {
+                // if not empty select
+                if (params) {
+                    var warehouseId = +params.selected;
+                    fillDocsWithData(warehouseId);
+                    docSelect.prop('disabled', false).trigger("chosen:updated");
+                }
+                else {
+                    var $emptyOption = docSelect.find(":first-child");
+                    $emptyOption.prop('selected', true);
+                    docSelect.prop('disabled', true).trigger("chosen:updated");
+                }
+            });
 
+        } else {
+            var $warehouseLabel = $("<div></div>");
+            $warehouseLabel.attr("value", data.warehouses[0].warehouseId).text(data.warehouses[0].warehouseName);
+            $("#warehousePicker").append($warehouseLabel);
+            fillDocsWithData(data.warehouses[0].warehouseId);
+        }
+
+        // create data select
+        var minDate;
+        var maxDate;
+        if (useWarehouseRole) {
+            minDate = new Date();// current Date
+            minDate.setDate(minDate.getDate() - 1);
+            maxDate = new Date();
+            maxDate.setYear(maxDate.getFullYear() + 1);
+        } else {
+            minDate = null;
+            maxDate = null;
+        }
+        var dateSelect = $("#datePicker").find("input");
         var pickmeup = dateSelect.pickmeup({
             locale: {
                 days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"],
@@ -101,55 +101,68 @@
             },
             select_year: false,
             date: new Date(),
-            change: function(formattedDate) {
-                $(document).trigger( "docDateSelected", [ "bim", "baz" ] );
-            }
+            hide_on_select: true,
+            change: function (formattedDate) {
+                generateEventIfValidState();
+            },
+            min: minDate,
+            max: maxDate
+
         });
         dateSelect.pickmeup('set_date', new Date());
 
 
-        // add data to warehouse select
-        var warehouses = exampleData.warehouses;
-        for (var i = 0; i < warehouses.length; i++) {
-            warehouseSelect.append($("<option>").attr("value", warehouses[i].warehouseId).text(warehouses[i].warehouseName));
-        }
-        warehouseSelect.chosen({});
-        warehouseSelect.on('change', function(evt, params) {
-            // fill docs with data
-            var warehouseId = +params.selected;
-            var docs = findWarehouseById(warehouses, warehouseId).docs;
-            docSelect.empty();
-            for (var i = 0; i < docs.length; i++) {
-                docSelect.append($("<option>").attr("value", docs[i].docId).text(docs[i].docName));
-            }
-            docSelect.trigger("chosen:updated");
-        });
-
-
-        this.setSelectedDate = function(date) {
+        this.setSelectedDate = function (date) {
             dateSelect.pickmeup('set_date', date);
         };
 
         // TODO
-        this.setSelectedWarehouse = function(warehouseId) {
-
+        this.setSelectedWarehouse = function (warehouseId) {
+            $warehouseSelect.val(warehouseId);
+            $warehouseSelect.trigger("chosen:updated");
         };
 
         // TODO
-        this.setSelectedDoc = function(docId) {
-
+        this.setSelectedDoc = function (docId) {
+            docSelect.val(docId);
+            docSelect.trigger("chosen:updated");
         };
 
-        this.setWarehousePicker = function(warehousePicker) {
-
-        };
-
-        this.setOnSelected = function(handler) {
-            handler();
+        this.setOnSelected = function (handler) {
+            $(document).on("docDateSelected", handler);
         };
 
 
         //-------------------------- helper functions -------------------------------
+
+
+        function generateEventIfValidState() {
+            var selectedDate = dateSelect.pickmeup('get_date', true);
+            var selectedDoc =  docSelect.chosen().val();
+            var selectedWarehouse = getSelectedWarehouseId();
+            if (selectedDoc && selectedWarehouse) {
+                $(document).trigger("docDateSelected", [selectedDate, selectedWarehouse, selectedDoc]);
+            }
+        }
+
+        function getSelectedWarehouseId() {
+            if (settings.useWarehouseRole) {
+                return $warehouseSelect.chosen().val();
+            } else {
+                return $warehouseLabel.attr("value");
+            }
+        }
+
+        function fillDocsWithData(warehouseId) {
+            var docs = findWarehouseById(data.warehouses, warehouseId).docs;
+            docSelect.empty();
+            docSelect.append($("<option>"));
+            for (var i = 0; i < docs.length; i++) {
+                docSelect.append($("<option>").attr("value", docs[i].docId).text(docs[i].docName));
+            }
+            docSelect.trigger("chosen:updated");
+        }
+
         function sortByStringCompare(objects, propertyName) {
             function compare(a, b) {
                 return a[propertyName] < b[propertyName] ? -1 : a[propertyName] > b[propertyName];
@@ -158,11 +171,13 @@
         }
 
         function findWarehouseById(warehouses, id) {
-            return $.grep(warehouses, function(e){ return e.warehouseId === id; })[0];
+            return $.grep(warehouses, function (e) {
+                return e.warehouseId === id;
+            })[0];
         }
 
         return this;
     };
 
-}( jQuery ));
+}(jQuery));
 

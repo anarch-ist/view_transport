@@ -1,0 +1,15 @@
+#docAndDateSelector > *{
+    display: inline-block;
+}
+
+#docAndDateSelector #datePicker{
+
+}
+
+#docAndDateSelector #warehousePicker > *{
+    width: 200px;
+}
+
+#docAndDateSelector #docPicker > *{
+    width: 200px;
+}

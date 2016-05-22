@@ -46,31 +46,25 @@ public class MainServlet extends HttpServlet {
         JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
         if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
             Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
-
-
             JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
             for (Warehouse warehouse : allWarehousesWithDocs) {
                 JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
                 warehouseArrayBuilder.add(warehouseBuilder);
             }
-
             JsonObjectBuilder timeZoneBuilder = Json.createObjectBuilder();
             for (Map.Entry<RusTimeZoneAbbr, Double> rusTimeZoneAbbrEntry : AppContextCache.timeZoneAbbrIntegerMap.entrySet()) {
                 timeZoneBuilder.add(rusTimeZoneAbbrEntry.getKey().name(), rusTimeZoneAbbrEntry.getValue());
             }
-            sendDataBuilder.add("warehouses", warehouseArrayBuilder);
-            sendDataBuilder.add("timeZones", timeZoneBuilder);
-
+            sendDataBuilder.add("warehouses", warehouseArrayBuilder).add("timeZones", timeZoneBuilder);
 
         } else if (userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.WH_DISPATCHER) {
+            JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
             Warehouse warehouse = DaoFacade.getWarehouseWithDocsForUser(user.getUserId());
-            warehouse.getRusTimeZoneAbbr();
-            Double timeZoneOffset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr());
             JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
-            sendDataBuilder = Json.createObjectBuilder();
-            sendDataBuilder
-                    .add("warehouse", warehouseBuilder)
-                    .add("timeZoneOffset", timeZoneOffset);
+            warehouseArrayBuilder.add(warehouseBuilder);
+            JsonObjectBuilder timeZoneBuilder = Json.createObjectBuilder();
+            timeZoneBuilder.add(warehouse.getRusTimeZoneAbbr().name(), AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()));
+            sendDataBuilder.add("warehouses", warehouseArrayBuilder).add("timeZones", timeZoneBuilder);
         }
         request.setAttribute("docDateSelectorDataObject", sendDataBuilder.build().toString());
 
