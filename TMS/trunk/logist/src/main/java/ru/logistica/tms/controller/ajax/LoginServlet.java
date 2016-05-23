@@ -1,7 +1,8 @@
-package ru.logistica.tms.controller;
+package ru.logistica.tms.controller.ajax;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.logistica.tms.controller.ajax.AjaxHttpServlet;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dto.AuthResult;
 
@@ -10,15 +11,13 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @WebServlet("/login")
-public class LoginServlet extends JsonSendHttpServlet {
+public class LoginServlet extends AjaxHttpServlet {
 
     private static final Logger logger = LogManager.getLogger();
 

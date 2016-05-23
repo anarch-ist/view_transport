@@ -45,26 +45,24 @@ public class MainServlet extends HttpServlet {
 
         JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
         if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
+
             Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
             JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
             for (Warehouse warehouse : allWarehousesWithDocs) {
                 JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
                 warehouseArrayBuilder.add(warehouseBuilder);
             }
-            JsonObjectBuilder timeZoneBuilder = Json.createObjectBuilder();
-            for (Map.Entry<RusTimeZoneAbbr, Double> rusTimeZoneAbbrEntry : AppContextCache.timeZoneAbbrIntegerMap.entrySet()) {
-                timeZoneBuilder.add(rusTimeZoneAbbrEntry.getKey().name(), rusTimeZoneAbbrEntry.getValue());
-            }
-            sendDataBuilder.add("warehouses", warehouseArrayBuilder).add("timeZones", timeZoneBuilder);
+            sendDataBuilder.add("warehouses", warehouseArrayBuilder);
+
 
         } else if (userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.WH_DISPATCHER) {
+
             JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
             Warehouse warehouse = DaoFacade.getWarehouseWithDocsForUser(user.getUserId());
             JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
             warehouseArrayBuilder.add(warehouseBuilder);
-            JsonObjectBuilder timeZoneBuilder = Json.createObjectBuilder();
-            timeZoneBuilder.add(warehouse.getRusTimeZoneAbbr().name(), AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()));
-            sendDataBuilder.add("warehouses", warehouseArrayBuilder).add("timeZones", timeZoneBuilder);
+            sendDataBuilder.add("warehouses", warehouseArrayBuilder);
+
         }
         request.setAttribute("docDateSelectorDataObject", sendDataBuilder.build().toString());
 
@@ -75,7 +73,10 @@ public class MainServlet extends HttpServlet {
         JsonObjectBuilder warehouseBuilder = Json.createObjectBuilder();
         warehouseBuilder.add("warehouseId", warehouse.getWarehouseId());
         warehouseBuilder.add("warehouseName", warehouse.getWarehouseName());
-        warehouseBuilder.add("rusTimeZoneAbbr", warehouse.getRusTimeZoneAbbr().name());
+
+        RusTimeZoneAbbr timeZoneAbbr = warehouse.getRusTimeZoneAbbr();
+        warehouseBuilder.add("rusTimeZoneAbbr", timeZoneAbbr.name());
+        warehouseBuilder.add("timeOffset", AppContextCache.timeZoneAbbrIntegerMap.get(timeZoneAbbr));
 
         Set<Doc> docs = warehouse.getDocs();
         JsonArrayBuilder docArrayBuilder = Json.createArrayBuilder();

@@ -6,14 +6,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Редактирование доков</title>
-
+    <%--styles--%>
     <link rel="shortcut icon" type="image/x-icon" href="<c:url value="/media/custom/mainPage/favicon.ico"/>" >
-    <link rel="stylesheet" type="text/css"        href="<c:url value="/media/custom/mainPage/main.css"/>">
-
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/main.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/datePicker/pickmeup.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/chosen_v1.5.1/chosen.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/docAndDateSelector.css"/>">
+    <%--common scripts--%>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
-    <script src="<c:url value="/media/custom/mainPage/main.js"/>"></script>
-
+    <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
+    <script src="<c:url value="/media/chosen_v1.5.1/chosen.jquery.min.js"/>"></script>
+    <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
+    <%--specific scripts for different user roles--%>
+    <%--<c:set var="requestData" scope="request" value="${requestScope.docDateSelectorDataObject}"/>--%>
+    <c:set var="userRole" scope="session" value="${sessionScope.user.userRole.userRoleId}"/>
+    <c:choose>
+        <c:when test="${userRole == 'SUPPLIER_MANAGER'}">
+            <script src="<c:url value="/media/custom/mainPage/roleSupplierManager.js"/>"></script>
+        </c:when>
+        <c:when test="${userRole == 'WH_BOSS'}">
+            <script src="<c:url value="/media/custom/mainPage/roleWarehouseBoss.js"/>"></script>
+        </c:when>
+        <c:when test="${userRole == 'WH_DISPATCHER'}">
+            <script src="<c:url value="/media/custom/mainPage/roleWarehouseDispatcher.js"/>"></script>
+        </c:when>
+    </c:choose>
 </head>
+
 <body>
 
 <div id="userPane">
@@ -21,8 +40,6 @@
         <input id="exit" type="submit" value="выйти"/>
     </form>
 
-    <c:set var="userRole" scope="session" value="${sessionScope.user.userRole.userRoleId}"/>
-    <c:set var="requestData" scope="request" value="${requestScope.docDateSelectorDataObject}"/>
     <c:out value="${userRole}"/>
     <table>
         <tr>
@@ -38,40 +55,7 @@
 </div>
 
 <div id="docsPane">
-
-    <div id="docAndDateSelector">
-
-        <div id="datePicker">
-            <label for="date">Выберите дату </label>
-            <input id="date" class="filthypillow-1" />
-        </div>
-
-        <div id="warehousePicker">
-
-        </div>
-        <c:choose>
-            <c:when test="${userRole == 'SUPPLIER_MANAGER'}">
-                <c:out value="${requestData}"/>
-            </c:when>
-
-            <c:when test="${userRole == 'WH_BOSS' || userRole == 'WH_DISPATCHER'}">
-                <%--label tag нужно вызвать метод из DAO, получить склад пользователя--%>
-                <c:out value="${requestData}"/>
-            </c:when>
-        </c:choose>
-
-        <%--<div id="warehousePicker">--%>
-            <%--<select id="warehousePicker" name="warehouse"></select>--%>
-        <%--</div>  <!--fill with jsp-->--%>
-        <div id="docPicker"></div>
-
-    </div>
-
-    <div id="tableControls">
-        <button id="cargoInformation">Информация о грузе</button>
-        <button id="changeStatus">Изменить статус</button>
-    </div>
-
+    <div id="docAndDateSelector" data-component_data=${requestScope.docDateSelectorDataObject}></div>
 </div>
 
 

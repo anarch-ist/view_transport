@@ -4,6 +4,7 @@
       "warehouseId": 1,
       "warehouseName": "msk_warehouse",
       "rusTimeZoneAbbr": "MSK",
+      "timeOffset": 3.0,
       "docs": [
         {
           "docId": 1,
@@ -23,6 +24,7 @@
       "warehouseId": 2,
       "warehouseName": "ekt_warehouse",
       "rusTimeZoneAbbr": "YEKT",
+      "timeOffset": 5.0,
       "docs": [
         {
           "docId": 4,
@@ -38,18 +40,5 @@
         }
       ]
     }
-  ],
-  "timeZones": {
-    "VLAT": 10.0,
-    "EET": 2.0,
-    "YEKT": 5.0,
-    "PETT": 12.0,
-    "SAMT": 4.0,
-    "IRKT": 8.0,
-    "MAGT": 10.0,
-    "OMST": 6.0,
-    "MSK": 3.0,
-    "KRAT": 7.0,
-    "YAKT": 9.0
-  }
+  ]
 }

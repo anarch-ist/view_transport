@@ -19,27 +19,24 @@ $(document).ready(function() {
         }
     });
 
-    $confirmLoginBtn.on("click", function(e) {
+    $confirmLoginBtn.on("click", function (e) {
         e.preventDefault();
-
         if (checkFields()) {
-
             $.ajax({
                 url: "login",
                 method: "POST",
                 data: {login: $loginInput.val(), password: calcMD5($passwordInput.val())},
                 dataType: "json"
             }).done(function (data) {
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        $loginError.text(data.loginErrorText);
-                        $passwordError.text(data.passwordErrorText);
-                    }
-                })
-                .fail(function () {
-                    alert("error");
-                });
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    $loginError.text(data.loginErrorText);
+                    $passwordError.text(data.passwordErrorText);
+                }
+            }).fail(function () {
+                window.alert("error");
+            });
         }
     });
 
