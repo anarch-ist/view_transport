@@ -59,6 +59,7 @@
 
         elem.appendChild(tableElement);
 
+
         // rows and cells
         for(var i = 1; i <= y; i++) {
             var rowElement = document.createElement("tr");
@@ -72,14 +73,16 @@
                 cellElement.onclick = function(e) {
                     var _this = this;
                     var newEvent = new CustomEvent("selected", {
-                            detail: {
-                                x: _this.dataset.x,
-                                y: _this.dataset.y
-                            },
-                            bubbles: true,
-                            cancelable: false
-                        });
+                        detail: {
+                           x: _this.dataset.x,
+                           y: _this.dataset.y,
+                           isSelected: _this.classList.contains("highlight")
+                        },
+                        bubbles: true,
+                        cancelable: false
+                    });
                     tableElement.dispatchEvent(newEvent);
+                    _this.classList.toggle("highlight");
                 };
 
                 var labelElement = document.createElement("label");
@@ -125,6 +128,8 @@
         var divElement = main.findById(x, y).divElem;
         divElement.innerHTML = str;
     }
+
+    var selectedTd;
 
     main.setOnClicked = function(handler) {
         tableElement.addEventListener("selected", handler);
