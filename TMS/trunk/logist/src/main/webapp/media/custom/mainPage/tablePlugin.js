@@ -2,8 +2,9 @@
     "use strict";
     var DEFAULT_PARAMETERS = {
         parentId: '',
-        periodLength: 30, // in minutes!!!
-        windowSize: 60 * 24
+        periodSize: 30, // in minutes!!!
+        windowSize: 60 * 24,
+        selectionConstraint: null
     };
     var startupParameters = {};
 
@@ -21,7 +22,7 @@
     };
 
     main.findTableSizes = function() {
-        var periodsCount = startupParameters.windowSize / startupParameters.periodLength;
+        var periodsCount = startupParameters.windowSize / startupParameters.periodSize;
 
         var result = {
            x: 1,
@@ -38,19 +39,21 @@
             }
         }
         return result;
-    }
+    };
 
 
     main.defaultParameters = DEFAULT_PARAMETERS;
 
     var tableElement;
+    var selectedElements = [];
+    var serialNumber = 0;
 
     main.generate = function(){
-        var tableSize = main.findTableSizes(startupParameters.windowSize / startupParameters.periodLength);
+        var tableSize = main.findTableSizes(startupParameters.windowSize / startupParameters.periodSize);
         var x = tableSize.x;
         var y = tableSize.y;
         var firstPart = "00:00";
-        var periodLength = startupParameters.periodLength;
+        var periodSize= startupParameters.periodSize;
         var secondPart = "";
 
         //tableTag
@@ -59,24 +62,45 @@
 
         elem.appendChild(tableElement);
 
-
         // rows and cells
         for(var i = 1; i <= y; i++) {
             var rowElement = document.createElement("tr");
             tableElement.appendChild(rowElement);
 
             for(var j = 1; j <= x; j++) {
+                serialNumber++;
                 var cellElement = document.createElement("td");
                 cellElement.id = "cell_" + i + "_" + j;
                 cellElement.setAttribute("data-x", i);
                 cellElement.setAttribute("data-y", j);
+                cellElement.setAttribute("data-serialnumber", serialNumber);
+
                 cellElement.onclick = function(e) {
+
                     var _this = this;
+                    if (startupParameters.selectionConstraint) {
+                        if (startupParameters.selectionConstraint(
+                                +_this.dataset.serialnumber,
+                                selectedElementsAsSerialNumbers(selectedElements),
+                                _this.classList.contains("highlight"))) {
+                            return;
+                        }
+                    }
+
+                    var wasSelected = _this.classList.contains("highlight");
+                    if (!wasSelected) {
+                        selectedElements.push(_this);
+                    } else {
+                        var index = selectedElements.indexOf(_this);
+                        selectedElements.splice(index, 1);
+                    }
+                    selectedElements.sort(compareNum);
+
                     var newEvent = new CustomEvent("selected", {
                         detail: {
                            x: _this.dataset.x,
                            y: _this.dataset.y,
-                           isSelected: _this.classList.contains("highlight")
+                           isSelected: wasSelected
                         },
                         bubbles: true,
                         cancelable: false
@@ -88,7 +112,7 @@
                 var labelElement = document.createElement("label");
 
                 var time = firstPart.split(':');
-                var newTime = +time[0] * 60 + (+time[1]) + periodLength;
+                var newTime = +time[0] * 60 + (+time[1]) + periodSize;
                 var hours = Math.floor(newTime / 60);
                 var minutes = newTime - (hours * 60);
                 if(hours < 10) {
@@ -97,7 +121,7 @@
                 if(minutes < 10) {
                     minutes = "0" + minutes;
                 }
-                if(hours == 24){
+                if(hours === 24){
                     hours = "00";
                 }
 
@@ -113,6 +137,8 @@
         }
     };
 
+
+    // ----------------------------------METHODS------------------------------------------
     main.findById = function(x, y) {
         var result = {};
         var tdElement = document.getElementById("cell_" + x + "_" + y);
@@ -122,17 +148,34 @@
         result.labelElem = labelElement;
         result.divElem = divElement;
         return result;
-    }
+    };
 
     main.setString = function(str, x, y) {
         var divElement = main.findById(x, y).divElem;
         divElement.innerHTML = str;
-    }
-
-    var selectedTd;
+    };
 
     main.setOnClicked = function(handler) {
         tableElement.addEventListener("selected", handler);
+    };
+
+    // TODO implement this method
+    main.setDisabled = function(disabled) {
+        // tableElement.disabled = disabled;
+    };
+
+
+    // ----------------------------------HELPER FUNCTIONS------------------------------------------
+    function selectedElementsAsSerialNumbers() {
+        var result = [];
+        for (var i = 0; i < selectedElements.length; i++) {
+            result.push(+selectedElements[i].dataset.serialnumber);
+        }
+        return result;
+    }
+
+    function compareNum(a, b) {
+        return a.dataset.serialnumber - b.dataset.serialnumber;
     }
 
     window.tablePlugin = main;

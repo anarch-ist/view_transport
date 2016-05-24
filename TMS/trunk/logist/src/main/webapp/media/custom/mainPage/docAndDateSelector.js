@@ -6,7 +6,7 @@
     $.fn.docAndDateSelector = function (options) {
 
         var settings = $.extend({
-            useWarehouseRole: true,
+            useWarehouseSelect: true,
             offsetLabel: "Время склада:",
             docPlaceHolder: "Выберите док",
             warehousePlaceHolder: "Выберите склад",
@@ -14,8 +14,8 @@
         }, options);
 
         var data = settings.data;
-        var useWarehouseRole = settings.useWarehouseRole;
-        var firstWarehouse = data.warehouses[0]; // usable if useWarehouseRole = false
+        var useWarehouseSelect = settings.useWarehouseSelect;
+        var firstWarehouse = data.warehouses[0]; // usable if useWarehouseSelect = false
 
         // sort all data
         sortByStringCompare(data.warehouses, "warehouseName");
@@ -36,14 +36,14 @@
 
         // create offset component
         var $offsetDiv = $("#timeOffset").find("div");
-        if (!useWarehouseRole) {
+        if (!useWarehouseSelect) {
             fillOffset(firstWarehouse);
         }
 
         // create doc component
         var $docSelect = $("#docPicker").find("select");
         $docSelect.append($("<option>"));
-        if (useWarehouseRole) {
+        if (useWarehouseSelect) {
             $docSelect.prop('disabled', true);
         }
         $docSelect.chosen({
@@ -55,7 +55,7 @@
         });
 
         // create warehouse component
-        if (useWarehouseRole) {
+        if (useWarehouseSelect) {
             var $warehouseSelect = $("<select></select>");
             $("#warehousePicker").append($warehouseSelect);
             // add data to warehouse select
@@ -88,7 +88,7 @@
         // create data select component
         var minDate;
         var maxDate;
-        if (useWarehouseRole) {
+        if (useWarehouseSelect) {
             minDate = new Date();// current Date
             minDate.setDate(minDate.getDate() - 1);
             maxDate = new Date();
@@ -125,7 +125,7 @@
         };
 
         /**
-         * use this method with useWarehouseRole=false
+         * use this method with useWarehouseSelect=false
          * @param docId
          */
         this.setSelectedDoc = function(docId) {
@@ -133,7 +133,7 @@
         };
 
         /**
-         * use this method with useWarehouseRole=true
+         * use this method with useWarehouseSelect=true
          * @param warehouseId
          * @param docId
          */
@@ -185,7 +185,7 @@
         }
 
         function getSelectedWarehouseId() {
-            if (useWarehouseRole) {
+            if (useWarehouseSelect) {
                 return $warehouseSelect.chosen().val();
             } else {
                 return $warehouseLabel.attr("value");

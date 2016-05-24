@@ -12,25 +12,112 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/datePicker/pickmeup.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/chosen_v1.5.1/chosen.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/docAndDateSelector.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/tablePlugin.css"/>">
     <%--common scripts--%>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
     <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
     <script src="<c:url value="/media/chosen_v1.5.1/chosen.jquery.min.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
+    <script src="<c:url value="/media/custom/mainPage/tablePlugin.js"/>"></script>
     <%--specific scripts for different user roles--%>
-    <%--<c:set var="requestData" scope="request" value="${requestScope.docDateSelectorDataObject}"/>--%>
+    <c:set var="periodSize" scope="application" value="${initParam.periodSize}"/>
+    <c:set var="windowSize" scope="application" value="${initParam.windowSize}"/>
     <c:set var="userRole" scope="session" value="${sessionScope.user.userRole.userRoleId}"/>
-    <c:choose>
-        <c:when test="${userRole == 'SUPPLIER_MANAGER'}">
-            <script src="<c:url value="/media/custom/mainPage/roleSupplierManager.js"/>"></script>
-        </c:when>
-        <c:when test="${userRole == 'WH_BOSS'}">
-            <script src="<c:url value="/media/custom/mainPage/roleWarehouseBoss.js"/>"></script>
-        </c:when>
-        <c:when test="${userRole == 'WH_DISPATCHER'}">
-            <script src="<c:url value="/media/custom/mainPage/roleWarehouseDispatcher.js"/>"></script>
-        </c:when>
-    </c:choose>
+    <c:set var="isSupplierManager" scope="page" value="${userRole == 'SUPPLIER_MANAGER'}"/>
+    <c:set var="isWarehouseBoss" scope="page" value="${userRole == 'WH_BOSS'}"/>
+    <c:set var="isWarehouseDispatcher" scope="page" value="${userRole == 'WH_DISPATCHER'}"/>
+    <c:set var="useWarehouseSelect" scope="page" value="${!(isWarehouseBoss || isWarehouseDispatcher)}"/>
+
+    <script>
+        $(document).ready(function(){
+            "use strict";
+
+            // init table plugin
+            var tablePlugin = window.tablePlugin({
+                parentId: 'tableContainer',
+                windowSize: +<c:out value="${windowSize}"/>,
+                periodSize: +<c:out value="${periodSize}"/>,
+                <c:if test="${isSupplierManager}">
+                selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
+                    if (selectedSerialNumbers.length === 0) {
+                        return false;
+                    }
+                    else if(selectedSerialNumbers.length === 1) {
+                        if (isSelected) {
+                            return false;
+                        } else {
+                            var selectedSerialNumber = selectedSerialNumbers[0];
+                            if((serialNumber === (selectedSerialNumber - 1)) || (serialNumber === (selectedSerialNumber + 1))){
+                                return false;
+                            }
+                        }
+                    }else {
+                        var min = selectedSerialNumbers[0];
+                        var max = selectedSerialNumbers[selectedSerialNumbers.length - 1];
+                        if (isSelected && (serialNumber === min || serialNumber === max)) {
+                            return false;
+                        }
+                        if((serialNumber === (min - 1)) || (serialNumber === (max + 1))){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                </c:if>
+
+            });
+            tablePlugin.generate();
+
+            //tablePlugin.setString("Panasonic", 2, 3);
+            tablePlugin.setOnClicked(function(e) {
+                //window.console.log(e);
+                //window.console.log(e.detail);
+            });
+            tablePlugin.setDisabled(true);
+
+
+            // init docAndDateSelector
+            var $docAndDateSelector = $('#docAndDateSelector');
+            var docDateSelector = $docAndDateSelector.docAndDateSelector({
+                useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
+                data: ${requestScope.docDateSelectorDataObject}
+            });
+            //docDateSelector.setSelectedDate(new Date(2015, 10, 30));
+            //docDateSelector.setSelectedWarehouseAndDoc(1, 3);
+            //docDateSelector.setSelectedDoc(3);
+            docDateSelector.setOnSelected(function(event, date, warehouseId, docId) {
+                // на время отправки данных и их получения - таблица должна уходить в состояние disabled = true;
+                tablePlugin.setDisabled(true);
+                $.ajax({
+                    url: "getTableData",
+                    method: "POST",
+                    data: {date: date, warehouseId: warehouseId, docId: docId},
+                    dataType: "json"
+                }).done(function (tableData) {
+                    tablePlugin.setDisabled(false);
+                    console.log(tableData);
+
+                }).fail(function () {
+                    window.alert("error");
+                    tablePlugin.setDisabled(false);
+
+                });
+            });
+
+
+        });
+    </script>
+    <%--<c:choose>--%>
+        <%--<c:when test="${userRole == 'SUPPLIER_MANAGER'}">--%>
+
+        <%--</c:when>--%>
+        <%--<c:when test="${userRole == 'WH_BOSS'}">--%>
+            <%--<script src="<c:url value="/media/custom/mainPage/roleWarehouseBoss.js"/>"></script>--%>
+        <%--</c:when>--%>
+        <%--<c:when test="${userRole == 'WH_DISPATCHER'}">--%>
+            <%--<script src="<c:url value="/media/custom/mainPage/roleWarehouseDispatcher.js"/>"></script>--%>
+        <%--</c:when>--%>
+    <%--</c:choose>--%>
 </head>
 
 <body>
@@ -39,14 +126,12 @@
     <form action="logout" method="post">
         <input id="exit" type="submit" value="выйти"/>
     </form>
-
-    <c:out value="${userRole}"/>
     <table>
         <tr>
             <td>имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
         </tr>
         <tr>
-            <td>роль</td><td><c:out value="${sessionScope.user.userRole.userRoleId}"/></td>
+            <td>роль</td><td><c:out value="${userRole}"/></td>
         </tr>
         <tr>
             <td>должность</td><td><c:out value="${sessionScope.user.position}"/></td>
@@ -55,8 +140,10 @@
 </div>
 
 <div id="docsPane">
-    <div id="docAndDateSelector" data-component_data=${requestScope.docDateSelectorDataObject}></div>
+    <div id="docAndDateSelector"></div>
+    <div id="tableContainer"></div>
 </div>
+
 
 
 </body>

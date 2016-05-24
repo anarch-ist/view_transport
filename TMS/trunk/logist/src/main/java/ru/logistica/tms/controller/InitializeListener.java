@@ -38,7 +38,6 @@ public class InitializeListener implements ServletContextListener {
             HibernateUtils.setSessionFactory(sessionFactory);
 
             DaoFacade.fillOffsetsForAbbreviations();
-
         } catch (Exception e) {
             logger.error(e);
         }

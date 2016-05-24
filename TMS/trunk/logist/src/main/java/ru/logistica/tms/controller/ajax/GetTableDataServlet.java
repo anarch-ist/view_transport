@@ -1,5 +1,6 @@
 package ru.logistica.tms.controller.ajax;
 
+import javax.json.Json;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,5 +14,6 @@ public class GetTableDataServlet extends AjaxHttpServlet {
         System.out.println(req.getParameter("date"));
         System.out.println(req.getParameter("warehouseId"));
         System.out.println(req.getParameter("docId"));
+        sendJson(resp, Json.createObjectBuilder().add("data", "success").build());
     }
 }
