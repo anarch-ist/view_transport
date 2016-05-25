@@ -6,6 +6,9 @@ import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
 import ru.logistica.tms.dao.docDao.DocDaoImpl;
+import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
+import ru.logistica.tms.dao.docPeriodDao.DocPeriodDao;
+import ru.logistica.tms.dao.docPeriodDao.DocPeriodImpl;
 import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
@@ -14,13 +17,11 @@ import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.AuthResult;
 import ru.logistica.tms.util.CriptUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
+
 
     private interface DaoScript {
         void execute() throws DAOException;
@@ -100,6 +101,36 @@ public class DaoFacade {
                 warehouseDao.findAll(Warehouse.class);
             }
         });
+    }
+
+    public static List<DocPeriod> getAllPeriodsForDoc(final Integer docId, final Date timeStampBegin, final Date timeStampEnd) {
+        final List<?>[] result = new List<?>[1];
+
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DocPeriodDao docPeriodDao = new DocPeriodImpl();
+                List<DocPeriod> allPeriodsBetweenTimeStampsForDoc =
+                        docPeriodDao.findAllPeriodsBetweenTimeStampsForDoc(docId, timeStampBegin, timeStampEnd);
+                result[0] = allPeriodsBetweenTimeStampsForDoc;
+            }
+        });
+        return (List<DocPeriod>) result[0];
+    }
+
+
+    public static Warehouse getWarehouseById(final Integer warehouseId) {
+        final Warehouse[] result = new Warehouse[1];
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                Warehouse warehouse = warehouseDao.findById(Warehouse.class, warehouseId);
+                warehouse.getRusTimeZoneAbbr();
+                result[0] = warehouse;
+            }
+        });
+        return result[0];
     }
 
 //    public static Map<Integer, String> getAllPointsAsIdAndNameMap() {

@@ -21,10 +21,13 @@ INSERT INTO docs VALUES
   (6, 'ekt_warehouse_doc3', 2)
 ;
 
+-- create docPeriods
 INSERT INTO doc_periods VALUES (1, 1, '2016-10-19 10:00:00 Z', '2016-10-19 10:30:00 Z');
-INSERT INTO doc_periods VALUES (2, 1, '2016-03-02 12:30:00 Z', '2016-03-02 13:00:00 Z');
-INSERT INTO doc_periods VALUES (3, 1, '2016-03-02 13:00:00 Z', '2016-03-02 13:30:00 Z');
-INSERT INTO donut_doc_periods VALUES (2, '2016-03-02', 'donut_comment', 'driver1', '89055678654', '123erk', 3, 1);
+INSERT INTO doc_periods VALUES (3, 1, '2016-10-19 13:00:00 Z', '2016-10-19 13:30:00 Z');
+
+-- create donutDocPeriod
+INSERT INTO doc_periods VALUES (2, 1, '2016-10-19 12:30:00 Z', '2016-10-19 13:00:00 Z');
+INSERT INTO donut_doc_periods VALUES (2, '2016-10-19', 'donut_comment', 'driver1', '89055678654', '123erk', 3, 1);
 
 INSERT INTO orders VALUES (1, 'orderNumber1', 2, 1, 2, 'CREATED', 'commentForStatus');
 

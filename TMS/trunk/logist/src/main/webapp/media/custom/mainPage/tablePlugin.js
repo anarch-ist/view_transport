@@ -163,6 +163,14 @@
         tableElement.addEventListener("selected", handler);
     };
 
+    main.setNotFreeState = function (timeStampStart, timeStampEnd, state, company) {
+        var periodNumberStart = definedStartTimeSerialNumberByMinutes(timeStampStart);
+        var periodNumberEnd = definedEndTimeSerialNumberByMinutes(timeStampEnd);
+        for(var i = periodNumberStart; i <= periodNumberEnd; i++){
+            findCellBySerialNumber(i, state, company);
+        }
+    };
+
     // TODO implement this method
 //    main.setDisabled = function(disabled) {
 //        // tableElement.disabled = disabled;
@@ -180,14 +188,6 @@
 
     function compareNum(a, b) {
         return a.dataset.serialnumber - b.dataset.serialnumber;
-    }
-
-    main.setNotFreeState = function (timeStampStart, timeStampEnd, state, company) {
-        var periodNumberStart = definedStartTimeSerialNumberByMinutes(timeStampStart);
-        var periodNumberEnd = definedEndTimeSerialNumberByMinutes(timeStampEnd);
-        for(var i = periodNumberStart; i <= periodNumberEnd; i++){
-            findCellBySerialNumber(i, state, company);
-        }
     }
 
     function definedStartTimeSerialNumberByMinutes(timeStamp) {
@@ -228,28 +228,29 @@
 
     main.sendDocPeriods = function() {
         var result = [];
-        var rows = tableElement.rows;
-        var row;
-        var cells;
-        var state;
-        for(var i = 0; i < rows.length; i++){
-            row = rows[i];
-            cells = row.cells;
-            for(var j = 0; j < cells.length; j++){
-                var elemClass = cells[j].lastElementChild.getAttribute('class');
-                if(elemClass){
-                    var obj = {};
 
-                    state = elemClass;
-                }
+        var previousState;
+        var previousSerialNumber;
+        var sequentialStates = [];
+        for(var i = 0; i < selectedElements.length; i++){
+            var cellState = selectedElements[i].lastElementChild.getAttribute('class');
+            var cellSerialNumber = selectedElements[i].dataset.serialnumber;
+            if (cellState === previousState && (cellSerialNumber - 1) === previousSerialNumber) {
+                sequentialStates.push(i);
+            } else {
+
             }
+
+
+            previousSerialNumber = cellSerialNumber;
+            previousState = cellState;
         }
 
         var formElem = document.createElement("form");
         formElem.setAttribute('Action', 'submit');
 
         // send result as content????
-        formElem.setAttribute('Content', result);
+        //formElem.setAttribute('Content', result);
         var inputElem = document.createElement("input");
         inputElem.setAttribute('Type', 'button');
         inputElem.setAttribute('Value', 'Отправить');

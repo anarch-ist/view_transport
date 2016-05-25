@@ -7,6 +7,7 @@
             <class name="ru.logistica.tms.dao.supplierDao.SuppliersDaoImplTest" />
             <class name="ru.logistica.tms.dao.userDao.UserDaoImplTest" />
             <class name="ru.logistica.tms.dao.TestRelations" />
+            <class name="ru.logistica.tms.dao.DaoFacadeTest" />
         </classes>
     </test>
 </suite>

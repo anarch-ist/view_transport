@@ -176,7 +176,8 @@
         }
 
         function generateEventIfValidState() {
-            var selectedDate = dateSelect.pickmeup('get_date', true);
+            // BINDING with GetTableDataServlet
+            var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d');
             var selectedDoc =  $docSelect.chosen().val();
             var selectedWarehouse = getSelectedWarehouseId();
             if (selectedDoc && selectedWarehouse) {

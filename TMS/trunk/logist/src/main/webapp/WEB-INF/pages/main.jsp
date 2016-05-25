@@ -73,7 +73,7 @@
                 //window.console.log(e);
                 //window.console.log(e.detail);
             });
-            tablePlugin.setDisabled(true);
+            //tablePlugin.setDisabled(true);
 
 
             // init docAndDateSelector
@@ -87,14 +87,26 @@
             //docDateSelector.setSelectedDoc(3);
             docDateSelector.setOnSelected(function(event, date, warehouseId, docId) {
                 // на время отправки данных и их получения - таблица должна уходить в состояние disabled = true;
-                tablePlugin.setDisabled(true);
+                //tablePlugin.setDisabled(true);
                 $.ajax({
                     url: "getTableData",
                     method: "POST",
                     data: {date: date, warehouseId: warehouseId, docId: docId},
                     dataType: "json"
                 }).done(function (tableData) {
-                    tablePlugin.setDisabled(false);
+                    var periodsArray = tableData.docPeriods;
+                    periodsArray.forEach(function(period) {
+                        if (period.state === "DISABLED") {
+                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state);
+                        } else if (period.state === "OCCUPIED") {
+                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state, period.supplierName);
+                            //period.supplierId;
+                        }
+                    });
+                    //tablePlugin.setDisabled(false);
+//                    tableData.periodBegin;
+//                    tableData.periodEnd;
+
                     console.log(tableData);
 
                 }).fail(function () {

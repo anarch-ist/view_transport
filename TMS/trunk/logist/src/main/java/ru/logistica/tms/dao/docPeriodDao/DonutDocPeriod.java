@@ -111,7 +111,6 @@ public class DonutDocPeriod extends DocPeriod{
                 ", licensePlate='" + licensePlate + '\'' +
                 ", palletsQty=" + palletsQty +
                 ", supplier=" + supplier +
-                ", orders=" + orders +
                 '}';
     }
 }
