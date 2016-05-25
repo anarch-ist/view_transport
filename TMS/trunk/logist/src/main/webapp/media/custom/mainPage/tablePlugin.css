@@ -32,8 +32,15 @@ body {
 
 .companyDiv {
     font-weight:bold;
-    display: table-cell;
     vertical-align: middle;
+}
+
+.occupied {
+    background-color: red;
+}
+
+.disabled {
+    background-color: grey;
 }
 
 

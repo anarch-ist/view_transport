@@ -38,16 +38,19 @@
                 }
             });
             tablePlugin.generate();
-            tablePlugin.setDisabled(true);
+            <!--tablePlugin.setDisabled(true);-->
             <!--var obj = tablePlugin.findById(6, 4);-->
             <!--window.console.log(obj.tdElem);-->
             <!--window.console.log(obj.labelElem);-->
             <!--window.console.log(obj.divElem);-->
-            tablePlugin.setString("Panasonic", 2, 3);
+            tablePlugin.setString("Panasonic", 6, 3);
             tablePlugin.setOnClicked(function(e) {
 //                window.console.log(e);
 //                window.console.log(e.detail);
             });
+            tablePlugin.setNotFreeState(150, 300, "occupied", "Sony");
+            tablePlugin.setNotFreeState(450, 600, "disabled");
+            tablePlugin.sendDocPeriods();
         };
     </script>
 

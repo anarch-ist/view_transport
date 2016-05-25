@@ -26,11 +26,11 @@
         // generate content
         this.empty();
         this.append(
-            "<div id='docAndDateSelector'>"+
-            "<div id='datePicker'><input type='text' readonly='readonly'></div>" +
-            "<div id='warehousePicker'></div>" +
-            "<div id='docPicker'><select></select></div>" +
-            "<div id='timeOffset'><label>" + settings.offsetLabel + "</label><div></div></div>" +
+            "<div id='docAndDateSelectorId' class='docAndDateSelector'>"+
+            "<div id='datePickerId' class='datePicker'><input type='text' readonly='readonly'></div>" +
+            "<div id='warehousePicker' class='placePicker'></div>" +
+            "<div id='docPicker' class='placePicker'><select></select></div>" +
+            "<div id='timeOffset'><label class='timeGMT'>" + settings.offsetLabel + "</label><div class='timeGMT'></div></div>" +
             "</div>"
         );
 
@@ -97,7 +97,7 @@
             minDate = null;
             maxDate = null;
         }
-        var dateSelect = $("#datePicker").find("input");
+        var dateSelect = $("#datePickerId").find("input");
         dateSelect.pickmeup({
             locale: {
                 days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"],

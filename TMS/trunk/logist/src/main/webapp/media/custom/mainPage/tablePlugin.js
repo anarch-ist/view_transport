@@ -164,9 +164,9 @@
     };
 
     // TODO implement this method
-    main.setDisabled = function(disabled) {
-        // tableElement.disabled = disabled;
-    };
+//    main.setDisabled = function(disabled) {
+//        // tableElement.disabled = disabled;
+//    };
 
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
@@ -181,6 +181,81 @@
     function compareNum(a, b) {
         return a.dataset.serialnumber - b.dataset.serialnumber;
     }
+
+    main.setNotFreeState = function (timeStampStart, timeStampEnd, state, company) {
+        var periodNumberStart = definedStartTimeSerialNumberByMinutes(timeStampStart);
+        var periodNumberEnd = definedEndTimeSerialNumberByMinutes(timeStampEnd);
+        for(var i = periodNumberStart; i <= periodNumberEnd; i++){
+            findCellBySerialNumber(i, state, company);
+        }
+    }
+
+    function definedStartTimeSerialNumberByMinutes(timeStamp) {
+        var periodSize = startupParameters.periodSize;
+        var result;
+        if(timeStamp === 0) return 1;
+        result = timeStamp / periodSize;
+        result++;
+        return result;
+    }
+
+    function definedEndTimeSerialNumberByMinutes(timeStamp) {
+        var periodSize = startupParameters.periodSize;
+        var result;
+        if(timeStamp === 0) return (24 * 60 / periodSize);
+        result = (timeStamp / periodSize);
+        return result;
+    }
+
+    function findCellBySerialNumber(number, state, company) {
+
+        var rows = tableElement.rows;
+        var row;
+        var cells;
+        for(var i = 0; i < rows.length; i++){
+            row = rows[i];
+            cells = row.cells;
+            for(var j = 0; j < cells.length; j++){
+                if(number == cells[j].dataset.serialnumber){
+                    cells[j].lastElementChild.classList.add(state);
+                    if(company){
+                        cells[j].lastElementChild.innerHTML = company;
+                    }
+                }
+            }
+        }
+    }
+
+    main.sendDocPeriods = function() {
+//        var result = [];
+//        var rows = tableElement.rows;
+//        var row;
+//        var cells;
+//        for(var i = 0; i < rows.length; i++){
+//            row = rows[i];
+//            cells = row.cells;
+//            for(var j = 0; j < cells.length; j++){
+//                var elemClass = cells[j].getAttribute('class');
+//                if(elemClass){
+//                    var obj = {
+//                      timeStart:
+//                      timeEnd:
+//                      state:
+//                      company:
+//                    };
+//                    cells[j].lastElementChild.classList.add(state);
+//                }
+//            }
+//        }
+
+        var formElem = document.createElement("form");
+        var inputElem = document.createElement("input");
+        inputElem.setAttribute('Type', 'submit');
+        inputElem.setAttribute('Value', 'Отправить');
+        formElem.appendChild(inputElem);
+        tableElement.appendChild(formElem);
+    }
+
 
     window.tablePlugin = main;
 
