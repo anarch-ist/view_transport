@@ -227,33 +227,34 @@
     }
 
     main.sendDocPeriods = function() {
-//        var result = [];
-//        var rows = tableElement.rows;
-//        var row;
-//        var cells;
-//        for(var i = 0; i < rows.length; i++){
-//            row = rows[i];
-//            cells = row.cells;
-//            for(var j = 0; j < cells.length; j++){
-//                var elemClass = cells[j].getAttribute('class');
-//                if(elemClass){
-//                    var obj = {
-//                      timeStart:
-//                      timeEnd:
-//                      state:
-//                      company:
-//                    };
-//                    cells[j].lastElementChild.classList.add(state);
-//                }
-//            }
-//        }
+        var result = [];
+        var rows = tableElement.rows;
+        var row;
+        var cells;
+        var state;
+        for(var i = 0; i < rows.length; i++){
+            row = rows[i];
+            cells = row.cells;
+            for(var j = 0; j < cells.length; j++){
+                var elemClass = cells[j].lastElementChild.getAttribute('class');
+                if(elemClass){
+                    var obj = {};
+
+                    state = elemClass;
+                }
+            }
+        }
 
         var formElem = document.createElement("form");
+        formElem.setAttribute('Action', 'submit');
+
+        // send result as content????
+        formElem.setAttribute('Content', result);
         var inputElem = document.createElement("input");
-        inputElem.setAttribute('Type', 'submit');
+        inputElem.setAttribute('Type', 'button');
         inputElem.setAttribute('Value', 'Отправить');
         formElem.appendChild(inputElem);
-        tableElement.appendChild(formElem);
+        document.body.appendChild(formElem);
     }
 
 
