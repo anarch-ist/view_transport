@@ -1,25 +1,39 @@
-td {
-    /*outline: 1px solid orange;*/
+body {
+    font-family: Courier New, serif;
+    font-size: 15px;
+}
+
+.tableCell {
+    border: 1px solid orange;
     text-align: center;
 }
 
-td > *{
-    height: 20px;
+.tableCell > * {
+    height: 25px;
     table-layout: fixed;
-    border-collapse: collapse;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
-table {
+.mainTable {
     background-color: #FDE4D0;
     border: 1px solid orange;
     border-collapse: collapse;
 }
 
 .highlight {
-    outline: 3px solid #ED1C24;
+    outline: 2px solid #ED1C24;
 }
 
-table label {
-    background-color: white;
+.timePeriodLabel {
+    background-color: #FFFAFA;
+    border-bottom: 1px solid orange;
 }
+
+.companyDiv {
+    font-weight:bold;
+    display: table-cell;
+    vertical-align: middle;
+}
+
 

@@ -9,8 +9,8 @@
         window.onload = function() {
             var tablePlugin = window.tablePlugin({
                 parentId: 'tableContainer',
-                periodSize: 90,
-                windowSize: 60 * 48,
+                periodSize: 30,
+                windowSize: 60 * 24,
                 selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
                     if (selectedSerialNumbers.length === 0) {
                         return false;
@@ -53,7 +53,7 @@
 
 </head>
 <body>
-    <div id="tableContainer"></div>
+    <div id="tableContainer" class="tableSpace"></div>
 </body>
 
 

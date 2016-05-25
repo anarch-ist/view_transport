@@ -59,6 +59,7 @@
         //tableTag
         var elem = document.getElementById(startupParameters.parentId);
         tableElement = document.createElement("table");
+        tableElement.classList.add("mainTable");
 
         elem.appendChild(tableElement);
 
@@ -70,6 +71,7 @@
             for(var j = 1; j <= x; j++) {
                 serialNumber++;
                 var cellElement = document.createElement("td");
+                cellElement.classList.add("tableCell");
                 cellElement.id = "cell_" + i + "_" + j;
                 cellElement.setAttribute("data-x", i);
                 cellElement.setAttribute("data-y", j);
@@ -110,6 +112,7 @@
                 };
 
                 var labelElement = document.createElement("label");
+                labelElement.classList.add("timePeriodLabel");
 
                 var time = firstPart.split(':');
                 var newTime = +time[0] * 60 + (+time[1]) + periodSize;
@@ -130,6 +133,7 @@
                 firstPart = secondPart;
 
                 var divElement = document.createElement("div");
+                divElement.classList.add("companyDiv");
                 cellElement.appendChild(labelElement);
                 cellElement.appendChild(divElement);
                 rowElement.appendChild(cellElement);
