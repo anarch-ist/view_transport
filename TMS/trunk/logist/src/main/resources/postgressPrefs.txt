@@ -1,7 +1,0 @@
-user: postgres
-pass: postgres
-
-port: 5432
-
-local: russian, russia
-

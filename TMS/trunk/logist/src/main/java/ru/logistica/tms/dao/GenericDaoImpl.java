@@ -67,7 +67,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
     public T findById(Class<T> clazz, Id id) throws DAOException {
         try {
             Session hibernateSession = this.getSession();
-            return hibernateSession.get(clazz, id);
+            return (T) hibernateSession.get(clazz, id);
         } catch (Exception e) {
             throw new DAOException(e);
         }

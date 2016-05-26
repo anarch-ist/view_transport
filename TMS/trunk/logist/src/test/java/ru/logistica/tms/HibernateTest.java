@@ -36,7 +36,7 @@ public abstract class HibernateTest {
         configuration.addAnnotatedClass(UserRole.class);
         configuration.addAnnotatedClass(SupplierUser.class);
         configuration.addAnnotatedClass(WarehouseUser.class);
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL94Dialect");
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL9Dialect");
         configuration.setProperty("hibernate.connection.driver_class","org.postgresql.Driver");
         configuration.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres");
         configuration.setProperty("hibernate.connection.autocommit", "false");

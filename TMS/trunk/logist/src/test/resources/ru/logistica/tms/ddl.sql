@@ -220,6 +220,10 @@ CREATE SCHEMA audit;
 
 -- create user if not exist
 REVOKE ALL PRIVILEGES ON DATABASE postgres FROM app_user;
+REVOKE SELECT ON pg_timezone_names FROM app_user;
+REVOKE SELECT ON pg_timezone_abbrevs FROM app_user;
+REVOKE ALL PRIVILEGES ON SCHEMA pg_catalog FROM app_user;
+REVOKE ALL PRIVILEGES ON SCHEMA information_schema FROM app_user;
 DROP ROLE IF EXISTS app_user;
 CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
 

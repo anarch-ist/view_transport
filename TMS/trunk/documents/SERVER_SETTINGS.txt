@@ -1,0 +1,127 @@
+--------------SSH CONNECTION--------------------
+
+185.75.182.94
+SSH port: 49
+user: pigin_s
+password: 6RuPd9Kk
+root password: nS3SY38h
+
+--------------POSTGRESQL INSTALLATION-----------
+version=9.5
+https://wiki.postgresql.org/wiki/Apt
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-9-4-on-debian-8
+https://www.postgresql.org/download/linux/debian/
+
+Create the file /etc/apt/sources.list.d/pgdg.list, and add a line for the repository:
+deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main
+
+Import the repository signing key, and update the package lists:
+apt-get install wget ca-certificates
+wget –quiet -O – https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add –
+
+update all:
+apt-get update && apt-get upgrade
+install postgres9.5 port-5432:
+apt-get install postgresql-9.5
+
+startup: /etc/init.d/postgresql start
+stop: /etc/init.d/postgresql stop
+restart: /etc/init.d/postgresql restart
+
+PostgreSQL by default comes installed with a user and database, both called postgres
+So if you want to connect to the database, you will need to switch to the postgres user first. To do that execute the following command:
+su postgres
+psql
+
+change default postgres password:
+# Switch to postgres user
+$ su postgres
+
+# Now Login into postgres server
+$ psql
+
+## Running ' \password postgres ' to set password
+\password postgres
+
+# To quite from postgres
+\q
+
+
+Allow remote connections:
+nano /etc/postgresql/9.5/main/pg_hba.conf
+add string:
+host    all         all         0.0.0.0/0    md5
+
+/etc/postgresql/9.5/main/postgresql.conf
+modify and uncomment:
+listen_addresses = 'localhost' -> listen_addresses = '*'
+
+
+Set default timezone as UTC /etc/postgresql/9.5/main/postgresql.conf:
+timezone = 'UTC'
+
+restart postgres
+
+TODO set optimization params
+
+--------------TOMCAT INSTALLATION-----------
+
+JRE V 1.8.74 already installed
+
+stop start and restart tomcat:
+service tomcat8 stop
+service tomcat8 start
+service tomcat8 restart
+
+apt-get install tomcat8
+
+after installation automatically creates user tomcat8
+cannot bind on ports 1-1023, install autowiring package to achive this.
+/etc/tomcat8/ -- config files
+/usr/share/tomcat8-root
+/usr/share/tomcat8  
+/var/lib/tomcat8 (where the webapps/ directory resides)
+CATALINA_HOME:   /var/lib/tomcat8
+logs: /var/lib/tomcat8/logs
+
+create catalog for web applications:
+/home/pigin_s/tomcat_webapp
+chown pigin_s tomcat_webapp
+
+set this catalog instead default tomcat webapp:
+in file /var/lib/tomcat8/server.xml
+replace "webapp" in <context/> with "/home/pigin_s/tomcat_webapp"
+
+add privelege for all operations with  "/home/pigin_s/tomcat_webapp" to tomcat8 user
+usermod -a -G pigin_s tomcat8
+
+allow both users tomcat8 and pigin_s work with same files
+
+setfacl -m u:pigin_s:7 /home/pigin_s/tomcat_webapp
+setfacl -d -m u:pigin_s:7 /home/pigin_s/tomcat_webapp
+setfacl -m u:tomcat8:7 /home/pigin_s/tomcat_webapp
+setfacl -d -m u:tomcat8:7 /home/pigin_s/tomcat_webapp
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+

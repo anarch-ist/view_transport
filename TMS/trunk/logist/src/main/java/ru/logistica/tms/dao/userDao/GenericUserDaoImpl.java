@@ -10,7 +10,7 @@ public class GenericUserDaoImpl<T, Id extends Serializable> extends GenericDaoIm
     @Override
     public T findByLogin(Class<T> clazz, String login) throws DAOException {
         try {
-            return getSession().bySimpleNaturalId(clazz).load(login);
+            return (T) getSession().bySimpleNaturalId(clazz).load(login);
         } catch (Exception e) {
             throw new DAOException(e);
         }

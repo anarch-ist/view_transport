@@ -1,0 +1,6 @@
+user: postgres
+pass: rtpssmlpdrt54390
+port: 5432
+
+
+
