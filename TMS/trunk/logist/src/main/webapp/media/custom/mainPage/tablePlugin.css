@@ -30,7 +30,7 @@ body {
     border-bottom: 1px solid orange;
 }
 
-.companyDiv {
+#companyDiv {
     font-weight:bold;
     vertical-align: middle;
 }

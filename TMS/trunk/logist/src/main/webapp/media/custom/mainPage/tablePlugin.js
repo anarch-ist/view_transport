@@ -133,7 +133,7 @@
                 firstPart = secondPart;
 
                 var divElement = document.createElement("div");
-                divElement.classList.add("companyDiv");
+                divElement.setAttribute("id", "companyDiv");
                 cellElement.appendChild(labelElement);
                 cellElement.appendChild(divElement);
                 rowElement.appendChild(cellElement);
@@ -153,6 +153,8 @@
         result.divElem = divElement;
         return result;
     };
+
+
 
     main.setString = function(str, x, y) {
         var divElement = main.findById(x, y).divElem;
@@ -226,25 +228,147 @@
         }
     }
 
+    // index = 0 if start of periods and nothing if end
+    function splitPeriodsAndCountTime(str, index){
+        var hyphenArr = str.split('-');
+        var colonArr = [];
+        var result;
+        if(index === 0){
+            colonArr = hyphenArr[0].split(':');
+        }else{
+            colonArr = hyphenArr[hyphenArr.length - 1].split(':');
+        }
+        var hours = +colonArr[0];
+        hours = hours * 60;
+        var minutes = +colonArr[1];
+        result = hours + minutes;
+
+        return result;
+    }
+
+    function getCellById(x, y) {
+            var result = document.getElementById("cell_" + x + "_" + y);
+            return result;
+    };
+
     main.sendDocPeriods = function() {
         var result = [];
 
         var previousState;
         var previousSerialNumber;
         var sequentialStates = [];
-        for(var i = 0; i < selectedElements.length; i++){
+
+
+        selectedElements.push(getCellById(1, 6));
+        selectedElements.push(getCellById(2, 1));
+        selectedElements.push(getCellById(2, 3));
+        selectedElements.push(getCellById(2, 4));
+        selectedElements.push(getCellById(3, 3));
+        selectedElements.push(getCellById(3, 4));
+        selectedElements.push(getCellById(3, 5));
+        selectedElements.push(getCellById(3, 6));
+        selectedElements.push(getCellById(4, 1));
+        selectedElements.push(getCellById(4, 2));
+
+        for(var i = 0; i < selectedElements.length; ){
             var cellState = selectedElements[i].lastElementChild.getAttribute('class');
             var cellSerialNumber = selectedElements[i].dataset.serialnumber;
-            if (cellState === previousState && (cellSerialNumber - 1) === previousSerialNumber) {
+//            window.console.log(cellState + " " + cellSerialNumber);
+            if(!previousState){
                 sequentialStates.push(i);
-            } else {
+                previousState = cellState;
+                previousSerialNumber = cellSerialNumber;
+                i++;
+            }else{
+//            window.console.log(previousState + " " + previousSerialNumber + " " + cellState + " " + cellSerialNumber);
 
+                if(previousState === cellState && ((cellSerialNumber - 1) == previousSerialNumber)){
+
+                    sequentialStates.push(i);
+                    previousState = cellState;
+                    previousSerialNumber = cellSerialNumber;
+                    i++;
+                       window.console.log(cellState + " " + cellSerialNumber + " " + previousState + " " + previousSerialNumber);
+                }else if(previousState !== cellState || (cellSerialNumber - 1) != previousSerialNumber){
+                    window.console.log(sequentialStates + " k");
+//                    window.console.log(selectedElements[0] + " h");
+                    var firstIndex = sequentialStates[0];
+                    var lastIndex = sequentialStates[sequentialStates.length - 1];
+                    var firstElem = selectedElements[firstIndex];
+                    var lastElem = selectedElements[lastIndex];
+                    // periods
+                    var firstElemLabel = firstElem.firstElementChild.innerHTML;
+                    var lastElemLabel = lastElem.firstElementChild.innerHTML;
+                    var firstTime = splitPeriodsAndCountTime(firstElemLabel, 0);
+                    var lastTime = splitPeriodsAndCountTime(lastElemLabel);
+                    window.console.log(firstElemLabel + " " + firstTime + " " + lastElemLabel + " " + lastTime);
+                    // company
+//                    if(previousState === 'occupied'){
+//                        var companies = [];
+//                        var previousCompany;
+//                        var currentCompany;
+//
+//                        var objComp = {
+//                            startTime: beginTime,
+//                            endTime: stopTime,
+//                            state: previousState,
+//                            company: previousCompany
+//                        };
+//                        result.push(objComp);
+
+//                        for(var x = 0; x < sequentialStates.length; ){
+//
+//
+//                            currentCompany = selectedElements[sequentialStates[x]].lastElementChild.innerHTML;
+//                            window.console.log(currentCompany + " " + selectedElements[sequentialStates[x]].firstElementChild.innerHTML);
+//                            if(!previousCompany){
+//                                previousCompany = currentCompany;
+//                                companies.push(selectedElements[sequentialStates[x]]);
+//                                x++;
+////                                window.console.log(selectedElements[sequentialStates[x]]);
+//                            }else{
+//                                if(previousCompany === currentCompany){
+//                                    companies.push(selectedElements[sequentialStates[x]]);
+//                                    previousCompany = currentCompany;
+//                                    x++;
+//
+//                                }else if(previousCompany !== currentCompany || x === (sequentialStates.length - 1)){
+//                                    window.console.log(previousCompany + " " + currentCompany);
+//                                    var beginTime = splitPeriodsAndCountTime(companies[0].firstElementChild.innerHTML , 0);
+//                                    var stopTime = splitPeriodsAndCountTime(companies[companies.length - 1].firstElementChild.innerHTML);
+//                                    var objComp = {
+//                                        startTime: beginTime,
+//                                        endTime: stopTime,
+//                                        state: previousState,
+//                                        company: previousCompany
+//                                    };
+////                                    window.console.log(objComp);
+//                                    previousCompany = undefined;
+//                                    result.push(objComp);
+//                                    companies.length = 0;
+//                                }
+//                            }
+//                        }
+//                    }else
+//                    {
+                        var obj = {
+                            startTime: firstTime,
+                            endTime: lastTime,
+                            state: previousState
+                        };
+                        result.push(obj);
+                    }
+                    previousState = undefined;
+                    previousSerialNumber = undefined;
+                    sequentialStates.length = 0;
+
+                }
             }
+            window.console.log(result.length);
 
+//            previousSerialNumber = cellSerialNumber;
+//            previousState = cellState;
 
-            previousSerialNumber = cellSerialNumber;
-            previousState = cellState;
-        }
 
         var formElem = document.createElement("form");
         formElem.setAttribute('Action', 'submit');
