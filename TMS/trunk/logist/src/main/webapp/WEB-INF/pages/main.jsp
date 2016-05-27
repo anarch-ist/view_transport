@@ -19,6 +19,7 @@
     <script src="<c:url value="/media/chosen_v1.5.1/chosen.jquery.min.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/tablePlugin.js"/>"></script>
+    <script src="<c:url value="/media/custom/mainPage/tableControlsPlugin.js"/>"></script>
     <%--specific scripts for different user roles--%>
     <c:set var="periodSize" scope="application" value="${initParam.periodSize}"/>
     <c:set var="windowSize" scope="application" value="${initParam.windowSize}"/>
@@ -32,7 +33,7 @@
         $(document).ready(function(){
             "use strict";
 
-            // init table plugin
+            // ---------------------------------init table plugin----------------------------------------
             var tablePlugin = window.tablePlugin({
                 parentId: 'tableContainer',
                 windowSize: +<c:out value="${windowSize}"/>,
@@ -76,7 +77,7 @@
             //tablePlugin.setDisabled(true);
 
 
-            // init docAndDateSelector
+            // ---------------------------------init docDateSelector plugin----------------------------------------
             var $docAndDateSelector = $('#docAndDateSelector');
             var docDateSelector = $docAndDateSelector.docAndDateSelector({
                 useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
@@ -111,10 +112,67 @@
 
                 }).fail(function () {
                     window.alert("error");
-                    tablePlugin.setDisabled(false);
+                    //tablePlugin.setDisabled(false);
 
                 });
             });
+
+            // ---------------------------------init tableControlsPlugin----------------------------------------
+            var tableControlsPlugin = window.tableControlsPlugin({
+                tablePlugin:tablePlugin,
+                parentId:"tableControlsContainer",
+                buttons: [
+                    <c:if test="${isSupplierManager}">
+                    {name:"Добавить комментарий", id :"addSupCommentBtn", enabledIfAnySelected: true},
+                    {name:"Отменить", id:"cancelSupOrderBtn", enabledIfAnySelected: true},
+                    {name:"Зарезервировать", id:"occupySupPeriodBtn", enabledIfAnySelected: true}
+                    </c:if>
+                    <c:if test="${isWarehouseBoss}">
+                    {name:"Информация о грузе", id :"cargoInfoBtn", enabledIfAnySelected: true},
+                    {name:"Открыть интервал", id:"setFreePeriodBtn", enabledIfAnySelected: true},
+                    {name:"Закрыть интервал", id:"setDisabledPeriodBtn", enabledIfAnySelected: true}
+                    </c:if>
+                    <c:if test="${isWarehouseDispatcher}">
+                    {name:"Информация о грузе", id :"cargoInfoBtn", enabledIfAnySelected: true},
+                    {name:"Изменить статус", id:"changeStatusBtn", enabledIfAnySelected: true}
+                    </c:if>
+                ]
+            });
+            tableControlsPlugin.generateContent();
+            <c:if test="${isSupplierManager}">
+            var occupyPeriodBtnElem = tableControlsPlugin.getButtonByPluginId("occupySupPeriodBtn");
+
+            occupyPeriodBtnElem.onclick = function(e) {
+                var selectionObject = docDateSelector.getSelectionObject();
+                if (selectionObject === null) {
+                    return;
+                }
+                $.ajax({
+                    url: "setTableData",
+                    method: "POST",
+                    data: {docAndDate: selectionObject, period: tablePlugin.getSelectedPeriod()},
+                    dataType: "json"
+                }).done(function (tableData) {
+                    var periodsArray = tableData.docPeriods;
+                    periodsArray.forEach(function(period) {
+                        if (period.state === "DISABLED") {
+                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state);
+                        } else if (period.state === "OCCUPIED") {
+                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state, period.supplierName);
+                            //period.supplierId;
+                        }
+                    });
+
+                }).fail(function () {
+                    window.alert("error");
+                    //tablePlugin.setDisabled(false);
+
+                });
+            };
+            </c:if>
+
+
+
 
 
         });
@@ -154,6 +212,7 @@
 <div id="docsPane">
     <div id="docAndDateSelector"></div>
     <div id="tableContainer"></div>
+    <div id="tableControlsContainer"></div>
 </div>
 
 

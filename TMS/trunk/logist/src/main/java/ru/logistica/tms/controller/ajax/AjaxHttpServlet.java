@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class AjaxHttpServlet extends HttpServlet {
+
+
     protected void sendJson(HttpServletResponse response, JsonObject jsonObject) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

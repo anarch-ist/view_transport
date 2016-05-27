@@ -12,6 +12,7 @@
     <script src="docAndDateSelector.js"></script>
 
     <script>
+        var docDateSelector;
         $(document).ready(function(){
             var exampleData = {
                 "warehouses": [
@@ -57,7 +58,7 @@
                     }
                 ]
             };
-            var docDateSelector = $("#container").docAndDateSelector({
+            docDateSelector = $("#container").docAndDateSelector({
                 useWarehouseSelect:true,
                 data: exampleData
             });
@@ -66,12 +67,14 @@
             <!--docDateSelector.setSelectedWarehouseAndDoc(1, 3);-->
             //docDateSelector.setSelectedDoc(3);
 
-            docDateSelector.setOnSelected(function(event, date, warehouseId, docId) {
+            docDateSelector.setOnSelected(function(event, selectionObject) {
                 window.console.log("SELECTED EVENT");
-                window.console.log(date);
-                window.console.log(warehouseId);
-                window.console.log(docId);
+                window.console.log(selectionObject.date);
+                window.console.log(selectionObject.warehouseId);
+                window.console.log(selectionObject.docId);
             })
+
+
         });
     </script>
 </head>

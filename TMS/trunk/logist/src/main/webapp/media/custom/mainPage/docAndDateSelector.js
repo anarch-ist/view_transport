@@ -148,7 +148,6 @@
             $(document).on("docDateSelected", handler);
         };
 
-
         //-------------------------- FUNCTIONS -------------------------------
         function setDoc(docId) {
             $docSelect.val(docId);
@@ -176,12 +175,21 @@
         }
 
         function generateEventIfValidState() {
-            // BINDING with GetTableDataServlet
+            var selectionObject = getSelectionObject();
+            if (selectionObject !== null) {
+                $(document).trigger("docDateSelected", selectionObject);
+            }
+        }
+
+        function getSelectionObject() {
+            // BINDING date format with GetTableDataServlet
             var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d');
-            var selectedDoc =  $docSelect.chosen().val();
-            var selectedWarehouse = getSelectedWarehouseId();
-            if (selectedDoc && selectedWarehouse) {
-                $(document).trigger("docDateSelected", [selectedDate, selectedWarehouse, selectedDoc]);
+            var selectedDocId =  $docSelect.chosen().val();
+            var selectedWarehouseId = getSelectedWarehouseId();
+            if (selectedDocId && selectedWarehouseId) {
+                return {date: selectedDate, warehouseId: selectedWarehouseId, docId: selectedDocId};
+            } else {
+                return null;
             }
         }
 
@@ -215,6 +223,8 @@
             }
             objects.sort(compare);
         }
+
+        this.getSelectionObject = getSelectionObject;
 
         return this;
     };

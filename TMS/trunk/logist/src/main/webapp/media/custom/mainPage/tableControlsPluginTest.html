@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="tablePlugin.css" rel="stylesheet">
+    <script src="tablePlugin.js"></script>
+    <script src="tableControlsPlugin.js"></script>
+
+    <script>
+        window.onload = function() {
+            var tablePlugin = window.tablePlugin({
+                parentId: 'tableContainer',
+                periodSize: 30,
+                windowSize: 60 * 24
+            });
+            tablePlugin.generate();
+
+            var tableControlsPlugin = window.tableControlsPlugin({
+                tablePlugin:tablePlugin,
+                parentId:"buttons",
+                buttons: [{name:"testButton", id :"123", enabledIfAnySelected: true}, {name:"secondButton", id:"345", enabledIfAnySelected: true}]
+            });
+            tableControlsPlugin.generateContent();
+            console.log(tableControlsPlugin.getButtonByPluginId("123"));
+
+
+
+        };
+    </script>
+</head>
+<body>
+    <div id="tableContainer"></div>
+    <div id="buttons"></div>
+</body>
+</html>

@@ -52,7 +52,12 @@
             tablePlugin.setNotFreeState(240, 300, "occupied", "LG");
             tablePlugin.setNotFreeState(420, 450, "occupied", "Apple");
             tablePlugin.setNotFreeState(450, 600, "disabled");
-            tablePlugin.sendDocPeriods();
+            //tablePlugin.sendDocPeriods();
+            tablePlugin.setOnAnySelected(function(anySelected) {
+                console.log(anySelected);
+            });
+
+            //tablePlugin.getSelectedPeriod()
 
         };
     </script>

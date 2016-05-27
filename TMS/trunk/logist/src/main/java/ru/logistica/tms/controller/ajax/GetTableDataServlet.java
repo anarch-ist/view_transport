@@ -5,6 +5,7 @@ import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
+import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import javax.json.Json;
@@ -24,28 +25,23 @@ import java.util.TimeZone;
 
 @WebServlet("/getTableData")
 public class GetTableDataServlet extends AjaxHttpServlet {
-    private static final SimpleDateFormat dateFormat = new UtcSimpleDateFormat("yyyy-MM-dd");
-
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Integer warehouseId = Integer.parseInt(req.getParameter("warehouseId"));
-        Integer docId = Integer.parseInt(req.getParameter("docId"));
-        Date utcDate = null;
+        DocDateSelectorData docDateSelectorData = null;
         try {
-            utcDate = dateFormat.parse(req.getParameter("date")); // UTC utcDate
+            docDateSelectorData = new DocDateSelectorData(req.getParameter("date"), req.getParameter("warehouseId"), req.getParameter("docId"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         Integer windowSize = Integer.parseInt(getServletContext().getInitParameter("windowSize"));
 
-        Warehouse warehouse = DaoFacade.getWarehouseById(warehouseId);
+        Warehouse warehouse = DaoFacade.getWarehouseById(docDateSelectorData.warehouseId);
         Integer offset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()).intValue();
-        long timeStampBegin = utcDate.getTime() - offset * 60 * 60 * 1000;
+        long timeStampBegin = docDateSelectorData.utcDate.getTime() - offset * 60 * 60 * 1000;
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
 
-        List<DocPeriod> allPeriods = DaoFacade.getAllPeriodsForDoc(docId, new Date(timeStampBegin), new Date(timeStampEnd));
+        List<DocPeriod> allPeriods = DaoFacade.getAllPeriodsForDoc(docDateSelectorData.docId, new Date(timeStampBegin), new Date(timeStampEnd));
 
 
         // create and send json object to client
