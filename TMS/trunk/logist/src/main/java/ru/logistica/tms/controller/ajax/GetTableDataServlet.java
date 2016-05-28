@@ -6,17 +6,16 @@ import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
+import ru.logistica.tms.dto.ValidateDataException;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,12 +27,15 @@ public class GetTableDataServlet extends AjaxHttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        DocDateSelectorData docDateSelectorData = null;
+
+        String receivedData = req.getParameter("selectionObject");
+        DocDateSelectorData docDateSelectorData;
         try {
-            docDateSelectorData = new DocDateSelectorData(req.getParameter("date"), req.getParameter("warehouseId"), req.getParameter("docId"));
-        } catch (ParseException e) {
-            e.printStackTrace();
+            docDateSelectorData = new DocDateSelectorData(receivedData);
+        } catch (ValidateDataException e) {
+            throw new ServletException(e);
         }
+
         Integer windowSize = Integer.parseInt(getServletContext().getInitParameter("windowSize"));
 
         Warehouse warehouse = DaoFacade.getWarehouseById(docDateSelectorData.warehouseId);

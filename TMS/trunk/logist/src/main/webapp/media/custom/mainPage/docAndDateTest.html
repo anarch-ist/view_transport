@@ -69,10 +69,13 @@
 
             docDateSelector.setOnSelected(function(event, selectionObject) {
                 window.console.log("SELECTED EVENT");
-                window.console.log(selectionObject.date);
-                window.console.log(selectionObject.warehouseId);
-                window.console.log(selectionObject.docId);
-            })
+                window.console.log(selectionObject);
+            });
+
+            docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
+                window.console.log("SELECTION AVAILABLE EVENT");
+                window.console.log(isSelectionAvailable);
+            });
 
 
         });

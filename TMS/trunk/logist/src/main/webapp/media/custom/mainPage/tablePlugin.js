@@ -45,6 +45,7 @@
     main.defaultParameters = DEFAULT_PARAMETERS;
 
     var tableElement;
+    var disableElement;
     var selectedElements = [];
     var serialNumber = 0;
 
@@ -56,12 +57,16 @@
         var periodSize= startupParameters.periodSize;
         var secondPart = "";
 
-        //tableTag
-        var elem = document.getElementById(startupParameters.parentId);
+        var parentElem = document.getElementById(startupParameters.parentId);
+        //diableElement
+        disableElement = document.createElement("div");
+        parentElem.appendChild(disableElement);
+        disableElement.classList.add("tablePlugin-disable");
+        //tableElement
         tableElement = document.createElement("table");
         tableElement.classList.add("mainTable");
 
-        elem.appendChild(tableElement);
+        parentElem.appendChild(tableElement);
 
         // rows and cells
         for(var i = 1; i <= y; i++) {
@@ -198,6 +203,14 @@
         return {periodBegin:periodBegin, periodEnd: periodEnd};
     };
 
+    main.clear = function() {
+        selectedElements.length = 0;
+        [].forEach.call(tableElement.getElementsByTagName("td"), function(element) {
+            element.children[1].classList.remove('occupied', 'highlight', 'disabled');
+            element.children[1].innerHTML = "";
+        });
+    };
+
     // TODO implement this method
     /**
      * @return array of periods with identical state
@@ -206,9 +219,18 @@
     };
 
     // TODO implement this method
-//    main.setDisabled = function(disabled) {
-//        // tableElement.disabled = disabled;
-//    };
+    main.setDisabled = function(disabled) {
+        if (disabled) {
+            disableElement.style.width = getComputedStyle(tableElement).width;
+            disableElement.style.height = getComputedStyle(tableElement).height;
+            disableElement.style.position = "absolute";
+            disableElement.style.zIndex = getComputedStyle(tableElement).zIndex + 1;
+        } else {
+            disableElement.style.width = "0%";
+            disableElement.style.height = "0%";
+            //disableElement.style.zIndex = 0;
+        }
+    };
 
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------

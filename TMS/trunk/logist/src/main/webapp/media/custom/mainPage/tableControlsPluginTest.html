@@ -22,7 +22,11 @@
                 buttons: [{name:"testButton", id :"123", enabledIfAnySelected: true}, {name:"secondButton", id:"345", enabledIfAnySelected: true}]
             });
             tableControlsPlugin.generateContent();
-            console.log(tableControlsPlugin.getButtonByPluginId("123"));
+            var buttonByPluginId = tableControlsPlugin.getButtonByPluginId("123");
+            buttonByPluginId.onclick = function(e) {
+                window.console.log(e);
+            }
+
 
 
 

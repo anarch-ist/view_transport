@@ -17,6 +17,7 @@
         var useWarehouseSelect = settings.useWarehouseSelect;
         var firstWarehouse = data.warehouses[0]; // usable if useWarehouseSelect = false
 
+
         // sort all data
         sortByStringCompare(data.warehouses, "warehouseName");
         data.warehouses.forEach(function (warehouse) {
@@ -51,7 +52,7 @@
             placeholder_text_single: settings.docPlaceHolder
         });
         $docSelect.on('change', function () {
-            generateEventIfValidState();
+            generateEvents();
         });
 
         // create warehouse component
@@ -76,6 +77,7 @@
                     warehouseId = null;
                 }
                 onWarehouseChange(warehouseId);
+                generateEvents();
             });
 
         } else {
@@ -110,7 +112,7 @@
             date: new Date(),
             hide_on_select: true,
             change: function () {
-                generateEventIfValidState();
+                generateEvents();
             },
             min: minDate,
             max: maxDate
@@ -144,8 +146,16 @@
             setDoc(docId);
         };
 
+        this.isSelectionAvailable = function() {
+            return lastSelectionAvailable;
+        };
+
         this.setOnSelected = function (handler) {
             $(document).on("docDateSelected", handler);
+        };
+
+        this.setOnSelectionAvailable = function(handler) {
+            $(document).on("selectionAvailableChanged", handler);
         };
 
         //-------------------------- FUNCTIONS -------------------------------
@@ -174,18 +184,24 @@
             }
         }
 
-        function generateEventIfValidState() {
+        var lastSelectionAvailable = false;
+        function generateEvents() {
             var selectionObject = getSelectionObject();
-            if (selectionObject !== null) {
+            var selectionAvailable = (selectionObject !== null);
+            if (selectionAvailable) {
                 $(document).trigger("docDateSelected", selectionObject);
             }
+            if (selectionAvailable !== lastSelectionAvailable) {
+                $(document).trigger("selectionAvailableChanged", selectionAvailable);
+            }
+            lastSelectionAvailable = selectionAvailable;
         }
 
         function getSelectionObject() {
             // BINDING date format with GetTableDataServlet
             var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d');
-            var selectedDocId =  $docSelect.chosen().val();
-            var selectedWarehouseId = getSelectedWarehouseId();
+            var selectedDocId =  +$docSelect.chosen().val();
+            var selectedWarehouseId = +getSelectedWarehouseId();
             if (selectedDocId && selectedWarehouseId) {
                 return {date: selectedDate, warehouseId: selectedWarehouseId, docId: selectedDocId};
             } else {

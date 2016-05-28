@@ -2,19 +2,36 @@ package ru.logistica.tms.dto;
 
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
-import java.text.ParseException;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DocDateSelectorData {
     public static final SimpleDateFormat dateFormat = new UtcSimpleDateFormat("yyyy-MM-dd");
-    public final Date utcDate;
-    public final Integer warehouseId;
-    public final Integer docId;
+    public Date utcDate;
+    public Integer warehouseId;
+    public Integer docId;
 
-    public DocDateSelectorData(String utcDate, String warehouseId, String docId) throws ParseException {
-        this.utcDate = dateFormat.parse(utcDate);
-        this.warehouseId = Integer.parseInt(warehouseId);
-        this.docId = Integer.parseInt(docId);
+    public DocDateSelectorData(String docDateJsonString) throws ValidateDataException {
+        try (JsonReader receivedDataReader = Json.createReader(new StringReader(docDateJsonString))){
+            JsonObject receivedJsonObject = receivedDataReader.readObject();
+            this.utcDate = dateFormat.parse(receivedJsonObject.getString("date"));
+            this.warehouseId = receivedJsonObject.getInt("warehouseId");
+            this.docId = receivedJsonObject.getInt("docId");
+        } catch (Exception e) {
+            throw new ValidateDataException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "DocDateSelectorData{" +
+                "utcDate=" + utcDate +
+                ", warehouseId=" + warehouseId +
+                ", docId=" + docId +
+                '}';
     }
 }

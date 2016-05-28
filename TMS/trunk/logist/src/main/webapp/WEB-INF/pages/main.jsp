@@ -86,24 +86,19 @@
             //docDateSelector.setSelectedDate(new Date(2015, 10, 30));
             //docDateSelector.setSelectedWarehouseAndDoc(1, 3);
             //docDateSelector.setSelectedDoc(3);
-            docDateSelector.setOnSelected(function(event, date, warehouseId, docId) {
+
+
+            docDateSelector.setOnSelected(function(event, selectionObject) {
                 // на время отправки данных и их получения - таблица должна уходить в состояние disabled = true;
                 //tablePlugin.setDisabled(true);
                 $.ajax({
                     url: "getTableData",
                     method: "POST",
-                    data: {date: date, warehouseId: warehouseId, docId: docId},
+                    data: {selectionObject: JSON.stringify(selectionObject)},
                     dataType: "json"
                 }).done(function (tableData) {
                     var periodsArray = tableData.docPeriods;
-                    periodsArray.forEach(function(period) {
-                        if (period.state === "DISABLED") {
-                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state);
-                        } else if (period.state === "OCCUPIED") {
-                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state, period.supplierName);
-                            //period.supplierId;
-                        }
-                    });
+                    fillTableWithData(periodsArray);
                     //tablePlugin.setDisabled(false);
 //                    tableData.periodBegin;
 //                    tableData.periodEnd;
@@ -144,24 +139,23 @@
 
             occupyPeriodBtnElem.onclick = function(e) {
                 var selectionObject = docDateSelector.getSelectionObject();
+                console.log(selectionObject);
                 if (selectionObject === null) {
                     return;
                 }
+
                 $.ajax({
                     url: "setTableData",
                     method: "POST",
-                    data: {docAndDate: selectionObject, period: tablePlugin.getSelectedPeriod()},
+                    data: {
+                        selectionObject: JSON.stringify(selectionObject),
+                        period: JSON.stringify(tablePlugin.getSelectedPeriod())
+                    },
                     dataType: "json"
                 }).done(function (tableData) {
+                    // refresh table
                     var periodsArray = tableData.docPeriods;
-                    periodsArray.forEach(function(period) {
-                        if (period.state === "DISABLED") {
-                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state);
-                        } else if (period.state === "OCCUPIED") {
-                            tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state, period.supplierName);
-                            //period.supplierId;
-                        }
-                    });
+                    fillTableWithData(periodsArray);
 
                 }).fail(function () {
                     window.alert("error");
@@ -170,9 +164,33 @@
                 });
             };
             </c:if>
+            createBindingBetweenSelectorAndTable();
+
+            <%--------------------------------------------FUNCTIONS---------------------------------------------------%>
+            function fillTableWithData(periodsArray) {
+                tablePlugin.clear();
+                periodsArray.forEach(function (period) {
+                    if (period.state === "DISABLED") {
+                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state);
+                    } else if (period.state === "OCCUPIED") {
+                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, period.state, period.supplierName);
+                        //period.supplierId;
+                    }
+                });
+            }
+
+            function createBindingBetweenSelectorAndTable() {
+                docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
+                    tablePlugin.setDisabled(!isSelectionAvailable);
+                    var elementsByTagName = document.getElementById("tableControlsContainer").getElementsByTagName("input");
+                    [].forEach.call(elementsByTagName, function(element) {
+                        element.disabled = !isSelectionAvailable;
+                    });
+
+                });
 
 
-
+            }
 
 
         });
