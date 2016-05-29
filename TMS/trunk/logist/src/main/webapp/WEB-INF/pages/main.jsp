@@ -13,13 +13,19 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/chosen_v1.5.1/chosen.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/docAndDateSelector.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/tablePlugin.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/Remodal-1.0.7/dist/remodal.css"/>" />
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/Remodal-1.0.7/dist/remodal-default-theme.css"/>" />
     <%--common scripts--%>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
     <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
     <script src="<c:url value="/media/chosen_v1.5.1/chosen.jquery.min.js"/>"></script>
+    <script src="<c:url value="/media/Remodal-1.0.7/dist/remodal.min.js"/>"></script>
+
     <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/tablePlugin.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/tableControlsPlugin.js"/>"></script>
+
+
     <%--specific scripts for different user roles--%>
     <c:set var="periodSize" scope="application" value="${initParam.periodSize}"/>
     <c:set var="windowSize" scope="application" value="${initParam.windowSize}"/>
@@ -70,7 +76,7 @@
             tablePlugin.generate();
 
             //tablePlugin.setString("Panasonic", 2, 3);
-            tablePlugin.setOnClicked(function(e) {
+            tablePlugin.setOnSelectionChanged(function(e) {
                 //window.console.log(e);
                 //window.console.log(e.detail);
             });
@@ -102,8 +108,7 @@
                     //tablePlugin.setDisabled(false);
 //                    tableData.periodBegin;
 //                    tableData.periodEnd;
-
-                    console.log(tableData);
+                    //console.log(tableData);
 
                 }).fail(function () {
                     window.alert("error");
@@ -139,32 +144,39 @@
 
             occupyPeriodBtnElem.onclick = function(e) {
                 var selectionObject = docDateSelector.getSelectionObject();
-                console.log(selectionObject);
                 if (selectionObject === null) {
                     return;
                 }
+                supplierInputDataDialog.open();
 
-                $.ajax({
-                    url: "setTableData",
-                    method: "POST",
-                    data: {
-                        selectionObject: JSON.stringify(selectionObject),
-                        period: JSON.stringify(tablePlugin.getSelectedPeriod())
-                    },
-                    dataType: "json"
-                }).done(function (tableData) {
-                    // refresh table
-                    var periodsArray = tableData.docPeriods;
-                    fillTableWithData(periodsArray);
-
-                }).fail(function () {
-                    window.alert("error");
-                    //tablePlugin.setDisabled(false);
-
-                });
+//                $.ajax({
+//                    url: "setTableData",
+//                    method: "POST",
+//                    data: {
+//                        selectionObject: JSON.stringify(selectionObject),
+//                        period: JSON.stringify(tablePlugin.getSelectedPeriod())
+//                    },
+//                    dataType: "json"
+//                }).done(function (tableData) {
+//                    // refresh table
+//                    var periodsArray = tableData.docPeriods;
+//                    fillTableWithData(periodsArray);
+//
+//                }).fail(function () {
+//                    window.alert("error");
+//                    //tablePlugin.setDisabled(false);
+//
+//                });
             };
             </c:if>
             createBindingBetweenSelectorAndTable();
+            $docAndDateSelector.triggerEvents();
+
+            // ---------------------------------init dialogs----------------------------------------
+            var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
+
+
+
 
             <%--------------------------------------------FUNCTIONS---------------------------------------------------%>
             function fillTableWithData(periodsArray) {
@@ -182,17 +194,8 @@
             function createBindingBetweenSelectorAndTable() {
                 docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                     tablePlugin.setDisabled(!isSelectionAvailable);
-                    var elementsByTagName = document.getElementById("tableControlsContainer").getElementsByTagName("input");
-                    [].forEach.call(elementsByTagName, function(element) {
-                        element.disabled = !isSelectionAvailable;
-                    });
-
                 });
-
-
             }
-
-
         });
     </script>
     <%--<c:choose>--%>
@@ -231,6 +234,15 @@
     <div id="docAndDateSelector"></div>
     <div id="tableContainer"></div>
     <div id="tableControlsContainer"></div>
+
+    <%--dialogs--%>
+    <div data-remodal-id="modal">
+        <button data-remodal-action="close" class="remodal-close"></button>
+        <h1>Remodal</h1>
+        <p>
+            Responsive, lightweight, fast, synchronized with CSS animations, fully customizable modal window plugin with declarative configuration and hash tracking.
+        </p>
+    </div>
 </div>
 
 

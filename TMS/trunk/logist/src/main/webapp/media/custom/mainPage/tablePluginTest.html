@@ -44,19 +44,21 @@
             <!--window.console.log(obj.labelElem);-->
             <!--window.console.log(obj.divElem);-->
             tablePlugin.setString("Panasonic", 6, 3);
-            tablePlugin.setOnClicked(function(e) {
-//                window.console.log(e);
-//                window.console.log(e.detail);
+            tablePlugin.setOnSelectionChanged(function(e) {
+                window.console.log(e.detail);
             });
             tablePlugin.setNotFreeState(150, 210, "occupied", "Sony");
             tablePlugin.setNotFreeState(240, 300, "occupied", "LG");
             tablePlugin.setNotFreeState(420, 450, "occupied", "Apple");
             tablePlugin.setNotFreeState(450, 600, "disabled");
             //tablePlugin.sendDocPeriods();
-            tablePlugin.setOnAnySelected(function(anySelected) {
-                console.log(anySelected);
+            tablePlugin.setOnAnySelected(function(e) {
+                console.log("ANY SELECTED" + e.detail);
             });
             tablePlugin.clear();
+            tablePlugin.setOnDisableChanged(function(e) {
+                window.console.log("DISABLE" + e.detail);
+            });
             //tablePlugin.getSelectedPeriod()
 
         };

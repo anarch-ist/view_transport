@@ -83,8 +83,8 @@
                 cellElement.setAttribute("data-serialnumber", serialNumber);
 
                 cellElement.onclick = function(e) {
-
                     var _this = this;
+                    // apply selection constraint
                     if (startupParameters.selectionConstraint) {
                         if (startupParameters.selectionConstraint(
                                 +_this.dataset.serialnumber,
@@ -93,27 +93,7 @@
                             return;
                         }
                     }
-
-                    var wasSelected = _this.classList.contains("highlight");
-                    if (!wasSelected) {
-                        selectedElements.push(_this);
-                    } else {
-                        var index = selectedElements.indexOf(_this);
-                        selectedElements.splice(index, 1);
-                    }
-                    selectedElements.sort(compareNum);
-                    // generate selected event
-                    var newEvent = new CustomEvent("selected", {
-                        detail: {
-                           x: _this.dataset.x,
-                           y: _this.dataset.y,
-                           isSelected: wasSelected
-                        },
-                        bubbles: true,
-                        cancelable: false
-                    });
-                    tableElement.dispatchEvent(newEvent);
-                    _this.classList.toggle("highlight");
+                    toggleSelection(_this);
                 };
 
                 var labelElement = document.createElement("label");
@@ -144,6 +124,18 @@
                 rowElement.appendChild(cellElement);
             }
         }
+
+        // generate any selected event
+        var anySelected = false;
+        main.setOnSelectionChanged(function() {
+            if (selectedElements.length === 0) {
+                generateAnySelectedEvent(false);
+                anySelected = false;
+            } else if (selectedElements.length !== 0 && !anySelected) {
+                generateAnySelectedEvent(true);
+                anySelected = true;
+            }
+        });
     };
 
 
@@ -176,21 +168,18 @@
         return (selectedElements.length !== 0);
     };
 
-    main.setOnClicked = function(handler) {
+    main.setOnSelectionChanged = function(handler) {
         tableElement.addEventListener("selected", handler);
     };
 
+
+
     main.setOnAnySelected = function(handler) {
-        var notAnySelected = true;
-        main.setOnClicked(function() {
-            if (selectedElements.length === 0) {
-                handler(false);
-                notAnySelected = true;
-            } else if (selectedElements.length !== 0 && notAnySelected) {
-                handler(true);
-                notAnySelected = false;
-            }
-        });
+        tableElement.addEventListener("anySelected", handler);
+    };
+
+    main.setOnDisableChanged = function(handler) {
+        tableElement.addEventListener("disableChanged", handler);
     };
 
     // FIXME make it work with different states
@@ -204,9 +193,19 @@
     };
 
     main.clear = function() {
-        selectedElements.length = 0;
+        if (selectedElements.length === 0) {
+            generateAnySelectedEvent(false);
+        } else {
+            var copy = selectedElements.slice();
+            copy.forEach(function(cellElement) {
+                removeSelectionStyle(cellElement);
+                modifySelectedElementsArray(cellElement, false);
+                generateSelectedEvent(cellElement, false);
+            });
+        }
+
         [].forEach.call(tableElement.getElementsByTagName("td"), function(element) {
-            element.children[1].classList.remove('occupied', 'highlight', 'disabled');
+            element.children[1].classList.remove('occupied', 'disabled');
             element.children[1].innerHTML = "";
         });
     };
@@ -218,7 +217,6 @@
     main.getSelectedPeriods = function() {
     };
 
-    // TODO implement this method
     main.setDisabled = function(disabled) {
         if (disabled) {
             disableElement.style.width = getComputedStyle(tableElement).width;
@@ -230,10 +228,68 @@
             disableElement.style.height = "0%";
             //disableElement.style.zIndex = 0;
         }
+
+        var newEvent = new CustomEvent("disableChanged", {
+            detail: disabled,
+            bubbles: true,
+            cancelable: false
+        });
+        tableElement.dispatchEvent(newEvent);
     };
 
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
+    function modifySelectedElementsArray(cellElement, isSelected) {
+        if (isSelected) {
+            selectedElements.push(cellElement);
+        } else {
+            var index = selectedElements.indexOf(cellElement);
+            selectedElements.splice(index, 1);
+        }
+        selectedElements.sort(compareNum);
+    }
+
+    function generateSelectedEvent(cellElement, isSelected) {
+        var newEvent = new CustomEvent("selected", {
+            detail: {
+                x: cellElement.dataset.x,
+                y: cellElement.dataset.y,
+                isSelected: isSelected
+            },
+            bubbles: true,
+            cancelable: false
+        });
+        tableElement.dispatchEvent(newEvent);
+    }
+
+    function generateAnySelectedEvent(isSelected) {
+        var newEvent = new CustomEvent("anySelected", {
+            detail: isSelected,
+            bubbles: true,
+            cancelable: false
+        });
+        tableElement.dispatchEvent(newEvent);
+    }
+
+    function removeSelectionStyle(cellElement) {
+        cellElement.classList.remove("highlight");
+    }
+    function addSelectionStyle(cellElement) {
+        cellElement.classList.add("highlight");
+    }
+
+    function toggleSelection(cellElement) {
+        var wasSelected = cellElement.classList.contains("highlight");
+        if (wasSelected) {
+            removeSelectionStyle(cellElement);
+        } else {
+            addSelectionStyle(cellElement);
+        }
+        var isSelected = !wasSelected;
+        modifySelectedElementsArray(cellElement, isSelected);
+        generateSelectedEvent(cellElement, isSelected);
+    }
+
     function selectedElementsAsSerialNumbers() {
         var result = [];
         for (var i = 0; i < selectedElements.length; i++) {
@@ -282,160 +338,10 @@
         }
     }
 
-    // index = 0 if start of periods and nothing if end
-    function splitPeriodsAndCountTime(str, index){
-        var hyphenArr = str.split('-');
-        var colonArr = [];
-        var result;
-        if(index === 0){
-            colonArr = hyphenArr[0].split(':');
-        }else{
-            colonArr = hyphenArr[hyphenArr.length - 1].split(':');
-        }
-        var hours = +colonArr[0];
-        hours = hours * 60;
-        var minutes = +colonArr[1];
-        result = hours + minutes;
-
-        return result;
-    }
-
     function getCellById(x, y) {
             var result = document.getElementById("cell_" + x + "_" + y);
             return result;
     }
-
-//    main.sendDocPeriods = function() {
-//        var result = [];
-//
-//        var previousState;
-//        var previousSerialNumber;
-//        var sequentialStates = [];
-//
-//
-//        selectedElements.push(getCellById(1, 6));
-//        selectedElements.push(getCellById(2, 1));
-//        selectedElements.push(getCellById(2, 3));
-//        selectedElements.push(getCellById(2, 4));
-//        selectedElements.push(getCellById(3, 3));
-//        selectedElements.push(getCellById(3, 4));
-//        selectedElements.push(getCellById(3, 5));
-//        selectedElements.push(getCellById(3, 6));
-//        selectedElements.push(getCellById(4, 1));
-//        selectedElements.push(getCellById(4, 2));
-//
-//        for(var i = 0; i < selectedElements.length; ){
-//            var cellState = selectedElements[i].lastElementChild.getAttribute('class');
-//            var cellSerialNumber = selectedElements[i].dataset.serialnumber;
-////            window.console.log(cellState + " " + cellSerialNumber);
-//            if(!previousState){
-//                sequentialStates.push(i);
-//                previousState = cellState;
-//                previousSerialNumber = cellSerialNumber;
-//                i++;
-//            }else{
-////            window.console.log(previousState + " " + previousSerialNumber + " " + cellState + " " + cellSerialNumber);
-//
-//                if(previousState === cellState && ((cellSerialNumber - 1) == previousSerialNumber)){
-//
-//                    sequentialStates.push(i);
-//                    previousState = cellState;
-//                    previousSerialNumber = cellSerialNumber;
-//                    i++;
-//                       window.console.log(cellState + " " + cellSerialNumber + " " + previousState + " " + previousSerialNumber);
-//                }else if(previousState !== cellState || (cellSerialNumber - 1) != previousSerialNumber){
-//                    window.console.log(sequentialStates + " k");
-////                    window.console.log(selectedElements[0] + " h");
-//                    var firstIndex = sequentialStates[0];
-//                    var lastIndex = sequentialStates[sequentialStates.length - 1];
-//                    var firstElem = selectedElements[firstIndex];
-//                    var lastElem = selectedElements[lastIndex];
-//                    // periods
-//                    var firstElemLabel = firstElem.firstElementChild.innerHTML;
-//                    var lastElemLabel = lastElem.firstElementChild.innerHTML;
-//                    var firstTime = splitPeriodsAndCountTime(firstElemLabel, 0);
-//                    var lastTime = splitPeriodsAndCountTime(lastElemLabel);
-//                    window.console.log(firstElemLabel + " " + firstTime + " " + lastElemLabel + " " + lastTime);
-//                    // company
-////                    if(previousState === 'occupied'){
-////                        var companies = [];
-////                        var previousCompany;
-////                        var currentCompany;
-////
-////                        var objComp = {
-////                            startTime: beginTime,
-////                            endTime: stopTime,
-////                            state: previousState,
-////                            company: previousCompany
-////                        };
-////                        result.push(objComp);
-//
-////                        for(var x = 0; x < sequentialStates.length; ){
-////
-////
-////                            currentCompany = selectedElements[sequentialStates[x]].lastElementChild.innerHTML;
-////                            window.console.log(currentCompany + " " + selectedElements[sequentialStates[x]].firstElementChild.innerHTML);
-////                            if(!previousCompany){
-////                                previousCompany = currentCompany;
-////                                companies.push(selectedElements[sequentialStates[x]]);
-////                                x++;
-//////                                window.console.log(selectedElements[sequentialStates[x]]);
-////                            }else{
-////                                if(previousCompany === currentCompany){
-////                                    companies.push(selectedElements[sequentialStates[x]]);
-////                                    previousCompany = currentCompany;
-////                                    x++;
-////
-////                                }else if(previousCompany !== currentCompany || x === (sequentialStates.length - 1)){
-////                                    window.console.log(previousCompany + " " + currentCompany);
-////                                    var beginTime = splitPeriodsAndCountTime(companies[0].firstElementChild.innerHTML , 0);
-////                                    var stopTime = splitPeriodsAndCountTime(companies[companies.length - 1].firstElementChild.innerHTML);
-////                                    var objComp = {
-////                                        startTime: beginTime,
-////                                        endTime: stopTime,
-////                                        state: previousState,
-////                                        company: previousCompany
-////                                    };
-//////                                    window.console.log(objComp);
-////                                    previousCompany = undefined;
-////                                    result.push(objComp);
-////                                    companies.length = 0;
-////                                }
-////                            }
-////                        }
-////                    }else
-////                    {
-//                        var obj = {
-//                            startTime: firstTime,
-//                            endTime: lastTime,
-//                            state: previousState
-//                        };
-//                        result.push(obj);
-//                    }
-//                    previousState = undefined;
-//                    previousSerialNumber = undefined;
-//                    sequentialStates.length = 0;
-//
-//                }
-//            }
-//            window.console.log(result.length);
-//
-////            previousSerialNumber = cellSerialNumber;
-////            previousState = cellState;
-//
-//
-//        var formElem = document.createElement("form");
-//        formElem.setAttribute('Action', 'submit');
-//
-//        // send result as content????
-//        //formElem.setAttribute('Content', result);
-//        var inputElem = document.createElement("input");
-//        inputElem.setAttribute('Type', 'button');
-//        inputElem.setAttribute('Value', 'Отправить');
-//        formElem.appendChild(inputElem);
-//        document.body.appendChild(formElem);
-//    };
-
 
     window.tablePlugin = main;
 

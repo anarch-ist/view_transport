@@ -158,6 +158,10 @@
             $(document).on("selectionAvailableChanged", handler);
         };
 
+        this.triggerEvents = function() {
+            generateEvents();
+        };
+
         //-------------------------- FUNCTIONS -------------------------------
         function setDoc(docId) {
             $docSelect.val(docId);
@@ -184,14 +188,14 @@
             }
         }
 
-        var lastSelectionAvailable = false;
+        var lastSelectionAvailable = null; // null is initial state
         function generateEvents() {
             var selectionObject = getSelectionObject();
             var selectionAvailable = (selectionObject !== null);
             if (selectionAvailable) {
                 $(document).trigger("docDateSelected", selectionObject);
             }
-            if (selectionAvailable !== lastSelectionAvailable) {
+            if (lastSelectionAvailable === null || selectionAvailable !== lastSelectionAvailable) {
                 $(document).trigger("selectionAvailableChanged", selectionAvailable);
             }
             lastSelectionAvailable = selectionAvailable;

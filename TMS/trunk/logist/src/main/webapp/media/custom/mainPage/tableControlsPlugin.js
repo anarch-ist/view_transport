@@ -33,23 +33,41 @@
             buttonElem.setAttribute('value', buttons[i].name);
             buttonElem.setAttribute('id', buttons[i].id);
             buttonElem.id = buttons[i].id;
+
+            startupParameters.tablePlugin.setOnDisableChanged(
+                (function(innerButtonElem) {
+                    return function (e) {
+                        innerButtonElem.disabled = e.detail;
+                    };
+                }(buttonElem))
+            );
+
             if (buttons[i].enabledIfAnySelected) {
                 buttonElem.enabledIfAnySelected = buttons[i].enabledIfAnySelected;
                 buttonElem.disabled = !startupParameters.tablePlugin.isAnySelected();
                 startupParameters.tablePlugin.setOnAnySelected(
-                    (function(innerInputElem) {
-                        return function (anySelected) {
-                            innerInputElem.disabled = !anySelected;
+                    (function(innerButtonElem) {
+                        return function (e) {
+                            innerButtonElem.disabled = !e.detail;
                         };
                     }(buttonElem))
                 );
             }
+
+
             containerElem.appendChild(buttonElem);
         }
     };
 
     main.getButtonByPluginId = function(pluginId) {
         return document.getElementById(pluginId);
+    };
+
+    main.setDisabled =function(disabled) {
+        var elementsByTagName = document.getElementById(startupParameters.parentId).getElementsByTagName("input");
+        [].forEach.call(elementsByTagName, function(element) {
+            element.disabled = disabled;
+        });
     };
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
