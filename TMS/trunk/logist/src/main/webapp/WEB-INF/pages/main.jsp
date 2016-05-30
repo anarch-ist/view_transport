@@ -15,11 +15,19 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/tablePlugin.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/Remodal-1.0.7/dist/remodal.css"/>" />
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/Remodal-1.0.7/dist/remodal-default-theme.css"/>" />
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/DataTables-1.10.12/css/jquery.dataTables.min.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/Select-1.2.0/css/select.dataTables.min.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/Buttons-1.2.1/css/buttons.dataTables.min.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/Editor-1.5.6/css/editor.dataTables.min.css"/>"/>
     <%--common scripts--%>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
     <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
     <script src="<c:url value="/media/chosen_v1.5.1/chosen.jquery.min.js"/>"></script>
     <script src="<c:url value="/media/Remodal-1.0.7/dist/remodal.min.js"/>"></script>
+    <script src="<c:url value="/media/DataTables-1.10.12/js/jquery.dataTables.min.js"/>"></script>
+    <script src="<c:url value="/media/Select-1.2.0/js/dataTables.select.min.js"/>"></script>
+    <script src="<c:url value="/media/Buttons-1.2.1/js/dataTables.buttons.js"/>"></script>
+    <script src="<c:url value="/media/Editor-1.5.6/js/dataTables.editor.min.js"/>"></script>
 
     <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/tablePlugin.js"/>"></script>
@@ -37,7 +45,7 @@
 
     <script>
         $(document).ready(function(){
-            "use strict";
+//            "use strict";
 
             // ---------------------------------init table plugin----------------------------------------
             var tablePlugin = window.tablePlugin({
@@ -168,12 +176,131 @@
 //
 //                });
             };
+
+            var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
+            var idGenerator = makeCounter();
+            var ordersDataTableEditor = new $.fn.dataTable.Editor( {
+                // When editing data the changes only reflected in the DOM, not in any AJAX backend datasource and not localstorage.
+                ajax: function (method, url, d, successCallback, errorCallback) {
+                    var output = {data: []};
+
+                    if (d.action === 'create') {
+                        var addedRow = d.data[Object.keys(d.data)[0]];
+                        addedRow.id = "id" + idGenerator(); // get new GUID from custom method
+                        console.log(addedRow.id);
+                        output.data.push(addedRow);
+                    }
+
+                    else if (d.action === 'edit') {
+                        var key = Object.keys(d.data)[0];
+                        var editedRow = d.data[Object.keys(d.data)[0]];
+                        editedRow.id = key;
+                        output.data.push(editedRow);
+                    }
+
+                    successCallback(output);
+                },
+
+                table: "#ordersDataTable",
+                fields: [ {
+                    label: "Номер заявки:",
+                    name: "number"
+                }, {
+                    label: "Конечный склад доставки:",
+                    name: "finalWarehouseDestination"
+                }, {
+                    label: "Количество коробок:",
+                    name: "boxQty"
+                }, {
+                    label: "Комментарий:",
+                    name: "comment"
+                }, {
+                    label: "Статус:",
+                    name: "status"
+                }
+                ]
+            } );
+
+            $('#ordersDataTable').on('click', 'tbody td:not(:first-child)', function (e) {
+                ordersDataTableEditor.inline(this);
+            });
+
+            var dataTable = $('#ordersDataTable').DataTable({
+                paging:false,
+                searching: false,
+                dom: 'Bt',
+                select: {
+                    style:    'os',
+                    selector: 'td:first-child'
+                },
+                buttons: [
+                    {
+                        text: 'Создать',
+                        action: function (e, dt, node, config) {
+                            ordersDataTableEditor
+                                    .create(false)
+                                    //.set("DT_RowId", "id" + idGenerator())
+                                    .set("number", "testN")
+                                    .set("finalWarehouseDestination", "testW")
+                                    .set("boxQty", "testBoxq")
+                                    .set("comment", "testComm")
+                                    .set("status", "testSt")
+                                    .submit();
+//                            dataTable.row.add( {
+//                                "number":       ,
+//                                "finalWarehouseDestination":   "testW",
+//                                "":     "",
+//                                "": "",
+//                                "":     ""
+//                            } ).draw( false );
+                        }
+                    },
+                    {
+                        extend: 'selectedSingle',
+                        className: 'deleteBtn',
+                        text: 'удалить',
+                        action: function (e, dt, node, config) {
+                            //$.showRequestStatusDialog("changeStatusForRequest", dataTable);
+                        }
+                    }
+                ],
+                columns: [
+//                    {
+//                        data: null,
+//                        defaultContent: '',
+//                        className: 'select-checkbox',
+//                        orderable: false
+//                    },
+                    {"data": "number"},
+                    {"data": "finalWarehouseDestination"},
+                    {"data": "boxQty"},
+                    {"data": "comment"},
+                    {"data": "status"}
+                ]
+
+//                columnDefs: [
+//                    {"name": "number", "orderable": false, "targets": 0},
+//                    {"name": "finalWarehouseDestination", "orderable": false, "targets": 1},
+//                    {"name": "boxQty", "orderable": false, "targets": 2},
+//                    {"name": "comment", "orderable": false, "targets": 3},
+//                    {"name": "status", "orderable": false, "targets": 4}
+//                ]
+            });
+
+            function makeCounter() {
+                var counter = 0;
+                return function () {
+                    return counter++;
+                }
+            }
+
             </c:if>
             createBindingBetweenSelectorAndTable();
             $docAndDateSelector.triggerEvents();
 
             // ---------------------------------init dialogs----------------------------------------
-            var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
+
+
 
 
 
@@ -196,6 +323,8 @@
                     tablePlugin.setDisabled(!isSelectionAvailable);
                 });
             }
+
+
         });
     </script>
     <%--<c:choose>--%>
@@ -236,13 +365,47 @@
     <div id="tableControlsContainer"></div>
 
     <%--dialogs--%>
-    <div data-remodal-id="modal">
-        <button data-remodal-action="close" class="remodal-close"></button>
-        <h1>Remodal</h1>
-        <p>
-            Responsive, lightweight, fast, synchronized with CSS animations, fully customizable modal window plugin with declarative configuration and hash tracking.
-        </p>
-    </div>
+    <c:if test="${isSupplierManager}">
+        <div data-remodal-id="modal">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Ввод данных</h1>
+            <div id="routeListDataContainer">
+                <table>
+                    <tr>
+                        <td><label for="driverNameDiv">ФИО водителя:</label></td>
+                        <td><input type="text" id="driverNameDiv"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="licensePlateDiv">№ транспортного средства:</label></td>
+                        <td><input type="text" id="licensePlateDiv"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="palletsQty">Количество паллет:</label></td>
+                        <td><input type="text" id="palletsQty"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="driverPhoneNumberDiv">Телефон водителя</label></td>
+                        <td><input type="text" id="driverPhoneNumberDiv"/></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="ordersDataContainer">
+                <table id="ordersDataTable" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
+                    <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Конечный склад доставки</th>
+                        <th>Количество коробок</th>
+                        <th>Комментарий</th>
+                        <th>Статус</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+        </div>
+    </c:if>
+
 </div>
 
 

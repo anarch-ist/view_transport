@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../DataTables-1.10.12/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="../../Editor-1.5.6/css/editor.dataTables.css">
+    <link rel="stylesheet" href="../../Buttons-1.2.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="../../Select-1.2.0/css/select.dataTables.min.css">
+    <link rel="stylesheet" href="../../chosen_v1.5.1/chosen.css">
+    <link rel="stylesheet" href="donutCrudPlugin.css">
+
+
+    <script src="../../jQuery-2.1.4/jquery-2.1.4.min.js"></script>
+    <script src="../../DataTables-1.10.12/js/jquery.dataTables.js"></script>
+    <script src="dataTables.custom_editor.js"></script>
+    <script src="../../Buttons-1.2.1/js/dataTables.buttons.min.js"></script>
+    <script src="../../Select-1.2.0/js/dataTables.select.min.js"></script>
+    <script src="../../chosen_v1.5.1/chosen.jquery.min.js"></script>
+    <script src="../../editor.chosen.js"></script>
+    <script src="../../jquery.mask-1.7.7/jquery.mask.min.js"></script>
+    <script src="../../editor.mask.js"></script>
+    <script src="../../dataTables.keyTable.min.js"></script>
+
+
+    <script src="donutCrudPlugin.js"></script>
+    <script>
+        $(document).ready(function() {
+            var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin();
+
+        });
+    </script>
+</head>
+<body>
+    <div id="routeListDataContainer"></div>
+</body>
+</html>
