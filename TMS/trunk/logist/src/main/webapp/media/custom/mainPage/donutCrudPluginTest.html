@@ -26,7 +26,37 @@
     <script src="donutCrudPlugin.js"></script>
     <script>
         $(document).ready(function() {
-            var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin();
+            var exampleData = {
+                period:"t1 t2",
+                comment:"someComment",
+                driver:"someDriver",
+                driverPhoneNumber: "+7906548976",
+                licensePlate: "hbguegrf",
+                palletsQty: 4,
+                supplierName: "поставщик1",
+                orders:[
+                    {
+                        orderId: 1,
+                        orderNumber: "orewnoer123",
+                        boxQty:4,
+                        finalDestinationWarehouseId: 1,
+                        orderStatusId: "STATUS",
+                        commentForStatus: "order status comment"
+                    }
+                ]
+            };
+
+            var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
+                isEditable:true,
+                ordersCrud: "all",
+                editableFields: {
+                    donutFields:["driver", "licensePlate", "palletsQty", "driverPhoneNumber"],
+                    ordersFields: ["orderNumber", "finalDestinationWarehouse", "boxQty", "commentForStatus", "orderStatus"]
+                },
+               orderStatuses: {STATUS: "СТАТУС"},
+               warehouses: {1: "СКЛАД"}
+            });
+            donutCrudPluginInstance.setData(exampleData);
 
         });
     </script>

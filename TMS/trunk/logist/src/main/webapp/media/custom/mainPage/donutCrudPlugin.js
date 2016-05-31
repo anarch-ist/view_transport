@@ -6,99 +6,28 @@
         var settings = $.extend({
             // big save button exist or not if false
             isEditable: true,
-            ordersCrud: ["C", "U", "D"],
+            ordersCrud: "all", // all, update, read
             editableFields: {
-                ordersFields: ["orderNumber", "finalDestinationWarehouse", "boxQty", "commentForStatus", "orderStatus"],
-                donutFields: ["driver", "licensePlate", "palletsQty", "driverPhoneNumber", "comment", "period", "supplier"]
-            }
+                donutFields: ["period", "driver", "licensePlate", "palletsQty", "driverPhoneNumber", "comment"],
+                ordersFields: ["orderNumber", "finalDestinationWarehouse", "boxQty", "commentForStatus", "orderStatus"]
+            },
+            orderStatuses: {"EXAMPLE_ORDER_ID": "EXAMPLE_ORDER_V"},
+            warehouses: {1: "EXAMPLE_WH"}
         }, options);
 
-        // generate content
-        {
-            this.empty();
 
-            var $routeListTable = $("<table>").attr("id", "routeListTable");
-
-            var $periodTr = $("<tr>");
-            var $periodDiv = $("<td>");
-            var $periodLabel = $("<label>").text("Интервал");
-            var $period = $("<td>");
-            var $periodInput = $("<input>");
-
-            var $companyTr = $("<tr>");
-            var $companyDiv = $("<td>");
-            var $companyLabel = $("<label>").text("Поставщик");
-            var $company = $("<td>");
-            var $companyInput = $("<input>");
-
-            var $driverTr = $("<tr>");
-            var $driverNameDiv = $("<td>");
-            var $driverNameLabel = $("<label>").text("ФИО водителя:");
-            var $driverName = $("<td>");
-            var $driverNameInput = $("<input>");
-
-            var $licenseTr = $("<tr>");
-            var $licensePlateDiv = $("<td>");
-            var $licensePlateLabel = $("<label>").text("№ транспортного средства:");
-            var $licensePlate = $("<td>");
-            var $licensePlateInput = $("<input>");
-
-            var $palletTr = $("<tr>");
-            var $palletQtyDiv = $("<td>");
-            var $palletQtyLabel = $("<label>").text("Количество паллет:");
-            var $palletQty = $("<td>");
-            var $palletQtyInput = $("<input>");
-
-            var $driverPhoneTr = $("<tr>");
-            var $driverPhoneDiv = $("<td>");
-            var $driverPhoneLabel = $("<label>").text("Телефон водителя:");
-            var $driverPhone = $("<td>");
-            var $driverPhoneInput = $("<input>");
-
-            var $commentTr = $("<tr>");
-            var $commentDiv = $("<td>");
-            var $commentLabel = $("<label>").text("Комментарий:");
-            var $comment = $("<td>");
-            var $commentArea = $("<textarea>");
-
-            this.append(
-                $routeListTable.append(
-                    $periodTr.append($periodDiv.append($periodLabel), $period.append($periodInput)),
-                    $companyTr.append($companyDiv.append($companyLabel), $company.append($companyInput)),
-                    $driverTr.append($driverNameDiv.append($driverNameLabel), $driverName.append($driverNameInput)),
-                    $licenseTr.append($licensePlateDiv.append($licensePlateLabel), $licensePlate.append($licensePlateInput)),
-                    $palletTr.append($palletQtyDiv.append($palletQtyLabel), $palletQty.append($palletQtyInput)),
-                    $driverPhoneTr.append($driverPhoneDiv.append($driverPhoneLabel), $driverPhone.append($driverPhoneInput)),
-                    $commentTr.append($commentDiv.append($commentLabel), $comment.append($commentArea))
-                )
-            );
-
-            var $ordersTable = $('<table cellpadding="0" cellspacing="0" border="0" class="display" width="100%" id="ordersDataTable">');
-
-            var $thead = $("<thead>");
-            var $orderTr = $("<tr>");
-            var $selectTh = $("<th>");
-            var $numberTh = $("<th>").text("№");
-            var $finalDestinationTh = $("<th>").text("Конечный склад доставки");
-            var $palletQtyTh = $("<th>").text("Количество коробок");
-            var $commentTh = $("<th>").text("Комментарий");
-            var $statusTh = $("<th>").text("Статус");
-
-            this.append(
-                $ordersTable.append(
-                    $thead.append(
-                        $orderTr.append(
-                            $selectTh, $numberTh, $finalDestinationTh, $palletQtyTh, $commentTh, $statusTh
-                        )
-                    )
-                )
-            );
-
-        }
+        var pluginsSettings = processSettings();
+        var createInline = pluginsSettings.createInline;
+        var resultCssPartClick = pluginsSettings.resultCssPartClick;
+        var resultCssPartKeys = pluginsSettings.resultCssPartKeys;
+        var _this = this;
 
 
+        var donutFields = generateContent();
 
-        var idGenerator = makeCounter();
+
+        //create and configure table
+
         var ordersDataTableEditor = new $.fn.dataTable.Editor( {
             // When editing data the changes only reflected in the DOM, not in any AJAX backend datasource and not localstorage.
             ajax: function (method, url, data, successCallback, errorCallback) {
@@ -106,7 +35,7 @@
 
                 if (data.action === 'create') {
                     var addedRow = data.data[Object.keys(data.data)[0]];
-                    addedRow.orderId = "id" + idGenerator(); // get new GUID from custom method
+                    addedRow.orderId = getId();
                     output.data.push(addedRow);
                 }
 
@@ -126,7 +55,12 @@
                 name: "number"
             }, {
                 label: "Конечный склад доставки:",
-                name: "finalWarehouseDestination"
+                name: "finalWarehouseDestination",
+                type: "chosen",
+                options: pluginsSettings.warehouseSelectPairs,
+                opts: {
+                    inherit_select_classes: true
+                }
             }, {
                 label: "Количество коробок:",
                 name: "boxQty"
@@ -135,14 +69,42 @@
                 name: "comment"
             }, {
                 label: "Статус:",
-                name: "status"
+                name: "orderStatus",
+                type: "chosen",
+                options: pluginsSettings.orderStatusSelectPairs,
+                opts: {
+                    disable_search: true,
+                    inherit_select_classes: true
+                }
             }
             ]
         } );
 
-
         // generate dataTable
-        var dataTable = $('#ordersDataTable').DataTable({
+        var buttons = [];
+        if (settings.ordersCrud === "all") {
+            buttons.push({
+                text: 'Создать',
+                action: function (e, dt, node, config) {
+                    ordersDataTableEditor.submit();
+                    createRow("", "", Object.keys(settings.warehouses)[0], "", "", Object.keys(settings.orderStatuses)[0]);
+                }
+            });
+        }
+        if (settings.ordersCrud === "all") {
+            buttons.push({
+                extend: 'selected',
+                className: 'deleteBtn',
+                text: 'Удалить',
+                action: function (e, dt, node, config) {
+                    ordersDataTableEditor
+                        .remove('.selected', false)
+                        .submit();
+                }
+            });
+        }
+        var $ordersDataTable = $('#ordersDataTable');
+        var dataTable = $ordersDataTable.DataTable({
             paging:false,
             searching: false,
             dom: 'Bt',
@@ -152,38 +114,13 @@
                 selector: 'td:first-child'
             },
             keys: {
-                columns: ':not(:first-child)',
-                keys: [ 9 ]
+                columns: resultCssPartKeys,
+                keys: [9]
             },
-            buttons: [
-                {
-                    text: 'Создать',
-                    action: function (e, dt, node, config) {
-                        ordersDataTableEditor.submit();
-                        ordersDataTableEditor
-                            .create(false)
-                            .set("number", "")
-                            .set("finalWarehouseDestination", "")
-                            .set("boxQty", "")
-                            .set("comment", "")
-                            .set("status", "S")
-                            .submit();
-                    }
-                },
-                {
-                    extend: 'selected',
-                    className: 'deleteBtn',
-                    text: 'Удалить',
-                    action: function (e, dt, node, config) {
-                        ordersDataTableEditor
-                            .remove('.selected', false)
-                            .submit();
-                    }
-                }
-            ],
+            buttons: buttons,
             columns: [
                 {
-                    "data": null,
+                    data: null,
                     defaultContent: '',
                     className: 'select-checkbox',
                     orderable: false
@@ -192,41 +129,279 @@
                 {"data": "finalWarehouseDestination"},
                 {"data": "boxQty"},
                 {"data": "comment"},
-                {"data": "status"}
+                {"data": "orderStatus"}
             ],
             columnDefs: [
-                {"name": "number", "orderable": false, "targets": 0},
-                {"name": "finalWarehouseDestination", "orderable": false, "targets": 1},
-                {"name": "boxQty", "orderable": false, "targets": 2},
-                {"name": "comment", "orderable": false, "targets": 3},
-                {"name": "status", "orderable": false, "targets": 4}
+                {"name": "number", "orderable": false, "targets": 1},
+                {"name": "finalWarehouseDestination", "orderable": false, "targets": 2,
+                    render: function (data, type, full, meta) {
+                        return type === 'display' ? settings.warehouses[data]:data;
+                    }
+                },
+                {"name": "boxQty", "orderable": false, "targets": 3},
+                {"name": "comment", "orderable": false, "targets": 4},
+                {"name": "orderStatus", "orderable": false, "targets": 5,
+                    render: function (data, type, full, meta) {
+                        return type === 'display' ? settings.orderStatuses[data]:data;
+                    }
+                }
             ]
         });
 
-        dataTable.on( 'key-focus', function ( e, datatable, cell ) {
-            ordersDataTableEditor.submit();
-            ordersDataTableEditor.inline(cell.index(), {
-                onBlur: 'submit',
-                onReturn: 'submit',
-                submit: 'all'
+        // create inline editing
+        if (createInline) {
+            dataTable.on('key-focus', function (e, datatable, cell) {
+                ordersDataTableEditor.submit();
+                ordersDataTableEditor.inline(cell.index(), {
+                    onBlur: 'submit',
+                    onReturn: 'submit',
+                    submit: 'all'
+                });
             });
-        } );
 
-        $('#ordersDataTable').on('click', 'tbody td', function () {
-            ordersDataTableEditor.inline(this, {
-                onBlur: 'submit',
-                onReturn: 'submit',
-                submit: 'all'
+            $ordersDataTable.on('click', 'tbody td' + resultCssPartClick, function () {
+                if (dataTable.rows().count() !== 0) {
+                    ordersDataTableEditor.inline(this, {
+                        onBlur: 'submit',
+                        onReturn: 'submit',
+                        submit: 'all'
+                    });
+                }
             });
-        });
-        ordersDataTableEditor.on("submitComplete", function(e, json, data) {
-            window.console.log(e);
-        });
+        }
+
+        if (settings.isEditable) {
+            this.append($("<button>").text("Отправить"));
+        }
+
+        // --------------------------- METHODS --------------------------------
+
+
+        this.setData = function(data) {
+            donutFields.companyNameDiv.text(data.supplierName);
+            donutFields.periodInput.val(data.period);
+            donutFields.driverNameInput.val(data.driver);
+            donutFields.licensePlateInput.val(data.licensePlate);
+            donutFields.palletQtyInput.val(data.palletsQty);
+            donutFields.driverPhoneNumberInput.val(data.driverPhoneNumber);
+            donutFields.commentArea.val(data.comment);
+            ordersDataTableEditor.remove('tr');
+            data.orders.forEach(function(order) {
+                createRow(order.orderId, order.orderNumber, order.finalDestinationWarehouseId, order.boxQty, order.commentForStatus, order.orderStatusId);
+            });
+
+        };
+
+        this.getData = function() {
+
+        };
+
         // --------------------------- FUNCTIONS --------------------------------
+        var idGenerator = makeCounter();
+        var currentId;
+        function getId() {
+            if (currentId) {
+                return currentId;
+            } else {
+                return "virtualId" + idGenerator(); // get new GUID from custom method
+            }
+        }
+        function createRow(orderId, number, finalWarehouseDestinationId, boxQty, comment, statusId) {
+            currentId = orderId;
+            ordersDataTableEditor
+                .create(false)
+                .set("number", number)
+                .set("finalWarehouseDestination", finalWarehouseDestinationId)
+                .set("boxQty", boxQty)
+                .set("comment", comment)
+                .set("orderStatus", statusId)
+                .submit();
+        }
+
         function makeCounter() {
             var counter = 0;
             return function () {
                 return counter++;
+            };
+        }
+
+        function setReadOnlyIfOption(donutOptionName, $donutInput) {
+            if (settings.editableFields.donutFields.indexOf(donutOptionName) === -1) {
+                $donutInput.attr("readonly", "readonly");
+            }
+        }
+
+        function processSettings() {
+
+            if (!settings.isEditable) {
+                settings.ordersCrud = "read";
+                settings.editableFields.ordersFields = [];
+                settings.editableFields.donutFields = [];
+            }
+
+            var editableOrdersFieldsNotEmpty = settings.editableFields.ordersFields.length !== 0;
+            var createInline = (settings.ordersCrud === "update" || settings.ordersCrud === "all" || editableOrdersFieldsNotEmpty);
+
+            var resultCssPartClick = "";
+            var resultCssPartKeys = "";
+            if (editableOrdersFieldsNotEmpty) {
+                var ordersFieldsNthNumbers = {
+                    "orderNumber": 2,
+                    "finalDestinationWarehouse": 3,
+                    "boxQty": 4,
+                    "commentForStatus": 5,
+                    "orderStatus": 6
+                };
+
+                if (Object.keys(ordersFieldsNthNumbers).length === settings.editableFields.ordersFields.length) {
+                    resultCssPartClick = ":not(:first-child)";
+                } else {
+                    for (var prName in ordersFieldsNthNumbers) {
+                        if (!ordersFieldsNthNumbers.hasOwnProperty(prName)) {
+                            continue;
+                        }
+                        var nthNumber = ordersFieldsNthNumbers[prName];
+                        if (settings.editableFields.ordersFields.indexOf(prName) < 0) {
+                            resultCssPartClick += ":nth-child(" + nthNumber + "), ";
+                        }
+                    }
+                    resultCssPartClick = resultCssPartClick.slice(0, resultCssPartClick.length - 2);
+                    resultCssPartClick = ":not(:first-child, " + resultCssPartClick + ")";
+                }
+
+
+                settings.editableFields.ordersFields.forEach(function (orderField) {
+                    var ordersFieldsNthNumber = ordersFieldsNthNumbers[orderField];
+                    if (ordersFieldsNthNumber) {
+                        resultCssPartKeys += ":nth-child(" + ordersFieldsNthNumber + "), ";
+                    }
+                });
+                resultCssPartKeys = resultCssPartKeys.slice(0, resultCssPartKeys.length - 2);
+            }
+
+            var orderStatusSelectPairs = [];
+            for(var orderStatusId in settings.orderStatuses) {
+                if (!settings.orderStatuses.hasOwnProperty(orderStatusId)) {
+                    continue;
+                }
+                var orderStatusName = settings.orderStatuses[orderStatusId];
+                orderStatusSelectPairs.push({label:orderStatusName, value:orderStatusId});
+            }
+
+
+            var warehouseSelectPairs = [];
+            for(var warehouseId in settings.warehouses) {
+                if (!settings.warehouses.hasOwnProperty(warehouseId)) {
+                    continue;
+                }
+                var warehouseName = settings.warehouses[warehouseId];
+                warehouseSelectPairs.push({label:warehouseName, value:+warehouseId});
+            }
+
+            return {
+                createInline: createInline,
+                resultCssPartClick: resultCssPartClick,
+                resultCssPartKeys: resultCssPartKeys,
+                orderStatusSelectPairs: orderStatusSelectPairs,
+                warehouseSelectPairs: warehouseSelectPairs
+            };
+        }
+
+        function generateContent() {
+            _this.empty();
+
+            var $routeListTable = $("<table>").attr("id", "routeListTable");
+
+            var $companyTr = $("<tr>");
+            var $companyDiv = $("<td>");
+            var $companyLabel = $("<label>").text("Поставщик");
+            var $company = $("<td>");
+            var $companyName = $("<div>");
+
+            var $periodTr = $("<tr>");
+            var $periodDiv = $("<td>");
+            var $periodLabel = $("<label>").text("Интервал");
+            var $period = $("<td>");
+            var $periodInput = $("<input>");
+            setReadOnlyIfOption("period", $periodInput);
+
+            var $driverTr = $("<tr>");
+            var $driverNameDiv = $("<td>");
+            var $driverNameLabel = $("<label>").text("ФИО водителя");
+            var $driverName = $("<td>");
+            var $driverNameInput = $("<input>");
+            setReadOnlyIfOption("driver", $driverNameInput);
+
+            var $licenseTr = $("<tr>");
+            var $licensePlateDiv = $("<td>");
+            var $licensePlateLabel = $("<label>").text("№ транспортного средства");
+            var $licensePlate = $("<td>");
+            var $licensePlateInput = $("<input>");
+            setReadOnlyIfOption("licensePlate", $licensePlateInput);
+
+            var $palletTr = $("<tr>");
+            var $palletQtyDiv = $("<td>");
+            var $palletQtyLabel = $("<label>").text("Количество паллет");
+            var $palletQty = $("<td>");
+            var $palletQtyInput = $("<input>");
+            setReadOnlyIfOption("palletsQty", $palletQtyInput);
+
+            var $driverPhoneTr = $("<tr>");
+            var $driverPhoneDiv = $("<td>");
+            var $driverPhoneLabel = $("<label>").text("Телефон водителя");
+            var $driverPhone = $("<td>");
+            var $driverPhoneInput = $("<input>");
+            setReadOnlyIfOption("driverPhoneNumber", $driverPhoneInput);
+
+            var $commentTr = $("<tr>");
+            var $commentDiv = $("<td>");
+            var $commentLabel = $("<label>").text("Комментарий");
+            var $comment = $("<td>");
+            var $commentArea = $("<textarea>");
+            $commentArea.css("resize","none");
+            setReadOnlyIfOption("comment", $commentArea);
+
+            _this.append(
+                $routeListTable.append(
+                    $companyTr.append($companyDiv.append($companyLabel), $company.append($companyName)),
+                    $periodTr.append($periodDiv.append($periodLabel), $period.append($periodInput)),
+                    $driverTr.append($driverNameDiv.append($driverNameLabel), $driverName.append($driverNameInput)),
+                    $licenseTr.append($licensePlateDiv.append($licensePlateLabel), $licensePlate.append($licensePlateInput)),
+                    $palletTr.append($palletQtyDiv.append($palletQtyLabel), $palletQty.append($palletQtyInput)),
+                    $driverPhoneTr.append($driverPhoneDiv.append($driverPhoneLabel), $driverPhone.append($driverPhoneInput)),
+                    $commentTr.append($commentDiv.append($commentLabel), $comment.append($commentArea))
+                )
+            );
+
+            var $ordersTable = $('<table cellpadding="0" cellspacing="0" border="0" class="display" width="100%" id="ordersDataTable">');
+
+            var $thead = $("<thead>");
+            var $orderTr = $("<tr>");
+            var $selectTh = $("<th>");
+            var $numberTh = $("<th>").text("№");
+            var $finalDestinationTh = $("<th>").text("Конечный склад доставки");
+            var $palletQtyTh = $("<th>").text("Количество коробок");
+            var $commentTh = $("<th>").text("Комментарий");
+            var $statusTh = $("<th>").text("Статус");
+
+            _this.append(
+                $ordersTable.append(
+                    $thead.append(
+                        $orderTr.append(
+                            $selectTh, $numberTh, $finalDestinationTh, $palletQtyTh, $commentTh, $statusTh
+                        )
+                    )
+                )
+            );
+
+            return {
+                companyNameDiv: $companyName,
+                periodInput: $periodInput,
+                driverNameInput: $driverNameInput,
+                licensePlateInput: $licensePlateInput,
+                palletQtyInput: $palletQtyInput,
+                driverPhoneNumberInput: $driverPhoneInput,
+                commentArea: $commentArea
             };
         }
 
