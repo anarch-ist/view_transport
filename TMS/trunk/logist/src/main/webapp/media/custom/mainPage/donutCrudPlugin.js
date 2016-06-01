@@ -8,8 +8,8 @@
             isEditable: true,
             ordersCrud: "all", // all, update, read
             editableFields: {
-                donutFields: ["period", "driver", "licensePlate", "palletsQty", "driverPhoneNumber", "comment"],
-                ordersFields: ["orderNumber", "finalDestinationWarehouse", "boxQty", "commentForStatus", "orderStatus"]
+                donutFields: ["period", "driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
+                ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
             },
             orderStatuses: {"EXAMPLE_ORDER_ID": "EXAMPLE_ORDER_V"},
             warehouses: {1: "EXAMPLE_WH"}
@@ -52,10 +52,10 @@
             table: "#ordersDataTable",
             fields: [ {
                 label: "Номер заявки:",
-                name: "number"
+                name: "orderNumber"
             }, {
                 label: "Конечный склад доставки:",
-                name: "finalWarehouseDestination",
+                name: "finalDestinationWarehouseId",
                 type: "chosen",
                 options: pluginsSettings.warehouseSelectPairs,
                 opts: {
@@ -63,13 +63,15 @@
                 }
             }, {
                 label: "Количество коробок:",
-                name: "boxQty"
+                name: "boxQty",
+                type: "mask",
+                mask: "##"
             }, {
                 label: "Комментарий:",
-                name: "comment"
+                name: "commentForStatus"
             }, {
                 label: "Статус:",
-                name: "orderStatus",
+                name: "orderStatusId",
                 type: "chosen",
                 options: pluginsSettings.orderStatusSelectPairs,
                 opts: {
@@ -125,22 +127,22 @@
                     className: 'select-checkbox',
                     orderable: false
                 },
-                {"data": "number"},
-                {"data": "finalWarehouseDestination"},
+                {"data": "orderNumber"},
+                {"data": "finalDestinationWarehouseId"},
                 {"data": "boxQty"},
-                {"data": "comment"},
-                {"data": "orderStatus"}
+                {"data": "commentForStatus"},
+                {"data": "orderStatusId"}
             ],
             columnDefs: [
-                {"name": "number", "orderable": false, "targets": 1},
-                {"name": "finalWarehouseDestination", "orderable": false, "targets": 2,
+                {"name": "orderNumber", "orderable": false, "targets": 1},
+                {"name": "finalDestinationWarehouseId", "orderable": false, "targets": 2,
                     render: function (data, type, full, meta) {
                         return type === 'display' ? settings.warehouses[data]:data;
                     }
                 },
                 {"name": "boxQty", "orderable": false, "targets": 3},
-                {"name": "comment", "orderable": false, "targets": 4},
-                {"name": "orderStatus", "orderable": false, "targets": 5,
+                {"name": "commentForStatus", "orderable": false, "targets": 4},
+                {"name": "orderStatusId", "orderable": false, "targets": 5,
                     render: function (data, type, full, meta) {
                         return type === 'display' ? settings.orderStatuses[data]:data;
                     }
@@ -184,7 +186,7 @@
             donutFields.licensePlateInput.val(data.licensePlate);
             donutFields.palletQtyInput.val(data.palletsQty);
             donutFields.driverPhoneNumberInput.val(data.driverPhoneNumber);
-            donutFields.commentArea.val(data.comment);
+            donutFields.commentArea.val(data.commentForDonut);
             ordersDataTableEditor.remove('tr');
             data.orders.forEach(function(order) {
                 createRow(order.orderId, order.orderNumber, order.finalDestinationWarehouseId, order.boxQty, order.commentForStatus, order.orderStatusId);
@@ -193,7 +195,23 @@
         };
 
         this.getData = function() {
-
+            var result = {};
+            result.period = donutFields.periodInput.val();
+            result.commentForDonut = donutFields.commentArea.val();
+            result.supplierName = donutFields.companyNameDiv.text();
+            result.driver = donutFields.driverNameInput.val();
+            result.licensePlate = donutFields.licensePlateInput.val();
+            result.palletsQty = +donutFields.palletQtyInput.val();
+            result.driverPhoneNumber = donutFields.driverPhoneNumberInput.val();
+            var orders = [];
+            dataTable.data().each(function(row) {
+                var copy = $.extend({}, row);
+                copy.boxQty = +copy.boxQty;
+                copy.finalDestinationWarehouseId = +copy.finalDestinationWarehouseId;
+                orders.push(copy);
+            });
+            result.orders = orders;
+            return result;
         };
 
         // --------------------------- FUNCTIONS --------------------------------
@@ -206,15 +224,15 @@
                 return "virtualId" + idGenerator(); // get new GUID from custom method
             }
         }
-        function createRow(orderId, number, finalWarehouseDestinationId, boxQty, comment, statusId) {
+        function createRow(orderId, orderNumber, finalWarehouseDestinationId, boxQty, commentForStatus, statusId) {
             currentId = orderId;
             ordersDataTableEditor
                 .create(false)
-                .set("number", number)
-                .set("finalWarehouseDestination", finalWarehouseDestinationId)
+                .set("orderNumber", orderNumber)
+                .set("finalDestinationWarehouseId", finalWarehouseDestinationId)
                 .set("boxQty", boxQty)
-                .set("comment", comment)
-                .set("orderStatus", statusId)
+                .set("commentForStatus", commentForStatus)
+                .set("orderStatusId", statusId)
                 .submit();
         }
 
@@ -247,10 +265,10 @@
             if (editableOrdersFieldsNotEmpty) {
                 var ordersFieldsNthNumbers = {
                     "orderNumber": 2,
-                    "finalDestinationWarehouse": 3,
+                    "finalDestinationWarehouseId": 3,
                     "boxQty": 4,
                     "commentForStatus": 5,
-                    "orderStatus": 6
+                    "orderStatusId": 6
                 };
 
                 if (Object.keys(ordersFieldsNthNumbers).length === settings.editableFields.ordersFields.length) {
@@ -343,7 +361,7 @@
             var $palletQtyDiv = $("<td>");
             var $palletQtyLabel = $("<label>").text("Количество паллет");
             var $palletQty = $("<td>");
-            var $palletQtyInput = $("<input>");
+            var $palletQtyInput = $("<input>").attr("type", "number").attr("min", "0").attr("max", "99").attr("step", "1");
             setReadOnlyIfOption("palletsQty", $palletQtyInput);
 
             var $driverPhoneTr = $("<tr>");
@@ -359,7 +377,7 @@
             var $comment = $("<td>");
             var $commentArea = $("<textarea>");
             $commentArea.css("resize","none");
-            setReadOnlyIfOption("comment", $commentArea);
+            setReadOnlyIfOption("commentForDonut", $commentArea);
 
             _this.append(
                 $routeListTable.append(

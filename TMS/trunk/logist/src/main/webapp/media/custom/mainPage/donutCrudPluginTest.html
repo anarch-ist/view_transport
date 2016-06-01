@@ -25,38 +25,40 @@
 
     <script src="donutCrudPlugin.js"></script>
     <script>
+        var donutCrudPluginInstance;
         $(document).ready(function() {
             var exampleData = {
+                supplierName: "поставщик1",
                 period:"t1 t2",
-                comment:"someComment",
                 driver:"someDriver",
-                driverPhoneNumber: "+7906548976",
                 licensePlate: "hbguegrf",
                 palletsQty: 4,
-                supplierName: "поставщик1",
+                driverPhoneNumber: "+7906548976",
+                commentForDonut:"someComment",
                 orders:[
                     {
                         orderId: 1,
                         orderNumber: "orewnoer123",
-                        boxQty:4,
                         finalDestinationWarehouseId: 1,
-                        orderStatusId: "STATUS",
-                        commentForStatus: "order status comment"
+                        boxQty:4,
+                        commentForStatus: "order status comment",
+                        orderStatusId: "STATUS"
                     }
                 ]
             };
 
-            var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
-                isEditable:true,
+            donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
+                isEditable: true,
                 ordersCrud: "all",
                 editableFields: {
-                    donutFields:["driver", "licensePlate", "palletsQty", "driverPhoneNumber"],
-                    ordersFields: ["orderNumber", "finalDestinationWarehouse", "boxQty", "commentForStatus", "orderStatus"]
+                    donutFields: ["driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
+                    ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
                 },
-               orderStatuses: {STATUS: "СТАТУС"},
-               warehouses: {1: "СКЛАД"}
+                orderStatuses: {STATUS: "СТАТУС"},
+                warehouses: {1: "СКЛАД"}
             });
             donutCrudPluginInstance.setData(exampleData);
+            window.console.log(donutCrudPluginInstance.getData());
 
         });
     </script>
