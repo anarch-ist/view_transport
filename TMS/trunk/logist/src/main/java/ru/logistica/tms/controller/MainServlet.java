@@ -4,6 +4,7 @@ package ru.logistica.tms.controller;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
+import ru.logistica.tms.dao.orderDao.OrderStatuses;
 import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRole;
 import ru.logistica.tms.dao.userDao.UserRoles;
@@ -30,10 +31,6 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // достать сессию, оттуда достать роль пользователя.
-        // извлечь все данные для соответсвующей роли пользователя
-        // записать данные в dto объекты и передать их в контексте запроса
-        //
         HttpSession session = request.getSession(false);
         User user = (User)session.getAttribute("user");
         UserRole userRole = user.getUserRole();
@@ -41,8 +38,6 @@ public class MainServlet extends HttpServlet {
 
         // список всех складов(пары ключ-имя)
         // список всех доков для всех складов(id склада, id дока, имя дока)
-
-
         JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
         if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
 
@@ -64,7 +59,17 @@ public class MainServlet extends HttpServlet {
             sendDataBuilder.add("warehouses", warehouseArrayBuilder);
 
         }
+
+        // список всех статусов для заявки
+        JsonObjectBuilder orderStatusesBuilder = Json.createObjectBuilder();
+        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.toString(), "УДАЛЕН ПОСТАВЩИКОМ");
+        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.toString(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА");
+        orderStatusesBuilder.add(OrderStatuses.CREATED.toString(), "СОЗДАН");
+        orderStatusesBuilder.add(OrderStatuses.DELIVERED.toString(), "ДОСТАВЛЕН");
+        orderStatusesBuilder.add(OrderStatuses.ERROR.toString(), "ОШИБКА");
+
         request.setAttribute("docDateSelectorDataObject", sendDataBuilder.build().toString());
+        request.setAttribute("orderStatuses", orderStatusesBuilder.build().toString());
 
         request.getRequestDispatcher("/WEB-INF/pages/main.jsp").forward(request, response);
     }

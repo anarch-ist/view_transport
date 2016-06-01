@@ -13,8 +13,9 @@ public class Supplier {
     private Set<DonutDocPeriod> donutDocPeriods;
 
     @Id
-    @Column(name = "supplierid", nullable = false)
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @SequenceGenerator(name="suppliers_supplierid_seq", sequenceName="suppliers_supplierid_seq", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "suppliers_supplierid_seq")
+    @Column(name = "supplierid", updatable = false)
     public Integer getSupplierId() {
         return supplierId;
     }

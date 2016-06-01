@@ -28,7 +28,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String receivedData = req.getParameter("selectionObject");
+        String receivedData = req.getParameter("docDateSelection");
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(receivedData);

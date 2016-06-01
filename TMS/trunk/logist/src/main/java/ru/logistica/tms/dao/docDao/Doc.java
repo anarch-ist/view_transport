@@ -15,8 +15,9 @@ public class Doc {
     private Set<DocPeriod> docPeriods;
 
     @Id
-    @Column(name = "docid", nullable = false)
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @SequenceGenerator(name="docs_docid_seq", sequenceName="docs_docid_seq", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "docs_docid_seq")
+    @Column(name = "docid", updatable = false)
     public Integer getDocId() {
         return docId;
     }

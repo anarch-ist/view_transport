@@ -67,9 +67,9 @@
             <!--docDateSelector.setSelectedWarehouseAndDoc(1, 3);-->
             //docDateSelector.setSelectedDoc(3);
 
-            docDateSelector.setOnSelected(function(event, selectionObject) {
+            docDateSelector.setOnSelected(function(event, docDateSelection) {
                 window.console.log("SELECTED EVENT");
-                window.console.log(selectionObject);
+                window.console.log(docDateSelection);
             });
 
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {

@@ -13,8 +13,9 @@ public class DocPeriod {
     private Doc doc;
 
     @Id
-    @Column(name = "docperiodid", nullable = false)
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @SequenceGenerator(name="doc_periods_docperiodid_seq", sequenceName="doc_periods_docperiodid_seq", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "doc_periods_docperiodid_seq")
+    @Column(name = "docperiodid", updatable = false)
     public Long getDocPeriodId() {
         return docPeriodId;
     }

@@ -1,5 +1,11 @@
 package ru.logistica.tms.controller.ajax;
 
+import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.userDao.SupplierUser;
+import ru.logistica.tms.dto.DocDateSelectorData;
+import ru.logistica.tms.dto.Donut;
+import ru.logistica.tms.dto.ValidateDataException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,13 +17,25 @@ public class SetTableDataServlet extends AjaxHttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String docAndDate = req.getParameter("selectionObject");
+        String donutData = req.getParameter("donut");
+        String docDateSelection = req.getParameter("docDateSelection");
+        SupplierUser supplierUser = (SupplierUser)req.getSession(false).getAttribute("user");
 
-        String period = req.getParameter("period");
-        System.out.println("WRITE INTO DB: " + docAndDate + "  " + period);
+//        System.out.println("WRITE INTO DB: " + donutData);
+//        System.out.println("docDateSelection: " + docDateSelection);
+//        System.out.println("supplierUser: " + supplierUser);
 
-//        JsonReader reader1 = Json.createReader(new StringReader(docAndDate));
-//        JsonReader reader2 = Json.createReader(new StringReader(period));
+        Donut donut;
+        DocDateSelectorData docDateSelectorData;
+        try {
+            docDateSelectorData = new DocDateSelectorData(docDateSelection);
+            donut = new Donut(donutData);
+//            System.out.println(donut);
+        } catch (ValidateDataException e) {
+            throw new ServletException(e);
+        }
+
+        DaoFacade.insertDonut(donut, docDateSelectorData, supplierUser.getSupplier());
 
         req.getRequestDispatcher("getTableData").forward(req, resp);
     }

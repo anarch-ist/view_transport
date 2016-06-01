@@ -45,8 +45,8 @@ public abstract class HibernateTest {
         configuration.setProperty("hibernate.current_session_context_class", "thread");
         configuration.setProperty("hibernate.connection_pool_size", "1");
         configuration.setProperty("hibernate.hbm2ddl.auto", "update");
-        //configuration.setProperty("hibernate.show_sql", "true");
-        configuration.setProperty("hibernate.show_sql", "false");
+        configuration.setProperty("hibernate.show_sql", "true");
+//        configuration.setProperty("hibernate.show_sql", "false");
         configuration.setProperty("hibernate.format_sql", "true");
         SessionFactory sessionFactory = configuration.buildSessionFactory();
         HibernateUtils.setSessionFactory(sessionFactory);

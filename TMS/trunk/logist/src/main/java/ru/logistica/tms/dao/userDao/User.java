@@ -20,8 +20,9 @@ public class User {
     private UserRole userRole;
 
     @Id
-    @Column(name = "userid", nullable = false)
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @SequenceGenerator(name="users_userid_seq", sequenceName="users_userid_seq", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "users_userid_seq")
+    @Column(name = "userid", updatable = false)
     public Integer getUserId() {
         return userId;
     }

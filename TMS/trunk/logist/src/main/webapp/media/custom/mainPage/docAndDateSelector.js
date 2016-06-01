@@ -190,10 +190,10 @@
 
         var lastSelectionAvailable = null; // null is initial state
         function generateEvents() {
-            var selectionObject = getSelectionObject();
-            var selectionAvailable = (selectionObject !== null);
+            var docDateSelection = getSelectionObject();
+            var selectionAvailable = (docDateSelection !== null);
             if (selectionAvailable) {
-                $(document).trigger("docDateSelected", selectionObject);
+                $(document).trigger("docDateSelected", docDateSelection);
             }
             if (lastSelectionAvailable === null || selectionAvailable !== lastSelectionAvailable) {
                 $(document).trigger("selectionAvailableChanged", selectionAvailable);

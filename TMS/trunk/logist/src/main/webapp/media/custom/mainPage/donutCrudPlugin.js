@@ -12,7 +12,8 @@
                 ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
             },
             orderStatuses: {"EXAMPLE_ORDER_ID": "EXAMPLE_ORDER_V"},
-            warehouses: {1: "EXAMPLE_WH"}
+            warehouses: {1: "EXAMPLE_WH"},
+            onSubmit: function() {}
         }, options);
 
 
@@ -173,15 +174,22 @@
         }
 
         if (settings.isEditable) {
-            this.append($("<button>").text("Отправить"));
+            var submitBtn = $("<button>").text("Отправить");
+            submitBtn.on("click", function(e) {
+                settings.onSubmit();
+            });
+            _this.append(submitBtn);
         }
 
         // --------------------------- METHODS --------------------------------
 
+        this.setPeriod = function(periodString){
+            donutFields.periodInput.val(periodString);
+        };
 
         this.setData = function(data) {
             donutFields.companyNameDiv.text(data.supplierName);
-            donutFields.periodInput.val(data.period);
+            this.setPeriod(data.period);
             donutFields.driverNameInput.val(data.driver);
             donutFields.licensePlateInput.val(data.licensePlate);
             donutFields.palletQtyInput.val(data.palletsQty);
@@ -208,6 +216,9 @@
                 var copy = $.extend({}, row);
                 copy.boxQty = +copy.boxQty;
                 copy.finalDestinationWarehouseId = +copy.finalDestinationWarehouseId;
+                if (copy.orderId.lastIndexOf("virtualId", 0) === 0) {
+                    copy.orderId = null;
+                }
                 orders.push(copy);
             });
             result.orders = orders;

@@ -6,15 +6,22 @@ import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
 import ru.logistica.tms.dao.docDao.DocDaoImpl;
-import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
-import ru.logistica.tms.dao.docPeriodDao.DocPeriodDao;
-import ru.logistica.tms.dao.docPeriodDao.DocPeriodImpl;
+import ru.logistica.tms.dao.docPeriodDao.*;
+import ru.logistica.tms.dao.orderDao.Order;
+import ru.logistica.tms.dao.orderDao.OrderDao;
+import ru.logistica.tms.dao.orderDao.OrderDaoImpl;
+import ru.logistica.tms.dao.orderDao.OrderStatuses;
+import ru.logistica.tms.dao.supplierDao.Supplier;
+import ru.logistica.tms.dao.supplierDao.SupplierDao;
+import ru.logistica.tms.dao.supplierDao.SupplierDaoImpl;
 import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.AuthResult;
+import ru.logistica.tms.dto.DocDateSelectorData;
+import ru.logistica.tms.dto.Donut;
 import ru.logistica.tms.util.CriptUtils;
 
 import java.util.*;
@@ -38,6 +45,60 @@ public class DaoFacade {
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
+    }
+
+    public static void insertDonut(final Donut donut, final DocDateSelectorData docDateSelectorData, final Supplier usersSupplier) {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DocDao docDao = new DocDaoImpl();
+                Doc doc = docDao.findById(Doc.class, docDateSelectorData.docId);
+                SupplierDao supplierDao = new SupplierDaoImpl();
+                Supplier supplier = supplierDao.findById(Supplier.class, usersSupplier.getSupplierId());
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+
+                DonutDocPeriod donutDocPeriod = new DonutDocPeriod();
+
+                donutDocPeriod.setDoc(doc);
+                donutDocPeriod.setSupplier(supplier);
+                donutDocPeriod.setPalletsQty((short) donut.palletsQty);
+                donutDocPeriod.setLicensePlate(donut.licensePlate);
+                donutDocPeriod.setComment(donut.commentForDonut);
+                donutDocPeriod.setCreationDate(new Date());
+                donutDocPeriod.setDriver(donut.driver);
+                donutDocPeriod.setDriverPhoneNumber(donut.driverPhoneNumber);
+                donutDocPeriod.setPeriod(getPeriod());
+                donutDocPeriod.setDoc(doc);
+
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                donutDocPeriodDao.save(donutDocPeriod);
+
+                OrderDao orderDao = new OrderDaoImpl();
+                for (Donut.Order dtoOrder: donut.orders) {
+                    Order order = new Order();
+                    order.setBoxQty((short) dtoOrder.boxQty);
+                    order.setCommentForStatus(dtoOrder.commentForStatus);
+                    order.setFinalDestinationWarehouse(warehouseDao.findById(Warehouse.class, dtoOrder.finalDestinationWarehouseId));
+                    order.setOrderNumber(dtoOrder.orderNumber);
+                    order.setOrderStatus(OrderStatuses.valueOf(dtoOrder.orderStatusId));
+                    order.setDonutDocPeriod(donutDocPeriod);
+                    orderDao.save(order);
+                }
+            }
+
+            private Period getPeriod() throws DAOException {
+                String[] split = donut.period.split(";");
+                int periodBegin = Integer.parseInt(split[0]); // in minutes from day begin
+                int periodEnd = Integer.parseInt(split[1]);  // in minutes from day begin
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                Warehouse warehouse = warehouseDao.findById(Warehouse.class, docDateSelectorData.warehouseId);
+                Integer offset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()).intValue();
+                long dateBegin = docDateSelectorData.utcDate.getTime() - offset * 60 * 60 * 1000;
+                long timeStampBegin = dateBegin + periodBegin * 60 * 1000;
+                long timeStampEnd = dateBegin + periodEnd * 60 * 1000;
+                return new Period(new Date(timeStampBegin), new Date(timeStampEnd));
+            }
+        });
     }
 
     public static Set<Warehouse> getAllWarehousesWithDocs() {

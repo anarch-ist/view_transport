@@ -16,8 +16,9 @@ public class Warehouse {
     private Set<Order> finalDestinationOrders;
 
     @Id
-    @Column(name = "warehouseid", nullable = false)
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @SequenceGenerator(name="warehouses_warehouseid_seq", sequenceName="warehouses_warehouseid_seq", allocationSize=1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "warehouses_warehouseid_seq")
+    @Column(name = "warehouseid", updatable = false)
     public Integer getWarehouseId() {
         return warehouseId;
     }

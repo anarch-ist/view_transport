@@ -1,5 +1,6 @@
 package ru.logistica.tms.dto;
 
+import ru.logistica.tms.util.JsonUtils;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import javax.json.Json;
@@ -11,13 +12,19 @@ import java.util.Date;
 
 public class DocDateSelectorData {
     public static final SimpleDateFormat dateFormat = new UtcSimpleDateFormat("yyyy-MM-dd");
-    public Date utcDate;
-    public Integer warehouseId;
-    public Integer docId;
+    public final Date utcDate;
+    public final Integer warehouseId;
+    public final Integer docId;
+
+    public DocDateSelectorData(Date utcDate, Integer warehouseId, Integer docId) {
+        this.utcDate = utcDate;
+        this.warehouseId = warehouseId;
+        this.docId = docId;
+    }
 
     public DocDateSelectorData(String docDateJsonString) throws ValidateDataException {
-        try (JsonReader receivedDataReader = Json.createReader(new StringReader(docDateJsonString))){
-            JsonObject receivedJsonObject = receivedDataReader.readObject();
+        try {
+            JsonObject receivedJsonObject = JsonUtils.parseString(docDateJsonString);
             this.utcDate = dateFormat.parse(receivedJsonObject.getString("date"));
             this.warehouseId = receivedJsonObject.getInt("warehouseId");
             this.docId = receivedJsonObject.getInt("docId");

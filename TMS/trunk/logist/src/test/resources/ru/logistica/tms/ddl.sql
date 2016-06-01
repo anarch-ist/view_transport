@@ -22,6 +22,7 @@ CREATE TABLE docs (
   FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
 );
 -- if no period => OPENED, if doc_period => OCCUPIED, if
+
 CREATE TABLE doc_periods (
   docPeriodID BIGSERIAL, -- Static
   docID       INTEGER                  NOT NULL, -- Static
@@ -235,3 +236,7 @@ GRANT USAGE ON SCHEMA pg_catalog TO app_user;
 GRANT SELECT ON pg_timezone_names TO app_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
 GRANT INSERT, UPDATE ON TABLE doc_periods, donut_doc_periods, orders TO app_user;
+GRANT ALL ON SEQUENCE doc_periods_docperiodid_seq TO app_user;
+GRANT ALL ON SEQUENCE orders_orderid_seq TO app_user;
+
+
