@@ -29,7 +29,7 @@ CREATE TABLE doc_periods (
   periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
   periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
   -- длина периода кратна 30 минутам
-  -- BINDING with web.xml (periodSize)
+  -- BINDING with web.xml (cellSize)
   CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
                                                (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
   PRIMARY KEY (docPeriodID),

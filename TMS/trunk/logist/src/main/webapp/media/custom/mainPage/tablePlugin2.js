@@ -1,12 +1,15 @@
 (function() {
     "use strict";
+
     var DEFAULT_PARAMETERS = {
         parentId: '',
         cellSize: 30, // in minutes!!!
         windowSize: 60 * 24,
-        selectionConstraint: null
+        selectionConstraint: null,
+        allowedStatesForSelection: {isOpenedAllowed: true, isClosedAllowed: true, isOccupiedAllowed: true}
     };
     var startupParameters = {};
+
 
     // value is an object
     var main = function (initParams) {
@@ -21,25 +24,9 @@
         return main;
     };
 
-    main.findTableSizes = function() {
-        var periodsCount = startupParameters.windowSize / startupParameters.cellSize;
 
-        var result = {
-           x: 1,
-           y: periodsCount
-        };
-
-        for(var i = 2; i <= (periodsCount / 2); i++) {
-            if(!(periodsCount % i)) {
-                var j = periodsCount / i;
-                if(((result.y - result.x) > (j - i)) && ((j - i) >= 0)) {
-                    result.x = i;
-                    result.y = j;
-                }
-            }
-        }
-        return result;
-    };
+    var data = [];
+    var dataAndCellsRelation = new Map();
 
 
     main.defaultParameters = DEFAULT_PARAMETERS;
@@ -47,41 +34,33 @@
     var tableElement;
     var disableElement;
     var selectedElements = [];
-    var serialNumber = 0;
+    var generatedCells = [];
 
     main.generate = function(){
-        var tableSize = main.findTableSizes(startupParameters.windowSize / startupParameters.cellSize);
-        var x = tableSize.x;
-        var y = tableSize.y;
-        var firstPart = "00:00";
-        var periodSize= startupParameters.cellSize;
-        var secondPart = "";
+        var tableSizes = findTableSizes(startupParameters.windowSize, startupParameters.cellSize);
+        var serialNumber = 0;
 
         var parentElem = document.getElementById(startupParameters.parentId);
-        //diableElement
+        parentElem.classList.add("tablePlugin");
         disableElement = document.createElement("div");
         parentElem.appendChild(disableElement);
-        disableElement.classList.add("tablePlugin-disable");
-        //tableElement
+        disableElement.classList.add("tp_disabled");
         tableElement = document.createElement("table");
         tableElement.classList.add("mainTable");
-
         parentElem.appendChild(tableElement);
+        var labelGenerator = createLabelGenerator(startupParameters.cellSize);
 
-        // rows and cells
-        for(var i = 1; i <= y; i++) {
+        // generate rows and cells
+        for(var i = 1; i <= tableSizes.y; i++) {
             var rowElement = document.createElement("tr");
             tableElement.appendChild(rowElement);
 
-            for(var j = 1; j <= x; j++) {
+            for(var j = 1; j <= tableSizes.x; j++) {
                 serialNumber++;
                 var cellElement = document.createElement("td");
-                cellElement.classList.add("tableCell");
-                cellElement.id = "cell_" + i + "_" + j;
-                cellElement.setAttribute("data-x", i);
-                cellElement.setAttribute("data-y", j);
+                generatedCells.push(cellElement);
+                dataAndCellsRelation.set(cellElement, null);
                 cellElement.setAttribute("data-serialnumber", serialNumber);
-
                 cellElement.onclick = function(e) {
                     var _this = this;
                     // apply selection constraint
@@ -89,38 +68,14 @@
                         if (startupParameters.selectionConstraint(
                                 +_this.dataset.serialnumber,
                                 selectedElementsAsSerialNumbers(selectedElements),
-                                _this.classList.contains("highlight"))) {
+                                _this.classList.contains("tp_highlight"))) {
                             return;
                         }
                     }
                     toggleSelection(_this);
                 };
-
-                var labelElement = document.createElement("label");
-                labelElement.classList.add("timePeriodLabel");
-
-                var time = firstPart.split(':');
-                var newTime = +time[0] * 60 + (+time[1]) + periodSize;
-                var hours = Math.floor(newTime / 60);
-                var minutes = newTime - (hours * 60);
-                if(hours < 10) {
-                    hours = "0" + hours;
-                }
-                if(minutes < 10) {
-                    minutes = "0" + minutes;
-                }
-                if(hours === 24){
-                    hours = "00";
-                }
-
-                secondPart = hours + ":" + minutes;
-                labelElement.innerHTML = firstPart + "-" + secondPart;
-                firstPart = secondPart;
-
-                var divElement = document.createElement("div");
-                divElement.setAttribute("id", "companyDiv");
-                cellElement.appendChild(labelElement);
-                cellElement.appendChild(divElement);
+                cellElement.appendChild(labelGenerator());
+                cellElement.appendChild(document.createElement("div"));
                 rowElement.appendChild(cellElement);
             }
         }
@@ -140,28 +95,58 @@
 
 
     // ----------------------------------METHODS------------------------------------------
-    main.findById = function(x, y) {
-        var result = {};
-        var tdElement = document.getElementById("cell_" + x + "_" + y);
-        var labelElement = tdElement.children[0];
-        var divElement = tdElement.children[1];
-        result.tdElem = tdElement;
-        result.labelElem = labelElement;
-        result.divElem = divElement;
-        return result;
-    };
 
-    main.setString = function(str, x, y) {
-        var divElement = main.findById(x, y).divElem;
-        divElement.innerHTML = str;
-    };
 
-    main.setNotFreeState = function (timeStampStart, timeStampEnd, state, company) {
-        var periodNumberStart = definedStartTimeSerialNumberByMinutes(timeStampStart);
-        var periodNumberEnd = definedEndTimeSerialNumberByMinutes(timeStampEnd);
-        for(var i = periodNumberStart; i <= periodNumberEnd; i++){
-            findCellBySerialNumber(i, state, company);
+
+    /**
+     * set data array and creates view for this data
+     * @param newData
+     */
+    main.setData = function(newData) {
+        data = newData;
+
+        clearVisual();
+
+
+        data.forEach(function(dataElem) {
+            dataElem.cells = [];
+            var cellsForPeriod = getCellsForPeriod(dataElem.periodBegin, dataElem.periodEnd);
+            for (var i = 0; i < cellsForPeriod.length; i++) {
+
+                var cellDiv = cellsForPeriod[i].getElementsByTagName('div')[0];
+
+                dataElem.cells.push(cellsForPeriod[i]);
+                dataAndCellsRelation.set(cellsForPeriod[i], dataElem);
+
+                if (dataElem.state === "OCCUPIED") {
+                    cellDiv.innerHTML = dataElem.stateData.supplierName;
+                    cellDiv.classList.add("tp_occupied");
+                    if (dataElem.stateData.owned) {
+                        cellDiv.classList.add("tp_owned");
+                    }
+                } else if (dataElem.state === "CLOSED") {
+                    cellDiv = cellsForPeriod[i].getElementsByTagName('div')[0];
+                    cellDiv.classList.add("tp_closed");
+                }
+            }
+        });
+
+        //for(let amount of dataAndCellsRelation.values()) {
+        //    window.console.log(amount);
+        //}
+
+        // цикл по записям
+        for(let entry of dataAndCellsRelation) { // то же что и recipeMap.entries()
+            window.console.log(entry);
         }
+
+    };
+
+    /**
+     * cloned data object
+     */
+    main.getData = function() {
+        return JSON.parse(JSON.stringify(data));
     };
 
     main.isAnySelected = function() {
@@ -171,8 +156,6 @@
     main.setOnSelectionChanged = function(handler) {
         tableElement.addEventListener("selected", handler);
     };
-
-
 
     main.setOnAnySelected = function(handler) {
         tableElement.addEventListener("anySelected", handler);
@@ -192,6 +175,7 @@
         return {periodBegin:periodBegin, periodEnd: periodEnd};
     };
 
+
     main.clear = function() {
         if (selectedElements.length === 0) {
             generateAnySelectedEvent(false);
@@ -204,10 +188,7 @@
             });
         }
 
-        [].forEach.call(tableElement.getElementsByTagName("td"), function(element) {
-            element.children[1].classList.remove('occupied', 'disabled');
-            element.children[1].innerHTML = "";
-        });
+        clearVisual();
     };
 
     // TODO implement this method
@@ -239,6 +220,89 @@
 
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
+
+    function findTableSizes(windowsSize, periodSize) {
+        var periodsCount = windowsSize / periodSize;
+
+        var result = {
+            x: 1,
+            y: periodsCount
+        };
+
+        for (var i = 2; i <= (periodsCount / 2); i++) {
+            if (!(periodsCount % i)) {
+                var j = periodsCount / i;
+                if (((result.y - result.x) > (j - i)) && ((j - i) >= 0)) {
+                    result.x = i;
+                    result.y = j;
+                }
+            }
+        }
+        return result;
+    }
+    function createLabelGenerator(periodSize) {
+        var firstPart = "00:00";
+        var secondPart = "";
+
+        return function () {
+            var labelElement = document.createElement("label");
+            var time = firstPart.split(':');
+            var newTime = +time[0] * 60 + (+time[1]) + periodSize;
+            var hours = Math.floor(newTime / 60);
+            var minutes = newTime - (hours * 60);
+            if(hours < 10) {
+                hours = "0" + hours;
+            }
+            if(minutes < 10) {
+                minutes = "0" + minutes;
+            }
+            if(hours === 24){
+                hours = "00";
+            }
+            secondPart = hours + ":" + minutes;
+            labelElement.innerHTML = firstPart + "-" + secondPart;
+            firstPart = secondPart;
+            return labelElement;
+        };
+    }
+
+    function clearVisual() {
+        [].forEach.call(tableElement.getElementsByTagName("td"), function (element) {
+            var cellDiv = element.getElementsByTagName('div')[0];
+            cellDiv.className = "";
+            cellDiv.innerHTML = "";
+        });
+    }
+
+    /**
+     * @param periodBegin
+     * @param periodEnd
+     * @return array of cells within period
+     */
+    function getCellsForPeriod(periodBegin, periodEnd) {
+        var periodSize = periodEnd - periodBegin,
+            cellSize = startupParameters.cellSize,
+            minSerialNumber,
+            maxSerialNumber;
+        if (periodSize === cellSize) {
+            minSerialNumber = periodBegin / cellSize;
+            maxSerialNumber = minSerialNumber;
+        } else {
+            var cellQty = periodSize/startupParameters.cellSize - 1;
+            minSerialNumber = periodBegin / cellSize;
+            maxSerialNumber = minSerialNumber + cellQty;
+        }
+
+        var result = [];
+        for(var i = 0; i < generatedCells.length; i++){
+            var serialnumber = generatedCells[i].dataset.serialnumber - 1;
+            if(serialnumber >= minSerialNumber && serialnumber <= maxSerialNumber){
+                result.push(generatedCells[i]);
+            }
+        }
+        return result;
+    }
+
     function modifySelectedElementsArray(cellElement, isSelected) {
         if (isSelected) {
             selectedElements.push(cellElement);
@@ -246,14 +310,14 @@
             var index = selectedElements.indexOf(cellElement);
             selectedElements.splice(index, 1);
         }
-        selectedElements.sort(compareNum);
+        selectedElements.sort(function compareNum(a, b) {
+            return a.dataset.serialnumber - b.dataset.serialnumber;
+        });
     }
 
     function generateSelectedEvent(cellElement, isSelected) {
         var newEvent = new CustomEvent("selected", {
             detail: {
-                x: cellElement.dataset.x,
-                y: cellElement.dataset.y,
                 isSelected: isSelected
             },
             bubbles: true,
@@ -272,14 +336,14 @@
     }
 
     function removeSelectionStyle(cellElement) {
-        cellElement.classList.remove("highlight");
+        cellElement.classList.remove("tp_highlight");
     }
     function addSelectionStyle(cellElement) {
-        cellElement.classList.add("highlight");
+        cellElement.classList.add("tp_highlight");
     }
 
     function toggleSelection(cellElement) {
-        var wasSelected = cellElement.classList.contains("highlight");
+        var wasSelected = cellElement.classList.contains("tp_highlight");
         if (wasSelected) {
             removeSelectionStyle(cellElement);
         } else {
@@ -298,51 +362,8 @@
         return result;
     }
 
-    function compareNum(a, b) {
-        return a.dataset.serialnumber - b.dataset.serialnumber;
-    }
 
-    function definedStartTimeSerialNumberByMinutes(timeStamp) {
-        var periodSize = startupParameters.cellSize;
-        var result;
-        if(timeStamp === 0) return 1;
-        result = timeStamp / periodSize;
-        result++;
-        return result;
-    }
-
-    function definedEndTimeSerialNumberByMinutes(timeStamp) {
-        var periodSize = startupParameters.cellSize;
-        var result;
-        if(timeStamp === 0) return (24 * 60 / periodSize);
-        result = (timeStamp / periodSize);
-        return result;
-    }
-
-    function findCellBySerialNumber(number, state, company) {
-
-        var rows = tableElement.rows;
-        var row;
-        var cells;
-        for(var i = 0; i < rows.length; i++){
-            row = rows[i];
-            cells = row.cells;
-            for(var j = 0; j < cells.length; j++){
-                if(number == cells[j].dataset.serialnumber){
-                    cells[j].lastElementChild.classList.add(state);
-                    if(company){
-                        cells[j].lastElementChild.innerHTML = company;
-                    }
-                }
-            }
-        }
-    }
-
-    function getCellById(x, y) {
-            var result = document.getElementById("cell_" + x + "_" + y);
-            return result;
-    }
-
-    window.tablePlugin = main;
+    window.tablePlugin2 = main;
 
 })();
+

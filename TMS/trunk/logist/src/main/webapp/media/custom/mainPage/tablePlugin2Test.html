@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>test</title>
-    <script src="tablePlugin.js"></script>
-    <link href="tablePlugin.css" rel="stylesheet">
+    <script src="tablePlugin2.js"></script>
+    <script src="es6-shim.min.js"></script>
+    <link href="tablePlugin2.css" rel="stylesheet">
     <script>
         window.onload = function() {
-            var tablePlugin = window.tablePlugin({
+            var exampleData = [
+                {periodBegin: 630, periodEnd: 690, state: "CLOSED"},
+                {periodBegin: 690, periodEnd: 720, state: "OCCUPIED", stateData:{owned:true, supplierName: "someSupplier"}},
+                {periodBegin: 720, periodEnd: 750, state: "OCCUPIED", stateData:{owned:false, supplierName: "someSupplier2"}}
+            ];
+
+            var tablePlugin2 = window.tablePlugin2({
                 parentId: 'tableContainer',
                 cellSize: 30,
                 windowSize: 60 * 24,
@@ -37,36 +44,27 @@
                     return true;
                 }
             });
-            tablePlugin.generate();
-            <!--tablePlugin.setDisabled(true);-->
-            <!--var obj = tablePlugin.findById(6, 4);-->
-            <!--window.console.log(obj.tdElem);-->
-            <!--window.console.log(obj.labelElem);-->
-            <!--window.console.log(obj.divElem);-->
-            tablePlugin.setString("Panasonic", 6, 3);
-            tablePlugin.setOnSelectionChanged(function(e) {
+            tablePlugin2.generate();
+            tablePlugin2.setOnSelectionChanged(function(e) {
                 window.console.log(e.detail);
             });
-            tablePlugin.setNotFreeState(150, 210, "occupied", "Sony");
-            tablePlugin.setNotFreeState(240, 300, "occupied", "LG");
-            tablePlugin.setNotFreeState(420, 450, "occupied", "Apple");
-            tablePlugin.setNotFreeState(450, 600, "disabled");
-            //tablePlugin.sendDocPeriods();
-            tablePlugin.setOnAnySelected(function(e) {
+            tablePlugin2.setData(exampleData);
+
+            tablePlugin2.setOnAnySelected(function(e) {
                 console.log("ANY SELECTED" + e.detail);
             });
-            //tablePlugin.clear();
-            tablePlugin.setOnDisableChanged(function(e) {
+            //tablePlugin2.clear();
+            tablePlugin2.setOnDisableChanged(function(e) {
                 window.console.log("DISABLE" + e.detail);
             });
-            //tablePlugin.getSelectedPeriod()
+
 
         };
     </script>
 
 </head>
 <body>
-    <div id="tableContainer" class="tableSpace"></div>
+<div id="tableContainer" class="tableSpace"></div>
 </body>
 
 
