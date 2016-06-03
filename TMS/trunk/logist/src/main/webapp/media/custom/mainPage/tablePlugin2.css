@@ -1,36 +1,27 @@
-body {
-    font-family: Courier New, serif;
-    font-size: 15px;
-}
-
-.tableCell {
+.tablePlugin td {
     border: 1px solid orange;
     text-align: center;
 }
 
-.tableCell > * {
+.tablePlugin td > * {
     height: 25px;
     table-layout: fixed;
     padding-left: 15px;
     padding-right: 15px;
 }
 
-.mainTable {
+.tablePlugin table {
     background-color: #FDE4D0;
     border: 1px solid orange;
     border-collapse: collapse;
 }
 
-.highlight {
-    outline: 2px solid #ED1C24;
-}
-
-.timePeriodLabel {
+.tablePlugin td label {
     background-color: #FFFAFA;
     border-bottom: 1px solid orange;
 }
 
-#companyDiv {
+.tablePlugin td div {
     font-weight:bold;
     vertical-align: middle;
 }
@@ -39,10 +30,20 @@ body {
     background-color: red;
 }
 
-.disabled {
+.tp_owned:before {
+    content:"*";
+}
+
+.tp_closed {
     background-color: grey;
 }
-.tablePlugin-disable {
+
+.tp_disabled {
     background-color: rgba(0,0,0, 0.5);
 }
+
+.tp_highlight {
+    outline: 2px solid #ED1C24;
+}
+
 

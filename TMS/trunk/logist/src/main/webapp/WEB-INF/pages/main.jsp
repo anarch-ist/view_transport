@@ -63,7 +63,7 @@
             var tablePlugin = window.tablePlugin({
                 parentId: 'tableContainer',
                 windowSize: +<c:out value="${windowSize}"/>,
-                periodSize: +<c:out value="${periodSize}"/>,
+                cellSize: +<c:out value="${periodSize}"/>,
                 <c:if test="${isSupplierManager}">
                 selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
                     if (selectedSerialNumbers.length === 0) {
@@ -174,7 +174,7 @@
                 ordersCrud: "all",
                 editableFields: {
                     donutFields: ["driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
-                    ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
+                    ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus"]
                 },
                 orderStatuses: ${requestScope.orderStatuses},
                 warehouses: warehousesKeyValuePairs,

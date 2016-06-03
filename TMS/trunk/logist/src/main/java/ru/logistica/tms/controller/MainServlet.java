@@ -62,9 +62,9 @@ public class MainServlet extends HttpServlet {
 
         // список всех статусов для заявки
         JsonObjectBuilder orderStatusesBuilder = Json.createObjectBuilder();
+        orderStatusesBuilder.add(OrderStatuses.CREATED.toString(), "СОЗДАН");
         orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.toString(), "УДАЛЕН ПОСТАВЩИКОМ");
         orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.toString(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА");
-        orderStatusesBuilder.add(OrderStatuses.CREATED.toString(), "СОЗДАН");
         orderStatusesBuilder.add(OrderStatuses.DELIVERED.toString(), "ДОСТАВЛЕН");
         orderStatusesBuilder.add(OrderStatuses.ERROR.toString(), "ОШИБКА");
 
