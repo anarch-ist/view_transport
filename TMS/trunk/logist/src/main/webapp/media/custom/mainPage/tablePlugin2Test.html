@@ -9,9 +9,9 @@
     <script>
         window.onload = function() {
             var exampleData = [
-                {periodBegin: 630, periodEnd: 690, state: "CLOSED"},
-                {periodBegin: 690, periodEnd: 720, state: "OCCUPIED", stateData:{owned:true, supplierName: "someSupplier"}},
-                {periodBegin: 720, periodEnd: 750, state: "OCCUPIED", stateData:{owned:false, supplierName: "someSupplier2"}}
+                {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED", owned: true},
+                {docPeriodId: 11, periodBegin: 690, periodEnd: 720, state: "OCCUPIED", owned:true, stateData:{supplierName: "someSupplier"}},
+                {docPeriodId: 12, periodBegin: 720, periodEnd: 750, state: "OCCUPIED", owned: false, stateData:{supplierName: "someSupplier2"}}
             ];
 
             var tablePlugin2 = window.tablePlugin2({
@@ -46,16 +46,19 @@
             });
             tablePlugin2.generate();
             tablePlugin2.setOnSelectionChanged(function(e) {
-                window.console.log(e.detail);
+//                window.console.log("SELECTION CHANGED: " + e.detail.cellElement);
+//                window.console.log("SELECTION CHANGED: " + e.detail.isSelected);
+//                window.console.log("SELECTION CHANGED: " + e.detail.selectedElements);
+//                window.console.log("SELECTION CHANGED: " + e.detail.data.stateData);
             });
             tablePlugin2.setData(exampleData);
 
             tablePlugin2.setOnAnySelected(function(e) {
-                console.log("ANY SELECTED" + e.detail);
+                //console.log("ANY SELECTED: " + e.detail);
             });
             //tablePlugin2.clear();
             tablePlugin2.setOnDisableChanged(function(e) {
-                window.console.log("DISABLE" + e.detail);
+                //window.console.log("DISABLE: " + e.detail);
             });
 
 
