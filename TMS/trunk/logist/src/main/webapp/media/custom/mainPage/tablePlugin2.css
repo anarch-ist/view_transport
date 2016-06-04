@@ -8,21 +8,24 @@
     table-layout: fixed;
     padding-left: 15px;
     padding-right: 15px;
+
 }
 
 .tablePlugin table {
     background-color: #FDE4D0;
     border: 1px solid orange;
     border-collapse: collapse;
+    width: 100%;
 }
 
 .tablePlugin td label {
     background-color: #FFFAFA;
     border-bottom: 1px solid orange;
+
 }
 
 .tablePlugin td div {
-    font-weight:bold;
+    /*font-weight:bold;*/
     vertical-align: middle;
 }
 
@@ -30,8 +33,12 @@
     background-color: red;
 }
 
-.tp_owned:before {
-    content:"*";
+/*.tp_owned:before {*/
+    /*content:"*";*/
+/*}*/
+
+.tp_owned{
+    font-weight: bold;
 }
 
 .tp_closed {

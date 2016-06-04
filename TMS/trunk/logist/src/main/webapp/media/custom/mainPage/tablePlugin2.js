@@ -6,8 +6,17 @@
         cellSize: 30, // in minutes!!!
         windowSize: 60 * 24,
         selectionConstraint: null,
-        allowedStatesForSelection: {isOpenedAllowed: true, isClosedAllowed: true, isOccupiedAllowed: true}
+        allowedStatesForSelection: {isOpenedAllowed: true, isClosedAllowed: true, isOccupiedAllowed: true},
+        selectionModel: {
+            isSelectAllOccupied: true,
+            isSelectAllClosed: true
+        }
     };
+
+    const CLOSED = "CLOSED";
+    const OCCUPIED = "OCCUPIED";
+    const OPENED = "OPENED";
+
     var startupParameters = {};
 
 
@@ -33,7 +42,7 @@
 
     var tableElement;
     var disableElement;
-    var selectedElements = [];
+    var selectedElementsInstance = new SelectedElements();
     var generatedCells = [];
 
     main.generate = function(){
@@ -61,19 +70,7 @@
                 generatedCells.push(cellElement);
                 dataAndCellsRelation.set(cellElement, null);
                 cellElement.setAttribute("data-serialnumber", serialNumber);
-                cellElement.onclick = function(e) {
-                    var _this = this;
-                    // apply selection constraint
-                    if (startupParameters.selectionConstraint) {
-                        if (startupParameters.selectionConstraint(
-                                +_this.dataset.serialnumber,
-                                selectedElementsAsSerialNumbers(selectedElements),
-                                _this.classList.contains("tp_highlight"))) {
-                            return;
-                        }
-                    }
-                    toggleSelection(_this);
-                };
+                cellElement.onclick = onClickHandlersFactory(cellElement);
                 cellElement.appendChild(labelGenerator());
                 cellElement.appendChild(document.createElement("div"));
                 rowElement.appendChild(cellElement);
@@ -83,10 +80,10 @@
         // generate any selected event
         var anySelected = false;
         main.setOnSelectionChanged(function() {
-            if (selectedElements.length === 0) {
+            if (selectedElementsInstance.isEmpty()) {
                 generateAnySelectedEvent(false);
                 anySelected = false;
-            } else if (selectedElements.length !== 0 && !anySelected) {
+            } else if (!anySelected) {
                 generateAnySelectedEvent(true);
                 anySelected = true;
             }
@@ -104,10 +101,7 @@
      */
     main.setData = function(newData) {
         data = newData;
-
         clearVisual();
-
-
         data.forEach(function(dataElem) {
             dataElem.cells = [];
             var cellsForPeriod = getCellsForPeriod(dataElem.periodBegin, dataElem.periodEnd);
@@ -118,28 +112,18 @@
                 dataElem.cells.push(cellsForPeriod[i]);
                 dataAndCellsRelation.set(cellsForPeriod[i], dataElem);
 
-                if (dataElem.state === "OCCUPIED") {
+                if (dataElem.state === OCCUPIED) {
                     cellDiv.innerHTML = dataElem.stateData.supplierName;
                     cellDiv.classList.add("tp_occupied");
-                    if (dataElem.stateData.owned) {
+                    if (dataElem.owned) {
                         cellDiv.classList.add("tp_owned");
                     }
-                } else if (dataElem.state === "CLOSED") {
+                } else if (dataElem.state === CLOSED) {
                     cellDiv = cellsForPeriod[i].getElementsByTagName('div')[0];
                     cellDiv.classList.add("tp_closed");
                 }
             }
         });
-
-        //for(let amount of dataAndCellsRelation.values()) {
-        //    window.console.log(amount);
-        //}
-
-        // цикл по записям
-        for(let entry of dataAndCellsRelation) { // то же что и recipeMap.entries()
-            window.console.log(entry);
-        }
-
     };
 
     /**
@@ -150,7 +134,7 @@
     };
 
     main.isAnySelected = function() {
-        return (selectedElements.length !== 0);
+        return (!selectedElementsInstance.isEmpty());
     };
 
     main.setOnSelectionChanged = function(handler) {
@@ -167,20 +151,20 @@
 
     // FIXME make it work with different states
     main.getSelectedPeriod = function() {
-        if (selectedElements.length === 0) {
-            return {};
-        }
-        var periodBegin = (+selectedElements[0].dataset.serialnumber -1) * startupParameters.cellSize;
-        var periodEnd = (+selectedElements[selectedElements.length - 1].dataset.serialnumber) * startupParameters.cellSize;
-        return {periodBegin:periodBegin, periodEnd: periodEnd};
+        //if (selectedElementsInstance.isEmpty()) {
+        //    return {};
+        //}
+        //var periodBegin = (+selectedElementsInstance[0].dataset.serialnumber -1) * startupParameters.cellSize;
+        //var periodEnd = (+selectedElementsInstance[selectedElementsInstance.length - 1].dataset.serialnumber) * startupParameters.cellSize;
+        //return {periodBegin:periodBegin, periodEnd: periodEnd};
     };
 
 
     main.clear = function() {
-        if (selectedElements.length === 0) {
+        if (selectedElementsInstance.isEmpty()) {
             generateAnySelectedEvent(false);
         } else {
-            var copy = selectedElements.slice();
+            var copy = selectedElementsInstance.slice();
             copy.forEach(function(cellElement) {
                 removeSelectionStyle(cellElement);
                 modifySelectedElementsArray(cellElement, false);
@@ -191,12 +175,6 @@
         clearVisual();
     };
 
-    // TODO implement this method
-    /**
-     * @return array of periods with identical state
-     */
-    main.getSelectedPeriods = function() {
-    };
 
     main.setDisabled = function(disabled) {
         if (disabled) {
@@ -218,8 +196,140 @@
         tableElement.dispatchEvent(newEvent);
     };
 
-
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
+
+    var previousSelectedState;
+    function onClickHandlersFactory(cellElement) {
+
+        return function() {
+            var wasSelected = selectedElementsInstance.contains(cellElement);
+
+            // apply selection constraint
+            if (startupParameters.selectionConstraint) {
+                if (startupParameters.selectionConstraint(
+                        +cellElement.dataset.serialnumber,
+                        selectedElementsInstance.selectedElementsAsSerialNumbers(),
+                        wasSelected)) {
+                    return;
+                }
+            }
+
+            var relatedData = dataAndCellsRelation.get(cellElement);
+            var currentSelectedState;
+            if (relatedData === null) {
+                currentSelectedState = OPENED;
+            } else if (relatedData.state === CLOSED) {
+                currentSelectedState = CLOSED;
+            } else if (relatedData.state === OCCUPIED) {
+                currentSelectedState = OCCUPIED;
+            }
+
+            if (!startupParameters.allowedStatesForSelection.isOpenedAllowed) {
+                if (currentSelectedState === OPENED) {
+                    return;
+                }
+            }
+
+            if (!startupParameters.allowedStatesForSelection.isClosedAllowed) {
+                if (currentSelectedState === CLOSED) {
+                    return;
+                }
+            }
+
+            if (!startupParameters.allowedStatesForSelection.isOccupiedAllowed) {
+                if (currentSelectedState === OCCUPIED) {
+                    return;
+                }
+            }
+
+            // если не владлец, то всегда запрещать возможность выбора
+            if (currentSelectedState !== OPENED && !relatedData.owned) {
+                return;
+            }
+
+            if (startupParameters.selectionModel.isSelectAllClosed) {
+                // если выбран один, то автоматом выбирать все с данным состоянием
+                if (currentSelectedState === CLOSED) {
+                    if (wasSelected) {
+                        selectedElementsInstance.clearSelection();
+                    } else {
+                        relatedData.cells.forEach(function (cell) {
+                            selectedElementsInstance.add(cell);
+                        }); // cells for selection
+                    }
+                    return;
+                }
+            }
+            // toggle selection
+            if (wasSelected) {
+                selectedElementsInstance.remove(cellElement);
+            } else {
+                if (previousSelectedState !== currentSelectedState) {
+                    selectedElementsInstance.clearSelection();
+                }
+                previousSelectedState = currentSelectedState;
+                selectedElementsInstance.add(cellElement);
+            }
+
+            generateSelectedEvent(cellElement, !wasSelected);
+        };
+    }
+
+    function SelectedElements() {
+        var selectedElements = [];
+
+        this.add = function (cellElement) {
+            selectedElements.push(cellElement);
+            addSelectionStyle(cellElement);
+            sort();
+        };
+
+        this.remove = function (cellElement) {
+            var index = selectedElements.indexOf(cellElement);
+            selectedElements.splice(index, 1);
+            removeSelectionStyle(cellElement);
+            sort();
+        };
+
+        this.contains = function(cellElement) {
+          return selectedElements.indexOf(cellElement) >= 0;
+        };
+
+        this.clear = function () {
+            selectedElements.splice();
+        };
+
+        this.isEmpty = function () {
+            return selectedElements.length === 0;
+        };
+
+        this.selectedElementsAsSerialNumbers = function () {
+            var result = [];
+            for (var i = 0; i < selectedElements.length; i++) {
+                result.push(+selectedElements[i].dataset.serialnumber);
+            }
+            return result;
+        };
+
+        this.clearSelection = function () {
+            selectedElements.forEach(function (element) {
+                removeSelectionStyle(element);
+            });
+            selectedElements.length = 0;
+        };
+
+        function sort() {
+            selectedElements.sort(function compareNum(a, b) {
+                return a.dataset.serialnumber - b.dataset.serialnumber;
+            });
+        }
+        function removeSelectionStyle(cellElement) {
+            cellElement.classList.remove("tp_highlight");
+        }
+        function addSelectionStyle(cellElement) {
+            cellElement.classList.add("tp_highlight");
+        }
+    }
 
     function findTableSizes(windowsSize, periodSize) {
         var periodsCount = windowsSize / periodSize;
@@ -303,22 +413,13 @@
         return result;
     }
 
-    function modifySelectedElementsArray(cellElement, isSelected) {
-        if (isSelected) {
-            selectedElements.push(cellElement);
-        } else {
-            var index = selectedElements.indexOf(cellElement);
-            selectedElements.splice(index, 1);
-        }
-        selectedElements.sort(function compareNum(a, b) {
-            return a.dataset.serialnumber - b.dataset.serialnumber;
-        });
-    }
-
     function generateSelectedEvent(cellElement, isSelected) {
         var newEvent = new CustomEvent("selected", {
             detail: {
-                isSelected: isSelected
+                isSelected: isSelected,
+                cellElement: cellElement,
+                selectedElements: selectedElementsInstance,
+                data: dataAndCellsRelation.get(cellElement)
             },
             bubbles: true,
             cancelable: false
@@ -335,32 +436,6 @@
         tableElement.dispatchEvent(newEvent);
     }
 
-    function removeSelectionStyle(cellElement) {
-        cellElement.classList.remove("tp_highlight");
-    }
-    function addSelectionStyle(cellElement) {
-        cellElement.classList.add("tp_highlight");
-    }
-
-    function toggleSelection(cellElement) {
-        var wasSelected = cellElement.classList.contains("tp_highlight");
-        if (wasSelected) {
-            removeSelectionStyle(cellElement);
-        } else {
-            addSelectionStyle(cellElement);
-        }
-        var isSelected = !wasSelected;
-        modifySelectedElementsArray(cellElement, isSelected);
-        generateSelectedEvent(cellElement, isSelected);
-    }
-
-    function selectedElementsAsSerialNumbers() {
-        var result = [];
-        for (var i = 0; i < selectedElements.length; i++) {
-            result.push(+selectedElements[i].dataset.serialnumber);
-        }
-        return result;
-    }
 
 
     window.tablePlugin2 = main;
