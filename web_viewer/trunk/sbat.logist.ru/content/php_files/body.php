@@ -43,11 +43,12 @@
 <div class="container">
 
     <div id="menu"
-         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: -5px;">
+         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: -5px;position:fixed;top:5px;z-index:99999;right:10px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php
                 $data = $privUser->getUserInfo()->toArray();
+                //exit(print_r($data));
 
                 $userRole = $privUser->getUserEntity()->getUserRole($data['userID']);
                 echo $data['userName'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
@@ -56,7 +57,7 @@
             </div>
             <div id="userRoleContainer" style="display: none">
                 <?php
-                echo $userRole;
+                echo '<span id="data-role" data-role="'.$data['userRoleID'].'">'.$userRole.'</span>';
                 ?>
             </div>
             <button id="logout">выйти</button>
@@ -66,66 +67,151 @@
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
         <thead>
         <tr>
-            <th>ID заявки</th>
-            <th>Номер внутренней заявки</th>
-            <th>Дата заявки</th>
-            <th>Номер накладной</th>
-            <th>Дата накладной</th>
-            <th>Номер документа</th>
-            <th>Дата документа</th>
-            <th>Фирма</th>
-            <th>Зона склада</th>
-            <th>Комментарий</th>
-            <th>Количество коробок</th>
-            <th>Статус заявки</th>
-            <th>Клиент, Номер</th>
-            <th>Клиент, ИНН</th>
-            <th>Клиент, Имя</th>
-            <th>Торговый представитель</th>
-            <th>Пункт доставки</th>
-            <th>Склад отправки</th>
-            <th>Текущее подразделение</th>
-            <th>Следующий пункт маршрута</th>
-            <th>Маршрут</th>
-            <th>Водитель</th>
-            <th>Номер ТС</th>
-            <th>Количество паллет</th>
-            <th>Маршрутный лист</th>
-            <th>Время прибытия в следующий пункт</th>
+        <?php if($data['userRoleID'] == 'ADMIN'){ echo '
+            <th class="col1">ID заявки</th>
+            <th class="col2">Номер внутренней заявки</th>
+            <th class="col3">Дата заявки</th>
+            <th class="col4">Номер накладной</th>
+            <th class="col5">Дата накладной</th>
+            <th class="col6">Номер документа</th>
+            <th class="col7">Дата документа</th>
+            <th class="col8">Фирма</th>
+            <th class="col9">Зона склада</th>
+            <th class="col10">Комментарий</th>
+            <th class="col11">Количество коробок</th>
+            <th class="col12">Статус заявки</th>
+            <th class="col13">Клиент, Номер</th>
+            <th class="col14">Клиент, ИНН</th>
+            <th class="col15">Клиент, Имя</th>
+            <th class="col16">Торговый представитель</th>
+            <th class="col17">Пункт доставки</th>
+            <th class="col18">Склад отправки</th>
+            <th class="col19">Текущее подразделение</th>
+            <th class="col20">Следующий пункт маршрута</th>
+            <th class="col21">Маршрут</th>
+            <th class="col22">Водитель</th>
+            <th class="col23">Номер ТС</th>
+            <th class="col24">Количество паллет</th>
+            <th class="col25">Маршрутный лист</th>
+            <th class="col26">Время прибытия в следующий пункт</th>';
+        }elseif($data['userRoleID'] == 'W_DISPATCHER' || $data['userRoleID'] == 'DISPATCHER' || $data['userRoleID'] == 'MARKET_AGENT'){
+            echo '
+            
+            <th class="col4">Номер накладной</th>
+            <th class="col5">Дата накладной</th>
+            <th class="col9">Зона склада</th>
+            <th class="col11">Количество коробок</th>
+            <th class="col12">Статус заявки</th>
+            <th class="col17">Пункт доставки</th>
+            <th class="col18">Склад отправки</th>
+            <th class="col19">Текущее подразделение</th>
+            <th class="col20">Следующий пункт маршрута</th>
+            <th class="col21">Маршрут</th>
+            <th class="col22">Водитель</th>
+            <th class="col24">Количество паллет</th>
+            <th class="col25">Маршрутный лист</th>
+            <th class="col26">Время прибытия в следующий пункт</th>
+            ';
+        }elseif($data['userRoleID'] == 'CLIENT_MANAGER'){
+            echo '
+            
+            <th class="col3">Дата заявки</th>
+            <th class="col4">Номер накладной</th>
+            
+            <th class="col11">Количество коробок</th>
+            <th class="col12">Статус заявки</th>
+            
+            <th class="col17">Пункт доставки</th>
+            
+            <th class="col19">Текущее подразделение</th>
+            <th class="col20">Следующий пункт маршрута</th>
+            
+            <th class="col26">Время прибытия в следующий пункт</th>';
+        }
+        ?>
+            
         </tr>
         </thead>
 
         <!--search containers-->
         <tfoot>
         <tr>
-            <th>ID заявки</th>
-            <th>Номер внутренней заявки</th>
-            <th>Дата заявки</th>
-            <th>Номер накладной</th>
-            <th>Дата накладной</th>
-            <th>Номер документа</th>
-            <th>Дата документа</th>
-            <th>Фирма</th>
-            <th>Зона склада</th>
-            <th>Комментарий</th>
-            <th>Количество коробок</th>
-            <th>Статус заявки</th>
-            <th>Клиент, Номер</th>
-            <th>Клиент, ИНН</th>
-            <th>Клиент, Имя</th>
-            <th>Торговый представитель</th>
-            <th>Пункт доставки</th>
-            <th>Склад отправки</th>
-            <th>Текущее подразделение</th>
-            <th>Следующий пункт маршрута</th>
-            <th>Маршрут</th>
-            <th>Водитель</th>
-            <th>Номер ТС</th>
-            <th>Количество паллет</th>
-            <th>Маршрутный лист</th>
-            <th>Плановое время прибытия в следующий пункт</th>
+            <?php if($data['userRoleID'] == 'ADMIN'){ echo '
+            <th class="col1">ID заявки</th>
+            <th class="col2">Номер внутренней заявки</th>
+            <th class="col3">Дата заявки</th>
+            <th class="col4">Номер накладной</th>
+            <th class="col5">Дата накладной</th>
+            <th class="col6">Номер документа</th>
+            <th class="col7">Дата документа</th>
+            <th class="col8">Фирма</th>
+            <th class="col9">Зона склада</th>
+            <th class="col10">Комментарий</th>
+            <th class="col11">Количество коробок</th>
+            <th class="col12">Статус заявки</th>
+            <th class="col13">Клиент, Номер</th>
+            <th class="col14">Клиент, ИНН</th>
+            <th class="col15">Клиент, Имя</th>
+            <th class="col16">Торговый представитель</th>
+            <th class="col17">Пункт доставки</th>
+            <th class="col18">Склад отправки</th>
+            <th class="col19">Текущее подразделение</th>
+            <th class="col20">Следующий пункт маршрута</th>
+            <th class="col21">Маршрут</th>
+            <th class="col22">Водитель</th>
+            <th class="col23">Номер ТС</th>
+            <th class="col24">Количество паллет</th>
+            <th class="col25">Маршрутный лист</th>
+            <th class="col26">Время прибытия в следующий пункт</th>';
+        }elseif($data['userRoleID'] == 'W_DISPATCHER' || $data['userRoleID'] == 'DISPATCHER' || $data['userRoleID'] == 'MARKET_AGENT'){
+            echo '
+            
+            <th class="col4">Номер накладной</th>
+            <th class="col5">Дата накладной</th>
+            <th class="col9">Зона склада</th>
+            <th class="col11">Количество коробок</th>
+            <th class="col12">Статус заявки</th>
+            <th class="col17">Пункт доставки</th>
+            <th class="col18">Склад отправки</th>
+            <th class="col19">Текущее подразделение</th>
+            <th class="col20">Следующий пункт маршрута</th>
+            <th class="col21">Маршрут</th>
+            <th class="col22">Водитель</th>
+            <th class="col24">Количество паллет</th>
+            <th class="col25">Маршрутный лист</th>
+            <th class="col26">Время прибытия в следующий пункт</th>
+            ';
+        }elseif($data['userRoleID'] == 'CLIENT_MANAGER'){
+            echo '
+            
+            <th class="col3">Дата заявки</th>
+            <th class="col4">Номер накладной</th>
+            
+            <th class="col11">Количество коробок</th>
+            <th class="col12">Статус заявки</th>
+            
+            <th class="col17">Пункт доставки</th>
+            
+            <th class="col19">Текущее подразделение</th>
+            <th class="col20">Следующий пункт маршрута</th>
+            
+            <th class="col26">Время прибытия в следующий пункт</th>';
+        }
+        ?>
         </tr>
         </tfoot>
     </table>
 </div>
 </body>
+
+<style>
+    #user-grid_wrapper .dt-buttons{
+        position:fixed;
+        top:15px;
+        z-index:9999999;
+    }
+
+    #user-grid_wrapper{
+        margin-top:60px;
+    }
+</style>

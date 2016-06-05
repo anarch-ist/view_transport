@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    $('button').addClass('ui-state-active ui-state focus');
+
     // --------LOGOUT-----------------
     $("#logout").button().on("click", function () {
         // delete auth cookies
@@ -234,10 +236,10 @@ $(document).ready(function () {
     //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
     dataTable.on( 'select', function ( e, dt, type, indexes ) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
-        if(routeListID == null){
+        /*if(routeListID == null){
             
             buttons.disable();
-        }
+        }*/
     });
 
 

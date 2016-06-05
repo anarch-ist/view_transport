@@ -867,7 +867,7 @@ body .ui-tooltip {
 .ui-widget-content .ui-state-default,
 .ui-widget-header .ui-state-default {
 	border: 1px solid #cb5d5d;
-	background: #3ebe28 url("images/ui-bg_glass_100_3ebe28_1x400.png") 50% 50% repeat-x;
+	background: #3ebe28 url("images/ui-icons_ef8c08_256x240.png") 50% 50% repeat-x;
 	font-weight: bold;
 	color: #07371a;
 }
@@ -1112,7 +1112,7 @@ body .ui-tooltip {
 .ui-icon-plusthick { background-position: -32px -128px; }
 .ui-icon-minus { background-position: -48px -128px; }
 .ui-icon-minusthick { background-position: -64px -128px; }
-.ui-icon-close { background-position: -80px -128px; }
+.ui-icon-close { background-position: -100px -128px; }
 .ui-icon-closethick { background-position: -96px -128px; }
 .ui-icon-key { background-position: -112px -128px; }
 .ui-icon-lightbulb { background-position: -128px -128px; }
