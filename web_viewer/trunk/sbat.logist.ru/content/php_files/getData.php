@@ -25,6 +25,7 @@ function getStatusHistory(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
     }
     $data = $privUser->getRequestEntity()->getRequestHistoryByRequestIdExternal($requestIDExternal);
+    //exit(print_r($data));
     return json_encode($data);
 }
 function getRequestsForRouteList(PrivilegedUser $privUser)
@@ -57,7 +58,12 @@ function getRequestsForUser(PrivilegedUser $privUser)
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
         "data" => $dataArray['requests']   // total data array
     );
-    
+    foreach($dataArray['requests'] as $key => $value){
+        $json_data['data'][$key]['requestDate'] = date('d-m-Y', strtotime($value['requestDate']));
+        $json_data['data'][$key]['invoiceDate'] = date('d-m-Y', strtotime($value['invoiceDate']));
+        $json_data['data'][$key]['documentDate'] = date('d-m-Y', strtotime($value['documentDate']));
+        $json_data['data'][$key]['arrivalTimeToNextRoutePoint'] = date('d-m-Y H:i:s', strtotime($value['arrivalTimeToNextRoutePoint']));
+    }
     return json_encode($json_data);
 }
 

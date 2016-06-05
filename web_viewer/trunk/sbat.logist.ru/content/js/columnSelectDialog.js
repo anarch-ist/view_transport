@@ -1,5 +1,11 @@
 $(document).ready(function () {
 
+        var role = $('#data-role').attr('data-role');
+        
+        if(role == 'ADMIN'){
+            $('#user-grid').remove('.col1');
+        }
+
     var html =
         '<div id="columnSelectDialogContainer" title="Выбор столбцов">' +
         '<div id="inputsContainer" title="Выбор столбцов"></div>' +
@@ -11,21 +17,28 @@ $(document).ready(function () {
 
     $.showColumnSelectDialog = function (dataTable) {
 
+        
+
         $inputsContainer.html("");
 
 
         dataTable.columns().every(function() {
             var column = this;
+            //console.log(column);
             var columnIndex = column.index();
             var columnVisibility = column.visible();
             var columnRusName = $(column.header()).attr("aria-label").split(":")[0];
+            if(columnRusName != '' && columnRusName != undefined){
 
-            var input = $("<input>").attr("type", "checkbox").attr("id", columnIndex).prop("checked", columnVisibility);
-            input.change(function() {
-                column.visible(this.checked);
-            });
-            var label = $("<label>").attr("for", columnIndex).html(columnRusName);
-            $inputsContainer.append(input, label, "<br>");
+           
+
+                var input = $("<input>").attr("type", "checkbox").attr("id", columnIndex).prop("checked", columnVisibility);
+                input.change(function() {
+                    column.visible(this.checked);
+                });
+                var label = $("<label>").attr("for", columnIndex).html(columnRusName);
+                $inputsContainer.append(input, label, "<br>");
+            }
 
         });
 

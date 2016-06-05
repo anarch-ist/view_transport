@@ -38,7 +38,7 @@ $(document).ready(function () {
                 {"name": "pointWhereStatusWasChanged", "data": "pointWhereStatusWasChanged", "targets": 1},
                 {"name": "userNameThatChangedStatus", "data": "userNameThatChangedStatus", "targets": 2},
                 {"name": "requestStatusRusName", "data": "requestStatusRusName", "targets": 3},
-                {"name": "routeListIDExternal", "data": "routeListIDExternal", "targets": 4},
+                {"name": "routeListNumber", "data": "routeListNumber", "targets": 4},
                 {"name": "boxQty", "data": "boxQty", "targets": 5}
             ]
         }
