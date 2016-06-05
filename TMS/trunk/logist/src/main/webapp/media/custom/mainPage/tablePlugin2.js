@@ -8,8 +8,8 @@
         selectionConstraint: null,
         allowedStatesForSelection: {isOpenedAllowed: true, isClosedAllowed: true, isOccupiedAllowed: true},
         selectionModel: {
-            isSelectAllOccupied: true,
-            isSelectAllClosed: true
+            isSelectAllOccupied: false,
+            isSelectAllClosed: false
         }
     };
 
@@ -113,7 +113,7 @@
                 dataAndCellsRelation.set(cellsForPeriod[i], dataElem);
 
                 if (dataElem.state === OCCUPIED) {
-                    cellDiv.innerHTML = dataElem.stateData.supplierName;
+                    cellDiv.innerHTML = dataElem.supplierName;
                     cellDiv.classList.add("tp_occupied");
                     if (dataElem.owned) {
                         cellDiv.classList.add("tp_owned");
@@ -149,7 +149,12 @@
         tableElement.addEventListener("disableChanged", handler);
     };
 
+
+    main.getSelectionData = function() {
+        return selectedElementsInstance.getSelectionData();
+    };
     // FIXME make it work with different states
+
     main.getSelectedPeriod = function() {
         //if (selectedElementsInstance.isEmpty()) {
         //    return {};
@@ -242,38 +247,50 @@
                 }
             }
 
-            // если не владлец, то всегда запрещать возможность выбора
+            // if not owner always restrict selection
             if (currentSelectedState !== OPENED && !relatedData.owned) {
                 return;
             }
 
-            if (startupParameters.selectionModel.isSelectAllClosed) {
-                // если выбран один, то автоматом выбирать все с данным состоянием
-                if (currentSelectedState === CLOSED) {
-                    if (wasSelected) {
-                        selectedElementsInstance.clearSelection();
-                    } else {
-                        relatedData.cells.forEach(function (cell) {
-                            selectedElementsInstance.add(cell);
-                        }); // cells for selection
-                    }
-                    return;
-                }
-            }
             // toggle selection
             if (wasSelected) {
-                selectedElementsInstance.remove(cellElement);
+                clearSelection(cellElement, currentSelectedState);
             } else {
                 if (previousSelectedState !== currentSelectedState) {
                     selectedElementsInstance.clearSelection();
                 }
                 previousSelectedState = currentSelectedState;
-                selectedElementsInstance.add(cellElement);
+                addSelection(cellElement, currentSelectedState, relatedData);
             }
 
             generateSelectedEvent(cellElement, !wasSelected);
         };
+
+        function clearSelection(cellElement, currentSelectedState) {
+            if (
+                (startupParameters.selectionModel.isSelectAllClosed && currentSelectedState === CLOSED) ||
+                (startupParameters.selectionModel.isSelectAllOccupied && currentSelectedState === OCCUPIED)
+            ) {
+                selectedElementsInstance.clearSelection();
+            } else {
+                selectedElementsInstance.remove(cellElement);
+            }
+        }
+
+        function addSelection(cellElement, currentSelectedState, relatedData) {
+            if (
+                (startupParameters.selectionModel.isSelectAllClosed && currentSelectedState === CLOSED) ||
+                (startupParameters.selectionModel.isSelectAllOccupied && currentSelectedState === OCCUPIED)
+            ) {
+                relatedData.cells.forEach(function (cell) {
+                    selectedElementsInstance.add(cell);
+                });
+            } else {
+                selectedElementsInstance.add(cellElement);
+            }
+        }
     }
+
 
     function SelectedElements() {
         var selectedElements = [];
@@ -318,6 +335,28 @@
             selectedElements.length = 0;
         };
 
+        // TODO
+        this.getSelectionData = function() {
+            var result = [];
+            var allObjects = [];
+            for (var i = 0; i < selectedElements.length; i++) {
+                var dataObject = dataAndCellsRelation.get(selectedElements[i]);
+                if (allObjects.indexOf(dataObject) === -1) {
+                    allObjects.push(dataObject);
+                }
+            }
+            for (var j = 0; j < allObjects.length; j++) {
+                if (allObjects[j]) {
+                    var data = JSON.parse(JSON.stringify(allObjects[j]));
+                    if (allObjects[j].hasOwnProperty("cells")) {
+                        data.selectedCells = intersect(allObjects[j].cells, selectedElements);
+                        result.push(data);
+                    }
+                }
+            }
+            return result;
+        };
+
         function sort() {
             selectedElements.sort(function compareNum(a, b) {
                 return a.dataset.serialnumber - b.dataset.serialnumber;
@@ -329,6 +368,16 @@
         function addSelectionStyle(cellElement) {
             cellElement.classList.add("tp_highlight");
         }
+        function intersect(a, b) {
+            var t;
+            if (b.length > a.length) {
+                t = b, b = a, a = t;
+            } // indexOf to loop over shorter
+            return a.filter(function (e) {
+                if (b.indexOf(e) !== -1) return true;
+            });
+        }
+
     }
 
     function findTableSizes(windowsSize, periodSize) {
