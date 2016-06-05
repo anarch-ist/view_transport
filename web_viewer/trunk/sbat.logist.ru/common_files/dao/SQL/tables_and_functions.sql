@@ -1382,18 +1382,19 @@ FOR EACH ROW
   END;
 
 -- синхронизация при изменении имени пользователя для driverName и marketAgentUserName
-CREATE TRIGGER after_users_update AFTER UPDATE ON users
-FOR EACH ROW
-  IF (NEW.userName <> OLD.userName)
-  THEN
-    UPDATE mat_view_big_select
-    SET marketAgentUserName = NEW.userName
-    WHERE marketAgentUserID = NEW.userID;
-
-    UPDATE mat_view_big_select
-    SET driverUserName = NEW.userName
-    WHERE driverUserName = NEW.userID;
-  END IF;
+-- TODO работает не правильно временно отключен
+# CREATE TRIGGER after_users_update AFTER UPDATE ON users
+# FOR EACH ROW
+#   IF (NEW.userName <> OLD.userName)
+#   THEN
+#     UPDATE mat_view_big_select
+#     SET marketAgentUserName = NEW.userName
+#     WHERE marketAgentUserID = NEW.userID;
+#
+#     UPDATE mat_view_big_select
+#     SET driverUserName = NEW.userName
+#     WHERE driverUserName = NEW.userID;
+#   END IF;
 
 CREATE TRIGGER after_route_list_insert AFTER INSERT ON route_lists
 FOR EACH ROW
@@ -1528,7 +1529,8 @@ CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(255))
       request_statuses.requestStatusRusName AS requestStatusRusName,
       points.pointName                      AS pointWhereStatusWasChanged,
       users.userName                        AS userNameThatChangedStatus,
-      route_lists.routeListIDExternal       AS routeListIDExternal
+      route_lists.routeListIDExternal       AS routeListIDExternal,
+      route_lists.routeListNumber           AS routeListNumber
 
     FROM requests_history
       INNER JOIN (request_statuses)
