@@ -1548,6 +1548,8 @@ CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(255))
         requests_history.routeListID = route_lists.routeListID
         )
     WHERE requests_history.requestIDExternal = _requestIDExternal
+          AND requests_history.lastStatusUpdated IS NOT NULL
+          AND requests_history.lastStatusUpdated != '0000-00-00 00:00:00'
     ORDER BY lastStatusUpdated;
   END;
 
