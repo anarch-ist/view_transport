@@ -186,7 +186,9 @@
         this.setPeriod = function(periodString){
             donutFields.periodInput.val(periodString);
         };
-
+        this.setSupplierName = function(supplierName){
+            donutFields.companyNameDiv.text(supplierName);
+        };
         this.setData = function(data) {
             donutFields.companyNameDiv.text(data.supplierName);
             this.setPeriod(data.period);
