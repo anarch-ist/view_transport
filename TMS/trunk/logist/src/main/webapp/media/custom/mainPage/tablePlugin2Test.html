@@ -9,41 +9,50 @@
     <script>
         window.onload = function() {
             var exampleData = [
-                {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED", owned: true},
-                {docPeriodId: 11, periodBegin: 690, periodEnd: 720, state: "OCCUPIED", owned:false, supplierName: "someSupplier"},
-                {docPeriodId: 12, periodBegin: 720, periodEnd: 780, state: "OCCUPIED", owned: true, supplierName: "someSupplier2"},
-                {docPeriodId: 13, periodBegin: 840, periodEnd: 870, state: "OCCUPIED", owned: false, supplierName: "someSupplier2"}
+                {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED",   owned: true},
+                {docPeriodId: 11, periodBegin: 690, periodEnd: 720, state: "OCCUPIED", owned: false, supplierName: "someSupplier"},
+                {docPeriodId: 12, periodBegin: 720, periodEnd: 780, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"},
+                {docPeriodId: 13, periodBegin: 840, periodEnd: 870, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"}
             ];
 
             var tablePlugin2 = window.tablePlugin2({
                 parentId: 'tableContainer',
                 cellSize: 30,
                 windowSize: 60 * 24,
-//                selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
-//                    if (selectedSerialNumbers.length === 0) {
-//                        return false;
-//                    }
-//                    else if(selectedSerialNumbers.length === 1) {
-//                        if (isSelected) {
-//                            return false;
-//                        } else {
-//                            var selectedSerialNumber = selectedSerialNumbers[0];
-//                            if((serialNumber === (selectedSerialNumber - 1)) || (serialNumber === (selectedSerialNumber + 1))){
-//                                return false;
-//                            }
-//                        }
-//                    }else {
-//                        var min = selectedSerialNumbers[0];
-//                        var max = selectedSerialNumbers[selectedSerialNumbers.length - 1];
-//                        if (isSelected && (serialNumber === min || serialNumber === max)) {
-//                            return false;
-//                        }
-//                        if((serialNumber === (min - 1)) || (serialNumber === (max + 1))){
-//                            return false;
-//                        }
-//                    }
-//                    return true;
-//                }
+                selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
+                    if (selectedSerialNumbers.length === 0) {
+                        return false;
+                    }
+                    else if(selectedSerialNumbers.length === 1) {
+                        if (isSelected) {
+                            return false;
+                        } else {
+                            var selectedSerialNumber = selectedSerialNumbers[0];
+                            if((serialNumber === (selectedSerialNumber - 1)) || (serialNumber === (selectedSerialNumber + 1))){
+                                return false;
+                            }
+                        }
+                    }else {
+                        var min = selectedSerialNumbers[0];
+                        var max = selectedSerialNumbers[selectedSerialNumbers.length - 1];
+                        if (isSelected && (serialNumber === min || serialNumber === max)) {
+                            return false;
+                        }
+                        if((serialNumber === (min - 1)) || (serialNumber === (max + 1))){
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                allowedStatesForSelection: {
+                    isOpenedAllowed: true,
+                    isClosedAllowed: true,
+                    isOccupiedAllowed: true
+                },
+                selectionModel: {
+                    isSelectAllOccupied: false,
+                    isSelectAllClosed: false
+                }
             });
             tablePlugin2.generate();
             tablePlugin2.setOnSelectionChanged(function(e) {

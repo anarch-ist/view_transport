@@ -54,7 +54,6 @@
                 );
             }
 
-
             containerElem.appendChild(buttonElem);
         }
     };
@@ -63,7 +62,7 @@
         return document.getElementById(pluginId);
     };
 
-    main.setDisabled =function(disabled) {
+    main.setDisabled = function(disabled) {
         var elementsByTagName = document.getElementById(startupParameters.parentId).getElementsByTagName("input");
         [].forEach.call(elementsByTagName, function(element) {
             element.disabled = disabled;

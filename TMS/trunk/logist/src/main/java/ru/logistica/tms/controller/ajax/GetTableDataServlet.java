@@ -4,6 +4,8 @@ import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
+import ru.logistica.tms.dao.supplierDao.Supplier;
+import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.ValidateDataException;
@@ -24,7 +26,14 @@ import java.util.TimeZone;
 
 @WebServlet("/getTableData")
 public class GetTableDataServlet extends AjaxHttpServlet {
-
+    /*
+    var exampleData = [
+                {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED",   owned: true},
+                {docPeriodId: 11, periodBegin: 690, periodEnd: 720, state: "OCCUPIED", owned: false, supplierName: "someSupplier"},
+                {docPeriodId: 12, periodBegin: 720, periodEnd: 780, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"},
+                {docPeriodId: 13, periodBegin: 840, periodEnd: 870, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"}
+            ];
+            */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -43,28 +52,64 @@ public class GetTableDataServlet extends AjaxHttpServlet {
         long timeStampBegin = docDateSelectorData.utcDate.getTime() - offset * 60 * 60 * 1000;
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
 
+        Object user = req.getSession(false).getAttribute("user");
         List<DocPeriod> allPeriods = DaoFacade.getAllPeriodsForDoc(docDateSelectorData.docId, new Date(timeStampBegin), new Date(timeStampEnd));
-
 
         // create and send json object to client
         JsonObjectBuilder sendObjectBuilder = Json.createObjectBuilder();
         JsonArrayBuilder docPeriodArrayBuilder = Json.createArrayBuilder();
         for (DocPeriod period : allPeriods) {
+            boolean isDonutDocPeriod = (period instanceof DonutDocPeriod);
             JsonObjectBuilder docPeriodBuilder = Json.createObjectBuilder();
+            docPeriodBuilder.add("docPeriodId", period.getDocPeriodId());
             docPeriodBuilder.add("periodBegin", (period.getPeriod().getPeriodBegin().getTime() - timeStampBegin)/(1000*60));
             docPeriodBuilder.add("periodEnd", (period.getPeriod().getPeriodEnd().getTime() - timeStampBegin)/(1000*60));
+            setOwned(user, period, isDonutDocPeriod, docPeriodBuilder);
 
-            if (period instanceof DonutDocPeriod) {
+            if (isDonutDocPeriod) {
                 DonutDocPeriod donutDocPeriod = (DonutDocPeriod) period;
                 docPeriodBuilder.add("state", "OCCUPIED");
                 docPeriodBuilder.add("supplierName", donutDocPeriod.getSupplier().getInn());
-                docPeriodBuilder.add("supplierId", donutDocPeriod.getSupplier().getSupplierId());
             } else {
-                docPeriodBuilder.add("state", "DISABLED");
+                docPeriodBuilder.add("state", "CLOSED");
             }
             docPeriodArrayBuilder.add(docPeriodBuilder);
         }
         JsonObject docPeriods = sendObjectBuilder.add("docPeriods", docPeriodArrayBuilder).build();
         sendJson(resp, docPeriods);
+    }
+
+    private void setOwned(Object user, DocPeriod period, boolean isDonutDocPeriod, JsonObjectBuilder docPeriodBuilder) throws ServletException {
+        if (user instanceof WarehouseUser) {
+            WarehouseUser warehouseUser = (WarehouseUser) user;
+            if (warehouseUser.getUserRole().getUserRoleId() == UserRoles.WH_BOSS) {
+                if (!period.getDoc().getWarehouse().equals(warehouseUser.getWarehouse())) {
+                    throw new ServletException("not accessed");
+                }
+                docPeriodBuilder.add("owned", true);
+
+            } else if(warehouseUser.getUserRole().getUserRoleId() == UserRoles.WH_DISPATCHER) {
+                if (isDonutDocPeriod) {
+                    docPeriodBuilder.add("owned", true);
+                } else {
+                    docPeriodBuilder.add("owned", false);
+                }
+            } else {
+                throw new ServletException("bad role");
+            }
+        }
+        else if (user instanceof SupplierUser) {
+            if (isDonutDocPeriod) {
+                SupplierUser supplierUser = (SupplierUser) user;
+                DonutDocPeriod donutDocPeriod = (DonutDocPeriod) period;
+                if (donutDocPeriod.getSupplier().equals(supplierUser.getSupplier())) {
+                    docPeriodBuilder.add("owned", true);
+                } else {
+                    docPeriodBuilder.add("owned", false);
+                }
+            } else {
+                docPeriodBuilder.add("owned", false);
+            }
+        }
     }
 }

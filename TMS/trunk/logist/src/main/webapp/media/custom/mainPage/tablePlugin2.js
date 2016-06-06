@@ -6,7 +6,11 @@
         cellSize: 30, // in minutes!!!
         windowSize: 60 * 24,
         selectionConstraint: null,
-        allowedStatesForSelection: {isOpenedAllowed: true, isClosedAllowed: true, isOccupiedAllowed: true},
+        allowedStatesForSelection: {
+            isOpenedAllowed: true,
+            isClosedAllowed: true,
+            isOccupiedAllowed: true
+        },
         selectionModel: {
             isSelectAllOccupied: false,
             isSelectAllClosed: false
@@ -18,18 +22,8 @@
     const OPENED = "OPENED";
 
     var startupParameters = {};
-
-
-    // value is an object
     var main = function (initParams) {
-        for(var key in DEFAULT_PARAMETERS) {
-            if (DEFAULT_PARAMETERS.hasOwnProperty(key)) {
-                startupParameters[key] = DEFAULT_PARAMETERS[key];
-                if (initParams[key]) {
-                    startupParameters[key] = initParams[key];
-                }
-            }
-        }
+        startupParameters = merge(DEFAULT_PARAMETERS, initParams);
         return main;
     };
 
@@ -100,8 +94,11 @@
      * @param newData
      */
     main.setData = function(newData) {
+
         data = newData;
+        selectedElementsInstance.clearSelection();
         clearVisual();
+
         data.forEach(function(dataElem) {
             dataElem.cells = [];
             var cellsForPeriod = getCellsForPeriod(dataElem.periodBegin, dataElem.periodEnd);
@@ -132,6 +129,9 @@
     main.getData = function() {
         return JSON.parse(JSON.stringify(data));
     };
+    main.getSelectionData = function() {
+        return selectedElementsInstance.getSelectionData();
+    };
 
     main.isAnySelected = function() {
         return (!selectedElementsInstance.isEmpty());
@@ -148,38 +148,6 @@
     main.setOnDisableChanged = function(handler) {
         tableElement.addEventListener("disableChanged", handler);
     };
-
-
-    main.getSelectionData = function() {
-        return selectedElementsInstance.getSelectionData();
-    };
-    // FIXME make it work with different states
-
-    main.getSelectedPeriod = function() {
-        //if (selectedElementsInstance.isEmpty()) {
-        //    return {};
-        //}
-        //var periodBegin = (+selectedElementsInstance[0].dataset.serialnumber -1) * startupParameters.cellSize;
-        //var periodEnd = (+selectedElementsInstance[selectedElementsInstance.length - 1].dataset.serialnumber) * startupParameters.cellSize;
-        //return {periodBegin:periodBegin, periodEnd: periodEnd};
-    };
-
-
-    main.clear = function() {
-        if (selectedElementsInstance.isEmpty()) {
-            generateAnySelectedEvent(false);
-        } else {
-            var copy = selectedElementsInstance.slice();
-            copy.forEach(function(cellElement) {
-                removeSelectionStyle(cellElement);
-                modifySelectedElementsArray(cellElement, false);
-                generateSelectedEvent(cellElement, false);
-            });
-        }
-
-        clearVisual();
-    };
-
 
     main.setDisabled = function(disabled) {
         if (disabled) {
@@ -200,6 +168,23 @@
         });
         tableElement.dispatchEvent(newEvent);
     };
+    //main.clear = function() {
+    //    if (selectedElementsInstance.isEmpty()) {
+    //        generateAnySelectedEvent(false);
+    //    } else {
+    //        var copy = selectedElementsInstance.slice();
+    //        copy.forEach(function(cellElement) {
+    //            removeSelectionStyle(cellElement);
+    //            modifySelectedElementsArray(cellElement, false);
+    //            generateSelectedEvent(cellElement, false);
+    //        });
+    //    }
+    //
+    //    clearVisual();
+    //};
+
+
+
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
 
@@ -312,10 +297,6 @@
           return selectedElements.indexOf(cellElement) >= 0;
         };
 
-        this.clear = function () {
-            selectedElements.splice();
-        };
-
         this.isEmpty = function () {
             return selectedElements.length === 0;
         };
@@ -335,25 +316,35 @@
             selectedElements.length = 0;
         };
 
-        // TODO
+        // example result:
+        //var exampleResult = [
+        //    {data: null, periods: [{periodBegin: 630, periodEnd: 660}, {periodBegin: 660, periodEnd:690}]},
+        //    {data: null, periods: [{periodBegin: 630, periodEnd: 660}, {periodBegin: 660, periodEnd:690}]}
+        //];
         this.getSelectionData = function() {
             var result = [];
             var allObjects = [];
+            var selectedElementsWithoutState = [];
             for (var i = 0; i < selectedElements.length; i++) {
                 var dataObject = dataAndCellsRelation.get(selectedElements[i]);
+                if (dataObject === null) {
+                    selectedElementsWithoutState.push(selectedElements[i]);
+                }
                 if (allObjects.indexOf(dataObject) === -1) {
                     allObjects.push(dataObject);
                 }
             }
+
             for (var j = 0; j < allObjects.length; j++) {
-                if (allObjects[j]) {
-                    var data = JSON.parse(JSON.stringify(allObjects[j]));
-                    if (allObjects[j].hasOwnProperty("cells")) {
-                        data.selectedCells = intersect(allObjects[j].cells, selectedElements);
-                        result.push(data);
-                    }
+                if (allObjects[j] !== null) {
+                    var cells = intersect(allObjects[j].cells, selectedElements);
+                    var data = cloneWithoutCells(allObjects[j]);
+                    result.push({data: data, periods: getPeriodsFromCells(cells)});
+                } else {
+                    result.push({data:null, periods:getPeriodsFromCells(selectedElementsWithoutState)});
                 }
             }
+
             return result;
         };
 
@@ -377,7 +368,21 @@
                 if (b.indexOf(e) !== -1) return true;
             });
         }
-
+        function getPeriodsFromCells(cells) {
+            var periods = [];
+            cells.forEach(function(cell) {
+                periods.push(getPeriodForCell(cell));
+            });
+            return periods;
+        }
+        function cloneWithoutCells(object) {
+            return JSON.parse(JSON.stringify(object, function(key, value) {
+                if (key === "cells") {
+                    return undefined;
+                }
+                return value;
+            }));
+        }
     }
 
     function findTableSizes(windowsSize, periodSize) {
@@ -462,6 +467,12 @@
         return result;
     }
 
+    function getPeriodForCell(cellElement) {
+        var periodEnd = cellElement.dataset.serialnumber * startupParameters.cellSize;
+        var periodBegin = periodEnd - startupParameters.cellSize;
+        return {periodBegin: periodBegin, periodEnd: periodEnd};
+    }
+
     function generateSelectedEvent(cellElement, isSelected) {
         var newEvent = new CustomEvent("selected", {
             detail: {
@@ -485,7 +496,20 @@
         tableElement.dispatchEvent(newEvent);
     }
 
-
+    function merge() {
+        var obj = {},
+            i = 0,
+            il = arguments.length,
+            key;
+        for (; i < il; i++) {
+            for (key in arguments[i]) {
+                if (arguments[i].hasOwnProperty(key)) {
+                    obj[key] = arguments[i][key];
+                }
+            }
+        }
+        return obj;
+    }
 
     window.tablePlugin2 = main;
 
