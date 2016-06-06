@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/main.css"/>">
 
     <%--common scripts--%>
+    <script src="<c:url value="/media/es6-shim.min.js"/>"></script>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
     <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
     <script src="<c:url value="/media/Remodal-1.0.7/dist/remodal.min.js"/>"></script>
@@ -89,8 +90,17 @@
                         }
                     }
                     return true;
-                }
+                },
                 </c:if>
+                allowedStatesForSelection: {
+                    isOpenedAllowed: <c:out value="${isSupplierManager || isWarehouseBoss}"/>,
+                    isClosedAllowed: <c:out value="${isWarehouseBoss}"/>,
+                    isOccupiedAllowed: true
+                },
+                selectionModel: {
+                    isSelectAllOccupied: <c:out value="${isWarehouseBoss || isWarehouseDispatcher}"/>,
+                    isSelectAllClosed: false
+                }
 
             });
             tablePlugin.generate();
@@ -123,7 +133,6 @@
                     data: {docDateSelection: JSON.stringify(docDateSelection)},
                     dataType: "json"
                 }).done(function (tableData) {
-                    console.log(tableData);
                     tablePlugin.setData(tableData.docPeriods);
                     tablePlugin.setDisabled(false);
                 }).fail(function () {
@@ -184,14 +193,15 @@
                         },
                         dataType: "json"
                     }).done(function (tableData) {
-                        // refresh table
-                        tablePlugin.setData(tableData);
+                        tablePlugin.setData(tableData.docPeriods);
                         supplierInputDataDialog.close();
                     }).fail(function () {
                         window.alert("error");
                     });
                 }
             });
+
+
 
             var occupyPeriodBtnElem = tableControlsPlugin.getButtonByPluginId("occupySupPeriodBtn");
 
@@ -200,9 +210,19 @@
                 if (docDateSelection === null) {
                     return;
                 }
-                var selectedPeriod = tablePlugin.getSelectedPeriod();
-                var periodString = selectedPeriod.periodBegin + ";" + selectedPeriod.periodEnd;
-                donutCrudPluginInstance.setPeriod(periodString);
+                var selectionData = tablePlugin.getSelectionData();
+                var supplierName = '<c:out value="${sessionScope.user.supplier.inn}"/>';
+
+                var periodsString;
+                var periods = selectionData[0].periods;
+                if (periods.length === 1) {
+                    periodsString = periods[0].periodBegin + ";" + periods[0].periodEnd;
+                } else if (periods.length > 1) {
+                    periodsString = periods[0].periodBegin + ";" + periods[periods.length - 1].periodEnd;
+                } else
+                    throw new Error("bad period");
+                donutCrudPluginInstance.setSupplierName(supplierName);
+                donutCrudPluginInstance.setPeriod(periodsString);
                 supplierInputDataDialog.open();
             };
 
@@ -215,19 +235,6 @@
             $docAndDateSelector.triggerEvents();
 
             <%--------------------------------------------FUNCTIONS---------------------------------------------------%>
-//            function fillTableWithData(periodsArray) {
-//
-////                tablePlugin.clear();
-////                periodsArray.forEach(function (period) {
-////                    if (period.state === "DISABLED") {
-////                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, "disabled");
-////                    } else if (period.state === "OCCUPIED") {
-////                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, "occupied", period.supplierName);
-////                        //period.supplierId;
-////                    }
-////                });
-//            }
-
             function createBindingBetweenSelectorAndTable() {
                 docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                     tablePlugin.setDisabled(!isSelectionAvailable);
