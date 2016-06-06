@@ -37,19 +37,31 @@ INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 1
 INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 12:30:00 Z', '2016-10-19 13:00:00 Z'); -- id == 2
 INSERT INTO donut_doc_periods (donutdocperiodid, creationdate, comment, driver, driverphonenumber, licenseplate, palletsqty, supplierid)
 VALUES (2, '2016-10-19', 'donut_comment', 'driver1', '89055678654', '123erk', 3, 1);
+INSERT INTO donut_doc_periods (donutdocperiodid, creationdate, comment, driver, driverphonenumber, licenseplate, palletsqty, supplierid)
+VALUES (4, '2016-10-19', 'donut_comment', 'driver2', '8903435642', '754erk', 6, 2);
 INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 13:00:00 Z', '2016-10-19 13:30:00 Z'); -- id == 3
+INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 18:00:00 Z', '2016-10-19 18:30:00 Z'); -- id == 4
 
 
 INSERT INTO orders (ordernumber, boxqty, finaldestinationwarehouseid, donutdocperiodid, orderstatus, commentforstatus) -- id == 1
   VALUES ('orderNumber1', 2, 1, 2, 'CREATED', 'commentForStatus');
 
 INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 1
-  VALUES ('user1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'ivanov ivan', '9260943566', 'ivan@s.ru', 'manager');
+  VALUES ('us1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'ivanov ivan', '9260943566', 'ivan@s.ru', 'manager');
 INSERT INTO supplier_users VALUES (1, 1);
 
 INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 2
-  VALUES ('user2', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_BOSS', 'сидоров петр', '9260943566', 'sidor@s.ru', 'boss');
+  VALUES ('ub1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_BOSS', 'сидоров петр', '9260943566', 'sidor@s.ru', 'boss');
 INSERT INTO warehouse_users VALUES (2, 1);
+
+INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 2
+  VALUES ('us2', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'smirnova marina', '9070543566', 'mar@s.ru', 'manager');
+INSERT INTO supplier_users VALUES (3, 2);
+
+INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 1
+  VALUES ('ud1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'DISPATCHER', 'komova olga', '90163569874', 'olga@s.ru', 'dispatcher');
+INSERT INTO warehouse_users VALUES (4, 1);
+
 
 
 

@@ -1,5 +1,5 @@
 body {
-    font-family: Courier New, serif;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 15px;
 }
 
@@ -26,8 +26,8 @@ body {
 }
 
 .timePeriodLabel {
-    background-color: #FFFAFA;
-    border-bottom: 1px solid orange;
+    /*background-color: #FFFAFA;
+    border-bottom: 1px solid orange;*/
 }
 
 #companyDiv {
