@@ -1,6 +1,14 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 15px;
+}
+
 .tablePlugin td {
     border: 1px solid orange;
     text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .tablePlugin td > * {
@@ -19,10 +27,11 @@
 }
 
 .tablePlugin td label {
-    background-color: #FFFAFA;
-    border-bottom: 1px solid orange;
+    /*background-color: #FFFAFA;
+    border-bottom: 1px solid orange;*/
 
 }
+
 
 .tablePlugin td div {
     /*font-weight:bold;*/

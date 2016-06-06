@@ -1,0 +1,57 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+
+}
+
+#routeListTable:first-child{
+    width: 500px;
+    margin: 0 auto;
+
+}
+
+
+.dt-button{
+    cursor: pointer;
+    border-radius: 3px !important;
+    padding: 0.8em 1.5em !important;
+
+}
+
+.dt-buttons{
+    text-align: center;
+}
+
+thead:first-child tr[role="row"]{
+    font-size: 16px;
+}
+
+table.dataTable > *{
+    text-align: center;
+}
+
+input, textarea{
+    width: 180px;
+}
+
+table.dataTable tr{
+    height: 45px;
+}
+
+/*table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {
+  background-color: #FFF5EE;
+}
+
+
+table.dataTable.order-column tbody tr > .sorting_1,
+table.dataTable.order-column tbody tr > .sorting_2,
+table.dataTable.order-column tbody tr > .sorting_3, table.dataTable.display tbody tr > .sorting_1,
+table.dataTable.display tbody tr > .sorting_2,
+table.dataTable.display tbody tr > .sorting_3 {
+  background-color: #FFF5EE;
+}
+
+table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {
+  background-color: #FFF5EE;
+}
+
