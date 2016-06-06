@@ -10,14 +10,14 @@ $(document).ready(function () {
     $("body").append(
         '<div id="statusChangeDialog" title="Выбор нового статуса">' +
         '<table>' +
-        '<tr valign="top" ><td width="200" padding="10px"><label for="statusCurrent">Текущий статус: </label></td><td><strong id="statusCurrent"></strong></td></tr>' +
+        '<tr valign="top" id="currentStatusTR" ><td width="200" padding="10px"><label for="statusCurrent">Текущий статус: </label></td><td><strong id="statusCurrent"></strong></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
         '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Номер ТС: </label></td><td><input id="vehicleNumberInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
-        '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes">aaaaaaaaaa</div></td></tr>' +
-        '<tr id="selectNumbersRequestsTr" valign="top"><td width="200"><label for="statusSelect">Номера накладных: </label></td><td><div id="numberRequestCheckBoxes"></div></td></tr>' +
+        '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes2"><table id="requestCheckBoxes"></table></div></td></tr>' +
+        //'<tr id="selectNumbersRequestsTr" valign="top"><td width="200"><label for="statusSelect">Номера накладных: </label></td><td><div id="numberRequestCheckBoxes"></div></td></tr>' +
         '</table>' +
         '</div>'
     );
@@ -101,10 +101,12 @@ $(document).ready(function () {
                                 
                                 $('#selectNumbersRequestsTr').show();
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
-                                $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
+                                /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
+                                $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
+                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
                                 $selectRequestsTr.hide();
                                 $selectNumbersRequestsTr.hide();
+                            
 
                             });
                         }
@@ -131,12 +133,13 @@ $(document).ready(function () {
                             $requestCheckBoxes.html("");
                             $numberRequestCheckBoxes.html("");
                             $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
+                            $('#currentStatusTR').hide();
                             requestsArray.forEach(function(request){
                                 
                                 $('#selectNumbersRequestsTr').show();
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
-                                $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
+                                $requestCheckBoxes.append('<tr><td><label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>&nbsp;&nbsp;<span style="font-weight:bold;">'+request.invoiceNumber+'</span></td><td>&nbsp;&nbsp;<span>'+request.requestStatusRusName+'</span></td></tr>');
+                                //$numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
 
                             });
                             $selectRequestsTr.show();
