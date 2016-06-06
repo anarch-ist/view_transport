@@ -20,6 +20,7 @@ ALTER SEQUENCE warehouses_warehouseid_seq RESTART;
 
 ------------------------ MAKE INSERTS ONLY WITH SEQUENCES, NEVER SPECIFY ID MANUALLY ----------------------------------
 INSERT INTO suppliers (inn) VALUES ('supplier1Inn'); -- id == 1
+INSERT INTO suppliers (inn) VALUES ('supplier2Inn'); -- id == 2
 INSERT INTO warehouses (warehousename, rustimezoneabbr) VALUES ('msk_warehouse', 'MSK'); -- id == 1
 INSERT INTO warehouses (warehousename, rustimezoneabbr) VALUES ('ekt_warehouse', 'YEKT'); -- id == 2
 INSERT INTO docs (docname, warehouseid) VALUES

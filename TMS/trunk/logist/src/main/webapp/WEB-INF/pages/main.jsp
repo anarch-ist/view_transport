@@ -20,7 +20,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/chosen_v1.5.1/chosen.css"/>">
 
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/docAndDateSelector.css"/>">
-    <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/tablePlugin.css"/>">
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/tablePlugin2.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/donutCrudPlugin.css"/>">
 
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/main.css"/>">
@@ -41,7 +41,7 @@
     <script src="<c:url value="/media/dataTables.keyTable.min.js"/>"></script>
 
     <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
-    <script src="<c:url value="/media/custom/mainPage/tablePlugin.js"/>"></script>
+    <script src="<c:url value="/media/custom/mainPage/tablePlugin2.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/tableControlsPlugin.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/donutCrudPlugin.js"/>"></script>
 
@@ -60,7 +60,7 @@
 //            "use strict";
 
             // ---------------------------------init table plugin----------------------------------------
-            var tablePlugin = window.tablePlugin({
+            var tablePlugin = window.tablePlugin2({
                 parentId: 'tableContainer',
                 windowSize: +<c:out value="${windowSize}"/>,
                 cellSize: +<c:out value="${periodSize}"/>,
@@ -123,13 +123,9 @@
                     data: {docDateSelection: JSON.stringify(docDateSelection)},
                     dataType: "json"
                 }).done(function (tableData) {
-                    var periodsArray = tableData.docPeriods;
-                    fillTableWithData(periodsArray);
-                    //tablePlugin.setDisabled(false);
-//                    tableData.periodBegin;
-//                    tableData.periodEnd;
-                    //console.log(tableData);
-
+                    console.log(tableData);
+                    tablePlugin.setData(tableData.docPeriods);
+                    tablePlugin.setDisabled(false);
                 }).fail(function () {
                     window.alert("error");
                     //tablePlugin.setDisabled(false);
@@ -189,8 +185,7 @@
                         dataType: "json"
                     }).done(function (tableData) {
                         // refresh table
-                        var periodsArray = tableData.docPeriods;
-                        fillTableWithData(periodsArray);
+                        tablePlugin.setData(tableData);
                         supplierInputDataDialog.close();
                     }).fail(function () {
                         window.alert("error");
@@ -220,17 +215,18 @@
             $docAndDateSelector.triggerEvents();
 
             <%--------------------------------------------FUNCTIONS---------------------------------------------------%>
-            function fillTableWithData(periodsArray) {
-                tablePlugin.clear();
-                periodsArray.forEach(function (period) {
-                    if (period.state === "DISABLED") {
-                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, "disabled");
-                    } else if (period.state === "OCCUPIED") {
-                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, "occupied", period.supplierName);
-                        //period.supplierId;
-                    }
-                });
-            }
+//            function fillTableWithData(periodsArray) {
+//
+////                tablePlugin.clear();
+////                periodsArray.forEach(function (period) {
+////                    if (period.state === "DISABLED") {
+////                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, "disabled");
+////                    } else if (period.state === "OCCUPIED") {
+////                        tablePlugin.setNotFreeState(period.periodBegin, period.periodEnd, "occupied", period.supplierName);
+////                        //period.supplierId;
+////                    }
+////                });
+//            }
 
             function createBindingBetweenSelectorAndTable() {
                 docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
