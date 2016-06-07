@@ -15,14 +15,30 @@
                 cellSize: 30,
                 windowSize: 60 * 24
             });
-            tablePlugin.generate();
-
             var tableControlsPlugin = window.tableControlsPlugin({
                 tablePlugin:tablePlugin,
                 parentId:"buttons",
-                buttons: [{name:"testButton", id :"123", enabledIfAnySelected: true}, {name:"secondButton", id:"345", enabledIfAnySelected: true}]
+                buttons: [
+                    {
+                        name: "testButton",
+                        id: "123",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return true;
+                        }
+                    }, {
+                        name: "secondButton",
+                        id: "345",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
+                    }
+                ]
             });
             tableControlsPlugin.generateContent();
+            tablePlugin.generate();
+
             var buttonByPluginId = tableControlsPlugin.getButtonByPluginId("123");
             buttonByPluginId.onclick = function(e) {
                 window.console.log(e);

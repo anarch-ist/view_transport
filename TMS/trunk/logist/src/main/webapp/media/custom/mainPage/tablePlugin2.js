@@ -17,9 +17,9 @@
         }
     };
 
-    const CLOSED = "CLOSED";
-    const OCCUPIED = "OCCUPIED";
-    const OPENED = "OPENED";
+    var CLOSED = "CLOSED",
+        OCCUPIED = "OCCUPIED",
+        OPENED = "OPENED";
 
     var startupParameters = {};
     var main = function (initParams) {
@@ -27,14 +27,10 @@
         return main;
     };
 
-
     var data = [];
     var dataAndCellsRelation = new Map();
 
-
-    main.defaultParameters = DEFAULT_PARAMETERS;
-
-    var tableElement;
+    var tableElement = document.createElement("table");
     var disableElement;
     var selectedElementsInstance = new SelectedElements();
     var generatedCells = [];
@@ -48,7 +44,6 @@
         disableElement = document.createElement("div");
         parentElem.appendChild(disableElement);
         disableElement.classList.add("tp_disabled");
-        tableElement = document.createElement("table");
         tableElement.classList.add("mainTable");
         parentElem.appendChild(tableElement);
         var labelGenerator = createLabelGenerator(startupParameters.cellSize);
@@ -71,17 +66,16 @@
             }
         }
 
-        // generate any selected event
-        var anySelected = false;
-        main.setOnSelectionChanged(function() {
-            if (selectedElementsInstance.isEmpty()) {
-                generateAnySelectedEvent(false);
-                anySelected = false;
-            } else if (!anySelected) {
-                generateAnySelectedEvent(true);
-                anySelected = true;
-            }
+
+
+        createEventDependencies();
+
+        // generate createdEvent
+        var newEvent = new CustomEvent("created", {
+            bubbles: true,
+            cancelable: false
         });
+        tableElement.dispatchEvent(newEvent);
     };
 
 
@@ -98,6 +92,12 @@
         data = newData;
         selectedElementsInstance.clearSelection();
         clearVisual();
+
+        var newEvent = new CustomEvent("cleared", {
+            bubbles: true,
+            cancelable: false
+        });
+        tableElement.dispatchEvent(newEvent);
 
         data.forEach(function(dataElem) {
             dataElem.cells = [];
@@ -132,24 +132,19 @@
     main.getSelectionData = function() {
         return selectedElementsInstance.getSelectionData();
     };
-
     main.isAnySelected = function() {
         return (!selectedElementsInstance.isEmpty());
     };
 
-    main.setOnSelectionChanged = function(handler) {
-        tableElement.addEventListener("selected", handler);
+    main.isDisabled = function() {
+        return previousDisabled;
     };
 
-    main.setOnAnySelected = function(handler) {
-        tableElement.addEventListener("anySelected", handler);
-    };
-
-    main.setOnDisableChanged = function(handler) {
-        tableElement.addEventListener("disableChanged", handler);
-    };
-
+    var previousDisabled;
     main.setDisabled = function(disabled) {
+        if (disabled === previousDisabled) {
+            return;
+        }
         if (disabled) {
             disableElement.style.width = getComputedStyle(tableElement).width;
             disableElement.style.height = getComputedStyle(tableElement).height;
@@ -161,29 +156,59 @@
             //disableElement.style.zIndex = 0;
         }
 
-        var newEvent = new CustomEvent("disableChanged", {
-            detail: disabled,
-            bubbles: true,
-            cancelable: false
-        });
-        tableElement.dispatchEvent(newEvent);
+        generateDisabledChangeEvent(disabled);
+
+        previousDisabled = disabled;
     };
-    //main.clear = function() {
-    //    if (selectedElementsInstance.isEmpty()) {
-    //        generateAnySelectedEvent(false);
-    //    } else {
-    //        var copy = selectedElementsInstance.slice();
-    //        copy.forEach(function(cellElement) {
-    //            removeSelectionStyle(cellElement);
-    //            modifySelectedElementsArray(cellElement, false);
-    //            generateSelectedEvent(cellElement, false);
-    //        });
-    //    }
-    //
-    //    clearVisual();
-    //};
 
+    // Handlers
+    main.setOnCreated = function(handler) {
+        tableElement.addEventListener("created", handler);
+    };
+    main.setOnSelectionChanged = function(handler) {
+        tableElement.addEventListener("selected", handler);
+    };
+    main.setOnAnySelected = function(handler) {
+        tableElement.addEventListener("anySelected", handler);
+    };
+    main.setOnDisableChanged = function(handler) {
+        tableElement.addEventListener("disableChanged", handler);
+    };
+    main.setOnCleared = function(handler) {
+        tableElement.addEventListener("cleared", handler);
+    };
 
+    function createEventDependencies() {
+        main.setOnCreated(function() {
+            generateDisabledChangeEvent(false);
+            generateAnySelectedEvent(false);
+        });
+
+        var anySelected = false;
+        main.setOnSelectionChanged(function() {
+            if (selectedElementsInstance.isEmpty()) {
+                generateAnySelectedEvent(false);
+                anySelected = false;
+            } else if (!anySelected) {
+                generateAnySelectedEvent(true);
+                anySelected = true;
+            }
+        });
+
+        main.setOnCleared(function() {
+            //if (selectedElementsInstance.isEmpty()) {
+                generateAnySelectedEvent(false);
+            //} else {
+            //    var copy = selectedElementsInstance.slice();
+            //    copy.forEach(function(cellElement) {
+            //        removeSelectionStyle(cellElement);
+            //        modifySelectedElementsArray(cellElement, false);
+            //        generateSelectedEvent(cellElement, false);
+            //    });
+            //}
+        });
+
+    }
 
 
     // ----------------------------------HELPER FUNCTIONS------------------------------------------
@@ -247,8 +272,7 @@
                 previousSelectedState = currentSelectedState;
                 addSelection(cellElement, currentSelectedState, relatedData);
             }
-
-            generateSelectedEvent(cellElement, !wasSelected);
+            generateSelectedEvent(cellElement, !wasSelected, currentSelectedState);
         };
 
         function clearSelection(cellElement, currentSelectedState) {
@@ -277,7 +301,8 @@
     }
 
 
-    function SelectedElements() {
+    function
+    SelectedElements() {
         var selectedElements = [];
 
         this.add = function (cellElement) {
@@ -473,13 +498,14 @@
         return {periodBegin: periodBegin, periodEnd: periodEnd};
     }
 
-    function generateSelectedEvent(cellElement, isSelected) {
+    function generateSelectedEvent(cellElement, isSelected, currentSelectedState) {
         var newEvent = new CustomEvent("selected", {
             detail: {
                 isSelected: isSelected,
                 cellElement: cellElement,
                 selectedElements: selectedElementsInstance,
-                data: dataAndCellsRelation.get(cellElement)
+                data: dataAndCellsRelation.get(cellElement),
+                currentSelectedState: currentSelectedState
             },
             bubbles: true,
             cancelable: false
@@ -495,6 +521,16 @@
         });
         tableElement.dispatchEvent(newEvent);
     }
+
+    function generateDisabledChangeEvent(disabled) {
+        var newEvent = new CustomEvent("disableChanged", {
+            detail: disabled,
+            bubbles: true,
+            cancelable: false
+        });
+        tableElement.dispatchEvent(newEvent);
+    }
+
 
     function merge() {
         var obj = {},

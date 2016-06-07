@@ -148,18 +148,39 @@
                 parentId:"tableControlsContainer",
                 buttons: [
                     <c:if test="${isSupplierManager}">
-                    {name:"Отменить", id:"cancelSupOrderBtn", enabledIfAnySelected: true},
-                    {name:"Изменить", id:"updateSupBtn", enabledIfAnySelected: true},
-                    {name:"Зарезервировать", id:"occupySupPeriodBtn", enabledIfAnySelected: true}
+                    {
+                        name: "Отменить",
+                        id: "cancelSupOrderBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
+                    },
+                    {
+                        name: "Изменить",
+                        id: "updateSupBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED" && isFullPeriodSelected
+                        }
+                    },
+                    {
+                        name: "Зарезервировать",
+                        id: "occupySupPeriodBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OPENED" && isFullPeriodSelected
+                        }
+                    }
                     </c:if>
                     <c:if test="${isWarehouseBoss}">
                     {name:"Информация о грузе", id :"cargoInfoBtn", enabledIfAnySelected: true},
                     {name:"Открыть интервал", id:"setFreePeriodBtn", enabledIfAnySelected: true},
-                    {name:"Закрыть интервал", id:"setDisabledPeriodBtn", enabledIfAnySelected: true}
+                    {name:"Закрыть интервал", id:"setDisabledPeriodBtn", enabledIfAnySelected: true},
+                    {name:"Отмена МЛ", id:"cancelDonut", enabledIfAnySelected: true}
                     </c:if>
                     <c:if test="${isWarehouseDispatcher}">
-                    {name:"Информация о грузе", id :"cargoInfoBtn", enabledIfAnySelected: true},
-                    {name:"Изменить статус", id:"changeStatusBtn", enabledIfAnySelected: true}
+                    {name:"Изменить статусы", id:"changeStatusBtn", enabledIfAnySelected: true}
                     </c:if>
                 ]
             });
