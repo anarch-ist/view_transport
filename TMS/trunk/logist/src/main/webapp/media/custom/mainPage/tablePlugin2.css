@@ -1,14 +1,16 @@
 body {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 15px;
+    color: #33363e;
 }
 
 .tablePlugin td {
-    border: 1px solid orange;
+    border: 1px solid #aab7d1;
     text-align: center;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    cursor: default;
 }
 
 .tablePlugin td > * {
@@ -20,15 +22,16 @@ body {
 }
 
 .tablePlugin table {
-    background-color: #FDE4D0;
-    border: 1px solid orange;
+    background-color: #e5e9f1;
+    border: 1px solid #aab7d1;
     border-collapse: collapse;
-    width: 100%;
+    width: 70%;
+    margin: 0 auto;
 }
 
 .tablePlugin td label {
-    /*background-color: #FFFAFA;
-    border-bottom: 1px solid orange;*/
+    /*background-color: #eef0f5;
+    /*border-bottom: 1px solid orange;*/
 
 }
 
@@ -36,10 +39,12 @@ body {
 .tablePlugin td div {
     /*font-weight:bold;*/
     vertical-align: middle;
+    /*border-top: 1px solid #aab7d1;*/
+
 }
 
 .tp_occupied {
-    background-color: red;
+    background-color: #d1aab7;
 }
 
 /*.tp_owned:before {*/
@@ -51,7 +56,7 @@ body {
 }
 
 .tp_closed {
-    background-color: grey;
+    background-color: #8892a7;
 }
 
 .tp_disabled {
@@ -59,7 +64,7 @@ body {
 }
 
 .tp_highlight {
-    outline: 2px solid #ED1C24;
+    outline: 3px solid #b1aad1;
 }
 
 

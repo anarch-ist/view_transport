@@ -150,6 +150,7 @@
                 }
             ]
         });
+        dataTable.buttons().container().appendTo(donutFields.buttonsContainer);
 
         // create inline editing
         if (createInline) {
@@ -404,6 +405,9 @@
                 )
             );
 
+            var $buttonsContainer = $("<div>");
+            _this.append($buttonsContainer);
+
             var $ordersTable = $('<table cellpadding="0" cellspacing="0" border="0" class="display" width="100%" id="ordersDataTable">');
 
             var $thead = $("<thead>");
@@ -425,6 +429,8 @@
                 )
             );
 
+
+
             return {
                 companyNameDiv: $companyName,
                 periodInput: $periodInput,
@@ -432,7 +438,8 @@
                 licensePlateInput: $licensePlateInput,
                 palletQtyInput: $palletQtyInput,
                 driverPhoneNumberInput: $driverPhoneInput,
-                commentArea: $commentArea
+                commentArea: $commentArea,
+                buttonsContainer: $buttonsContainer
             };
         }
 
