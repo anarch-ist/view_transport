@@ -14,7 +14,8 @@
         selectionModel: {
             isSelectAllOccupied: false,
             isSelectAllClosed: false
-        }
+        },
+        buttons: null
     };
 
     var CLOSED = "CLOSED",
@@ -65,10 +66,12 @@
                 rowElement.appendChild(cellElement);
             }
         }
-
-
-
         createEventDependencies();
+
+        if (startupParameters.buttons !== null) {
+            var tableControls = new TableControls(parentElem, main, startupParameters.buttons);
+            tableControls.generateContent();
+        }
 
         // generate createdEvent
         var newEvent = new CustomEvent("created", {
@@ -196,18 +199,8 @@
         });
 
         main.setOnCleared(function() {
-            //if (selectedElementsInstance.isEmpty()) {
-                generateAnySelectedEvent(false);
-            //} else {
-            //    var copy = selectedElementsInstance.slice();
-            //    copy.forEach(function(cellElement) {
-            //        removeSelectionStyle(cellElement);
-            //        modifySelectedElementsArray(cellElement, false);
-            //        generateSelectedEvent(cellElement, false);
-            //    });
-            //}
+            generateAnySelectedEvent(false);
         });
-
     }
 
 
@@ -301,9 +294,12 @@
     }
 
 
-    function
-    SelectedElements() {
+    function SelectedElements() {
         var selectedElements = [];
+
+        this.getSelectedCells = function() {
+            return selectedElements;
+        };
 
         this.add = function (cellElement) {
             selectedElements.push(cellElement);
@@ -409,7 +405,6 @@
             }));
         }
     }
-
     function findTableSizes(windowsSize, periodSize) {
         var periodsCount = windowsSize / periodSize;
 
@@ -454,7 +449,6 @@
             return labelElement;
         };
     }
-
     function clearVisual() {
         [].forEach.call(tableElement.getElementsByTagName("td"), function (element) {
             var cellDiv = element.getElementsByTagName('div')[0];
@@ -501,11 +495,11 @@
     function generateSelectedEvent(cellElement, isSelected, currentSelectedState) {
         var newEvent = new CustomEvent("selected", {
             detail: {
-                isSelected: isSelected,
                 cellElement: cellElement,
-                selectedElements: selectedElementsInstance,
-                data: dataAndCellsRelation.get(cellElement),
-                currentSelectedState: currentSelectedState
+                isSelected: isSelected,
+                currentSelectedState: currentSelectedState,
+                selectedElements: selectedElementsInstance.getSelectedCells(),
+                data: dataAndCellsRelation.get(cellElement)
             },
             bubbles: true,
             cancelable: false
@@ -545,6 +539,109 @@
             }
         }
         return obj;
+    }
+
+
+    function TableControls(containerElem, tablePlugin, buttonsDescription) {
+        var state = {isDisabled:null, isAnySelected:null, currentSelectedState:null, isFullPeriodSelected:null};
+        this.generateContent = function() {
+
+
+            var buttons = [];
+
+            tablePlugin.setOnCreated(function() {
+                state.isDisabled = tablePlugin.isDisabled();
+                state.isAnySelected = tablePlugin.isDisabled();
+            });
+
+            tablePlugin.setOnDisableChanged(function(e) {
+                state.isDisabled = e.detail;
+                buttons.forEach(function(buttonElem){
+                    handleState(buttonElem, state);
+                });
+            });
+
+            tablePlugin.setOnAnySelected(function(e) {
+                state.isAnySelected = e.detail;
+                buttons.forEach(function(buttonElem){
+                    handleState(buttonElem, state);
+                });
+            });
+
+            tablePlugin.setOnSelectionChanged(function(e) {
+                var selectedCells = e.detail.selectedElements;
+                var stateCells = e.detail.data;
+                if (stateCells === null) {
+                    state.isFullPeriodSelected = true;
+                } else {
+                    state.isFullPeriodSelected = selectedCells.length > 0 ? selectedCells.length === stateCells.cells.length : false;
+                }
+
+                state.currentSelectedState = e.detail.currentSelectedState;
+
+                buttons.forEach(function(buttonElem){
+                    handleState(buttonElem, state);
+                });
+            });
+
+
+            for (var i = 0; i < buttonsDescription.length; i++) {
+                var buttonElem = document.createElement('input');
+                buttonElem.setAttribute('type', 'button');
+                buttonElem.setAttribute('value', buttonsDescription[i].name);
+                buttonElem.setAttribute('id', buttonsDescription[i].id);
+                buttonElem.id = buttonsDescription[i].id;
+                containerElem.appendChild(buttonElem);
+                buttons.push({
+                    buttonElem:buttonElem,
+                    enabledIfAnySelected: buttonsDescription[i].enabledIfAnySelected,
+                    enabledIf: buttonsDescription[i].enabledIf
+                });
+            }
+        };
+
+        tablePlugin.getButtonByPluginId = function(pluginId) {
+            return document.getElementById(pluginId);
+        };
+
+        function handleState(button, state) {
+            var buttonElem = button.buttonElem;
+
+            if (state.isDisabled) {
+                buttonElem.disabled = true;
+                return;
+            }
+
+            if (button.enabledIfAnySelected) {
+                if (!state.isAnySelected) {
+                    buttonElem.disabled = true;
+                } else {
+                    handleEnabledIf();
+                }
+            } else {
+                handleEnabledIf();
+            }
+
+            function handleEnabledIf() {
+                if (button.enabledIf) {
+                    buttonElem.disabled = !button.enabledIf(state.currentSelectedState, state.isFullPeriodSelected);
+                } else {
+                    buttonElem.disabled = false;
+                }
+            }
+
+        }
+
+        function compareArrayContent(firstArr, secondArr) {
+            if (firstArr.length != secondArr.length) return false;
+            for (var i = 0; i < secondArr.length; i++) {
+                if (firstArr[i].compare) {
+                    if (!firstArr[i].compare(secondArr[i])) return false;
+                }
+                if (firstArr[i] !== secondArr[i]) return false;
+            }
+            return true;
+        }
     }
 
     window.tablePlugin2 = main;
