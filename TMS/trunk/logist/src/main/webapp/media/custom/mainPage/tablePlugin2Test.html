@@ -52,7 +52,33 @@
                 selectionModel: {
                     isSelectAllOccupied: false,
                     isSelectAllClosed: false
-                }
+                },
+                buttons: [
+                    {
+                        name: "отменить",
+                        id: "cancelBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
+                    },
+                    {
+                        name: "изменить",
+                        id: "changeBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return (state === "OCCUPIED" && isFullPeriodSelected);
+                        }
+                    },
+                    {
+                        name: "зарезервировать",
+                        id: "reserveBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OPENED";
+                        }
+                    }
+                ]
             });
             tablePlugin2.setOnCreated(function() {
                 window.console.log("CREATED");
@@ -77,6 +103,11 @@
 
             tablePlugin2.generate();
             tablePlugin2.setData(exampleData);
+
+            var buttonByPluginId = tablePlugin2.getButtonByPluginId("cancelBtn");
+            buttonByPluginId.onclick = function(e) {
+                window.console.log(e);
+            };
 
             //tablePlugin2.clear();
         };

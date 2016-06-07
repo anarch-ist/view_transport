@@ -43,7 +43,6 @@
 
     <script src="<c:url value="/media/custom/mainPage/docAndDateSelector.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/tablePlugin2.js"/>"></script>
-    <script src="<c:url value="/media/custom/mainPage/tableControlsPlugin.js"/>"></script>
     <script src="<c:url value="/media/custom/mainPage/donutCrudPlugin.js"/>"></script>
 
 
