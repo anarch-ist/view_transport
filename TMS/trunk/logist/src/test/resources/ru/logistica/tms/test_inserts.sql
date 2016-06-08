@@ -35,7 +35,7 @@ INSERT INTO docs (docname, warehouseid) VALUES
 -- create docPeriods
 INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 10:00:00 Z', '2016-10-19 10:30:00 Z'); -- id == 1
 
-INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 12:30:00 Z', '2016-10-19 13:00:00 Z'); -- id == 2
+INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 11:30:00 Z', '2016-10-19 13:00:00 Z'); -- id == 2
 INSERT INTO donut_doc_periods (donutdocperiodid, creationdate, comment, driver, driverphonenumber, licenseplate, palletsqty, supplierid)
 VALUES (2, '2016-10-19', 'donut_comment', 'driver1', '89055678654', '123erk', 3, 1);
 

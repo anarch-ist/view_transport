@@ -545,8 +545,6 @@
     function TableControls(containerElem, tablePlugin, buttonsDescription) {
         var state = {isDisabled:null, isAnySelected:null, currentSelectedState:null, isFullPeriodSelected:null};
         this.generateContent = function() {
-
-
             var buttons = [];
 
             tablePlugin.setOnCreated(function() {
@@ -630,17 +628,6 @@
                 }
             }
 
-        }
-
-        function compareArrayContent(firstArr, secondArr) {
-            if (firstArr.length != secondArr.length) return false;
-            for (var i = 0; i < secondArr.length; i++) {
-                if (firstArr[i].compare) {
-                    if (!firstArr[i].compare(secondArr[i])) return false;
-                }
-                if (firstArr[i] !== secondArr[i]) return false;
-            }
-            return true;
         }
     }
 

@@ -235,7 +235,7 @@ GRANT USAGE ON SCHEMA public TO app_user;
 GRANT USAGE ON SCHEMA pg_catalog TO app_user;
 GRANT SELECT ON pg_timezone_names TO app_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
-GRANT INSERT, UPDATE ON TABLE doc_periods, donut_doc_periods, orders TO app_user;
+GRANT INSERT, UPDATE, DELETE ON TABLE doc_periods, donut_doc_periods, orders TO app_user;
 GRANT ALL ON SEQUENCE doc_periods_docperiodid_seq TO app_user;
 GRANT ALL ON SEQUENCE orders_orderid_seq TO app_user;
 

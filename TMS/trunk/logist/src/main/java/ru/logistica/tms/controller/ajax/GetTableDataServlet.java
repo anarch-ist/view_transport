@@ -38,6 +38,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         String receivedData = req.getParameter("docDateSelection");
+        System.out.println(receivedData);
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(receivedData);
@@ -47,9 +48,9 @@ public class GetTableDataServlet extends AjaxHttpServlet {
 
         Integer windowSize = Integer.parseInt(getServletContext().getInitParameter("windowSize"));
 
-        Warehouse warehouse = DaoFacade.getWarehouseById(docDateSelectorData.warehouseId);
-        Integer offset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()).intValue();
-        long timeStampBegin = docDateSelectorData.utcDate.getTime() - offset * 60 * 60 * 1000;
+        //Warehouse warehouse = DaoFacade.getWarehouseById(docDateSelectorData.warehouseId);
+        //Integer offset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()).intValue();
+        long timeStampBegin = docDateSelectorData.utcDate;
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
 
         Object user = req.getSession(false).getAttribute("user");

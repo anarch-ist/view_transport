@@ -95,7 +95,7 @@ public class DaoFacadeTest extends HibernateTest {
         Donut.Order dtoOrder = new Donut.Order(2, "234", 2, 4, "erferg", OrderStatuses.CREATED.name());
         orders.add(dtoOrder);
         Donut donut = new Donut("450;510", "driver", "licPl", 4, "phN", "commne", orders);
-        DocDateSelectorData docDateSelectorData = new DocDateSelectorData(new Date(), 1, 1);
+        DocDateSelectorData docDateSelectorData = new DocDateSelectorData(new Date().getTime(), 1, 1);
 
         HibernateUtils.beginTransaction();
         SupplierUserDao supplierUserDao = new SupplierUserDaoImpl();

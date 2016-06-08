@@ -30,6 +30,7 @@ public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
 
 
+
     private interface DaoScript {
         void execute() throws DAOException;
     }
@@ -45,6 +46,35 @@ public class DaoFacade {
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
+    }
+
+    public static void updateDonutPeriod(final long donutDocPeriodId, final Date periodBegin, final Date periodEnd) {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                donutDocPeriod.setPeriod(new Period(periodBegin, periodEnd));
+                donutDocPeriodDao.update(donutDocPeriod);
+            }
+        });
+    }
+
+    public static void deleteDonutWithRequests(final long donutDocPeriodId) {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                Set<Order> orders = donutDocPeriod.getOrders();
+                for (Order order : orders) {
+                    OrderDao orderDao = new OrderDaoImpl();
+                    orderDao.delete(order);
+                }
+                donutDocPeriodDao.delete(donutDocPeriod);
+            }
+        });
+
     }
 
     public static void insertDonut(final Donut donut, final DocDateSelectorData docDateSelectorData, final Supplier usersSupplier) {
@@ -87,13 +117,11 @@ public class DaoFacade {
             }
 
             private Period getPeriod() throws DAOException {
+                // TODO redo this shit
                 String[] split = donut.period.split(";");
                 int periodBegin = Integer.parseInt(split[0]); // in minutes from day begin
                 int periodEnd = Integer.parseInt(split[1]);  // in minutes from day begin
-                WarehouseDao warehouseDao = new WarehouseDaoImpl();
-                Warehouse warehouse = warehouseDao.findById(Warehouse.class, docDateSelectorData.warehouseId);
-                Integer offset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()).intValue();
-                long dateBegin = docDateSelectorData.utcDate.getTime() - offset * 60 * 60 * 1000;
+                long dateBegin = docDateSelectorData.utcDate;
                 long timeStampBegin = dateBegin + periodBegin * 60 * 1000;
                 long timeStampEnd = dateBegin + periodEnd * 60 * 1000;
                 return new Period(new Date(timeStampBegin), new Date(timeStampEnd));
@@ -193,16 +221,5 @@ public class DaoFacade {
         });
         return result[0];
     }
-
-//    public static Map<Integer, String> getAllPointsAsIdAndNameMap() {
-//        // Map<Integer, String> result =
-//        doInTransaction(new DaoScript() {
-//            @Override
-//            public void execute() throws DaoException {
-//                GenericDao<Warehouse> warehouseGenericDao = new WarehouseDaoImpl();
-//                warehouseGenericDao.getAll();
-//            }
-//        });
-//    }
 
 }

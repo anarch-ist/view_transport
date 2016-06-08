@@ -57,13 +57,23 @@
 
     <script>
         $(document).ready(function(){
-//            "use strict";
+        "use strict";
 
             // ---------------------------------init table plugin----------------------------------------
             var tablePlugin = window.tablePlugin2({
                 parentId: 'tableContainer',
                 windowSize: +<c:out value="${windowSize}"/>,
                 cellSize: +<c:out value="${periodSize}"/>,
+                allowedStatesForSelection: {
+                    isOpenedAllowed: <c:out value="${isSupplierManager || isWarehouseBoss}"/>,
+                    isClosedAllowed: <c:out value="${isWarehouseBoss}"/>,
+                    isOccupiedAllowed: true
+                },
+                selectionModel: {
+                    isSelectAllOccupied: <c:out value="${isWarehouseBoss || isWarehouseDispatcher}"/>,
+                    isSelectAllClosed: false
+                },
+
                 <c:if test="${isSupplierManager}">
                 selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
                     if (selectedSerialNumbers.length === 0) {
@@ -90,101 +100,98 @@
                     }
                     return true;
                 },
-                </c:if>
-                allowedStatesForSelection: {
-                    isOpenedAllowed: <c:out value="${isSupplierManager || isWarehouseBoss}"/>,
-                    isClosedAllowed: <c:out value="${isWarehouseBoss}"/>,
-                    isOccupiedAllowed: true
-                },
-                selectionModel: {
-                    isSelectAllOccupied: <c:out value="${isWarehouseBoss || isWarehouseDispatcher}"/>,
-                    isSelectAllClosed: false
-                }
-
-            });
-            tablePlugin.generate();
-
-            //tablePlugin.setString("Panasonic", 2, 3);
-            tablePlugin.setOnSelectionChanged(function(e) {
-                //window.console.log(e);
-                //window.console.log(e.detail);
-            });
-            //tablePlugin.setDisabled(true);
-
-            var warehousesData = ${requestScope.docDateSelectorDataObject};
-            // ---------------------------------init docDateSelector plugin----------------------------------------
-            var $docAndDateSelector = $('#docAndDateSelector');
-            var docDateSelector = $docAndDateSelector.docAndDateSelector({
-                useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
-                data: warehousesData
-            });
-            //docDateSelector.setSelectedDate(new Date(2015, 10, 30));
-            //docDateSelector.setSelectedWarehouseAndDoc(1, 3);
-            //docDateSelector.setSelectedDoc(3);
-
-
-            docDateSelector.setOnSelected(function(event, docDateSelection) {
-                // на время отправки данных и их получения - таблица должна уходить в состояние disabled = true;
-                //tablePlugin.setDisabled(true);
-                $.ajax({
-                    url: "getTableData",
-                    method: "POST",
-                    data: {docDateSelection: JSON.stringify(docDateSelection)},
-                    dataType: "json"
-                }).done(function (tableData) {
-                    tablePlugin.setData(tableData.docPeriods);
-                    tablePlugin.setDisabled(false);
-                }).fail(function () {
-                    window.alert("error");
-                    //tablePlugin.setDisabled(false);
-
-                });
-            });
-
-            // ---------------------------------init tableControlsPlugin----------------------------------------
-            var tableControlsPlugin = window.tableControlsPlugin({
-                tablePlugin:tablePlugin,
-                parentId:"tableControlsContainer",
                 buttons: [
-                    <c:if test="${isSupplierManager}">
                     {
-                        name: "Отменить",
-                        id: "cancelSupOrderBtn",
+                        name: "отменить",
+                        id: "sCancelBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OCCUPIED";
                         }
                     },
                     {
-                        name: "Изменить",
-                        id: "updateSupBtn",
+                        name: "изменить",
+                        id: "sChangeBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
-                            return state === "OCCUPIED" && isFullPeriodSelected
+                            return (state === "OCCUPIED" && isFullPeriodSelected);
                         }
                     },
                     {
-                        name: "Зарезервировать",
-                        id: "occupySupPeriodBtn",
+                        name: "зарезервировать",
+                        id: "sReserveBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
-                            return state === "OPENED" && isFullPeriodSelected
+                            return state === "OPENED";
                         }
                     }
-                    </c:if>
-                    <c:if test="${isWarehouseBoss}">
-                    {name:"Информация о грузе", id :"cargoInfoBtn", enabledIfAnySelected: true},
-                    {name:"Открыть интервал", id:"setFreePeriodBtn", enabledIfAnySelected: true},
-                    {name:"Закрыть интервал", id:"setDisabledPeriodBtn", enabledIfAnySelected: true},
-                    {name:"Отмена МЛ", id:"cancelDonut", enabledIfAnySelected: true}
-                    </c:if>
-                    <c:if test="${isWarehouseDispatcher}">
-                    {name:"Изменить статусы", id:"changeStatusBtn", enabledIfAnySelected: true}
-                    </c:if>
                 ]
-            });
-            tableControlsPlugin.generateContent();
+                </c:if>
 
+                <c:if test="${isWarehouseDispatcher}">
+                buttons: [
+                    {
+                        name: "изменить статусы",
+                        id: "dChangeStatusBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return (state === "OCCUPIED" && isFullPeriodSelected);
+                        }
+                    }
+                ]
+                </c:if>
+
+                <c:if test="${isWarehouseBoss}">
+                buttons: [
+                    {
+                        name: "открыть",
+                        id: "bOpenPeriodBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "CLOSED";
+                        }
+                    },
+                    {
+                        name: "закрыть",
+                        id: "bClosePeriodBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OPENED";
+                        }
+                    },
+                    {
+                        name: "отменить",
+                        id: "bCancelBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED" && isFullPeriodSelected;
+                        }
+                    },
+                    {
+                        name: "информация",
+                        id: "bInfoBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED" && isFullPeriodSelected;
+                        }
+                    }
+                ]
+                </c:if>
+            });
+            tablePlugin.generate();
+
+            var warehousesData = ${requestScope.docDateSelectorDataObject};
+
+            // ---------------------------------init docDateSelector plugin----------------------------------------
+            var $docAndDateSelector = $('#docAndDateSelector');
+            var docDateSelector = $docAndDateSelector.docAndDateSelector({
+                useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
+                data: warehousesData
+            });
+
+            docDateSelector.setOnSelected(function(event, docDateSelection) {
+                sendTableAjax("getTableData");
+            });
 
 
             // ---------------------------------init donutCrudPlugin----------------------------------------
@@ -204,28 +211,12 @@
                 orderStatuses: ${requestScope.orderStatuses},
                 warehouses: warehousesKeyValuePairs,
                 onSubmit: function() {
-                    $.ajax({
-                        url: "setTableData",
-                        method: "POST",
-                        data: {
-                            docDateSelection: JSON.stringify(docDateSelector.getSelectionObject()),
-                            donut: JSON.stringify(donutCrudPluginInstance.getData())
-                        },
-                        dataType: "json"
-                    }).done(function (tableData) {
-                        tablePlugin.setData(tableData.docPeriods);
-                        supplierInputDataDialog.close();
-                    }).fail(function () {
-                        window.alert("error");
-                    });
+                    sendTableAjax("setTableData", {donut: donutCrudPluginInstance.getData()}, function() {supplierInputDataDialog.close();})
                 }
             });
 
-
-
-            var occupyPeriodBtnElem = tableControlsPlugin.getButtonByPluginId("occupySupPeriodBtn");
-
-            occupyPeriodBtnElem.onclick = function(e) {
+            var sReserveBtn = tablePlugin.getButtonByPluginId("sReserveBtn");
+            sReserveBtn.onclick = function(e) {
                 var docDateSelection = docDateSelector.getSelectionObject();
                 if (docDateSelection === null) {
                     return;
@@ -245,19 +236,89 @@
                 donutCrudPluginInstance.setPeriod(periodsString);
                 supplierInputDataDialog.open();
             };
-
             var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
 
+            var sCancelBtn = tablePlugin.getButtonByPluginId("sCancelBtn");
+            sCancelBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var docPeriodId = selectionData.data.docPeriodId,
+                    dataDocPeriodBegin = selectionData.data.periodBegin,
+                    dataDocPeriodEnd = selectionData.data.periodEnd;
+                var sendObject = {docPeriodId: docPeriodId};
+                var sumOfSelectedPeriods = 0;
+                selectionData.periods.forEach(function(period) {
+                    sumOfSelectedPeriods += period.periodEnd - period.periodBegin;
+                });
+
+                var doRemoveDonut = (dataDocPeriodEnd - dataDocPeriodBegin) === sumOfSelectedPeriods;
+                if (doRemoveDonut) {
+                    sendTableAjax("removeDonut", {dataForDelete: sendObject});
+                } else {
+                    var newPeriod = {periodBegin: null, periodEnd: null};
+                    var utcDate = docDateSelector.getSelectionObject().date.getTime();
+// TODO
+//                    var gapIndex = 0;
+//                    if (selectionData.periods.length === 1) {
+//
+//                    } else{
+//                        for (var i = 0; i < selectionData.periods.length - 1; i++) {
+//                            if (selectionData.periods[i].periodEnd != selectionData.periods[i + 1].periodBegin) {
+//                                gapIndex = i;
+//                                break;
+//                            }
+//                        }
+//                    }
+
+                    selectionData.periods.forEach(function(period) {
+                        sumOfSelectedPeriods += period.periodEnd - period.periodBegin;
+                    });
+
+
+                    newPeriod.periodBegin = selectionData.periods[0].periodBegin * 60 * 1000 + utcDate;
+                    newPeriod.periodEnd = selectionData.periods[0].periodEnd * 60 * 1000 + utcDate;
+                    $.extend(sendObject, newPeriod);
+                    sendTableAjax("updateDonut", {dataForUpdate: sendObject});
+                }
+            };
             </c:if>
 
 
-            createBindingBetweenSelectorAndTable();
+            docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
+                tablePlugin.setDisabled(!isSelectionAvailable);
+            });
             $docAndDateSelector.triggerEvents();
+            // дату надо пересыдать с временной зоной(Z)
+            // date format: 'YYYY-mm-dd'
+            function periodAsTimestamps(periodBegin, periodEnd, dateString, offset) {
+                Date.parse(dateString);
+            }
 
-            <%--------------------------------------------FUNCTIONS---------------------------------------------------%>
-            function createBindingBetweenSelectorAndTable() {
-                docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
-                    tablePlugin.setDisabled(!isSelectionAvailable);
+            function sendTableAjax(url, data, onDone) {
+                //tablePlugin.setDisabled(true);
+                var rawDocDateSelection = docDateSelector.getSelectionObject();
+                var forSendDocDateSelection = $.extend(rawDocDateSelection, {date: rawDocDateSelection.date.getTime()});
+                var sendObject = {docDateSelection: forSendDocDateSelection};
+                if (data) {
+                    sendObject = $.extend(true, sendObject, data);
+                }
+                for (var key in sendObject) {
+                    if (sendObject.hasOwnProperty(key)) {
+                        sendObject[key] = JSON.stringify(sendObject[key]);
+                    }
+                }
+
+                $.ajax({
+                    url: url,
+                    method: "POST",
+                    data: sendObject,
+                    dataType: "json"
+                }).done(function (tableData) {
+                    tablePlugin.setData(tableData.docPeriods);
+                    //ablePlugin.setDisabled(false);
+                    if (onDone) onDone();
+                }).fail(function () {
+                    window.alert("error");
+                   // tablePlugin.setDisabled(false);
                 });
             }
 
