@@ -20,7 +20,7 @@ public class Donut {
 
     public Donut(String jsonSting) throws ValidateDataException {
         try {
-            JsonObject receivedJsonObject = JsonUtils.parseString(jsonSting);
+            JsonObject receivedJsonObject = JsonUtils.parseStringAsObject(jsonSting);
             this.driver = receivedJsonObject.getString("driver");
             this.licensePlate = receivedJsonObject.getString("licensePlate");
             this.palletsQty = receivedJsonObject.getInt("palletsQty");

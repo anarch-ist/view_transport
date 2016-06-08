@@ -70,14 +70,14 @@
             docDateSelector.setOnSelected(function(event, docDateSelection) {
                 window.console.log("SELECTED EVENT");
                 window.console.log(docDateSelection);
+                window.console.log($.extend(docDateSelection, {date: docDateSelection.date.getTime()}));
+
             });
 
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                 window.console.log("SELECTION AVAILABLE EVENT");
                 window.console.log(isSelectionAvailable);
             });
-
-
         });
     </script>
 </head>

@@ -162,6 +162,8 @@
             generateEvents();
         };
 
+
+
         //-------------------------- FUNCTIONS -------------------------------
         function setDoc(docId) {
             $docSelect.val(docId);
@@ -169,6 +171,7 @@
         }
 
         function fillOffset(warehouseById) {
+            $offsetDiv.data("offset", warehouseById.timeOffset);
             $offsetDiv.text(warehouseById.rusTimeZoneAbbr + " GMT+" + warehouseById.timeOffset);
         }
 
@@ -201,13 +204,17 @@
             lastSelectionAvailable = selectionAvailable;
         }
 
+        /**
+         *
+         * @returns {null or selection Object}
+         */
         function getSelectionObject() {
-            // BINDING date format with GetTableDataServlet
-            var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d');
+            var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d'); // actually 'YYYY-MM-DD'
             var selectedDocId =  +$docSelect.chosen().val();
             var selectedWarehouseId = +getSelectedWarehouseId();
             if (selectedDocId && selectedWarehouseId) {
-                return {date: selectedDate, warehouseId: selectedWarehouseId, docId: selectedDocId};
+                var utcDate = new Date(new Date(Date.parse(selectedDate)).getTime() - getOffset() * 3600 * 1000);
+                return {date: utcDate, warehouseId: selectedWarehouseId, docId: selectedDocId};
             } else {
                 return null;
             }
@@ -244,6 +251,10 @@
             objects.sort(compare);
         }
 
+        function getOffset() {
+            return +$offsetDiv.data("offset");
+        }
+        this.getOffset = getOffset;
         this.getSelectionObject = getSelectionObject;
 
         return this;

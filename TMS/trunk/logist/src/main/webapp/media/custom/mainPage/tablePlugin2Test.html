@@ -19,6 +19,15 @@
                 parentId: 'tableContainer',
                 cellSize: 30,
                 windowSize: 60 * 24,
+                allowedStatesForSelection: {
+                    isOpenedAllowed: true,
+                    isClosedAllowed: false,
+                    isOccupiedAllowed: true
+                },
+                selectionModel: {
+                    isSelectAllOccupied: false,
+                    isSelectAllClosed: false
+                },
                 selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
                     if (selectedSerialNumbers.length === 0) {
                         return false;
@@ -43,15 +52,6 @@
                         }
                     }
                     return true;
-                },
-                allowedStatesForSelection: {
-                    isOpenedAllowed: true,
-                    isClosedAllowed: true,
-                    isOccupiedAllowed: true
-                },
-                selectionModel: {
-                    isSelectAllOccupied: false,
-                    isSelectAllClosed: false
                 },
                 buttons: [
                     {
@@ -86,7 +86,6 @@
             tablePlugin2.setOnAnySelected(function(e) {
                 console.log("ANY SELECTED: " + e.detail);
             });
-
             tablePlugin2.setOnDisableChanged(function(e) {
                 window.console.log("DISABLE CHANGED: " + e.detail);
             });
