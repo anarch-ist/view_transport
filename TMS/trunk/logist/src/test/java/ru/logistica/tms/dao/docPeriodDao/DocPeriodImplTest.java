@@ -82,7 +82,7 @@ public class DocPeriodImplTest extends HibernateTest {
         secondPeriodBeginTimestamp = dateFormat.parse("10-05-2016T20:30:00Z");
         secondPeriodEndTimestamp = dateFormat.parse("10-05-2016T21:00:00Z");
         donutDocPeriod.setPeriod(new Period(secondPeriodBeginTimestamp, secondPeriodEndTimestamp));
-        donutDocPeriod.setComment("fffu");
+        donutDocPeriod.setCommentForDonut("fffu");
         donutDocPeriod.setCreationDate(new Date());
         donutDocPeriod.setDriver("driver");
         donutDocPeriod.setDriverPhoneNumber("dr_phobe");

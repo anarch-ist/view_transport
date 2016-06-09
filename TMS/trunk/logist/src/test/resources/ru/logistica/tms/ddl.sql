@@ -51,7 +51,7 @@ CREATE TABLE suppliers (
 CREATE TABLE donut_doc_periods (
   donutDocPeriodID  BIGINT,
   creationDate      DATE         NOT NULL DEFAULT NOW(), -- Static
-  comment           TEXT         NOT NULL, -- Static
+  commentForDonut   TEXT         NOT NULL, -- Static
   driver            VARCHAR(255) NOT NULL, -- Static
   driverPhoneNumber VARCHAR(12)  NOT NULL, -- Static
   licensePlate      VARCHAR(9)   NOT NULL, -- Static

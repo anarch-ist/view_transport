@@ -70,7 +70,7 @@
                     isOccupiedAllowed: true
                 },
                 selectionModel: {
-                    isSelectAllOccupied: <c:out value="${isWarehouseBoss || isWarehouseDispatcher}"/>,
+                    isSelectAllOccupied: true,
                     isSelectAllClosed: false
                 },
 
@@ -103,15 +103,15 @@
                 buttons: [
                     {
                         name: "отменить",
-                        id: "sCancelBtn",
+                        id: "sDeleteBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
-                            return state === "OCCUPIED";
+                            return (state === "OCCUPIED" && isFullPeriodSelected);
                         }
                     },
                     {
                         name: "изменить",
-                        id: "sChangeBtn",
+                        id: "sUpdateBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return (state === "OCCUPIED" && isFullPeriodSelected);
@@ -119,7 +119,7 @@
                     },
                     {
                         name: "зарезервировать",
-                        id: "sReserveBtn",
+                        id: "sInsertBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OPENED";
@@ -200,6 +200,7 @@
             warehousesData.warehouses.forEach(function(warehouse) {
                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
             });
+            var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
 
             var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
@@ -209,21 +210,70 @@
                     ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus"]
                 },
                 orderStatuses: ${requestScope.orderStatuses},
-                warehouses: warehousesKeyValuePairs,
-                onSubmit: function() {
-                    sendTableAjax("setTableData", {donut: donutCrudPluginInstance.getData()}, function() {supplierInputDataDialog.close();})
-                }
+                warehouses: warehousesKeyValuePairs
             });
 
-            var sReserveBtn = tablePlugin.getButtonByPluginId("sReserveBtn");
-            sReserveBtn.onclick = function(e) {
-                var docDateSelection = docDateSelector.getSelectionObject();
-                if (docDateSelection === null) {
-                    return;
-                }
-                var selectionData = tablePlugin.getSelectionData();
-                var supplierName = '<c:out value="${sessionScope.user.supplier.inn}"/>';
+            var sInsertBtn = tablePlugin.getButtonByPluginId("sInsertBtn");
+            sInsertBtn.onclick = function(e) {
+                donutCrudPluginInstance.setSupplierName('<c:out value="${sessionScope.user.supplier.inn}"/>');
+                donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                donutCrudPluginInstance.setOnSubmit(function() {
+                    sendTableAjax("insertDonut", {createdDonut: donutCrudPluginInstance.getData()}, function() {
+                        donutCrudPluginInstance.setOnSubmit(null);
+                        supplierInputDataDialog.close();
+                    })
+                });
+                supplierInputDataDialog.open();
+            };
 
+            var sUpdateBtn = tablePlugin.getButtonByPluginId("sUpdateBtn");
+            sUpdateBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var sendObject = {donutDocPeriodId: donutDocPeriodId};
+                // TODO get IDs for deleted requests and send
+                $.ajax({
+                    url: "selectDonut",
+                    method: "POST",
+                    data: sendObject,
+                    dataType: "json"
+                }).done(function (donutData) {
+                    donutCrudPluginInstance.setData(donutData);
+                    donutCrudPluginInstance.setSupplierName('<c:out value="${sessionScope.user.supplier.inn}"/>');
+                    donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                    donutCrudPluginInstance.setOnSubmit(function() {
+                        var sendObject = $.extend(
+                                donutCrudPluginInstance.getData(),
+                                {removedOrders: removedOrders, donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
+                        );
+                        sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
+                            donutCrudPluginInstance.setOnRowRemoved(null);
+                            donutCrudPluginInstance.setOnSubmit(null);
+                            supplierInputDataDialog.close();
+                        })
+                    });
+                    var removedOrders = [];
+                    donutCrudPluginInstance.setOnRowRemoved(function(rowData) {
+                        if (rowData.orderId !== null) {
+                            removedOrders.push(rowData.orderId);
+                        }
+                    });
+                    supplierInputDataDialog.open();
+                }).fail(function () {
+                    window.alert("error");
+                });
+            };
+
+            var sDeleteBtn = tablePlugin.getButtonByPluginId("sDeleteBtn");
+            sDeleteBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var sendObject = {donutDocPeriodId: donutDocPeriodId};
+                sendTableAjax("deleteDonut", {dataForDelete: sendObject});
+            };
+
+            function getSelectedPeriodAsString() {
+                var selectionData = tablePlugin.getSelectionData();
                 var periodsString;
                 var periods = selectionData[0].periods;
                 if (periods.length === 1) {
@@ -232,54 +282,9 @@
                     periodsString = periods[0].periodBegin + ";" + periods[periods.length - 1].periodEnd;
                 } else
                     throw new Error("bad period");
-                donutCrudPluginInstance.setSupplierName(supplierName);
-                donutCrudPluginInstance.setPeriod(periodsString);
-                supplierInputDataDialog.open();
-            };
-            var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
+                return periodsString;
+            }
 
-            var sCancelBtn = tablePlugin.getButtonByPluginId("sCancelBtn");
-            sCancelBtn.onclick = function(e) {
-                var selectionData = tablePlugin.getSelectionData()[0];
-                var docPeriodId = selectionData.data.docPeriodId,
-                    dataDocPeriodBegin = selectionData.data.periodBegin,
-                    dataDocPeriodEnd = selectionData.data.periodEnd;
-                var sendObject = {docPeriodId: docPeriodId};
-                var sumOfSelectedPeriods = 0;
-                selectionData.periods.forEach(function(period) {
-                    sumOfSelectedPeriods += period.periodEnd - period.periodBegin;
-                });
-
-                var doRemoveDonut = (dataDocPeriodEnd - dataDocPeriodBegin) === sumOfSelectedPeriods;
-                if (doRemoveDonut) {
-                    sendTableAjax("removeDonut", {dataForDelete: sendObject});
-                } else {
-                    var newPeriod = {periodBegin: null, periodEnd: null};
-                    var utcDate = docDateSelector.getSelectionObject().date.getTime();
-// TODO
-//                    var gapIndex = 0;
-//                    if (selectionData.periods.length === 1) {
-//
-//                    } else{
-//                        for (var i = 0; i < selectionData.periods.length - 1; i++) {
-//                            if (selectionData.periods[i].periodEnd != selectionData.periods[i + 1].periodBegin) {
-//                                gapIndex = i;
-//                                break;
-//                            }
-//                        }
-//                    }
-
-                    selectionData.periods.forEach(function(period) {
-                        sumOfSelectedPeriods += period.periodEnd - period.periodBegin;
-                    });
-
-
-                    newPeriod.periodBegin = selectionData.periods[0].periodBegin * 60 * 1000 + utcDate;
-                    newPeriod.periodEnd = selectionData.periods[0].periodEnd * 60 * 1000 + utcDate;
-                    $.extend(sendObject, newPeriod);
-                    sendTableAjax("updateDonut", {dataForUpdate: sendObject});
-                }
-            };
             </c:if>
 
 

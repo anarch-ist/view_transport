@@ -12,7 +12,7 @@ import java.util.Set;
 @PrimaryKeyJoinColumn(name="donutdocperiodid")
 public class DonutDocPeriod extends DocPeriod{
     private Date creationDate;
-    private String comment;
+    private String commentForDonut;
     private String driver;
     private String driverPhoneNumber;
     private String licensePlate;
@@ -32,13 +32,13 @@ public class DonutDocPeriod extends DocPeriod{
     }
 
     @Basic
-    @Column(name = "comment", nullable = false, length = -1)
-    public String getComment() {
-        return comment;
+    @Column(name = "commentfordonut", nullable = false, length = -1)
+    public String getCommentForDonut() {
+        return commentForDonut;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setCommentForDonut(String commentForDonut) {
+        this.commentForDonut = commentForDonut;
     }
 
     @Basic
@@ -105,7 +105,7 @@ public class DonutDocPeriod extends DocPeriod{
         return "DonutDocPeriod{" +
                 super.toString() +
                 "creationDate=" + creationDate +
-                ", comment='" + comment + '\'' +
+                ", comment='" + commentForDonut + '\'' +
                 ", driver='" + driver + '\'' +
                 ", driverPhoneNumber='" + driverPhoneNumber + '\'' +
                 ", licensePlate='" + licensePlate + '\'' +

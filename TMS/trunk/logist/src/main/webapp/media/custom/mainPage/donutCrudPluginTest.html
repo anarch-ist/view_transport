@@ -38,7 +38,7 @@
                 commentForDonut:"someComment",
                 orders:[
                     {
-                        orderId: 1,
+                        orderId: 1,  // number or null
                         orderNumber: "orewnoer123",
                         finalDestinationWarehouseId: 1,
                         boxQty:4,
@@ -59,7 +59,12 @@
                 warehouses: {1: "СКЛАД"}
             });
             donutCrudPluginInstance.setData(exampleData);
-            window.console.log(donutCrudPluginInstance.getData());
+            donutCrudPluginInstance.setData(exampleData);
+            //window.console.log(donutCrudPluginInstance.getData());
+            donutCrudPluginInstance.setOnRowRemoved(function(rowData) {
+                window.console.log(rowData);
+            });
+
 
         });
     </script>
