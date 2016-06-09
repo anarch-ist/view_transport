@@ -84,7 +84,8 @@
                 window.console.log("CREATED");
             });
             tablePlugin2.setOnAnySelected(function(e) {
-                console.log("ANY SELECTED: " + e.detail);
+                window.console.log(tablePlugin2.getSelectionData());
+                window.console.log("ANY SELECTED: " + e.detail);
             });
             tablePlugin2.setOnDisableChanged(function(e) {
                 window.console.log("DISABLE CHANGED: " + e.detail);

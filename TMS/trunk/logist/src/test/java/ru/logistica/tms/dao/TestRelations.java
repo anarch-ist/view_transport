@@ -1,7 +1,6 @@
 package ru.logistica.tms.dao;
 
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.HibernateTest;
 import ru.logistica.tms.dao.docDao.Doc;
@@ -53,7 +52,7 @@ public class TestRelations extends HibernateTest {
 
         donutDocPeriod = new DonutDocPeriod();
         donutDocPeriod.setPeriod(new Period(new Date(BASE_PERIOD *5), new Date(BASE_PERIOD *6)));
-        donutDocPeriod.setComment("donutComment");
+        donutDocPeriod.setCommentForDonut("donutComment");
         donutDocPeriod.setCreationDate(new Date(java.sql.Date.valueOf("2016-02-13").getTime()));
         donutDocPeriod.setDriver("someDriver");
         donutDocPeriod.setDriverPhoneNumber("865943567");

@@ -10,13 +10,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/removeDonut")
-public class RemoveDonut extends AjaxHttpServlet {
+@WebServlet("/deleteDonut")
+public class RemoveDonutDocPeriod extends AjaxHttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonObject dataForDelete = JsonUtils.parseStringAsObject(req.getParameter("dataForDelete"));
-        long docPeriodId = dataForDelete.getJsonNumber("docPeriodId").longValueExact();
-        DaoFacade.deleteDonutWithRequests(docPeriodId);
+        long donutDocPeriodId = dataForDelete.getJsonNumber("donutDocPeriodId").longValueExact();
+        DaoFacade.deleteDonutWithRequests(donutDocPeriodId);
         req.getRequestDispatcher("/getTableData").forward(req, resp);
     }
 }

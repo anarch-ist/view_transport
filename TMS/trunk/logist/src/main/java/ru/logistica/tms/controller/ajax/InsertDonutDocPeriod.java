@@ -12,18 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/setTableData")
-public class SetTableDataServlet extends AjaxHttpServlet {
+@WebServlet("/insertDonut")
+public class InsertDonutDocPeriod extends AjaxHttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String donutData = req.getParameter("donut");
+        String donutData = req.getParameter("createdDonut");
         String docDateSelection = req.getParameter("docDateSelection");
         SupplierUser supplierUser = (SupplierUser)req.getSession(false).getAttribute("user");
-
-//        System.out.println("WRITE INTO DB: " + donutData);
-//        System.out.println("docDateSelection: " + docDateSelection);
-//        System.out.println("supplierUser: " + supplierUser);
 
         Donut donut;
         DocDateSelectorData docDateSelectorData;

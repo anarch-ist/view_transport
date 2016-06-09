@@ -2,6 +2,7 @@ package ru.logistica.tms.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.Hibernate;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
@@ -46,6 +47,20 @@ public class DaoFacade {
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
+    }
+
+    public static DonutDocPeriod selectDonutWithRequests(final long donutDocPeriodId) {
+        final DonutDocPeriod[] result = new DonutDocPeriod[1];
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                Hibernate.initialize(donutDocPeriod.getOrders());
+                result[0] = donutDocPeriod;
+            }
+        });
+        return result[0];
     }
 
     public static void updateDonutPeriod(final long donutDocPeriodId, final Date periodBegin, final Date periodEnd) {
@@ -93,7 +108,7 @@ public class DaoFacade {
                 donutDocPeriod.setSupplier(supplier);
                 donutDocPeriod.setPalletsQty((short) donut.palletsQty);
                 donutDocPeriod.setLicensePlate(donut.licensePlate);
-                donutDocPeriod.setComment(donut.commentForDonut);
+                donutDocPeriod.setCommentForDonut(donut.commentForDonut);
                 donutDocPeriod.setCreationDate(new Date());
                 donutDocPeriod.setDriver(donut.driver);
                 donutDocPeriod.setDriverPhoneNumber(donut.driverPhoneNumber);

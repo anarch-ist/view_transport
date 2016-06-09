@@ -183,7 +183,27 @@
         }
 
         // --------------------------- METHODS --------------------------------
+        if (settings.isEditable) {
+            this.setOnSubmit = function (onSubmitHandler) {
+                submitBtn.off("click");
+                if (onSubmitHandler) {
+                    submitBtn.on("click", function (e) {
+                        onSubmitHandler();
+                    });
+                }
+            };
+        }
 
+        this.setOnRowRemoved = function(handler) {
+            ordersDataTableEditor.off('initRemove');
+            if (handler) {
+                ordersDataTableEditor.on('initRemove', function(e, node, rowsData) {
+                    rowsData.forEach(function(rowData) {
+                        handler(toPluginDataModel(rowData));
+                    });
+                });
+            }
+        };
         this.setPeriod = function(periodString){
             donutFields.periodInput.val(periodString);
         };
@@ -191,18 +211,17 @@
             donutFields.companyNameDiv.text(supplierName);
         };
         this.setData = function(data) {
-            donutFields.companyNameDiv.text(data.supplierName);
+            this.setSupplierName(data.supplierName);
             this.setPeriod(data.period);
             donutFields.driverNameInput.val(data.driver);
             donutFields.licensePlateInput.val(data.licensePlate);
             donutFields.palletQtyInput.val(data.palletsQty);
             donutFields.driverPhoneNumberInput.val(data.driverPhoneNumber);
             donutFields.commentArea.val(data.commentForDonut);
-            ordersDataTableEditor.remove('tr');
+            ordersDataTableEditor.remove('tr', false).submit();
             data.orders.forEach(function(order) {
                 createRow(order.orderId, order.orderNumber, order.finalDestinationWarehouseId, order.boxQty, order.commentForStatus, order.orderStatusId);
             });
-
         };
 
         this.getData = function() {
@@ -215,14 +234,8 @@
             result.palletsQty = +donutFields.palletQtyInput.val();
             result.driverPhoneNumber = donutFields.driverPhoneNumberInput.val();
             var orders = [];
-            dataTable.data().each(function(row) {
-                var copy = $.extend({}, row);
-                copy.boxQty = +copy.boxQty;
-                copy.finalDestinationWarehouseId = +copy.finalDestinationWarehouseId;
-                if (copy.orderId.lastIndexOf("virtualId", 0) === 0) {
-                    copy.orderId = null;
-                }
-                orders.push(copy);
+            dataTable.data().each(function(rowData) {
+                orders.push(toPluginDataModel(rowData));
             });
             result.orders = orders;
             return result;
@@ -232,7 +245,7 @@
         var idGenerator = makeCounter();
         var currentId;
         function getId() {
-            if (currentId) {
+            if (typeof currentId === "number") {
                 return currentId;
             } else {
                 return "virtualId" + idGenerator(); // get new GUID from custom method
@@ -255,6 +268,16 @@
             return function () {
                 return counter++;
             };
+        }
+
+        function toPluginDataModel(rowData) {
+            var copy = $.extend({}, rowData);
+            copy.boxQty = +copy.boxQty;
+            copy.finalDestinationWarehouseId = +copy.finalDestinationWarehouseId;
+            if (typeof copy.orderId !== "number") {
+                copy.orderId = null;
+            }
+            return copy;
         }
 
         function setReadOnlyIfOption(donutOptionName, $donutInput) {

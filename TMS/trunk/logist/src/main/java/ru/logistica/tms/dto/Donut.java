@@ -1,5 +1,6 @@
 package ru.logistica.tms.dto;
 
+import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.util.JsonUtils;
 
 import javax.json.*;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 public class Donut {
     //    public final String supplierName;
+    public final Long donutDocPeriodId; // can be null
     public final String period;
     public final String driver;
     public final String licensePlate;
@@ -21,6 +23,12 @@ public class Donut {
     public Donut(String jsonSting) throws ValidateDataException {
         try {
             JsonObject receivedJsonObject = JsonUtils.parseStringAsObject(jsonSting);
+            if (receivedJsonObject.containsKey("donutDocPeriodId") &&
+                    receivedJsonObject.get("donutDocPeriodId").getValueType().equals(JsonValue.ValueType.NUMBER)) {
+                this.donutDocPeriodId = receivedJsonObject.getJsonNumber("donutDocPeriodId").longValue();
+            } else {
+                this.donutDocPeriodId = null;
+            }
             this.driver = receivedJsonObject.getString("driver");
             this.licensePlate = receivedJsonObject.getString("licensePlate");
             this.palletsQty = receivedJsonObject.getInt("palletsQty");
@@ -59,7 +67,8 @@ public class Donut {
         }
     }
 
-    public Donut(String period, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<Order> orders) {
+    public Donut(Long donutDocPeriodId, String period, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<Order> orders) {
+        this.donutDocPeriodId = donutDocPeriodId;
         this.period = period;
         this.driver = driver;
         this.licensePlate = licensePlate;
@@ -72,7 +81,9 @@ public class Donut {
     @Override
     public String toString() {
         return "Donut{" +
-                "driver='" + driver + '\'' +
+                "donutDocPeriodId=" + donutDocPeriodId +
+                ", period='" + period + '\'' +
+                ", driver='" + driver + '\'' +
                 ", licensePlate='" + licensePlate + '\'' +
                 ", palletsQty=" + palletsQty +
                 ", driverPhoneNumber='" + driverPhoneNumber + '\'' +
@@ -80,7 +91,6 @@ public class Donut {
                 ", orders=" + orders +
                 '}';
     }
-
 
     public static class Order {
         public final Integer orderId; // can be null
