@@ -211,7 +211,7 @@
             donutFields.companyNameDiv.text(supplierName);
         };
         this.setData = function(data) {
-            this.setSupplierName(data.supplierName);
+            this.setSupplierName(data.supplierInn);
             this.setPeriod(data.period);
             donutFields.driverNameInput.val(data.driver);
             donutFields.licensePlateInput.val(data.licensePlate);

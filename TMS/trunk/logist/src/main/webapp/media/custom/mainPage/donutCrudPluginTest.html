@@ -27,7 +27,7 @@
 
     <script>
         var exampleData = {
-            supplierName: "поставщик1",
+            supplierInn: "поставщик1",
             period:"t1 t2",
             driver:"someDriver",
             licensePlate: "hbguegrf",
@@ -36,7 +36,7 @@
             commentForDonut:"someComment",
             orders:[
                 {
-                    orderId: 1,  // number or null
+                    orderId: 7,  // number or null
                     orderNumber: "orewnoer123",
                     finalDestinationWarehouseId: 1,
                     boxQty:4,
@@ -48,23 +48,23 @@
         var donutCrudPluginInstance;
         $(document).ready(function() {
 
-
-
             donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
-                ordersCrud: "all",
+                ordersCrud: "update",
                 editableFields: {
-                    donutFields: ["driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
-                    ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
+                    donutFields: [],
+                    ordersFields: ["orderStatusId", "commentForStatus"]
                 },
                 orderStatuses: {STATUS: "СТАТУС"},
                 warehouses: {1: "СКЛАД"}
             });
-            donutCrudPluginInstance.setData(exampleData);
+
             //window.console.log(donutCrudPluginInstance.getData());
             donutCrudPluginInstance.setOnRowRemoved(function(rowData) {
                 window.console.log(rowData);
             });
+            donutCrudPluginInstance.setData(exampleData);
+
 
 
         });

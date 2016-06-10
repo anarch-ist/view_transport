@@ -50,13 +50,15 @@ public class SelectDonutDocPeriod extends AjaxHttpServlet {
      */
     private JsonObject getAsJsonObject(DonutDocPeriod donutDocPeriod) {
 
+
         JsonObjectBuilder resultBuilder = Json.createObjectBuilder();
         resultBuilder
                 .add("driver", donutDocPeriod.getDriver())
                 .add("licensePlate", donutDocPeriod.getLicensePlate())
                 .add("palletsQty", donutDocPeriod.getPalletsQty())
                 .add("driverPhoneNumber", donutDocPeriod.getDriverPhoneNumber())
-                .add("commentForDonut", donutDocPeriod.getCommentForDonut());
+                .add("commentForDonut", donutDocPeriod.getCommentForDonut())
+                .add("supplierInn", donutDocPeriod.getSupplier().getInn());
 
         JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
         Set<Order> orders = donutDocPeriod.getOrders();
