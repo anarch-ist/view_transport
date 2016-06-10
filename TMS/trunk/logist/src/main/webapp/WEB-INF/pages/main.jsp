@@ -231,7 +231,7 @@
                 var selectionData = tablePlugin.getSelectionData()[0];
                 var donutDocPeriodId = selectionData.data.docPeriodId;
                 var sendObject = {donutDocPeriodId: donutDocPeriodId};
-                // TODO get IDs for deleted requests and send
+
                 $.ajax({
                     url: "selectDonut",
                     method: "POST",
@@ -246,6 +246,7 @@
                                 donutCrudPluginInstance.getData(),
                                 {removedOrders: removedOrders, donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
                         );
+                        window.console.log(donutCrudPluginInstance.getData());
                         sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
                             donutCrudPluginInstance.setOnRowRemoved(null);
                             donutCrudPluginInstance.setOnSubmit(null);

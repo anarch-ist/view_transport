@@ -13,7 +13,7 @@ import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
-import ru.logistica.tms.dto.Donut;
+import ru.logistica.tms.dto.DonutInsertData;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import java.text.SimpleDateFormat;
@@ -91,10 +91,10 @@ public class DaoFacadeTest extends HibernateTest {
     public void testInsertDonut() throws Exception {
         DaoFacade.fillOffsetsForAbbreviations();
 
-        Set<Donut.Order> orders = new HashSet<>();
-        Donut.Order dtoOrder = new Donut.Order(2, "234", 2, 4, "erferg", OrderStatuses.CREATED.name());
+        Set<DonutInsertData.OrderInsertData> orders = new HashSet<>();
+        DonutInsertData.OrderInsertData dtoOrder = new DonutInsertData.OrderInsertData("234", 2, 4, "erferg", OrderStatuses.CREATED.name());
         orders.add(dtoOrder);
-        Donut donut = new Donut("450;510", "driver", "licPl", 4, "phN", "commne", orders);
+        DonutInsertData donut = new DonutInsertData("450;510", "driver", "licPl", 4, "phN", "commne", orders);
         DocDateSelectorData docDateSelectorData = new DocDateSelectorData(new Date().getTime(), 1, 1);
 
         HibernateUtils.beginTransaction();

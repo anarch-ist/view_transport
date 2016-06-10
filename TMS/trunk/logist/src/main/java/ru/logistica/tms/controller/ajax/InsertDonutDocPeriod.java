@@ -3,7 +3,7 @@ package ru.logistica.tms.controller.ajax;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dto.DocDateSelectorData;
-import ru.logistica.tms.dto.Donut;
+import ru.logistica.tms.dto.DonutInsertData;
 import ru.logistica.tms.dto.ValidateDataException;
 
 import javax.servlet.ServletException;
@@ -21,17 +21,17 @@ public class InsertDonutDocPeriod extends AjaxHttpServlet {
         String docDateSelection = req.getParameter("docDateSelection");
         SupplierUser supplierUser = (SupplierUser)req.getSession(false).getAttribute("user");
 
-        Donut donut;
+        DonutInsertData donutInsertData;
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(docDateSelection);
-            donut = new Donut(donutData);
+            donutInsertData = new DonutInsertData(donutData);
 //            System.out.println(donut);
         } catch (ValidateDataException e) {
             throw new ServletException(e);
         }
 
-        DaoFacade.insertDonut(donut, docDateSelectorData, supplierUser.getSupplier());
+        DaoFacade.insertDonut(donutInsertData, docDateSelectorData, supplierUser.getSupplier());
 
         req.getRequestDispatcher("getTableData").forward(req, resp);
     }

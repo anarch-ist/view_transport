@@ -22,7 +22,8 @@ import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.AuthResult;
 import ru.logistica.tms.dto.DocDateSelectorData;
-import ru.logistica.tms.dto.Donut;
+import ru.logistica.tms.dto.DonutInsertData;
+import ru.logistica.tms.dto.DonutUpdateData;
 import ru.logistica.tms.util.CriptUtils;
 
 import java.util.*;
@@ -63,6 +64,58 @@ public class DaoFacade {
         return result[0];
     }
 
+    public static void updateDonutWithRequests(final DonutUpdateData donutUpdateData) {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, (long) donutUpdateData.donutDocPeriodId);
+                donutDocPeriod.setDriverPhoneNumber(donutUpdateData.driverPhoneNumber);
+                donutDocPeriod.setDriver(donutUpdateData.driver);
+                donutDocPeriod.setCommentForDonut(donutUpdateData.commentForDonut);
+                donutDocPeriod.setLicensePlate(donutUpdateData.licensePlate);
+                donutDocPeriod.setPalletsQty((short) donutUpdateData.palletsQty);
+
+
+                OrderDao orderDao = new OrderDaoImpl();
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                Set<DonutUpdateData.OrderUpdateData> ordersUpdateData = donutUpdateData.orders;
+                for (DonutUpdateData.OrderUpdateData orderUpdateData : ordersUpdateData) {
+                    if (orderUpdateData.orderId == null) {
+                        // insert
+                        Order order = new Order();
+                        order.setOrderStatus(OrderStatuses.valueOf(orderUpdateData.orderStatusId));
+                        order.setOrderNumber(orderUpdateData.orderNumber);
+                        order.setFinalDestinationWarehouse(warehouseDao.findById(Warehouse.class, orderUpdateData.finalDestinationWarehouseId));
+                        order.setBoxQty((short) orderUpdateData.boxQty);
+                        order.setDonutDocPeriod(donutDocPeriod);
+                        order.setCommentForStatus(orderUpdateData.commentForStatus);
+                        orderDao.save(order);
+                    } else {
+                        // update
+                        Order order = orderDao.findById(Order.class, orderUpdateData.orderId);
+                        order.setOrderStatus(OrderStatuses.valueOf(orderUpdateData.orderStatusId));
+                        order.setOrderNumber(orderUpdateData.orderNumber);
+                        order.setFinalDestinationWarehouse(warehouseDao.findById(Warehouse.class, orderUpdateData.finalDestinationWarehouseId));
+                        order.setBoxQty((short) orderUpdateData.boxQty);
+                        order.setCommentForStatus(orderUpdateData.commentForStatus);
+                        orderDao.update(order);
+                    }
+                }
+                donutDocPeriodDao.update(donutDocPeriod);
+
+                for (Integer orderIdForDelete: donutUpdateData.ordersIdForDelete) {
+                    // delete transient instance
+                    Order order = orderDao.findById(Order.class, orderIdForDelete);
+                    order.setOrderId(orderIdForDelete);
+                    orderDao.delete(order);
+                }
+
+            }
+
+        });
+    }
+
     public static void updateDonutPeriod(final long donutDocPeriodId, final Date periodBegin, final Date periodEnd) {
         doInTransaction(new DaoScript() {
             @Override
@@ -92,7 +145,7 @@ public class DaoFacade {
 
     }
 
-    public static void insertDonut(final Donut donut, final DocDateSelectorData docDateSelectorData, final Supplier usersSupplier) {
+    public static void insertDonut(final DonutInsertData donut, final DocDateSelectorData docDateSelectorData, final Supplier usersSupplier) {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -119,7 +172,7 @@ public class DaoFacade {
                 donutDocPeriodDao.save(donutDocPeriod);
 
                 OrderDao orderDao = new OrderDaoImpl();
-                for (Donut.Order dtoOrder: donut.orders) {
+                for (DonutInsertData.OrderInsertData dtoOrder: donut.orders) {
                     Order order = new Order();
                     order.setBoxQty((short) dtoOrder.boxQty);
                     order.setCommentForStatus(dtoOrder.commentForStatus);

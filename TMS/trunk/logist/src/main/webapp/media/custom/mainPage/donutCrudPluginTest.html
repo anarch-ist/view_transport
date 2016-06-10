@@ -24,29 +24,31 @@
 
 
     <script src="donutCrudPlugin.js"></script>
+
     <script>
+        var exampleData = {
+            supplierName: "поставщик1",
+            period:"t1 t2",
+            driver:"someDriver",
+            licensePlate: "hbguegrf",
+            palletsQty: 4,
+            driverPhoneNumber: "+7906548976",
+            commentForDonut:"someComment",
+            orders:[
+                {
+                    orderId: 1,  // number or null
+                    orderNumber: "orewnoer123",
+                    finalDestinationWarehouseId: 1,
+                    boxQty:4,
+                    commentForStatus: "order status comment",
+                    orderStatusId: "STATUS"
+                }
+            ]
+        };
         var donutCrudPluginInstance;
         $(document).ready(function() {
 
-            var exampleData = {
-                supplierName: "поставщик1",
-                period:"t1 t2",
-                driver:"someDriver",
-                licensePlate: "hbguegrf",
-                palletsQty: 4,
-                driverPhoneNumber: "+7906548976",
-                commentForDonut:"someComment",
-                orders:[
-                    {
-                        orderId: 1,  // number or null
-                        orderNumber: "orewnoer123",
-                        finalDestinationWarehouseId: 1,
-                        boxQty:4,
-                        commentForStatus: "order status comment",
-                        orderStatusId: "STATUS"
-                    }
-                ]
-            };
+
 
             donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
@@ -58,7 +60,6 @@
                 orderStatuses: {STATUS: "СТАТУС"},
                 warehouses: {1: "СКЛАД"}
             });
-            donutCrudPluginInstance.setData(exampleData);
             donutCrudPluginInstance.setData(exampleData);
             //window.console.log(donutCrudPluginInstance.getData());
             donutCrudPluginInstance.setOnRowRemoved(function(rowData) {
