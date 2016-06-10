@@ -1,41 +1,38 @@
 package ru.logistica.tms.dto;
 
-import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.util.JsonUtils;
 
-import javax.json.*;
+import javax.json.JsonArray;
+import javax.json.JsonNumber;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Donut {
-    //    public final String supplierName;
-    public final Long donutDocPeriodId; // can be null
+public class DonutUpdateData {
+    public final int donutDocPeriodId;
     public final String period;
     public final String driver;
     public final String licensePlate;
     public final int palletsQty;
     public final String driverPhoneNumber;
     public final String commentForDonut;
-    public final Set<Order> orders;
+    public final Set<OrderUpdateData> orders;
+    public final Set<Integer> ordersIdForDelete;
 
-
-    public Donut(String jsonSting) throws ValidateDataException {
+    public DonutUpdateData(String jsonSting) throws ValidateDataException {
         try {
             JsonObject receivedJsonObject = JsonUtils.parseStringAsObject(jsonSting);
-            if (receivedJsonObject.containsKey("donutDocPeriodId") &&
-                    receivedJsonObject.get("donutDocPeriodId").getValueType().equals(JsonValue.ValueType.NUMBER)) {
-                this.donutDocPeriodId = receivedJsonObject.getJsonNumber("donutDocPeriodId").longValue();
-            } else {
-                this.donutDocPeriodId = null;
-            }
+            this.donutDocPeriodId = receivedJsonObject.getInt("donutDocPeriodId");
             this.driver = receivedJsonObject.getString("driver");
             this.licensePlate = receivedJsonObject.getString("licensePlate");
             this.palletsQty = receivedJsonObject.getInt("palletsQty");
             this.driverPhoneNumber = receivedJsonObject.getString("driverPhoneNumber");
             this.commentForDonut = receivedJsonObject.getString("commentForDonut");
             this.period = receivedJsonObject.getString("period");
-            Set<Order> ordersSet = new HashSet<>();
+
+            Set<OrderUpdateData> ordersSet = new HashSet<>();
             JsonArray orders = receivedJsonObject.getJsonArray("orders");
             for (JsonValue orderAsJsonValue : orders) {
                 if (!orderAsJsonValue.getValueType().equals(JsonValue.ValueType.OBJECT))
@@ -43,14 +40,13 @@ public class Donut {
                 JsonObject orderAsJsonObject = (JsonObject) orderAsJsonValue;
 
                 Integer orderId;
-                JsonValue orderIdAsJsonValue = orderAsJsonObject.get("orderId");
-                JsonValue.ValueType orderIdValueType = orderIdAsJsonValue.getValueType();
-                if (orderIdValueType == JsonValue.ValueType.NULL) {
+                if (orderAsJsonObject.isNull("orderId")) {
                     orderId = null;
                 } else {
-                    orderId = ((JsonNumber) orderIdAsJsonValue).intValue();
+                    orderId = orderAsJsonObject.getInt("orderId");
                 }
-                Order order = new Order(
+
+                OrderUpdateData order = new OrderUpdateData(
                         orderId,
                         orderAsJsonObject.getString("orderNumber"),
                         orderAsJsonObject.getInt("finalDestinationWarehouseId"),
@@ -62,12 +58,20 @@ public class Donut {
             }
             this.orders = ordersSet;
 
+            Set<Integer> ordersIdForDelete = new HashSet<>();
+            JsonArray removedOrders = receivedJsonObject.getJsonArray("removedOrders");
+            for (JsonValue removedOrder : removedOrders) {
+                ordersIdForDelete.add(((JsonNumber) removedOrder).intValueExact());
+            }
+            this.ordersIdForDelete = ordersIdForDelete;
+
+
         } catch (Exception e) {
             throw new ValidateDataException(e);
         }
     }
 
-    public Donut(Long donutDocPeriodId, String period, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<Order> orders) {
+    public DonutUpdateData(int donutDocPeriodId, String period, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderUpdateData> orders, Set<Integer> ordersIdForDelete) {
         this.donutDocPeriodId = donutDocPeriodId;
         this.period = period;
         this.driver = driver;
@@ -76,11 +80,12 @@ public class Donut {
         this.driverPhoneNumber = driverPhoneNumber;
         this.commentForDonut = commentForDonut;
         this.orders = orders;
+        this.ordersIdForDelete = ordersIdForDelete;
     }
 
     @Override
     public String toString() {
-        return "Donut{" +
+        return "DonutUpdateData{" +
                 "donutDocPeriodId=" + donutDocPeriodId +
                 ", period='" + period + '\'' +
                 ", driver='" + driver + '\'' +
@@ -92,7 +97,7 @@ public class Donut {
                 '}';
     }
 
-    public static class Order {
+    public static class OrderUpdateData {
         public final Integer orderId; // can be null
         public final String orderNumber;
         public final int finalDestinationWarehouseId;
@@ -100,7 +105,7 @@ public class Donut {
         public final String commentForStatus;
         public final String orderStatusId;
 
-        public Order(Integer orderId, String orderNumber, int finalDestinationWarehouseId, int boxQty, String commentForStatus, String orderStatusId) {
+        public OrderUpdateData(Integer orderId, String orderNumber, int finalDestinationWarehouseId, int boxQty, String commentForStatus, String orderStatusId) {
             Objects.requireNonNull(orderNumber);
             Objects.requireNonNull(commentForStatus);
             this.orderId = orderId;

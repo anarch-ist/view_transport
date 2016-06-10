@@ -33,14 +33,13 @@
             // When editing data the changes only reflected in the DOM, not in any AJAX backend datasource and not localstorage.
             ajax: function (method, url, data, successCallback, errorCallback) {
                 var output = {data: []};
-
                 if (data.action === 'create') {
                     var addedRow = data.data[Object.keys(data.data)[0]];
-                    addedRow.orderId = getId();
+                    addedRow.orderId = createRow.lastAddedId;
                     output.data.push(addedRow);
                 }
-
                 else if (data.action === 'edit') {
+
                     var key = Object.keys(data.data)[0];
                     var editedRow = data.data[Object.keys(data.data)[0]];
                     editedRow.orderId = key;
@@ -90,7 +89,7 @@
                 text: 'Создать',
                 action: function (e, dt, node, config) {
                     ordersDataTableEditor.submit();
-                    createRow("", "", Object.keys(settings.warehouses)[0], "", "", Object.keys(settings.orderStatuses)[0]);
+                    createRow(virtualIdGenerator(), "", Object.keys(settings.warehouses)[0], "", "", Object.keys(settings.orderStatuses)[0]);
                 }
             });
         }
@@ -177,6 +176,7 @@
         if (settings.isEditable) {
             var submitBtn = $("<button>").text("Отправить");
             submitBtn.on("click", function(e) {
+
                 settings.onSubmit();
             });
             _this.append(submitBtn);
@@ -188,12 +188,12 @@
                 submitBtn.off("click");
                 if (onSubmitHandler) {
                     submitBtn.on("click", function (e) {
+                        ordersDataTableEditor.submit();
                         onSubmitHandler();
                     });
                 }
             };
         }
-
         this.setOnRowRemoved = function(handler) {
             ordersDataTableEditor.off('initRemove');
             if (handler) {
@@ -242,17 +242,10 @@
         };
 
         // --------------------------- FUNCTIONS --------------------------------
-        var idGenerator = makeCounter();
-        var currentId;
-        function getId() {
-            if (typeof currentId === "number") {
-                return currentId;
-            } else {
-                return "virtualId" + idGenerator(); // get new GUID from custom method
-            }
-        }
+        var virtualIdGenerator = makeCounter();
+
         function createRow(orderId, orderNumber, finalWarehouseDestinationId, boxQty, commentForStatus, statusId) {
-            currentId = orderId;
+            createRow.lastAddedId = orderId + "";
             ordersDataTableEditor
                 .create(false)
                 .set("orderNumber", orderNumber)
@@ -266,7 +259,7 @@
         function makeCounter() {
             var counter = 0;
             return function () {
-                return counter++;
+                return "virtualId" + counter++;
             };
         }
 
@@ -274,8 +267,10 @@
             var copy = $.extend({}, rowData);
             copy.boxQty = +copy.boxQty;
             copy.finalDestinationWarehouseId = +copy.finalDestinationWarehouseId;
-            if (typeof copy.orderId !== "number") {
+            if (copy.orderId.lastIndexOf("virtualId", 0) === 0) {
                 copy.orderId = null;
+            } else {
+                copy.orderId = +copy.orderId;
             }
             return copy;
         }
