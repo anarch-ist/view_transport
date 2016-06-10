@@ -132,7 +132,7 @@
                 buttons: [
                     {
                         name: "изменить статусы",
-                        id: "dChangeStatusBtn",
+                        id: "dUpdateBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return (state === "OCCUPIED" && isFullPeriodSelected);
@@ -181,18 +181,18 @@
             tablePlugin.generate();
 
             var warehousesData = ${requestScope.docDateSelectorDataObject};
-
             // ---------------------------------init docDateSelector plugin----------------------------------------
             var $docAndDateSelector = $('#docAndDateSelector');
             var docDateSelector = $docAndDateSelector.docAndDateSelector({
                 useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
                 data: warehousesData
             });
-
             docDateSelector.setOnSelected(function(event, docDateSelection) {
                 sendTableAjax("getTableData");
             });
 
+            // ---------------------------------init dialog plugin------------------------------------------
+            var donutCrudPluginDialog = $('[data-remodal-id=modal]').remodal();
 
             // ---------------------------------init donutCrudPlugin----------------------------------------
             <c:if test="${isSupplierManager}">
@@ -200,7 +200,6 @@
             warehousesData.warehouses.forEach(function(warehouse) {
                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
             });
-            var supplierInputDataDialog = $('[data-remodal-id=modal]').remodal();
 
             var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
@@ -220,10 +219,10 @@
                 donutCrudPluginInstance.setOnSubmit(function() {
                     sendTableAjax("insertDonut", {createdDonut: donutCrudPluginInstance.getData()}, function() {
                         donutCrudPluginInstance.setOnSubmit(null);
-                        supplierInputDataDialog.close();
+                        donutCrudPluginDialog.close();
                     })
                 });
-                supplierInputDataDialog.open();
+                donutCrudPluginDialog.open();
             };
 
             var sUpdateBtn = tablePlugin.getButtonByPluginId("sUpdateBtn");
@@ -246,11 +245,10 @@
                                 donutCrudPluginInstance.getData(),
                                 {removedOrders: removedOrders, donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
                         );
-                        window.console.log(donutCrudPluginInstance.getData());
                         sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
                             donutCrudPluginInstance.setOnRowRemoved(null);
                             donutCrudPluginInstance.setOnSubmit(null);
-                            supplierInputDataDialog.close();
+                            donutCrudPluginDialog.close();
                         })
                     });
                     var removedOrders = [];
@@ -259,7 +257,7 @@
                             removedOrders.push(rowData.orderId);
                         }
                     });
-                    supplierInputDataDialog.open();
+                    donutCrudPluginDialog.open();
                 }).fail(function () {
                     window.alert("error");
                 });
@@ -273,6 +271,64 @@
                 sendTableAjax("deleteDonut", {dataForDelete: sendObject});
             };
 
+
+            </c:if>
+
+            <c:if test="${isWarehouseDispatcher}">
+
+            var warehousesKeyValuePairs = {};
+            warehousesData.warehouses.forEach(function(warehouse) {
+                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
+            });
+
+            var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
+                isEditable: true,
+                ordersCrud: "update",
+                editableFields: {
+                    donutFields: [],
+                    ordersFields: ["orderStatusId", "commentForStatus"]
+                },
+                orderStatuses: ${requestScope.orderStatuses},
+                warehouses: warehousesKeyValuePairs
+            });
+
+            var dUpdateBtn = tablePlugin.getButtonByPluginId("dUpdateBtn");
+            dUpdateBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var sendObject = {donutDocPeriodId: donutDocPeriodId};
+
+                $.ajax({
+                    url: "selectDonut",
+                    method: "POST",
+                    data: sendObject,
+                    dataType: "json"
+                }).done(function (donutData) {
+                    window.console.log(donutData);
+                    donutCrudPluginInstance.setData(donutData);
+                    donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                    donutCrudPluginInstance.setOnSubmit(function() {
+                        var sendObject = $.extend(
+                                donutCrudPluginInstance.getData(),
+                                {removedOrders: [], donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
+                        );
+                        sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
+                            donutCrudPluginInstance.setOnRowRemoved(null);
+                            donutCrudPluginInstance.setOnSubmit(null);
+                            donutCrudPluginDialog.close();
+                        })
+                    });
+                    donutCrudPluginDialog.open();
+                }).fail(function () {
+                    window.alert("error");
+                });
+            };
+            </c:if>
+
+            docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
+                tablePlugin.setDisabled(!isSelectionAvailable);
+            });
+            $docAndDateSelector.triggerEvents();
             function getSelectedPeriodAsString() {
                 var selectionData = tablePlugin.getSelectionData();
                 var periodsString;
@@ -285,20 +341,6 @@
                     throw new Error("bad period");
                 return periodsString;
             }
-
-            </c:if>
-
-
-            docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
-                tablePlugin.setDisabled(!isSelectionAvailable);
-            });
-            $docAndDateSelector.triggerEvents();
-            // дату надо пересыдать с временной зоной(Z)
-            // date format: 'YYYY-mm-dd'
-            function periodAsTimestamps(periodBegin, periodEnd, dateString, offset) {
-                Date.parse(dateString);
-            }
-
             function sendTableAjax(url, data, onDone) {
                 //tablePlugin.setDisabled(true);
                 var rawDocDateSelection = docDateSelector.getSelectionObject();
@@ -357,13 +399,11 @@
     <div id="tableControlsContainer"></div>
 
     <%--dialogs--%>
-    <c:if test="${isSupplierManager}">
-        <div data-remodal-id="modal">
-            <button data-remodal-action="close" class="remodal-close"></button>
-            <h1>Ввод данных</h1>
-            <div id="routeListDataContainer"></div>
-        </div>
-    </c:if>
+    <div data-remodal-id="modal">
+        <button data-remodal-action="close" class="remodal-close"></button>
+        <h1>Ввод данных</h1>
+        <div id="routeListDataContainer"></div>
+    </div>
 
 </div>
 

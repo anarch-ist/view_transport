@@ -39,7 +39,7 @@ public class MainServlet extends HttpServlet {
         // список всех складов(пары ключ-имя)
         // список всех доков для всех складов(id склада, id дока, имя дока)
         JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
-        if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
+        if (userRoleId == UserRoles.SUPPLIER_MANAGER || userRoleId == UserRoles.WH_DISPATCHER) {
 
             Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
             JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
@@ -50,7 +50,7 @@ public class MainServlet extends HttpServlet {
             sendDataBuilder.add("warehouses", warehouseArrayBuilder);
 
 
-        } else if (userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.WH_DISPATCHER) {
+        } else if (userRoleId == UserRoles.WH_BOSS) {
 
             JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
             Warehouse warehouse = DaoFacade.getWarehouseWithDocsForUser(user.getUserId());
