@@ -31,42 +31,24 @@ public class MainServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        User user = (User)session.getAttribute("user");
-        UserRole userRole = user.getUserRole();
-        UserRoles userRoleId = userRole.getUserRoleId();
-
         // список всех складов(пары ключ-имя)
         // список всех доков для всех складов(id склада, id дока, имя дока)
         JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
-        if (userRoleId == UserRoles.SUPPLIER_MANAGER || userRoleId == UserRoles.WH_DISPATCHER) {
-
-            Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
-            JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
-            for (Warehouse warehouse : allWarehousesWithDocs) {
-                JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
-                warehouseArrayBuilder.add(warehouseBuilder);
-            }
-            sendDataBuilder.add("warehouses", warehouseArrayBuilder);
-
-
-        } else if (userRoleId == UserRoles.WH_BOSS) {
-
-            JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
-            Warehouse warehouse = DaoFacade.getWarehouseWithDocsForUser(user.getUserId());
+        Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
+        JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
+        for (Warehouse warehouse : allWarehousesWithDocs) {
             JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
             warehouseArrayBuilder.add(warehouseBuilder);
-            sendDataBuilder.add("warehouses", warehouseArrayBuilder);
-
         }
+        sendDataBuilder.add("warehouses", warehouseArrayBuilder);
 
         // список всех статусов для заявки
         JsonObjectBuilder orderStatusesBuilder = Json.createObjectBuilder();
-        orderStatusesBuilder.add(OrderStatuses.CREATED.toString(), "СОЗДАН");
-        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.toString(), "УДАЛЕН ПОСТАВЩИКОМ");
-        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.toString(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА");
-        orderStatusesBuilder.add(OrderStatuses.DELIVERED.toString(), "ДОСТАВЛЕН");
-        orderStatusesBuilder.add(OrderStatuses.ERROR.toString(), "ОШИБКА");
+        orderStatusesBuilder.add(OrderStatuses.CREATED.name(), "СОЗДАН");
+        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.name(), "УДАЛЕН ПОСТАВЩИКОМ");
+        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.name(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА");
+        orderStatusesBuilder.add(OrderStatuses.DELIVERED.name(), "ДОСТАВЛЕН");
+        orderStatusesBuilder.add(OrderStatuses.ERROR.name(), "ОШИБКА");
 
         request.setAttribute("docDateSelectorDataObject", sendDataBuilder.build().toString());
         request.setAttribute("orderStatuses", orderStatusesBuilder.build().toString());
@@ -94,4 +76,6 @@ public class MainServlet extends HttpServlet {
         warehouseBuilder.add("docs", docArrayBuilder);
         return warehouseBuilder;
     }
+
+
 }
