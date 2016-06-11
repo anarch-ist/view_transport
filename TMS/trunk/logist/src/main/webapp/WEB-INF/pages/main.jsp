@@ -153,7 +153,7 @@
                     },
                     {
                         name: "закрыть",
-                        id: "bClosePeriodBtn",
+                        id: "bClosePeriodsBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OPENED";
@@ -304,7 +304,6 @@
                     data: sendObject,
                     dataType: "json"
                 }).done(function (donutData) {
-                    window.console.log(donutData);
                     donutCrudPluginInstance.setData(donutData);
                     donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
                     donutCrudPluginInstance.setOnSubmit(function() {
@@ -324,6 +323,69 @@
                 });
             };
             </c:if>
+
+            <c:if test="${isWarehouseBoss}">
+            var warehousesKeyValuePairs = {};
+            warehousesData.warehouses.forEach(function(warehouse) {
+                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
+            });
+
+            var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
+                isEditable: false,
+                orderStatuses: ${requestScope.orderStatuses},
+                warehouses: warehousesKeyValuePairs
+            });
+
+            var bInfoBtn = tablePlugin.getButtonByPluginId("bInfoBtn");
+            bInfoBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var sendObject = {donutDocPeriodId: donutDocPeriodId};
+
+                $.ajax({
+                    url: "selectDonut",
+                    method: "POST",
+                    data: sendObject,
+                    dataType: "json"
+                }).done(function (donutData) {
+                    donutCrudPluginInstance.setData(donutData);
+                    donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                    donutCrudPluginDialog.open();
+                }).fail(function () {
+                    window.alert("error");
+                });
+            };
+            var bClosePeriodsBtn = tablePlugin.getButtonByPluginId("bClosePeriodsBtn");
+            bClosePeriodsBtn.onclick = function() {
+                var utcDate = docDateSelector.getSelectionObject().date.getTime();
+                var selectionData = tablePlugin.getSelectionData();
+                var periods = selectionData[0].periods;
+                var absolutePeriods = [];
+                periods.forEach(function(period){
+                    absolutePeriods.push({periodBegin: utcDate + period.periodBegin * 60 * 1000, periodEnd: utcDate + period.periodEnd * 60 * 1000 });
+                });
+                sendTableAjax("insertDocPeriods", {periodsForInsert: absolutePeriods});
+            };
+            var bOpenPeriodBtn = tablePlugin.getButtonByPluginId("bOpenPeriodBtn");
+            bOpenPeriodBtn.onclick = function() {
+                var utcDate = docDateSelector.getSelectionObject().date.getTime();
+                var selectionData = tablePlugin.getSelectionData();
+                selectionData.forEach(function(elem) {
+                    elem.data.periodBegin = utcDate + elem.data.periodBegin * 60 * 1000;
+                    elem.data.periodEnd = utcDate + elem.data.periodEnd * 60 * 1000;
+                    var periods = elem.periods;
+                    periods.forEach(function(period){
+                        period.periodBegin = utcDate + period.periodBegin * 60 * 1000;
+                        period.periodEnd = utcDate + period.periodEnd * 60 * 1000;
+                    });
+                });
+                sendTableAjax("openDocPeriods", {openPeriodsData: selectionData});
+            };
+
+
+
+            </c:if>
+
 
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                 tablePlugin.setDisabled(!isSelectionAvailable);

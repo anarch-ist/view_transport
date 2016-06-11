@@ -28,31 +28,31 @@
                     isSelectAllOccupied: false,
                     isSelectAllClosed: false
                 },
-                selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
-                    if (selectedSerialNumbers.length === 0) {
-                        return false;
-                    }
-                    else if(selectedSerialNumbers.length === 1) {
-                        if (isSelected) {
-                            return false;
-                        } else {
-                            var selectedSerialNumber = selectedSerialNumbers[0];
-                            if((serialNumber === (selectedSerialNumber - 1)) || (serialNumber === (selectedSerialNumber + 1))){
-                                return false;
-                            }
-                        }
-                    }else {
-                        var min = selectedSerialNumbers[0];
-                        var max = selectedSerialNumbers[selectedSerialNumbers.length - 1];
-                        if (isSelected && (serialNumber === min || serialNumber === max)) {
-                            return false;
-                        }
-                        if((serialNumber === (min - 1)) || (serialNumber === (max + 1))){
-                            return false;
-                        }
-                    }
-                    return true;
-                },
+//                selectionConstraint: function(serialNumber, selectedSerialNumbers, isSelected) {
+//                    if (selectedSerialNumbers.length === 0) {
+//                        return false;
+//                    }
+//                    else if(selectedSerialNumbers.length === 1) {
+//                        if (isSelected) {
+//                            return false;
+//                        } else {
+//                            var selectedSerialNumber = selectedSerialNumbers[0];
+//                            if((serialNumber === (selectedSerialNumber - 1)) || (serialNumber === (selectedSerialNumber + 1))){
+//                                return false;
+//                            }
+//                        }
+//                    }else {
+//                        var min = selectedSerialNumbers[0];
+//                        var max = selectedSerialNumbers[selectedSerialNumbers.length - 1];
+//                        if (isSelected && (serialNumber === min || serialNumber === max)) {
+//                            return false;
+//                        }
+//                        if((serialNumber === (min - 1)) || (serialNumber === (max + 1))){
+//                            return false;
+//                        }
+//                    }
+//                    return true;
+//                },
                 buttons: [
                     {
                         name: "отменить",

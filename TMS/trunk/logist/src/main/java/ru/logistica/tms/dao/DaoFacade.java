@@ -20,16 +20,14 @@ import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
-import ru.logistica.tms.dto.AuthResult;
-import ru.logistica.tms.dto.DocDateSelectorData;
-import ru.logistica.tms.dto.DonutInsertData;
-import ru.logistica.tms.dto.DonutUpdateData;
+import ru.logistica.tms.dto.*;
 import ru.logistica.tms.util.CriptUtils;
 
 import java.util.*;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
+
 
 
 
@@ -48,6 +46,24 @@ public class DaoFacade {
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
+    }
+
+    public static void insertDocPeriods(final PeriodsForInsertData periodsForInsertData, final int docId) {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DocPeriodDao docPeriodDao = new DocPeriodImpl();
+                DocDao docDao = new DocDaoImpl();
+                Doc doc = docDao.findById(Doc.class, docId);
+                for (PeriodsForInsertData.PeriodData periodData : periodsForInsertData) {
+                    DocPeriod docPeriod = new DocPeriod();
+                    docPeriod.setPeriod(new Period(periodData.periodBegin, periodData.periodEnd));
+                    docPeriod.setDoc(doc);
+                    docPeriodDao.save(docPeriod);
+                }
+            }
+        });
+
     }
 
     public static DonutDocPeriod selectDonutWithRequests(final long donutDocPeriodId) {
@@ -274,7 +290,6 @@ public class DaoFacade {
         });
         return (List<DocPeriod>) result[0];
     }
-
 
     public static Warehouse getWarehouseById(final Integer warehouseId) {
         final Warehouse[] result = new Warehouse[1];

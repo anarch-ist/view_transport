@@ -38,7 +38,6 @@ public class GetTableDataServlet extends AjaxHttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         String receivedData = req.getParameter("docDateSelection");
-        System.out.println(receivedData);
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(receivedData);

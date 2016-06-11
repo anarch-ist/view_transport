@@ -340,7 +340,7 @@
         // example result:
         //var exampleResult = [
         //    {data: null, periods: [{periodBegin: 630, periodEnd: 660}, {periodBegin: 660, periodEnd:690}]},
-        //    {data: null, periods: [{periodBegin: 630, periodEnd: 660}, {periodBegin: 660, periodEnd:690}]}
+        //    {data: ..., periods: [{periodBegin: 630, periodEnd: 660}, {periodBegin: 660, periodEnd:690}]}
         //];
         this.getSelectionData = function() {
             var result = [];
@@ -362,7 +362,7 @@
                     var data = cloneWithoutCells(allObjects[j]);
                     result.push({data: data, periods: getPeriodsFromCells(cells)});
                 } else {
-                    result.push({data:null, periods:getPeriodsFromCells(selectedElementsWithoutState)});
+                    result.push({data:null, periods: getPeriodsFromCells(selectedElementsWithoutState)});
                 }
             }
 
@@ -389,13 +389,47 @@
                 if (b.indexOf(e) !== -1) return true;
             });
         }
+
+
+        /**
+         * concat periods
+         * @param cells
+         * @returns {Array}
+         */
         function getPeriodsFromCells(cells) {
-            var periods = [];
+            var rawPeriods = [];
             cells.forEach(function(cell) {
-                periods.push(getPeriodForCell(cell));
+                rawPeriods.push(getPeriodForCell(cell));
             });
-            return periods;
+            return concatSortedPeriods(rawPeriods);
         }
+
+        function concatSortedPeriods(periods) {
+            if (periods.length === 1) {
+                return periods;
+            }
+
+            var gapIndexes = [];
+            for (var i = 0; i < periods.length - 1; i++) {
+                if (periods[i].periodEnd < periods[i + 1].periodBegin) {
+                    gapIndexes.push(i);
+                }
+            }
+
+            if (gapIndexes.length === 0) {
+                return [{periodBegin: periods[0].periodBegin, periodEnd: periods[periods.length - 1].periodEnd}];
+            }
+
+            var result = [];
+            result.push({periodBegin: periods[0].periodBegin, periodEnd: periods[gapIndexes[0]].periodEnd});
+            for (var j = 0; j < gapIndexes.length - 1; j++) {
+                result.push({periodBegin: periods[gapIndexes[j] + 1].periodBegin, periodEnd: periods[gapIndexes[j + 1]].periodEnd});
+            }
+            result.push({periodBegin: periods[gapIndexes[gapIndexes.length - 1] + 1].periodBegin, periodEnd: periods[periods.length - 1].periodEnd});
+
+            return result;
+        }
+
         function cloneWithoutCells(object) {
             return JSON.parse(JSON.stringify(object, function(key, value) {
                 if (key === "cells") {
@@ -525,7 +559,6 @@
         tableElement.dispatchEvent(newEvent);
     }
 
-
     function merge() {
         var obj = {},
             i = 0,
@@ -540,7 +573,6 @@
         }
         return obj;
     }
-
 
     function TableControls(containerElem, tablePlugin, buttonsDescription) {
         var state = {isDisabled:null, isAnySelected:null, currentSelectedState:null, isFullPeriodSelected:null};
