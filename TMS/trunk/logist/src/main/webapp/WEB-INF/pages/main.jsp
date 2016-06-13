@@ -368,8 +368,12 @@
             };
             var bOpenPeriodBtn = tablePlugin.getButtonByPluginId("bOpenPeriodBtn");
             bOpenPeriodBtn.onclick = function() {
-                var utcDate = docDateSelector.getSelectionObject().date.getTime();
+                const selectionObject = docDateSelector.getSelectionObject();
+                var utcDate = selectionObject.date.getTime();
+                var docId = selectionObject.docId;
                 var selectionData = tablePlugin.getSelectionData();
+                tablePlugin.getSelectionData();
+                var sendData = [];
                 selectionData.forEach(function(elem) {
                     elem.data.periodBegin = utcDate + elem.data.periodBegin * 60 * 1000;
                     elem.data.periodEnd = utcDate + elem.data.periodEnd * 60 * 1000;
@@ -378,11 +382,87 @@
                         period.periodBegin = utcDate + period.periodBegin * 60 * 1000;
                         period.periodEnd = utcDate + period.periodEnd * 60 * 1000;
                     });
+                    sendData.push(getDataForSendOpen(elem, docId));
                 });
-                sendTableAjax("openDocPeriods", {openPeriodsData: selectionData});
+                sendTableAjax("openDocPeriods", {openPeriodsData: sendData});
             };
 
-
+            <%--BINDING dto.OpenDocPeriodsData.java--%>
+            function getDataForSendOpen(obj, docId){
+                if(obj.periods.length === 1 && obj.data.periodBegin === obj.periods[0].periodBegin && obj.data.periodEnd === obj.periods[0].periodEnd){
+                    return [{
+                        action: "DELETE",
+                        docPeriodId: obj.data.docPeriodId
+                    }];
+                }else if(obj.periods.length === 1){
+                    if (obj.data.periodBegin === obj.periods[0].periodBegin) {
+                        return [{
+                            periodBegin: obj.periods[0].periodEnd,
+                            periodEnd: obj.data.periodEnd,
+                            action: "UPDATE",
+                            docPeriodId: obj.data.docPeriodId
+                        }];
+                    } else if (obj.data.periodEnd === obj.periods[0].periodEnd) {
+                        return [{
+                            periodBegin: obj.data.periodBegin,
+                            periodEnd: obj.periods[0].periodBegin,
+                            action: "UPDATE",
+                            docPeriodId: obj.data.docPeriodId
+                        }];
+                    } else {
+                        return [
+                            {
+                                periodBegin: obj.data.periodBegin,
+                                periodEnd: obj.periods[0].periodBegin,
+                                action: "UPDATE",
+                                docPeriodId: obj.data.docPeriodId
+                            },
+                            {
+                                periodBegin: obj.periods[0].periodEnd,
+                                periodEnd: obj.data.periodEnd,
+                                action: "INSERT",
+                                docId: docId
+                            }
+                        ];
+                    }
+                }else {
+                    var result = [];
+                    if (obj.data.periodBegin !== obj.periods[0].periodBegin) {
+                        result.push({
+                            periodBegin: obj.data.periodBegin,
+                            periodEnd: obj.periods[0].periodBegin,
+                            action: "UPDATE",
+                            docPeriodId: obj.data.docPeriodId
+                        });
+                    }
+                    for (var i = 0; i < obj.periods.length - 1; i++) {
+                        if (i === 0 && result.length === 0) {
+                            result.push({
+                                periodBegin: obj.periods[i].periodEnd,
+                                periodEnd: obj.periods[i + 1].periodBegin,
+                                action: "UPDATE",
+                                docPeriodId: obj.data.docPeriodId
+                            });
+                        } else {
+                            result.push({
+                                periodBegin: obj.periods[i].periodEnd,
+                                periodEnd: obj.periods[i + 1].periodBegin,
+                                action: "INSERT",
+                                docId: docId
+                            });
+                        }
+                    }
+                    if (obj.data.periodEnd !== obj.periods[obj.periods.length - 1].periodEnd) {
+                        result.push({
+                            periodBegin: obj.periods[obj.periods.length - 1].periodEnd,
+                            periodEnd: obj.data.periodEnd,
+                            action: "INSERT",
+                            docId: docId
+                        });
+                    }
+                    return result;
+                }
+            }
 
             </c:if>
 
