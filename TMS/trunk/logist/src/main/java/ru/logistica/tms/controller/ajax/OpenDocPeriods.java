@@ -1,5 +1,9 @@
 package ru.logistica.tms.controller.ajax;
 
+import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dto.OpenDocPeriodsData;
+import ru.logistica.tms.dto.ValidateDataException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,7 +15,14 @@ import java.io.IOException;
 public class OpenDocPeriods extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println(req.getParameter("openPeriodsData"));
+
+        try {
+            OpenDocPeriodsData openDocPeriodsData = new OpenDocPeriodsData(req.getParameter("openPeriodsData"));
+            DaoFacade.openPeriods(openDocPeriodsData);
+        } catch (ValidateDataException e) {
+            throw new ServletException(e);
+        }
+
         req.getRequestDispatcher("getTableData").forward(req, resp);
     }
 }

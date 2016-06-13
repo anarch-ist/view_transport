@@ -28,7 +28,7 @@ public class DocPeriodImplTest extends HibernateTest {
     private Doc doc;
     private Warehouse warehouse;
     private Supplier supplier;
-    DocPeriodDao docPeriodDao = new DocPeriodImpl();
+    DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
     private Date firstPeriodBeginTimestamp;
     private Date firstPeriodEndTimestamp;
     private Date secondPeriodBeginTimestamp;

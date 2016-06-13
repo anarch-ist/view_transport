@@ -101,7 +101,7 @@ public class TestRelations extends HibernateTest {
 
         DocDao docDao = new DocDaoImpl();
         docDao.persist(doc);
-        DocPeriodDao docPeriodDao = new DocPeriodImpl();
+        DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
         docPeriodDao.persist(emptyDocPeriod);
 
         DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();

@@ -9,7 +9,7 @@ import ru.logistica.tms.dao.docDao.Doc;
 import java.util.Date;
 import java.util.List;
 
-public class DocPeriodImpl extends GenericDaoImpl<DocPeriod, Long> implements DocPeriodDao {
+public class DocPeriodDaoImpl extends GenericDaoImpl<DocPeriod, Long> implements DocPeriodDao {
 
     @Override
     public List<DocPeriod> findAllPeriodsBetweenTimeStampsForDoc(Integer docId, Date utcTimestampBegin, Date utcTimestampEnd) throws DAOException {

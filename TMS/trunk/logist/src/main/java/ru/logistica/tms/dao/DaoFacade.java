@@ -30,7 +30,6 @@ public class DaoFacade {
 
 
 
-
     private interface DaoScript {
         void execute() throws DAOException;
     }
@@ -48,11 +47,42 @@ public class DaoFacade {
         }
     }
 
+    public static void openPeriods(final OpenDocPeriodsData openDocPeriodsData) {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
+                DocDao docDao = new DocDaoImpl();
+
+                for (OpenDocPeriodsData.DocAction docAction : openDocPeriodsData) {
+
+                    if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.DeleteOperation) {
+                        docPeriodDao.delete(docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId));
+                    } else if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.UpdateOperation) {
+                        OpenDocPeriodsData.DocAction.UpdateOperation updateOperation = (OpenDocPeriodsData.DocAction.UpdateOperation) docAction.idOperation;
+                        DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
+                        docPeriod.setPeriod(new Period(new Date(updateOperation.periodBegin), new Date(updateOperation.periodEnd)));
+                        docPeriodDao.update(docPeriod);
+                    }
+
+                    Set<OpenDocPeriodsData.DocAction.InsertOperation> insertOperations = docAction.insertOperations;
+                    for (OpenDocPeriodsData.DocAction.InsertOperation insertOperation : insertOperations) {
+                        DocPeriod docPeriod = new DocPeriod();
+                        docPeriod.setPeriod(new Period(new Date(insertOperation.periodBegin), new Date(insertOperation.periodEnd)));
+                        docPeriod.setDoc(docDao.findById(Doc.class, insertOperation.docId));
+                        docPeriodDao.save(docPeriod);
+                    }
+
+                }
+            }
+        });
+    }
+
     public static void insertDocPeriods(final PeriodsForInsertData periodsForInsertData, final int docId) {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                DocPeriodDao docPeriodDao = new DocPeriodImpl();
+                DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
                 DocDao docDao = new DocDaoImpl();
                 Doc doc = docDao.findById(Doc.class, docId);
                 for (PeriodsForInsertData.PeriodData periodData : periodsForInsertData) {
@@ -282,7 +312,7 @@ public class DaoFacade {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                DocPeriodDao docPeriodDao = new DocPeriodImpl();
+                DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
                 List<DocPeriod> allPeriodsBetweenTimeStampsForDoc =
                         docPeriodDao.findAllPeriodsBetweenTimeStampsForDoc(docId, timeStampBegin, timeStampEnd);
                 result[0] = allPeriodsBetweenTimeStampsForDoc;
