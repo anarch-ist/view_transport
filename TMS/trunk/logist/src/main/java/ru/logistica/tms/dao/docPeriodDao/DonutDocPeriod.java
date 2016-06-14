@@ -2,6 +2,7 @@ package ru.logistica.tms.dao.docPeriodDao;
 
 import ru.logistica.tms.dao.orderDao.Order;
 import ru.logistica.tms.dao.supplierDao.Supplier;
+import ru.logistica.tms.dao.userDao.SupplierUser;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,7 +18,7 @@ public class DonutDocPeriod extends DocPeriod{
     private String driverPhoneNumber;
     private String licensePlate;
     private Short palletsQty;
-    private Supplier supplier;
+    private SupplierUser supplierUser;
     private Set<Order> orders;
 
     @Basic
@@ -82,13 +83,13 @@ public class DonutDocPeriod extends DocPeriod{
     }
 
     @ManyToOne
-    @JoinColumn(name = "supplierid", nullable = false)
-    public Supplier getSupplier() {
-        return supplier;
+    @JoinColumn(name = "supplieruserid", nullable = false)
+    public SupplierUser getSupplierUser() {
+        return supplierUser;
     }
 
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
+    public void setSupplierUser(SupplierUser supplier) {
+        this.supplierUser = supplier;
     }
 
     @OneToMany(mappedBy = "donutDocPeriod")
@@ -110,7 +111,7 @@ public class DonutDocPeriod extends DocPeriod{
                 ", driverPhoneNumber='" + driverPhoneNumber + '\'' +
                 ", licensePlate='" + licensePlate + '\'' +
                 ", palletsQty=" + palletsQty +
-                ", supplier=" + supplier +
+                ", supplierUser=" + supplierUser +
                 '}';
     }
 }

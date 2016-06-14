@@ -1,88 +1,9 @@
 DROP SCHEMA IF EXISTS public CASCADE;
 CREATE SCHEMA public;
 
-
--- -------------------------------------------------------------------------------------------------------------------
---                                                 WAREHOUSES
--- -------------------------------------------------------------------------------------------------------------------
-
-
-CREATE TABLE warehouses (
-  warehouseID   SERIAL, -- Static
-  warehouseName VARCHAR(128) NOT NULL, -- Dynamic
-  rusTimeZoneAbbr VARCHAR(6) NOT NULL, -- Dynamic
-  PRIMARY KEY (warehouseID)
-);
-
-CREATE TABLE docs (
-  docID       SERIAL, -- Static
-  docName     VARCHAR(255) NOT NULL, -- Dynamic
-  warehouseID INTEGER      NOT NULL, -- Static
-  PRIMARY KEY (docID),
-  FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
-);
--- if no period => OPENED, if doc_period => OCCUPIED, if
-
-CREATE TABLE doc_periods (
-  docPeriodID BIGSERIAL, -- Static
-  docID       INTEGER                  NOT NULL, -- Static
-  periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
-  periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
-  -- длина периода кратна 30 минутам
-  -- BINDING with web.xml (cellSize)
-  CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
-                                               (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
-  PRIMARY KEY (docPeriodID),
-  FOREIGN KEY (docID) REFERENCES docs (docID)
-);
-
-
--- -------------------------------------------------------------------------------------------------------------------
---                                            SUPPLIERS, DONUTS AND ORDERS
--- -------------------------------------------------------------------------------------------------------------------
-
-
-CREATE TABLE suppliers (
-  supplierID SERIAL, -- Static
-  INN        VARCHAR(32) NOT NULL, -- Static
-  PRIMARY KEY (supplierID)
-);
-
-CREATE TABLE donut_doc_periods (
-  donutDocPeriodID  BIGINT,
-  creationDate      DATE         NOT NULL DEFAULT NOW(), -- Static
-  commentForDonut   TEXT         NOT NULL, -- Static
-  driver            VARCHAR(255) NOT NULL, -- Static
-  driverPhoneNumber VARCHAR(12)  NOT NULL, -- Static
-  licensePlate      VARCHAR(9)   NOT NULL, -- Static
-  palletsQty        INTEGER      NOT NULL CONSTRAINT positive_pallets_qty CHECK (palletsQty >= 0), -- Static
-  supplierID        INTEGER      NOT NULL, -- Static
-  PRIMARY KEY (donutDocPeriodID),
-  FOREIGN KEY (donutDocPeriodID) REFERENCES doc_periods (docPeriodID),
-  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
-);
-
-CREATE TABLE orders (
-  orderID                     SERIAL, -- Static
-  orderNumber                 VARCHAR(16) NOT NULL, -- Static
-  boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty > 0), -- Static
-  finalDestinationWarehouseID INTEGER     NOT NULL, -- Static
-  donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
-  orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
-  commentForStatus            TEXT        NOT NULL, -- Dynamic
-  -- BINDING ru.logistica.tms.daoorderDao.OrderStatuses
-  CONSTRAINT order_statuses CHECK (orderStatus IN
-                                   ('CREATED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
-  PRIMARY KEY (orderID),
-  FOREIGN KEY (finalDestinationWarehouseID) REFERENCES warehouses (warehouseID),
-  FOREIGN KEY (donutDocPeriodID) REFERENCES donut_doc_periods (donutDocPeriodID)
-);
-
-
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                 USERS
 -- -------------------------------------------------------------------------------------------------------------------
-
 
 CREATE TABLE user_roles (
   userRoleID VARCHAR(32), -- Static
@@ -111,34 +32,6 @@ CREATE TABLE users (
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID),
   UNIQUE (userLogin)
 );
-
-
--- WH_BOSS  WH_DISPATCHER
-CREATE TABLE warehouse_users (
-  userID      INTEGER, -- Static
-  warehouseID INTEGER NOT NULL, -- Static
-  PRIMARY KEY (userID),
-  FOREIGN KEY (userID) REFERENCES users
-  ON DELETE CASCADE
-  ON UPDATE CASCADE,
-  FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE
-);
-
--- SUPPLIER_MANAGER
-CREATE TABLE supplier_users (
-  userID     INTEGER, -- Static
-  supplierID INTEGER NOT NULL, -- Static
-  PRIMARY KEY (userID),
-  FOREIGN KEY (userID) REFERENCES users
-  ON DELETE CASCADE
-  ON UPDATE CASCADE,
-  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE
-);
-
 
 CREATE TABLE permissions (
   permissionID VARCHAR(32), -- Static
@@ -182,6 +75,104 @@ SELECT insert_permission_for_role('WH_BOSS', 'testPerm1');
 SELECT insert_permission_for_role('WH_BOSS', 'testPerm2');
 SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                                 WAREHOUSES
+-- -------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE warehouses (
+  warehouseID   SERIAL, -- Static
+  warehouseName VARCHAR(128) NOT NULL, -- Dynamic
+  rusTimeZoneAbbr VARCHAR(6) NOT NULL, -- Dynamic
+  PRIMARY KEY (warehouseID)
+);
+
+CREATE TABLE docs (
+  docID       SERIAL, -- Static
+  docName     VARCHAR(255) NOT NULL, -- Dynamic
+  warehouseID INTEGER      NOT NULL, -- Static
+  PRIMARY KEY (docID),
+  FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
+);
+-- if no period => OPENED, if doc_period => OCCUPIED, if
+
+CREATE TABLE doc_periods (
+  docPeriodID BIGSERIAL, -- Static
+  docID       INTEGER                  NOT NULL, -- Static
+  periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
+  periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
+  -- длина периода кратна 30 минутам
+  -- BINDING with web.xml (cellSize)
+  CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
+                                               (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
+  PRIMARY KEY (docPeriodID),
+  FOREIGN KEY (docID) REFERENCES docs (docID)
+);
+
+-- WH_BOSS  WH_DISPATCHER
+CREATE TABLE warehouse_users (
+  userID      INTEGER, -- Static
+  warehouseID INTEGER NOT NULL, -- Static
+  PRIMARY KEY (userID),
+  FOREIGN KEY (userID) REFERENCES users
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
+  FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE
+);
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                            SUPPLIERS, DONUTS AND ORDERS
+-- -------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE suppliers (
+  supplierID SERIAL, -- Static
+  INN        VARCHAR(32) NOT NULL, -- Static
+  PRIMARY KEY (supplierID)
+);
+
+-- SUPPLIER_MANAGER
+CREATE TABLE supplier_users (
+  userID     INTEGER, -- Static
+  supplierID INTEGER NOT NULL, -- Static
+  PRIMARY KEY (userID),
+  FOREIGN KEY (userID) REFERENCES users
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
+  FOREIGN KEY (supplierID) REFERENCES suppliers (supplierID)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE
+);
+
+CREATE TABLE donut_doc_periods (
+  donutDocPeriodID  BIGINT,
+  creationDate      DATE         NOT NULL DEFAULT NOW(), -- Static
+  commentForDonut   TEXT         NOT NULL, -- Static
+  driver            VARCHAR(255) NOT NULL, -- Static
+  driverPhoneNumber VARCHAR(12)  NOT NULL, -- Static
+  licensePlate      VARCHAR(9)   NOT NULL, -- Static
+  palletsQty        INTEGER      NOT NULL CONSTRAINT positive_pallets_qty CHECK (palletsQty >= 0), -- Static
+  supplierUserID    INTEGER      NOT NULL, -- Static
+  PRIMARY KEY (donutDocPeriodID),
+  FOREIGN KEY (donutDocPeriodID) REFERENCES doc_periods (docPeriodID),
+  FOREIGN KEY (supplierUserID) REFERENCES supplier_users (userID)
+);
+CREATE TABLE orders (
+  orderID                     SERIAL, -- Static
+  orderNumber                 VARCHAR(16) NOT NULL, -- Static
+  boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty > 0), -- Static
+  finalDestinationWarehouseID INTEGER     NOT NULL, -- Static
+  donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
+  orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
+  commentForStatus            TEXT        NOT NULL, -- Dynamic
+  -- BINDING ru.logistica.tms.daoorderDao.OrderStatuses
+  CONSTRAINT order_statuses CHECK (orderStatus IN
+                                   ('CREATED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
+  PRIMARY KEY (orderID),
+  FOREIGN KEY (finalDestinationWarehouseID) REFERENCES warehouses (warehouseID),
+  FOREIGN KEY (donutDocPeriodID) REFERENCES donut_doc_periods (donutDocPeriodID)
+);
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                 AUDIT SCHEMA

@@ -1,15 +1,11 @@
 package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
-import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
-import ru.logistica.tms.dao.supplierDao.Supplier;
 import ru.logistica.tms.dao.userDao.*;
-import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.ValidateDataException;
-import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import javax.json.*;
 import javax.servlet.ServletException;
@@ -17,12 +13,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.StringReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 @WebServlet("/getTableData")
 public class GetTableDataServlet extends AjaxHttpServlet {
@@ -69,7 +61,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
             if (isDonutDocPeriod) {
                 DonutDocPeriod donutDocPeriod = (DonutDocPeriod) period;
                 docPeriodBuilder.add("state", "OCCUPIED");
-                docPeriodBuilder.add("supplierName", donutDocPeriod.getSupplier().getInn());
+                docPeriodBuilder.add("supplierName", donutDocPeriod.getSupplierUser().getSupplier().getInn());
             } else {
                 docPeriodBuilder.add("state", "CLOSED");
             }
@@ -102,7 +94,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
             if (isDonutDocPeriod) {
                 SupplierUser supplierUser = (SupplierUser) user;
                 DonutDocPeriod donutDocPeriod = (DonutDocPeriod) period;
-                if (donutDocPeriod.getSupplier().equals(supplierUser.getSupplier())) {
+                if (donutDocPeriod.getSupplierUser().equals(supplierUser)) {
                     docPeriodBuilder.add("owned", true);
                 } else {
                     docPeriodBuilder.add("owned", false);

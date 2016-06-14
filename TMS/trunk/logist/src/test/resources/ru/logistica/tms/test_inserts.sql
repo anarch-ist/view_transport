@@ -35,7 +35,7 @@ INSERT INTO docs (docname, warehouseid) VALUES
 
 -- create users
 INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 1
-VALUES ('us1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'ivanov ivan', '9260943566', 'ivan@s.ru', 'manager');
+VALUES ('us1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'ivanov ivan', '9260943566', 'ask_sergey@inbox.ru', 'manager');
 INSERT INTO supplier_users VALUES (1, 1);
 
 INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 2
@@ -43,7 +43,7 @@ VALUES ('ub1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_BOSS'
 INSERT INTO warehouse_users VALUES (2, 1);
 
 INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 3
-VALUES ('us2', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'smirnova marina', '9070543566', 'mar@s.ru', 'manager');
+VALUES ('us2', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'SUPPLIER_MANAGER', 'smirnova', '9070543566', 'smirnovayi@logicsmart.ru', 'manager');
 INSERT INTO supplier_users VALUES (3, 2);
 
 INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 4

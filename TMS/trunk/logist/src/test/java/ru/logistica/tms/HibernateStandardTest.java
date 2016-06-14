@@ -1,9 +1,13 @@
 package ru.logistica.tms;
 
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.dao.HibernateUtils;
 
 public abstract class HibernateStandardTest extends HibernateTest {
+
+
     @Test
     public void testSave() throws Exception {
         HibernateUtils.beginTransaction();

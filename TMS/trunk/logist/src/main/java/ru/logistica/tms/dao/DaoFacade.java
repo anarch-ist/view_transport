@@ -46,19 +46,19 @@ public class DaoFacade {
             HibernateUtils.getCurrentSession().close();
         }
     }
-    // TODO
-//    public static String getSupplierEmailByDonutDocPeriodId(final long donutDocPeriodId) {
-////        String result;
-////        doInTransaction(new DaoScript() {
-////            @Override
-////            public void execute() throws DAOException {
-////                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
-////                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
-////                donutDocPeriod.getSupplier().getEmail();
-////
-////            }
-////        });
-//    }
+
+    public static String getSupplierEmailByDonutDocPeriodId(final long donutDocPeriodId) {
+        final String[] result = new String[1];
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                result[0] = donutDocPeriod.getSupplierUser().getEmail();
+            }
+        });
+        return result[0];
+    }
 
     public static void openPeriods(final OpenDocPeriodsData openDocPeriodsData) {
         doInTransaction(new DaoScript() {
@@ -192,20 +192,18 @@ public class DaoFacade {
 
     }
 
-    public static void insertDonut(final DonutInsertData donut, final DocDateSelectorData docDateSelectorData, final Supplier usersSupplier) {
+    public static void insertDonut(final DonutInsertData donut, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
                 DocDao docDao = new DocDaoImpl();
                 Doc doc = docDao.findById(Doc.class, docDateSelectorData.docId);
-                SupplierDao supplierDao = new SupplierDaoImpl();
-                Supplier supplier = supplierDao.findById(Supplier.class, usersSupplier.getSupplierId());
                 WarehouseDao warehouseDao = new WarehouseDaoImpl();
 
                 DonutDocPeriod donutDocPeriod = new DonutDocPeriod();
 
                 donutDocPeriod.setDoc(doc);
-                donutDocPeriod.setSupplier(supplier);
+                donutDocPeriod.setSupplierUser(supplierUser);
                 donutDocPeriod.setPalletsQty((short) donut.palletsQty);
                 donutDocPeriod.setLicensePlate(donut.licensePlate);
                 donutDocPeriod.setCommentForDonut(donut.commentForDonut);
