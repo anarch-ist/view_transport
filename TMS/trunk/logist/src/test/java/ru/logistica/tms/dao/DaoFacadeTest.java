@@ -29,7 +29,6 @@ public class DaoFacadeTest extends HibernateTest {
     public void setUp() throws Exception {
         super.setUp();
         TestUtil.fillWithSampleData();
-
     }
 
     @Test
@@ -39,22 +38,9 @@ public class DaoFacadeTest extends HibernateTest {
         for (Warehouse warehouse : allWarehousesWithDocs) {
             if (warehouse.getWarehouseId() == 1) {
                 Set<Doc> docs = warehouse.getDocs();
-                Assert.assertTrue(docs.size() == 3);
+                Assert.assertTrue(docs.size() == 6);
             }
         }
-    }
-
-    @Test
-    public void testGetAllDocsForWarehouseUserId() throws Exception {
-        //TODO
-//        Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllDocsForWarehouseUserId();
-//        Assert.assertTrue(allWarehousesWithDocs.size() == 1);
-//        for (Warehouse warehouse : allWarehousesWithDocs) {
-//            if (warehouse.getWarehouseId() == 1) {
-//                Set<Doc> docs = warehouse.getDocs();
-//                Assert.assertTrue(docs.size() == 3);
-//            }
-//        }
     }
 
     @Test
@@ -102,8 +88,7 @@ public class DaoFacadeTest extends HibernateTest {
         SupplierUser user1 = supplierUserDao.findByLogin(SupplierUser.class, "user1");
         HibernateUtils.commitTransaction();
 
-
-        DaoFacade.insertDonut(donut, docDateSelectorData, user1.getSupplier());
+        DaoFacade.insertDonut(donut, docDateSelectorData, user1);
 
     }
 }

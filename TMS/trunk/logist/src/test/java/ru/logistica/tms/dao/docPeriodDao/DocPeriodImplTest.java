@@ -4,6 +4,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.logistica.tms.HibernateTest;
+import ru.logistica.tms.TestUtil;
 import ru.logistica.tms.dao.HibernateUtils;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
@@ -11,6 +12,9 @@ import ru.logistica.tms.dao.docDao.DocDaoImpl;
 import ru.logistica.tms.dao.supplierDao.Supplier;
 import ru.logistica.tms.dao.supplierDao.SupplierDao;
 import ru.logistica.tms.dao.supplierDao.SupplierDaoImpl;
+import ru.logistica.tms.dao.userDao.SupplierUser;
+import ru.logistica.tms.dao.userDao.SupplierUserDao;
+import ru.logistica.tms.dao.userDao.SupplierUserDaoImpl;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
@@ -24,7 +28,6 @@ import java.util.List;
 public class DocPeriodImplTest extends HibernateTest {
     private static final SimpleDateFormat dateFormat = new UtcSimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss'Z'"); //ISO-8601
 
-
     private Doc doc;
     private Warehouse warehouse;
     private Supplier supplier;
@@ -36,9 +39,9 @@ public class DocPeriodImplTest extends HibernateTest {
 
 
     @BeforeClass
-    @Override
     public void setUp() throws Exception {
         super.setUp();
+        TestUtil.fillWithSampleData();
 
         HibernateUtils.beginTransaction();
         SupplierDao supplierDao = new SupplierDaoImpl();
@@ -77,6 +80,7 @@ public class DocPeriodImplTest extends HibernateTest {
     @Test(dependsOnMethods = {"testSave"})
     public void testPersist() throws Exception {
         HibernateUtils.beginTransaction();
+        SupplierUserDao supplierUserDao = new SupplierUserDaoImpl();
         DonutDocPeriod donutDocPeriod = new DonutDocPeriod();
         donutDocPeriod.setDoc(doc);
         secondPeriodBeginTimestamp = dateFormat.parse("10-05-2016T20:30:00Z");
@@ -88,7 +92,7 @@ public class DocPeriodImplTest extends HibernateTest {
         donutDocPeriod.setDriverPhoneNumber("dr_phobe");
         donutDocPeriod.setLicensePlate("lic_pl");
         donutDocPeriod.setPalletsQty((short)3);
-        donutDocPeriod.setSupplier(supplier);
+        donutDocPeriod.setSupplierUser(supplierUserDao.findById(SupplierUser.class, 1));
         docPeriodDao.persist(donutDocPeriod);
         HibernateUtils.commitTransaction();
     }

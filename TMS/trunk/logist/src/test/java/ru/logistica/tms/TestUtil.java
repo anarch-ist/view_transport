@@ -16,7 +16,7 @@ public class TestUtil {
         executeFiles(false, "ddl.sql");
     }
     public static void fillWithSampleData() throws URISyntaxException {
-        executeFiles(false, "test_inserts.sql");
+        executeFiles(true, "test_inserts.sql");
     }
     public static void recreateDatabaseAndFillWithSampleData() {
         executeFiles(false, "ddl.sql", "test_inserts.sql");
@@ -55,12 +55,16 @@ public class TestUtil {
         return output.toString();
     }
 
+
+    // TODO FIX IT!
     private static void executeFiles(boolean showOutput, String... fileNames) {
-        executeCommand("cmd /c taskkill -f /IM psql.exe");
+
         for (String fileName : fileNames) {
             try {
                 Path pathToSql = Paths.get(TestUtil.class.getResource(fileName).toURI());
+                executeCommand("cmd /c taskkill -f /IM psql.exe");
                 String output = executeCommand("cmd /c psql.exe -U postgres -d postgres -h localhost -f " + pathToSql);
+
                 if (showOutput) System.out.println(output);
             }
             catch (Exception err) {

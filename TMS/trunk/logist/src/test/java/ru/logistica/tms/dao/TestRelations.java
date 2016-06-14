@@ -14,6 +14,7 @@ import ru.logistica.tms.dao.orderDao.OrderStatuses;
 import ru.logistica.tms.dao.supplierDao.Supplier;
 import ru.logistica.tms.dao.supplierDao.SupplierDao;
 import ru.logistica.tms.dao.supplierDao.SupplierDaoImpl;
+import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
@@ -26,6 +27,7 @@ import java.util.Set;
 public class TestRelations extends HibernateTest {
     public static final int BASE_PERIOD = 1800 * 1000;
 
+    private SupplierUser supplierUser;
     private Warehouse warehouse;
     private Doc doc;
     private DocPeriod emptyDocPeriod;
@@ -39,6 +41,19 @@ public class TestRelations extends HibernateTest {
         // CREATE ENTITIES
         supplier = new Supplier();
         supplier.setInn("123456");
+
+        supplierUser = new SupplierUser();
+
+        supplierUser.setEmail("sssss");
+        supplierUser.setSalt("jrteOl270Hx8gS75");
+        supplierUser.setPassAndSalt("4e8941fd14c700ec2dd42f36b2e7cedf");
+        supplierUser.setPhoneNumber("ewfef");
+        supplierUser.setPosition("ergerg");
+        supplierUser.setUserLogin("login111");
+        supplierUser.setUserName("name");
+        UserRole userRole = new UserRole();
+        userRole.setUserRoleId(UserRoles.SUPPLIER_MANAGER);
+        supplierUser.setUserRole(userRole);
 
         warehouse = new Warehouse();
         warehouse.setWarehouseName("warehouse1");
@@ -68,11 +83,12 @@ public class TestRelations extends HibernateTest {
 
         // CREATE RELATIONS
         doc.setWarehouse(warehouse);
+        supplierUser.setSupplier(supplier);
         Set<Doc> docs = new HashSet<>();
         docs.add(doc);
         warehouse.setDocs(docs);
         emptyDocPeriod.setDoc(doc);
-        donutDocPeriod.setSupplier(supplier);
+        donutDocPeriod.setSupplierUser(supplierUser);
         donutDocPeriod.setDoc(doc);
         HashSet<DocPeriod> docPeriods = new HashSet<>();
         docPeriods.add(emptyDocPeriod);
@@ -80,7 +96,6 @@ public class TestRelations extends HibernateTest {
         doc.setDocPeriods(docPeriods);
         HashSet<DonutDocPeriod> donutDocPeriods = new HashSet<>();
         donutDocPeriods.add(donutDocPeriod);
-        supplier.setDonutDocPeriods(donutDocPeriods);
         order.setFinalDestinationWarehouse(warehouse);
         order.setDonutDocPeriod(donutDocPeriod);
         Set<Order> orders = new HashSet<>();
@@ -96,6 +111,8 @@ public class TestRelations extends HibernateTest {
         HibernateUtils.beginTransaction();
         SupplierDao supplierDao = new SupplierDaoImpl();
         supplierDao.persist(supplier);
+        SupplierUserDao supplierUserDao = new SupplierUserDaoImpl();
+        supplierUserDao.persist(supplierUser);
         WarehouseDao warehouseDao = new WarehouseDaoImpl();
         warehouseDao.persist(warehouse);
 
