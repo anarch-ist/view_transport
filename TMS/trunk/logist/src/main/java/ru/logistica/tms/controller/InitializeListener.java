@@ -12,6 +12,7 @@ import ru.logistica.tms.dao.HibernateUtils;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.Properties;
 import java.util.TimeZone;
 
 @WebListener
@@ -22,28 +23,16 @@ public class InitializeListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
         try {
+            // set TimeZone as UTC
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+
+            // init db connection pool and make default selects
             Configuration configuration = new Configuration().configure();
             serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
             sessionFactory = configuration.configure().buildSessionFactory(serviceRegistry);
-//            Configuration configuration = new Configuration();
-//            configuration.configure();
-//            StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().applySetting(configuration.getProperties()).build();
-//
-//            serviceRegistry = new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
-//            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-
-
-// hib 5.0.0.final init
-//            Metadata metadata = new MetadataSources(standardRegistry)
-//                    .getMetadataBuilder()
-//                    .applyImplicitNamingStrategy(ImplicitNamingStrategyJpaCompliantImpl.INSTANCE)
-//                    .build();
-//
-//            SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
             HibernateUtils.setSessionFactory(sessionFactory);
-
             DaoFacade.fillOffsetsForAbbreviations();
         } catch (Exception e) {
             logger.error(e);

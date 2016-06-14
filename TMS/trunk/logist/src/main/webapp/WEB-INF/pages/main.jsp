@@ -161,7 +161,7 @@
                     },
                     {
                         name: "отменить",
-                        id: "bCancelBtn",
+                        id: "bCancelDonutBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OCCUPIED" && isFullPeriodSelected;
@@ -192,7 +192,7 @@
             });
 
             // ---------------------------------init dialog plugin------------------------------------------
-            var donutCrudPluginDialog = $('[data-remodal-id=modal]').remodal();
+            var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
 
             // ---------------------------------init donutCrudPlugin----------------------------------------
             <c:if test="${isSupplierManager}">
@@ -368,7 +368,7 @@
             };
             var bOpenPeriodBtn = tablePlugin.getButtonByPluginId("bOpenPeriodBtn");
             bOpenPeriodBtn.onclick = function() {
-                const selectionObject = docDateSelector.getSelectionObject();
+                var selectionObject = docDateSelector.getSelectionObject();
                 var utcDate = selectionObject.date.getTime();
                 var docId = selectionObject.docId;
                 var selectionData = tablePlugin.getSelectionData();
@@ -386,7 +386,6 @@
                 });
                 sendTableAjax("openDocPeriods", {openPeriodsData: sendData});
             };
-
             <%--BINDING dto.OpenDocPeriodsData.java--%>
             function getDataForSendOpen(obj, docId){
                 if(obj.periods.length === 1 && obj.data.periodBegin === obj.periods[0].periodBegin && obj.data.periodEnd === obj.periods[0].periodEnd){
@@ -463,6 +462,24 @@
                     return result;
                 }
             }
+
+            var emailDialog = $('[data-remodal-id=sendEmailDialog]').remodal();
+            var bCancelDonutBtn = tablePlugin.getButtonByPluginId("bCancelDonutBtn");
+
+            bCancelDonutBtn.onclick = function() {
+                $("#emailInterval").text(getSelectedPeriodAsString());
+                $("#emailSupplier").text(tablePlugin.getSelectionData()[0].data.supplierName);
+                emailDialog.open();
+            };
+            $("#submitEmail").on("click", function() {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var sendObject = {donutDocPeriodId: donutDocPeriodId, emailContent: $("#emailMessageArea").val()};
+                sendTableAjax("deleteDonut", {dataForDelete: sendObject}, function() {
+                    emailDialog.close();
+                });
+            });
+
 
             </c:if>
 
@@ -541,11 +558,29 @@
     <div id="tableControlsContainer"></div>
 
     <%--dialogs--%>
-    <div data-remodal-id="modal">
+    <div data-remodal-id="donutsDialog">
         <button data-remodal-action="close" class="remodal-close"></button>
         <h1>Ввод данных</h1>
         <div id="routeListDataContainer"></div>
     </div>
+
+    <c:if test="${isWarehouseBoss}">
+        <div data-remodal-id="sendEmailDialog">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Отмена доставки</h1>
+            <table>
+                <tr>
+                    <td>Интервал</td><td id="emailInterval"></td>
+                </tr>
+                <tr>
+                    <td>Поставщик</td><td id="emailSupplier"></td>
+                </tr>
+            </table>
+            <label for="emailMessageArea">Сообщение поставщику</label>
+            <textarea id="emailMessageArea" style="resize:none" cols="75" rows="10" autofocus></textarea>
+            <button id="submitEmail">Отправить</button>
+        </div>
+    </c:if>
 
 </div>
 
