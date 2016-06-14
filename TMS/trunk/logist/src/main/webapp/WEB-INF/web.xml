@@ -19,6 +19,24 @@
         <param-value>30</param-value>
     </context-param>
 
+    <!--SMTP Params-->
+    <context-param>
+        <param-name>smtpHost</param-name>
+        <param-value>smtp.mail.ru</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtpPort</param-name>
+        <param-value>465</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtpUserAddress</param-name>
+        <param-value>testsmpt@bk.ru</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtpPass</param-name>
+        <param-value>testtest12345</param-value>
+    </context-param>
+
     <!--<description>logist app</description>-->
     <!--<display-name>Archetype Created Web Application</display-name>-->
 
@@ -41,16 +59,6 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-
-    <!--<servlet>-->
-    <!--<servlet-name>main</servlet-name>-->
-    <!--<jsp-file>/main.jsp</jsp-file>-->
-    <!--</servlet>-->
-
-    <!--<servlet-mapping>-->
-    <!--<servlet-name>main</servlet-name>-->
-    <!--<url-pattern>/main</url-pattern>-->
-    <!--</servlet-mapping>-->
 
     <session-config>
 

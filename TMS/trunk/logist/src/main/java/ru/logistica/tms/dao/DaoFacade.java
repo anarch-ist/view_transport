@@ -46,6 +46,19 @@ public class DaoFacade {
             HibernateUtils.getCurrentSession().close();
         }
     }
+    // TODO
+//    public static String getSupplierEmailByDonutDocPeriodId(final long donutDocPeriodId) {
+////        String result;
+////        doInTransaction(new DaoScript() {
+////            @Override
+////            public void execute() throws DAOException {
+////                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+////                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+////                donutDocPeriod.getSupplier().getEmail();
+////
+////            }
+////        });
+//    }
 
     public static void openPeriods(final OpenDocPeriodsData openDocPeriodsData) {
         doInTransaction(new DaoScript() {
@@ -162,18 +175,6 @@ public class DaoFacade {
         });
     }
 
-    public static void updateDonutPeriod(final long donutDocPeriodId, final Date periodBegin, final Date periodEnd) {
-        doInTransaction(new DaoScript() {
-            @Override
-            public void execute() throws DAOException {
-                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
-                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
-                donutDocPeriod.setPeriod(new Period(periodBegin, periodEnd));
-                donutDocPeriodDao.update(donutDocPeriod);
-            }
-        });
-    }
-
     public static void deleteDonutWithRequests(final long donutDocPeriodId) {
         doInTransaction(new DaoScript() {
             @Override
@@ -279,19 +280,6 @@ public class DaoFacade {
         return authResult;
     }
 
-    public static Warehouse getWarehouseWithDocsForUser(final Integer userId) {
-        final Warehouse[] result = new Warehouse[1];
-        doInTransaction(new DaoScript() {
-            @Override
-            public void execute() throws DAOException {
-                WarehouseUserDao warehouseUserDao = new WarehouseUserDaoImpl();
-                WarehouseUser warehouseUser = warehouseUserDao.findById(WarehouseUser.class, userId);
-                result[0] = warehouseUser.getWarehouse();
-            }
-        });
-        return result[0];
-    }
-
     public static void fillOffsetsForAbbreviations() {
         doInTransaction(new DaoScript() {
             @Override
@@ -319,20 +307,6 @@ public class DaoFacade {
             }
         });
         return (List<DocPeriod>) result[0];
-    }
-
-    public static Warehouse getWarehouseById(final Integer warehouseId) {
-        final Warehouse[] result = new Warehouse[1];
-        doInTransaction(new DaoScript() {
-            @Override
-            public void execute() throws DAOException {
-                WarehouseDao warehouseDao = new WarehouseDaoImpl();
-                Warehouse warehouse = warehouseDao.findById(Warehouse.class, warehouseId);
-                warehouse.getRusTimeZoneAbbr();
-                result[0] = warehouse;
-            }
-        });
-        return result[0];
     }
 
 }
