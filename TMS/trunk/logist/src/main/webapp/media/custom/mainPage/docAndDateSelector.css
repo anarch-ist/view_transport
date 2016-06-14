@@ -30,6 +30,6 @@
     background: none;
 }
 
-.pickmeup .pmu-instance .pmu-not-in-month, .pickmeup .pmu-instance .pmu-day-of-week{
+.pickmeup .pmu-instance .pmu-not-in-month, .pickmeup .pmu-instance .pmu-day-of-week, .pickmeup .pmu-months .pmu-disabled{
     color: #666d7d !important;
 }
