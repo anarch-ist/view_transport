@@ -14,4 +14,22 @@
     padding-left: 5px;
 }
 
+.pickmeup {
+    background: #eef0f5 !important;
+}
 
+.pickmeup .pmu-instance .pmu-selected {
+    background: #aab7d1 !important;
+}
+
+.pickmeup .pmu-instance .pmu-button {
+    color: #788db6 !important;
+}
+
+.pickmeup .pmu-instance .pmu-today {
+    background: none;
+}
+
+.pickmeup .pmu-instance .pmu-not-in-month, .pickmeup .pmu-instance .pmu-day-of-week{
+    color: #666d7d !important;
+}
