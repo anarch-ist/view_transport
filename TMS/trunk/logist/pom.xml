@@ -99,6 +99,8 @@
                     <password>admin</password>
                     <url>http://localhost:8080/manager/text</url>
                     <contextReloadable>true</contextReloadable>
+                    <!--<warDirectory>${project.build.directory}/${project.build.finalName}</warDirectory>-->
+                    <!--<contextFile></contextFile>-->
                 </configuration>
 
                 <dependencies>
