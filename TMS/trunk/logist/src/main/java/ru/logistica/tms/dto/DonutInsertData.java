@@ -10,7 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class DonutInsertData {
-    public final String period;
+    public final long periodBegin;
+    public final long periodEnd;
     public final String driver;
     public final String licensePlate;
     public final int palletsQty;
@@ -26,7 +27,8 @@ public class DonutInsertData {
             this.palletsQty = receivedJsonObject.getInt("palletsQty");
             this.driverPhoneNumber = receivedJsonObject.getString("driverPhoneNumber");
             this.commentForDonut = receivedJsonObject.getString("commentForDonut");
-            this.period = receivedJsonObject.getString("period");
+            this.periodBegin = receivedJsonObject.getJsonObject("period").getJsonNumber("periodBegin").longValueExact();
+            this.periodEnd = receivedJsonObject.getJsonObject("period").getJsonNumber("periodEnd").longValueExact();
             Set<OrderInsertData> ordersSet = new HashSet<>();
             JsonArray orders = receivedJsonObject.getJsonArray("orders");
             for (JsonValue orderAsJsonValue : orders) {
@@ -49,8 +51,9 @@ public class DonutInsertData {
         }
     }
 
-    public DonutInsertData(String period, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderInsertData> orders) {
-        this.period = period;
+    public DonutInsertData(long periodBegin, long periodEnd, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderInsertData> orders) {
+        this.periodBegin = periodBegin;
+        this.periodEnd = periodEnd;
         this.driver = driver;
         this.licensePlate = licensePlate;
         this.palletsQty = palletsQty;
@@ -62,7 +65,8 @@ public class DonutInsertData {
     @Override
     public String toString() {
         return "DonutInsertData{" +
-                " period='" + period + '\'' +
+                "periodBegin=" + periodBegin +
+                ", periodEnd=" + periodEnd +
                 ", driver='" + driver + '\'' +
                 ", licensePlate='" + licensePlate + '\'' +
                 ", palletsQty=" + palletsQty +

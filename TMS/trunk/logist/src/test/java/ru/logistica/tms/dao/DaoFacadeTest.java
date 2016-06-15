@@ -80,7 +80,7 @@ public class DaoFacadeTest extends HibernateTest {
         Set<DonutInsertData.OrderInsertData> orders = new HashSet<>();
         DonutInsertData.OrderInsertData dtoOrder = new DonutInsertData.OrderInsertData("234", 2, 4, "erferg", OrderStatuses.CREATED.name());
         orders.add(dtoOrder);
-        DonutInsertData donut = new DonutInsertData("450;510", "driver", "licPl", 4, "phN", "commne", orders);
+        DonutInsertData donut = new DonutInsertData(450*60*1000, 510*60*1000, "driver", "licPl", 4, "phN", "commne", orders);
         DocDateSelectorData docDateSelectorData = new DocDateSelectorData(new Date().getTime(), 1, 1);
 
         HibernateUtils.beginTransaction();

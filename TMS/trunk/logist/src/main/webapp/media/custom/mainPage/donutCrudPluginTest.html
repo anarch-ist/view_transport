@@ -28,25 +28,25 @@
     <script>
         var exampleData = {
             supplierInn: "поставщик1",
-            period:"t1 t2",
-            driver:"someDriver",
+            period: {periodBegin: 0, periodEnd: 90},
+            driver: "someDriver",
             licensePlate: "hbguegrf",
             palletsQty: 4,
             driverPhoneNumber: "+7906548976",
-            commentForDonut:"someComment",
-            orders:[
+            commentForDonut: "someComment",
+            orders: [
                 {
                     orderId: 7,  // number or null
                     orderNumber: "orewnoer123",
                     finalDestinationWarehouseId: 1,
-                    boxQty:4,
+                    boxQty: 4,
                     commentForStatus: "order status comment",
                     orderStatusId: "STATUS"
                 }
             ]
         };
         var donutCrudPluginInstance;
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
@@ -60,17 +60,16 @@
             });
 
             //window.console.log(donutCrudPluginInstance.getData());
-            donutCrudPluginInstance.setOnRowRemoved(function(rowData) {
+            donutCrudPluginInstance.setOnRowRemoved(function (rowData) {
                 window.console.log(rowData);
             });
             donutCrudPluginInstance.setData(exampleData);
-
 
 
         });
     </script>
 </head>
 <body>
-    <div id="routeListDataContainer"></div>
+<div id="routeListDataContainer"></div>
 </body>
 </html>

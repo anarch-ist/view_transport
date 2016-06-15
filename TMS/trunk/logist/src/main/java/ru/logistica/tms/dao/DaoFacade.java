@@ -190,7 +190,7 @@ public class DaoFacade {
 
     }
 
-    public static void insertDonut(final DonutInsertData donut, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) {
+    public static void insertDonut(final DonutInsertData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -202,20 +202,20 @@ public class DaoFacade {
 
                 donutDocPeriod.setDoc(doc);
                 donutDocPeriod.setSupplierUser(supplierUser);
-                donutDocPeriod.setPalletsQty((short) donut.palletsQty);
-                donutDocPeriod.setLicensePlate(donut.licensePlate);
-                donutDocPeriod.setCommentForDonut(donut.commentForDonut);
+                donutDocPeriod.setPalletsQty((short) donutInsertData.palletsQty);
+                donutDocPeriod.setLicensePlate(donutInsertData.licensePlate);
+                donutDocPeriod.setCommentForDonut(donutInsertData.commentForDonut);
                 donutDocPeriod.setCreationDate(new Date());
-                donutDocPeriod.setDriver(donut.driver);
-                donutDocPeriod.setDriverPhoneNumber(donut.driverPhoneNumber);
-                donutDocPeriod.setPeriod(getPeriod());
+                donutDocPeriod.setDriver(donutInsertData.driver);
+                donutDocPeriod.setDriverPhoneNumber(donutInsertData.driverPhoneNumber);
+                donutDocPeriod.setPeriod(new Period(new Date(donutInsertData.periodBegin), new Date(donutInsertData.periodEnd)));
                 donutDocPeriod.setDoc(doc);
 
                 DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
                 donutDocPeriodDao.save(donutDocPeriod);
 
                 OrderDao orderDao = new OrderDaoImpl();
-                for (DonutInsertData.OrderInsertData dtoOrder: donut.orders) {
+                for (DonutInsertData.OrderInsertData dtoOrder: donutInsertData.orders) {
                     Order order = new Order();
                     order.setBoxQty((short) dtoOrder.boxQty);
                     order.setCommentForStatus(dtoOrder.commentForStatus);
@@ -225,17 +225,6 @@ public class DaoFacade {
                     order.setDonutDocPeriod(donutDocPeriod);
                     orderDao.save(order);
                 }
-            }
-
-            private Period getPeriod() throws DAOException {
-                // TODO redo this shit
-                String[] split = donut.period.split(";");
-                int periodBegin = Integer.parseInt(split[0]); // in minutes from day begin
-                int periodEnd = Integer.parseInt(split[1]);  // in minutes from day begin
-                long dateBegin = docDateSelectorData.utcDate;
-                long timeStampBegin = dateBegin + periodBegin * 60 * 1000;
-                long timeStampEnd = dateBegin + periodEnd * 60 * 1000;
-                return new Period(new Date(timeStampBegin), new Date(timeStampEnd));
             }
         });
     }
