@@ -18,83 +18,48 @@
         buttons: null
     };
 
+    // CONSTANTS
     var CLOSED = "CLOSED",
         OCCUPIED = "OCCUPIED",
         OPENED = "OPENED";
 
     var startupParameters = {};
+    var tableElement;
+    var disableElement;
+    var parentElem;
+    var generatedCells;
+
+    // VARS
+    var data = [];
+    var dataAndCellsRelation = new Map();
+    var selectedElementsInstance = new SelectedElements();
+    var tableControls;
+    var labelGenerator;
+    var previousSelectedState;
+    var previousDisabled;
+    var previousAnySelected = false;
+
     var main = function (initParams) {
         startupParameters = merge(DEFAULT_PARAMETERS, initParams);
+        tableElement = document.createElement("table");
+        disableElement = document.createElement("div");
+        parentElem = document.getElementById(startupParameters.parentId);
+        tableControls = new TableControls(parentElem, main, startupParameters.buttons);
+        generatedCells = [];
+        generateContent();
+
         return main;
     };
 
-    var data = [];
-    var dataAndCellsRelation = new Map();
-
-    var tableElement = document.createElement("table");
-    var disableElement;
-    var selectedElementsInstance = new SelectedElements();
-    var generatedCells = [];
-
-    main.generate = function(){
-        var tableSizes = findTableSizes(startupParameters.windowSize, startupParameters.cellSize);
-        var serialNumber = 0;
-
-        var parentElem = document.getElementById(startupParameters.parentId);
-        parentElem.classList.add("tablePlugin");
-        disableElement = document.createElement("div");
-        parentElem.appendChild(disableElement);
-        disableElement.classList.add("tp_disabled");
-        tableElement.classList.add("mainTable");
-        parentElem.appendChild(tableElement);
-        var labelGenerator = createLabelGenerator(startupParameters.cellSize);
-
-        // generate rows and cells
-        for(var i = 1; i <= tableSizes.y; i++) {
-            var rowElement = document.createElement("tr");
-            tableElement.appendChild(rowElement);
-
-            for(var j = 1; j <= tableSizes.x; j++) {
-                serialNumber++;
-                var cellElement = document.createElement("td");
-                generatedCells.push(cellElement);
-                dataAndCellsRelation.set(cellElement, null);
-                cellElement.setAttribute("data-serialnumber", serialNumber);
-                cellElement.onclick = onClickHandlersFactory(cellElement);
-                cellElement.appendChild(labelGenerator());
-                cellElement.appendChild(document.createElement("div"));
-                rowElement.appendChild(cellElement);
-            }
-        }
-        createEventDependencies();
-
-        if (startupParameters.buttons !== null) {
-            var tableControls = new TableControls(parentElem, main, startupParameters.buttons);
-            tableControls.generateContent();
-        }
-
-        // generate createdEvent
-        var newEvent = new CustomEvent("created", {
-            bubbles: true,
-            cancelable: false
-        });
-        tableElement.dispatchEvent(newEvent);
-    };
-
-
     // ----------------------------------METHODS------------------------------------------
-
-
 
     /**
      * set data array and creates view for this data
      * @param newData
      */
     main.setData = function(newData) {
-
+        clearAll();
         data = newData;
-        selectedElementsInstance.clearSelection();
-        clearVisual();
 
         var newEvent = new CustomEvent("cleared", {
             bubbles: true,
@@ -135,6 +100,11 @@
     main.getSelectionData = function() {
         return selectedElementsInstance.getSelectionData();
     };
+
+    main.getLabelGenerator = function() {
+        return labelGenerator;
+    };
+
     main.isAnySelected = function() {
         return (!selectedElementsInstance.isEmpty());
     };
@@ -143,7 +113,6 @@
         return previousDisabled;
     };
 
-    var previousDisabled;
     main.setDisabled = function(disabled) {
         if (disabled === previousDisabled) {
             return;
@@ -181,20 +150,65 @@
         tableElement.addEventListener("cleared", handler);
     };
 
+
+
+    // -------------------------------------- FUNCTIONS ------------------------------------------
+
+    function generateContent(){
+        var tableSizes = findTableSizes(startupParameters.windowSize, startupParameters.cellSize);
+        var serialNumber = 0;
+        parentElem.classList.add("tablePlugin");
+        parentElem.appendChild(disableElement);
+        disableElement.classList.add("tp_disabled");
+        tableElement.classList.add("mainTable");
+        parentElem.appendChild(tableElement);
+        labelGenerator = new LabelGenerator(startupParameters.cellSize);
+
+        // generate rows and cells
+        for(var i = 1; i <= tableSizes.y; i++) {
+            var rowElement = document.createElement("tr");
+            tableElement.appendChild(rowElement);
+
+            for(var j = 1; j <= tableSizes.x; j++) {
+                serialNumber++;
+                var cellElement = document.createElement("td");
+                generatedCells.push(cellElement);
+                dataAndCellsRelation.set(cellElement, null);
+                cellElement.setAttribute("data-serialnumber", serialNumber);
+                cellElement.onclick = onClickHandlersFactory(cellElement);
+                cellElement.appendChild(labelGenerator.generateLabelElement());
+                cellElement.appendChild(document.createElement("div"));
+                rowElement.appendChild(cellElement);
+            }
+        }
+        createEventDependencies();
+
+        if (tableControls.generateContent) {
+            tableControls.generateContent();
+        }
+
+        // generate createdEvent
+        var newEvent = new CustomEvent("created", {
+            bubbles: true,
+            cancelable: false
+        });
+        tableElement.dispatchEvent(newEvent);
+    }
+
     function createEventDependencies() {
         main.setOnCreated(function() {
             generateDisabledChangeEvent(false);
             generateAnySelectedEvent(false);
         });
 
-        var anySelected = false;
+
         main.setOnSelectionChanged(function() {
             if (selectedElementsInstance.isEmpty()) {
                 generateAnySelectedEvent(false);
-                anySelected = false;
-            } else if (!anySelected) {
+                previousAnySelected = false;
+            } else if (!previousAnySelected) {
                 generateAnySelectedEvent(true);
-                anySelected = true;
+                previousAnySelected = true;
             }
         });
 
@@ -203,10 +217,19 @@
         });
     }
 
+    function clearAll() {
+        data = [];
+        selectedElementsInstance.clearSelection();
+        for (var key of dataAndCellsRelation.keys()) {
+            dataAndCellsRelation.set(key, null);
+        }
+        clearVisual();
 
-    // ----------------------------------HELPER FUNCTIONS------------------------------------------
+        previousDisabled = undefined;
+        previousSelectedState = undefined;
+        previousAnySelected = false;
+    }
 
-    var previousSelectedState;
     function onClickHandlersFactory(cellElement) {
 
         return function() {
@@ -292,7 +315,6 @@
             }
         }
     }
-
 
     function SelectedElements() {
         var selectedElements = [];
@@ -439,6 +461,7 @@
             }));
         }
     }
+
     function findTableSizes(windowsSize, periodSize) {
         var periodsCount = windowsSize / periodSize;
 
@@ -458,16 +481,14 @@
         }
         return result;
     }
-    function createLabelGenerator(periodSize) {
-        var firstPart = "00:00";
-        var secondPart = "";
 
-        return function () {
-            var labelElement = document.createElement("label");
-            var time = firstPart.split(':');
-            var newTime = +time[0] * 60 + (+time[1]) + periodSize;
-            var hours = Math.floor(newTime / 60);
-            var minutes = newTime - (hours * 60);
+    function LabelGenerator(periodSize) {
+        var currentCount = 0;
+        var _this = this;
+
+        this.countTimeFromMinutes = function(timeInMinutes) {
+            var hours = Math.floor(timeInMinutes / 60);
+            var minutes = timeInMinutes - (hours * 60);
             if(hours < 10) {
                 hours = "0" + hours;
             }
@@ -477,12 +498,25 @@
             if(hours === 24){
                 hours = "00";
             }
-            secondPart = hours + ":" + minutes;
-            labelElement.innerHTML = firstPart + "-" + secondPart;
-            firstPart = secondPart;
+            return hours + ":" + minutes;
+        };
+
+        this.getLabelTextFromMinutes = function(periodBegin, periodEnd) {
+            var firstPart = _this.countTimeFromMinutes(periodBegin);
+            var secondPart = _this.countTimeFromMinutes(periodEnd);
+            return firstPart + "-" + secondPart;
+        };
+
+        this.generateLabelElement = function() {
+            var labelElement = document.createElement("label");
+            var periodBegin = currentCount * periodSize;
+            var periodEnd = (currentCount + 1) * periodSize;
+            labelElement.innerHTML = _this.getLabelTextFromMinutes(periodBegin, periodEnd);
+            currentCount++;
             return labelElement;
         };
     }
+
     function clearVisual() {
         [].forEach.call(tableElement.getElementsByTagName("td"), function (element) {
             var cellDiv = element.getElementsByTagName('div')[0];
@@ -575,13 +609,17 @@
     }
 
     function TableControls(containerElem, tablePlugin, buttonsDescription) {
+        if (buttonsDescription === null) {
+            return;
+        }
+
         var state = {isDisabled:null, isAnySelected:null, currentSelectedState:null, isFullPeriodSelected:null};
         this.generateContent = function() {
             var buttons = [];
 
             tablePlugin.setOnCreated(function() {
                 state.isDisabled = tablePlugin.isDisabled();
-                state.isAnySelected = tablePlugin.isDisabled();
+                state.isAnySelected = tablePlugin.isAnySelected();
             });
 
             tablePlugin.setOnDisableChanged(function(e) {
@@ -614,6 +652,9 @@
                 });
             });
 
+            //tablePlugin.setOnCleared(function() {
+            //
+            //});
 
             for (var i = 0; i < buttonsDescription.length; i++) {
                 var buttonElem = document.createElement('input');

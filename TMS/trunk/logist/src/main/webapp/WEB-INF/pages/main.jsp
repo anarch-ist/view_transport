@@ -178,7 +178,6 @@
                 ]
                 </c:if>
             });
-            tablePlugin.generate();
 
             var warehousesData = ${requestScope.docDateSelectorDataObject};
             // ---------------------------------init docDateSelector plugin----------------------------------------
@@ -479,8 +478,6 @@
                     emailDialog.close();
                 });
             });
-
-
             </c:if>
 
 
@@ -489,16 +486,8 @@
             });
             $docAndDateSelector.triggerEvents();
             function getSelectedPeriodAsString() {
-                var selectionData = tablePlugin.getSelectionData();
-                var periodsString;
-                var periods = selectionData[0].periods;
-                if (periods.length === 1) {
-                    periodsString = periods[0].periodBegin + ";" + periods[0].periodEnd;
-                } else if (periods.length > 1) {
-                    periodsString = periods[0].periodBegin + ";" + periods[periods.length - 1].periodEnd;
-                } else
-                    throw new Error("bad period");
-                return periodsString;
+                var periods = tablePlugin.getSelectionData()[0].periods;
+                return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(periods[0].periodBegin, periods[0].periodEnd);
             }
             function sendTableAjax(url, data, onDone) {
                 //tablePlugin.setDisabled(true);
@@ -553,6 +542,7 @@
 </div>
 
 <div id="docsPane">
+
     <div id="docAndDateSelector"></div>
     <div id="tableContainer"></div>
     <div id="tableControlsContainer"></div>
