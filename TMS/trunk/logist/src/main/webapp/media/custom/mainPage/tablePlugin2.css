@@ -18,15 +18,20 @@ body {
     table-layout: fixed;
     padding-left: 15px;
     padding-right: 15px;
+}
 
+.remodal{
+    min-width: 1024px !important;
 }
 
 .tablePlugin table {
     background-color: #e5e9f1;
-    border: 1px solid #aab7d1;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0px;
     width: 70%;
-    margin: 0 auto;
+    margin-left: 20px;
+    margin-top: 20px;
+    /*margin: 0 auto;*/
 }
 
 .tablePlugin td label {
@@ -61,6 +66,7 @@ body {
 
 .tp_disabled {
     background-color: rgba(0,0,0, 0.5);
+    left: 28px !important;
 }
 
 .tp_highlight {

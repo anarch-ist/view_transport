@@ -550,7 +550,7 @@
     <form action="logout" method="post">
         <input id="exit" type="submit" value="выйти"/>
     </form>
-    <table>
+    <table class="profileTable">
         <tr>
             <td>имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
         </tr>
