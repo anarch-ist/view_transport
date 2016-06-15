@@ -98,6 +98,7 @@
                     <username>admin</username>
                     <password>admin</password>
                     <url>http://localhost:8080/manager/text</url>
+                    <contextReloadable>true</contextReloadable>
                 </configuration>
 
                 <dependencies>

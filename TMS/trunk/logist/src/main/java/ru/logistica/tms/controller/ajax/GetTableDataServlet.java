@@ -39,8 +39,6 @@ public class GetTableDataServlet extends AjaxHttpServlet {
 
         Integer windowSize = Integer.parseInt(getServletContext().getInitParameter("windowSize"));
 
-        //Warehouse warehouse = DaoFacade.getWarehouseById(docDateSelectorData.warehouseId);
-        //Integer offset = AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr()).intValue();
         long timeStampBegin = docDateSelectorData.utcDate;
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
 

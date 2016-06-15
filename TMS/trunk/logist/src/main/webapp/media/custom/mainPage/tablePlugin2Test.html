@@ -7,13 +7,14 @@
     <script src="../../es6-shim.min.js"></script>
     <script src="tablePlugin2.js"></script>
     <script>
+        var exampleData = [
+            {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED",   owned: true},
+            {docPeriodId: 11, periodBegin: 690, periodEnd: 720, state: "OCCUPIED", owned: false, supplierName: "someSupplier"},
+            {docPeriodId: 12, periodBegin: 720, periodEnd: 780, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"},
+            {docPeriodId: 13, periodBegin: 840, periodEnd: 870, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"}
+        ];
         window.onload = function() {
-            var exampleData = [
-                {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED",   owned: true},
-                {docPeriodId: 11, periodBegin: 690, periodEnd: 720, state: "OCCUPIED", owned: false, supplierName: "someSupplier"},
-                {docPeriodId: 12, periodBegin: 720, periodEnd: 780, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"},
-                {docPeriodId: 13, periodBegin: 840, periodEnd: 870, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"}
-            ];
+
 
             var tablePlugin2 = window.tablePlugin2({
                 parentId: 'tableContainer',
@@ -101,7 +102,6 @@
                 window.console.log("SELECTION CHANGED");
             });
 
-            tablePlugin2.generate();
             tablePlugin2.setData(exampleData);
 
             var buttonByPluginId = tablePlugin2.getButtonByPluginId("cancelBtn");
