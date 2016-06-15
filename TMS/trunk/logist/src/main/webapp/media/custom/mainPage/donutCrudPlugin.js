@@ -25,7 +25,10 @@
 
 
         var donutFields = generateContent();
-
+        var period;
+        var periodToString = function(period) {
+            return period.periodBegin + ";" + period.periodEnd;
+        };
 
         //create and configure table
 
@@ -204,8 +207,12 @@
                 });
             }
         };
-        this.setPeriod = function(periodString){
-            donutFields.periodInput.val(periodString);
+        this.setPeriod = function(_period){
+            period = JSON.parse(JSON.stringify(_period));
+            donutFields.periodInput.val(periodToString(period));
+        };
+        this.setPeriodToString = function(_periodToString) {
+            periodToString = _periodToString;
         };
         this.setSupplierName = function(supplierName){
             donutFields.companyNameDiv.text(supplierName);
@@ -226,7 +233,7 @@
 
         this.getData = function() {
             var result = {};
-            result.period = donutFields.periodInput.val();
+            result.period = period;
             result.commentForDonut = donutFields.commentArea.val();
             result.supplierName = donutFields.companyNameDiv.text();
             result.driver = donutFields.driverNameInput.val();

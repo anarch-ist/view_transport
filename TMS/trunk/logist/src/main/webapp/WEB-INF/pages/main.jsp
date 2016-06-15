@@ -210,13 +210,20 @@
                 orderStatuses: ${requestScope.orderStatuses},
                 warehouses: warehousesKeyValuePairs
             });
+            donutCrudPluginInstance.setPeriodToString(function(period) {
+                return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
+            });
 
             var sInsertBtn = tablePlugin.getButtonByPluginId("sInsertBtn");
             sInsertBtn.onclick = function(e) {
                 donutCrudPluginInstance.setSupplierName('<c:out value="${sessionScope.user.supplier.inn}"/>');
-                donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                 donutCrudPluginInstance.setOnSubmit(function() {
-                    sendTableAjax("insertDonut", {createdDonut: donutCrudPluginInstance.getData()}, function() {
+                    var data = donutCrudPluginInstance.getData();
+                    var utcDate = docDateSelector.getSelectionObject().date.getTime();
+                    data.period.periodBegin = toUtcDateTime(utcDate, data.period.periodBegin);
+                    data.period.periodEnd = toUtcDateTime(utcDate, data.period.periodEnd);
+                    sendTableAjax("insertDonut", {createdDonut: data}, function() {
                         donutCrudPluginInstance.setOnSubmit(null);
                         donutCrudPluginDialog.close();
                     })
@@ -238,7 +245,7 @@
                 }).done(function (donutData) {
                     donutCrudPluginInstance.setData(donutData);
                     donutCrudPluginInstance.setSupplierName('<c:out value="${sessionScope.user.supplier.inn}"/>');
-                    donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                    donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                     donutCrudPluginInstance.setOnSubmit(function() {
                         var sendObject = $.extend(
                                 donutCrudPluginInstance.getData(),
@@ -290,6 +297,10 @@
                 orderStatuses: ${requestScope.orderStatuses},
                 warehouses: warehousesKeyValuePairs
             });
+            donutCrudPluginInstance.setPeriodToString(function(period) {
+                return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
+            });
+
 
             var dUpdateBtn = tablePlugin.getButtonByPluginId("dUpdateBtn");
             dUpdateBtn.onclick = function(e) {
@@ -304,7 +315,7 @@
                     dataType: "json"
                 }).done(function (donutData) {
                     donutCrudPluginInstance.setData(donutData);
-                    donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                    donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                     donutCrudPluginInstance.setOnSubmit(function() {
                         var sendObject = $.extend(
                                 donutCrudPluginInstance.getData(),
@@ -334,6 +345,9 @@
                 orderStatuses: ${requestScope.orderStatuses},
                 warehouses: warehousesKeyValuePairs
             });
+            donutCrudPluginInstance.setPeriodToString(function(period) {
+                return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
+            });
 
             var bInfoBtn = tablePlugin.getButtonByPluginId("bInfoBtn");
             bInfoBtn.onclick = function(e) {
@@ -348,7 +362,7 @@
                     dataType: "json"
                 }).done(function (donutData) {
                     donutCrudPluginInstance.setData(donutData);
-                    donutCrudPluginInstance.setPeriod(getSelectedPeriodAsString());
+                    donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                     donutCrudPluginDialog.open();
                 }).fail(function () {
                     window.alert("error");
@@ -361,7 +375,10 @@
                 var periods = selectionData[0].periods;
                 var absolutePeriods = [];
                 periods.forEach(function(period){
-                    absolutePeriods.push({periodBegin: utcDate + period.periodBegin * 60 * 1000, periodEnd: utcDate + period.periodEnd * 60 * 1000 });
+                    absolutePeriods.push({
+                        periodBegin: toUtcDateTime(utcDate, period.periodBegin),
+                        periodEnd: toUtcDateTime(utcDate, period.periodEnd)
+                    });
                 });
                 sendTableAjax("insertDocPeriods", {periodsForInsert: absolutePeriods});
             };
@@ -371,15 +388,14 @@
                 var utcDate = selectionObject.date.getTime();
                 var docId = selectionObject.docId;
                 var selectionData = tablePlugin.getSelectionData();
-                tablePlugin.getSelectionData();
                 var sendData = [];
                 selectionData.forEach(function(elem) {
-                    elem.data.periodBegin = utcDate + elem.data.periodBegin * 60 * 1000;
-                    elem.data.periodEnd = utcDate + elem.data.periodEnd * 60 * 1000;
+                    elem.data.periodBegin = toUtcDateTime(utcDate, elem.data.periodBegin);
+                    elem.data.periodEnd = toUtcDateTime(utcDate, elem.data.periodEnd);
                     var periods = elem.periods;
                     periods.forEach(function(period){
-                        period.periodBegin = utcDate + period.periodBegin * 60 * 1000;
-                        period.periodEnd = utcDate + period.periodEnd * 60 * 1000;
+                        period.periodBegin = toUtcDateTime(utcDate, period.periodBegin);
+                        period.periodEnd = toUtcDateTime(utcDate, period.periodEnd);
                     });
                     sendData.push(getDataForSendOpen(elem, docId));
                 });
@@ -466,7 +482,8 @@
             var bCancelDonutBtn = tablePlugin.getButtonByPluginId("bCancelDonutBtn");
 
             bCancelDonutBtn.onclick = function() {
-                $("#emailInterval").text(getSelectedPeriodAsString());
+                var period = getSelectedPeriod();
+                $("#emailInterval").text(tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd));
                 $("#emailSupplier").text(tablePlugin.getSelectionData()[0].data.supplierName);
                 emailDialog.open();
             };
@@ -485,9 +502,14 @@
                 tablePlugin.setDisabled(!isSelectionAvailable);
             });
             $docAndDateSelector.triggerEvents();
-            function getSelectedPeriodAsString() {
+
+            function toUtcDateTime(utcDate, periodPart) {
+                return utcDate + periodPart * 60 * 1000;
+            }
+            function getSelectedPeriod() {
                 var periods = tablePlugin.getSelectionData()[0].periods;
-                return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(periods[0].periodBegin, periods[0].periodEnd);
+                return {periodBegin: periods[0].periodBegin, periodEnd: periods[0].periodEnd};
+                //return ;
             }
             function sendTableAjax(url, data, onDone) {
                 //tablePlugin.setDisabled(true);
