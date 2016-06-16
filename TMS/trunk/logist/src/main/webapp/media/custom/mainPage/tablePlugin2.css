@@ -37,15 +37,19 @@ body {
 .tablePlugin td label {
     /*background-color: #eef0f5;
     /*border-bottom: 1px solid orange;*/
-
 }
 
+.mainTable{
+    table-layout: fixed;
+}
 
 .tablePlugin td div {
-    /*font-weight:bold;*/
     vertical-align: middle;
+    padding-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     /*border-top: 1px solid #aab7d1;*/
-
 }
 
 .tp_occupied {
