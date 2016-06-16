@@ -216,6 +216,7 @@
 
             var sInsertBtn = tablePlugin.getButtonByPluginId("sInsertBtn");
             sInsertBtn.onclick = function(e) {
+                donutCrudPluginInstance.clear();
                 donutCrudPluginInstance.setSupplierName('<c:out value="${sessionScope.user.supplier.inn}"/>');
                 donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                 donutCrudPluginInstance.setOnSubmit(function() {
@@ -247,8 +248,12 @@
                     donutCrudPluginInstance.setSupplierName('<c:out value="${sessionScope.user.supplier.inn}"/>');
                     donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                     donutCrudPluginInstance.setOnSubmit(function() {
+                        var utcDate = docDateSelector.getSelectionObject().date.getTime();
+                        var data = donutCrudPluginInstance.getData();
+                        data.period.periodBegin = toUtcDateTime(utcDate, data.period.periodBegin);
+                        data.period.periodEnd = toUtcDateTime(utcDate, data.period.periodEnd);
                         var sendObject = $.extend(
-                                donutCrudPluginInstance.getData(),
+                                data,
                                 {removedOrders: removedOrders, donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
                         );
                         sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
@@ -555,7 +560,7 @@
             <td>Имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
         </tr>
         <tr>
-            <td>Роль</td><td><c:out value="${userRole}"/></td>
+            <td>роль</td><td><c:out value="${requestScope.userRoleRusName}"/></td>
         </tr>
         <tr>
             <td>Должность</td><td><c:out value="${sessionScope.user.position}"/></td>

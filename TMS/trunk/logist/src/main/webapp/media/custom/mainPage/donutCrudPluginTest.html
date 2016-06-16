@@ -41,7 +41,7 @@
                     finalDestinationWarehouseId: 1,
                     boxQty: 4,
                     commentForStatus: "order status comment",
-                    orderStatusId: "STATUS"
+                    orderStatusId: "STATUS2"
                 }
             ]
         };
@@ -50,12 +50,16 @@
 
             donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
-                ordersCrud: "update",
+                ordersCrud: "all",
                 editableFields: {
                     donutFields: [],
                     ordersFields: ["orderStatusId", "commentForStatus"]
                 },
-                orderStatuses: {STATUS: "СТАТУС"},
+                orderStatuses: [
+                    {statusName:"STATUS1", statusRusName:"СТАТУС1", isUpdatable: true}, // isUpdatable = true
+                    {statusName:"STATUS2", statusRusName:"СТАТУС2", isUpdatable: true}, // isUpdatable = true
+                    {statusName:"STATUS3", statusRusName:"СТАТУС3", isUpdatable: false}
+                ],
                 warehouses: {1: "СКЛАД"}
             });
 

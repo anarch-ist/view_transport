@@ -11,10 +11,7 @@ import ru.logistica.tms.dao.userDao.UserRoles;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,6 +24,8 @@ import java.util.Set;
 
 @WebServlet("/main")
 public class MainServlet extends HttpServlet {
+    private static boolean UPDATABLE = true;
+    private static boolean NOT_UPDATABLE = false;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -42,16 +41,31 @@ public class MainServlet extends HttpServlet {
         }
         sendDataBuilder.add("warehouses", warehouseArrayBuilder);
 
-        // список всех статусов для заявки
-        JsonObjectBuilder orderStatusesBuilder = Json.createObjectBuilder();
-        orderStatusesBuilder.add(OrderStatuses.CREATED.name(), "СОЗДАН");
-        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.name(), "УДАЛЕН ПОСТАВЩИКОМ");
-        orderStatusesBuilder.add(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.name(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА");
-        orderStatusesBuilder.add(OrderStatuses.DELIVERED.name(), "ДОСТАВЛЕН");
-        orderStatusesBuilder.add(OrderStatuses.ERROR.name(), "ОШИБКА");
+        // request statuses for roles
+        User user = (User) request.getSession(false).getAttribute("user");
+        UserRoles userRoleId = user.getUserRole().getUserRoleId();
+        JsonArray orderStatusesForRole;
+        if (userRoleId.equals(UserRoles.WH_DISPATCHER)) {
+            orderStatusesForRole = createOrderStatuses(NOT_UPDATABLE, UPDATABLE, UPDATABLE, UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE);
+        } else if (userRoleId.equals(UserRoles.SUPPLIER_MANAGER)) {
+            orderStatusesForRole = createOrderStatuses(UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE);
+        } else if (userRoleId.equals(UserRoles.WH_BOSS)) {
+            orderStatusesForRole = createOrderStatuses(NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE);
+        } else
+            throw new ServletException("no such role");
 
+        String userRoleRusName = "";
+        if (userRoleId == UserRoles.SUPPLIER_MANAGER)
+            userRoleRusName = "ПОСТАВЩИК";
+        else if (userRoleId == UserRoles.WH_DISPATCHER) {
+            userRoleRusName = "ДИСПЕТЧЕР СКЛАДА";
+        } else if (userRoleId == UserRoles.WH_BOSS) {
+            userRoleRusName = "НАЧАЛЬНИК СКЛАДА";
+        }
+
+        request.setAttribute("userRoleRusName", userRoleRusName);
         request.setAttribute("docDateSelectorDataObject", sendDataBuilder.build().toString());
-        request.setAttribute("orderStatuses", orderStatusesBuilder.build().toString());
+        request.setAttribute("orderStatuses", orderStatusesForRole.toString());
 
         request.getRequestDispatcher("/WEB-INF/pages/main.jsp").forward(request, response);
     }
@@ -77,5 +91,30 @@ public class MainServlet extends HttpServlet {
         return warehouseBuilder;
     }
 
+    private JsonObjectBuilder createStatusBuilder(String statusName, String statusRusName, boolean isUpdatable) {
+        JsonObjectBuilder statusBuilder = Json.createObjectBuilder();
+        statusBuilder.add("statusName", statusName);
+        statusBuilder.add("statusRusName", statusRusName);
+        statusBuilder.add("isUpdatable", isUpdatable);
+        return  statusBuilder;
+    }
+
+    private JsonArray createOrderStatuses(
+            boolean isCreatedUpdatable,
+            boolean isArrivedUpdatable,
+            boolean isDeliveredUpdatable,
+            boolean isErrorUpdatable,
+            boolean isCancelledBySupplierUserUpdatable,
+            boolean isCancelledByWarehouseUserUpdatable
+    ) {
+        JsonArrayBuilder orderStatusesBuilder = Json.createArrayBuilder();
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CREATED.name(),                     "СОЗДАН",                    isCreatedUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.ARRIVED.name(),                     "ПРИБЫТИЕ НА ТЕРРИТОРИЮ",    isArrivedUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.DELIVERED.name(),                   "ДОСТАВЛЕН",                 isDeliveredUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.ERROR.name(),                       "ОШИБКА",                    isErrorUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.name(),  "УДАЛЕН ПОСТАВЩИКОМ",        isCancelledBySupplierUserUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.name(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА", isCancelledByWarehouseUserUpdatable));
+        return orderStatusesBuilder.build();
+    }
 
 }

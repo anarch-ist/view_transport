@@ -162,7 +162,6 @@ public class DaoFacade {
                 donutDocPeriodDao.update(donutDocPeriod);
 
                 for (Integer orderIdForDelete: donutUpdateData.ordersIdForDelete) {
-                    // delete transient instance
                     Order order = orderDao.findById(Order.class, orderIdForDelete);
                     order.setOrderId(orderIdForDelete);
                     orderDao.delete(order);

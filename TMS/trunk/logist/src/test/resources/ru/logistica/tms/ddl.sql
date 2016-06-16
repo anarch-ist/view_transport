@@ -161,14 +161,14 @@ CREATE TABLE donut_doc_periods (
 CREATE TABLE orders (
   orderID                     SERIAL, -- Static
   orderNumber                 VARCHAR(16) NOT NULL, -- Static
-  boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty > 0), -- Static
+  boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty >= 0), -- Static
   finalDestinationWarehouseID INTEGER     NOT NULL, -- Static
   donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
   orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
   commentForStatus            TEXT        NOT NULL, -- Dynamic
-  -- BINDING ru.logistica.tms.daoorderDao.OrderStatuses
+  -- BINDING ru.logistica.tms.dao.orderDao.OrderStatuses
   CONSTRAINT order_statuses CHECK (orderStatus IN
-                                   ('CREATED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
+                                   ('CREATED', 'ARRIVED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
   PRIMARY KEY (orderID),
   FOREIGN KEY (finalDestinationWarehouseID) REFERENCES warehouses (warehouseID),
   FOREIGN KEY (donutDocPeriodID) REFERENCES donut_doc_periods (donutDocPeriodID)

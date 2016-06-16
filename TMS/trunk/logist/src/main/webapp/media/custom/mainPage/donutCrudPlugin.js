@@ -11,7 +11,9 @@
                 donutFields: ["period", "driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
                 ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
             },
-            orderStatuses: {"EXAMPLE_ORDER_ID": "EXAMPLE_ORDER_V"},
+            orderStatuses: [
+                {statusName:"EXAMPLE_STATUS", statusRusName:"СТАТУС", isUpdatable: false}
+            ],
             warehouses: {1: "EXAMPLE_WH"},
             onSubmit: function() {}
         }, options);
@@ -92,7 +94,9 @@
                 text: 'Создать',
                 action: function (e, dt, node, config) {
                     ordersDataTableEditor.submit();
-                    createRow(virtualIdGenerator(), "", Object.keys(settings.warehouses)[0], "", "", Object.keys(settings.orderStatuses)[0]);
+                    var defaultStatus = settings.orderStatuses[0].statusName;
+
+                    createRow(virtualIdGenerator(), "", Object.keys(settings.warehouses)[0], "", "", defaultStatus);
                 }
             });
         }
@@ -146,8 +150,22 @@
                 {"name": "boxQty", "orderable": false, "targets": 3},
                 {"name": "commentForStatus", "orderable": false, "targets": 4},
                 {"name": "orderStatusId", "orderable": false, "targets": 5,
-                    render: function (data, type, full, meta) {
-                        return type === 'display' ? settings.orderStatuses[data]:data;
+                    render: function (tableOrderStatusName, type, full, meta) {
+                        var statusName;
+                        if (tableOrderStatusName === null) {
+                            statusName = $(dataTable.cell(meta.row, meta.col).node()).data("status_name");
+                        } else {
+                            statusName = tableOrderStatusName;
+                        }
+
+                        var filtered = settings.orderStatuses.filter(function(orderStatus) {
+                            return orderStatus.statusName === statusName;
+                        });
+                        var orderStatusRusName = "";
+                        if (filtered.length !== 0) {
+                            orderStatusRusName = filtered[0].statusRusName;
+                        }
+                        return type === 'display' ? orderStatusRusName : tableOrderStatusName;
                     }
                 }
             ]
@@ -158,6 +176,7 @@
         if (createInline) {
             dataTable.on('key-focus', function (e, datatable, cell) {
                 ordersDataTableEditor.submit();
+
                 ordersDataTableEditor.inline(cell.index(), {
                     onBlur: 'submit',
                     onReturn: 'submit',
@@ -167,6 +186,7 @@
 
             $ordersDataTable.on('click', 'tbody td' + resultCssPartClick, function () {
                 if (dataTable.rows().count() !== 0) {
+
                     ordersDataTableEditor.inline(this, {
                         onBlur: 'submit',
                         onReturn: 'submit',
@@ -179,7 +199,6 @@
         if (settings.isEditable) {
             var submitBtn = $("<button>").text("Отправить");
             submitBtn.on("click", function(e) {
-
                 settings.onSubmit();
             });
             _this.append(submitBtn);
@@ -208,8 +227,12 @@
             }
         };
         this.setPeriod = function(_period){
-            period = JSON.parse(JSON.stringify(_period));
-            donutFields.periodInput.val(periodToString(period));
+            if (_period) {
+                period = JSON.parse(JSON.stringify(_period));
+                donutFields.periodInput.val(periodToString(period));
+            } else {
+                donutFields.periodInput.val("");
+            }
         };
         this.setPeriodToString = function(_periodToString) {
             periodToString = _periodToString;
@@ -248,19 +271,51 @@
             return result;
         };
 
+        this.clear = function() {
+            var emptyData = {
+                supplierInn: "",
+                period: null,
+                driver: "",
+                licensePlate: "",
+                palletsQty: 0,
+                driverPhoneNumber: "",
+                commentForDonut: "",
+                orders: []
+            };
+            this.setData(emptyData);
+        };
+
         // --------------------------- FUNCTIONS --------------------------------
         var virtualIdGenerator = makeCounter();
 
         function createRow(orderId, orderNumber, finalWarehouseDestinationId, boxQty, commentForStatus, statusId) {
             createRow.lastAddedId = orderId + "";
-            ordersDataTableEditor
-                .create(false)
-                .set("orderNumber", orderNumber)
-                .set("finalDestinationWarehouseId", finalWarehouseDestinationId)
-                .set("boxQty", boxQty)
-                .set("commentForStatus", commentForStatus)
-                .set("orderStatusId", statusId)
-                .submit();
+
+            var filtered = settings.orderStatuses.filter(function(orderStatus) {
+                return orderStatus.statusName === statusId;
+            });
+
+            if (filtered[0].isUpdatable) {
+                ordersDataTableEditor
+                    .create(false)
+                    .set("orderNumber", orderNumber)
+                    .set("finalDestinationWarehouseId", finalWarehouseDestinationId)
+                    .set("boxQty", boxQty)
+                    .set("commentForStatus", commentForStatus)
+                    .set("orderStatusId", statusId)
+                    .submit();
+            } else {
+                ordersDataTableEditor
+                    .create(false)
+                    .set("orderNumber", orderNumber)
+                    .set("finalDestinationWarehouseId", finalWarehouseDestinationId)
+                    .set("boxQty", boxQty)
+                    .set("commentForStatus", commentForStatus)
+                    .submit();
+                var cell = dataTable.cell(dataTable.rows().count() - 1, "orderStatusId:name");
+                cell.data(filtered[0].statusName);
+                $(cell.node()).data("status_name", statusId);
+            }
         }
 
         function makeCounter() {
@@ -337,14 +392,11 @@
             }
 
             var orderStatusSelectPairs = [];
-            for(var orderStatusId in settings.orderStatuses) {
-                if (!settings.orderStatuses.hasOwnProperty(orderStatusId)) {
-                    continue;
+            settings.orderStatuses.forEach(function(orderStatus) {
+                if (orderStatus.isUpdatable) {
+                    orderStatusSelectPairs.push({label:orderStatus.statusRusName, value:orderStatus.statusName});
                 }
-                var orderStatusName = settings.orderStatuses[orderStatusId];
-                orderStatusSelectPairs.push({label:orderStatusName, value:orderStatusId});
-            }
-
+            });
 
             var warehouseSelectPairs = [];
             for(var warehouseId in settings.warehouses) {
