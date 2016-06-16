@@ -102,7 +102,7 @@
                 },
                 buttons: [
                     {
-                        name: "отменить",
+                        name: "Отменить",
                         id: "sDeleteBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -110,7 +110,7 @@
                         }
                     },
                     {
-                        name: "изменить",
+                        name: "Изменить",
                         id: "sUpdateBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -118,7 +118,7 @@
                         }
                     },
                     {
-                        name: "зарезервировать",
+                        name: "Зарезервировать",
                         id: "sInsertBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -131,7 +131,7 @@
                 <c:if test="${isWarehouseDispatcher}">
                 buttons: [
                     {
-                        name: "изменить статусы",
+                        name: "Изменить статусы",
                         id: "dUpdateBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -144,7 +144,7 @@
                 <c:if test="${isWarehouseBoss}">
                 buttons: [
                     {
-                        name: "открыть",
+                        name: "Открыть",
                         id: "bOpenPeriodBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -152,7 +152,7 @@
                         }
                     },
                     {
-                        name: "закрыть",
+                        name: "Закрыть",
                         id: "bClosePeriodsBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -160,7 +160,7 @@
                         }
                     },
                     {
-                        name: "отменить",
+                        name: "Отменить",
                         id: "bCancelDonutBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -168,7 +168,7 @@
                         }
                     },
                     {
-                        name: "информация",
+                        name: "Информация",
                         id: "bInfoBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
@@ -548,17 +548,17 @@
 
 <div id="userPane">
     <form action="logout" method="post">
-        <input id="exit" type="submit" value="выйти"/>
+        <input id="exit" type="submit" value="Выйти"/>
     </form>
     <table class="profileTable">
         <tr>
-            <td>имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
+            <td>Имя</td><td><c:out value="${sessionScope.user.userName}"/></td>
         </tr>
         <tr>
-            <td>роль</td><td><c:out value="${userRole}"/></td>
+            <td>Роль</td><td><c:out value="${userRole}"/></td>
         </tr>
         <tr>
-            <td>должность</td><td><c:out value="${sessionScope.user.position}"/></td>
+            <td>Должность</td><td><c:out value="${sessionScope.user.position}"/></td>
         </tr>
     </table>
 </div>

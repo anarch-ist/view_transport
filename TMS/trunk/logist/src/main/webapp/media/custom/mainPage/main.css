@@ -28,6 +28,19 @@ a{
     border: 1px solid #FF7F50;
 }
 
+li.highlighted{
+    background-color: #aab7d1 !important;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(20%, #aab7d1), color-stop(90%, #99a9c8))  !important;
+    background-image: -webkit-linear-gradient(#aab7d1 20%, #99a9c8 90%)  !important;
+    background-image: -moz-linear-gradient(#aab7d1 20%, #99a9c8 90%)  !important;
+    background-image: -o-linear-gradient(#aab7d1 20%, #99a9c8 90%)  !important;
+    background-image: linear-gradient(#aab7d1 20%, #99a9c8 90%)  !important;
+}
+
+input[readonly="readonly"]{
+    cursor: pointer !important;
+}
+
 #userPane{
     position: relative;
 }
@@ -44,7 +57,6 @@ a{
     float: left;
     display: inline-block;
     top: 15px  !important;
-    left: 5%  !important;
 }
 
 .profileTable{
@@ -54,10 +66,12 @@ a{
     position: relative;
     top: 113px;
     left: 75%;
+    background-color: #e5e9f1;
+    table-layout: fixed;
 }
 
 .profileTable td{
-    border: 1px solid #c6c6c6;
+    border: 1px solid #aab7d1;
     padding: 6px;
     vertical-align: top;
     text-align: left;
@@ -66,6 +80,9 @@ a{
 
 .profileTable tr td:last-child{
     min-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .profileTable tr:first-child td:first-child, .mainTable tr:first-child td:first-child{
@@ -120,6 +137,10 @@ input[id="exit"]{
     margin-top: 50px;
 }
 
+input[type="button"]:disabled{
+
+}
+
 input[type="button"]{
     display: inline-block;
     box-sizing: border-box;
@@ -145,7 +166,7 @@ input[type="button"]{
     margin-left: 20px;
 }
 
-input[id="exit"]:active, input[type="button"] {
+input[id="exit"]:active, input[type="button"]:disabled {
     background-color:#e2e2e2 !important;
     background-image:-webkit-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
     background-image:-moz-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
@@ -156,7 +177,12 @@ input[id="exit"]:active, input[type="button"] {
     box-shadow:inset 1px 1px 3px #999999 !important;
 }
 
-input[id="exit"]:hover, input[type="button"]{
+input[type="button"]:disabled{
+    color: #8892a7;
+}
+
+input[id="exit"]:hover, input[type="button"]:enabled:hover{
+    cursor:pointer;
     border:1px solid #666  !important;
     background-color:#e0e0e0 !important;
     background-image:-webkit-linear-gradient(top, #f9f9f9 0%, #e0e0e0 100%) !important;
