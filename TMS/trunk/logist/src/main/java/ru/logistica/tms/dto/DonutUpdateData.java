@@ -12,7 +12,8 @@ import java.util.Set;
 
 public class DonutUpdateData {
     public final int donutDocPeriodId;
-    public final String period;
+    public final long periodBegin;
+    public final long periodEnd;
     public final String driver;
     public final String licensePlate;
     public final int palletsQty;
@@ -30,7 +31,8 @@ public class DonutUpdateData {
             this.palletsQty = receivedJsonObject.getInt("palletsQty");
             this.driverPhoneNumber = receivedJsonObject.getString("driverPhoneNumber");
             this.commentForDonut = receivedJsonObject.getString("commentForDonut");
-            this.period = receivedJsonObject.getString("period");
+            this.periodBegin = receivedJsonObject.getJsonObject("period").getJsonNumber("periodBegin").longValueExact();
+            this.periodEnd = receivedJsonObject.getJsonObject("period").getJsonNumber("periodEnd").longValueExact();
 
             Set<OrderUpdateData> ordersSet = new HashSet<>();
             JsonArray orders = receivedJsonObject.getJsonArray("orders");
@@ -71,9 +73,10 @@ public class DonutUpdateData {
         }
     }
 
-    public DonutUpdateData(int donutDocPeriodId, String period, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderUpdateData> orders, Set<Integer> ordersIdForDelete) {
+    public DonutUpdateData(int donutDocPeriodId, long periodBegin, long periodEnd, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderUpdateData> orders, Set<Integer> ordersIdForDelete) {
         this.donutDocPeriodId = donutDocPeriodId;
-        this.period = period;
+        this.periodBegin = periodBegin;
+        this.periodEnd = periodEnd;
         this.driver = driver;
         this.licensePlate = licensePlate;
         this.palletsQty = palletsQty;
@@ -87,13 +90,15 @@ public class DonutUpdateData {
     public String toString() {
         return "DonutUpdateData{" +
                 "donutDocPeriodId=" + donutDocPeriodId +
-                ", period='" + period + '\'' +
+                ", periodBegin=" + periodBegin +
+                ", periodEnd=" + periodEnd +
                 ", driver='" + driver + '\'' +
                 ", licensePlate='" + licensePlate + '\'' +
                 ", palletsQty=" + palletsQty +
                 ", driverPhoneNumber='" + driverPhoneNumber + '\'' +
                 ", commentForDonut='" + commentForDonut + '\'' +
                 ", orders=" + orders +
+                ", ordersIdForDelete=" + ordersIdForDelete +
                 '}';
     }
 

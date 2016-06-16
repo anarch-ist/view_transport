@@ -14,8 +14,7 @@ import java.io.IOException;
 @WebServlet("/updateDonut")
 public class UpdateDonutDocPeriod extends AjaxHttpServlet {
     /*var exampleData = {
-
-                period:"t1 t2",
+                period:{periodBegin:123499000000, periodEnd: 11223234500000},
                 driver:"someDriver",
                 licensePlate: "hbguegrf",
                 palletsQty: 4,
