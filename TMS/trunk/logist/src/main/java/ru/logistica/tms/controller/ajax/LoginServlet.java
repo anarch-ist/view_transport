@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.logistica.tms.controller.ajax.AjaxHttpServlet;
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dto.AuthResult;
 
 import javax.json.Json;
@@ -30,7 +31,12 @@ public class LoginServlet extends AjaxHttpServlet {
 
         String login = request.getParameter("login");
         String passMd5 = request.getParameter("password");
-        AuthResult authResult = DaoFacade.checkUser(login, passMd5);
+        AuthResult authResult;
+        try {
+            authResult = DaoFacade.checkUser(login, passMd5);
+        } catch (DaoScriptException e) {
+            throw new ServletException(e);
+        }
 
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
 

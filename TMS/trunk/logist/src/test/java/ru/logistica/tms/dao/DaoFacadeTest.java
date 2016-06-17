@@ -32,7 +32,7 @@ public class DaoFacadeTest extends HibernateTest {
     }
 
     @Test
-    public void testGetAllWarehousesWithDocs() throws Exception {
+    public void testGetAllWarehousesWithDocs() throws Exception, DaoScriptException {
         Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
         Assert.assertTrue(allWarehousesWithDocs.size() == 2);
         for (Warehouse warehouse : allWarehousesWithDocs) {
@@ -44,7 +44,7 @@ public class DaoFacadeTest extends HibernateTest {
     }
 
     @Test
-    public void testFillOffsetsForAbbreviations() throws Exception {
+    public void testFillOffsetsForAbbreviations() throws Exception, DaoScriptException {
         DaoFacade.fillOffsetsForAbbreviations();
         Assert.assertEquals(AppContextCache.timeZoneAbbrIntegerMap.get(RusTimeZoneAbbr.EET), 2.0);
         Assert.assertEquals(AppContextCache.timeZoneAbbrIntegerMap.get(RusTimeZoneAbbr.MSK), 3.0);
@@ -65,7 +65,7 @@ public class DaoFacadeTest extends HibernateTest {
     }
 
     @Test(enabled = false)
-    public void testGetAllPeriodsForDoc() throws Exception {
+    public void testGetAllPeriodsForDoc() throws Exception, DaoScriptException {
         String inputDateString = "2016-10-19";
         Date utcDate = dateFormat.parse(inputDateString);
         List<DocPeriod> allPeriodsForDoc = DaoFacade.getAllPeriodsForDoc(1, utcDate, utcDate);
@@ -74,7 +74,7 @@ public class DaoFacadeTest extends HibernateTest {
 
 
     @Test
-    public void testInsertDonut() throws Exception {
+    public void testInsertDonut() throws Exception, DaoScriptException {
         DaoFacade.fillOffsetsForAbbreviations();
 
         Set<DonutInsertData.OrderInsertData> orders = new HashSet<>();

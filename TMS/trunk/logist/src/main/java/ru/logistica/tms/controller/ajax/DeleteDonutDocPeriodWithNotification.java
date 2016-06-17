@@ -2,6 +2,9 @@ package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
+import ru.logistica.tms.dto.DocDateSelectionForEmail;
+import ru.logistica.tms.dto.DocDateSelectorData;
+import ru.logistica.tms.dto.ValidateDataException;
 import ru.logistica.tms.util.EmailUtils;
 
 import javax.servlet.ServletContext;
@@ -32,18 +35,35 @@ public class DeleteDonutDocPeriodWithNotification extends HttpServlet{
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Long donutDocPeriodId = Long.parseLong(req.getParameter("donutDocPeriodId"));
         String emailContent = req.getParameter("emailContent");
+        String intervalAsText = req.getParameter("intervalAsText");
+        String docDateSelection = req.getParameter("docDateSelection");
 
-        String supplierUserEmail = null;
+        DocDateSelectorData docDateSelectorData;
+        DocDateSelectionForEmail docDateSelectionForEmail;
+        try {
+            docDateSelectorData = new DocDateSelectorData(docDateSelection);
+            docDateSelectionForEmail = DaoFacade.getDocDateSelectionForEmail(docDateSelectorData);
+        } catch (ValidateDataException | DaoScriptException e) {
+            throw new ServletException(e);
+        }
+
+        String supplierUserEmail;
         try {
             supplierUserEmail = DaoFacade.getSupplierEmailByDonutDocPeriodId(donutDocPeriodId);
         } catch (DaoScriptException e) {
             throw new ServletException(e);
         }
-
+        String email =
+                docDateSelectionForEmail.getDate() + "\n" +
+                docDateSelectionForEmail.getWarehouseName() + "\n" +
+                docDateSelectionForEmail.getDocName() + "\n" +
+                intervalAsText + "\n" +
+                "------------------------------" + "\n" +
+                emailContent;
         String subject = "Удаление маршрутного листа";
         String message = "Сообщение отправлено";
         try {
-            EmailUtils.sendEmailSSL(host, port, fromAddress, pass, supplierUserEmail, subject, emailContent);
+            EmailUtils.sendEmailSSL(host, port, fromAddress, pass, supplierUserEmail, subject, email);
             getServletContext().getRequestDispatcher("/deleteDonut").forward(req, resp);
         } catch (Exception e) {
             message = e.getMessage();

@@ -2,6 +2,7 @@ package ru.logistica.tms.controller;
 
 
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
@@ -33,7 +34,12 @@ public class MainServlet extends HttpServlet {
         // список всех складов(пары ключ-имя)
         // список всех доков для всех складов(id склада, id дока, имя дока)
         JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
-        Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
+        Set<Warehouse> allWarehousesWithDocs;
+        try {
+            allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
+        } catch (DaoScriptException e) {
+            throw new ServletException(e);
+        }
         JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
         for (Warehouse warehouse : allWarehousesWithDocs) {
             JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);

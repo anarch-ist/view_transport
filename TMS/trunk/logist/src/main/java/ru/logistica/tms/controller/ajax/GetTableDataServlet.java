@@ -45,7 +45,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
 
         Object user = req.getSession(false).getAttribute("user");
-        List<DocPeriod> allPeriods = null;
+        List<DocPeriod> allPeriods;
         try {
             allPeriods = DaoFacade.getAllPeriodsForDoc(docDateSelectorData.docId, new Date(timeStampBegin), new Date(timeStampEnd));
         } catch (DaoScriptException e) {

@@ -1,6 +1,7 @@
 package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.orderDao.Order;
 
@@ -20,7 +21,12 @@ public class SelectDonutDocPeriod extends AjaxHttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         long donutDocPeriodId = Long.parseLong(req.getParameter("donutDocPeriodId"));
-        DonutDocPeriod donutDocPeriod = DaoFacade.selectDonutWithRequests(donutDocPeriodId);
+        DonutDocPeriod donutDocPeriod;
+        try {
+            donutDocPeriod = DaoFacade.selectDonutWithRequests(donutDocPeriodId);
+        } catch (DaoScriptException e) {
+            throw new ServletException(e);
+        }
         JsonObject donutDocPeriodAsJsonObject = getAsJsonObject(donutDocPeriod);
         sendJson(resp, donutDocPeriodAsJsonObject);
     }
@@ -49,8 +55,6 @@ public class SelectDonutDocPeriod extends AjaxHttpServlet {
      *
      */
     private JsonObject getAsJsonObject(DonutDocPeriod donutDocPeriod) {
-
-
         JsonObjectBuilder resultBuilder = Json.createObjectBuilder();
         resultBuilder
                 .add("driver", donutDocPeriod.getDriver())
