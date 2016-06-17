@@ -1,6 +1,7 @@
 package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dto.OpenDocPeriodsData;
 import ru.logistica.tms.dto.ValidateDataException;
 
@@ -19,7 +20,7 @@ public class OpenDocPeriods extends HttpServlet {
         try {
             OpenDocPeriodsData openDocPeriodsData = new OpenDocPeriodsData(req.getParameter("openPeriodsData"));
             DaoFacade.openPeriods(openDocPeriodsData);
-        } catch (ValidateDataException e) {
+        } catch (ValidateDataException | DaoScriptException e) {
             throw new ServletException(e);
         }
 

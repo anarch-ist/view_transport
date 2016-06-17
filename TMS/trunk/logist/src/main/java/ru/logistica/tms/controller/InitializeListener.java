@@ -7,6 +7,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.HibernateUtils;
 
 import javax.servlet.ServletContextEvent;
@@ -33,7 +34,11 @@ public class InitializeListener implements ServletContextListener {
             serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
             sessionFactory = configuration.configure().buildSessionFactory(serviceRegistry);
             HibernateUtils.setSessionFactory(sessionFactory);
-            DaoFacade.fillOffsetsForAbbreviations();
+            try {
+                DaoFacade.fillOffsetsForAbbreviations();
+            } catch (DaoScriptException e) {
+                logger.error(e);
+            }
         } catch (Exception e) {
             logger.error(e);
         }

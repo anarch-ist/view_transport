@@ -13,12 +13,12 @@
     <div id="exception">${pageContext.exception}</div>
     <div id="uri">${pageContext.errorData.requestURI}</div>
     <div id="statusCode">${pageContext.errorData.statusCode}</div>
-    <div id="stacktrace">
-        <c:forEach var="trace"
-                   items="${pageContext.exception.stackTrace}">
-            <p>${trace}</p>
-        </c:forEach>
-    </div>
+    <%--<div id="stacktrace">--%>
+        <%--<c:forEach var="trace"--%>
+                   <%--items="${pageContext.exception.stackTrace}">--%>
+            <%--<p>${trace}</p>--%>
+        <%--</c:forEach>--%>
+    <%--</div>--%>
 </div>
 
 </body>

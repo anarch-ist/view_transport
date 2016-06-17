@@ -29,6 +29,8 @@ public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
 
 
+
+
     private interface DaoScript {
         void execute() throws DAOException;
     }
@@ -45,6 +47,23 @@ public class DaoFacade {
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
+    }
+
+    public static DocDateSelectionForEmail getDocDateSelectionForEmail(final DocDateSelectorData docDateSelectorData) throws DaoScriptException {
+        final DocDateSelectionForEmail result = new DocDateSelectionForEmail();
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                Warehouse warehouse = warehouseDao.findById(Warehouse.class, docDateSelectorData.warehouseId);
+                result.setWarehouseName(warehouse.getWarehouseName());
+                DocDao docDao = new DocDaoImpl();
+                Doc doc = docDao.findById(Doc.class, docDateSelectorData.docId);
+                result.setDocName(doc.getDocName());
+                result.setDate(new Date(docDateSelectorData.utcDate).toString());
+            }
+        });
+        return result;
     }
 
     public static String getSupplierEmailByDonutDocPeriodId(final long donutDocPeriodId) throws DaoScriptException {

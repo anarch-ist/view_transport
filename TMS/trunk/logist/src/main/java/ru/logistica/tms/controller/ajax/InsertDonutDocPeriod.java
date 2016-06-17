@@ -1,6 +1,7 @@
 package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.DonutInsertData;
@@ -31,7 +32,11 @@ public class InsertDonutDocPeriod extends AjaxHttpServlet {
             throw new ServletException(e);
         }
 
-        DaoFacade.insertDonut(donutInsertData, docDateSelectorData, supplierUser);
+        try {
+            DaoFacade.insertDonut(donutInsertData, docDateSelectorData, supplierUser);
+        } catch (DaoScriptException e) {
+            throw new ServletException(e);
+        }
 
         req.getRequestDispatcher("getTableData").forward(req, resp);
     }

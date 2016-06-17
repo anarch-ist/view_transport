@@ -485,17 +485,18 @@
 
             var emailDialog = $('[data-remodal-id=sendEmailDialog]').remodal();
             var bCancelDonutBtn = tablePlugin.getButtonByPluginId("bCancelDonutBtn");
-
+            var intervalAsText;
             bCancelDonutBtn.onclick = function() {
                 var period = getSelectedPeriod();
-                $("#emailInterval").text(tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd));
+                intervalAsText = tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
+                $("#emailInterval").text(intervalAsText);
                 $("#emailSupplier").text(tablePlugin.getSelectionData()[0].data.supplierName);
                 emailDialog.open();
             };
             $("#submitEmail").on("click", function() {
                 var selectionData = tablePlugin.getSelectionData()[0];
                 var donutDocPeriodId = selectionData.data.docPeriodId;
-                var sendObject = {donutDocPeriodId: donutDocPeriodId, emailContent: $("#emailMessageArea").val()};
+                var sendObject = {donutDocPeriodId: donutDocPeriodId, emailContent: $("#emailMessageArea").val(), intervalAsText: intervalAsText};
                 sendTableAjax("deleteDonutWithNotification", sendObject, function() {
                     emailDialog.close();
                 });
