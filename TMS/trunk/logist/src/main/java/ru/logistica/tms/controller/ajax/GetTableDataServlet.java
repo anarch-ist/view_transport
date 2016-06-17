@@ -1,6 +1,7 @@
 package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
+import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.userDao.*;
@@ -40,10 +41,16 @@ public class GetTableDataServlet extends AjaxHttpServlet {
         Integer windowSize = Integer.parseInt(getServletContext().getInitParameter("windowSize"));
 
         long timeStampBegin = docDateSelectorData.utcDate;
+        // TODO
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
 
         Object user = req.getSession(false).getAttribute("user");
-        List<DocPeriod> allPeriods = DaoFacade.getAllPeriodsForDoc(docDateSelectorData.docId, new Date(timeStampBegin), new Date(timeStampEnd));
+        List<DocPeriod> allPeriods = null;
+        try {
+            allPeriods = DaoFacade.getAllPeriodsForDoc(docDateSelectorData.docId, new Date(timeStampBegin), new Date(timeStampEnd));
+        } catch (DaoScriptException e) {
+            throw new ServletException(e);
+        }
 
         // create and send json object to client
         JsonObjectBuilder sendObjectBuilder = Json.createObjectBuilder();

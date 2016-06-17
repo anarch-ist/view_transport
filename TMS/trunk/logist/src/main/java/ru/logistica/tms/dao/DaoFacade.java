@@ -28,11 +28,12 @@ import java.util.*;
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
 
+
     private interface DaoScript {
         void execute() throws DAOException;
     }
 
-    private static void doInTransaction(DaoScript daoScript) {
+    private static void doInTransaction(DaoScript daoScript) throws DaoScriptException {
         try {
             HibernateUtils.beginTransaction();
             daoScript.execute();
@@ -40,12 +41,13 @@ public class DaoFacade {
         } catch (DAOException e) {
             logger.error(e.getMessage());
             HibernateUtils.rollbackTransaction();
+            throw new DaoScriptException(e);
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
     }
 
-    public static String getSupplierEmailByDonutDocPeriodId(final long donutDocPeriodId) {
+    public static String getSupplierEmailByDonutDocPeriodId(final long donutDocPeriodId) throws DaoScriptException {
         final String[] result = new String[1];
         doInTransaction(new DaoScript() {
             @Override
@@ -58,7 +60,7 @@ public class DaoFacade {
         return result[0];
     }
 
-    public static void openPeriods(final OpenDocPeriodsData openDocPeriodsData) {
+    public static void openPeriods(final OpenDocPeriodsData openDocPeriodsData) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -89,7 +91,7 @@ public class DaoFacade {
         });
     }
 
-    public static void insertDocPeriods(final PeriodsForInsertData periodsForInsertData, final int docId) {
+    public static void insertDocPeriods(final PeriodsForInsertData periodsForInsertData, final int docId) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -107,7 +109,7 @@ public class DaoFacade {
 
     }
 
-    public static DonutDocPeriod selectDonutWithRequests(final long donutDocPeriodId) {
+    public static DonutDocPeriod selectDonutWithRequests(final long donutDocPeriodId) throws DaoScriptException {
         final DonutDocPeriod[] result = new DonutDocPeriod[1];
         doInTransaction(new DaoScript() {
             @Override
@@ -121,7 +123,7 @@ public class DaoFacade {
         return result[0];
     }
 
-    public static void updateDonutWithRequests(final DonutUpdateData donutUpdateData) {
+    public static void updateDonutWithRequests(final DonutUpdateData donutUpdateData) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -172,15 +174,15 @@ public class DaoFacade {
         });
     }
 
-    public static void deleteDonutWithRequests(final long donutDocPeriodId) {
+    public static void deleteDonutWithRequests(final long donutDocPeriodId) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
                 DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                OrderDao orderDao = new OrderDaoImpl();
                 DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
                 Set<Order> orders = donutDocPeriod.getOrders();
                 for (Order order : orders) {
-                    OrderDao orderDao = new OrderDaoImpl();
                     orderDao.delete(order);
                 }
                 donutDocPeriodDao.delete(donutDocPeriod);
@@ -189,7 +191,28 @@ public class DaoFacade {
 
     }
 
-    public static void insertDonut(final DonutInsertData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) {
+    public static void deleteDonutWithRequestsIfCreated(final long donutDocPeriodId) throws DaoScriptException {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                OrderDao orderDao = new OrderDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                Set<Order> orders = donutDocPeriod.getOrders();
+                for (Order order : orders) {
+                    if (order.getOrderStatus() != OrderStatuses.CREATED)
+                        throw new DAOException("У одной из заявок статус отличается от " + OrderStatuses.CREATED.name());
+                }
+                for (Order order : orders) {
+                    orderDao.delete(order);
+                }
+                donutDocPeriodDao.delete(donutDocPeriod);
+            }
+        });
+
+    }
+
+    public static void insertDonut(final DonutInsertData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -228,7 +251,7 @@ public class DaoFacade {
         });
     }
 
-    public static Set<Warehouse> getAllWarehousesWithDocs() {
+    public static Set<Warehouse> getAllWarehousesWithDocs() throws DaoScriptException {
         final Set<Warehouse> result = new HashSet<>();
         doInTransaction(new DaoScript() {
             @Override
@@ -243,7 +266,7 @@ public class DaoFacade {
         return result;
     }
 
-    public static AuthResult checkUser(final String login, final String passMd5) {
+    public static AuthResult checkUser(final String login, final String passMd5) throws DaoScriptException {
         final AuthResult authResult = new AuthResult();
         // md5(md5(pass)+salt)
         doInTransaction(new DaoScript() {
@@ -264,7 +287,7 @@ public class DaoFacade {
         return authResult;
     }
 
-    public static void fillOffsetsForAbbreviations() {
+    public static void fillOffsetsForAbbreviations() throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -278,7 +301,7 @@ public class DaoFacade {
         });
     }
 
-    public static List<DocPeriod> getAllPeriodsForDoc(final Integer docId, final Date timeStampBegin, final Date timeStampEnd) {
+    public static List<DocPeriod> getAllPeriodsForDoc(final Integer docId, final Date timeStampBegin, final Date timeStampEnd) throws DaoScriptException {
         final List<?>[] result = new List<?>[1];
 
         doInTransaction(new DaoScript() {
