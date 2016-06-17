@@ -279,7 +279,7 @@
                 var selectionData = tablePlugin.getSelectionData()[0];
                 var donutDocPeriodId = selectionData.data.docPeriodId;
                 var sendObject = {donutDocPeriodId: donutDocPeriodId};
-                sendTableAjax("deleteDonut", {dataForDelete: sendObject});
+                sendTableAjax("deleteDonut", sendObject);
             };
 
 
@@ -496,7 +496,7 @@
                 var selectionData = tablePlugin.getSelectionData()[0];
                 var donutDocPeriodId = selectionData.data.docPeriodId;
                 var sendObject = {donutDocPeriodId: donutDocPeriodId, emailContent: $("#emailMessageArea").val()};
-                sendTableAjax("deleteDonut", {dataForDelete: sendObject}, function() {
+                sendTableAjax("deleteDonutWithNotification", sendObject, function() {
                     emailDialog.close();
                 });
             });
@@ -540,10 +540,18 @@
                     //ablePlugin.setDisabled(false);
                     if (onDone) onDone();
                 }).fail(function () {
-                    window.alert("error");
-                   // tablePlugin.setDisabled(false);
+                    // tablePlugin.setDisabled(false);
                 });
             }
+            <%------------------Error handling ----------------------%>
+            var errorDialogContainer = $('[data-remodal-id=errorDialog]');
+            var errorDialog = errorDialogContainer.remodal();
+            $(document).ajaxError(function(ev, jqXHR, ajaxSettings, thrownError) {
+                var tempDom = $('<output>').append($.parseHTML(jqXHR.responseText));
+                var $errorRoot = $('#errorRoot', tempDom);
+                errorDialogContainer.children("div").empty().append($errorRoot);
+                errorDialog.open();
+            });
 
         });
     </script>
@@ -579,6 +587,11 @@
         <button data-remodal-action="close" class="remodal-close"></button>
         <h1>Ввод данных</h1>
         <div id="routeListDataContainer"></div>
+    </div>
+
+    <div data-remodal-id="errorDialog">
+        <button data-remodal-action="close" class="remodal-close"></button>
+        <div></div>
     </div>
 
     <c:if test="${isWarehouseBoss}">

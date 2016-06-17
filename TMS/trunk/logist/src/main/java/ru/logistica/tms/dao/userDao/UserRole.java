@@ -1,6 +1,7 @@
 package ru.logistica.tms.dao.userDao;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,6 +28,16 @@ public class UserRole {
             inverseJoinColumns = {@JoinColumn(name = "permissionid", nullable = false, updatable = false)})
     public Set<Permission> getPermissions() {
         return permissions;
+    }
+
+    @Transient
+    public Set<PermissionNames> getPermissionNames() {
+        Set<PermissionNames> result = new HashSet<>();
+        Set<Permission> permissions = getPermissions();
+        for (Permission permission : permissions) {
+            result.add(permission.getPermissionId());
+        }
+        return result;
     }
 
     public void setPermissions(Set<Permission> permissions) {

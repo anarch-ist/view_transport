@@ -10,7 +10,7 @@ CREATE TABLE user_roles (
   PRIMARY KEY (userRoleID)
 );
 
--- BINDING ru.logistica.tms.daouserDao.UserRoles
+-- BINDING ru.logistica.tms.dao.userDao.UserRoles
 INSERT INTO user_roles (userRoleID)
 VALUES
   ('WH_BOSS'), -- обязан иметь склад, но у него нет ссылки на поставщика
@@ -33,6 +33,7 @@ CREATE TABLE users (
   UNIQUE (userLogin)
 );
 
+-- BINDING ru.logistica.tms.dao.userDao.PermissionNamesames
 CREATE TABLE permissions (
   permissionID VARCHAR(32), -- Static
   PRIMARY KEY (permissionID)
@@ -41,9 +42,8 @@ CREATE TABLE permissions (
 -- TODO create real permissions
 INSERT INTO permissions (permissionID)
 VALUES
-  ('testPerm1'),
-  ('testPerm2'),
-  ('testPerm3');
+  ('DELETE_ANY_DONUT'),
+  ('DELETE_CREATED_DONUT');
 
 CREATE TABLE permissions_for_roles (
   userRoleID   VARCHAR(32), -- Static
@@ -71,10 +71,8 @@ END;
 $$
 LANGUAGE plpgsql;
 
-SELECT insert_permission_for_role('WH_BOSS', 'testPerm1');
-SELECT insert_permission_for_role('WH_BOSS', 'testPerm2');
-SELECT insert_permission_for_role('WH_DISPATCHER', 'testPerm2');
-SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'testPerm3');
+SELECT insert_permission_for_role('WH_BOSS', 'DELETE_ANY_DONUT');
+SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'DELETE_CREATED_DONUT');
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                 WAREHOUSES

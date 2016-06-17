@@ -1,22 +1,20 @@
 package ru.logistica.tms.dao.userDao;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "permissions", schema = "public", catalog = "postgres")
 public class Permission {
-    private String permissionId;
+    private PermissionNames permissionId;
 
     @Id
     @Column(name = "permissionid", nullable = false, length = 32, updatable = false, insertable = false)
-    public String getPermissionId() {
+    @Enumerated(EnumType.STRING)
+    public PermissionNames getPermissionId() {
         return permissionId;
     }
 
-    public void setPermissionId(String permissionId) {
+    public void setPermissionId(PermissionNames permissionId) {
         this.permissionId = permissionId;
     }
 
