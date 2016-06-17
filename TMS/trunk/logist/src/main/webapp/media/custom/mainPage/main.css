@@ -59,7 +59,7 @@ input[readonly="readonly"]{
     top: 15px  !important;
 }
 
-.profileTable{
+.profileTable, #exception{
     border-collapse: separate;
     border-spacing: 0;
     line-height: 18px;
@@ -70,45 +70,74 @@ input[readonly="readonly"]{
     table-layout: fixed;
 }
 
-.profileTable td{
+#exception{
+    left: 10px;
+    top: 10px;
+    max-width: 400px;
+    table-layout: fixed;
+}
+
+.profileTable td, #exception td{
     border: 1px solid #aab7d1;
     padding: 6px;
     vertical-align: top;
     text-align: left;
 }
 
+.systemError{
+    background-image: url("systemError.ico");
+    background-repeat: no-repeat;
+    padding: 100px;
+    margin-top: 20px;
+    margin-left: 130px;
+    background-size: 130px auto;
+    width: 200px;
+}
 
-.profileTable tr td:last-child{
+.rusNameError{
+    display: inline-block;
+    max-width: 400px;
+    font-size: 20px;
+    text-align: left;
+    font-weight: bold;
+    padding-left: 10px;
+}
+
+.profileTable tr td:last-child, #exception tr td:last-child{
     min-width: 200px;
-    white-space: nowrap;
+    word-wrap:break-word;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.profileTable tr:first-child td:first-child, .mainTable tr:first-child td:first-child{
+.profileTable tr:first-child td:first-child, .mainTable tr:first-child td:first-child, #exception tr:first-child td:first-child{
     border-top-left-radius: 3px;
 }
 
-.profileTable tr:first-child td:last-child, .mainTable tr:first-child td:last-child{
+.profileTable tr:first-child td:last-child, .mainTable tr:first-child td:last-child, #exception tr:first-child td:last-child{
     border-top-right-radius: 3px;
 }
 
-.profileTable tr:last-child td:first-child,  .mainTable tr:last-child td:first-child{
+.profileTable tr:last-child td:first-child,  .mainTable tr:last-child td:first-child, #exception tr:last-child td:first-child{
     border-bottom-left-radius: 3px;
 }
 
-.profileTable tr:last-child td:last-child, .mainTable tr:last-child td:last-child{
+.profileTable tr:last-child td:last-child, .mainTable tr:last-child td:last-child, #exception tr:last-child td:last-child{
     border-bottom-right-radius: 3px;
 }
 
-.profileTable tr:first-child td, .profileTable tr:nth-child(2) td, .mainTable tr:first-child td, .mainTable tr:nth-child(2) td, .mainTable tr:nth-child(3) td,
-.mainTable tr:nth-child(4) td, .mainTable tr:nth-child(5) td, .mainTable tr:nth-child(6) td, .mainTable tr:nth-child(7) td{
+.profileTable tr:not(:last-of-type) td, .mainTable tr:not(:last-of-type) td, #exception tr:not(:last-of-type) td{
     border-bottom: 0;
 }
 
-.profileTable tr td:first-child, .mainTable tr td:first-child, .mainTable tr td:nth-child(2), .mainTable tr td:nth-child(3), .mainTable tr td:nth-child(4),
-.mainTable tr td:nth-child(5){
+.profileTable tr td:not(:last-child), .mainTable tr td:not(:last-child), #exception tr td:not(:last-child){
     border-right: 0;
+}
+
+#exception td:first-of-type{
+    vertical-align: middle;
+    text-align: center;
+    min-width: 100px;
 }
 
 
