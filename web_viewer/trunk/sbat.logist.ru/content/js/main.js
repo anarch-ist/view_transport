@@ -48,11 +48,13 @@ $(document).ready(function () {
         // format for data object: https://datatables.net/reference/option/stateSaveCallback
         // save all but paging
         stateSaveParams: function (settings, data) {
+
             data.start = 0;
             data.length = dataTable.page.len();
         },
         // manually load filters data into filter inputs
         stateLoaded: function (settings, data) {
+
             for (var i = 0; i < data.columns.length; i++) {
                 var column = data.columns[i];
                 var search = column.search.search;
@@ -76,8 +78,15 @@ $(document).ready(function () {
         // That is to say that the table will not be drawn until the Ajax request as completed.
         // As such, any actions that require the table to have completed its initialisation should be placed into the initComplete callback.
         initComplete: function(settings, json) {
-
+            //console.log(settings);
+            /*if(json == null || json == '' || json == undefined){
+                alert('Данных не найдено');
+            }*/
             // Apply the search
+            if(json['recordsFiltered'] == 0){
+                alert('Данных не найдено');
+            }
+
             dataTable.columns().every(function () {
                 var that = this;
                 $('input', this.footer()).on('keyup change', function (e) {
@@ -160,8 +169,11 @@ $(document).ready(function () {
         ajax: {
             url: "content/getData.php", // json datasource
             type: "post",  // method  , by default get
-            data: {"status": "getRequestsForUser"}    // post-parameter for determining type of query
-
+            data: {"status": "getRequestsForUser"},
+            
+            /*success: function (data) {
+                console.log(data);
+            }*/
             //error: function () {  // error handling
             //    //$(".user-grid-error").html("");
             //    //$("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
@@ -225,7 +237,10 @@ $(document).ready(function () {
             {"name": "routeListNumber", "searchable": true, "targets": 24},
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
 
-        ]
+        ],
+        /*success: function (data) {
+                console.log(data);
+        }*/
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
@@ -236,10 +251,10 @@ $(document).ready(function () {
     //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
     dataTable.on( 'select', function ( e, dt, type, indexes ) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
-        /*if(routeListID == null){
-            
-            buttons.disable();
-        }*/
+        if(routeListID == null){
+            dataTable.buttons(2).remove();
+            //buttons.disable();
+        }
     });
 
 

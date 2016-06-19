@@ -24,7 +24,7 @@ $(document).ready(function () {
 
         dataTable.columns().every(function() {
             var column = this;
-            //console.log(column);
+            console.log(column);
             var columnIndex = column.index();
             var columnVisibility = column.visible();
             var columnRusName = $(column.header()).attr("aria-label").split(":")[0];
