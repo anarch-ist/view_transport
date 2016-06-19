@@ -247,12 +247,13 @@ $(document).ready(function () {
     $(".dataTables_scrollHeadInner").css({"width":"100%"});
 
     $(".dataTable ").css({"width":"100%"});
-
+    var disabled = 0;
     //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
     dataTable.on( 'select', function ( e, dt, type, indexes ) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
-        if(routeListID == null){
+        if(routeListID == null && disabled != 1){
             dataTable.buttons(2).remove();
+            disabled = 1;
             //buttons.disable();
         }
     });
