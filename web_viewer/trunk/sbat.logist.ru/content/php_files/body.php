@@ -67,7 +67,6 @@
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
         <thead>
         <tr>
-        <?php if($data['userRoleID'] == 'ADMIN'){ echo '
             <th class="col1">ID заявки</th>
             <th class="col2">Номер внутренней заявки</th>
             <th class="col3">Дата заявки</th>
@@ -93,50 +92,13 @@
             <th class="col23">Номер ТС</th>
             <th class="col24">Количество паллет</th>
             <th class="col25">Маршрутный лист</th>
-            <th class="col26">Время прибытия в следующий пункт</th>';
-        }elseif($data['userRoleID'] == 'W_DISPATCHER' || $data['userRoleID'] == 'DISPATCHER' || $data['userRoleID'] == 'MARKET_AGENT'){
-            echo '
-            
-            <th class="col4">Номер накладной</th>
-            <th class="col5">Дата накладной</th>
-            <th class="col9">Зона склада</th>
-            <th class="col11">Количество коробок</th>
-            <th class="col12">Статус заявки</th>
-            <th class="col17">Пункт доставки</th>
-            <th class="col18">Склад отправки</th>
-            <th class="col19">Текущее подразделение</th>
-            <th class="col20">Следующий пункт маршрута</th>
-            <th class="col21">Маршрут</th>
-            <th class="col22">Водитель</th>
-            <th class="col24">Количество паллет</th>
-            <th class="col25">Маршрутный лист</th>
             <th class="col26">Время прибытия в следующий пункт</th>
-            ';
-        }elseif($data['userRoleID'] == 'CLIENT_MANAGER'){
-            echo '
-            
-            <th class="col3">Дата заявки</th>
-            <th class="col4">Номер накладной</th>
-            
-            <th class="col11">Количество коробок</th>
-            <th class="col12">Статус заявки</th>
-            
-            <th class="col17">Пункт доставки</th>
-            
-            <th class="col19">Текущее подразделение</th>
-            <th class="col20">Следующий пункт маршрута</th>
-            
-            <th class="col26">Время прибытия в следующий пункт</th>';
-        }
-        ?>
-            
-        </tr>
+      </tr>
         </thead>
 
         <!--search containers-->
         <tfoot>
         <tr>
-            <?php if($data['userRoleID'] == 'ADMIN'){ echo '
             <th class="col1">ID заявки</th>
             <th class="col2">Номер внутренней заявки</th>
             <th class="col3">Дата заявки</th>
@@ -162,42 +124,8 @@
             <th class="col23">Номер ТС</th>
             <th class="col24">Количество паллет</th>
             <th class="col25">Маршрутный лист</th>
-            <th class="col26">Время прибытия в следующий пункт</th>';
-        }elseif($data['userRoleID'] == 'W_DISPATCHER' || $data['userRoleID'] == 'DISPATCHER' || $data['userRoleID'] == 'MARKET_AGENT'){
-            echo '
-            
-            <th class="col4">Номер накладной</th>
-            <th class="col5">Дата накладной</th>
-            <th class="col9">Зона склада</th>
-            <th class="col11">Количество коробок</th>
-            <th class="col12">Статус заявки</th>
-            <th class="col17">Пункт доставки</th>
-            <th class="col18">Склад отправки</th>
-            <th class="col19">Текущее подразделение</th>
-            <th class="col20">Следующий пункт маршрута</th>
-            <th class="col21">Маршрут</th>
-            <th class="col22">Водитель</th>
-            <th class="col24">Количество паллет</th>
-            <th class="col25">Маршрутный лист</th>
             <th class="col26">Время прибытия в следующий пункт</th>
-            ';
-        }elseif($data['userRoleID'] == 'CLIENT_MANAGER'){
-            echo '
-            
-            <th class="col3">Дата заявки</th>
-            <th class="col4">Номер накладной</th>
-            
-            <th class="col11">Количество коробок</th>
-            <th class="col12">Статус заявки</th>
-            
-            <th class="col17">Пункт доставки</th>
-            
-            <th class="col19">Текущее подразделение</th>
-            <th class="col20">Следующий пункт маршрута</th>
-            
-            <th class="col26">Время прибытия в следующий пункт</th>';
-        }
-        ?>
+
         </tr>
         </tfoot>
     </table>
