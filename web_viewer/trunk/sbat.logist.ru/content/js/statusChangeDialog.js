@@ -115,10 +115,7 @@ $(document).ready(function () {
                 case "changeStatusForSeveralRequests":
                     $selectRequestsTr.show();
                     $statusSelect.on("selectmenuchange", function (e, ui) {
-                        if (ui.item.value === DEPARTURE_STATUS)
                             $("#palletsQtyTr").show();
-                        else
-                            $("#palletsQtyTr").hide();
                     });
 
                     $.post(

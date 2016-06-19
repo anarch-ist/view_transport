@@ -2,7 +2,8 @@
 namespace DAO;
 require_once 'IRequestsForUser.php';
 include_once __DIR__ . '/../DAO.php';
-
+ini_set('display_errors','Off');
+error_reporting('E_ALL');
 
 class RequestsForUserEntity implements IRequestsForUserEntity
 {
@@ -32,6 +33,9 @@ class RequestsForUserEntity implements IRequestsForUserEntity
         $array = $this->_DAO->multiSelect(new EntitySelectAllRequestsForUser($start, $count, $userID, $columnInformation, $orderColumnNumber));
         $arrayResult = array();
         // TODO возникает ошибка, если в запросе после фильтрации нет данных
+        if(empty($array[0]) || $array[0] == '' || !isset($array[0]) ){
+            $array[0] = array();
+        }
         $arrayResult['requests'] = $array[0];
         $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
         $arrayResult['totalCount'] = $array[2][0]['totalCount'];
