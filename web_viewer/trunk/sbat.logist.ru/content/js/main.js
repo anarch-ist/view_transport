@@ -255,6 +255,17 @@ $(document).ready(function () {
             dataTable.buttons(2).remove();
             disabled = 1;
             //buttons.disable();
+        }else if(disabled == 1 && routeListID != null){
+            dataTable.button().add( 2, {
+                name: 'changeRouteListStatus',
+                extend: 'selectedSingle',
+                className: 'changeStatusForSeveralRequests',
+                text: 'изменить статус МЛ',
+                action: function (e, dt, node, config) {
+                    $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
+                }
+            });
+            disabled = 0;
         }
     });
 
