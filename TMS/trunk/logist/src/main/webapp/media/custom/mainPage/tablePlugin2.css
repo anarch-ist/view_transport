@@ -53,8 +53,21 @@ body {
 }
 
 .tp_occupied {
+
+}
+
+.tp_error {
     background-color: #d1aab7;
 }
+
+.tp_delivered {
+    background-color: #b7d1aa;
+}
+
+.tp_in_process {
+    background-color: #99A9C8;
+}
+
 
 /*.tp_owned:before {*/
     /*content:"*";*/

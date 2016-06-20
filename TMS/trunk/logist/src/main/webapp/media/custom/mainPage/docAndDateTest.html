@@ -63,21 +63,25 @@
                 data: exampleData
             });
 
-            <!--docDateSelector.setSelectedDate(new Date(2015, 10, 30));-->
-            <!--docDateSelector.setSelectedWarehouseAndDoc(1, 3);-->
-            //docDateSelector.setSelectedDoc(3);
-
             docDateSelector.setOnSelected(function(event, docDateSelection) {
                 window.console.log("SELECTED EVENT");
                 window.console.log(docDateSelection);
                 window.console.log($.extend(docDateSelection, {date: docDateSelection.date.getTime()}));
-
             });
 
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                 window.console.log("SELECTION AVAILABLE EVENT");
                 window.console.log(isSelectionAvailable);
             });
+
+            docDateSelector.setSelectedDate(new Date(2015, 10, 30));
+            if (docDateSelector.withWarehouseSelect()) {
+                docDateSelector.setSelectedWarehouseAndDoc(1, 3);
+            } else {
+                docDateSelector.setSelectedDoc(3);
+            }
+            docDateSelector.triggerEvents();
+
         });
     </script>
 </head>

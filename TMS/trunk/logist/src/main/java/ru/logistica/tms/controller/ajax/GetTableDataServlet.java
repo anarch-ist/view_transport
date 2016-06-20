@@ -4,6 +4,8 @@ import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
+import ru.logistica.tms.dao.orderDao.Order;
+import ru.logistica.tms.dao.orderDao.OrderStatuses;
 import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.ValidateDataException;
@@ -16,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @WebServlet("/getTableData")
 public class GetTableDataServlet extends AjaxHttpServlet {
@@ -34,6 +38,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(receivedData);
+            req.getSession(false).setAttribute("lastDocDateSelection", docDateSelectorData);
         } catch (ValidateDataException e) {
             throw new ServletException(e);
         }
@@ -67,6 +72,7 @@ public class GetTableDataServlet extends AjaxHttpServlet {
                 DonutDocPeriod donutDocPeriod = (DonutDocPeriod) period;
                 docPeriodBuilder.add("state", "OCCUPIED");
                 docPeriodBuilder.add("supplierName", donutDocPeriod.getSupplierUser().getSupplier().getInn());
+                docPeriodBuilder.add("occupiedStatus", getOccupiedDetails(donutDocPeriod.getOrders()).name());
             } else {
                 docPeriodBuilder.add("state", "CLOSED");
             }
@@ -109,4 +115,29 @@ public class GetTableDataServlet extends AjaxHttpServlet {
             }
         }
     }
+
+    private OccupiedStatus getOccupiedDetails(Set<Order> orders) {
+        Objects.requireNonNull(orders);
+
+        if (orders.size() == 0)
+            return OccupiedStatus.IN_PROCESS;
+
+        boolean isDelivered = true;
+        for (Order order : orders) {
+            OrderStatuses orderStatus = order.getOrderStatus();
+            if (orderStatus == OrderStatuses.ERROR) {
+                return OccupiedStatus.ERROR;
+            }
+            if (orderStatus != OrderStatuses.DELIVERED) {
+                isDelivered = false;
+            }
+        }
+        if (isDelivered)
+            return OccupiedStatus.DELIVERED;
+        else {
+            return OccupiedStatus.IN_PROCESS;
+        }
+    }
+    // BINDING tablePlugin2.js setData()
+    enum OccupiedStatus {ERROR, DELIVERED, IN_PROCESS}
 }

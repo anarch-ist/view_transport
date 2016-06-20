@@ -18,7 +18,6 @@ public class DocDateSelectorData {
         this.warehouseId = warehouseId;
         this.docId = docId;
     }
-
     public DocDateSelectorData(String docDateJsonString) throws ValidateDataException {
         try {
             JsonObject receivedJsonObject = JsonUtils.parseStringAsObject(docDateJsonString);
@@ -28,6 +27,19 @@ public class DocDateSelectorData {
         } catch (Exception e) {
             throw new ValidateDataException(e);
         }
+    }
+
+    // need getters because of jsp Expression Language
+    public long getUtcDate() {
+        return utcDate;
+    }
+
+    public Integer getWarehouseId() {
+        return warehouseId;
+    }
+
+    public Integer getDocId() {
+        return docId;
     }
 
     @Override
