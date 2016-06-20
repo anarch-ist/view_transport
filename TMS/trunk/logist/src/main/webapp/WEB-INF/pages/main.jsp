@@ -503,12 +503,24 @@
             });
             </c:if>
 
-
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                 tablePlugin.setDisabled(!isSelectionAvailable);
             });
+
+            <%------------------ SESSION DATA LOADING ----------------------%>
+            <c:if test="${sessionScope.lastDocDateSelection != null}">
+            $docAndDateSelector.setSelectedDate(new Date(<c:out value="${sessionScope.lastDocDateSelection.utcDate}"/>));
+            if ($docAndDateSelector.withWarehouseSelect()) {
+                var warehouseId = <c:out value="${sessionScope.lastDocDateSelection.warehouseId}"/>;
+                var docId = <c:out value="${sessionScope.lastDocDateSelection.docId}"/>;
+                $docAndDateSelector.setSelectedWarehouseAndDoc(warehouseId, docId);
+            } else {
+                $docAndDateSelector.setSelectedDoc(<c:out value="${sessionScope.lastDocDateSelection.docId}"/>);
+            }
+            </c:if>
             $docAndDateSelector.triggerEvents();
 
+            <%------------------ FUNCTIONS ----------------------%>
             function toUtcDateTime(utcDate, periodPart) {
                 return utcDate + periodPart * 60 * 1000;
             }
@@ -544,7 +556,8 @@
                     // tablePlugin.setDisabled(false);
                 });
             }
-            <%------------------Error handling ----------------------%>
+
+            <%------------------ERROR HANDLING ----------------------%>
             var errorDialogContainer = $('[data-remodal-id=errorDialog]');
             var errorDialog = errorDialogContainer.remodal();
             $(document).ajaxError(function(ev, jqXHR, ajaxSettings, thrownError) {
@@ -561,6 +574,7 @@
 <body>
 
 <div id="userPane">
+
     <form action="logout" method="post">
         <input id="exit" type="submit" value="Выйти"/>
     </form>

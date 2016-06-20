@@ -162,7 +162,9 @@
             generateEvents();
         };
 
-
+        this.withWarehouseSelect = function() {
+            return useWarehouseSelect;
+        };
 
         //-------------------------- FUNCTIONS -------------------------------
         function setDoc(docId) {

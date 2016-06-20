@@ -76,10 +76,17 @@
 
                 dataElem.cells.push(cellsForPeriod[i]);
                 dataAndCellsRelation.set(cellsForPeriod[i], dataElem);
-
+                // BINDING GetTableDataServlet.java OccupiedStatus
                 if (dataElem.state === OCCUPIED) {
-                    cellDiv.innerHTML = dataElem.supplierName;
                     cellDiv.classList.add("tp_occupied");
+                    if (dataElem.occupiedStatus === "IN_PROCESS") {
+                        cellDiv.classList.add("tp_in_process");
+                    } else if (dataElem.occupiedStatus === "ERROR") {
+                        cellDiv.classList.add("tp_error");
+                    } else if (dataElem.occupiedStatus === "DELIVERED") {
+                        cellDiv.classList.add("tp_delivered");
+                    }
+                    cellDiv.innerHTML = dataElem.supplierName;
                     if (dataElem.owned) {
                         cellDiv.classList.add("tp_owned");
                     }

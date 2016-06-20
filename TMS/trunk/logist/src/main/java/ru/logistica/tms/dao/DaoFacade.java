@@ -329,6 +329,12 @@ public class DaoFacade {
                 DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
                 List<DocPeriod> allPeriodsBetweenTimeStampsForDoc =
                         docPeriodDao.findAllPeriodsBetweenTimeStampsForDoc(docId, timeStampBegin, timeStampEnd);
+                for (DocPeriod docPeriod : allPeriodsBetweenTimeStampsForDoc) {
+                    if (docPeriod instanceof DonutDocPeriod) {
+                        DonutDocPeriod donutDocPeriod = (DonutDocPeriod) docPeriod;
+                        Hibernate.initialize(donutDocPeriod.getOrders());
+                    }
+                }
                 result[0] = allPeriodsBetweenTimeStampsForDoc;
             }
         });
