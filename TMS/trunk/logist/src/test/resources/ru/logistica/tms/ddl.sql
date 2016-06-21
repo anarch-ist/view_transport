@@ -92,20 +92,41 @@ CREATE TABLE docs (
   PRIMARY KEY (docID),
   FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
 );
--- if no period => OPENED, if doc_period => OCCUPIED, if
 
 CREATE TABLE doc_periods (
   docPeriodID BIGSERIAL, -- Static
   docID       INTEGER                  NOT NULL, -- Static
   periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
   periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
-  -- длина периода кратна 30 минутам
-  -- BINDING with web.xml (cellSize)
+  -- BINDING with web.xml (cellSize) 30 minutes.
   CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
                                                (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
   PRIMARY KEY (docPeriodID),
   FOREIGN KEY (docID) REFERENCES docs (docID)
 );
+
+CREATE OR REPLACE FUNCTION doc_periods_no_intersections()
+  RETURNS TRIGGER AS $doc_periods_no_intersections$
+DECLARE
+  qty INTEGER;
+BEGIN
+  qty := (SELECT COUNT(*)
+          FROM doc_periods
+          WHERE docid = NEW.docId AND
+                (doc_periods.periodbegin, doc_periods.periodend) OVERLAPS (NEW.periodbegin, NEW.periodend));
+  IF qty <> 0
+  THEN RAISE EXCEPTION 'Период %, % занят частично или полностью.', NEW.periodbegin, NEW.periodend;
+  ELSE RETURN NEW;
+  END IF;
+END;
+$doc_periods_no_intersections$ LANGUAGE plpgsql;
+
+CREATE TRIGGER doc_periods_no_intersections
+BEFORE INSERT OR UPDATE ON doc_periods
+FOR EACH ROW EXECUTE PROCEDURE doc_periods_no_intersections();
+
+CREATE INDEX idx_time_limits_inversed
+ON doc_periods (docID, periodBegin, periodEnd DESC);
 
 -- WH_BOSS  WH_DISPATCHER
 CREATE TABLE warehouse_users (
