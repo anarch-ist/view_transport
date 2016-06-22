@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/openDocPeriods")
-public class OpenDocPeriods extends HttpServlet {
+public class OpenDocPeriods extends AjaxHttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         try {
             OpenDocPeriodsData openDocPeriodsData = new OpenDocPeriodsData(req.getParameter("openPeriodsData"));
-            DaoFacade.openPeriods(openDocPeriodsData);
+            DaoFacade.openPeriods(getUser(req).getUserId(), openDocPeriodsData);
         } catch (ValidateDataException | DaoScriptException e) {
             throw new ServletException(e);
         }

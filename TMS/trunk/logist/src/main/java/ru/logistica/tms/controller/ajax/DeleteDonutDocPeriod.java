@@ -31,9 +31,9 @@ public class DeleteDonutDocPeriod extends AjaxHttpServlet {
 
         try {
             if (permissionsForRole.contains(PermissionNames.DELETE_ANY_DONUT)) {
-                DaoFacade.deleteDonutWithRequests(donutDocPeriodId);
+                DaoFacade.deleteDonutWithRequests(getUser(req).getUserId(), donutDocPeriodId);
             } else if (permissionsForRole.contains(PermissionNames.DELETE_CREATED_DONUT)) {
-                DaoFacade.deleteDonutWithRequestsIfCreated(donutDocPeriodId);
+                DaoFacade.deleteDonutWithRequestsIfCreated(getUser(req).getUserId(), donutDocPeriodId);
             }
         } catch (DaoScriptException e) {
             throw new ServletException(e);

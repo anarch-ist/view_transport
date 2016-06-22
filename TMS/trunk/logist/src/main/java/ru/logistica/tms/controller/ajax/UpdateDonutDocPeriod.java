@@ -38,7 +38,7 @@ public class UpdateDonutDocPeriod extends AjaxHttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             DonutUpdateData donutUpdateData = new DonutUpdateData(req.getParameter("updatedDonut"));
-            DaoFacade.updateDonutWithRequests(donutUpdateData);
+            DaoFacade.updateDonutWithRequests(getUser(req).getUserId(), donutUpdateData);
         } catch (ValidateDataException | DaoScriptException e) {
             throw new ServletException(e);
         }

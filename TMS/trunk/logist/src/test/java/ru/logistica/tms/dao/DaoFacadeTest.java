@@ -88,7 +88,7 @@ public class DaoFacadeTest extends HibernateTest {
         SupplierUser user1 = supplierUserDao.findByLogin(SupplierUser.class, "user1");
         HibernateUtils.commitTransaction();
 
-        DaoFacade.insertDonut(donut, docDateSelectorData, user1);
+        DaoFacade.insertDonut(1, donut, docDateSelectorData, user1);
 
     }
 }

@@ -23,7 +23,7 @@ public class SelectDonutDocPeriod extends AjaxHttpServlet {
         long donutDocPeriodId = Long.parseLong(req.getParameter("donutDocPeriodId"));
         DonutDocPeriod donutDocPeriod;
         try {
-            donutDocPeriod = DaoFacade.selectDonutWithRequests(donutDocPeriodId);
+            donutDocPeriod = DaoFacade.getDonutWithRequests(donutDocPeriodId);
         } catch (DaoScriptException e) {
             throw new ServletException(e);
         }
