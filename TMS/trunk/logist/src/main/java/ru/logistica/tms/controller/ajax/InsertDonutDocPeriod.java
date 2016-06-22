@@ -27,13 +27,12 @@ public class InsertDonutDocPeriod extends AjaxHttpServlet {
         try {
             docDateSelectorData = new DocDateSelectorData(docDateSelection);
             donutInsertData = new DonutInsertData(donutData);
-//            System.out.println(donut);
         } catch (ValidateDataException e) {
             throw new ServletException(e);
         }
 
         try {
-            DaoFacade.insertDonut(donutInsertData, docDateSelectorData, supplierUser);
+            DaoFacade.insertDonut(getUser(req).getUserId(), donutInsertData, docDateSelectorData, supplierUser);
         } catch (DaoScriptException e) {
             throw new ServletException(e);
         }

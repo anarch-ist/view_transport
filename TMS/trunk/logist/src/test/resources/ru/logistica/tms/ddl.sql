@@ -95,9 +95,9 @@ CREATE TABLE docs (
 
 CREATE TABLE doc_periods (
   docPeriodID BIGSERIAL, -- Static
-  docID       INTEGER                  NOT NULL, -- Static
-  periodBegin TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
-  periodEnd   TIMESTAMP WITH TIME ZONE NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
+  docID       INTEGER     NOT NULL, -- Static
+  periodBegin TIMESTAMPTZ NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
+  periodEnd   TIMESTAMPTZ NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
   -- BINDING with web.xml (cellSize) 30 minutes.
   CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
                                                (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
@@ -177,6 +177,7 @@ CREATE TABLE donut_doc_periods (
   FOREIGN KEY (donutDocPeriodID) REFERENCES doc_periods (docPeriodID),
   FOREIGN KEY (supplierUserID) REFERENCES supplier_users (userID)
 );
+
 CREATE TABLE orders (
   orderID                     SERIAL, -- Static
   orderNumber                 VARCHAR(16) NOT NULL, -- Static
@@ -197,37 +198,153 @@ CREATE TABLE orders (
 --                                                 AUDIT SCHEMA
 -- -------------------------------------------------------------------------------------------------------------------
 
+-- if you want functions work you must set local var with "SET LOCAL audit.current_user_id=userIdVal" inside transaction
+
+
 DROP SCHEMA IF EXISTS audit CASCADE;
 CREATE SCHEMA audit;
--- TODO create audit trigger
--- NOT UPDATEABLE
--- CREATE TABLE audit.orders_progress (
---   orderID          INTEGER,
---   changeTimeStamp  TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() CHECK (EXTRACT(TIMEZONE FROM changeTimeStamp) = '0'),
---   donutID          INTEGER                  NOT NULL, -- заявка создается синхронно с пончиком(списком заявок), по ходу движения заявки от склада к складу пончик меняется.
---   orderStatusID    VARCHAR(32)              NOT NULL,
---   commentForStatus TEXT                     NOT NULL,
---   PRIMARY KEY (orderID, changeTimeStamp),
---   FOREIGN KEY (orderID) REFERENCES orders (orderID),
---   FOREIGN KEY (donutID) REFERENCES donuts (donutID)
--- );
---
--- CREATE TABLE audit.doc_periods_progress (
---   docPeriodID     BIGINT,
---   changeTimeStamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW() CHECK (EXTRACT(TIMEZONE FROM changeTimeStamp) = '0'), -- NOT UPDATEABLE
---   periodStateID   VARCHAR(32)              NOT NULL, -- NOT UPDATEABLE
---   donutID         INTEGER                  NULL,     -- NOT UPDATEABLE
---   -- маршрутный лист приклепляется только к периодам с состоянием 'OCCUPIED'
---   CONSTRAINT occupied_has_donut CHECK (donutID IS NOT NULL AND periodStateID = 'OCCUPIED' || donutID IS NULL AND
---                                        periodStateID <> 'OCCUPIED'),
---   PRIMARY KEY (docPeriodID, changeTimeStamp),
---   FOREIGN KEY (docPeriodID) REFERENCES doc_periods (docPeriodID),
---   FOREIGN KEY (donutID) REFERENCES donuts (donutID)
--- );
+
+
+CREATE TABLE audit.doc_periods_audit (
+  docPeriodsAuditID BIGSERIAL,
+  operation         CHAR(1)     NOT NULL,
+  stamp             TIMESTAMPTZ NOT NULL,
+  userID            INTEGER     NOT NULL,
+
+  docPeriodID       BIGINT      NOT NULL,
+  docID             INTEGER     NOT NULL,
+  periodBegin       TIMESTAMPTZ NOT NULL,
+  periodEnd         TIMESTAMPTZ NOT NULL,
+  PRIMARY KEY (docPeriodsAuditID)
+);
+CREATE OR REPLACE FUNCTION audit.process_doc_periods_audit() RETURNS TRIGGER AS $doc_periods_audit$
+DECLARE
+  userID INTEGER;
+BEGIN
+  BEGIN
+    -- BINDING DaoFacade.java passUserIdToAuditTrigger()
+    userID := (SELECT current_setting('audit.current_user_id'))::INTEGER;
+    EXCEPTION WHEN OTHERS THEN
+    userID := NULL;
+  END;
+  IF (userID IS NULL)
+  THEN RETURN NULL;
+  END IF;
+  IF (TG_OP = 'DELETE') THEN
+    INSERT INTO audit.doc_periods_audit(operation, stamp, userID, docPeriodID, docID, periodBegin, periodEnd)  SELECT 'D', now(), userID, OLD.*;
+    RETURN OLD;
+  ELSIF (TG_OP = 'UPDATE') THEN
+    INSERT INTO audit.doc_periods_audit(operation, stamp, userID, docPeriodID, docID, periodBegin, periodEnd) SELECT 'U', now(), userID, NEW.*;
+    RETURN NEW;
+  ELSIF (TG_OP = 'INSERT') THEN
+    INSERT INTO audit.doc_periods_audit(operation, stamp, userID, docPeriodID, docID, periodBegin, periodEnd) SELECT 'I', now(), userID, NEW.*;
+    RETURN NEW;
+  END IF;
+  RETURN NULL;
+END;
+$doc_periods_audit$ LANGUAGE plpgsql;
+CREATE TRIGGER doc_periods_audit
+AFTER INSERT OR UPDATE OR DELETE ON doc_periods
+FOR EACH ROW EXECUTE PROCEDURE audit.process_doc_periods_audit();
+
+
+CREATE TABLE audit.donut_doc_periods_audit (
+  donutDocPeriodsAuditID BIGSERIAL,
+  operation              CHAR(1)      NOT NULL,
+  stamp                  TIMESTAMPTZ  NOT NULL,
+  userID                 INTEGER      NOT NULL,
+
+  donutDocPeriodID       BIGINT       NOT NULL,
+  creationDate           DATE         NOT NULL,
+  commentForDonut        TEXT         NOT NULL,
+  driver                 VARCHAR(255) NOT NULL,
+  driverPhoneNumber      VARCHAR(12)  NOT NULL,
+  licensePlate           VARCHAR(9)   NOT NULL,
+  palletsQty             INTEGER      NOT NULL,
+  supplierUserID         INTEGER      NOT NULL,
+  PRIMARY KEY (donutDocPeriodsAuditID)
+);
+CREATE OR REPLACE FUNCTION audit.process_donut_doc_periods_audit() RETURNS TRIGGER AS $donut_doc_periods_audit$
+DECLARE
+  userID INTEGER;
+BEGIN
+  BEGIN
+    -- BINDING DaoFacade.java passUserIdToAuditTrigger()
+    userID := (SELECT current_setting('audit.current_user_id'))::INTEGER;
+    EXCEPTION WHEN OTHERS THEN
+    userID := NULL;
+  END;
+  IF (userID IS NULL)
+  THEN RETURN NULL;
+  END IF;
+  IF (TG_OP = 'DELETE') THEN
+    INSERT INTO audit.donut_doc_periods_audit(operation, stamp, userID, donutDocPeriodID, creationDate, commentForDonut, driver, driverPhoneNumber, licensePlate, palletsQty, supplierUserID)   SELECT 'D', now(), userID, OLD.*;
+    RETURN OLD;
+  ELSIF (TG_OP = 'UPDATE') THEN
+    INSERT INTO audit.donut_doc_periods_audit(operation, stamp, userID, donutDocPeriodID, creationDate, commentForDonut, driver, driverPhoneNumber, licensePlate, palletsQty, supplierUserID) SELECT 'U', now(), userID, NEW.*;
+    RETURN NEW;
+  ELSIF (TG_OP = 'INSERT') THEN
+    INSERT INTO audit.donut_doc_periods_audit(operation, stamp, userID, donutDocPeriodID, creationDate, commentForDonut, driver, driverPhoneNumber, licensePlate, palletsQty, supplierUserID) SELECT 'I', now(), userID, NEW.*;
+    RETURN NEW;
+  END IF;
+  RETURN NULL;
+END;
+$donut_doc_periods_audit$ LANGUAGE plpgsql;
+CREATE TRIGGER donut_doc_periods_audit
+AFTER INSERT OR UPDATE OR DELETE ON donut_doc_periods
+FOR EACH ROW EXECUTE PROCEDURE audit.process_donut_doc_periods_audit();
+
+
+CREATE TABLE audit.orders_audit (
+  ordersAuditID               BIGSERIAL,
+  operation                   CHAR(1)     NOT NULL,
+  stamp                       TIMESTAMPTZ NOT NULL,
+  userID                      INTEGER     NOT NULL,
+
+  orderID                     INTEGER,
+  orderNumber                 VARCHAR(16) NOT NULL,
+  boxQty                      SMALLINT    NOT NULL,
+  finalDestinationWarehouseID INTEGER     NOT NULL,
+  donutDocPeriodID            INTEGER     NOT NULL,
+  orderStatus                 VARCHAR(32) NOT NULL,
+  commentForStatus            TEXT        NOT NULL,
+  PRIMARY KEY (ordersAuditID)
+);
+CREATE OR REPLACE FUNCTION audit.process_orders_audit() RETURNS TRIGGER AS $orders_audit$
+DECLARE
+  userID INTEGER;
+BEGIN
+  BEGIN
+    -- BINDING DaoFacade.java passUserIdToAuditTrigger()
+    userID := (SELECT current_setting('audit.current_user_id'))::INTEGER;
+    EXCEPTION WHEN OTHERS THEN
+    userID := NULL;
+  END;
+  IF (userID IS NULL)
+  THEN RETURN NULL;
+  END IF;
+  IF (TG_OP = 'DELETE') THEN
+    INSERT INTO audit.orders_audit(operation, stamp, userID, orderID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus) SELECT 'D', now(), userID, OLD.*;
+    RETURN OLD;
+  ELSIF (TG_OP = 'UPDATE') THEN
+    INSERT INTO audit.orders_audit(operation, stamp, userID, orderID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus) SELECT 'U', now(), userID, NEW.*;
+    RETURN NEW;
+  ELSIF (TG_OP = 'INSERT') THEN
+    INSERT INTO audit.orders_audit(operation, stamp, userID, orderID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus) SELECT 'I', now(), userID, NEW.*;
+    RETURN NEW;
+  END IF;
+  RETURN NULL;
+END;
+$orders_audit$ LANGUAGE plpgsql;
+CREATE TRIGGER orders_audit
+AFTER INSERT OR UPDATE OR DELETE ON orders
+FOR EACH ROW EXECUTE PROCEDURE audit.process_orders_audit();
+
 
 -- -------------------------------------------------------------------------------------------------------------------
 --                                                 DB USERS
 -- -------------------------------------------------------------------------------------------------------------------
+
 
 -- create user if not exist
 REVOKE ALL PRIVILEGES ON DATABASE postgres FROM app_user;
@@ -235,6 +352,7 @@ REVOKE SELECT ON pg_timezone_names FROM app_user;
 REVOKE SELECT ON pg_timezone_abbrevs FROM app_user;
 REVOKE ALL PRIVILEGES ON SCHEMA pg_catalog FROM app_user;
 REVOKE ALL PRIVILEGES ON SCHEMA information_schema FROM app_user;
+REVOKE ALL PRIVILEGES ON SCHEMA audit FROM app_user;
 DROP ROLE IF EXISTS app_user;
 CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
 
@@ -243,10 +361,20 @@ CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
 GRANT CONNECT ON DATABASE postgres TO app_user;
 GRANT USAGE ON SCHEMA public TO app_user;
 GRANT USAGE ON SCHEMA pg_catalog TO app_user;
-GRANT SELECT ON pg_timezone_names TO app_user;
+GRANT USAGE ON SCHEMA audit TO app_user;
+GRANT SELECT ON pg_catalog.pg_timezone_names TO app_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
-GRANT INSERT, UPDATE, DELETE ON TABLE doc_periods, donut_doc_periods, orders TO app_user;
-GRANT ALL ON SEQUENCE doc_periods_docperiodid_seq TO app_user;
-GRANT ALL ON SEQUENCE orders_orderid_seq TO app_user;
+GRANT INSERT, UPDATE, DELETE ON TABLE public.doc_periods, public.donut_doc_periods, public.orders TO app_user;
+GRANT ALL ON SEQUENCE public.doc_periods_docperiodid_seq TO app_user;
+GRANT ALL ON SEQUENCE public.orders_orderid_seq TO app_user;
+GRANT ALL ON SEQUENCE audit.doc_periods_audit_docperiodsauditid_seq TO app_user;
+GRANT ALL ON SEQUENCE audit.donut_doc_periods_audit_donutdocperiodsauditid_seq TO app_user;
+GRANT ALL ON SEQUENCE audit.orders_audit_ordersauditid_seq TO app_user;
+GRANT INSERT ON ALL TABLES IN SCHEMA audit TO app_user;
+
+
+
+
+
 
 

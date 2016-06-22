@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/insertDocPeriods")
-public class InsertDocPeriods extends HttpServlet{
+public class InsertDocPeriods extends AjaxHttpServlet{
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PeriodsForInsertData periodsForInsertData;
@@ -31,7 +31,7 @@ public class InsertDocPeriods extends HttpServlet{
             throw new ServletException(e);
         }
         try {
-            DaoFacade.insertDocPeriods(periodsForInsertData, docDateSelectorData.docId);
+            DaoFacade.insertDocPeriods(getUser(req).getUserId(), periodsForInsertData, docDateSelectorData.docId);
         } catch (DaoScriptException e) {
             throw new ServletException(e);
         }
