@@ -14,7 +14,7 @@
         <!--Connections source from built-in tomcat connection pool-->
         <!-- Enable Hibernate's automatic session context management -->
         <property name="hibernate.connection.autocommit">false</property>
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
         <!-- Drop and re-create the database schema on startup (values = [create, update])-->
         <property name="hibernate.hbm2ddl.auto">update</property>
         <!--<property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>-->

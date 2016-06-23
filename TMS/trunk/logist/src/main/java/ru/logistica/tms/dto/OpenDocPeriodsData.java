@@ -2,13 +2,18 @@ package ru.logistica.tms.dto;
 
 import ru.logistica.tms.util.JsonUtils;
 
-import javax.json.*;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import java.util.HashSet;
 import java.util.Set;
 
 public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
     // BINDING main.jsp
-    private enum Action {INSERT, DELETE, UPDATE}
+    private enum Action {
+        INSERT, DELETE, UPDATE
+    }
+
     public OpenDocPeriodsData(String jsonString) throws ValidateDataException {
         try {
             JsonArray openPeriodsData = JsonUtils.parseStringAsArray(jsonString);
@@ -37,9 +42,9 @@ public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
                     for (int i = 1; i < jsonArray.size(); i++) {
                         insertOperations.add(
                                 new DocAction.InsertOperation(
-                                        ((JsonObject)jsonArray.get(i)).getInt("docId"),
-                                        ((JsonObject)jsonArray.get(i)).getJsonNumber("periodBegin").longValue(),
-                                        ((JsonObject)jsonArray.get(i)).getJsonNumber("periodEnd").longValue()
+                                        ((JsonObject) jsonArray.get(i)).getInt("docId"),
+                                        ((JsonObject) jsonArray.get(i)).getJsonNumber("periodBegin").longValue(),
+                                        ((JsonObject) jsonArray.get(i)).getJsonNumber("periodEnd").longValue()
                                 ));
                     }
                 }
@@ -69,9 +74,12 @@ public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
                     '}';
         }
 
-        public abstract static class Operation {}
-        public abstract static class IdOperation{
+        public abstract static class Operation {
+        }
+
+        public abstract static class IdOperation {
             public final long docPeriodId;
+
             protected IdOperation(long docPeriodId) {
                 this.docPeriodId = docPeriodId;
             }
@@ -83,10 +91,12 @@ public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
                         '}';
             }
         }
+
         public static class InsertOperation extends Operation {
             public final long periodBegin;
             public final long periodEnd;
             public final int docId;
+
             public InsertOperation(int docId, long periodBegin, long periodEnd) {
                 this.docId = docId;
                 this.periodBegin = periodBegin;
@@ -102,9 +112,11 @@ public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
                         '}';
             }
         }
+
         public static class UpdateOperation extends IdOperation {
             public final Long periodBegin;
             public final Long periodEnd;
+
             public UpdateOperation(long docPeriodId, Long periodBegin, Long periodEnd) {
                 super(docPeriodId);
                 this.periodBegin = periodBegin;
@@ -119,6 +131,7 @@ public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
                         "} " + super.toString();
             }
         }
+
         public static class DeleteOperation extends IdOperation {
             public DeleteOperation(long docPeriodId) {
                 super(docPeriodId);

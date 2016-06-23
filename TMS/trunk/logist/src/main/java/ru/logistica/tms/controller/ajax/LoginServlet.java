@@ -2,7 +2,6 @@ package ru.logistica.tms.controller.ajax;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.logistica.tms.controller.ajax.AjaxHttpServlet;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dto.AuthResult;
@@ -18,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet("/login")
-public class LoginServlet extends AjaxHttpServlet {
+public class LoginServlet extends AppHttpServlet {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -52,7 +51,7 @@ public class LoginServlet extends AjaxHttpServlet {
             JsonObject jsonObject = objectBuilder.add("loginErrorText", "").add("passwordErrorText", "пароль указан неверно").build();
             sendJson(response, jsonObject);
         } else if (authResult.isSystemError()) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "ошибка сервера при авторизации");
+            throw new ServletException("ошибка сервера при авторизации");
         }
     }
 

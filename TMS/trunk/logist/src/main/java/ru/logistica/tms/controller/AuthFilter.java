@@ -1,5 +1,8 @@
 package ru.logistica.tms.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
@@ -9,12 +12,12 @@ import java.io.IOException;
 
 @WebFilter("/*")
 public class AuthFilter implements Filter {
-    private ServletContext context;
+
+    private static final Logger logger = LogManager.getLogger();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.context = filterConfig.getServletContext();
-        this.context.log("AuthenticationFilter initialized");
+
     }
 
     @Override
@@ -25,7 +28,7 @@ public class AuthFilter implements Filter {
         // make avaliable all js and css
         String requestURI = request.getRequestURI();
 
-        if (requestURI.startsWith(request.getContextPath()+"/media/")) {
+        if (requestURI.startsWith(request.getContextPath() + "/media/")) {
             chain.doFilter(request, response);
             return;
         }

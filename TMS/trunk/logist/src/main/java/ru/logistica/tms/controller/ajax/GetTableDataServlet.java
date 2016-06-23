@@ -6,11 +6,16 @@ import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.orderDao.Order;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
-import ru.logistica.tms.dao.userDao.*;
+import ru.logistica.tms.dao.userDao.SupplierUser;
+import ru.logistica.tms.dao.userDao.UserRoles;
+import ru.logistica.tms.dao.userDao.WarehouseUser;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.ValidateDataException;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @WebServlet("/getTableData")
-public class GetTableDataServlet extends AjaxHttpServlet {
+public class GetTableDataServlet extends AppHttpServlet {
     /*
     var exampleData = [
                 {docPeriodId: 10, periodBegin: 630, periodEnd: 690, state: "CLOSED",   owned: true},

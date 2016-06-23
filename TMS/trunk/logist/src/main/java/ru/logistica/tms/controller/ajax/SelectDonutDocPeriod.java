@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Set;
 
 @WebServlet("/selectDonut")
-public class SelectDonutDocPeriod extends AjaxHttpServlet {
+public class SelectDonutDocPeriod extends AppHttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         long donutDocPeriodId = Long.parseLong(req.getParameter("donutDocPeriodId"));

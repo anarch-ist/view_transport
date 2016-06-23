@@ -14,10 +14,10 @@ import ru.logistica.tms.dao.orderDao.Order;
 import ru.logistica.tms.dao.orderDao.OrderDao;
 import ru.logistica.tms.dao.orderDao.OrderDaoImpl;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
-import ru.logistica.tms.dao.supplierDao.Supplier;
-import ru.logistica.tms.dao.supplierDao.SupplierDao;
-import ru.logistica.tms.dao.supplierDao.SupplierDaoImpl;
-import ru.logistica.tms.dao.userDao.*;
+import ru.logistica.tms.dao.userDao.SupplierUser;
+import ru.logistica.tms.dao.userDao.User;
+import ru.logistica.tms.dao.userDao.UserDao;
+import ru.logistica.tms.dao.userDao.UserDaoImpl;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
@@ -25,7 +25,10 @@ import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.*;
 import ru.logistica.tms.util.CriptUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();

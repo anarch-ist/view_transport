@@ -1,6 +1,6 @@
 package ru.logistica.tms.dao;
 
-public class DaoScriptException extends Throwable {
+public class DaoScriptException extends Exception {
     public DaoScriptException() {
     }
 
