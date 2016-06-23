@@ -345,19 +345,11 @@ FOR EACH ROW EXECUTE PROCEDURE audit.process_orders_audit();
 --                                                 DB USERS
 -- -------------------------------------------------------------------------------------------------------------------
 
-
--- create user if not exist
 REVOKE ALL PRIVILEGES ON DATABASE postgres FROM app_user;
 REVOKE SELECT ON pg_timezone_names FROM app_user;
-REVOKE SELECT ON pg_timezone_abbrevs FROM app_user;
 REVOKE ALL PRIVILEGES ON SCHEMA pg_catalog FROM app_user;
-REVOKE ALL PRIVILEGES ON SCHEMA information_schema FROM app_user;
-REVOKE ALL PRIVILEGES ON SCHEMA audit FROM app_user;
 DROP ROLE IF EXISTS app_user;
 CREATE ROLE app_user LOGIN PASSWORD 'vghdfvce5485';
-
--- TODO fix app privileges and create admin user with privileges
--- application user privileges:
 GRANT CONNECT ON DATABASE postgres TO app_user;
 GRANT USAGE ON SCHEMA public TO app_user;
 GRANT USAGE ON SCHEMA pg_catalog TO app_user;
@@ -365,16 +357,32 @@ GRANT USAGE ON SCHEMA audit TO app_user;
 GRANT SELECT ON pg_catalog.pg_timezone_names TO app_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO app_user;
 GRANT INSERT, UPDATE, DELETE ON TABLE public.doc_periods, public.donut_doc_periods, public.orders TO app_user;
-GRANT ALL ON SEQUENCE public.doc_periods_docperiodid_seq TO app_user;
-GRANT ALL ON SEQUENCE public.orders_orderid_seq TO app_user;
-GRANT ALL ON SEQUENCE audit.doc_periods_audit_docperiodsauditid_seq TO app_user;
-GRANT ALL ON SEQUENCE audit.donut_doc_periods_audit_donutdocperiodsauditid_seq TO app_user;
-GRANT ALL ON SEQUENCE audit.orders_audit_ordersauditid_seq TO app_user;
+GRANT ALL ON SEQUENCE public.doc_periods_docperiodid_seq, public.orders_orderid_seq TO app_user;
+GRANT ALL ON SEQUENCE
+audit.doc_periods_audit_docperiodsauditid_seq, audit.donut_doc_periods_audit_donutdocperiodsauditid_seq,
+audit.orders_audit_ordersauditid_seq
+TO app_user;
 GRANT INSERT ON ALL TABLES IN SCHEMA audit TO app_user;
 
 
-
-
-
-
-
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM admin_user;
+REVOKE SELECT ON pg_timezone_names FROM admin_user;
+REVOKE ALL PRIVILEGES ON SCHEMA pg_catalog FROM admin_user;
+DROP ROLE IF EXISTS admin_user;
+CREATE ROLE admin_user LOGIN PASSWORD 'dfnm2hk45';
+GRANT CONNECT ON DATABASE postgres TO admin_user;
+GRANT USAGE ON SCHEMA public TO admin_user;
+GRANT USAGE ON SCHEMA audit TO admin_user;
+GRANT USAGE ON SCHEMA pg_catalog TO admin_user;
+GRANT SELECT ON pg_catalog.pg_timezone_names TO admin_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO admin_user;
+GRANT SELECT ON ALL TABLES IN SCHEMA audit TO admin_user;
+GRANT INSERT, UPDATE, DELETE ON TABLE
+public.users, public.warehouse_users, public.supplier_users,
+public.warehouses, public.suppliers, public.orders, public.docs,
+public.doc_periods, public.donut_doc_periods
+TO admin_user;
+GRANT ALL ON SEQUENCE
+public.doc_periods_docperiodid_seq, public.orders_orderid_seq, public.docs_docid_seq,
+suppliers_supplierid_seq, users_userid_seq, warehouses_warehouseid_seq
+TO admin_user;

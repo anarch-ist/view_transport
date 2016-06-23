@@ -1,7 +1,6 @@
 package ru.logistica.tms.dao.docPeriodDao;
 
 import ru.logistica.tms.dao.orderDao.Order;
-import ru.logistica.tms.dao.supplierDao.Supplier;
 import ru.logistica.tms.dao.userDao.SupplierUser;
 
 import javax.persistence.*;

@@ -4,7 +4,6 @@ import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dto.DonutUpdateData;
 import ru.logistica.tms.dto.ValidateDataException;
-import ru.logistica.tms.util.JsonUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/updateDonut")
-public class UpdateDonutDocPeriod extends AjaxHttpServlet {
+public class UpdateDonutDocPeriod extends AppHttpServlet {
     /*var exampleData = {
                 period:{periodBegin:123499000000, periodEnd: 11223234500000},
                 driver:"someDriver",

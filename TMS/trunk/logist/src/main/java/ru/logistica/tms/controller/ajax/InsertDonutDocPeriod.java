@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/insertDonut")
-public class InsertDonutDocPeriod extends AjaxHttpServlet {
+public class InsertDonutDocPeriod extends AppHttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

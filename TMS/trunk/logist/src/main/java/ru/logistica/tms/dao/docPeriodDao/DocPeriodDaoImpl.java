@@ -2,9 +2,7 @@ package ru.logistica.tms.dao.docPeriodDao;
 
 import org.hibernate.Query;
 import ru.logistica.tms.dao.DAOException;
-import ru.logistica.tms.dao.GenericDao;
 import ru.logistica.tms.dao.GenericDaoImpl;
-import ru.logistica.tms.dao.docDao.Doc;
 
 import java.util.Date;
 import java.util.List;

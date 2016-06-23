@@ -1,11 +1,8 @@
 package ru.logistica.tms.dto;
 
 import ru.logistica.tms.util.JsonUtils;
-import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import javax.json.JsonObject;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class DocDateSelectorData {
     //public static final SimpleDateFormat dateFormat = new UtcSimpleDateFormat("yyyy-MM-dd");
@@ -18,6 +15,7 @@ public class DocDateSelectorData {
         this.warehouseId = warehouseId;
         this.docId = docId;
     }
+
     public DocDateSelectorData(String docDateJsonString) throws ValidateDataException {
         try {
             JsonObject receivedJsonObject = JsonUtils.parseStringAsObject(docDateJsonString);

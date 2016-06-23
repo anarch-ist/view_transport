@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class AjaxHttpServlet extends HttpServlet {
+public class AppHttpServlet extends HttpServlet {
 
     protected User getUser(HttpServletRequest req) {
         return (User)req.getSession(false).getAttribute("user");
