@@ -6,7 +6,7 @@ import ru.logistica.tms.util.CriptUtils;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "users", schema = "public", catalog = "postgres")
+@Table(name = "users", schema = "public")
 @Inheritance(strategy=InheritanceType.JOINED)
 public class User {
     private Integer userId;

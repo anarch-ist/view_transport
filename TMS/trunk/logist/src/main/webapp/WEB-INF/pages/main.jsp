@@ -269,8 +269,6 @@
                         }
                     });
                     donutCrudPluginDialog.open();
-                }).fail(function () {
-                    window.alert("error");
                 });
             };
 
@@ -333,8 +331,6 @@
                         })
                     });
                     donutCrudPluginDialog.open();
-                }).fail(function () {
-                    window.alert("error");
                 });
             };
             </c:if>
@@ -369,8 +365,6 @@
                     donutCrudPluginInstance.setData(donutData);
                     donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                     donutCrudPluginDialog.open();
-                }).fail(function () {
-                    window.alert("error");
                 });
             };
             var bClosePeriodsBtn = tablePlugin.getButtonByPluginId("bClosePeriodsBtn");
@@ -527,10 +521,8 @@
             function getSelectedPeriod() {
                 var periods = tablePlugin.getSelectionData()[0].periods;
                 return {periodBegin: periods[0].periodBegin, periodEnd: periods[0].periodEnd};
-                //return ;
             }
             function sendTableAjax(url, data, onDone) {
-                //tablePlugin.setDisabled(true);
                 var rawDocDateSelection = docDateSelector.getSelectionObject();
                 var forSendDocDateSelection = $.extend(rawDocDateSelection, {date: rawDocDateSelection.date.getTime()});
                 var sendObject = {docDateSelection: forSendDocDateSelection};
@@ -550,10 +542,7 @@
                     dataType: "json"
                 }).done(function (tableData) {
                     tablePlugin.setData(tableData.docPeriods);
-                    //ablePlugin.setDisabled(false);
                     if (onDone) onDone();
-                }).fail(function () {
-                    // tablePlugin.setDisabled(false);
                 });
             }
 

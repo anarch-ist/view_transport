@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "user_roles", schema = "public", catalog = "postgres")
+@Table(name = "user_roles", schema = "public")
 public class UserRole {
 
     private UserRoles userRoleId;
@@ -23,7 +23,7 @@ public class UserRole {
     }
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "permissions_for_roles", schema = "public", catalog = "postgres",
+    @JoinTable(name = "permissions_for_roles", schema = "public",
             joinColumns = {@JoinColumn(name = "userroleid", nullable = false, updatable = false)},
             inverseJoinColumns = {@JoinColumn(name = "permissionid", nullable = false, updatable = false)})
     public Set<Permission> getPermissions() {

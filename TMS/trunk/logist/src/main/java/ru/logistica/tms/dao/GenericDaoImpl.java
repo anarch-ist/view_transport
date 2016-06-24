@@ -18,7 +18,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
             getSession().update(entity);
         }
         catch (Exception e) {
-            throw new DAOException(e);
+            throw new DAOException(e.getMessage(), e);
         }
     }
 
@@ -28,7 +28,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
             getSession().delete(entity);
         }
         catch (Exception e) {
-            throw new DAOException(e);
+            throw new DAOException(e.getMessage(), e);
         }
 
     }
@@ -38,7 +38,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
         try {
             return (Id)getSession().save(entity);
         } catch (Exception e) {
-            throw new DAOException(e);
+            throw new DAOException(e.getMessage(), e);
         }
     }
 
@@ -47,7 +47,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
         try {
             getSession().persist(entity);
         } catch (Exception e) {
-            throw new DAOException(e);
+            throw new DAOException(e.getMessage(), e);
         }
     }
 
@@ -58,7 +58,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
             Query query = hibernateSession.createQuery("from " + clazz.getName());
             return query.list();
         } catch (Exception e) {
-            throw new DAOException(e);
+            throw new DAOException(e.getMessage(), e);
         }
 
     }
@@ -69,7 +69,7 @@ public abstract class GenericDaoImpl<T, Id extends Serializable> implements Gene
             Session hibernateSession = this.getSession();
             return (T) hibernateSession.get(clazz, id);
         } catch (Exception e) {
-            throw new DAOException(e);
+            throw new DAOException(e.getMessage(), e);
         }
 
     }
