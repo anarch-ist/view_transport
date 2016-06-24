@@ -5,7 +5,7 @@ import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "warehouse_users", schema = "public", catalog = "postgres")
+@Table(name = "warehouse_users", schema = "public")
 @PrimaryKeyJoinColumn(name="userid")
 public class WarehouseUser extends User{
     private Warehouse warehouse;

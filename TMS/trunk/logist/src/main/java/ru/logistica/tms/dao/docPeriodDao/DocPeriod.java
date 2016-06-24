@@ -5,7 +5,7 @@ import ru.logistica.tms.dao.docDao.Doc;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "doc_periods", schema = "public", catalog = "postgres")
+@Table(name = "doc_periods", schema = "public")
 @Inheritance(strategy=InheritanceType.JOINED)
 public class DocPeriod {
     private Long docPeriodId;

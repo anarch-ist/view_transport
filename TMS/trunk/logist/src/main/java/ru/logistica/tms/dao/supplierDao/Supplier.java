@@ -3,7 +3,7 @@ package ru.logistica.tms.dao.supplierDao;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "suppliers", schema = "public", catalog = "postgres")
+@Table(name = "suppliers", schema = "public")
 public class Supplier {
     private Integer supplierId;
     private String inn;

@@ -47,7 +47,7 @@ public class DaoFacade {
         } catch (DAOException e) {
             logger.error(e.getMessage());
             HibernateUtils.rollbackTransaction();
-            throw new DaoScriptException(e);
+            throw new DaoScriptException(e.getMessage(), e);
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
@@ -177,21 +177,29 @@ public class DaoFacade {
     }
 
 
-    public static void openPeriods(final int userId, final OpenDocPeriodsData openDocPeriodsData) throws DaoScriptException {
+    public static void openPeriods(final Integer userId, final OpenDocPeriodsData openDocPeriodsData) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                passUserIdToAuditTrigger(userId);
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
+
                 DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
                 DocDao docDao = new DocDaoImpl();
 
                 for (OpenDocPeriodsData.DocAction docAction : openDocPeriodsData) {
 
                     if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.DeleteOperation) {
-                        docPeriodDao.delete(docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId));
+                        DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
+                        if (docPeriod == null)
+                            throw new OutOfDateException();
+                        docPeriodDao.delete(docPeriod);
                     } else if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.UpdateOperation) {
                         OpenDocPeriodsData.DocAction.UpdateOperation updateOperation = (OpenDocPeriodsData.DocAction.UpdateOperation) docAction.idOperation;
                         DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
+                        if (docPeriod == null)
+                            throw new OutOfDateException();
                         docPeriod.setPeriod(new Period(new Date(updateOperation.periodBegin), new Date(updateOperation.periodEnd)));
                         docPeriodDao.update(docPeriod);
                     }
@@ -209,11 +217,13 @@ public class DaoFacade {
         });
     }
 
-    public static void insertDocPeriods(final int userId, final PeriodsForInsertData periodsForInsertData, final int docId) throws DaoScriptException {
+    public static void insertDocPeriods(final Integer userId, final PeriodsForInsertData periodsForInsertData, final int docId) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                passUserIdToAuditTrigger(userId);
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
                 DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
                 DocDao docDao = new DocDaoImpl();
                 Doc doc = docDao.findById(Doc.class, docId);
@@ -228,11 +238,13 @@ public class DaoFacade {
 
     }
 
-    public static void updateDonutWithRequests(final int userId, final DonutUpdateData donutUpdateData) throws DaoScriptException {
+    public static void updateDonutWithRequests(final Integer userId, final DonutUpdateData donutUpdateData) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                passUserIdToAuditTrigger(userId);
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
                 DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
                 DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, (long) donutUpdateData.donutDocPeriodId);
                 donutDocPeriod.setDriverPhoneNumber(donutUpdateData.driverPhoneNumber);
@@ -280,11 +292,13 @@ public class DaoFacade {
         });
     }
 
-    public static void deleteDonutWithRequests(final int userId, final long donutDocPeriodId) throws DaoScriptException {
+    public static void deleteDonutWithRequests(final Integer userId, final long donutDocPeriodId) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                passUserIdToAuditTrigger(userId);
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
                 DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
                 OrderDao orderDao = new OrderDaoImpl();
                 DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
@@ -298,11 +312,13 @@ public class DaoFacade {
 
     }
 
-    public static void deleteDonutWithRequestsIfCreated(final int userId, final long donutDocPeriodId) throws DaoScriptException {
+    public static void deleteDonutWithRequestsIfCreated(final Integer userId, final long donutDocPeriodId) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                passUserIdToAuditTrigger(userId);
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
                 DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
                 OrderDao orderDao = new OrderDaoImpl();
                 DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
@@ -320,11 +336,13 @@ public class DaoFacade {
 
     }
 
-    public static void insertDonut(final int userId, final DonutInsertData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) throws DaoScriptException {
+    public static void insertDonut(final Integer userId, final DonutInsertData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                passUserIdToAuditTrigger(userId);
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
                 DocDao docDao = new DocDaoImpl();
                 Doc doc = docDao.findById(Doc.class, docDateSelectorData.docId);
                 WarehouseDao warehouseDao = new WarehouseDaoImpl();

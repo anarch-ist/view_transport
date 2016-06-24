@@ -6,7 +6,7 @@ import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "orders", schema = "public", catalog = "postgres")
+@Table(name = "orders", schema = "public")
 public class Order {
     private Integer orderId;
     private String orderNumber;

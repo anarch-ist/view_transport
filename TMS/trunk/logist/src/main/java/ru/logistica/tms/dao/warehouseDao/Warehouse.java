@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "warehouses", schema = "public", catalog = "postgres")
+@Table(name = "warehouses", schema = "public")
 public class Warehouse {
     private Integer warehouseId;
     private String warehouseName;

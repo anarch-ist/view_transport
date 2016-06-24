@@ -3,7 +3,7 @@ package ru.logistica.tms.dao.userDao;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "permissions", schema = "public", catalog = "postgres")
+@Table(name = "permissions", schema = "public")
 public class Permission {
     private PermissionNames permissionId;
 

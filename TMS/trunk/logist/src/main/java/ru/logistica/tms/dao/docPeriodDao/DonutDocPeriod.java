@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "donut_doc_periods", schema = "public", catalog = "postgres")
+@Table(name = "donut_doc_periods", schema = "public")
 @PrimaryKeyJoinColumn(name="donutdocperiodid")
 public class DonutDocPeriod extends DocPeriod{
     private Date creationDate;

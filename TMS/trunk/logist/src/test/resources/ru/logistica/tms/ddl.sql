@@ -6,28 +6,31 @@ CREATE SCHEMA public;
 -- -------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE user_roles (
-  userRoleID VARCHAR(32), -- Static
+  userRoleID VARCHAR(32),
   PRIMARY KEY (userRoleID)
 );
 
 -- BINDING ru.logistica.tms.dao.userDao.UserRoles
 INSERT INTO user_roles (userRoleID)
 VALUES
-  ('WH_BOSS'), -- обязан иметь склад, но у него нет ссылки на поставщика
-  ('WH_DISPATCHER'), -- обязан иметь склад, но у него нет ссылки на поставщика
-  ('SUPPLIER_MANAGER') -- поставщик, не имеет склада, но ссылается на поставщика
+  -- обязан иметь склад, но у него нет ссылки на поставщика
+  ('WH_BOSS'),
+  -- обязан иметь склад, но у него нет ссылки на поставщика
+  ('WH_DISPATCHER'),
+  -- поставщик, не имеет склада, но ссылается на поставщика
+  ('SUPPLIER_MANAGER')
 ;
 
 CREATE TABLE users (
-  userID        SERIAL, -- Static
-  userLogin     VARCHAR(255) NOT NULL, -- Dynamic
-  salt          CHAR(16)     NOT NULL, -- Dynamic
-  passAndSalt   CHAR(32)     NOT NULL, -- Dynamic
-  userRoleID    VARCHAR(32)  NOT NULL, -- Static
-  userName      VARCHAR(255) NOT NULL, -- Dynamic
-  phoneNumber   VARCHAR(255) NOT NULL, -- Dynamic
-  email         VARCHAR(255) NOT NULL, -- Dynamic
-  position      VARCHAR(64)  NOT NULL, -- Static
+  userID        SERIAL,
+  userLogin     VARCHAR(255) NOT NULL,
+  salt          CHAR(16)     NOT NULL,
+  passAndSalt   CHAR(32)     NOT NULL,
+  userRoleID    VARCHAR(32)  NOT NULL,
+  userName      VARCHAR(255) NOT NULL,
+  phoneNumber   VARCHAR(255) NOT NULL,
+  email         VARCHAR(255) NOT NULL,
+  position      VARCHAR(64)  NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userRoleID) REFERENCES user_roles (userRoleID),
   UNIQUE (userLogin)
@@ -35,7 +38,7 @@ CREATE TABLE users (
 
 -- BINDING ru.logistica.tms.dao.userDao.PermissionNamesames
 CREATE TABLE permissions (
-  permissionID VARCHAR(32), -- Static
+  permissionID VARCHAR(32),
   PRIMARY KEY (permissionID)
 );
 
@@ -46,8 +49,8 @@ VALUES
   ('DELETE_CREATED_DONUT');
 
 CREATE TABLE permissions_for_roles (
-  userRoleID   VARCHAR(32), -- Static
-  permissionID VARCHAR(32), -- Static
+  userRoleID   VARCHAR(32),
+  permissionID VARCHAR(32),
   PRIMARY KEY (userRoleID, permissionID),
   FOREIGN KEY (permissionID) REFERENCES permissions (permissionID)
   ON DELETE RESTRICT
@@ -57,6 +60,7 @@ CREATE TABLE permissions_for_roles (
   ON UPDATE RESTRICT
 );
 
+--START_STM
 CREATE OR REPLACE FUNCTION insert_permission_for_role(_userRoleID VARCHAR(32), _permissionID VARCHAR(32))
   RETURNS VOID AS
 $$
@@ -70,6 +74,7 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+--END_STM
 
 SELECT insert_permission_for_role('WH_BOSS', 'DELETE_ANY_DONUT');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'DELETE_CREATED_DONUT');

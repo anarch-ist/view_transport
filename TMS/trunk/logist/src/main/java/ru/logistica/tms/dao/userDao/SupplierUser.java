@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "supplier_users", schema = "public", catalog = "postgres")
+@Table(name = "supplier_users", schema = "public")
 @PrimaryKeyJoinColumn(name="userid")
 public class SupplierUser extends User {
     private Set<DonutDocPeriod> donutDocPeriods;

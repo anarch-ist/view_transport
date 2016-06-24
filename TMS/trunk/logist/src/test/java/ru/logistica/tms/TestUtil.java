@@ -1,17 +1,90 @@
 package ru.logistica.tms;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import ru.logistica.tms.dao.ScriptRunner;
+
+import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TestUtil {
+
+
+
+
+    public static void splitSqlFile() throws URISyntaxException, IOException {
+        Path pathToSql = Paths.get(TestUtil.class.getResource("ddl.sql").toURI());
+        String sqlFileAsString = new String(Files.readAllBytes(pathToSql), StandardCharsets.UTF_8);
+        Pattern patternStr = Pattern.compile("--.*\\n");
+        Matcher matcherStr = patternStr.matcher(sqlFileAsString);
+        StringBuffer sb = new StringBuffer();
+        int endIndex = 0;
+        while (matcherStr.find()){
+            matcherStr.appendReplacement(sb, "");
+            endIndex = matcherStr.start();
+        }
+        sb.append(sqlFileAsString.substring(endIndex));
+        String sqlFileAsStringWithoutComments = sb.toString();
+//        System.out.println(sqlFileAsStringWithoutComments);
+
+//        System.out.println(sqlFileAsString);
+        int index = 0;
+        Pattern pattern = Pattern.compile(";\\s*\\n*(DROP|CREATE|INSERT|SELECT|REVOKE|GRANT)");
+        Matcher matcher = pattern.matcher(sqlFileAsStringWithoutComments);
+        List<Integer> indexes = new ArrayList<>();
+        indexes.add(index);
+        while (matcher.find()){
+            index = matcher.start() + 1;
+            indexes.add(index);
+        }
+        for(int i = 0; i < indexes.size() - 1; i++){
+//            System.out.println(sqlFileAsStringWithoutComments.substring(indexes.get(i), indexes.get(i + 1)));
+//            System.out.println("_______________________________________________");
+        }
+
+        System.out.println(indexes);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static Connection getConnection() throws SQLException, ClassNotFoundException {
+        Class.forName("org.postgresql.Driver");
+        Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/postgres", "postgres", "postgres");
+        return connection;
+    }
+    public static void jdbcRecreateDb() throws SQLException, URISyntaxException, IOException, ClassNotFoundException {
+        ScriptRunner scriptRunner = new ScriptRunner(getConnection(), true, true);
+        Path pathToSql = Paths.get(TestUtil.class.getResource("ddl.sql").toURI());
+        scriptRunner.setErrorLogWriter(new PrintWriter(new OutputStreamWriter(System.out)));
+        scriptRunner.runScript(new FileReader(pathToSql.toFile()));
+    }
+
     public static void recreateDatabase() throws URISyntaxException {
         executeFiles(false, "ddl.sql");
     }
