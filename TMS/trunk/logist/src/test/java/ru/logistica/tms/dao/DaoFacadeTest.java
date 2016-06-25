@@ -28,23 +28,23 @@ public class DaoFacadeTest extends HibernateTest {
     @BeforeClass
     public void setUp() throws Exception {
         super.setUp();
-        TestUtil.fillWithSampleData();
+        TestUtil.jdbcRecreateAndTestInserts();
     }
 
     @Test
-    public void testGetAllWarehousesWithDocs() throws Exception, DaoScriptException {
+    public void testGetAllWarehousesWithDocs() throws Exception {
         Set<Warehouse> allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
         Assert.assertTrue(allWarehousesWithDocs.size() == 2);
         for (Warehouse warehouse : allWarehousesWithDocs) {
             if (warehouse.getWarehouseId() == 1) {
                 Set<Doc> docs = warehouse.getDocs();
-                Assert.assertTrue(docs.size() == 6);
+                Assert.assertTrue(docs.size() == 3);
             }
         }
     }
 
     @Test
-    public void testFillOffsetsForAbbreviations() throws Exception, DaoScriptException {
+    public void testFillOffsetsForAbbreviations() throws Exception {
         DaoFacade.fillOffsetsForAbbreviations();
         Assert.assertEquals(AppContextCache.timeZoneAbbrIntegerMap.get(RusTimeZoneAbbr.EET), 2.0);
         Assert.assertEquals(AppContextCache.timeZoneAbbrIntegerMap.get(RusTimeZoneAbbr.MSK), 3.0);
@@ -65,7 +65,7 @@ public class DaoFacadeTest extends HibernateTest {
     }
 
     @Test(enabled = false)
-    public void testGetAllPeriodsForDoc() throws Exception, DaoScriptException {
+    public void testGetAllPeriodsForDoc() throws Exception {
         String inputDateString = "2016-10-19";
         Date utcDate = dateFormat.parse(inputDateString);
         List<DocPeriod> allPeriodsForDoc = DaoFacade.getAllPeriodsForDoc(1, utcDate, utcDate);
@@ -74,7 +74,7 @@ public class DaoFacadeTest extends HibernateTest {
 
 
     @Test
-    public void testInsertDonut() throws Exception, DaoScriptException {
+    public void testInsertDonut() throws Exception {
         DaoFacade.fillOffsetsForAbbreviations();
 
         Set<DonutInsertData.OrderInsertData> orders = new HashSet<>();
@@ -85,7 +85,7 @@ public class DaoFacadeTest extends HibernateTest {
 
         HibernateUtils.beginTransaction();
         SupplierUserDao supplierUserDao = new SupplierUserDaoImpl();
-        SupplierUser user1 = supplierUserDao.findByLogin(SupplierUser.class, "user1");
+        SupplierUser user1 = supplierUserDao.findByLogin(SupplierUser.class, "us1");
         HibernateUtils.commitTransaction();
 
         DaoFacade.insertDonut(1, donut, docDateSelectorData, user1);

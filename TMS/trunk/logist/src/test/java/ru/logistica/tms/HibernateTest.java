@@ -20,7 +20,7 @@ public abstract class HibernateTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        //TestUtil.recreateDatabase();
+        TestUtil.jdbcRecreateDatabase();
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         // setup the session factory
         Configuration configuration = new Configuration();
@@ -36,15 +36,15 @@ public abstract class HibernateTest {
         configuration.addAnnotatedClass(UserRole.class);
         configuration.addAnnotatedClass(SupplierUser.class);
         configuration.addAnnotatedClass(WarehouseUser.class);
-        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-        configuration.setProperty("hibernate.connection.driver_class","org.hsqldb.jdbcDriver");
-        configuration.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:postgres");
+        configuration.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL9Dialect");
+        configuration.setProperty("hibernate.connection.driver_class","org.postgresql.Driver");
+        configuration.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres");
         configuration.setProperty("hibernate.connection.autocommit", "false");
-        configuration.setProperty("hibernate.connection.username", "SA");
-        configuration.setProperty("hibernate.connection.password", "");
+        configuration.setProperty("hibernate.connection.username", "postgres");
+        configuration.setProperty("hibernate.connection.password", "postgres");
         configuration.setProperty("hibernate.current_session_context_class", "thread");
         configuration.setProperty("hibernate.connection_pool_size", "1");
-        configuration.setProperty("hibernate.hbm2ddl.auto", "create");
+        configuration.setProperty("hibernate.hbm2ddl.auto", "update");
         configuration.setProperty("hibernate.show_sql", "true");
 //        configuration.setProperty("hibernate.show_sql", "false");
         configuration.setProperty("hibernate.format_sql", "true");

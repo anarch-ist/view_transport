@@ -41,7 +41,7 @@ public class DocPeriodImplTest extends HibernateTest {
     @BeforeClass
     public void setUp() throws Exception {
         super.setUp();
-        TestUtil.fillWithSampleData();
+        TestUtil.jdbcRecreateAndTestInserts();
 
         HibernateUtils.beginTransaction();
         SupplierDao supplierDao = new SupplierDaoImpl();
