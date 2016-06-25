@@ -44,10 +44,14 @@ public class DaoFacade {
             HibernateUtils.beginTransaction();
             daoScript.execute();
             HibernateUtils.commitTransaction();
-        } catch (DAOException e) {
-            logger.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error(e);
             HibernateUtils.rollbackTransaction();
-            throw new DaoScriptException(e.getMessage(), e);
+            String message = e.getMessage();
+            if (e instanceof org.hibernate.exception.GenericJDBCException) {
+                message = e.getCause().getMessage();
+            }
+            throw new DaoScriptException(message, e);
         } finally {
             HibernateUtils.getCurrentSession().close();
         }
