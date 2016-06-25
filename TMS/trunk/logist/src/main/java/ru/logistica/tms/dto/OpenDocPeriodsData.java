@@ -10,9 +10,11 @@ import java.util.Set;
 
 public class OpenDocPeriodsData extends HashSet<OpenDocPeriodsData.DocAction> {
     // BINDING main.jsp
-    private enum Action {
+    public enum Action {
         INSERT, DELETE, UPDATE
     }
+
+    public OpenDocPeriodsData() {}
 
     public OpenDocPeriodsData(String jsonString) throws ValidateDataException {
         try {

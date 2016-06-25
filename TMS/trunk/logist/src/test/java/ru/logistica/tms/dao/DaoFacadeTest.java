@@ -2,6 +2,7 @@ package ru.logistica.tms.dao;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.HibernateTest;
 import ru.logistica.tms.TestUtil;
@@ -14,6 +15,7 @@ import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.DonutInsertData;
+import ru.logistica.tms.dto.OpenDocPeriodsData;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import java.text.SimpleDateFormat;
@@ -25,9 +27,8 @@ import java.util.Set;
 public class DaoFacadeTest extends HibernateTest {
     private static final SimpleDateFormat dateFormat = new UtcSimpleDateFormat("yyyy-MM-dd"); //ISO-8601
 
-    @BeforeClass
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeMethod
+    public void beforeMethod() throws Exception {
         TestUtil.jdbcRecreateAndTestInserts();
     }
 
@@ -59,20 +60,6 @@ public class DaoFacadeTest extends HibernateTest {
         Assert.assertEquals(AppContextCache.timeZoneAbbrIntegerMap.get(RusTimeZoneAbbr.PETT), 12.0);
     }
 
-    @Test(enabled = false)
-    public void testCheckUser() throws Exception {
-
-    }
-
-    @Test(enabled = false)
-    public void testGetAllPeriodsForDoc() throws Exception {
-        String inputDateString = "2016-10-19";
-        Date utcDate = dateFormat.parse(inputDateString);
-        List<DocPeriod> allPeriodsForDoc = DaoFacade.getAllPeriodsForDoc(1, utcDate, utcDate);
-        Assert.assertEquals(allPeriodsForDoc.size(), 3);
-    }
-
-
     @Test
     public void testInsertDonut() throws Exception {
         DaoFacade.fillOffsetsForAbbreviations();
@@ -91,4 +78,19 @@ public class DaoFacadeTest extends HibernateTest {
         DaoFacade.insertDonut(1, donut, docDateSelectorData, user1);
 
     }
+
+    @Test(expectedExceptions = {DaoScriptException.class}, expectedExceptionsMessageRegExp = ".*Период.*занят частично или полностью.")
+    public void testOpenPeriodsSaveExistingPeriod() throws Exception {
+        OpenDocPeriodsData openDocPeriodsData = new OpenDocPeriodsData();
+
+        Set<OpenDocPeriodsData.DocAction.InsertOperation> insertOperations = new HashSet<>();
+        OpenDocPeriodsData.DocAction.InsertOperation insertOperation = new OpenDocPeriodsData.DocAction.InsertOperation(1, 1476871200000L, 1476873000000L);
+        insertOperations.add(insertOperation);
+
+        OpenDocPeriodsData.DocAction docAction = new OpenDocPeriodsData.DocAction(null, insertOperations);
+        openDocPeriodsData.add(docAction);
+        DaoFacade.openPeriods(null, openDocPeriodsData);
+    }
+
+
 }
