@@ -1,4 +1,3 @@
-
 SET TIMEZONE = 'UTC';
 TRUNCATE donut_doc_periods CASCADE;
 TRUNCATE doc_periods CASCADE;
