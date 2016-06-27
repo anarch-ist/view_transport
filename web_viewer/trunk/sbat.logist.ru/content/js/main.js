@@ -251,7 +251,7 @@ $(document).ready(function () {
     //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
     dataTable.on( 'select', function ( e, dt, type, indexes ) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListNumber;
-        //console.log(dataTable.row($('#user-grid .selected')).data().routeListNumber);
+        console.log(dataTable.row($('#user-grid .selected')).data());
         if(routeListID == null && disabled != 1){
             dataTable.buttons(2).remove();
             disabled = 1;
