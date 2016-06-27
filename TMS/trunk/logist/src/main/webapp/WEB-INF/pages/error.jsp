@@ -10,9 +10,21 @@
 <body>
 
 <div id="errorRoot">
-    <div id="exception">${pageContext.exception}</div>
-    <div id="uri">${pageContext.errorData.requestURI}</div>
-    <div id="statusCode">${pageContext.errorData.statusCode}</div>
+    <table>
+        <caption>Ошибка!</caption>
+        <tr>
+            <td>URL</td>
+            <td id="uri">${pageContext.errorData.requestURI}</td>
+        </tr>
+        <tr>
+            <td>Код</td>
+            <td id="statusCode">${pageContext.errorData.statusCode}</td>
+        </tr>
+        <tr>
+            <td>Сообщение</td>
+            <td id="exception">${pageContext.exception}</td>
+        </tr>
+    </table>
     <%--<div id="stacktrace">--%>
         <%--<c:forEach var="trace"--%>
                    <%--items="${pageContext.exception.stackTrace}">--%>

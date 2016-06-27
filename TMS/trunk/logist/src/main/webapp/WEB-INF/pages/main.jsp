@@ -29,6 +29,14 @@
     <script src="<c:url value="/media/es6-shim.min.js"/>"></script>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
     <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
+    <script>
+        window.REMODAL_GLOBALS = {
+            DEFAULTS: {
+                hashTracking: false,
+                closeOnOutsideClick: false
+            }
+        };
+    </script>
     <script src="<c:url value="/media/Remodal-1.0.7/dist/remodal.min.js"/>"></script>
 
     <script src="<c:url value="/media/DataTables-1.10.12/js/jquery.dataTables.min.js"/>"></script>
@@ -485,9 +493,11 @@
                 intervalAsText = tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
                 $("#emailInterval").text(intervalAsText);
                 $("#emailSupplier").text(tablePlugin.getSelectionData()[0].data.supplierName);
+                $("#submitEmail").prop("disabled", false);
                 emailDialog.open();
             };
             $("#submitEmail").on("click", function() {
+                $("#submitEmail").prop("disabled", true);
                 var selectionData = tablePlugin.getSelectionData()[0];
                 var donutDocPeriodId = selectionData.data.docPeriodId;
                 var sendObject = {donutDocPeriodId: donutDocPeriodId, emailContent: $("#emailMessageArea").val(), intervalAsText: intervalAsText};
@@ -609,8 +619,11 @@
                 <tr>
                     <td>Поставщик</td><td id="emailSupplier"></td>
                 </tr>
+                <tr >
+                    <td colspan="2"><label for="emailMessageArea">Сообщение поставщику</label></td>
+                </tr>
             </table>
-            <label for="emailMessageArea">Сообщение поставщику</label>
+
             <textarea id="emailMessageArea" style="resize:none" cols="75" rows="10" autofocus></textarea>
             <button id="submitEmail">Отправить</button>
         </div>

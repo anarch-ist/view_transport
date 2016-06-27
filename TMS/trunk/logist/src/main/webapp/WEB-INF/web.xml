@@ -36,14 +36,16 @@
         <param-name>smtpPass</param-name>
         <param-value>testtest12345</param-value>
     </context-param>
-
+    <context-param>
+        <param-name>smtpConnectionTimeout</param-name>
+        <param-value>2000</param-value>
+    </context-param>
+    <context-param>
+        <param-name>smtpTimeout</param-name>
+        <param-value>20000</param-value>
+    </context-param>
     <!--<description>logist app</description>-->
     <!--<display-name>Archetype Created Web Application</display-name>-->
-
-    <error-page>
-        <exception-type>java.lang.Throwable</exception-type >
-        <location>/error</location>
-    </error-page>
 
     <!--turn off scriptlets-->
     <jsp-config>
