@@ -196,14 +196,10 @@ public class DaoFacade {
 
                     if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.DeleteOperation) {
                         DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
-                        if (docPeriod == null)
-                            throw new OutOfDateException();
                         docPeriodDao.delete(docPeriod);
                     } else if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.UpdateOperation) {
                         OpenDocPeriodsData.DocAction.UpdateOperation updateOperation = (OpenDocPeriodsData.DocAction.UpdateOperation) docAction.idOperation;
                         DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
-                        if (docPeriod == null)
-                            throw new OutOfDateException();
                         docPeriod.setPeriod(new Period(new Date(updateOperation.periodBegin), new Date(updateOperation.periodEnd)));
                         docPeriodDao.update(docPeriod);
                     }
@@ -222,6 +218,7 @@ public class DaoFacade {
     }
 
     public static void insertDocPeriods(final Integer userId, final PeriodsForInsertData periodsForInsertData, final int docId) throws DaoScriptException {
+
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -284,7 +281,7 @@ public class DaoFacade {
                     }
                 }
                 donutDocPeriodDao.update(donutDocPeriod);
-
+                // delete
                 for (Integer orderIdForDelete: donutUpdateData.ordersIdForDelete) {
                     Order order = orderDao.findById(Order.class, orderIdForDelete);
                     order.setOrderId(orderIdForDelete);

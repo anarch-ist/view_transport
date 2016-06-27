@@ -1,5 +1,7 @@
 package ru.logistica.tms.controller.ajax;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dto.DocDateSelectionForEmail;
@@ -17,10 +19,14 @@ import java.io.IOException;
 
 @WebServlet("/deleteDonutWithNotification")
 public class DeleteDonutDocPeriodWithNotification extends HttpServlet{
+    public static final Logger logger = LogManager.getLogger();
+
     private String host;
     private String port;
     private String fromAddress;
     private String pass;
+    private String connectionTimeout;
+    private String timeout;
 
     public void init() {
         // reads SMTP server setting from web.xml file
@@ -29,6 +35,8 @@ public class DeleteDonutDocPeriodWithNotification extends HttpServlet{
         port = context.getInitParameter("smtpPort");
         fromAddress = context.getInitParameter("smtpUserAddress");
         pass = context.getInitParameter("smtpPass");
+        connectionTimeout = context.getInitParameter("smtpConnectionTimeout");
+        timeout = context.getInitParameter("smtpTimeout");
     }
 
     @Override
@@ -63,11 +71,13 @@ public class DeleteDonutDocPeriodWithNotification extends HttpServlet{
         String subject = "Удаление маршрутного листа";
         String message = "Сообщение отправлено";
         try {
-            EmailUtils.sendEmailSSL(host, port, fromAddress, pass, supplierUserEmail, subject, email);
             getServletContext().getRequestDispatcher("/deleteDonut").forward(req, resp);
+            logger.info("donut deleted by WH_BOSS");
+            EmailUtils.sendEmailSSL(host, port, connectionTimeout, timeout, fromAddress, pass, supplierUserEmail, subject, email);
+            logger.info("email sended with params supplierUserEmail = {}, text = {}", supplierUserEmail, email);
         } catch (Exception e) {
             message = e.getMessage();
-            throw new ServletException(e);
+            throw new ServletException(message, e);
         } finally {
             req.setAttribute("message", message);
         }

@@ -1,20 +1,20 @@
 body{
-	background: #eee;
-	font-family:  "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-size: 15px;
+    background: #eee;
+    font-family:  "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 15px;
     color: #33363e;
 }
 
 a{
-	color: #6495ED;
+    color: #6495ED;
 }
 
 .dropDownList{
-	padding: 10px 100px;
+    padding: 10px 100px;
 }
 
 #mainTable {
-	border-collapse: collapse;
+    border-collapse: collapse;
     line-height: 1.1;
     /*background:  radial-gradient(farthest-corner at 50% 50%, white, #FDE4D0);*/
     background:  #FDE4D0;
@@ -23,7 +23,7 @@ a{
 }
 
 .timePeriod, .company{
-	font-size: 0.8em;
+    font-size: 0.8em;
     padding: 15px 30px;
     border: 1px solid #FF7F50;
 }
@@ -59,7 +59,7 @@ input[readonly="readonly"]{
     top: 15px  !important;
 }
 
-.profileTable, #exception{
+.profileTable{
     border-collapse: separate;
     border-spacing: 0;
     line-height: 18px;
@@ -73,11 +73,10 @@ input[readonly="readonly"]{
 #exception{
     left: 10px;
     top: 10px;
-    max-width: 400px;
     table-layout: fixed;
 }
 
-.profileTable td, #exception td{
+.profileTable td{
     border: 1px solid #aab7d1;
     padding: 6px;
     vertical-align: top;
@@ -103,7 +102,7 @@ input[readonly="readonly"]{
     padding-left: 10px;
 }
 
-.profileTable tr td:last-child, #exception tr td:last-child{
+.profileTable tr td:last-child{
     min-width: 200px;
     word-wrap:break-word;
     overflow: hidden;
@@ -199,7 +198,7 @@ input[id="exit"]:active, input[type="button"]:disabled {
     background-color:#e2e2e2 !important;
     background-image:-webkit-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
     background-image:-moz-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
-    background-image:-ms-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100% !important);
+    background-image:-ms-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
     background-image:-o-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
     background-image:linear-gradient(to bottom, #f3f3f3 0%, #e2e2e2 100%) !important;
     filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f3f3f3', EndColorStr='#e2e2e2') !important;
@@ -220,4 +219,34 @@ input[id="exit"]:hover, input[type="button"]:enabled:hover{
     background-image:-o-linear-gradient(top, #f9f9f9 0%, #e0e0e0 100%) !important;
     background-image:linear-gradient(to bottom, #f9f9f9 0%, #e0e0e0 100%) !important;
     filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f9f9f9', EndColorStr='#e0e0e0')  !important;
+}
+
+/*Send Email Dialog*/
+div[data-remodal-id="sendEmailDialog"] #emailMessageArea{
+    width: 100%;
+}
+
+div[data-remodal-id="sendEmailDialog"] table tr:last-child td{
+    padding-top: 20px;
+}
+
+/*Error Dialog*/
+#errorRoot table{
+    width: 100%;
+}
+
+#errorRoot caption{
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#errorRoot table tr td:first-child{
+    vertical-align: top;
+    padding-right: 20px;
+}
+
+#errorRoot table tr:last-child td:last-child{
+    max-height: 100px;
+    overflow-y: auto;
+    display: block;
 }

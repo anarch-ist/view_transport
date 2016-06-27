@@ -92,5 +92,13 @@ public class DaoFacadeTest extends HibernateTest {
         DaoFacade.openPeriods(null, openDocPeriodsData);
     }
 
+    @Test(expectedExceptions = {DaoScriptException.class}, expectedExceptionsMessageRegExp = "Данные изменились, операция не актуальна на выбранных данных.")
+    public void testOpenPeriodsDeleteNotExistingPeriod() throws Exception {
+        OpenDocPeriodsData openDocPeriodsData = new OpenDocPeriodsData();
+        OpenDocPeriodsData.DocAction docAction = new OpenDocPeriodsData.DocAction(new OpenDocPeriodsData.DocAction.DeleteOperation(200), null);
+        openDocPeriodsData.add(docAction);
+        DaoFacade.openPeriods(null, openDocPeriodsData);
+    }
+
 
 }
