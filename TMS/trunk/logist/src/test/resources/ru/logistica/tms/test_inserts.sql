@@ -66,6 +66,6 @@ INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 1
 INSERT INTO orders (ordernumber, boxqty, finaldestinationwarehouseid, donutdocperiodid, orderstatus, commentforstatus) -- id == 1
   VALUES ('orderNumber1', 2, 1, 2, 'CREATED', 'commentForStatus');
 
-
+-- SELECT md5(CONCAT(md5('testtest'), 'jrteOl270Hx8gS75'));
 
 
