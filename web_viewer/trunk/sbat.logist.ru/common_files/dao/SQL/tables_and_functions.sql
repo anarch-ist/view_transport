@@ -1603,3 +1603,6 @@ CREATE INDEX ind4 ON mat_view_route_points_sequential (routePointID);
 
 -- индекс для поиска общего количества записей для конкретного пользователя
 CREATE INDEX ind5 ON mat_view_row_count_for_user (userID);
+
+-- индекс для оптимизации запроса selectRequestStatusHistory
+CREATE INDEX ind6 ON requests_history (requestIDExternal);
