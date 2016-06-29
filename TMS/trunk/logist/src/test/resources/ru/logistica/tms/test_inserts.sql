@@ -49,6 +49,11 @@ INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumb
 VALUES ('ud1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_DISPATCHER', 'komova olga', '90163569874', 'olga@s.ru', 'dispatcher');
 INSERT INTO warehouse_users VALUES (4, 1);
 
+-- create WH_SECURITY_OFFICER
+INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 5
+VALUES ('uo1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_SECURITY_OFFICER', 'sidorov petr', '90163569874', 'sidor@s.ru', 'officer');
+INSERT INTO warehouse_users VALUES (5, 1);
+
 
 -- create docPeriods
 INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 10:00:00 Z', '2016-10-19 10:30:00 Z'); -- id == 1

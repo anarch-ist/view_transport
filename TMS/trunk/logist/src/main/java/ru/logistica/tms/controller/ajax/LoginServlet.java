@@ -34,7 +34,7 @@ public class LoginServlet extends AppHttpServlet {
         try {
             authResult = DaoFacade.checkUser(login, passMd5);
         } catch (DaoScriptException e) {
-            throw new ServletException(e);
+            throw new ServletException(e.getMessage(), e);
         }
 
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();

@@ -190,7 +190,11 @@ input[type="button"]{
     margin-top: 30px;
 }
 
-#sDeleteBtn, #sUpdateBtn, #sInsertBtn, #bOpenPeriodBtn, #bClosePeriodsBtn, #bCancelDonutBtn, #bInfoBtn, #dUpdateBtn{
+/*#sDeleteBtn, #sUpdateBtn, #sInsertBtn, #bOpenPeriodBtn, #bClosePeriodsBtn, #bCancelDonutBtn, #bInfoBtn, #dUpdateBtn{*/
+    /*margin-left: 20px;*/
+/*}*/
+
+.tablePlugin input[type="button"] {
     margin-left: 20px;
 }
 

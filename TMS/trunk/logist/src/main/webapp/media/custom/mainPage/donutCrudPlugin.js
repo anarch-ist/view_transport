@@ -490,7 +490,7 @@
             var $thead = $("<thead>");
             var $orderTr = $("<tr>");
             var $selectTh = $("<th>");
-            var $numberTh = $("<th>").text("№");
+            var $numberTh = $("<th>").text("№ листа заказа");
             var $finalDestinationTh = $("<th>").text("Конечный склад доставки");
             var $palletQtyTh = $("<th>").text("Количество коробок");
             var $commentTh = $("<th>").text("Комментарий");

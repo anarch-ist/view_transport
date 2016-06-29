@@ -61,7 +61,8 @@
     <c:set var="isSupplierManager" scope="page" value="${userRole == 'SUPPLIER_MANAGER'}"/>
     <c:set var="isWarehouseBoss" scope="page" value="${userRole == 'WH_BOSS'}"/>
     <c:set var="isWarehouseDispatcher" scope="page" value="${userRole == 'WH_DISPATCHER'}"/>
-    <c:set var="useWarehouseSelect" scope="page" value="${!(isWarehouseBoss || isWarehouseDispatcher)}"/>
+    <c:set var="isSecurityOfficer" scope="page" value="${userRole == 'WH_SECURITY_OFFICER'}"/>
+    <c:set var="useWarehouseSelect" scope="page" value="${!(isWarehouseBoss || isWarehouseDispatcher || isSecurityOfficer)}"/>
 
     <script>
         $(document).ready(function(){
@@ -149,6 +150,19 @@
                 ]
                 </c:if>
 
+                <c:if test="${isSecurityOfficer}">
+                buttons: [
+                    {
+                        name: "Прибытие",
+                        id: "oUpdateBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return (state === "OCCUPIED" && isFullPeriodSelected);
+                        }
+                    }
+                ]
+                </c:if>
+
                 <c:if test="${isWarehouseBoss}">
                 buttons: [
                     {
@@ -187,12 +201,12 @@
                 </c:if>
             });
 
-            var warehousesData = ${requestScope.docDateSelectorDataObject};
+            var warehousesWithDocs = ${requestScope.warehousesWithDocs};
             // ---------------------------------init docDateSelector plugin----------------------------------------
             var $docAndDateSelector = $('#docAndDateSelector');
             var docDateSelector = $docAndDateSelector.docAndDateSelector({
                 useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
-                data: warehousesData
+                data: warehousesWithDocs
             });
             docDateSelector.setOnSelected(function(event, docDateSelection) {
                 sendTableAjax("getTableData");
@@ -204,7 +218,7 @@
             // ---------------------------------init donutCrudPlugin----------------------------------------
             <c:if test="${isSupplierManager}">
             var warehousesKeyValuePairs = {};
-            warehousesData.warehouses.forEach(function(warehouse) {
+            warehousesWithDocs.warehouses.forEach(function(warehouse) {
                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
             });
 
@@ -294,7 +308,7 @@
             <c:if test="${isWarehouseDispatcher}">
 
             var warehousesKeyValuePairs = {};
-            warehousesData.warehouses.forEach(function(warehouse) {
+            warehousesWithDocs.warehouses.forEach(function(warehouse) {
                 warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
             });
 
@@ -345,7 +359,7 @@
 
             <c:if test="${isWarehouseBoss}">
             var warehousesKeyValuePairs = {};
-            warehousesData.warehouses.forEach(function(warehouse) {
+            warehousesWithDocs.warehouses.forEach(function(warehouse) {
                 warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
             });
 
@@ -512,14 +526,14 @@
             });
 
             <%------------------ SESSION DATA LOADING ----------------------%>
-            <c:if test="${sessionScope.lastDocDateSelection != null}">
-            $docAndDateSelector.setSelectedDate(new Date(<c:out value="${sessionScope.lastDocDateSelection.utcDate}"/>));
+            <c:if test="${requestScope.lastDocDateSelection != null}">
+            $docAndDateSelector.setSelectedDate(new Date(<c:out value="${requestScope.lastDocDateSelection.utcDate}"/>));
             if ($docAndDateSelector.withWarehouseSelect()) {
-                var warehouseId = <c:out value="${sessionScope.lastDocDateSelection.warehouseId}"/>;
-                var docId = <c:out value="${sessionScope.lastDocDateSelection.docId}"/>;
+                var warehouseId = <c:out value="${requestScope.lastDocDateSelection.warehouseId}"/>;
+                var docId = <c:out value="${requestScope.lastDocDateSelection.docId}"/>;
                 $docAndDateSelector.setSelectedWarehouseAndDoc(warehouseId, docId);
             } else {
-                $docAndDateSelector.setSelectedDoc(<c:out value="${sessionScope.lastDocDateSelection.docId}"/>);
+                $docAndDateSelector.setSelectedDoc(<c:out value="${requestScope.lastDocDateSelection.docId}"/>);
             }
             </c:if>
             $docAndDateSelector.triggerEvents();
