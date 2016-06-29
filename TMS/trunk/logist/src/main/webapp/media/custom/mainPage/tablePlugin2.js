@@ -85,6 +85,8 @@
                         cellDiv.classList.add("tp_error");
                     } else if (dataElem.occupiedStatus === "DELIVERED") {
                         cellDiv.classList.add("tp_delivered");
+                    } else if (dataElem.occupiedStatus === "ARRIVED") {
+                        cellDiv.classList.add("tp_arrived");
                     }
                     cellDiv.innerHTML = dataElem.supplierName;
                     if (dataElem.owned) {

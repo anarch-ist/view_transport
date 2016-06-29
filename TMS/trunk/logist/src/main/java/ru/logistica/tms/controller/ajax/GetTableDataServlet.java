@@ -17,7 +17,6 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -82,7 +81,7 @@ public class GetTableDataServlet extends AppHttpServlet {
                 DonutDocPeriod donutDocPeriod = (DonutDocPeriod) period;
                 docPeriodBuilder.add("state", "OCCUPIED");
                 docPeriodBuilder.add("supplierName", donutDocPeriod.getSupplierUser().getSupplier().getInn());
-                docPeriodBuilder.add("occupiedStatus", getOccupiedDetails(donutDocPeriod.getOrders()).name());
+                docPeriodBuilder.add("occupiedStatus", getOccupiedStatus(donutDocPeriod.getOrders()).name());
             } else {
                 docPeriodBuilder.add("state", "CLOSED");
             }
@@ -127,28 +126,35 @@ public class GetTableDataServlet extends AppHttpServlet {
         }
     }
 
-    private OccupiedStatus getOccupiedDetails(Set<Order> orders) {
+    private OccupiedStatus getOccupiedStatus(Set<Order> orders) {
         Objects.requireNonNull(orders);
 
         if (orders.size() == 0)
             return OccupiedStatus.IN_PROCESS;
 
-        boolean isDelivered = true;
+        int deliveredCount = 0;
+        int arrivedCount = 0;
         for (Order order : orders) {
             OrderStatuses orderStatus = order.getOrderStatus();
             if (orderStatus == OrderStatuses.ERROR) {
                 return OccupiedStatus.ERROR;
             }
-            if (orderStatus != OrderStatuses.DELIVERED) {
-                isDelivered = false;
+            if (orderStatus == OrderStatuses.DELIVERED) {
+                deliveredCount++;
+            }
+            else if (orderStatus == OrderStatuses.ARRIVED) {
+                arrivedCount++;
             }
         }
-        if (isDelivered)
+        int size = orders.size();
+        if (deliveredCount == size)
             return OccupiedStatus.DELIVERED;
-        else {
+        else if (arrivedCount == size) {
+            return OccupiedStatus.ARRIVED;
+        } else {
             return OccupiedStatus.IN_PROCESS;
         }
     }
     // BINDING tablePlugin2.js setData()
-    enum OccupiedStatus {ERROR, DELIVERED, IN_PROCESS}
+    enum OccupiedStatus {ERROR, DELIVERED, IN_PROCESS, ARRIVED}
 }

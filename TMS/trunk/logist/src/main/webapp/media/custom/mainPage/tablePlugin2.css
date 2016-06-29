@@ -67,7 +67,9 @@ body {
 .tp_in_process {
     background-color: #99A9C8;
 }
-
+.tp_arrived {
+    background-color: #c8b899;
+}
 
 /*.tp_owned:before {*/
     /*content:"*";*/

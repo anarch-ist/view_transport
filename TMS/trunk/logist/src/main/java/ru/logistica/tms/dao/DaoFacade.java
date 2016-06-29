@@ -33,6 +33,7 @@ import java.util.Set;
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
 
+
     private interface DaoScript {
         void execute() throws DAOException;
     }
@@ -181,6 +182,8 @@ public class DaoFacade {
     }
 
 
+
+
     public static void openPeriods(final Integer userId, final OpenDocPeriodsData openDocPeriodsData) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
@@ -237,6 +240,23 @@ public class DaoFacade {
             }
         });
 
+    }
+
+    public static void setOrderStatusesToArrived(final Integer userId, final long donutDocPeriodId) throws DaoScriptException {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                Set<Order> orders = donutDocPeriod.getOrders();
+                for (Order order : orders) {
+                    order.setOrderStatus(OrderStatuses.ARRIVED);
+                }
+            }
+        });
     }
 
     public static void updateDonutWithRequests(final Integer userId, final DonutUpdateData donutUpdateData) throws DaoScriptException {
