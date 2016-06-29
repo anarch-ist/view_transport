@@ -7,6 +7,7 @@ CREATE SCHEMA public;
 
 CREATE TABLE user_roles (
   userRoleID VARCHAR(32),
+  userRoleRusName VARCHAR(128), --t
   PRIMARY KEY (userRoleID)
 );
 
@@ -89,6 +90,14 @@ CREATE TABLE warehouses (
   warehouseID   SERIAL, -- Static
   warehouseName VARCHAR(128) NOT NULL, -- Dynamic
   rusTimeZoneAbbr VARCHAR(6) NOT NULL, -- Dynamic
+  region              VARCHAR(128)   NULL, --t
+  district            VARCHAR(64)    NULL, --t
+  locality            VARCHAR(64)    NULL, --t
+  mailIndex           VARCHAR(6)     NULL, --t
+  address             TEXT           NULL, --t
+  email               VARCHAR(255)   NULL, --t
+  phoneNumber         VARCHAR(16)    NULL, --t
+  responsiblePersonId VARCHAR(128)   NULL, --t
   PRIMARY KEY (warehouseID)
 );
 
@@ -155,6 +164,16 @@ CREATE TABLE warehouse_users (
 CREATE TABLE suppliers (
   supplierID SERIAL, -- Static
   INN        VARCHAR(32) NOT NULL, -- Static
+  clientName         VARCHAR(255) NULL, --t
+  KPP                VARCHAR(64)  NULL, --t
+  corAccount         VARCHAR(64)  NULL, --t
+  curAccount         VARCHAR(64)  NULL, --t
+  BIK                VARCHAR(64)  NULL, --t
+  bankName           VARCHAR(128) NULL, --t
+  contractNumber     VARCHAR(64)  NULL, --t
+  dateOfSigning      DATE         NULL, --t
+  startContractDate  DATE         NULL, --t
+  endContractDate    DATE         NULL, --t
   PRIMARY KEY (supplierID)
 );
 
@@ -193,6 +212,18 @@ CREATE TABLE orders (
   donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
   orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
   commentForStatus            TEXT        NOT NULL, -- Dynamic
+  orderDate                   DATE           NULL,  --t
+  supplierID                  INTEGER        NOT NULL,  --t
+  invoiceNumber               VARCHAR(255)   NULL, --t
+  invoiceDate                 DATE           NULL, --t
+  deliveryDate                TIMESTAMP      NULL, --t
+  weight                      INTEGER        NULL, -- масса в граммах  --t
+  volume                      INTEGER        NULL, -- в кубических сантиметрах --t
+  goodsCost                   DECIMAL(12, 2) NULL, -- цена всех товаров в заявке --t
+  lastStatusUpdated           TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user --t
+  lastModifiedBy              INTEGER        NULL, -- один из пользователей - это parser. --t
+  orderStatusID               VARCHAR(32)    NOT NULL, --t
+  donutID                     INTEGER        NULL, --t
   -- BINDING ru.logistica.tms.dao.orderDao.OrderStatuses
   CONSTRAINT order_statuses CHECK (orderStatus IN
                                    ('CREATED', 'ARRIVED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
