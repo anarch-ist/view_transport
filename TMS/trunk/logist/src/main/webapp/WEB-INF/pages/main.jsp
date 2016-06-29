@@ -212,11 +212,9 @@
                 sendTableAjax("getTableData");
             });
 
-            // ---------------------------------init dialog plugin------------------------------------------
-            var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
-
             // ---------------------------------init donutCrudPlugin----------------------------------------
             <c:if test="${isSupplierManager}">
+            var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
             var warehousesKeyValuePairs = {};
             warehousesWithDocs.warehouses.forEach(function(warehouse) {
                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
@@ -306,7 +304,7 @@
             </c:if>
 
             <c:if test="${isWarehouseDispatcher}">
-
+            var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
             var warehousesKeyValuePairs = {};
             warehousesWithDocs.warehouses.forEach(function(warehouse) {
                 warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
@@ -358,6 +356,7 @@
             </c:if>
 
             <c:if test="${isWarehouseBoss}">
+            var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
             var warehousesKeyValuePairs = {};
             warehousesWithDocs.warehouses.forEach(function(warehouse) {
                 warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
@@ -521,6 +520,55 @@
             });
             </c:if>
 
+            <c:if test="${isSecurityOfficer}">
+            var $confirmArrivalDialog = $('[data-remodal-id=confirmArrivalDialog]').remodal();
+            var oUpdateBtn = tablePlugin.getButtonByPluginId("oUpdateBtn");
+            var currentDonutDocPeriodId;
+
+            $("#officerConfirm").on("click", function(e) {
+                sendTableAjax("setOrderStatusesToArrived", {donutDocPeriodId: currentDonutDocPeriodId}, function() {
+                    $confirmArrivalDialog.close();
+                })
+            });
+
+            oUpdateBtn.onclick = function(e) {
+
+                // открыть диалоговое окно с двумя labels - номер машины и имя водителя
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                currentDonutDocPeriodId = donutDocPeriodId;
+                var sendObject = {donutDocPeriodId: donutDocPeriodId};
+
+                $.ajax({
+                    url: "selectDonut",
+                    method: "POST",
+                    data: sendObject,
+                    dataType: "json"
+                }).done(function (donutData) {
+                    $("#licensePlate").text(donutData.driver);
+                    $("#driverName").text(donutData.licensePlate);
+
+//                    donutCrudPluginInstance.setData(donutData);
+//                    donutCrudPluginInstance.setPeriod(getSelectedPeriod());
+//                    donutCrudPluginInstance.setOnSubmit(function() {
+//                        var sendObject = $.extend(
+//                                donutCrudPluginInstance.getData(),
+//                                {removedOrders: [], donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
+//                        );
+//                        sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
+//                            donutCrudPluginInstance.setOnRowRemoved(null);
+//                            donutCrudPluginInstance.setOnSubmit(null);
+//                            donutCrudPluginDialog.close();
+//                        })
+//                    });
+                    $confirmArrivalDialog.open();
+                });
+
+
+            };
+            </c:if>
+
+
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                 tablePlugin.setDisabled(!isSelectionAvailable);
             });
@@ -611,16 +659,18 @@
     <div id="tableControlsContainer"></div>
 
     <%--dialogs--%>
-    <div data-remodal-id="donutsDialog">
-        <button data-remodal-action="close" class="remodal-close"></button>
-        <h1>Ввод данных</h1>
-        <div id="routeListDataContainer"></div>
-    </div>
-
     <div data-remodal-id="errorDialog">
         <button data-remodal-action="close" class="remodal-close"></button>
         <div></div>
     </div>
+
+    <c:if test="${isWarehouseBoss || isWarehouseDispatcher || isSupplierManager}">
+        <div data-remodal-id="donutsDialog">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Ввод данных</h1>
+            <div id="routeListDataContainer"></div>
+        </div>
+    </c:if>
 
     <c:if test="${isWarehouseBoss}">
         <div data-remodal-id="sendEmailDialog">
@@ -640,6 +690,22 @@
 
             <textarea id="emailMessageArea" style="resize:none" cols="75" rows="10" autofocus></textarea>
             <button id="submitEmail">Отправить</button>
+        </div>
+    </c:if>
+
+    <c:if test="${isSecurityOfficer}">
+        <div data-remodal-id="confirmArrivalDialog">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Данные прибытия</h1>
+            <table>
+                <tr>
+                    <td>Номер автомобиля</td><td id="licensePlate"></td>
+                </tr>
+                <tr>
+                    <td>Имя водителя</td><td id="driverName"></td>
+                </tr>
+            </table>
+            <button id="officerConfirm">Подтвердить</button>
         </div>
     </c:if>
 

@@ -7,7 +7,6 @@ CREATE SCHEMA public;
 
 CREATE TABLE user_roles (
   userRoleID VARCHAR(32),
-  userRoleRusName VARCHAR(128), --t
   PRIMARY KEY (userRoleID)
 );
 
@@ -45,7 +44,7 @@ CREATE TABLE permissions (
   PRIMARY KEY (permissionID)
 );
 
--- TODO create real permissions
+-- TODO create all permissions
 INSERT INTO permissions (permissionID)
 VALUES
   ('DELETE_ANY_DONUT'),
@@ -63,7 +62,6 @@ CREATE TABLE permissions_for_roles (
   ON UPDATE RESTRICT
 );
 
---START_STM
 CREATE OR REPLACE FUNCTION insert_permission_for_role(_userRoleID VARCHAR(32), _permissionID VARCHAR(32))
   RETURNS VOID AS
 $$
@@ -77,7 +75,6 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
---END_STM
 
 SELECT insert_permission_for_role('WH_BOSS', 'DELETE_ANY_DONUT');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'DELETE_CREATED_DONUT');
@@ -87,33 +84,33 @@ SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'DELETE_CREATED_DONUT');
 -- -------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE warehouses (
-  warehouseID   SERIAL, -- Static
-  warehouseName VARCHAR(128) NOT NULL, -- Dynamic
-  rusTimeZoneAbbr VARCHAR(6) NOT NULL, -- Dynamic
-  region              VARCHAR(128)   NULL, --t
-  district            VARCHAR(64)    NULL, --t
-  locality            VARCHAR(64)    NULL, --t
-  mailIndex           VARCHAR(6)     NULL, --t
-  address             TEXT           NULL, --t
-  email               VARCHAR(255)   NULL, --t
-  phoneNumber         VARCHAR(16)    NULL, --t
-  responsiblePersonId VARCHAR(128)   NULL, --t
+  warehouseID         SERIAL,
+  warehouseName       VARCHAR(128) NOT NULL,
+  rusTimeZoneAbbr     VARCHAR(6)   NOT NULL,
+  region              VARCHAR(128) NULL, --t
+  district            VARCHAR(64)  NULL, --t
+  locality            VARCHAR(64)  NULL, --t
+  mailIndex           VARCHAR(6)   NULL, --t
+  address             TEXT         NULL, --t
+  email               VARCHAR(255) NULL, --t
+  phoneNumber         VARCHAR(16)  NULL, --t
+  responsiblePersonId VARCHAR(128) NULL, --t
   PRIMARY KEY (warehouseID)
 );
 
 CREATE TABLE docs (
-  docID       SERIAL, -- Static
-  docName     VARCHAR(255) NOT NULL, -- Dynamic
-  warehouseID INTEGER      NOT NULL, -- Static
+  docID       SERIAL, 
+  docName     VARCHAR(255) NOT NULL, 
+  warehouseID INTEGER      NOT NULL, 
   PRIMARY KEY (docID),
   FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
 );
 
 CREATE TABLE doc_periods (
-  docPeriodID BIGSERIAL, -- Static
-  docID       INTEGER     NOT NULL, -- Static
-  periodBegin TIMESTAMPTZ NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), -- Static
-  periodEnd   TIMESTAMPTZ NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), -- Static
+  docPeriodID BIGSERIAL, 
+  docID       INTEGER     NOT NULL, 
+  periodBegin TIMESTAMPTZ NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodBegin) = '0'), 
+  periodEnd   TIMESTAMPTZ NOT NULL CHECK (EXTRACT(TIMEZONE FROM periodEnd) = '0'), 
   -- BINDING with web.xml (cellSize) 30 minutes.
   CONSTRAINT multiplicity_of_the_period CHECK (periodEnd > periodBegin AND
                                                (EXTRACT(EPOCH FROM (periodEnd - periodBegin)) :: INTEGER % 1800) = 0),
@@ -130,9 +127,17 @@ BEGIN
           FROM doc_periods
           WHERE docid = NEW.docId AND
                 (doc_periods.periodbegin, doc_periods.periodend) OVERLAPS (NEW.periodbegin, NEW.periodend));
-  IF qty <> 0
-  THEN RAISE EXCEPTION 'Период %, % занят частично или полностью.', NEW.periodbegin, NEW.periodend;
-  ELSE RETURN NEW;
+
+  IF qty = 0 THEN
+    RETURN NEW;
+  ELSEIF (TG_OP = 'INSERT') THEN
+    RAISE EXCEPTION 'Период %, % занят частично или полностью.', NEW.periodbegin, NEW.periodend;
+  ELSEIF (TG_OP = 'UPDATE') THEN
+    IF NEW.periodBegin >= OLD.periodBegin AND NEW.periodEnd <= OLD.periodEnd THEN
+      RETURN NEW;
+    ELSE
+      RAISE EXCEPTION 'Период %, % занят частично или полностью.', NEW.periodbegin, NEW.periodend;
+    END IF;
   END IF;
 END;
 $doc_periods_no_intersections$ LANGUAGE plpgsql;
@@ -146,8 +151,8 @@ ON doc_periods (docID, periodBegin, periodEnd DESC);
 
 -- WH_BOSS  WH_DISPATCHER
 CREATE TABLE warehouse_users (
-  userID      INTEGER, -- Static
-  warehouseID INTEGER NOT NULL, -- Static
+  userID      INTEGER, 
+  warehouseID INTEGER NOT NULL, 
   PRIMARY KEY (userID),
   FOREIGN KEY (userID) REFERENCES users
   ON DELETE CASCADE
@@ -162,25 +167,25 @@ CREATE TABLE warehouse_users (
 -- -------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE suppliers (
-  supplierID SERIAL, -- Static
-  INN        VARCHAR(32) NOT NULL, -- Static
-  clientName         VARCHAR(255) NULL, --t
-  KPP                VARCHAR(64)  NULL, --t
-  corAccount         VARCHAR(64)  NULL, --t
-  curAccount         VARCHAR(64)  NULL, --t
-  BIK                VARCHAR(64)  NULL, --t
-  bankName           VARCHAR(128) NULL, --t
-  contractNumber     VARCHAR(64)  NULL, --t
-  dateOfSigning      DATE         NULL, --t
-  startContractDate  DATE         NULL, --t
-  endContractDate    DATE         NULL, --t
+  supplierID        SERIAL,
+  INN               VARCHAR(32)  NOT NULL,
+  clientName        VARCHAR(255) NULL, --t
+  KPP               VARCHAR(64)  NULL, --t
+  corAccount        VARCHAR(64)  NULL, --t
+  curAccount        VARCHAR(64)  NULL, --t
+  BIK               VARCHAR(64)  NULL, --t
+  bankName          VARCHAR(128) NULL, --t
+  contractNumber    VARCHAR(64)  NULL, --t
+  dateOfSigning     DATE         NULL, --t
+  startContractDate DATE         NULL, --t
+  endContractDate   DATE         NULL, --t
   PRIMARY KEY (supplierID)
 );
 
 -- SUPPLIER_MANAGER
 CREATE TABLE supplier_users (
-  userID     INTEGER, -- Static
-  supplierID INTEGER NOT NULL, -- Static
+  userID     INTEGER,
+  supplierID INTEGER NOT NULL,
   PRIMARY KEY (userID),
   FOREIGN KEY (userID) REFERENCES users
   ON DELETE CASCADE
@@ -192,38 +197,33 @@ CREATE TABLE supplier_users (
 
 CREATE TABLE donut_doc_periods (
   donutDocPeriodID  BIGINT,
-  creationDate      DATE         NOT NULL DEFAULT NOW(), -- Static
-  commentForDonut   TEXT         NOT NULL, -- Static
-  driver            VARCHAR(255) NOT NULL, -- Static
-  driverPhoneNumber VARCHAR(12)  NOT NULL, -- Static
-  licensePlate      VARCHAR(9)   NOT NULL, -- Static
-  palletsQty        INTEGER      NOT NULL CONSTRAINT positive_pallets_qty CHECK (palletsQty >= 0), -- Static
-  supplierUserID    INTEGER      NOT NULL, -- Static
+  creationDate      DATE         NOT NULL DEFAULT NOW(), 
+  commentForDonut   TEXT         NOT NULL, 
+  driver            VARCHAR(255) NOT NULL, 
+  driverPhoneNumber VARCHAR(12)  NOT NULL, 
+  licensePlate      VARCHAR(9)   NOT NULL, 
+  palletsQty        INTEGER      NOT NULL CONSTRAINT positive_pallets_qty CHECK (palletsQty >= 0), 
+  supplierUserID    INTEGER      NOT NULL, 
   PRIMARY KEY (donutDocPeriodID),
   FOREIGN KEY (donutDocPeriodID) REFERENCES doc_periods (docPeriodID),
   FOREIGN KEY (supplierUserID) REFERENCES supplier_users (userID)
 );
 
 CREATE TABLE orders (
-  orderID                     SERIAL, -- Static
-  orderNumber                 VARCHAR(16) NOT NULL, -- Static
-  boxQty                      SMALLINT    NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty >= 0), -- Static
-  finalDestinationWarehouseID INTEGER     NOT NULL, -- Static
-  donutDocPeriodID            INTEGER     NOT NULL, -- Dynamic
-  orderStatus                 VARCHAR(32) NOT NULL, -- Dynamic
-  commentForStatus            TEXT        NOT NULL, -- Dynamic
-  orderDate                   DATE           NULL,  --t
-  supplierID                  INTEGER        NOT NULL,  --t
+  orderID                     SERIAL,
+  orderNumber                 VARCHAR(16)    NOT NULL,
+  boxQty                      SMALLINT       NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty >= 0),
+  finalDestinationWarehouseID INTEGER        NOT NULL,
+  donutDocPeriodID            INTEGER        NOT NULL,
+  orderStatus                 VARCHAR(32)    NOT NULL,
+  commentForStatus            TEXT           NOT NULL,
+  orderDate                   DATE           NULL, --t
   invoiceNumber               VARCHAR(255)   NULL, --t
   invoiceDate                 DATE           NULL, --t
   deliveryDate                TIMESTAMP      NULL, --t
   weight                      INTEGER        NULL, -- масса в граммах  --t
   volume                      INTEGER        NULL, -- в кубических сантиметрах --t
   goodsCost                   DECIMAL(12, 2) NULL, -- цена всех товаров в заявке --t
-  lastStatusUpdated           TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP, -- date and time when status was updated by any user --t
-  lastModifiedBy              INTEGER        NULL, -- один из пользователей - это parser. --t
-  orderStatusID               VARCHAR(32)    NOT NULL, --t
-  donutID                     INTEGER        NULL, --t
   -- BINDING ru.logistica.tms.dao.orderDao.OrderStatuses
   CONSTRAINT order_statuses CHECK (orderStatus IN
                                    ('CREATED', 'ARRIVED', 'CANCELLED_BY_WAREHOUSE_USER', 'CANCELLED_BY_SUPPLIER_USER', 'ERROR', 'DELIVERED')),
