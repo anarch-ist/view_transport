@@ -8,10 +8,13 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.HibernateUtils;
+import ru.logistica.tms.dao.userDao.User;
+import ru.logistica.tms.dto.DocDateSelectorData;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 @WebListener
@@ -32,6 +35,10 @@ public class InitializeListener implements ServletContextListener {
             sessionFactory = configuration.configure().buildSessionFactory(serviceRegistry);
             HibernateUtils.setSessionFactory(sessionFactory);
             DaoFacade.fillOffsetsForAbbreviations();
+            logger.info("offsets for abbreviations selected from database");
+            // this map holds session data for each user
+            sce.getServletContext().setAttribute("sessionDataHolder", new HashMap<User, DocDateSelectorData>());
+            logger.info("created empty sessionDataHolder");
         } catch (Exception e) {
             logger.error(e);
         }

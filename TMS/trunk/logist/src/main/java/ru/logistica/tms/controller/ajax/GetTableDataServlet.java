@@ -7,6 +7,7 @@ import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.orderDao.Order;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
 import ru.logistica.tms.dao.userDao.SupplierUser;
+import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRoles;
 import ru.logistica.tms.dao.userDao.WarehouseUser;
 import ru.logistica.tms.dto.DocDateSelectorData;
@@ -16,15 +17,13 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @WebServlet("/getTableData")
 public class GetTableDataServlet extends AppHttpServlet {
@@ -36,16 +35,24 @@ public class GetTableDataServlet extends AppHttpServlet {
                 {docPeriodId: 13, periodBegin: 840, periodEnd: 870, state: "OCCUPIED", owned: true,  supplierName: "someSupplier2"}
             ];
             */
+
+    private Map<User, DocDateSelectorData> sessionDataHolder;
+
+    @Override
+    public void init() throws ServletException {
+        sessionDataHolder  = (Map<User, DocDateSelectorData>) getServletContext().getAttribute("sessionDataHolder");
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        User user = getUser(req);
         String receivedData = req.getParameter("docDateSelection");
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(receivedData);
-            req.getSession(false).setAttribute("lastDocDateSelection", docDateSelectorData);
+            sessionDataHolder.put(user, docDateSelectorData);
         } catch (ValidateDataException e) {
-            throw new ServletException(e);
+            throw new ServletException(e.getMessage(), e);
         }
 
         Integer windowSize = Integer.parseInt(getServletContext().getInitParameter("windowSize"));
@@ -53,8 +60,6 @@ public class GetTableDataServlet extends AppHttpServlet {
         long timeStampBegin = docDateSelectorData.utcDate;
         // TODO
         long timeStampEnd = timeStampBegin + windowSize * 60 * 1000;
-
-        Object user = req.getSession(false).getAttribute("user");
         List<DocPeriod> allPeriods;
         try {
             allPeriods = DaoFacade.getAllPeriodsForDoc(docDateSelectorData.docId, new Date(timeStampBegin), new Date(timeStampEnd));
@@ -90,13 +95,14 @@ public class GetTableDataServlet extends AppHttpServlet {
     private void setOwned(Object user, DocPeriod period, boolean isDonutDocPeriod, JsonObjectBuilder docPeriodBuilder) throws ServletException {
         if (user instanceof WarehouseUser) {
             WarehouseUser warehouseUser = (WarehouseUser) user;
-            if (warehouseUser.getUserRole().getUserRoleId() == UserRoles.WH_BOSS) {
+            UserRoles userRoleId = warehouseUser.getUserRole().getUserRoleId();
+            if (userRoleId == UserRoles.WH_BOSS) {
                 if (!period.getDoc().getWarehouse().equals(warehouseUser.getWarehouse())) {
                     throw new ServletException("not accessed");
                 }
                 docPeriodBuilder.add("owned", true);
 
-            } else if(warehouseUser.getUserRole().getUserRoleId() == UserRoles.WH_DISPATCHER) {
+            } else if(userRoleId == UserRoles.WH_DISPATCHER || userRoleId == UserRoles.WH_SECURITY_OFFICER) {
                 if (isDonutDocPeriod) {
                     docPeriodBuilder.add("owned", true);
                 } else {

@@ -1,6 +1,7 @@
 package ru.logistica.tms.controller;
 
 
+import ru.logistica.tms.controller.ajax.AppHttpServlet;
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.cache.AppContextCache;
@@ -10,6 +11,7 @@ import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRoles;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
+import ru.logistica.tms.dto.DocDateSelectorData;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -21,42 +23,48 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 @WebServlet("/main")
-public class MainServlet extends HttpServlet {
-    private static boolean UPDATABLE = true;
-    private static boolean NOT_UPDATABLE = false;
+public class MainServlet extends AppHttpServlet {
+
+    private Map<User, DocDateSelectorData> sessionDataHolder;
+
+    @Override
+    public void init() throws ServletException {
+        sessionDataHolder  = (Map<User, DocDateSelectorData>) getServletContext().getAttribute("sessionDataHolder");
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // список всех складов(пары ключ-имя)
-        // список всех доков для всех складов(id склада, id дока, имя дока)
-        JsonObjectBuilder sendDataBuilder = Json.createObjectBuilder();
+        JsonObjectBuilder warehousesWithDocs = Json.createObjectBuilder();
         Set<Warehouse> allWarehousesWithDocs;
         try {
             allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
         } catch (DaoScriptException e) {
-            throw new ServletException(e);
+            throw new ServletException(e.getMessage(), e);
         }
         JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
         for (Warehouse warehouse : allWarehousesWithDocs) {
             JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
             warehouseArrayBuilder.add(warehouseBuilder);
         }
-        sendDataBuilder.add("warehouses", warehouseArrayBuilder);
+        warehousesWithDocs.add("warehouses", warehouseArrayBuilder);
 
         // request statuses for roles
-        User user = (User) request.getSession(false).getAttribute("user");
+        User user = getUser(request);
         UserRoles userRoleId = user.getUserRole().getUserRoleId();
         JsonArray orderStatusesForRole;
         if (userRoleId.equals(UserRoles.WH_DISPATCHER)) {
-            orderStatusesForRole = createOrderStatuses(NOT_UPDATABLE, UPDATABLE, UPDATABLE, UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE);
+            orderStatusesForRole = createOrderStatuses(false, true, true, true, false, false);
         } else if (userRoleId.equals(UserRoles.SUPPLIER_MANAGER)) {
-            orderStatusesForRole = createOrderStatuses(UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE);
+            orderStatusesForRole = createOrderStatuses(true, false, false, false, false, false);
         } else if (userRoleId.equals(UserRoles.WH_BOSS)) {
-            orderStatusesForRole = createOrderStatuses(NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE, NOT_UPDATABLE);
+            orderStatusesForRole = createOrderStatuses(false, false, false, false, false, false);
+        } else if (userRoleId.equals(UserRoles.WH_SECURITY_OFFICER)) {
+            orderStatusesForRole = createOrderStatuses(false, true, false, false, false, false);
         } else
             throw new ServletException("no such role");
 
@@ -67,11 +75,14 @@ public class MainServlet extends HttpServlet {
             userRoleRusName = "ДИСПЕТЧЕР СКЛАДА";
         } else if (userRoleId == UserRoles.WH_BOSS) {
             userRoleRusName = "НАЧАЛЬНИК СКЛАДА";
+        } else if (userRoleId == UserRoles.WH_SECURITY_OFFICER) {
+            userRoleRusName = "ОХРАННИК";
         }
 
         request.setAttribute("userRoleRusName", userRoleRusName);
-        request.setAttribute("docDateSelectorDataObject", sendDataBuilder.build().toString());
+        request.setAttribute("warehousesWithDocs", warehousesWithDocs.build().toString());
         request.setAttribute("orderStatuses", orderStatusesForRole.toString());
+        request.setAttribute("lastDocDateSelection", sessionDataHolder.get(user));
 
         request.getRequestDispatcher("/WEB-INF/pages/main.jsp").forward(request, response);
     }
