@@ -7,16 +7,15 @@ import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
+import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRoles;
+import ru.logistica.tms.dao.userDao.WarehouseUser;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -39,50 +38,78 @@ public class MainServlet extends AppHttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        JsonObjectBuilder warehousesWithDocs = Json.createObjectBuilder();
-        Set<Warehouse> allWarehousesWithDocs;
-        try {
-            allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
-        } catch (DaoScriptException e) {
-            throw new ServletException(e.getMessage(), e);
-        }
-        JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
-        for (Warehouse warehouse : allWarehousesWithDocs) {
-            JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
-            warehouseArrayBuilder.add(warehouseBuilder);
-        }
-        warehousesWithDocs.add("warehouses", warehouseArrayBuilder);
-
-        // request statuses for roles
         User user = getUser(request);
         UserRoles userRoleId = user.getUserRole().getUserRoleId();
+        JsonObject docDateSelectorDataForRole;
         JsonArray orderStatusesForRole;
-        if (userRoleId.equals(UserRoles.WH_DISPATCHER)) {
+        String userRoleRusName;
+
+
+        JsonArrayBuilder warehouseArrayBuilder = Json.createArrayBuilder();
+        if (user instanceof WarehouseUser) {
+            WarehouseUser warehouseUser = (WarehouseUser) user;
+            Warehouse warehouseWithDocs;
+            try {
+                warehouseWithDocs = DaoFacade.getWarehouseWithDocs(warehouseUser.getWarehouse().getWarehouseId());
+            } catch (DaoScriptException e) {
+                throw new ServletException(e.getMessage(), e);
+            }
+            JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouseWithDocs);
+            warehouseArrayBuilder.add(warehouseBuilder);
+        } else {
+            Set<Warehouse> allWarehousesWithDocs;
+            try {
+                allWarehousesWithDocs = DaoFacade.getAllWarehousesWithDocs();
+            } catch (DaoScriptException e) {
+                throw new ServletException(e.getMessage(), e);
+            }
+            for (Warehouse warehouse : allWarehousesWithDocs) {
+                JsonObjectBuilder warehouseBuilder = createWarehouseBuilder(warehouse);
+                warehouseArrayBuilder.add(warehouseBuilder);
+            }
+        }
+        JsonObjectBuilder warehousesWithDocs = Json.createObjectBuilder();
+        warehousesWithDocs.add("warehouses", warehouseArrayBuilder);
+        docDateSelectorDataForRole = warehousesWithDocs.build();
+
+
+        if (userRoleId == UserRoles.WH_DISPATCHER) {
             orderStatusesForRole = createOrderStatuses(false, true, true, true, false, false);
-        } else if (userRoleId.equals(UserRoles.SUPPLIER_MANAGER)) {
+            userRoleRusName = "ДИСПЕТЧЕР СКЛАДА";
+        } else if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
             orderStatusesForRole = createOrderStatuses(true, false, false, false, false, false);
-        } else if (userRoleId.equals(UserRoles.WH_BOSS)) {
+            userRoleRusName = "ПОСТАВЩИК";
+        } else if (userRoleId == UserRoles.WH_BOSS) {
             orderStatusesForRole = createOrderStatuses(false, false, false, false, false, false);
-        } else if (userRoleId.equals(UserRoles.WH_SECURITY_OFFICER)) {
+            userRoleRusName = "НАЧАЛЬНИК СКЛАДА";
+        } else if (userRoleId == UserRoles.WH_SECURITY_OFFICER) {
             orderStatusesForRole = createOrderStatuses(false, true, false, false, false, false);
+            userRoleRusName = "ОХРАННИК";
         } else
             throw new ServletException("no such role");
 
-        String userRoleRusName = "";
-        if (userRoleId == UserRoles.SUPPLIER_MANAGER)
-            userRoleRusName = "ПОСТАВЩИК";
-        else if (userRoleId == UserRoles.WH_DISPATCHER) {
-            userRoleRusName = "ДИСПЕТЧЕР СКЛАДА";
-        } else if (userRoleId == UserRoles.WH_BOSS) {
-            userRoleRusName = "НАЧАЛЬНИК СКЛАДА";
-        } else if (userRoleId == UserRoles.WH_SECURITY_OFFICER) {
-            userRoleRusName = "ОХРАННИК";
+
+        if (userRoleId == UserRoles.WH_DISPATCHER || userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.SUPPLIER_MANAGER) {
+            JsonObject warehousesForDonutCrudPlugin;
+            try {
+                Set<Warehouse> allWarehouses = DaoFacade.getAllWarehouses();
+                JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+                for (Warehouse warehouse : allWarehouses) {
+                    jsonObjectBuilder.add(String.valueOf(warehouse.getWarehouseId()), warehouse.getWarehouseName());
+                }
+                warehousesForDonutCrudPlugin = jsonObjectBuilder.build();
+            } catch (DaoScriptException e) {
+                throw new ServletException(e.getMessage(), e);
+            }
+            request.setAttribute("warehousesForDonutCrudPlugin", warehousesForDonutCrudPlugin.toString());
         }
 
+
         request.setAttribute("userRoleRusName", userRoleRusName);
-        request.setAttribute("warehousesWithDocs", warehousesWithDocs.build().toString());
-        request.setAttribute("orderStatuses", orderStatusesForRole.toString());
+        request.setAttribute("docDateSelectorDataForRole", docDateSelectorDataForRole.toString());
+        request.setAttribute("orderStatusesForRole", orderStatusesForRole.toString());
         request.setAttribute("lastDocDateSelection", sessionDataHolder.get(user));
+
 
         request.getRequestDispatcher("/WEB-INF/pages/main.jsp").forward(request, response);
     }
