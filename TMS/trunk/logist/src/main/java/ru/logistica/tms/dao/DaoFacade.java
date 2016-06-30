@@ -152,7 +152,7 @@ public class DaoFacade {
         return result[0];
     }
 
-    public static Set<Warehouse> getAllWarehousesWithDocs() throws DaoScriptException {
+    public static Set<Warehouse> getAllWarehouses() throws DaoScriptException {
         final Set<Warehouse> result = new HashSet<>();
         doInTransaction(new DaoScript() {
             @Override
@@ -167,6 +167,36 @@ public class DaoFacade {
         return result;
     }
 
+    public static Warehouse getWarehouseWithDocs(final int warehouseId) throws DaoScriptException {
+        final Warehouse[] result = new Warehouse[1];
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                result[0] = warehouseDao.findById(Warehouse.class, warehouseId);
+                Hibernate.initialize(result[0].getDocs());
+            }
+        });
+        return result[0];
+    }
+
+    public static Set<Warehouse> getAllWarehousesWithDocs() throws DaoScriptException {
+        final Set<Warehouse> result = new HashSet<>();
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                WarehouseDao warehouseDao = new WarehouseDaoImpl();
+                List<Warehouse> warehouses = warehouseDao.findAll(Warehouse.class);
+                for (Warehouse warehouse : warehouses) {
+                    Hibernate.initialize(warehouse.getDocs());
+                    result.add(warehouse);
+                }
+            }
+        });
+        return result;
+    }
+
+
     public static void fillOffsetsForAbbreviations() throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
@@ -180,7 +210,6 @@ public class DaoFacade {
             }
         });
     }
-
 
 
 

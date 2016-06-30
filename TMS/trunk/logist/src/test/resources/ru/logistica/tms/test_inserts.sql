@@ -55,6 +55,7 @@ VALUES ('uo1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_SECUR
 INSERT INTO warehouse_users VALUES (5, 1);
 
 
+
 -- create docPeriods
 INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 10:00:00 Z', '2016-10-19 10:30:00 Z'); -- id == 1
 

@@ -49,7 +49,7 @@ public class Warehouse {
         this.rusTimeZoneAbbr = rusTimeZoneAbbr;
     }
 
-    @OneToMany(mappedBy="warehouse", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="warehouse")
     public Set<Doc> getDocs() {
         return docs;
     }

@@ -201,12 +201,12 @@
                 </c:if>
             });
 
-            var warehousesWithDocs = ${requestScope.warehousesWithDocs};
+
             // ---------------------------------init docDateSelector plugin----------------------------------------
             var $docAndDateSelector = $('#docAndDateSelector');
             var docDateSelector = $docAndDateSelector.docAndDateSelector({
                 useWarehouseSelect:<c:out value="${useWarehouseSelect}"/>,
-                data: warehousesWithDocs
+                data: ${requestScope.docDateSelectorDataForRole}
             });
             docDateSelector.setOnSelected(function(event, docDateSelection) {
                 sendTableAjax("getTableData");
@@ -215,10 +215,6 @@
             // ---------------------------------init donutCrudPlugin----------------------------------------
             <c:if test="${isSupplierManager}">
             var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
-            var warehousesKeyValuePairs = {};
-            warehousesWithDocs.warehouses.forEach(function(warehouse) {
-               warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
-            });
 
             var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
@@ -227,8 +223,8 @@
                     donutFields: ["driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
                     ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus"]
                 },
-                orderStatuses: ${requestScope.orderStatuses},
-                warehouses: warehousesKeyValuePairs
+                orderStatuses: ${requestScope.orderStatusesForRole},
+                warehouses: ${requestScope.warehousesForDonutCrudPlugin}
             });
             donutCrudPluginInstance.setPeriodToString(function(period) {
                 return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
@@ -305,10 +301,6 @@
 
             <c:if test="${isWarehouseDispatcher}">
             var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
-            var warehousesKeyValuePairs = {};
-            warehousesWithDocs.warehouses.forEach(function(warehouse) {
-                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
-            });
 
             var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: true,
@@ -317,8 +309,8 @@
                     donutFields: [],
                     ordersFields: ["orderStatusId", "commentForStatus"]
                 },
-                orderStatuses: ${requestScope.orderStatuses},
-                warehouses: warehousesKeyValuePairs
+                orderStatuses: ${requestScope.orderStatusesForRole},
+                warehouses: ${requestScope.warehousesForDonutCrudPlugin}
             });
             donutCrudPluginInstance.setPeriodToString(function(period) {
                 return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
@@ -357,15 +349,11 @@
 
             <c:if test="${isWarehouseBoss}">
             var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
-            var warehousesKeyValuePairs = {};
-            warehousesWithDocs.warehouses.forEach(function(warehouse) {
-                warehousesKeyValuePairs[warehouse.warehouseId] = warehouse.warehouseName;
-            });
 
             var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
                 isEditable: false,
-                orderStatuses: ${requestScope.orderStatuses},
-                warehouses: warehousesKeyValuePairs
+                orderStatuses: ${requestScope.orderStatusesForRole},
+                warehouses: ${requestScope.warehousesForDonutCrudPlugin}
             });
             donutCrudPluginInstance.setPeriodToString(function(period) {
                 return tablePlugin.getLabelGenerator().getLabelTextFromMinutes(period.periodBegin, period.periodEnd);
