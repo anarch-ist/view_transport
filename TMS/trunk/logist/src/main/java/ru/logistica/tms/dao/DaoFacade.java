@@ -3,6 +3,7 @@ package ru.logistica.tms.dao;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import ru.logistica.tms.dao.cache.AppContextCache;
@@ -25,10 +26,7 @@ import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.*;
 import ru.logistica.tms.util.CriptUtils;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
@@ -196,6 +194,31 @@ public class DaoFacade {
         return result;
     }
 
+    public static List<Object> getAllDonutsForSupplier(final int supplierUserId) throws DaoScriptException {
+        final List<Object> result = new ArrayList<>();
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                Session currentSession = HibernateUtils.getCurrentSession();
+                Query query = currentSession.createQuery(
+                        "SELECT " +
+                                "donutDocPeriod.creationDate," +
+                                " donutDocPeriod.period," +
+                                " donutDocPeriod.doc.warehouse.warehouseName," +
+                                " donutDocPeriod.doc.docName," +
+                                " orders.orderNumber," +
+                                " orders.orderStatus," +
+                                " donutDocPeriod.commentForDonut" +
+                                " FROM DonutDocPeriod as donutDocPeriod" +
+                                " left join donutDocPeriod.orders as orders" +
+                                " WHERE donutDocPeriod.supplierUser.userId = :supplierUserId"
+                );
+                query.setInteger("supplierUserId", supplierUserId);
+                result.addAll(query.list());
+            }
+        });
+        return result;
+    }
 
     public static void fillOffsetsForAbbreviations() throws DaoScriptException {
         doInTransaction(new DaoScript() {
