@@ -17,6 +17,7 @@ public class DonutDocPeriod extends DocPeriod{
     private String driverPhoneNumber;
     private String licensePlate;
     private Short palletsQty;
+    private Date lastModified;
     private SupplierUser supplierUser;
     private Set<Order> orders;
 
@@ -79,6 +80,16 @@ public class DonutDocPeriod extends DocPeriod{
 
     public void setPalletsQty(Short palletsQty) {
         this.palletsQty = palletsQty;
+    }
+
+    @Basic
+    @Column(name = "lastModified", nullable = true, updatable = false, insertable = false)
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 
     @ManyToOne

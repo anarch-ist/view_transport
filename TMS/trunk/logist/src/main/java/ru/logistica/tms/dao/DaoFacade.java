@@ -6,6 +6,8 @@ import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.transform.ResultTransformer;
+import org.hibernate.transform.Transformers;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
@@ -15,10 +17,8 @@ import ru.logistica.tms.dao.orderDao.Order;
 import ru.logistica.tms.dao.orderDao.OrderDao;
 import ru.logistica.tms.dao.orderDao.OrderDaoImpl;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
-import ru.logistica.tms.dao.userDao.SupplierUser;
-import ru.logistica.tms.dao.userDao.User;
-import ru.logistica.tms.dao.userDao.UserDao;
-import ru.logistica.tms.dao.userDao.UserDaoImpl;
+import ru.logistica.tms.dao.supplierDao.Supplier;
+import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
@@ -194,30 +194,68 @@ public class DaoFacade {
         return result;
     }
 
-    public static List<Object> getAllDonutsForSupplier(final int supplierUserId) throws DaoScriptException {
-        final List<Object> result = new ArrayList<>();
+    public static SupplierDonuts getAllDonutsForSupplier(final int supplierUserId) throws DaoScriptException {
+
+        final SupplierDonuts[] result = new SupplierDonuts[1];
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
                 Session currentSession = HibernateUtils.getCurrentSession();
-                Query query = currentSession.createQuery(
-                        "SELECT " +
-                                "donutDocPeriod.creationDate," +
-                                " donutDocPeriod.period," +
-                                " donutDocPeriod.doc.warehouse.warehouseName," +
-                                " donutDocPeriod.doc.docName," +
-                                " orders.orderNumber," +
-                                " orders.orderStatus," +
-                                " donutDocPeriod.commentForDonut" +
-                                " FROM DonutDocPeriod as donutDocPeriod" +
-                                " left join donutDocPeriod.orders as orders" +
-                                " WHERE donutDocPeriod.supplierUser.userId = :supplierUserId"
+                SupplierUserDao supplierUserDao = new SupplierUserDaoImpl();
+                Supplier supplier = supplierUserDao.findById(SupplierUser.class, supplierUserId).getSupplier();
+                final int supplierId = supplier.getSupplierId();
+                Query query = currentSession.createSQLQuery(
+                        "SELECT\n" +
+                                "  doc_periods.periodBegin,\n" +
+                                "  doc_periods.periodEnd,\n" +
+                                "  warehouses.warehousename,\n" +
+                                "  docs.docname,\n" +
+                                "  string_agg(orders.orderNumber, '<br/>') AS orderNumbers,\n" +
+                                "  string_agg(orders.orderstatus, '<br/>') AS orderStatuses,\n" +
+                                "  donut_doc_periods.commentfordonut,\n" +
+                                "  GREATEST(donut_doc_periods.lastModified, max(orders.lastmodified))\n" +
+                                "FROM donut_doc_periods\n" +
+                                "  INNER JOIN doc_periods ON donut_doc_periods.donutdocperiodid = doc_periods.docperiodid\n" +
+                                "  INNER JOIN docs ON doc_periods.docid = docs.docid\n" +
+                                "  INNER JOIN warehouses ON docs.warehouseid = warehouses.warehouseid\n" +
+                                "  LEFT JOIN orders ON donut_doc_periods.donutdocperiodid = orders.donutdocperiodid\n" +
+                                "  INNER JOIN supplier_users ON donut_doc_periods.supplieruserid = supplier_users.userid\n" +
+                                "  INNER JOIN suppliers ON supplier_users.supplierid = suppliers.supplierid\n" +
+                                "WHERE suppliers.supplierid = :supplierId\n" +
+                                "GROUP BY donut_doc_periods.donutdocperiodid, doc_periods.periodBegin, doc_periods.periodEnd, docs.docname,\n" +
+                                "  warehouses.warehousename, donut_doc_periods.lastModified\n" +
+                                "ORDER BY donut_doc_periods.lastModified DESC\n" +
+                                "LIMIT 1000;"
                 );
-                query.setInteger("supplierUserId", supplierUserId);
-                result.addAll(query.list());
+                query.setInteger("supplierId", supplierId);
+                query.setReadOnly(true);
+                query.setResultTransformer(new ResultTransformer() {
+                    @Override
+                    public Object transformTuple(Object[] rowData, String[] aliasNames) {
+                        SupplierDonuts.Donut donutForSupplier = new SupplierDonuts.Donut();
+                        donutForSupplier.setPeriodBegin((Date) rowData[0]);
+                        donutForSupplier.setPeriodEnd((Date) rowData[1]);
+                        donutForSupplier.setWarehouseName((String) rowData[2]);
+                        donutForSupplier.setDocName((String) rowData[3]);
+                        donutForSupplier.setOrderNumbersAsString((String) rowData[4]);
+                        donutForSupplier.setOrderStatusesAsString((String) rowData[5]);
+                        donutForSupplier.setComment((String) rowData[6]);
+                        donutForSupplier.setLastModified((Date) rowData[7]);
+                        return donutForSupplier;
+                    }
+
+                    @Override
+                    public List transformList(List collection) {
+                        SupplierDonuts result = new SupplierDonuts();
+                        result.addAll(collection);
+                        return result;
+                    }
+                });
+                result[0] = (SupplierDonuts) query.list();
+                result[0].setSupplierName(supplier.getInn());
             }
         });
-        return result;
+        return result[0];
     }
 
     public static void fillOffsetsForAbbreviations() throws DaoScriptException {

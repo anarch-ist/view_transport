@@ -1,12 +1,16 @@
 package ru.logistica.tms.dao.supplierDao;
 
+import ru.logistica.tms.dao.userDao.SupplierUser;
+
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "suppliers", schema = "public")
 public class Supplier {
     private Integer supplierId;
     private String inn;
+    private Set<SupplierUser> supplierUsers;
 
     @Id
     @SequenceGenerator(name="suppliers_supplierid_seq", sequenceName="suppliers_supplierid_seq", allocationSize=1)
@@ -28,6 +32,15 @@ public class Supplier {
 
     public void setInn(String inn) {
         this.inn = inn;
+    }
+
+    @OneToMany(mappedBy = "supplier")
+    public Set<SupplierUser> getSupplierUsers() {
+        return supplierUsers;
+    }
+
+    public void setSupplierUsers(Set<SupplierUser> supplierUsers) {
+        this.supplierUsers = supplierUsers;
     }
 
     @Override

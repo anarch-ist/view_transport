@@ -13,14 +13,17 @@
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>
+        <property name="hibernate.connection.autocommit">false</property>
         <property name="hibernate.connection.username">app_user</property>
         <property name="hibernate.connection.password">vghdfvce5485</property>
-        <property name="hibernate.connection.autocommit">false</property>
+
         <!--connection pool settings-->
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.max_size">20</property>
         <property name="hibernate.c3p0.timeout">1800</property>
         <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
+
         <!--other settings-->
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">false</property>
@@ -38,6 +41,8 @@
         <mapping class="ru.logistica.tms.dao.userDao.UserRole"/>
         <mapping class="ru.logistica.tms.dao.userDao.User"/>
         <mapping class="ru.logistica.tms.dao.userDao.WarehouseUser"/>
+        <mapping class="ru.logistica.tms.dao.audit.orderAuditDao.OrdersAudit"/>
+        <mapping class="ru.logistica.tms.dao.audit.docPeriodAuditDao.DonutDocPeriodAudit"/>
 
     </session-factory>
 </hibernate-configuration>

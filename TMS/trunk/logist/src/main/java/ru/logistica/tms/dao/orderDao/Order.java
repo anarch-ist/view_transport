@@ -4,6 +4,7 @@ import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "orders", schema = "public")
@@ -13,6 +14,7 @@ public class Order {
     private Short boxQty;
     private OrderStatuses orderStatus;
     private String commentForStatus;
+    private Date lastModified;
     private DonutDocPeriod donutDocPeriod;
     private Warehouse finalDestinationWarehouse;
 
@@ -87,6 +89,16 @@ public class Order {
 
     public void setCommentForStatus(String commentForStatus) {
         this.commentForStatus = commentForStatus;
+    }
+
+    @Basic
+    @Column(name = "lastModified", nullable = true, updatable = false, insertable = false)
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 
     @Override

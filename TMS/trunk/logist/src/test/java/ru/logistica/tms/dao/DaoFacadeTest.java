@@ -16,6 +16,7 @@ import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.DonutInsertData;
 import ru.logistica.tms.dto.OpenDocPeriodsData;
+import ru.logistica.tms.dto.SupplierDonuts;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
 import java.text.SimpleDateFormat;
@@ -100,5 +101,10 @@ public class DaoFacadeTest extends HibernateTest {
         DaoFacade.openPeriods(null, openDocPeriodsData);
     }
 
+    @Test
+    public void testGetAllDonutsForSupplier() throws Exception {
+        SupplierDonuts allDonutsForSupplier = DaoFacade.getAllDonutsForSupplier(1);
+        System.out.println(allDonutsForSupplier);
+    }
 
 }
