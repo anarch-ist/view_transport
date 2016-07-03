@@ -1,11 +1,9 @@
 package ru.logistica.tms.dto;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
 
-public class SupplierDonuts extends ArrayList<SupplierDonuts.Donut> {
+public class SupplierDonuts extends ArrayList<SupplierDonuts.SupplierDonut> {
     private String supplierName;
 
     public String getSupplierName() {
@@ -16,28 +14,28 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.Donut> {
         this.supplierName = supplierName;
     }
 
-    public String toJsonString() {
-        JsonObjectBuilder result = Json.createObjectBuilder();
-        result.add("supplierName", getSupplierName());
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        for(Donut donut : this) {
-            JsonObjectBuilder donutBuilder = Json.createObjectBuilder();
-            donutBuilder.add("periodBegin", donut.getPeriodBegin().toString());
-            donutBuilder.add("periodEnd", donut.getPeriodEnd().toString());
-            donutBuilder.add("warehouseName", donut.getWarehouseName());
-            donutBuilder.add("docName", donut.getDocName());
-            donutBuilder.add("comment", donut.getComment());
-            donutBuilder.add("lastModified", donut.getLastModified().toString());
-            donutBuilder.add("orderNumbers", donut.orderNumbersAsString);
-            donutBuilder.add("orderStatuses", donut.orderStatusesAsString);
-        }
-        result.add("donutDocPeriods", arrayBuilder);
-        return result.build().toString();
-    }
+//    public String toJsonString() {
+//        JsonObjectBuilder result = Json.createObjectBuilder();
+//        result.add("supplierName", getSupplierName());
+//        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+//        for(SupplierDonut donut : this) {
+//            JsonObjectBuilder donutBuilder = Json.createObjectBuilder();
+//            donutBuilder.add("periodBegin", donut.getPeriodBegin().toString());
+//            donutBuilder.add("periodEnd", donut.getPeriodEnd().toString());
+//            donutBuilder.add("warehouseName", donut.getWarehouseName());
+//            donutBuilder.add("docName", donut.getDocName());
+//            donutBuilder.add("comment", donut.getComment());
+//            donutBuilder.add("lastModified", donut.getLastModified().toString());
+//            donutBuilder.add("orderNumbers", donut.orderNumbersAsString);
+//            donutBuilder.add("orderStatuses", donut.orderStatusesAsString);
+//        }
+//        result.add("donutDocPeriods", arrayBuilder);
+//        return result.build().toString();
+//    }
 
-    public static class Donut {
-        private Date dateBegin;
-        private Date dateEnd;
+    public static class SupplierDonut {
+        private Date periodBegin;
+        private Date periodEnd;
         private String warehouseName;
         private String docName;
         private String comment;
@@ -62,19 +60,19 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.Donut> {
         }
 
         public Date getPeriodBegin() {
-            return dateBegin;
+            return periodBegin;
         }
 
         public void setPeriodBegin(Date dateBegin) {
-            this.dateBegin = dateBegin;
+            this.periodBegin = dateBegin;
         }
 
         public Date getPeriodEnd() {
-            return dateEnd;
+            return periodEnd;
         }
 
         public void setPeriodEnd(Date dateEnd) {
-            this.dateEnd = dateEnd;
+            this.periodEnd = dateEnd;
         }
 
         public String getWarehouseName() {
@@ -112,8 +110,8 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.Donut> {
         @Override
         public String toString() {
             return "Donut{" +
-                    "dateBegin=" + dateBegin +
-                    ", dateEnd=" + dateEnd +
+                    "periodBegin=" + periodBegin +
+                    ", periodEnd=" + periodEnd +
                     ", warehouseName='" + warehouseName + '\'' +
                     ", docName='" + docName + '\'' +
                     ", comment='" + comment + '\'' +

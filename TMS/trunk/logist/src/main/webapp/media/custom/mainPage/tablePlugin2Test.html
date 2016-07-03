@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>test</title>
     <link href="tablePlugin2.css" rel="stylesheet">
+    <link href="main.css" rel="stylesheet">
     <script src="../../es6-shim.min.js"></script>
     <script src="tablePlugin2.js"></script>
     <script>
@@ -78,7 +79,16 @@
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OPENED";
                         }
+                    },
+                    {
+                        name: "testLink",
+                        id: "someId",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
                     }
+
                 ]
             });
             tablePlugin2.setOnCreated(function() {
@@ -107,6 +117,11 @@
             var buttonByPluginId = tablePlugin2.getButtonByPluginId("cancelBtn");
             buttonByPluginId.onclick = function(e) {
                 window.console.log(e);
+            };
+            var buttonByPluginId2 = tablePlugin2.getButtonByPluginId("someId");
+            buttonByPluginId2.onclick = function(e) {
+                var redirectWindow = window.open('http://google.com', '_blank');
+                redirectWindow.location;
             };
 
             //tablePlugin2.clear();
