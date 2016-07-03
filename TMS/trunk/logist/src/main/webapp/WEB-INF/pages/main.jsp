@@ -133,6 +133,14 @@
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OPENED";
                         }
+                    },
+                    {
+                        name: "История поставщика",
+                        id: "sHistoryBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
                     }
                 ]
                 </c:if>
@@ -296,6 +304,13 @@
                 sendTableAjax("deleteDonut", sendObject);
             };
 
+            var sHistoryBtn = tablePlugin.getButtonByPluginId("sHistoryBtn");
+            sHistoryBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var redirectWindow = window.open('getSupplierHistory?docPeriodId=' + donutDocPeriodId, '_blank');
+                redirectWindow.location;
+            };
 
             </c:if>
 

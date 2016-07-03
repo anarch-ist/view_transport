@@ -7,7 +7,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.ResultTransformer;
-import org.hibernate.transform.Transformers;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.docDao.DocDao;
@@ -194,16 +193,18 @@ public class DaoFacade {
         return result;
     }
 
-    public static SupplierDonuts getAllDonutsForSupplier(final int supplierUserId) throws DaoScriptException {
+    public static SupplierDonuts getAllDonutsForSupplier(final long donutDocPeriodId) throws DaoScriptException {
 
         final SupplierDonuts[] result = new SupplierDonuts[1];
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
-                Session currentSession = HibernateUtils.getCurrentSession();
-                SupplierUserDao supplierUserDao = new SupplierUserDaoImpl();
-                Supplier supplier = supplierUserDao.findById(SupplierUser.class, supplierUserId).getSupplier();
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                Supplier supplier = donutDocPeriod.getSupplierUser().getSupplier();
                 final int supplierId = supplier.getSupplierId();
+
+                Session currentSession = HibernateUtils.getCurrentSession();
                 Query query = currentSession.createSQLQuery(
                         "SELECT\n" +
                                 "  doc_periods.periodBegin,\n" +
@@ -232,7 +233,7 @@ public class DaoFacade {
                 query.setResultTransformer(new ResultTransformer() {
                     @Override
                     public Object transformTuple(Object[] rowData, String[] aliasNames) {
-                        SupplierDonuts.Donut donutForSupplier = new SupplierDonuts.Donut();
+                        SupplierDonuts.SupplierDonut donutForSupplier = new SupplierDonuts.SupplierDonut();
                         donutForSupplier.setPeriodBegin((Date) rowData[0]);
                         donutForSupplier.setPeriodEnd((Date) rowData[1]);
                         donutForSupplier.setWarehouseName((String) rowData[2]);
