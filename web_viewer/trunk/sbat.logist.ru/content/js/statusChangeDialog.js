@@ -98,8 +98,10 @@ $(document).ready(function () {
                             $numberRequestCheckBoxes.html("");
                             console.log(requestsArray[0]['requestStatusRusName']);
                             $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
+                            $('#selectNumbersRequestsTr').hide();
+                            $selectRequestsTr.hide();
                             requestsArray.forEach(function(request){
-                                $('#selectNumbersRequestsTr').show();
+                                
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
                                 /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
                                 $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
