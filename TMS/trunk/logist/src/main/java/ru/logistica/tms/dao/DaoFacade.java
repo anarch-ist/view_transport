@@ -24,8 +24,10 @@ import ru.logistica.tms.dao.warehouseDao.WarehouseDao;
 import ru.logistica.tms.dao.warehouseDao.WarehouseDaoImpl;
 import ru.logistica.tms.dto.*;
 import ru.logistica.tms.util.CriptUtils;
+import ru.logistica.tms.util.RusNames;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
@@ -193,7 +195,7 @@ public class DaoFacade {
         return result;
     }
 
-    public static SupplierDonuts getAllDonutsForSupplier(final long donutDocPeriodId) throws DaoScriptException {
+    public static SupplierDonuts getAllDonutsForSupplier(final long donutDocPeriodId, final String delimiter) throws DaoScriptException {
 
         final SupplierDonuts[] result = new SupplierDonuts[1];
         doInTransaction(new DaoScript() {
@@ -201,6 +203,7 @@ public class DaoFacade {
             public void execute() throws DAOException {
                 DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
                 DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                final Double timeShift = AppContextCache.timeZoneAbbrIntegerMap.get(donutDocPeriod.getDoc().getWarehouse().getRusTimeZoneAbbr());
                 Supplier supplier = donutDocPeriod.getSupplierUser().getSupplier();
                 final int supplierId = supplier.getSupplierId();
 
@@ -211,8 +214,8 @@ public class DaoFacade {
                                 "  doc_periods.periodEnd,\n" +
                                 "  warehouses.warehousename,\n" +
                                 "  docs.docname,\n" +
-                                "  string_agg(orders.orderNumber, '<br/>') AS orderNumbers,\n" +
-                                "  string_agg(orders.orderstatus, '<br/>') AS orderStatuses,\n" +
+                                "  string_agg(orders.orderNumber, :_delimiter) AS orderNumbers,\n" +
+                                "  string_agg(orders.orderstatus, :_delimiter) AS orderStatuses,\n" +
                                 "  donut_doc_periods.commentfordonut,\n" +
                                 "  GREATEST(donut_doc_periods.lastModified, max(orders.lastmodified))\n" +
                                 "FROM donut_doc_periods\n" +
@@ -229,20 +232,35 @@ public class DaoFacade {
                                 "LIMIT 1000;"
                 );
                 query.setInteger("supplierId", supplierId);
+                query.setString("_delimiter", delimiter);
                 query.setReadOnly(true);
                 query.setResultTransformer(new ResultTransformer() {
                     @Override
                     public Object transformTuple(Object[] rowData, String[] aliasNames) {
                         SupplierDonuts.SupplierDonut donutForSupplier = new SupplierDonuts.SupplierDonut();
-                        donutForSupplier.setPeriodBegin((Date) rowData[0]);
-                        donutForSupplier.setPeriodEnd((Date) rowData[1]);
+                        donutForSupplier.setPeriodBegin(getDateWithShift((Date)rowData[0]));
+                        donutForSupplier.setPeriodEnd(getDateWithShift((Date)rowData[1]));
                         donutForSupplier.setWarehouseName((String) rowData[2]);
                         donutForSupplier.setDocName((String) rowData[3]);
                         donutForSupplier.setOrderNumbersAsString((String) rowData[4]);
-                        donutForSupplier.setOrderStatusesAsString((String) rowData[5]);
+                        String orderStatusesAsString = (String) rowData[5];
+                        String[] orderStatuses = orderStatusesAsString.split(delimiter);
+                        String orderStatusesLocalized = "";
+                        for (int i = 0; i < orderStatuses.length; i++) {
+                            orderStatusesLocalized += RusNames.getOrderStatusesConverter().get(OrderStatuses.valueOf(orderStatuses[i]));
+                            if (i != orderStatuses.length - 1) {
+                                orderStatusesLocalized += delimiter;
+                            }
+                        }
+                        donutForSupplier.setOrderStatusesAsString(orderStatusesLocalized);
                         donutForSupplier.setComment((String) rowData[6]);
                         donutForSupplier.setLastModified((Date) rowData[7]);
                         return donutForSupplier;
+                    }
+
+                    private Date getDateWithShift(Date date) {
+                        date.setTime(date.getTime() + 3600 * 1000 * timeShift.intValue());
+                        return date;
                     }
 
                     @Override
@@ -437,7 +455,7 @@ public class DaoFacade {
                 Set<Order> orders = donutDocPeriod.getOrders();
                 for (Order order : orders) {
                     if (order.getOrderStatus() != OrderStatuses.CREATED)
-                        throw new DAOException("У одной из заявок статус отличается от " + OrderStatuses.CREATED.name());
+                        throw new DAOException("У одной из заявок статус отличается от " + RusNames.getOrderStatusesConverter().get(OrderStatuses.CREATED));
                 }
                 for (Order order : orders) {
                     orderDao.delete(order);

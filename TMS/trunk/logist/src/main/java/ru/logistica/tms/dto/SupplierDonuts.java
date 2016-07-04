@@ -1,5 +1,6 @@
 package ru.logistica.tms.dto;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -14,26 +15,9 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.SupplierDonut> {
         this.supplierName = supplierName;
     }
 
-//    public String toJsonString() {
-//        JsonObjectBuilder result = Json.createObjectBuilder();
-//        result.add("supplierName", getSupplierName());
-//        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-//        for(SupplierDonut donut : this) {
-//            JsonObjectBuilder donutBuilder = Json.createObjectBuilder();
-//            donutBuilder.add("periodBegin", donut.getPeriodBegin().toString());
-//            donutBuilder.add("periodEnd", donut.getPeriodEnd().toString());
-//            donutBuilder.add("warehouseName", donut.getWarehouseName());
-//            donutBuilder.add("docName", donut.getDocName());
-//            donutBuilder.add("comment", donut.getComment());
-//            donutBuilder.add("lastModified", donut.getLastModified().toString());
-//            donutBuilder.add("orderNumbers", donut.orderNumbersAsString);
-//            donutBuilder.add("orderStatuses", donut.orderStatusesAsString);
-//        }
-//        result.add("donutDocPeriods", arrayBuilder);
-//        return result.build().toString();
-//    }
-
     public static class SupplierDonut {
+        // BINDING supplierHistory.jsp
+        private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm");
         private Date periodBegin;
         private Date periodEnd;
         private String warehouseName;
@@ -60,7 +44,7 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.SupplierDonut> {
         }
 
         public Date getPeriodBegin() {
-            return periodBegin;
+            return getFormattedDate(periodBegin);
         }
 
         public void setPeriodBegin(Date dateBegin) {
@@ -68,7 +52,7 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.SupplierDonut> {
         }
 
         public Date getPeriodEnd() {
-            return periodEnd;
+            return getFormattedDate(periodEnd);
         }
 
         public void setPeriodEnd(Date dateEnd) {
@@ -100,11 +84,20 @@ public class SupplierDonuts extends ArrayList<SupplierDonuts.SupplierDonut> {
         }
 
         public Date getLastModified() {
-            return lastModified;
+            return getFormattedDate(lastModified);
         }
 
         public void setLastModified(Date lastModified) {
             this.lastModified = lastModified;
+        }
+
+        private Date getFormattedDate(Date date) {
+            return new Date(date.getTime()) {
+                @Override
+                public String toString() {
+                    return dateFormat.format(this);
+                }
+            };
         }
 
         @Override

@@ -550,20 +550,6 @@
                 }).done(function (donutData) {
                     $("#licensePlate").text(donutData.driver);
                     $("#driverName").text(donutData.licensePlate);
-
-//                    donutCrudPluginInstance.setData(donutData);
-//                    donutCrudPluginInstance.setPeriod(getSelectedPeriod());
-//                    donutCrudPluginInstance.setOnSubmit(function() {
-//                        var sendObject = $.extend(
-//                                donutCrudPluginInstance.getData(),
-//                                {removedOrders: [], donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId}
-//                        );
-//                        sendTableAjax("updateDonut", {updatedDonut: sendObject}, function() {
-//                            donutCrudPluginInstance.setOnRowRemoved(null);
-//                            donutCrudPluginInstance.setOnSubmit(null);
-//                            donutCrudPluginDialog.close();
-//                        })
-//                    });
                     $confirmArrivalDialog.open();
                 });
 
