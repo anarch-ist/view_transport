@@ -7,18 +7,17 @@ import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
-import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRoles;
 import ru.logistica.tms.dao.userDao.WarehouseUser;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 import ru.logistica.tms.dto.DocDateSelectorData;
+import ru.logistica.tms.util.RusNames;
 
 import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -73,18 +72,19 @@ public class MainServlet extends AppHttpServlet {
         docDateSelectorDataForRole = warehousesWithDocs.build();
 
 
+        Map<UserRoles, String> userRolesConverter = RusNames.getUserRolesConverter();
         if (userRoleId == UserRoles.WH_DISPATCHER) {
             orderStatusesForRole = createOrderStatuses(false, true, true, true, false, false);
-            userRoleRusName = "ДИСПЕТЧЕР СКЛАДА";
+            userRoleRusName = userRolesConverter.get(UserRoles.WH_DISPATCHER);
         } else if (userRoleId == UserRoles.SUPPLIER_MANAGER) {
             orderStatusesForRole = createOrderStatuses(true, false, false, false, false, false);
-            userRoleRusName = "ПОСТАВЩИК";
+            userRoleRusName = userRolesConverter.get(UserRoles.SUPPLIER_MANAGER);
         } else if (userRoleId == UserRoles.WH_BOSS) {
             orderStatusesForRole = createOrderStatuses(false, false, false, false, false, false);
-            userRoleRusName = "НАЧАЛЬНИК СКЛАДА";
+            userRoleRusName = userRolesConverter.get(UserRoles.WH_BOSS);
         } else if (userRoleId == UserRoles.WH_SECURITY_OFFICER) {
             orderStatusesForRole = createOrderStatuses(false, true, false, false, false, false);
-            userRoleRusName = "ОХРАННИК";
+            userRoleRusName = userRolesConverter.get(UserRoles.WH_SECURITY_OFFICER);
         } else
             throw new ServletException("no such role");
 
@@ -152,12 +152,13 @@ public class MainServlet extends AppHttpServlet {
             boolean isCancelledByWarehouseUserUpdatable
     ) {
         JsonArrayBuilder orderStatusesBuilder = Json.createArrayBuilder();
-        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CREATED.name(),                     "СОЗДАН",                    isCreatedUpdatable));
-        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.ARRIVED.name(),                     "ПРИБЫТИЕ НА ТЕРРИТОРИЮ",    isArrivedUpdatable));
-        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.DELIVERED.name(),                   "ДОСТАВЛЕН",                 isDeliveredUpdatable));
-        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.ERROR.name(),                       "ОШИБКА",                    isErrorUpdatable));
-        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.name(),  "УДАЛЕН ПОСТАВЩИКОМ",        isCancelledBySupplierUserUpdatable));
-        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.name(), "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА", isCancelledByWarehouseUserUpdatable));
+        Map<OrderStatuses, String> orderStatusesConverter = RusNames.getOrderStatusesConverter();
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CREATED.name(),                     orderStatusesConverter.get(OrderStatuses.CREATED),                     isCreatedUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.ARRIVED.name(),                     orderStatusesConverter.get(OrderStatuses.ARRIVED),                     isArrivedUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.DELIVERED.name(),                   orderStatusesConverter.get(OrderStatuses.DELIVERED),                   isDeliveredUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.ERROR.name(),                       orderStatusesConverter.get(OrderStatuses.ERROR),                       isErrorUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CANCELLED_BY_SUPPLIER_USER.name(),  orderStatusesConverter.get(OrderStatuses.CANCELLED_BY_SUPPLIER_USER),  isCancelledBySupplierUserUpdatable));
+        orderStatusesBuilder.add(createStatusBuilder(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER.name(), orderStatusesConverter.get(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER), isCancelledByWarehouseUserUpdatable));
         return orderStatusesBuilder.build();
     }
 

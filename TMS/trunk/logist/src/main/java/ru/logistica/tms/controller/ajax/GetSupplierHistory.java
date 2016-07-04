@@ -19,7 +19,7 @@ public class GetSupplierHistory extends AppHttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            SupplierDonuts allDonutsForSupplier = DaoFacade.getAllDonutsForSupplier(Long.parseLong(req.getParameter("docPeriodId")));
+            SupplierDonuts allDonutsForSupplier = DaoFacade.getAllDonutsForSupplier(Long.parseLong(req.getParameter("docPeriodId")), "<br/>");
             req.setAttribute("supplierName", allDonutsForSupplier.getSupplierName());
             req.setAttribute("allDonutsForSupplier", allDonutsForSupplier);
         } catch (DaoScriptException | NumberFormatException e) {

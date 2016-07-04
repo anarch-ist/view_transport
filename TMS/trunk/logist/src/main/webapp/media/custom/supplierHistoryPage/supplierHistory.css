@@ -1,0 +1,7 @@
+table tfoot th {
+    padding: 10px 0 18px 0 !important;
+}
+
+table tfoot th input {
+    width: 100%;
+}
