@@ -9,7 +9,7 @@
             ordersCrud: "all", // all, update, read
             editableFields: {
                 donutFields: ["period", "driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
-                ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId"]
+                ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId", "invoiceNumber", "goodsCost", "orderPalletsQty"]
             },
             orderStatuses: [
                 {statusName:"EXAMPLE_STATUS", statusRusName:"СТАТУС", isUpdatable: false}
@@ -55,7 +55,7 @@
             },
             idSrc: "orderId",
             table: "#ordersDataTable",
-            fields: [ {
+            fields: [{
                 label: "Номер заявки:",
                 name: "orderNumber"
             }, {
@@ -67,7 +67,7 @@
                     inherit_select_classes: true
                 }
             }, {
-                label: "Количество коробок:",
+                label: "Кол-во коробок:",
                 name: "boxQty",
                 type: "mask",
                 mask: "##"
@@ -83,10 +83,39 @@
                     disable_search: true,
                     inherit_select_classes: true
                 }
+            }, {
+                label: "Номер накладной:",
+                name: "invoiceNumber"
+            }, {
+                label: "Сумма:",
+                name: "goodsCost"
+                //type: "mask",
+                //mask: "AA",
+                //maskOptions: {
+                //    'translation': {
+                //        A: {pattern: /[0-9.]/, optional: false, recursive: true}
+                //    },
+                //    reverse: false,
+                //    placeholder: ""
+                //}
+            }, {
+                label: "Кол-во паллет:",
+                name: "orderPalletsQty",
+                type: "mask",
+                mask: "##"
             }
+
             ]
         } );
 
+        var input = ordersDataTableEditor.field("goodsCost").input();
+        input.keyup(function(){
+            var str = $(this).val();
+            if(/^(\d*\.)?\d*$/.test(str)){
+            }else{
+                input[0].value="";
+            }
+        });
         // generate dataTable
         var buttons = [];
         if (settings.ordersCrud === "all") {
@@ -95,8 +124,7 @@
                 action: function (e, dt, node, config) {
                     ordersDataTableEditor.submit();
                     var defaultStatus = settings.orderStatuses[0].statusName;
-
-                    createRow(virtualIdGenerator(), "", Object.keys(settings.warehouses)[0], "", "", defaultStatus);
+                    createRow(virtualIdGenerator(), "", Object.keys(settings.warehouses)[0], "", "", defaultStatus, "", "", "");
                 }
             });
         }
@@ -138,7 +166,10 @@
                 {"data": "finalDestinationWarehouseId"},
                 {"data": "boxQty"},
                 {"data": "commentForStatus"},
-                {"data": "orderStatusId"}
+                {"data": "orderStatusId"},
+                {"data": "invoiceNumber"},
+                {"data": "goodsCost"},
+                {"data": "orderPalletsQty"}
             ],
             columnDefs: [
                 {"name": "orderNumber", "orderable": false, "targets": 1},
@@ -167,7 +198,10 @@
                         }
                         return type === 'display' ? orderStatusRusName : tableOrderStatusName;
                     }
-                }
+                },
+                {"name": "invoiceNumber", "orderable": false, "targets": 6},
+                {"name": "goodsCost", "orderable": false, "targets": 7},
+                {"name": "orderPalletsQty", "orderable": false, "targets": 8}
             ]
         });
         dataTable.buttons().container().appendTo(donutFields.buttonsContainer);
@@ -250,7 +284,17 @@
             donutFields.commentArea.val(data.commentForDonut);
             ordersDataTableEditor.remove('tr', false).submit();
             data.orders.forEach(function(order) {
-                createRow(order.orderId, order.orderNumber, order.finalDestinationWarehouseId, order.boxQty, order.commentForStatus, order.orderStatusId);
+                createRow(
+                    order.orderId,
+                    order.orderNumber,
+                    order.finalDestinationWarehouseId,
+                    order.boxQty,
+                    order.commentForStatus,
+                    order.orderStatusId,
+                    order.invoiceNumber,
+                    order.goodsCost,
+                    order.orderPalletsQty
+                );
             });
         };
 
@@ -288,7 +332,7 @@
         // --------------------------- FUNCTIONS --------------------------------
         var virtualIdGenerator = makeCounter();
 
-        function createRow(orderId, orderNumber, finalWarehouseDestinationId, boxQty, commentForStatus, statusId) {
+        function createRow(orderId, orderNumber, finalWarehouseDestinationId, boxQty, commentForStatus, statusId, invoiceNumber, goodsCost, orderPalletsQty) {
             createRow.lastAddedId = orderId + "";
 
             var filtered = settings.orderStatuses.filter(function(orderStatus) {
@@ -303,6 +347,9 @@
                     .set("boxQty", boxQty)
                     .set("commentForStatus", commentForStatus)
                     .set("orderStatusId", statusId)
+                    .set("invoiceNumber", invoiceNumber)
+                    .set("goodsCost", goodsCost)
+                    .set("orderPalletsQty", orderPalletsQty)
                     .submit();
             } else {
                 ordersDataTableEditor
@@ -311,6 +358,9 @@
                     .set("finalDestinationWarehouseId", finalWarehouseDestinationId)
                     .set("boxQty", boxQty)
                     .set("commentForStatus", commentForStatus)
+                    .set("invoiceNumber", invoiceNumber)
+                    .set("goodsCost", goodsCost)
+                    .set("orderPalletsQty", orderPalletsQty)
                     .submit();
                 var cell = dataTable.cell(dataTable.rows().count() - 1, "orderStatusId:name");
                 cell.data(filtered[0].statusName);
@@ -329,6 +379,8 @@
             var copy = $.extend({}, rowData);
             copy.boxQty = +copy.boxQty;
             copy.finalDestinationWarehouseId = +copy.finalDestinationWarehouseId;
+            copy.goodsCost = +copy.goodsCost;
+            copy.orderPalletsQty = +copy.orderPalletsQty;
             if (copy.orderId.lastIndexOf("virtualId", 0) === 0) {
                 copy.orderId = null;
             } else {
@@ -362,7 +414,10 @@
                     "finalDestinationWarehouseId": 3,
                     "boxQty": 4,
                     "commentForStatus": 5,
-                    "orderStatusId": 6
+                    "orderStatusId": 6,
+                    "invoiceNumber": 7,
+                    "goodsCost": 8,
+                    "orderPalletsQty": 9
                 };
 
                 if (Object.keys(ordersFieldsNthNumbers).length === settings.editableFields.ordersFields.length) {
@@ -492,15 +547,19 @@
             var $selectTh = $("<th>");
             var $numberTh = $("<th>").text("№ листа заказа");
             var $finalDestinationTh = $("<th>").text("Конечный склад доставки");
-            var $palletQtyTh = $("<th>").text("Количество коробок");
+            var $palletQtyTh = $("<th>").text("Кол-во коробок");
             var $commentTh = $("<th>").text("Комментарий");
             var $statusTh = $("<th>").text("Статус");
+            var $invoiceNumber = $("<th>").text("№ накладной");
+            var $goodsCost = $("<th>").text("Сумма");
+            var $orderPalletsQty = $("<th>").text("Кол-во паллет");
+
 
             _this.append(
                 $ordersTable.append(
                     $thead.append(
                         $orderTr.append(
-                            $selectTh, $numberTh, $finalDestinationTh, $palletQtyTh, $commentTh, $statusTh
+                            $selectTh, $numberTh, $finalDestinationTh, $palletQtyTh, $commentTh, $statusTh, $invoiceNumber, $goodsCost, $orderPalletsQty
                         )
                     )
                 )

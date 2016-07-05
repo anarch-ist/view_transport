@@ -219,13 +219,14 @@ CREATE TABLE orders (
   donutDocPeriodID            INTEGER        NOT NULL,
   orderStatus                 VARCHAR(32)    NOT NULL,
   commentForStatus            TEXT           NOT NULL,
+  invoiceNumber               VARCHAR(255)   NOT NULL,
+  goodsCost                   DECIMAL(12, 2) NOT NULL, -- цена всех товаров в заявке
+  orderPalletsQty             SMALLINT       NOT NULL CONSTRAINT positive_orders_pallets_qty CHECK (orderPalletsQty >= 0),
   orderDate                   DATE           NULL, --t
-  invoiceNumber               VARCHAR(255)   NULL, --t
   invoiceDate                 DATE           NULL, --t
   deliveryDate                TIMESTAMP      NULL, --t
   weight                      INTEGER        NULL, -- масса в граммах  --t
   volume                      INTEGER        NULL, -- в кубических сантиметрах --t
-  goodsCost                   DECIMAL(12, 2) NULL, -- цена всех товаров в заявке --t
   lastModified                TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
   -- BINDING ru.logistica.tms.dao.orderDao.OrderStatuses
   CONSTRAINT order_statuses CHECK (orderStatus IN
@@ -322,7 +323,7 @@ BEGIN
   THEN RETURN NULL;
   END IF;
   IF (TG_OP = 'DELETE') THEN
-    INSERT INTO audit.donut_doc_periods_audit(operation, stamp, userID, donutDocPeriodID, creationDate, commentForDonut, driver, driverPhoneNumber, licensePlate, palletsQty, supplierUserID, lastModified)   SELECT 'D', now(), userID, OLD.*;
+    INSERT INTO audit.donut_doc_periods_audit(operation, stamp, userID, donutDocPeriodID, creationDate, commentForDonut, driver, driverPhoneNumber, licensePlate, palletsQty, supplierUserID, lastModified)      SELECT 'D', now(), userID, OLD.*;
     RETURN OLD;
   ELSIF (TG_OP = 'UPDATE') THEN
     INSERT INTO audit.donut_doc_periods_audit(operation, stamp, userID, donutDocPeriodID, creationDate, commentForDonut, driver, driverPhoneNumber, licensePlate, palletsQty, supplierUserID, lastModified) SELECT 'U', now(), userID, NEW.*;
@@ -345,21 +346,23 @@ CREATE TABLE audit.orders_audit (
   stamp                       TIMESTAMPTZ    NOT NULL,
   userID                      INTEGER        NOT NULL,
 
-  orderID                     INTEGER,
+  orderID                     SERIAL,
   orderNumber                 VARCHAR(16)    NOT NULL,
-  boxQty                      SMALLINT       NOT NULL,
+  boxQty                      SMALLINT       NOT NULL CONSTRAINT positive_box_qty CHECK (boxQty >= 0),
   finalDestinationWarehouseID INTEGER        NOT NULL,
   donutDocPeriodID            INTEGER        NOT NULL,
   orderStatus                 VARCHAR(32)    NOT NULL,
   commentForStatus            TEXT           NOT NULL,
+  invoiceNumber               VARCHAR(255)   NOT NULL,
+  goodsCost                   DECIMAL(12, 2) NOT NULL, -- цена всех товаров в заявке
+  orderPalletsQty             SMALLINT       NOT NULL CONSTRAINT positive_orders_pallets_qty CHECK (ordersPalletsQty >=
+                                                                                                    0),
   orderDate                   DATE           NULL, --t
-  invoiceNumber               VARCHAR(255)   NULL, --t
   invoiceDate                 DATE           NULL, --t
   deliveryDate                TIMESTAMP      NULL, --t
   weight                      INTEGER        NULL, -- масса в граммах  --t
   volume                      INTEGER        NULL, -- в кубических сантиметрах --t
-  goodsCost                   DECIMAL(12, 2) NULL, -- цена всех товаров в заявке --t
-  lastModified                TIMESTAMPTZ    NOT NULL,
+  lastModified                TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
   PRIMARY KEY (ordersAuditID)
 );
 
@@ -377,13 +380,13 @@ BEGIN
   THEN RETURN NULL;
   END IF;
   IF (TG_OP = 'DELETE') THEN
-    INSERT INTO audit.orders_audit(operation, stamp, userID, orderID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus, orderDate, invoiceNumber, invoiceDate, deliveryDate, weight, volume, goodsCost, lastModified) SELECT 'D', now(), userID, OLD.*;
+    INSERT INTO audit.orders_audit(operation, stamp, userID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus, invoiceNumber, goodsCost, orderPalletsQty, orderDate, invoiceDate, deliveryDate, weight, volume, lastModified)  SELECT 'D', now(), userID, OLD.*;
     RETURN OLD;
   ELSIF (TG_OP = 'UPDATE') THEN
-    INSERT INTO audit.orders_audit(operation, stamp, userID, orderID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus, orderDate, invoiceNumber, invoiceDate, deliveryDate, weight, volume, goodsCost, lastModified) SELECT 'U', now(), userID, NEW.*;
+    INSERT INTO audit.orders_audit(operation, stamp, userID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus, invoiceNumber, goodsCost, orderPalletsQty, orderDate, invoiceDate, deliveryDate, weight, volume, lastModified) SELECT 'U', now(), userID, NEW.*;
     RETURN NEW;
   ELSIF (TG_OP = 'INSERT') THEN
-    INSERT INTO audit.orders_audit(operation, stamp, userID, orderID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus, orderDate, invoiceNumber, invoiceDate, deliveryDate, weight, volume, goodsCost, lastModified) SELECT 'I', now(), userID, NEW.*;
+    INSERT INTO audit.orders_audit(operation, stamp, userID, orderNumber, boxQty, finalDestinationWarehouseID, donutDocPeriodID, orderStatus, commentForStatus, invoiceNumber, goodsCost, orderPalletsQty, orderDate, invoiceDate, deliveryDate, weight, volume, lastModified) SELECT 'I', now(), userID, NEW.*;
     RETURN NEW;
   END IF;
   RETURN NULL;

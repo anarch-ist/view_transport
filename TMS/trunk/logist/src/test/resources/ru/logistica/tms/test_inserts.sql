@@ -69,8 +69,8 @@ VALUES (3, '2016-10-19', 'donut_comment', 'driver2', '8903435642', '754erk', 6, 
 
 INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 13:00:00 Z', '2016-10-19 13:30:00 Z'); -- id == 4
 
-INSERT INTO orders (ordernumber, boxqty, finaldestinationwarehouseid, donutdocperiodid, orderstatus, commentforstatus) -- id == 1
-  VALUES ('orderNumber1', 2, 1, 2, 'CREATED', 'commentForStatus');
+INSERT INTO orders (ordernumber, boxqty, finaldestinationwarehouseid, donutdocperiodid, orderstatus, commentforstatus, invoicenumber, goodscost, orderpalletsqty) -- id == 1
+  VALUES ('orderNumber1', 2, 1, 2, 'CREATED', 'commentForStatus', 'invNumber1', 12000.00, 2);
 
 -- SELECT md5(CONCAT(md5('testtest'), 'jrteOl270Hx8gS75'));
 

@@ -41,7 +41,10 @@
                     finalDestinationWarehouseId: 1,
                     boxQty: 4,
                     commentForStatus: "order status comment",
-                    orderStatusId: "STATUS2"
+                    orderStatusId: "STATUS2",
+                    invoiceNumber: "invNumber",
+                    goodsCost: 12000.01,
+                    orderPalletsQty: 10
                 }
             ]
         };
@@ -53,7 +56,7 @@
                 ordersCrud: "all",
                 editableFields: {
                     donutFields: [],
-                    ordersFields: ["orderStatusId", "commentForStatus"]
+                    ordersFields: ["orderStatusId", "commentForStatus", "goodsCost"]
                 },
                 orderStatuses: [
                     {statusName:"STATUS1", statusRusName:"СТАТУС1", isUpdatable: true}, // isUpdatable = true
@@ -63,12 +66,12 @@
                 warehouses: {1: "СКЛАД"}
             });
 
-            //window.console.log(donutCrudPluginInstance.getData());
+
             donutCrudPluginInstance.setOnRowRemoved(function (rowData) {
                 window.console.log(rowData);
             });
             donutCrudPluginInstance.setData(exampleData);
-
+            window.console.log(donutCrudPluginInstance.getData());
 
         });
     </script>
