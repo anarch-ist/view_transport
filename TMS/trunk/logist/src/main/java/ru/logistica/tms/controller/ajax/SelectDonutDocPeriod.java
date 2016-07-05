@@ -75,6 +75,7 @@ public class SelectDonutDocPeriod extends AppHttpServlet {
                             .add("boxQty", order.getBoxQty())
                             .add("commentForStatus", order.getCommentForStatus())
                             .add("orderStatusId", order.getOrderStatus().name())
+                    // TODO ADD fields
             );
         }
         resultBuilder.add("orders", jsonArrayBuilder);

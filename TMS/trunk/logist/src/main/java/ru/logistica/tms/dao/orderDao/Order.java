@@ -4,6 +4,7 @@ import ru.logistica.tms.dao.docPeriodDao.DonutDocPeriod;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -12,11 +13,14 @@ public class Order {
     private Integer orderId;
     private String orderNumber;
     private Short boxQty;
+    private Warehouse finalDestinationWarehouse;
+    private DonutDocPeriod donutDocPeriod;
     private OrderStatuses orderStatus;
     private String commentForStatus;
+    private String invoiceNumber;
+    private BigDecimal goodsCost;
+    private Short orderPalletsQty;
     private Date lastModified;
-    private DonutDocPeriod donutDocPeriod;
-    private Warehouse finalDestinationWarehouse;
 
     @Id
     @SequenceGenerator(name="orders_orderid_seq", sequenceName="orders_orderid_seq", allocationSize=1)
@@ -89,6 +93,36 @@ public class Order {
 
     public void setCommentForStatus(String commentForStatus) {
         this.commentForStatus = commentForStatus;
+    }
+
+    @Basic
+    @Column(name = "invoicenumber", nullable = false, length = 255)
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    @Basic
+    @Column(name = "goodscost", nullable = false, length = 12, precision = 2)
+    public BigDecimal getGoodsCost() {
+        return goodsCost;
+    }
+
+    public void setGoodsCost(BigDecimal goodsCost) {
+        this.goodsCost = goodsCost;
+    }
+
+    @Basic
+    @Column(name = "orderpalletsqty", nullable = false)
+    public Short getOrderPalletsQty() {
+        return orderPalletsQty;
+    }
+
+    public void setOrderPalletsQty(Short orderPalletsQty) {
+        this.orderPalletsQty = orderPalletsQty;
     }
 
     @Basic
