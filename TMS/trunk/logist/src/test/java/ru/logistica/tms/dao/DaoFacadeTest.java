@@ -103,7 +103,7 @@ public class DaoFacadeTest extends HibernateTest {
 
     @Test
     public void testGetAllDonutsForSupplier() throws Exception {
-        SupplierDonuts allDonutsForSupplier = DaoFacade.getAllDonutsForSupplier(1);
+        SupplierDonuts allDonutsForSupplier = DaoFacade.getAllDonutsForSupplier(1, "<br/>");
         System.out.println(allDonutsForSupplier);
     }
 

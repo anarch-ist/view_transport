@@ -305,6 +305,7 @@ public class DaoFacade {
                 DocDao docDao = new DocDaoImpl();
 
                 for (OpenDocPeriodsData.DocAction docAction : openDocPeriodsData) {
+                    // упорядочивать операции
 
                     if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.DeleteOperation) {
                         DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
@@ -314,6 +315,7 @@ public class DaoFacade {
                         DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
                         docPeriod.setPeriod(new Period(new Date(updateOperation.periodBegin), new Date(updateOperation.periodEnd)));
                         docPeriodDao.update(docPeriod);
+                        HibernateUtils.getCurrentSession().flush();
                     }
 
                     Set<OpenDocPeriodsData.DocAction.InsertOperation> insertOperations = docAction.insertOperations;
@@ -323,7 +325,6 @@ public class DaoFacade {
                         docPeriod.setDoc(docDao.findById(Doc.class, insertOperation.docId));
                         docPeriodDao.save(docPeriod);
                     }
-
                 }
             }
         });

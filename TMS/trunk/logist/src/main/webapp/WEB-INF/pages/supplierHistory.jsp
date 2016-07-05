@@ -77,7 +77,7 @@
 <c:set var="allDonutsForSupplier" scope="request" value="${requestScope.allDonutsForSupplier}"/>
 
 <table id="allDonutsForSupplierTable" cellspacing="0" width="100%">
-    <caption>Наименование поставщика: <c:out value="${requestScope.supplierName}"/></caption>
+    <caption>Наименование поставщика: <br><span><c:out value="${requestScope.supplierName}"/></span></caption>
     <thead>
     <tr>
         <th>Начало периода</th>
