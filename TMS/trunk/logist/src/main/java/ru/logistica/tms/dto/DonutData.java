@@ -7,11 +7,10 @@ import javax.json.JsonNumber;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
-public class DonutUpdateData {
-    public final int donutDocPeriodId;
+public class DonutData {
+    public final Integer donutDocPeriodId; // can be null for insert operation
     public final long periodBegin;
     public final long periodEnd;
     public final String driver;
@@ -19,13 +18,17 @@ public class DonutUpdateData {
     public final int palletsQty;
     public final String driverPhoneNumber;
     public final String commentForDonut;
-    public final Set<OrderUpdateData> orders;
-    public final Set<Integer> ordersIdForDelete;
+    public final Set<OrderData> orders;
+    public final Set<Integer> ordersIdForDelete; // can be null if no delete operations
 
-    public DonutUpdateData(String jsonSting) throws ValidateDataException {
+    public DonutData(String jsonSting) throws ValidateDataException {
         try {
             JsonObject receivedJsonObject = JsonUtils.parseStringAsObject(jsonSting);
-            this.donutDocPeriodId = receivedJsonObject.getInt("donutDocPeriodId");
+            if (receivedJsonObject.containsKey("donutDocPeriodId")) {
+                this.donutDocPeriodId = receivedJsonObject.getInt("donutDocPeriodId");
+            } else {
+                this.donutDocPeriodId = null;
+            }
             this.driver = receivedJsonObject.getString("driver");
             this.licensePlate = receivedJsonObject.getString("licensePlate");
             this.palletsQty = receivedJsonObject.getInt("palletsQty");
@@ -34,7 +37,7 @@ public class DonutUpdateData {
             this.periodBegin = receivedJsonObject.getJsonObject("period").getJsonNumber("periodBegin").longValueExact();
             this.periodEnd = receivedJsonObject.getJsonObject("period").getJsonNumber("periodEnd").longValueExact();
 
-            Set<OrderUpdateData> ordersSet = new HashSet<>();
+            Set<OrderData> ordersSet = new HashSet<>();
             JsonArray orders = receivedJsonObject.getJsonArray("orders");
             for (JsonValue orderAsJsonValue : orders) {
                 if (!orderAsJsonValue.getValueType().equals(JsonValue.ValueType.OBJECT))
@@ -48,32 +51,38 @@ public class DonutUpdateData {
                     orderId = orderAsJsonObject.getInt("orderId");
                 }
 
-                OrderUpdateData order = new OrderUpdateData(
+                OrderData order = new OrderData(
                         orderId,
                         orderAsJsonObject.getString("orderNumber"),
                         orderAsJsonObject.getInt("finalDestinationWarehouseId"),
                         orderAsJsonObject.getInt("boxQty"),
                         orderAsJsonObject.getString("commentForStatus"),
-                        orderAsJsonObject.getString("orderStatusId")
-                );
+                        orderAsJsonObject.getString("orderStatusId"),
+                        orderAsJsonObject.getString("invoiceNumber"),
+                        orderAsJsonObject.getJsonNumber("goodsCost").bigDecimalValue(),
+                        orderAsJsonObject.getInt("orderPalletsQty")
+                        );
                 ordersSet.add(order);
             }
             this.orders = ordersSet;
 
-            Set<Integer> ordersIdForDelete = new HashSet<>();
-            JsonArray removedOrders = receivedJsonObject.getJsonArray("removedOrders");
-            for (JsonValue removedOrder : removedOrders) {
-                ordersIdForDelete.add(((JsonNumber) removedOrder).intValueExact());
+            if (receivedJsonObject.containsKey("removedOrders")) {
+                Set<Integer> ordersIdForDelete = new HashSet<>();
+                JsonArray removedOrders = receivedJsonObject.getJsonArray("removedOrders");
+                for (JsonValue removedOrder : removedOrders) {
+                    ordersIdForDelete.add(((JsonNumber) removedOrder).intValueExact());
+                }
+                this.ordersIdForDelete = ordersIdForDelete;
+            } else {
+                this.ordersIdForDelete = null;
             }
-            this.ordersIdForDelete = ordersIdForDelete;
-
 
         } catch (Exception e) {
             throw new ValidateDataException(e);
         }
     }
 
-    public DonutUpdateData(int donutDocPeriodId, long periodBegin, long periodEnd, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderUpdateData> orders, Set<Integer> ordersIdForDelete) {
+    public DonutData(Integer donutDocPeriodId, long periodBegin, long periodEnd, String driver, String licensePlate, int palletsQty, String driverPhoneNumber, String commentForDonut, Set<OrderData> orders, Set<Integer> ordersIdForDelete) {
         this.donutDocPeriodId = donutDocPeriodId;
         this.periodBegin = periodBegin;
         this.periodEnd = periodEnd;
@@ -88,7 +97,7 @@ public class DonutUpdateData {
 
     @Override
     public String toString() {
-        return "DonutUpdateData{" +
+        return "DonutData{" +
                 "donutDocPeriodId=" + donutDocPeriodId +
                 ", periodBegin=" + periodBegin +
                 ", periodEnd=" + periodEnd +
@@ -102,35 +111,4 @@ public class DonutUpdateData {
                 '}';
     }
 
-    public static class OrderUpdateData {
-        public final Integer orderId; // can be null
-        public final String orderNumber;
-        public final int finalDestinationWarehouseId;
-        public final int boxQty;
-        public final String commentForStatus;
-        public final String orderStatusId;
-
-        public OrderUpdateData(Integer orderId, String orderNumber, int finalDestinationWarehouseId, int boxQty, String commentForStatus, String orderStatusId) {
-            Objects.requireNonNull(orderNumber);
-            Objects.requireNonNull(commentForStatus);
-            this.orderId = orderId;
-            this.orderNumber = orderNumber;
-            this.finalDestinationWarehouseId = finalDestinationWarehouseId;
-            this.boxQty = boxQty;
-            this.commentForStatus = commentForStatus;
-            this.orderStatusId = orderStatusId;
-        }
-
-        @Override
-        public String toString() {
-            return "Order{" +
-                    "orderId=" + orderId +
-                    ", orderNumber='" + orderNumber + '\'' +
-                    ", finalDestinationWarehouseId=" + finalDestinationWarehouseId +
-                    ", boxQty=" + boxQty +
-                    ", commentForStatus='" + commentForStatus + '\'' +
-                    ", orderStatusId='" + orderStatusId + '\'' +
-                    '}';
-        }
-    }
 }

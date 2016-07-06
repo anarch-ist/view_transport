@@ -2,7 +2,7 @@ package ru.logistica.tms.controller.ajax;
 
 import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
-import ru.logistica.tms.dto.DonutUpdateData;
+import ru.logistica.tms.dto.DonutData;
 import ru.logistica.tms.dto.ValidateDataException;
 
 import javax.servlet.ServletException;
@@ -36,7 +36,7 @@ public class UpdateDonutDocPeriod extends AppHttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            DonutUpdateData donutUpdateData = new DonutUpdateData(req.getParameter("updatedDonut"));
+            DonutData donutUpdateData = new DonutData(req.getParameter("updatedDonut"));
             DaoFacade.updateDonutWithRequests(getUser(req).getUserId(), donutUpdateData);
         } catch (ValidateDataException | DaoScriptException e) {
             throw new ServletException(e);

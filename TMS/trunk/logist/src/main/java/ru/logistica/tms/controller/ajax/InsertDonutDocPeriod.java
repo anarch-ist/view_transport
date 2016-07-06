@@ -4,7 +4,7 @@ import ru.logistica.tms.dao.DaoFacade;
 import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dto.DocDateSelectorData;
-import ru.logistica.tms.dto.DonutInsertData;
+import ru.logistica.tms.dto.DonutData;
 import ru.logistica.tms.dto.ValidateDataException;
 
 import javax.servlet.ServletException;
@@ -20,19 +20,19 @@ public class InsertDonutDocPeriod extends AppHttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String donutData = req.getParameter("createdDonut");
         String docDateSelection = req.getParameter("docDateSelection");
-        SupplierUser supplierUser = (SupplierUser)req.getSession(false).getAttribute("user");
+        SupplierUser supplierUser = (SupplierUser)getUser(req);
 
-        DonutInsertData donutInsertData;
+        DonutData donutInsertData;
         DocDateSelectorData docDateSelectorData;
         try {
             docDateSelectorData = new DocDateSelectorData(docDateSelection);
-            donutInsertData = new DonutInsertData(donutData);
+            donutInsertData = new DonutData(donutData);
         } catch (ValidateDataException e) {
             throw new ServletException(e);
         }
 
         try {
-            DaoFacade.insertDonut(getUser(req).getUserId(), donutInsertData, docDateSelectorData, supplierUser);
+            DaoFacade.insertDonut(supplierUser.getUserId(), donutInsertData, docDateSelectorData, supplierUser);
         } catch (DaoScriptException e) {
             throw new ServletException(e);
         }

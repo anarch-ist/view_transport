@@ -1,28 +1,23 @@
 package ru.logistica.tms.dao;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.logistica.tms.HibernateTest;
 import ru.logistica.tms.TestUtil;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
-import ru.logistica.tms.dao.docPeriodDao.DocPeriod;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
 import ru.logistica.tms.dao.userDao.*;
 import ru.logistica.tms.dao.warehouseDao.RusTimeZoneAbbr;
 import ru.logistica.tms.dao.warehouseDao.Warehouse;
-import ru.logistica.tms.dto.DocDateSelectorData;
-import ru.logistica.tms.dto.DonutInsertData;
-import ru.logistica.tms.dto.OpenDocPeriodsData;
-import ru.logistica.tms.dto.SupplierDonuts;
+import ru.logistica.tms.dto.*;
 import ru.logistica.tms.util.UtcSimpleDateFormat;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class DaoFacadeTest extends HibernateTest {
@@ -65,10 +60,10 @@ public class DaoFacadeTest extends HibernateTest {
     public void testInsertDonut() throws Exception {
         DaoFacade.fillOffsetsForAbbreviations();
 
-        Set<DonutInsertData.OrderInsertData> orders = new HashSet<>();
-        DonutInsertData.OrderInsertData dtoOrder = new DonutInsertData.OrderInsertData("234", 2, 4, "erferg", OrderStatuses.CREATED.name());
+        Set<OrderData> orders = new HashSet<>();
+        OrderData dtoOrder = new OrderData(null, "234", 2, 4, "erferg", OrderStatuses.CREATED.name(), "inv1", new BigDecimal(12.0), 4);
         orders.add(dtoOrder);
-        DonutInsertData donut = new DonutInsertData(450*60*1000, 510*60*1000, "driver", "licPl", 4, "phN", "commne", orders);
+        DonutData donut = new DonutData(null, 450*60*1000, 510*60*1000, "driver", "licPl", 4, "phN", "commne", orders, null);
         DocDateSelectorData docDateSelectorData = new DocDateSelectorData(new Date().getTime(), 1, 1);
 
         HibernateUtils.beginTransaction();
