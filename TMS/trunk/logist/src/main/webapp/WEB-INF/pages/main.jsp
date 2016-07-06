@@ -24,9 +24,11 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/donutCrudPlugin.css"/>">
 
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/main.css"/>">
-
+    
     <%--common scripts--%>
+    <script src="<c:url value="/media/es5-shim.min.js"/>"></script>
     <script src="<c:url value="/media/es6-shim.min.js"/>"></script>
+    <script src="<c:url value="/media/customEventPolyForIE.js"/>"></script>
     <script src="<c:url value="/media/jQuery-2.1.4/jquery-2.1.4.min.js"/>"></script>
     <script src="<c:url value="/media/datePicker/jquery.pickmeup.min.js"/>"></script>
     <script>

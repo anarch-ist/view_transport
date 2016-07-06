@@ -506,7 +506,8 @@
             var $palletQtyDiv = $("<td>");
             var $palletQtyLabel = $("<label>").text("Количество паллет");
             var $palletQty = $("<td>");
-            var $palletQtyInput = $("<input>").attr("type", "number").attr("min", "0").attr("max", "99").attr("step", "1");
+            var $palletQtyInput = $("<input>").attr("type", "text");
+            $palletQtyInput.mask('##');
             setReadOnlyIfOption("palletsQty", $palletQtyInput);
 
             var $driverPhoneTr = $("<tr>");
@@ -535,6 +536,7 @@
                     $commentTr.append($commentDiv.append($commentLabel), $comment.append($commentArea))
                 )
             );
+
 
             var $buttonsContainer = $("<div>");
             _this.append($buttonsContainer);

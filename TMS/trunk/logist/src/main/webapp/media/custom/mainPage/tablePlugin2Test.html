@@ -5,7 +5,9 @@
     <title>test</title>
     <link href="tablePlugin2.css" rel="stylesheet">
     <link href="main.css" rel="stylesheet">
+    <script src="../../es5-shim.min.js"></script>
     <script src="../../es6-shim.min.js"></script>
+    <script src="../../customEventPolyForIE.js"></script>
     <script src="tablePlugin2.js"></script>
     <script>
         var exampleData = [
@@ -95,7 +97,7 @@
                 window.console.log("CREATED");
             });
             tablePlugin2.setOnAnySelected(function(e) {
-                window.console.log(tablePlugin2.getSelectionData());
+                //window.console.log(tablePlugin2.getSelectionData());
                 window.console.log("ANY SELECTED: " + e.detail);
             });
             tablePlugin2.setOnDisableChanged(function(e) {

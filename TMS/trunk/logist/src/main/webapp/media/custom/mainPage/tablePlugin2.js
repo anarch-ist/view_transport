@@ -229,8 +229,9 @@
     function clearAll() {
         data = [];
         selectedElementsInstance.clearSelection();
-        for (var key of dataAndCellsRelation.keys()) {
-            dataAndCellsRelation.set(key, null);
+        var keys = dataAndCellsRelation.keys();
+        for (var i = 0; i < keys.length; i++) {
+            dataAndCellsRelation.set(keys[i], null);
         }
         clearVisual();
 
