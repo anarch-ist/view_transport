@@ -33,7 +33,6 @@
         };
 
         //create and configure table
-
         var ordersDataTableEditor = new $.fn.dataTable.Editor( {
             // When editing data the changes only reflected in the DOM, not in any AJAX backend datasource and not localstorage.
             ajax: function (method, url, data, successCallback, errorCallback) {
@@ -166,10 +165,10 @@
                 {"data": "finalDestinationWarehouseId"},
                 {"data": "boxQty"},
                 {"data": "commentForStatus"},
-                {"data": "orderStatusId"},
                 {"data": "invoiceNumber"},
                 {"data": "goodsCost"},
-                {"data": "orderPalletsQty"}
+                {"data": "orderPalletsQty"},
+                {"data": "orderStatusId"}
             ],
             columnDefs: [
                 {"name": "orderNumber", "orderable": false, "targets": 1},
@@ -180,7 +179,10 @@
                 },
                 {"name": "boxQty", "orderable": false, "targets": 3},
                 {"name": "commentForStatus", "orderable": false, "targets": 4},
-                {"name": "orderStatusId", "orderable": false, "targets": 5,
+                {"name": "invoiceNumber", "orderable": false, "targets": 5},
+                {"name": "goodsCost", "orderable": false, "targets": 6},
+                {"name": "orderPalletsQty", "orderable": false, "targets": 7},
+                {"name": "orderStatusId", "orderable": false, "targets": 8,
                     render: function (tableOrderStatusName, type, full, meta) {
                         var statusName;
                         if (tableOrderStatusName === null) {
@@ -198,10 +200,7 @@
                         }
                         return type === 'display' ? orderStatusRusName : tableOrderStatusName;
                     }
-                },
-                {"name": "invoiceNumber", "orderable": false, "targets": 6},
-                {"name": "goodsCost", "orderable": false, "targets": 7},
-                {"name": "orderPalletsQty", "orderable": false, "targets": 8}
+                }
             ]
         });
         dataTable.buttons().container().appendTo(donutFields.buttonsContainer);
@@ -414,10 +413,10 @@
                     "finalDestinationWarehouseId": 3,
                     "boxQty": 4,
                     "commentForStatus": 5,
-                    "orderStatusId": 6,
-                    "invoiceNumber": 7,
-                    "goodsCost": 8,
-                    "orderPalletsQty": 9
+                    "invoiceNumber": 6,
+                    "goodsCost": 7,
+                    "orderPalletsQty": 8,
+                    "orderStatusId": 9
                 };
 
                 if (Object.keys(ordersFieldsNthNumbers).length === settings.editableFields.ordersFields.length) {
@@ -547,19 +546,19 @@
             var $selectTh = $("<th>");
             var $numberTh = $("<th>").text("№ листа заказа");
             var $finalDestinationTh = $("<th>").text("Конечный склад доставки");
-            var $palletQtyTh = $("<th>").text("Кол-во коробок");
+            var $boxQtyTh = $("<th>").text("Кол-во коробок");
             var $commentTh = $("<th>").text("Комментарий");
-            var $statusTh = $("<th>").text("Статус");
             var $invoiceNumber = $("<th>").text("№ накладной");
             var $goodsCost = $("<th>").text("Сумма");
             var $orderPalletsQty = $("<th>").text("Кол-во паллет");
+            var $statusTh = $("<th>").text("Статус");
 
 
             _this.append(
                 $ordersTable.append(
                     $thead.append(
                         $orderTr.append(
-                            $selectTh, $numberTh, $finalDestinationTh, $palletQtyTh, $commentTh, $statusTh, $invoiceNumber, $goodsCost, $orderPalletsQty
+                            $selectTh, $numberTh, $finalDestinationTh, $boxQtyTh, $commentTh, $invoiceNumber, $goodsCost, $orderPalletsQty, $statusTh
                         )
                     )
                 )

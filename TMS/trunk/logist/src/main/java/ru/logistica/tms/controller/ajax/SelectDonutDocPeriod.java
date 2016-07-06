@@ -46,7 +46,10 @@ public class SelectDonutDocPeriod extends AppHttpServlet {
      *      finalDestinationWarehouseId: 1,
      *      boxQty:4,
      *      commentForStatus: "order status comment",
-     *      orderStatusId: "STATUS"
+     *      orderStatusId: "STATUS",
+     *      invoiceNumber: invNuumber,
+     *      goodsCost: 12000.03,
+     *      orderPalletsQty: 4
      *    }
      *   ]
      * }
@@ -75,7 +78,9 @@ public class SelectDonutDocPeriod extends AppHttpServlet {
                             .add("boxQty", order.getBoxQty())
                             .add("commentForStatus", order.getCommentForStatus())
                             .add("orderStatusId", order.getOrderStatus().name())
-                    // TODO ADD fields
+                            .add("invoiceNumber", order.getInvoiceNumber())
+                            .add("goodsCost", order.getGoodsCost())
+                            .add("orderPalletsQty", order.getOrderPalletsQty())
             );
         }
         resultBuilder.add("orders", jsonArrayBuilder);

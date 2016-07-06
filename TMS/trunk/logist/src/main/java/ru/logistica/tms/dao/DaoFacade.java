@@ -27,7 +27,6 @@ import ru.logistica.tms.util.CriptUtils;
 import ru.logistica.tms.util.RusNames;
 
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class DaoFacade {
     private static final Logger logger = LogManager.getLogger();
@@ -305,7 +304,6 @@ public class DaoFacade {
                 DocDao docDao = new DocDaoImpl();
 
                 for (OpenDocPeriodsData.DocAction docAction : openDocPeriodsData) {
-                    // упорядочивать операции
 
                     if (docAction.idOperation instanceof OpenDocPeriodsData.DocAction.DeleteOperation) {
                         DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, docAction.idOperation.docPeriodId);
@@ -369,7 +367,7 @@ public class DaoFacade {
         });
     }
 
-    public static void updateDonutWithRequests(final Integer userId, final DonutUpdateData donutUpdateData) throws DaoScriptException {
+    public static void updateDonutWithRequests(final Integer userId, final DonutData donutUpdateData) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -387,8 +385,8 @@ public class DaoFacade {
 
                 OrderDao orderDao = new OrderDaoImpl();
                 WarehouseDao warehouseDao = new WarehouseDaoImpl();
-                Set<DonutUpdateData.OrderUpdateData> ordersUpdateData = donutUpdateData.orders;
-                for (DonutUpdateData.OrderUpdateData orderUpdateData : ordersUpdateData) {
+                Set<OrderData> ordersUpdateData = donutUpdateData.orders;
+                for (OrderData orderUpdateData : ordersUpdateData) {
                     if (orderUpdateData.orderId == null) {
                         // insert
                         Order order = new Order();
@@ -398,6 +396,9 @@ public class DaoFacade {
                         order.setBoxQty((short) orderUpdateData.boxQty);
                         order.setDonutDocPeriod(donutDocPeriod);
                         order.setCommentForStatus(orderUpdateData.commentForStatus);
+                        order.setInvoiceNumber(orderUpdateData.invoiceNumber);
+                        order.setGoodsCost(orderUpdateData.goodsCost);
+                        order.setOrderPalletsQty((short) orderUpdateData.orderPalletsQty);
                         orderDao.save(order);
                     } else {
                         // update
@@ -407,15 +408,20 @@ public class DaoFacade {
                         order.setFinalDestinationWarehouse(warehouseDao.findById(Warehouse.class, orderUpdateData.finalDestinationWarehouseId));
                         order.setBoxQty((short) orderUpdateData.boxQty);
                         order.setCommentForStatus(orderUpdateData.commentForStatus);
+                        order.setInvoiceNumber(orderUpdateData.invoiceNumber);
+                        order.setGoodsCost(orderUpdateData.goodsCost);
+                        order.setOrderPalletsQty((short) orderUpdateData.orderPalletsQty);
                         orderDao.update(order);
                     }
                 }
                 donutDocPeriodDao.update(donutDocPeriod);
                 // delete
-                for (Integer orderIdForDelete: donutUpdateData.ordersIdForDelete) {
-                    Order order = orderDao.findById(Order.class, orderIdForDelete);
-                    order.setOrderId(orderIdForDelete);
-                    orderDao.delete(order);
+                if (donutUpdateData.ordersIdForDelete != null) {
+                    for (Integer orderIdForDelete: donutUpdateData.ordersIdForDelete) {
+                        Order order = orderDao.findById(Order.class, orderIdForDelete);
+                        order.setOrderId(orderIdForDelete);
+                        orderDao.delete(order);
+                    }
                 }
 
             }
@@ -467,7 +473,7 @@ public class DaoFacade {
 
     }
 
-    public static void insertDonut(final Integer userId, final DonutInsertData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) throws DaoScriptException {
+    public static void insertDonut(final Integer userId, final DonutData donutInsertData, final DocDateSelectorData docDateSelectorData, final SupplierUser supplierUser) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
             public void execute() throws DAOException {
@@ -495,7 +501,7 @@ public class DaoFacade {
                 donutDocPeriodDao.save(donutDocPeriod);
 
                 OrderDao orderDao = new OrderDaoImpl();
-                for (DonutInsertData.OrderInsertData dtoOrder: donutInsertData.orders) {
+                for (OrderData dtoOrder: donutInsertData.orders) {
                     Order order = new Order();
                     order.setBoxQty((short) dtoOrder.boxQty);
                     order.setCommentForStatus(dtoOrder.commentForStatus);
@@ -503,6 +509,9 @@ public class DaoFacade {
                     order.setOrderNumber(dtoOrder.orderNumber);
                     order.setOrderStatus(OrderStatuses.valueOf(dtoOrder.orderStatusId));
                     order.setDonutDocPeriod(donutDocPeriod);
+                    order.setInvoiceNumber(dtoOrder.invoiceNumber);
+                    order.setGoodsCost(dtoOrder.goodsCost);
+                    order.setOrderPalletsQty((short) dtoOrder.orderPalletsQty);
                     orderDao.save(order);
                 }
             }

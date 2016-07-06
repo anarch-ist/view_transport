@@ -136,7 +136,7 @@
                     },
                     {
                         name: "История поставщика",
-                        id: "sHistoryBtn",
+                        id: "supplierHistoryBtn",
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OCCUPIED";
@@ -154,6 +154,14 @@
                         enabledIf: function (state, isFullPeriodSelected) {
                             return (state === "OCCUPIED" && isFullPeriodSelected);
                         }
+                    },
+                    {
+                        name: "История поставщика",
+                        id: "supplierHistoryBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
                     }
                 ]
                 </c:if>
@@ -166,6 +174,14 @@
                         enabledIfAnySelected: true,
                         enabledIf: function (state, isFullPeriodSelected) {
                             return (state === "OCCUPIED" && isFullPeriodSelected);
+                        }
+                    },
+                    {
+                        name: "История поставщика",
+                        id: "supplierHistoryBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
                         }
                     }
                 ]
@@ -204,9 +220,18 @@
                         enabledIf: function (state, isFullPeriodSelected) {
                             return state === "OCCUPIED" && isFullPeriodSelected;
                         }
+                    },
+                    {
+                        name: "История поставщика",
+                        id: "supplierHistoryBtn",
+                        enabledIfAnySelected: true,
+                        enabledIf: function (state, isFullPeriodSelected) {
+                            return state === "OCCUPIED";
+                        }
                     }
                 ]
                 </c:if>
+
             });
 
 
@@ -229,7 +254,7 @@
                 ordersCrud: "all",
                 editableFields: {
                     donutFields: ["driver", "licensePlate", "palletsQty", "driverPhoneNumber", "commentForDonut"],
-                    ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus"]
+                    ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "invoiceNumber", "goodsCost", "orderPalletsQty"]
                 },
                 orderStatuses: ${requestScope.orderStatusesForRole},
                 warehouses: ${requestScope.warehousesForDonutCrudPlugin}
@@ -304,13 +329,7 @@
                 sendTableAjax("deleteDonut", sendObject);
             };
 
-            var sHistoryBtn = tablePlugin.getButtonByPluginId("sHistoryBtn");
-            sHistoryBtn.onclick = function(e) {
-                var selectionData = tablePlugin.getSelectionData()[0];
-                var donutDocPeriodId = selectionData.data.docPeriodId;
-                var redirectWindow = window.open('getSupplierHistory?docPeriodId=' + donutDocPeriodId, '_blank');
-                redirectWindow.location;
-            };
+
 
             </c:if>
 
@@ -321,8 +340,8 @@
                 isEditable: true,
                 ordersCrud: "update",
                 editableFields: {
-                    donutFields: [],
-                    ordersFields: ["orderStatusId", "commentForStatus"]
+                    donutFields: ["palletsQty"],
+                    ordersFields: ["orderStatusId", "commentForStatus", "orderPalletsQty"]
                 },
                 orderStatuses: ${requestScope.orderStatusesForRole},
                 warehouses: ${requestScope.warehousesForDonutCrudPlugin}
@@ -557,6 +576,13 @@
             };
             </c:if>
 
+            var supplierHistoryBtn = tablePlugin.getButtonByPluginId("supplierHistoryBtn");
+            supplierHistoryBtn.onclick = function(e) {
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var redirectWindow = window.open('getSupplierHistory?docPeriodId=' + donutDocPeriodId, '_blank');
+                redirectWindow.location;
+            };
 
             docDateSelector.setOnSelectionAvailable(function(event, isSelectionAvailable) {
                 tablePlugin.setDisabled(!isSelectionAvailable);
