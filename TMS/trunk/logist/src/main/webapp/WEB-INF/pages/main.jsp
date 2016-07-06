@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/donutCrudPlugin.css"/>">
 
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/custom/mainPage/main.css"/>">
-    
+
     <%--common scripts--%>
     <script src="<c:url value="/media/es5-shim.min.js"/>"></script>
     <script src="<c:url value="/media/es6-shim.min.js"/>"></script>
