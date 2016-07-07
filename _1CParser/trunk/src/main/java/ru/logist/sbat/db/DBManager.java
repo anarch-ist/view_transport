@@ -19,20 +19,9 @@ public class DBManager {
     private SystemResourcesContainer systemResourcesContainer;
     private volatile Connection connection;
 
-//    public DBManager(Connection connection) {
-//        this.connection = connection;
-//        try {
-//            connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-//        } catch (SQLException e) {
-//            logger.fatal(e);
-//            System.exit(-1);
-//        }
-//    }
-
     private void recreateConnection() throws SQLException, ResourceInitException {
         DBUtils.closeConnectionQuietly(connection);
         this.connection = systemResourcesContainer.createConnection();
-
     }
 
     public DBManager(SystemResourcesContainer systemResourcesContainer) {

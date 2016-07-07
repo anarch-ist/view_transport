@@ -23,7 +23,7 @@ public class SystemResourcesContainer {
         this.propertiesPojo = propertiesPojo;
         logger.info("try to connect to database...");
         createConnection();
-        logger.info("connection recieved");
+        logger.info("connection received");
         createPaths();
         logger.info("directory paths checked");
     }

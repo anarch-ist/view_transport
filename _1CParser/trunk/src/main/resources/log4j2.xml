@@ -1,39 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <File name="FILE" fileName="${sys:logFilename}">
-            <PatternLayout>
-                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
-            </PatternLayout>
-            <Filters>
 
-                <!-- First deny warn, error and fatal messages -->
-                <ThresholdFilter level="warn"  onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
-
-                <!-- Then accept info, warn, error, fatal and deny debug/trace -->
-                <ThresholdFilter level="info"  onMatch="ACCEPT" onMismatch="DENY"/>
-            </Filters>
-        </File>
-        <File name="ERROR_FILE" fileName="${sys:errorLogFilename}">
+        <RollingFile name="RollingFile" fileName="${sys:logsFileDir}/lastDay.log" filePattern="${sys:logsFileDir}/$${date:MM-yyyy}/app-%d{dd-MM-yyyy}-%i.log">
             <PatternLayout>
-                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
+                <Pattern>%d %p %c{10} [%t] %m %ex%n</Pattern>
             </PatternLayout>
-        </File>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
+
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%m%n"/>
         </Console>
+
     </Appenders>
 
     <Loggers>
         <Root level="trace">
-            <AppenderRef ref="FILE" level="TRACE"/>
-            <AppenderRef ref="ERROR_FILE" level="WARN"/>
+            <AppenderRef ref="RollingFile" level="TRACE"/>
             <AppenderRef ref="STDOUT" level="INFO"/>
         </Root>
-        <Logger name="ru.logist.sbat.db.DBManager" level="INFO" >
-            <AppenderRef ref="ERROR_FILE" level="INFO"/>
-        </Logger>
     </Loggers>
 </Configuration>

@@ -7,7 +7,9 @@ import ru.logist.sbat.db.DBUtils;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Selects {
     public static final String PARSER_LOGIN = "parser";
@@ -32,7 +34,7 @@ public class Selects {
     private BidiMap<String, Integer> allRoutesAsKeyPairs;
     private BidiMap<String, Integer> allRequestsAsKeyPairs;
     private BidiMap<String, Integer> allRouteListsAsKeyPairs;
-
+    private Set<String>              allUserLogins;
 
     public void setConnection(Connection connection) {
         this.connection = connection;
@@ -49,6 +51,7 @@ public class Selects {
         allRoutesAsKeyPairs = null;
         allRequestsAsKeyPairs = null;
         allRouteListsAsKeyPairs = null;
+        allUserLogins = null;
     }
 
 
@@ -147,6 +150,18 @@ public class Selects {
         } finally {
             DBUtils.closeStatementQuietly(statement);
         }
+    }
+
+    public Set<String> allUserLogins() throws SQLException {
+        if (allUserLogins == null) {
+            allUserLogins = new HashSet<>();
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT login FROM users;");
+            while (resultSet.next()) {
+                allUserLogins.add(resultSet.getString(1));
+            }
+        }
+        return allUserLogins;
     }
 
     /**
