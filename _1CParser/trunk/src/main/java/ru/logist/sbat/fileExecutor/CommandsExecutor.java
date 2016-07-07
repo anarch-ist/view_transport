@@ -97,14 +97,14 @@ public class CommandsExecutor {
             transactionResult.setStatus(TransactionResult.OK_STATUS);
         } catch (DBCohesionException e) {
             logger.warn(e);
-            rollbackWithFatalEx();
+            rollback();
             deleteIncomingFile();
             transactionResult.setStatus(TransactionResult.ERROR_STATUS);
             writeDbFileResponse(transactionResult);
             return;
         } catch (SQLException | ResourceInitException e) {
             logger.error(e);
-            rollbackWithFatalEx();
+            rollback();
             deleteIncomingFile();
             transactionResult.setStatus(TransactionResult.ERROR_STATUS);
             writeDbFileResponse(transactionResult);
@@ -117,7 +117,7 @@ public class CommandsExecutor {
         deleteIncomingFile();
     }
 
-    private void rollbackWithFatalEx() throws FatalException {
+    private void rollback() throws FatalException {
         try {
             dbManager.getConnection().rollback();
         } catch (SQLException ex) {

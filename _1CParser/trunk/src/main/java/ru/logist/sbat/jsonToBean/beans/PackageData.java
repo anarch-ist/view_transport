@@ -20,20 +20,20 @@ public class PackageData {
     private static final Logger logger = LogManager.getLogger();
 
     public static final String FN_UPDATE_POINTS = "updatePoints";
-    public static final String FN_DELETE_POINTS = "deletePoints";
+    public static final DeleteCoordinate FN_DELETE_POINTS = new DeleteCoordinate("deletePoints", "pointId");
     public static final String FN_UPDATE_DIRECTIONS = "updateDirections";
-    public static final String FN_DELETE_DIRECTIONS = "deleteDirections";
+    public static final DeleteCoordinate FN_DELETE_DIRECTIONS = new DeleteCoordinate("deleteDirections", "directId");
     public static final String FN_UPDATE_TRADER = "updateTrader";
-    public static final String FN_DELETE_TRADER = "deleteTrader";
+    public static final DeleteCoordinate FN_DELETE_TRADER = new DeleteCoordinate("deleteTrader", "traderId");
     public static final String FN_UPDATE_CLIENTS = "updateClients";
-    public static final String FN_DELETE_CLIENTS = "deleteClients";
+    public static final DeleteCoordinate FN_DELETE_CLIENTS = new DeleteCoordinate("deleteClients", "clientId");
     public static final String FN_UPDATE_ADDRESS = "updateAddress";
-    public static final String FN_DELETE_ADDRESS = "deleteAddress";
+    public static final DeleteCoordinate FN_DELETE_ADDRESS = new DeleteCoordinate("deleteAddress", "addressId");
     public static final String FN_UPDATE_REQUESTS = "updateRequests";
-    public static final String FN_DELETE_REQUESTS = "deleteRequests";
+    public static final DeleteCoordinate FN_DELETE_REQUESTS = new DeleteCoordinate("deleteRequests", "requestId");
     public static final String FN_UPDATE_STATUS = "updateStatus";
     public static final String FN_UPDATE_ROUTE_LISTS = "updateRouteLists";
-    public static final String FN_DELETE_ROUTE_LISTS = "deleteRouteLists";
+    public static final DeleteCoordinate FN_DELETE_ROUTE_LISTS = new DeleteCoordinate("deleteRouteLists", "routerSheetId");
 
     private List<PointData> updatePoints = new ArrayList<>();
     private List<String> deletePoints = new ArrayList<>();
@@ -55,29 +55,30 @@ public class PackageData {
 
         // check fields
         checkField(packageDataAsJsonObject, FN_UPDATE_POINTS);
-        checkField(packageDataAsJsonObject, FN_DELETE_POINTS);
+        checkField(packageDataAsJsonObject, FN_DELETE_POINTS.arrayName);
         checkField(packageDataAsJsonObject, FN_UPDATE_DIRECTIONS);
-        checkField(packageDataAsJsonObject, FN_DELETE_DIRECTIONS);
+        checkField(packageDataAsJsonObject, FN_DELETE_DIRECTIONS.arrayName);
         checkField(packageDataAsJsonObject, FN_UPDATE_TRADER);
-        checkField(packageDataAsJsonObject, FN_DELETE_TRADER);
+        checkField(packageDataAsJsonObject, FN_DELETE_TRADER.arrayName);
         checkField(packageDataAsJsonObject, FN_UPDATE_CLIENTS);
-        checkField(packageDataAsJsonObject, FN_DELETE_CLIENTS);
+        checkField(packageDataAsJsonObject, FN_DELETE_CLIENTS.arrayName);
         checkField(packageDataAsJsonObject, FN_UPDATE_ADDRESS);
-        checkField(packageDataAsJsonObject, FN_DELETE_ADDRESS);
+        checkField(packageDataAsJsonObject, FN_DELETE_ADDRESS.arrayName);
         checkField(packageDataAsJsonObject, FN_UPDATE_REQUESTS);
-        checkField(packageDataAsJsonObject, FN_DELETE_REQUESTS);
+        checkField(packageDataAsJsonObject, FN_DELETE_REQUESTS.arrayName);
         checkField(packageDataAsJsonObject, FN_UPDATE_STATUS);
         checkField(packageDataAsJsonObject, FN_UPDATE_ROUTE_LISTS);
-        checkField(packageDataAsJsonObject, FN_DELETE_ROUTE_LISTS);
+        checkField(packageDataAsJsonObject, FN_DELETE_ROUTE_LISTS.arrayName);
 
         // set values
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_POINTS), deletePoints, FN_DELETE_POINTS);
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_DIRECTIONS), deleteDirections, FN_DELETE_DIRECTIONS);
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_TRADER), deleteTraders, FN_DELETE_TRADER);
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_CLIENTS), deleteClients, FN_DELETE_CLIENTS);
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_ADDRESS), deleteAddresses, FN_DELETE_ADDRESS);
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_REQUESTS), deleteRequests, FN_DELETE_REQUESTS);
-        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_ROUTE_LISTS), deleteRouteLists, FN_DELETE_ROUTE_LISTS);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_POINTS.arrayName), deletePoints, FN_DELETE_POINTS);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_DIRECTIONS.arrayName), deleteDirections, FN_DELETE_DIRECTIONS);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_TRADER.arrayName), deleteTraders, FN_DELETE_TRADER);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_CLIENTS.arrayName), deleteClients, FN_DELETE_CLIENTS);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_ADDRESS.arrayName), deleteAddresses, FN_DELETE_ADDRESS);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_REQUESTS.arrayName), deleteRequests, FN_DELETE_REQUESTS);
+        setDeleteValue((JSONArray) packageDataAsJsonObject.get(FN_DELETE_ROUTE_LISTS.arrayName), deleteRouteLists, FN_DELETE_ROUTE_LISTS);
+
         setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_POINTS), updatePoints, PointData.class);
         setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_DIRECTIONS), updateDirections, DirectionsData.class);
         setValue((JSONArray) packageDataAsJsonObject.get(FN_UPDATE_TRADER), updateTraders, TraderData.class);
@@ -148,18 +149,23 @@ public class PackageData {
         uniqueCheck(updateData, dataClazz);
     }
 
-    private void setDeleteValue(JSONArray jsonArray, List<String> targetList, String fieldName) throws ValidatorException {
+    private void setDeleteValue(JSONArray jsonArray, List<String> targetList, DeleteCoordinate deleteCoordinate) throws ValidatorException {
 
         if (jsonArray.isEmpty())
             return;
 
         for (Object o : jsonArray) {
-            if (!o.getClass().equals(String.class))
-                throw new ValidatorException(GlobalUtils.getParameterizedString("{}: id {} for delete must be type of {}", fieldName, o, String.class.getSimpleName()));
-            String externalIdForDelete = (String) o;
-            if (externalIdForDelete.equals(""))
-                throw new ValidatorException(GlobalUtils.getParameterizedString("{}: id {} for delete must not be empty", fieldName, externalIdForDelete));
-            targetList.add(externalIdForDelete);
+            if (!o.getClass().equals(JSONObject.class))
+                throw new ValidatorException(GlobalUtils.getParameterizedString("{}: id {} for delete must be type of {}", deleteCoordinate.arrayName, o, JSONObject.class.getSimpleName()));
+            JSONObject jsonObject = (JSONObject) o;
+            Object valueForDelete = jsonObject.get(deleteCoordinate.fieldName);
+            if (valueForDelete == null) {
+                throw new ValidatorException(GlobalUtils.getParameterizedString("{}: value for delete must not be empty", deleteCoordinate.arrayName));
+            }
+            if (!valueForDelete.getClass().equals(String.class)) {
+                throw new ValidatorException(GlobalUtils.getParameterizedString("{} id {} value for delete must be type of {}", deleteCoordinate.arrayName, o, String.class.getSimpleName()));
+            }
+            targetList.add((String) valueForDelete);
         }
     }
 
@@ -223,5 +229,15 @@ public class PackageData {
                 ", updateRouteLists=" + getStringRepr(updateRouteLists) +
                 ", deleteRouteLists=" + getStringRepr(deleteRouteLists) +
                 '}';
+    }
+
+    private static class DeleteCoordinate {
+        public final String arrayName;
+        public final String fieldName;
+
+        public DeleteCoordinate(String arrayName, String fieldName) {
+            this.arrayName = arrayName;
+            this.fieldName = fieldName;
+        }
     }
 }

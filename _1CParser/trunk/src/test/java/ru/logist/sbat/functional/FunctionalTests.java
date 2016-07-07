@@ -280,4 +280,8 @@ public class FunctionalTests {
         requestsStatement.close();
     }
 
+    @Test(dependsOnMethods = {"routeListIdIsNotNullAfterRequestUpdateTest"})
+    public void deleteAddressTest() throws Exception {
+        loadFile("11.zip"); // delete address
+    }
 }
