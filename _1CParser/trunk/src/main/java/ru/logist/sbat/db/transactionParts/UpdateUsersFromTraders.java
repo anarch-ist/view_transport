@@ -29,7 +29,7 @@ public class UpdateUsersFromTraders extends TransactionPart {
     public PreparedStatement executePart() throws SQLException {
         if (updateMarketAgents.isEmpty())
             return null;
-        //2016-07-07 16:23:35,279 ERROR ru.logist.sbat.fileExecutor.CommandsExecutor [pool-1-thread-1] java.sql.BatchUpdateException: Duplicate entry 'bogomolov@ryazan.sbat.ru' for key 'login'
+
         logger.info("START update users table from JSON object:[updateTrader]");
         Set<String> allUserLogins = Selects.getInstance().allUserLogins();
         PreparedStatement result = connection.prepareStatement(

@@ -2,16 +2,17 @@
 <Configuration status="WARN">
     <Appenders>
 
-        <RollingFile name="RollingFile" fileName="${sys:logsFileDir}/lastDay.log" filePattern="${sys:logsFileDir}/$${date:MM-yyyy}/app-%d{dd-MM-yyyy}-%i.log">
+        <RollingFile append="true" name="DAILY_LOG" fileName="${sys:logsFileDir}/lastDay.log" filePattern="${sys:logsFileDir}/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}.log">
             <PatternLayout>
                 <Pattern>%d %p %c{10} [%t] %m %ex%n</Pattern>
             </PatternLayout>
             <Policies>
                 <OnStartupTriggeringPolicy />
-                <TimeBasedTriggeringPolicy interval="24" modulate="true"/>
-                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <!--interval is depends on min time unit inside filePattern-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <!--<SizeBasedTriggeringPolicy size="10 MB"/>-->
             </Policies>
-            <DefaultRolloverStrategy max="100"/>
+            <DefaultRolloverStrategy max="2000"/>
         </RollingFile>
 
         <Console name="STDOUT" target="SYSTEM_OUT">
@@ -22,7 +23,7 @@
 
     <Loggers>
         <Root level="trace">
-            <AppenderRef ref="RollingFile" level="TRACE"/>
+            <AppenderRef ref="DAILY_LOG" level="TRACE"/>
             <AppenderRef ref="STDOUT" level="INFO"/>
         </Root>
     </Loggers>
