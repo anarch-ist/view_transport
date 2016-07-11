@@ -2,7 +2,7 @@
 <Configuration status="WARN">
     <Appenders>
 
-        <RollingFile append="true" name="DAILY_LOG" fileName="${sys:logsFileDir}/lastDay.log" filePattern="${sys:logsFileDir}/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}.log">
+        <RollingFile name="DAILY_LOG" fileName="${sys:logsFileDir}/lastDay.log" filePattern="${sys:logsFileDir}/$${date:yyyy-MM}/app-%d{yyyy-MM-dd}.log">
             <PatternLayout>
                 <Pattern>%d %p %c{10} [%t] %m %ex%n</Pattern>
             </PatternLayout>
