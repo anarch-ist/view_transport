@@ -29,6 +29,11 @@
     <!--dateTimePicker-->
     <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>
     <script type="text/javascript" src="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.js"></script>
+
+<!--    <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery.datetimepicker_not_legal.css"/>-->
+<!--    <script type="text/javascript" src="common_files/media/dateTimePicker/jquery.datetimepicker_not_legal.js"></script>-->
+
+
     <!--jqueryCookiePlugin-->
     <script src="common_files/media/jqueryCookie-1.4.1/jquery.cookie.js"></script>
     <!--custom js-->
