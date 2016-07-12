@@ -31,37 +31,88 @@ $(document).ready(function () {
     var ADMIN_COL_VISIBLE = [
         "requestIDExternal",
         "requestNumber",
-        "requestDate"
-    ];
-    var CLIENT_MANAGER_COL_VISIBLE = [
-        "requestIDExternal",
-        "requestNumber",
-        "requestDate",
-        "invoiceNumber"
-    ];
-    var DISPATCHER_COL_VISIBLE = [
-        "requestIDExternal",
-        "requestNumber",
-        "requestDate",
-        "invoiceNumber",
-        "invoiceDate"
-    ];
-    var MARKET_AGENT_COL_VISIBLE = [
-        "requestIDExternal",
-        "requestNumber",
-        "requestDate",
-        "invoiceNumber",
-        "invoiceDate",
-        "documentNumber"
-    ];
-    var W_DISPATCHER_COL_VISIBLE = [
-        "requestIDExternal",
-        "requestNumber",
         "requestDate",
         "invoiceNumber",
         "invoiceDate",
         "documentNumber",
-        "documentDate"
+        "documentDate",
+        "firma",
+        "storage",
+        "commentForStatus",
+        "boxQty",
+        "requestStatusRusName",
+        "clientIDExternal",
+        "INN",
+        "clientName",
+        "marketAgentUserName",
+        "deliveryPointName",
+        "warehousePointName",
+        "lastVisitedPointName",
+        "nextPointName",
+        "routeName",
+        "driverUserName",
+        "licensePlate",
+        "palletsQty",
+        "routeListNumber",
+        "arrivalTimeToNextRoutePoint"
+    ];
+    var CLIENT_MANAGER_COL_VISIBLE = [
+        "invoiceNumber",
+        "invoiceDate",
+        "boxQty",
+        "requestStatusRusName",
+        "deliveryPointName",
+        "lastVisitedPointName",
+        "nextPointName",
+        "arrivalTimeToNextRoutePoint"
+    ];
+    var DISPATCHER_COL_VISIBLE = [
+        "invoiceNumber",
+        "invoiceDate",
+        "storage",
+        "boxQty",
+        "requestStatusRusName",
+        "deliveryPointName",
+        "warehousePointName",
+        "lastVisitedPointName",
+        "nextPointName",
+        "routeName",
+        "driverUserName",
+        "palletsQty",
+        "routeListNumber",
+        "arrivalTimeToNextRoutePoint"
+    ];
+    var MARKET_AGENT_COL_VISIBLE = [
+        "invoiceNumber",
+        "invoiceDate",
+        "storage",
+        "boxQty",
+        "requestStatusRusName",
+        "deliveryPointName",
+        "warehousePointName",
+        "lastVisitedPointName",
+        "nextPointName",
+        "routeName",
+        "driverUserName",
+        "palletsQty",
+        "routeListNumber",
+        "arrivalTimeToNextRoutePoint"
+    ];
+    var W_DISPATCHER_COL_VISIBLE = [
+        "invoiceNumber",
+        "invoiceDate",
+        "storage",
+        "boxQty",
+        "requestStatusRusName",
+        "deliveryPointName",
+        "warehousePointName",
+        "lastVisitedPointName",
+        "nextPointName",
+        "routeName",
+        "driverUserName",
+        "palletsQty",
+        "routeListNumber",
+        "arrivalTimeToNextRoutePoint"
     ];
 
     var role = $('#data-role').attr('data-role');
