@@ -86,6 +86,7 @@ $(document).ready(function () {
             if(json['recordsFiltered'] == 0){
                 alert('Данных не найдено');
             }
+            //console.log(this);
 
             dataTable.columns().every(function () {
                 var that = this;
