@@ -230,9 +230,12 @@
         data = [];
         selectedElementsInstance.clearSelection();
         var keys = dataAndCellsRelation.keys();
-        for (var i = 0; i < keys.length; i++) {
-            dataAndCellsRelation.set(keys[i], null);
-        }
+        var iteratorElem;
+        do {
+            iteratorElem = keys.next();
+            dataAndCellsRelation.set(iteratorElem.value, null);
+        } while (!iteratorElem.done);
+
         clearVisual();
 
         previousDisabled = undefined;
