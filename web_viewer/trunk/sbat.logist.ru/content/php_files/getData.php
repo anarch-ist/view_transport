@@ -47,9 +47,18 @@ function getRequestsForUser(PrivilegedUser $privUser)
 
     $start = (int)$_POST['start'];
     $count = (int)$_POST['length'];
+    foreach($_POST['columns'] as $key => $value){
+        if($value['data'] == 'requestDate' || $value['data'] == 'invoiceDate' || $value['data'] == 'documentDate' || $value['data'] == 'arrivalTimeToNextRoutePoint'){
+            if($value['search']['value'] != ''){
+                $_POST['columns'][$key]['search']['value'] = date('Y-m-d', strtotime($value['search']['value']));
+            }
+        }
+    }
     $columnInformation = $_POST['columns'];
+    //exit(print_r($_POST['columns']));
     $orderColumnNumber = $_POST['order'][0]['column'];
     $dataArray = $privUser->getRequestsForUser()->selectAllData($columnInformation, $orderColumnNumber, $start, $count);
+    //echo(print_r($data['dataArray']));
     // remove date seconds from
     // $dataArray['requestDate'] = explode(' ', $dataArray['requestDate'])[0];
     $json_data = array(
