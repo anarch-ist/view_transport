@@ -1524,13 +1524,13 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
 CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(255))
   BEGIN
     SELECT
-      requests_history.lastStatusUpdated    AS timeMarkWhenRequestWasChanged,
-      requests_history.boxQty               AS boxQty,
-      request_statuses.requestStatusRusName AS requestStatusRusName,
-      points.pointName                      AS pointWhereStatusWasChanged,
-      users.userName                        AS userNameThatChangedStatus,
-      route_lists.routeListIDExternal       AS routeListIDExternal,
-      route_lists.routeListNumber           AS routeListNumber
+      MAX(requests_history.lastStatusUpdated) AS timeMarkWhenRequestWasChanged,
+      requests_history.boxQty                 AS boxQty,
+      request_statuses.requestStatusRusName   AS requestStatusRusName,
+      points.pointName                        AS pointWhereStatusWasChanged,
+      users.userName                          AS userNameThatChangedStatus,
+      route_lists.routeListIDExternal         AS routeListIDExternal,
+      route_lists.routeListNumber             AS routeListNumber
 
     FROM requests_history
       INNER JOIN (request_statuses)
@@ -1550,7 +1550,8 @@ CREATE PROCEDURE selectRequestStatusHistory(_requestIDExternal VARCHAR(255))
     WHERE requests_history.requestIDExternal = _requestIDExternal
           AND requests_history.lastStatusUpdated IS NOT NULL
           AND requests_history.lastStatusUpdated != '0000-00-00 00:00:00'
-    ORDER BY lastStatusUpdated;
+    GROUP BY requests_history.requestStatusID
+    ORDER BY timeMarkWhenRequestWasChanged;
   END;
 
 
