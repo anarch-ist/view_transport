@@ -62,9 +62,10 @@
     <c:set var="userRole" scope="session" value="${sessionScope.user.userRole.userRoleId}"/>
     <c:set var="isSupplierManager" scope="page" value="${userRole == 'SUPPLIER_MANAGER'}"/>
     <c:set var="isWarehouseBoss" scope="page" value="${userRole == 'WH_BOSS'}"/>
+    <c:set var="isWarehouseSupervisor" scope="page" value="${userRole == 'WH_SUPERVISOR'}"/>
     <c:set var="isWarehouseDispatcher" scope="page" value="${userRole == 'WH_DISPATCHER'}"/>
     <c:set var="isSecurityOfficer" scope="page" value="${userRole == 'WH_SECURITY_OFFICER'}"/>
-    <c:set var="useWarehouseSelect" scope="page" value="${!(isWarehouseBoss || isWarehouseDispatcher || isSecurityOfficer)}"/>
+    <c:set var="useWarehouseSelect" scope="page" value="${isWarehouseSupervisor || !(isWarehouseBoss || isWarehouseDispatcher || isSecurityOfficer)}"/>
 
     <script>
         $(document).ready(function(){
@@ -76,8 +77,8 @@
                 windowSize: +<c:out value="${windowSize}"/>,
                 cellSize: +<c:out value="${periodSize}"/>,
                 allowedStatesForSelection: {
-                    isOpenedAllowed: <c:out value="${isSupplierManager || isWarehouseBoss}"/>,
-                    isClosedAllowed: <c:out value="${isWarehouseBoss}"/>,
+                    isOpenedAllowed: <c:out value="${isSupplierManager || isWarehouseBoss || isWarehouseSupervisor}"/>,
+                    isClosedAllowed: <c:out value="${isWarehouseBoss || isWarehouseSupervisor}"/>,
                     isOccupiedAllowed: true
                 },
                 selectionModel: {
@@ -189,7 +190,7 @@
                 ]
                 </c:if>
 
-                <c:if test="${isWarehouseBoss}">
+                <c:if test="${isWarehouseBoss || isWarehouseSupervisor}">
                 buttons: [
                     {
                         name: "Открыть",
@@ -383,7 +384,7 @@
             };
             </c:if>
 
-            <c:if test="${isWarehouseBoss}">
+            <c:if test="${isWarehouseBoss || isWarehouseSupervisor}">
             var donutCrudPluginDialog = $('[data-remodal-id=donutsDialog]').remodal();
 
             var donutCrudPluginInstance = $("#routeListDataContainer").donutCrudPlugin({
@@ -681,7 +682,7 @@
         <div></div>
     </div>
 
-    <c:if test="${isWarehouseBoss || isWarehouseDispatcher || isSupplierManager}">
+    <c:if test="${isWarehouseBoss || isWarehouseSupervisor || isWarehouseDispatcher || isSupplierManager}">
         <div data-remodal-id="donutsDialog">
             <button data-remodal-action="close" class="remodal-close"></button>
             <h1>Ввод данных</h1>
@@ -689,7 +690,7 @@
         </div>
     </c:if>
 
-    <c:if test="${isWarehouseBoss}">
+    <c:if test="${isWarehouseBoss || isWarehouseSupervisor}">
         <div data-remodal-id="sendEmailDialog">
             <button data-remodal-action="close" class="remodal-close"></button>
             <h1>Отмена доставки</h1>

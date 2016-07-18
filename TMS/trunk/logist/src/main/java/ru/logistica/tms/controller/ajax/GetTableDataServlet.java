@@ -9,6 +9,7 @@ import ru.logistica.tms.dao.orderDao.OrderStatuses;
 import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRoles;
+import ru.logistica.tms.dao.userDao.WarehouseSupervisor;
 import ru.logistica.tms.dao.userDao.WarehouseUser;
 import ru.logistica.tms.dto.DocDateSelectorData;
 import ru.logistica.tms.dto.ValidateDataException;
@@ -107,6 +108,15 @@ public class GetTableDataServlet extends AppHttpServlet {
                 } else {
                     docPeriodBuilder.add("owned", false);
                 }
+            } else {
+                throw new ServletException("bad role");
+            }
+        }
+        else if (user instanceof WarehouseSupervisor) {
+            WarehouseSupervisor warehouseSupervisor = (WarehouseSupervisor) user;
+            UserRoles userRoleId = warehouseSupervisor.getUserRole().getUserRoleId();
+            if (userRoleId == UserRoles.WH_SUPERVISOR) {
+                docPeriodBuilder.add("owned", true);
             } else {
                 throw new ServletException("bad role");
             }

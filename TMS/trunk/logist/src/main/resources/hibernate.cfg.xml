@@ -41,6 +41,7 @@
         <mapping class="ru.logistica.tms.dao.userDao.UserRole"/>
         <mapping class="ru.logistica.tms.dao.userDao.User"/>
         <mapping class="ru.logistica.tms.dao.userDao.WarehouseUser"/>
+        <mapping class="ru.logistica.tms.dao.userDao.WarehouseSupervisor"/>
         <mapping class="ru.logistica.tms.dao.audit.orderAuditDao.OrdersAudit"/>
         <mapping class="ru.logistica.tms.dao.audit.docPeriodAuditDao.DonutDocPeriodAudit"/>
 
