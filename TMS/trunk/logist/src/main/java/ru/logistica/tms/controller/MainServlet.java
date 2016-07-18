@@ -85,11 +85,15 @@ public class MainServlet extends AppHttpServlet {
         } else if (userRoleId == UserRoles.WH_SECURITY_OFFICER) {
             orderStatusesForRole = createOrderStatuses(false, true, false, false, false, false);
             userRoleRusName = userRolesConverter.get(UserRoles.WH_SECURITY_OFFICER);
+        } else if (userRoleId == UserRoles.WH_SUPERVISOR) {
+            orderStatusesForRole = createOrderStatuses(false, false, false, false, false, false);
+            userRoleRusName = userRolesConverter.get(UserRoles.WH_SUPERVISOR);
         } else
             throw new ServletException("no such role");
 
 
-        if (userRoleId == UserRoles.WH_DISPATCHER || userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.SUPPLIER_MANAGER) {
+        if (userRoleId == UserRoles.WH_DISPATCHER || userRoleId == UserRoles.WH_BOSS || userRoleId == UserRoles.WH_SUPERVISOR
+                || userRoleId == UserRoles.SUPPLIER_MANAGER) {
             JsonObject warehousesForDonutCrudPlugin;
             try {
                 Set<Warehouse> allWarehouses = DaoFacade.getAllWarehouses();

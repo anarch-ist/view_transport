@@ -26,6 +26,7 @@ public class RusNames {
         userRolesConverter.put(UserRoles.WH_BOSS, "НАЧАЛЬНИК СКЛАДА");
         userRolesConverter.put(UserRoles.WH_SECURITY_OFFICER, "ОХРАННИК");
         userRolesConverter.put(UserRoles.WH_DISPATCHER, "ДИСПЕТЧЕР СКЛАДА");
+        userRolesConverter.put(UserRoles.WH_SUPERVISOR, "РУКОВОДСТВО");
     }
     public static Map<UserRoles, String> getUserRolesConverter() {
         return userRolesConverter;

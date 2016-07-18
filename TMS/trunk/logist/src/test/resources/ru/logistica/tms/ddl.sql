@@ -20,7 +20,9 @@ VALUES
   -- охранник прикреплен к складу
   ('WH_SECURITY_OFFICER'),
   -- поставщик, не имеет склада, но ссылается на поставщика
-  ('SUPPLIER_MANAGER')
+  ('SUPPLIER_MANAGER'),
+  -- руководство, имеет доступ ко всем складам
+  ('WH_SUPERVISOR')
 ;
 
 CREATE TABLE users (
@@ -38,7 +40,7 @@ CREATE TABLE users (
   UNIQUE (userLogin)
 );
 
--- BINDING ru.logistica.tms.dao.userDao.PermissionNamesames
+-- BINDING ru.logistica.tms.dao.userDao.PermissionNames
 CREATE TABLE permissions (
   permissionID VARCHAR(32),
   PRIMARY KEY (permissionID)
@@ -77,6 +79,7 @@ $$
 LANGUAGE plpgsql;
 
 SELECT insert_permission_for_role('WH_BOSS', 'DELETE_ANY_DONUT');
+SELECT insert_permission_for_role('WH_SUPERVISOR', 'DELETE_ANY_DONUT');
 SELECT insert_permission_for_role('SUPPLIER_MANAGER', 'DELETE_CREATED_DONUT');
 
 -- -------------------------------------------------------------------------------------------------------------------
@@ -159,6 +162,15 @@ CREATE TABLE warehouse_users (
   ON UPDATE CASCADE,
   FOREIGN KEY (warehouseID) REFERENCES warehouses (warehouseID)
   ON DELETE RESTRICT
+  ON UPDATE CASCADE
+);
+
+-- WH_SUPERVISOR
+CREATE TABLE warehouse_supervisors (
+  userID      INTEGER,
+  PRIMARY KEY (userID),
+  FOREIGN KEY (userID) REFERENCES users
+  ON DELETE CASCADE
   ON UPDATE CASCADE
 );
 
@@ -435,7 +447,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA audit TO admin_user;
 GRANT INSERT, UPDATE, DELETE ON TABLE
 public.users, public.warehouse_users, public.supplier_users,
 public.warehouses, public.suppliers, public.orders, public.docs,
-public.doc_periods, public.donut_doc_periods
+public.doc_periods, public.donut_doc_periods, public.warehouse_supervisors
 TO admin_user;
 GRANT ALL ON SEQUENCE
 public.doc_periods_docperiodid_seq, public.orders_orderid_seq, public.docs_docid_seq,

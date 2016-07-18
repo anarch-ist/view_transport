@@ -54,6 +54,9 @@ INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumb
 VALUES ('uo1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_SECURITY_OFFICER', 'sidorov petr', '90163569874', 'sidor@s.ru', 'officer');
 INSERT INTO warehouse_users VALUES (5, 1);
 
+INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position) -- id == 6
+VALUES ('ws1', 'jrteOl270Hx8gS75', '4e8941fd14c700ec2dd42f36b2e7cedf', 'WH_SUPERVISOR', 'test user', '4991234567', 'test@test.ru', 'supervisor');
+INSERT INTO warehouse_supervisors VALUES (6);
 
 
 -- create docPeriods
