@@ -46,6 +46,8 @@ public class DeleteDonutDocPeriodWithNotification extends HttpServlet{
         String intervalAsText = req.getParameter("intervalAsText");
         String docDateSelection = req.getParameter("docDateSelection");
 
+        String isBegin = req.getParameter("isBegin");
+
         DocDateSelectorData docDateSelectorData;
         DocDateSelectionForEmail docDateSelectionForEmail;
         try {
@@ -71,8 +73,13 @@ public class DeleteDonutDocPeriodWithNotification extends HttpServlet{
         String subject = "Удаление маршрутного листа";
         String message = "Сообщение отправлено";
         try {
-            getServletContext().getRequestDispatcher("/deleteDonut").forward(req, resp);
-            logger.info("donut deleted by WH_BOSS");
+            if (isBegin == null) {
+                getServletContext().getRequestDispatcher("/deleteDonut").forward(req, resp);
+                logger.info("donut deleted by WH_BOSS");
+            } else {
+                getServletContext().getRequestDispatcher("/deleteDonutSinglePeriod").forward(req, resp);
+                logger.info("donut period deleted by WH_BOSS");
+            }
             EmailUtils.sendEmailSSL(host, port, connectionTimeout, timeout, fromAddress, pass, supplierUserEmail, subject, email);
             logger.info("email sended with params supplierUserEmail = {}, text = {}", supplierUserEmail, email);
         } catch (Exception e) {

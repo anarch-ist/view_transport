@@ -28,6 +28,8 @@
     var disableElement;
     var parentElem;
     var generatedCells;
+    var contextMenuElement;
+    var contextMenuItemElement;
 
     // VARS
     var data = [];
@@ -42,6 +44,8 @@
     var main = function (initParams) {
         startupParameters = merge(DEFAULT_PARAMETERS, initParams);
         tableElement = document.createElement("table");
+        contextMenuElement = document.createElement("ul");
+        contextMenuItemElement = document.createElement("li");
         disableElement = document.createElement("div");
         parentElem = document.getElementById(startupParameters.parentId);
         tableControls = new TableControls(parentElem, main, startupParameters.buttons);
@@ -171,6 +175,11 @@
         disableElement.classList.add("tp_disabled");
         tableElement.classList.add("mainTable");
         parentElem.appendChild(tableElement);
+        contextMenuElement.classList.add("custom-menu");
+        contextMenuItemElement.setAttribute("id", "customMenuItem1");
+        contextMenuElement.appendChild(contextMenuItemElement);
+        parentElem.appendChild(contextMenuElement);
+
         labelGenerator = new LabelGenerator(startupParameters.cellSize);
 
         // generate rows and cells

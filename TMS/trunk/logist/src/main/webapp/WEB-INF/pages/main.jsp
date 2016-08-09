@@ -543,6 +543,25 @@
                     emailDialog.close();
                 });
             });
+
+            var emailDialogSplitted = $('[data-remodal-id=sendEmailDialogSplitted]').remodal();
+            $("#submitEmailSplitted").on("click", function() {
+                var btn = $("#submitEmailSplitted");
+                btn.prop("disabled", true);
+                var data = btn.data("data");
+                var isBegin = btn.data("isBegin");
+                var selectionData = tablePlugin.getSelectionData()[0];
+                var donutDocPeriodId = selectionData.data.docPeriodId;
+                var sendObject = {periodToRemove: data, isBegin: isBegin, donutDocPeriodId: donutDocPeriodId, emailContent: $("#emailMessageAreaSplitted").val(), intervalAsText: intervalAsText};
+                sendTableAjax("deleteDonutWithNotification", sendObject, function() {
+                    emailDialogSplitted.close();
+                });
+            });
+
+            var cantDeletePeriodDialog = $('[data-remodal-id=cantDeletePeriodDialog]').remodal();
+            $("#submitCantDeletePeriod").on("click", function() {
+                cantDeletePeriodDialog.close();
+            });
             </c:if>
 
             <c:if test="${isSecurityOfficer}">
@@ -603,6 +622,50 @@
             }
             </c:if>
             $docAndDateSelector.triggerEvents();
+
+            <%------------------ CONTEXT MENU ------------------------------%>
+
+            $(document).bind("mousedown", function (event) {
+                if (!$(event.target).parents(".custom-menu").length > 0) {
+                    $(".custom-menu").hide(100);
+                }
+            });
+
+            $(document).on("contextmenu", ".mainTable td.tp_highlight:has(div.tp_occupied.tp_in_process.tp_owned)", function (event) {
+                event.preventDefault();
+                var item = $("#customMenuItem1");
+                item.text("Отменить период " + $(this).find("label").text());
+                item.attr("data", $(this).attr("data-serialnumber"));
+                item.attr("supplier", $(this).find("div.tp_occupied.tp_in_process.tp_owned").text());
+                item.click(function() {
+                    var data = $(this).attr("data");
+                    var supplier = $(this).attr("supplier");
+                    var periodBegin = (data - 1) * 30;
+                    var periodEnd = data * 30;
+                    var donutPeriod = getSelectedPeriod();
+                    if (periodBegin != donutPeriod.periodBegin && periodEnd != donutPeriod.periodEnd) {
+                        var alertDialog = $('[data-remodal-id=cantDeletePeriodDialog]').remodal();
+                        alertDialog.open();
+                    } else {
+                        var intervalAsText = tablePlugin.getLabelGenerator().getLabelTextFromMinutes(periodBegin, periodEnd);
+                        var emailDialog = $('[data-remodal-id=sendEmailDialogSplitted]').remodal();
+                        $("#emailIntervalSplitted").text(intervalAsText);
+                        $("#emailSupplierSplitted").text(supplier);
+                        var btn = $("#submitEmailSplitted");
+                        btn.data("data", data);
+                        btn.data("isBegin", periodBegin == donutPeriod.periodBegin);
+                        btn.prop("disabled", false);
+                        emailDialog.open();
+                    }
+                    $(".custom-menu").hide(100);
+                    item.unbind("click");
+                });
+                $(".custom-menu").finish().toggle(100).
+                        css({
+                            top: event.pageY + "px",
+                            left: event.pageX + "px"
+                        });
+            });
 
             <%------------------ FUNCTIONS ----------------------%>
             function toUtcDateTime(utcDate, periodPart) {
@@ -708,6 +771,35 @@
 
             <textarea id="emailMessageArea" style="resize:none" cols="75" rows="10" autofocus></textarea>
             <button id="submitEmail">Отправить</button>
+        </div>
+        <div data-remodal-id="sendEmailDialogSplitted">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Отмена интервала доставки</h1>
+            <table>
+                <tr>
+                    <td>Интервал</td><td id="emailIntervalSplitted"></td>
+                </tr>
+                <tr>
+                    <td>Поставщик</td><td id="emailSupplierSplitted"></td>
+                </tr>
+                <tr >
+                    <td colspan="2"><label for="emailMessageAreaSplitted">Сообщение поставщику</label></td>
+                </tr>
+            </table>
+
+            <textarea id="emailMessageAreaSplitted" style="resize:none" cols="75" rows="10" autofocus></textarea>
+            <button id="submitEmailSplitted">Отправить</button>
+        </div>
+        <div data-remodal-id="cantDeletePeriodDialog">
+            <button data-remodal-action="close" class="remodal-close"></button>
+            <h1>Ошибка</h1>
+            <table>
+                <tr>
+                    <td>Невозможно отменить интервал: допускается отмена только начального или конечного интервала</td>
+                </tr>
+            </table>
+
+            <button id="submitCantDeletePeriod">OK</button>
         </div>
     </c:if>
 

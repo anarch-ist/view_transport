@@ -429,6 +429,53 @@ public class DaoFacade {
         });
     }
 
+    public static void updateDonutPeriods(final Integer userId, final long donutDocPeriodId, final boolean isBegin) throws DaoScriptException {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
+                update(donutDocPeriodId, isBegin);
+            }
+        });
+    }
+
+    public static void updateDonutPeriodsIfCreated(final Integer userId, final long donutDocPeriodId, final boolean isBegin) throws DaoScriptException {
+        doInTransaction(new DaoScript() {
+            @Override
+            public void execute() throws DAOException {
+                if (userId != null) {
+                    passUserIdToAuditTrigger(userId);
+                }
+                DonutDocPeriodDao donutDocPeriodDao = new DonutDocPeriodDaoImpl();
+                DonutDocPeriod donutDocPeriod = donutDocPeriodDao.findById(DonutDocPeriod.class, donutDocPeriodId);
+                Set<Order> orders = donutDocPeriod.getOrders();
+                for (Order order : orders) {
+                    if (order.getOrderStatus() != OrderStatuses.CREATED)
+                        throw new DAOException("У одной из заявок статус отличается от " + RusNames.getOrderStatusesConverter().get(OrderStatuses.CREATED));
+                }
+                update(donutDocPeriodId, isBegin);
+            }
+        });
+    }
+
+    private static void update(final long donutDocPeriodId, final boolean isBegin) throws DAOException {
+        DocPeriodDao docPeriodDao = new DocPeriodDaoImpl();
+        DocPeriod docPeriod = docPeriodDao.findById(DocPeriod.class, donutDocPeriodId);
+        Period period = docPeriod.getPeriod();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(isBegin ? period.getPeriodBegin() : period.getPeriodEnd());
+        cal.add(Calendar.MINUTE, isBegin ? 30 : -30);
+        if (isBegin) {
+            period.setPeriodBegin(cal.getTime());
+        } else {
+            period.setPeriodEnd(cal.getTime());
+        }
+        docPeriod.setPeriod(period);
+        docPeriodDao.update(docPeriod);
+    }
+
     public static void deleteDonutWithRequests(final Integer userId, final long donutDocPeriodId) throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override

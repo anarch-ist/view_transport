@@ -35,6 +35,14 @@ public class Period {
         return periodEnd;
     }
 
+    public void setPeriodBegin(Date periodBegin) {
+        this.periodBegin = periodBegin;
+    }
+
+    public void setPeriodEnd(Date periodEnd) {
+        this.periodEnd = periodEnd;
+    }
+
     @Override
     public String toString() {
         return "Period{" +
