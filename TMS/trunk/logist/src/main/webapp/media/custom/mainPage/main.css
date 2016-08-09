@@ -234,6 +234,14 @@ div[data-remodal-id="sendEmailDialog"] table tr:last-child td{
     padding-top: 20px;
 }
 
+div[data-remodal-id="sendEmailDialogSplitted"] #emailMessageAreaSplitted{
+    width: 100%;
+}
+
+div[data-remodal-id="sendEmailDialogSplitted"] table tr:last-child td{
+    padding-top: 20px;
+}
+
 /*Error Dialog*/
 #errorRoot table{
     width: 100%;
