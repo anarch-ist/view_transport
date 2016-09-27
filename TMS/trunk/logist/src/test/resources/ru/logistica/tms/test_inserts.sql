@@ -1,4 +1,4 @@
-SET TIMEZONE = 'UTC';
+﻿SET TIMEZONE = 'UTC';
 TRUNCATE donut_doc_periods CASCADE;
 TRUNCATE doc_periods CASCADE;
 TRUNCATE docs CASCADE;
@@ -75,6 +75,8 @@ INSERT INTO doc_periods (docid, periodbegin, periodend) VALUES (1, '2016-10-19 1
 INSERT INTO orders (ordernumber, boxqty, finaldestinationwarehouseid, donutdocperiodid, orderstatus, commentforstatus, invoicenumber, goodscost, orderpalletsqty) -- id == 1
   VALUES ('orderNumber1', 2, 1, 2, 'CREATED', 'commentForStatus', 'invNumber1', 12000.00, 2);
 
--- SELECT md5(CONCAT(md5('testtest'), 'jrteOl270Hx8gS75'));
+--  INSERT INTO users (userlogin, salt, passandsalt, userroleid, username, phonenumber, email, position)
+VALUES ('Kalashnikov', 'jrteOl270Hx8gS75', md5(CONCAT(md5('go1890q'), 'jrteOl270Hx8gS75')), 'SUPPLIER_MANAGER', 'Поставка Калашников', '000000000', 'rusakovavm@logicsmart.ru', 'логист');
+
 
 
