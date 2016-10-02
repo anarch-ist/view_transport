@@ -562,13 +562,13 @@ $(document).ready(function () {
                 "paging": 10,
                 "columnDefs": [
                     {"name": "userName", "data": "userName", "targets": 0},
-                    {"name": "login", "data": "login", "targets": 0},
-                    {"name": "position", "data": "position", "targets": 1},
-                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 2},
-                    {"name": "email", "data": "email", "targets": 3},
-                    {"name": "password", "data": "password", "targets": 4, visible:false},
-                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 5},
-                    {"name": "pointName", "data": "pointName", "targets": 6}
+                    {"name": "login", "data": "login", "targets": 1},
+                    {"name": "position", "data": "position", "targets": 2},
+                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 3},
+                    {"name": "email", "data": "email", "targets": 4},
+                    {"name": "password", "data": "password", "targets": 5, visible:false},
+                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 6},
+                    {"name": "pointName", "data": "pointName", "targets": 7}
                 ]
             }
         );
