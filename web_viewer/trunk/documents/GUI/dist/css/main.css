@@ -1,0 +1,48 @@
+clearfix::after, body .container .row .mid::after {
+  content: "";
+  display: block;
+  clear: both; }
+
+body {
+  background: #f1f5f8 !important;
+  font-size: 14px;
+  line-height: 24px; }
+  body .container .row .mid {
+    margin: 0 auto;
+    width: 95%;
+    padding-bottom: 15px;
+    color: #5c5c5c; }
+    body .container .row .mid .info {
+      margin-top: 20px;
+      padding: 5px 0 5px 15px;
+      background: #9da5a9;
+      border-top: 1px solid #ced8e1;
+      border-bottom: 1px solid #ced8e1;
+      font-weight: bold;
+      color: #c22929; }
+    body .container .row .mid.request-information {
+      border-bottom: 2px solid #cecece; }
+      body .container .row .mid.request-information table {
+        display: inline-block;
+        vertical-align: top; }
+        body .container .row .mid.request-information table td:first-child {
+          font-weight: bold;
+          color: #5c5c5c; }
+    body .container .row .mid.status-history table {
+      margin: 20px auto;
+      width: 99%;
+      border-collapse: collapse; }
+      body .container .row .mid.status-history table td,
+      body .container .row .mid.status-history table th {
+        padding: 5px;
+        vertical-align: middle;
+        border-top: 1px solid #cecece;
+        border-bottom: 1px solid #cecece; }
+      body .container .row .mid.status-history table th {
+        font-weight: bold;
+        color: #c22929; }
+      body .container .row .mid.status-history table tr:nth-child(even) {
+        background: #e8e8e8; }
+      body .container .row .mid.status-history table tr:not(:first-child):hover {
+        cursor: pointer;
+        background: #cecece; }

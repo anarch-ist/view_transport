@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/media.css">
+    <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="mid request-information">
+          <div class="info">Информация о заявке</div>
+          <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+            <table class="left-table">
+              <tr>
+                <td>Дата заявки:</td>
+                <td id="request-date">17-09-16</td>
+              </tr>
+              <tr>
+                <td>Номер накладной:</td>
+                <td id="invoice-number">5943-345345</td>
+              </tr>
+              <tr>
+                <td>Дата накладной:</td>
+                <td id="invoice-date">17-09-16</td>
+              </tr>
+              <tr>
+                <td>Номер документа:</td>
+                <td id="document-number">453</td>
+              </tr>
+              <tr>
+                <td>Дата документа:</td>
+                <td id="document-date">18-09-16</td>
+              </tr>
+              <tr>
+                <td>Фирма:</td>
+                <td id="organization">Энергия-2016</td>
+              </tr>
+              <tr>
+                <td>Комментарий:</td>
+                <td id="comments">Доставить до 20.09.16</td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
+            <table class="right-table">
+              <tr>
+                <td>Количество коробок:</td>
+                <td id="box-quantity">6</td>
+              </tr>
+              <tr>
+                <td>Количество паллет:</td>
+                <td id="pallet-quantity">8</td>
+              </tr>
+              <tr>
+                <td>Клиент:</td>
+                <td id="client">Петров В.К.</td>
+              </tr>
+              <tr>
+                <td>ИНН:</td>
+                <td id="client">32556867423</td>
+              </tr>
+              <tr>
+                <td>Торговый представитель:</td>
+                <td id="sales-representative">Иванов Иван</td>
+              </tr>
+              <tr>
+                <td>Пункт доставки:</td>
+                <td id="arrival-point">Самара</td>
+              </tr>
+              <tr>
+                <td>Склад отправки:</td>
+                <td id="departure-warehouse">Москва</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="mid status-history">
+          <div class="info">История статусов</div>
+          <div class="col-xs-12">
+            <table>
+              <tr>
+                <th>Время</th>
+                <th>Пункт</th>
+                <th>Статус</th>
+              </tr>
+              <tr>
+                <td>2016-09-16 19:11:13</td>
+                <td>Москва</td>
+                <td>Заявка добавлена в БД</td>
+              </tr>
+              <tr>
+                <td>2016-09-16 22:11:13</td>
+                <td>Рязань</td>
+                <td>Выгружена на утверждение торговому представителю</td>
+              </tr>
+              <tr>
+                <td>2016-09-17 04:11:13</td>
+                <td>Самара</td>
+                <td>Создана расходная накладная</td>
+              </tr>
+              <tr>
+                <td>2016-09-17 05:11:13</td>
+                <td>Москва</td>
+                <td>Создана расходная накладная</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>
