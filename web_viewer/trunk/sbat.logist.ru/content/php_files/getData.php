@@ -14,10 +14,23 @@ try {
         echo getStatusHistory($privUser);
     } else if (strcasecmp($_POST['status'],'getRequestsForRouteList')===0) {
         echo getRequestsForRouteList($privUser);
+    }  else if (strcasecmp($_POST['status'],'getRequestByClientIdAndInvoiceNumber')===0) {
+        echo getRequestByClientIdAndInvoiceNumber($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
+function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser){
+    $clientId = $_POST['clientId'];
+    $invoiceNumber = $_POST['invoiceNumber'];
+    if(!isset($clientId) || empty($clientId) || !isset($invoiceNumber) || empty($invoiceNumber)){
+        throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
+    }
+    $data = $privUser->getRequestEntity()->selectRequestByClientIdAndInvoiceNumber($clientId,$invoiceNumber);
+    return json_encode($data);
+}
+
+
 function getStatusHistory(PrivilegedUser $privUser)
 {
     $requestIDExternal = $_POST['requestIDExternal'];
