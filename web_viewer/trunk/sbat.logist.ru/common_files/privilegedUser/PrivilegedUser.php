@@ -28,8 +28,12 @@ abstract class AuthUser
     {
         if ($authVariant === 'check') {
             if (!$this->checkAuth()) {
+            if(isset($_GET['clientId']) & isset($_GET['md5'])){
+                $this->authorize($_GET['clientId'],$_GET['md5']);
+            } else {
                 throw new AuthException('Проверка не пройдена');
             }
+        }
         } else if ($authVariant === 'auth') {
             if (!(isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password']))) {
                 $login = '';
