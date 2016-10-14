@@ -74,6 +74,12 @@ class RequestEntity implements IRequestEntity
         return $this->_DAO->select(new SelectRequestStatuses($pUser->getUserInfo()->getData('userRoleID')));
     }
 
+    function selectRequestByClientIdAndInvoiceNumber($clientId, $invoiceNumber)
+    {
+        $array = $this->_DAO->select(new SelectRequestByClientIdAndInvoiceNumber($clientId, $invoiceNumber));
+        return $array[0];
+    }
+
     function getRequestHistoryByRequestIdExternal($requestIDExternal)
     {
         return $this->_DAO->select(new SelectRequestHistory($requestIDExternal));
@@ -132,6 +138,28 @@ class SelectRequestStatuses implements IEntitySelect
         return "SELECT `request_statuses`.`requestStatusID`, `requestStatusRusName` from `request_statuses`, `request_statuses_for_user_role` where `request_statuses`.`requestStatusID` = `request_statuses_for_user_role`.`requestStatusID` AND userRoleID = '$this->role'";
     }
 }
+
+class SelectRequestByClientIdAndInvoiceNumber implements IEntitySelect
+{
+    private $clientId, $invoiceNumber;
+    private $userID;
+
+    function __construct($clientId, $invoiceNumber, $userID= -1)
+    {
+        if ($userID < 1) {
+            $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
+        }
+        $this->userID = DAO::getInstance()->checkString($userID);
+        $this->clientId = DAO::getInstance()->checkString($clientId);
+        $this->invoiceNumber = DAO::getInstance()->checkString($invoiceNumber);
+    }
+
+    function getSelectQuery()
+    {
+        return "CALL selectDataByClientIdAndInvoiceNumber($this->userID,'$this->clientId','$this->invoiceNumber')";
+    }
+}
+
 
 class SelectRequestHistory implements IEntitySelect
 {
