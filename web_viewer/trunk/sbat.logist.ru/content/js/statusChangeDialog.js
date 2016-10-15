@@ -58,9 +58,10 @@ $(document).ready(function () {
 
 
     // create and init dateTimePicker
-    createDateTimePickerLocalization();
-    var $dateTimePicker = $("#dateTimePicker");
-    $dateTimePicker.datetimepicker();
+    // createDateTimePickerLocalization();
+    // var $dateTimePicker = $("#dateTimePicker");
+    // $dateTimePicker.datetimepicker();
+    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '__.__.____ __:__', clearIfNotMatch:true})
 
 
     var $statusChangeDialog = $("#statusChangeDialog");
