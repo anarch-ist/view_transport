@@ -139,14 +139,22 @@ $(document).ready(function () {
                 className: 'statusHistory',
                 text: 'история статусов',
                 action: function (e, dt, node, config) {
-                    $.post("content/getData.php", {
-                            status: 'getStatusHistory',
-                            requestIDExternal: dataTable.row($('#user-grid .selected')).data().requestIDExternal
-                        },
-                        function (data) {
-                            $.showRequestHistoryDialog(data);
-                        }
-                    );
+                    var url =
+                        "?clientId=" +
+                        dataTable.row($('#user-grid .selected')).data().clientIDExternal +
+                        "&invoiceNumber=" +
+                        dataTable.row($('#user-grid .selected')).data().invoiceNumber;
+                    url = encodeURI(url);
+                    
+                    window.open(url, "width=400, height=700");
+                    // $.post("content/getData.php", {
+                    //         status: 'getStatusHistory',
+                    //         requestIDExternal: dataTable.row($('#user-grid .selected')).data().requestIDExternal
+                    //     },
+                    //     function (data) {
+                    //         $.showRequestHistoryDialog(data);
+                    //     }
+                    // );
                 }
             },
             {
