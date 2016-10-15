@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta charset="UTF-8"/>
     <!--    Applying all the CSS-->
     <link rel="stylesheet" type="text/css" href="common_files/media/bootstrap-3.3.2/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
