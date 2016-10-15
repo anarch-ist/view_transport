@@ -9,9 +9,9 @@ $(window).on('load', function () {
         $_GET[decode(arguments[1])] = decode(arguments[2]);
     });
 
-    if($_GET['requestIDExternal']){
-        alert($_GET['requestIDExternal']);
-    }
+    // if($_GET['requestIDExternal']){
+    //     alert($_GET['requestIDExternal']);
+    // }
 
 
     var timeoutID;
@@ -23,7 +23,6 @@ $(window).on('load', function () {
     function setHtml(html, callback) {
         document.write(html);
         if (window.jQuery) {
-            // window.alert('fgsfds');
             callback();
         } else if (!(window.jQuery)) {
 
@@ -68,7 +67,7 @@ $(window).on('load', function () {
             function (data) {
                 // alert(data);
                 requestIDExternal = JSON.parse(data).requestIDExternal;
-                // alert(requestIDExternal);
+
                 setRequestInfo(data);
 
             }
@@ -78,7 +77,7 @@ $(window).on('load', function () {
                     requestIDExternal: requestIDExternal,
                 },
                 function (data) {
-                    // alert(requestIDExternal);
+
                     // alert(data);
                     setHistoryTable(data);
                 }
@@ -118,7 +117,6 @@ $(window).on('load', function () {
 
     function setHistoryTable(requestHistoryData) {
         if (window.jQuery) {
-            // alert('fuck!');
             $requestHistoryDialogTable = $("#requestHistoryDialogTable");
             requestHistoryDialogTable = $requestHistoryDialogTable.DataTable({
                     "dom": 't', // show only table with no decorations
@@ -144,7 +142,6 @@ $(window).on('load', function () {
 
 
         } else {
-            // alert('dat was slow');
             timeoutID = window.setTimeout(function () {
                 setHistoryTable();
             }, 1000)
