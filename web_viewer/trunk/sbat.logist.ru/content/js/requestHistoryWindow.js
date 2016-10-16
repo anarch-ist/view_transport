@@ -100,15 +100,15 @@ $(window).on('load', function () {
             requestData[i].fullName = data[i].userName;
             delete requestData[i].userName;
         }
-            $('#request-date').html(requestData.requestDate);
+            $('#request-date').html(requestData.requestDate.split(' ')[0]);
             $('#invoice-number').html(requestData.invoiceNumber);
-            $('#invoice-date').html(requestData.invoiceDate);
+            $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
             $('#document-number').html(requestData.documentNumber);
-            $('#document-date').html(requestData.documentDate);
+            $('#document-date').html(requestData.documentDate.split(' ')[0]);
             $('#organization').html(requestData.firma);
             $('#comments').html(requestData.commentForStatus);
             $('#box-quantity').html(requestData.boxQty);
-            $('#client-INN').html(requestData.INN);
+            $('#client-INN').html(requestData.clientName+' '+requestData.INN);
             $('#sales-representative').html(requestData.marketAgentUserName);
             $('#arrival-point').html(requestData.deliveryPointName);
             $('#departure-warehouse').html(requestData.warehousePointName);
