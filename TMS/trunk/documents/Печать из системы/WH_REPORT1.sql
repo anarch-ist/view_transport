@@ -1,9 +1,10 @@
 ﻿SELECT DISTINCT
---warehouses.warehousename AS "Склад",
+warehouses.warehousename AS "Склад",
 suppliers.inn AS "Поставщик", 
 "Склад доставки".warehousename AS "Город",
 --"Все склады".warehousename,
-  doc_periods.periodbegin,
+doc_periods.periodbegin,
+docs.docname,
   to_char(doc_periods.periodbegin ,'DD.MM.YYYY') AS "Дата прибытия", 
   to_char(doc_periods.periodbegin+interval '3 hour' ,'hh24:mi')||'-'||  to_char(doc_periods.periodend+interval '3 hour' ,'hh24:mi') AS "Период разгрузки",
 --doc_periods.periodend AS "Окончание разгрузки", 
@@ -24,6 +25,7 @@ suppliers.inn AS "Поставщик",
   --warehouses.warehousename
 FROM 
   public.doc_periods, 
+  --public.docs,
   --public.donut_doc_periods, 
   public.docs, 
   public.warehouses, 
@@ -37,10 +39,10 @@ WHERE
   docs.warehouseid = warehouses.warehouseid AND
   --to_char(doc_periods.periodbegin ,'DD.MM.YYYY')=to_char(now() ,'DD.MM.YYYY') AND
   supplier_users.userid = donut_doc_periods.supplieruserid AND
-  warehouses.warehousename='Красноармейск' AND
+ -- warehouses.warehousename='Красноармейск' AND
   --suppliers.inn='AZ' AND
   supplier_users.supplierid = suppliers.supplierid AND
   orders.donutdocperiodid = donut_doc_periods.donutdocperiodid AND
   orders.finaldestinationwarehouseid = "Склад доставки".warehouseid
-  GROUP BY "Склад доставки".warehousename,doc_periods.periodbegin,orders.ordernumber,warehouses.warehousename,donut_doc_periods.palletsqty,suppliers.inn,doc_periods.periodend,donut_doc_periods.licenseplate,orders.orderpalletsqty
+  GROUP BY "Склад доставки".warehousename,doc_periods.periodbegin,orders.ordernumber,warehouses.warehousename,donut_doc_periods.palletsqty,suppliers.inn,docs.docname,doc_periods.periodend,donut_doc_periods.licenseplate,orders.orderpalletsqty
   ORDER BY doc_periods.periodbegin;
