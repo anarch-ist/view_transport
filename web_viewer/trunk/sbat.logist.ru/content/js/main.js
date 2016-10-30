@@ -26,17 +26,18 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         colReorder: true,
-       ScrollXInner: "100%",
-        scrollY:        "500px",
-       // scrollX:        true,
-       autoWidth: false,
-       scrollCollapse: true,
+        ScrollXInner: "100%",
+        scrollY: "500px",
+        scrollX: true,
+        //autoWidth: true,
+        scrollCollapse: true,
         //"order": [],
       //  jQueryUI: true,
      //   paging:         true,
       //  paginate: false,
-
-        fixedColumns: false,
+        fixedColumns: {
+            leftColumns: 2
+        },
        // fixedHeader: {
         //  header: true,
          //   footer: false
@@ -112,7 +113,7 @@ $(document).ready(function () {
         },
         buttons: [
             {
-                text: 'выбрать столбцы',
+                text: 'Выбрать столбцы',
                 action: function (e, dt, node, config) {
                     $.showColumnSelectDialog(dataTable);
                 }
@@ -120,7 +121,7 @@ $(document).ready(function () {
             {
                 extend: 'selectedSingle',
                 className: 'changeStatusForRequest',
-                text: 'изменить статус накладной',
+                text: 'Изменить статус накладной',
                 action: function (e, dt, node, config) {
                     $.showRequestStatusDialog("changeStatusForRequest", dataTable);
                 }
@@ -129,7 +130,7 @@ $(document).ready(function () {
                 name: 'changeRouteListStatus',
                 extend: 'selectedSingle',
                 className: 'changeStatusForSeveralRequests',
-                text: 'изменить статус МЛ',
+                text: 'Изменить статус МЛ',
                 action: function (e, dt, node, config) {
                     $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
                 }
@@ -137,7 +138,7 @@ $(document).ready(function () {
             {
                 extend: 'selectedSingle',
                 className: 'statusHistory',
-                text: 'история статусов',
+                text: 'История статусов',
                 action: function (e, dt, node, config) {
                     var url =
                         "?clientId=" +
@@ -158,7 +159,7 @@ $(document).ready(function () {
                 }
             },
             {
-                text: 'сброс фильтров',
+                text: 'Сброс фильтров',
                 action: function (e, dt, node, config) {
                     dataTable.columns().every(function () {
                         var $input = $('input', this.footer());
@@ -270,7 +271,7 @@ $(document).ready(function () {
                 name: 'changeRouteListStatus',
                 extend: 'selectedSingle',
                 className: 'changeStatusForSeveralRequests',
-                text: 'изменить статус МЛ',
+                text: 'Изменить статус МЛ',
                 action: function (e, dt, node, config) {
                     $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
                 }

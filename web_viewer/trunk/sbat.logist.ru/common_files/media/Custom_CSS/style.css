@@ -1,0 +1,113 @@
+body{
+    font-family: Tahoma, "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    color: #333;
+}
+
+.container{
+    margin-left: 0;
+}
+
+#buttonsContainer > div{
+    color: #c22929 !important;
+}
+
+#user-grid_info{
+    position: fixed;
+}
+
+#user-grid_paginate{
+    position: fixed;
+    right: 0;
+}
+
+.ui-dialog-title{
+    color: #c22929;
+}
+
+.dt-button{
+    border-radius: 0 !important;
+    border: 1px solid #cecece !important;
+}
+
+.dt-button span,
+button span,
+input[type="button"]{
+    line-height: 23px !important;
+    font-size: 12px;
+}
+
+.dt-button:not(.ui-state-disabled):hover,
+button:not(.ui-dialog-titlebar-close):hover,
+input[type="button"]:hover{
+    background-color: #c22929 !important;
+    color: #fff !important;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+thead tr th{
+    background: #9da5a9 !important;
+}
+
+.DataTables_sort_wrapper{
+    color: #fff !important;
+}
+
+.dataTable tr.selected{
+    background: #cecece !important;
+}
+
+.dataTable tbody tr:hover{
+    cursor: pointer;
+}
+
+tr.selected > .sorting_1{
+    background-color: rgb(221, 221, 221) !important;
+}
+
+#logout{
+    background-color: #F5F5F5;
+    color: #333;
+    border: 1px solid #cecece;
+    line-height: 23px;
+}
+
+
+#columnSelectDialogContainer{
+    padding: 20px !important;
+    height: auto !important;
+}
+
+#inputsContainer input[type='button']{
+    margin-left: 4px;
+    margin-top: 10px;
+    width: 100px;
+    height: 30px;
+    border: 1px solid #cecece !important;
+}
+
+#inputsContainer input[type='checkbox']{
+    margin: 4px;
+}
+
+.dt-button,
+button,
+input[type="button"]{
+    background-color: #cecece !important;
+}
+
+.DataTables_sort_wrapper span:hover{
+    cursor: pointer;
+}
+
+.ui-state-hover{
+    background-color: transparent; !important;
+}
+
+span,
+input[type="checkbox"],
+.dt-button{
+    outline: none !important;
+}
