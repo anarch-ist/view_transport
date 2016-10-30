@@ -159,7 +159,7 @@ $(document).ready(function () {
             visibleColsForRole = W_DISPATCHER_COL_VISIBLE;
         }
 
-        $("<input>").attr("type", "button").val("сброс").on("click", function() {
+        $("<input>").attr("type", "button").val("Сброс").on("click", function() {
             visibleColsForRole.forEach(function(elem) {
                 inputs[elem].prop("checked", true);
                 dataTable.column(elem+":name").visible(true);

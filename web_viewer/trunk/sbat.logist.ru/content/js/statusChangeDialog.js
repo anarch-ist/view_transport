@@ -52,7 +52,7 @@ $(document).ready(function () {
     $("#commentInput")
         .addClass("ui-widget ui-state-default ui-corner-all")
         .attr("rows", "5")
-        .attr("placeholder", "введите комментарий")
+        .attr("placeholder", "Введите комментарий")
         .width(COMMENT_WIDTH)
         .css("resize", "none");
 

@@ -9,6 +9,10 @@
     <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.1.0/css/select.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/FixedColumns-3.2.2/css/fixedColumns.jqueryui.min.css"/>
+<!--    <link rel="stylesheet" type="text/css" href="common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>-->
+
+    <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/style.css"/>
 
     <script src="common_files/media/jQuery-2.1.4/jquery-2.1.4.min.js"></script>
     <script src="common_files/media/jQueryUI-1.11.4/jquery-ui.min.js"></script>
@@ -25,6 +29,9 @@
     <script src="common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
     <script src="common_files/media/ColReorder-1.3.1/js/dataTables.colReorder.min.js"></script>
     <script src="common_files/media/FixedHeader-3.1.1/js/dataTables.fixedHeader.min.js"></script>
+    <script src="common_files/media/FixedColumns-3.2.2/js/dataTables.fixedColumns.min.js"></script>
+
+<!--    <script src="common_files/media/Bootstrap-3.3.2/js/bootstrap.min.js"></script>-->
 
     <!--dateTimePicker-->
     <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>
@@ -48,7 +55,7 @@
 <div class="container">
 
     <div id="menu"
-         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: -5px;position:fixed;top:5px;z-index:99999;right:10px;">
+         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: 10px;position:fixed;top:5px;z-index:99999;right:10px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php
@@ -65,7 +72,7 @@
                 echo '<span id="data-role" data-role="'.$data['userRoleID'].'">'.$userRole.'</span>';
                 ?>
             </div>
-            <button id="logout">выйти</button>
+            <button id="logout">Выйти</button>
         </div>
     </div>
 
