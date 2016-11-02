@@ -9,10 +9,8 @@ $(window).on('load', function () {
         $_GET[decode(arguments[1])] = decode(arguments[2]);
     });
 
-    // if($_GET['requestIDExternal']){
-    //     alert($_GET['requestIDExternal']);
-    // }
 
+    $('#pretensionSum').mask('0000000000.00', {reverse: true});
 
     var timeoutID;
     var requestIDExternal;
@@ -35,30 +33,31 @@ $(window).on('load', function () {
     }
 
 
-    if ($_GET['requestIDExternal']){
-        $.post("content/getData.php",{
-                status: 'getRequestById',
-                requestIDExternal: $_GET['requestHistory'],
-
-            },
-            function (data) {
-                // alert(JSON.stringify(data));
-                setRequestInfo(data);
-            }
-        ).success(function () {
-        });
-        $.post("content/getData.php", {
-                status: 'getStatusHistory',
-                requestIDExternal: $_GET['requestHistory']
-            },
-            function (data) {
-                setHistoryTable(data);
-            }
-        ).success(function () {
-        });
-    } else {
+    // if ($_GET['requestIDExternal']){
+    //     $.post("content/getData.php",{
+    //             status: 'getRequestById',
+    //             requestIDExternal: $_GET['requestHistory'],
+    //
+    //         },
+    //         function (data) {
+    //             // alert(JSON.stringify(data));
+    //             setRequestInfo(data);
+    //         }
+    //     ).success(function () {
+    //     });
+    //     $.post("content/getData.php", {
+    //             status: 'getStatusHistory',
+    //             requestIDExternal: $_GET['requestHistory']
+    //         },
+    //         function (data) {
+    //             setHistoryTable(data);
+    //         }
+    //     ).success(function () {
+    //     });
+    // } else
+    if($_GET['clientId'] && $_GET['invoiceNumber']) {
         //Why wasn't chicken able to cross the road?
-        //Because it was disabled
+        //Because it was disabled :|
         $.post("content/getData.php",{
                 status: 'getRequestByClientIdAndInvoiceNumber',
                 clientId: $_GET['clientId'],
@@ -113,6 +112,26 @@ $(window).on('load', function () {
             $('#arrival-point').html(requestData.deliveryPointName);
             $('#departure-warehouse').html(requestData.warehousePointName);
             $('#pallet-quantity').html(requestData.palletsQty);
+
+        $('#submitPretension').click(function () {
+            
+            $.post("content/getData.php",{
+                status: 'addPretension',
+                pretensionCathegory: $('#pretensionCathegory').val(),
+                pretensionStatus: 'OPENED',
+                pretensionSum: $('#pretensionSum').val(),
+                pretensionPositionNumber: $('#pretensionPositionNumber').val(),
+                requestIDExternal: requestData.requestIDExternal,
+                pretensionComment: $('#pretensionComment').val(),
+            }, function (data) {
+                if(data=='true'){
+                    $('#pretensionModal').modal('toggle');
+                    alert('Претензия успешно отправлена');
+                } else {
+                    alert(data);
+                }
+            })
+        });
     }
 
     function setHistoryTable(requestHistoryData) {

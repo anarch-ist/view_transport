@@ -16,10 +16,36 @@ try {
         echo getRequestsForRouteList($privUser);
     }  else if (strcasecmp($_POST['status'],'getRequestByClientIdAndInvoiceNumber')===0) {
         echo getRequestByClientIdAndInvoiceNumber($privUser);
-    }
+    } else if (strcasecmp($_POST['status'],'addPretension')===0) {
+    echo addPretension($privUser);
+}
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
+function addPretension(PrivilegedUser $privUser){
+    $requestIDExternal = $_POST['requestIDExternal'];
+    $pretensionComment = $_POST['pretensionComment'];
+    $pretensionStatus = $_POST['pretensionStatus'];
+    $pretensionCathegory = $_POST['pretensionCathegory'];
+    $pretensionSum = $_POST['pretensionSum'];
+    $pretensionPositionNumber= $_POST['pretensionPositionNumber'];
+    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+        throw new DataTransferException('Не задана заявка', __FILE__);
+    } elseif (!isset($pretensionStatus) || empty($pretensionStatus)){
+//        throw new DataTransferException('Не задан статус претензии', __FILE__);
+    } elseif (!isset($pretensionComment) || empty($pretensionComment)){
+//        throw new DataTransferException('Не задан комментарий претензии',__FILE__);
+    } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)){
+        throw new DataTransferException('Не задана категория претензии',__FILE__);
+    } elseif (!isset($pretensionSum) || empty($pretensionSum)){
+        throw new DataTransferException('Не задана сумма', __FILE__);
+    } elseif (!isset($pretensionPositionNumber) || empty($pretensionPositionNumber)){
+        throw new DataTransferException('Не задан номер позиции', __FILE__);
+    }
+    $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
+    return json_encode($data);
+}
+
 function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser){
     $clientId = $_POST['clientId'];
     $invoiceNumber = $_POST['invoiceNumber'];
