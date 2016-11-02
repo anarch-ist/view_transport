@@ -61,7 +61,7 @@ $(document).ready(function () {
     // createDateTimePickerLocalization();
     // var $dateTimePicker = $("#dateTimePicker");
     // $dateTimePicker.datetimepicker();
-    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '__.__.____ __:__', clearIfNotMatch:true})
+    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true})
 
 
     var $statusChangeDialog = $("#statusChangeDialog");

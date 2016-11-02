@@ -69,6 +69,10 @@ class RequestEntity implements IRequestEntity
         // TODO: Implement addRequest() method.
     }
 
+    function addPretension($requestIDExternal,$pretensionComment,$pretensionStatus,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum){
+        return $this->_DAO->insert(new addPretension($requestIDExternal,$pretensionComment,$pretensionStatus,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum));
+    }
+
     function getRequestStatuses(\PrivilegedUser $pUser)
     {
         return $this->_DAO->select(new SelectRequestStatuses($pUser->getUserInfo()->getData('userRoleID')));
@@ -136,6 +140,26 @@ class SelectRequestStatuses implements IEntitySelect
     function getSelectQuery()
     {
         return "SELECT `request_statuses`.`requestStatusID`, `requestStatusRusName` from `request_statuses`, `request_statuses_for_user_role` where `request_statuses`.`requestStatusID` = `request_statuses_for_user_role`.`requestStatusID` AND userRoleID = '$this->role'";
+    }
+}
+
+class addPretension implements IEntityInsert
+{
+    private $requestIDExternal,$pretensionComment,$pretensionStatus,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum;
+
+    function __construct($requestIDExternal,$pretensionComment,$pretensionStatus,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum)
+    {
+        $this->requestIDExternal=DAO::getInstance()->checkString($requestIDExternal);
+        $this->pretensionComment=DAO::getInstance()->checkString($pretensionComment);
+        $this->pretensionStatus=DAO::getInstance()->checkString($pretensionStatus);
+        $this->pretensionCathegory=DAO::getInstance()->checkString($pretensionCathegory);
+        $this->pretensionPositionNumber=DAO::getInstance()->checkString($pretensionPositionNumber);
+        $this->pretensionSum=DAO::getInstance()->checkString($pretensionSum);
+    }
+
+    function getInsertQuery()
+    {
+        return "CALL insert_pretension('$this->requestIDExternal','$this->pretensionComment','$this->pretensionStatus','$this->pretensionCathegory','$this->pretensionPositionNumber',$this->pretensionSum)";
     }
 }
 
