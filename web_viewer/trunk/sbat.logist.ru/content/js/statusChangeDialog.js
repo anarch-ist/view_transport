@@ -106,7 +106,8 @@ $(document).ready(function () {
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
                                 /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
                                 $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
-                                $requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
+                                $requestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
+                                //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;
                                 $selectRequestsTr.hide();
                                 $selectNumbersRequestsTr.hide();
                             
@@ -138,8 +139,9 @@ $(document).ready(function () {
                                 
                                 $('#selectNumbersRequestsTr').show();
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<tr><td><label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>&nbsp;&nbsp;<span style="font-weight:bold;">'+request.invoiceNumber+'</span></td><td>&nbsp;&nbsp;<span>'+request.requestStatusRusName+'</span></td></tr>');
+                                $requestCheckBoxes.append('<tr><td><span style="font-weight:bold;">'+request.invoiceNumber+'</span></td><td>&nbsp;&nbsp;<span>'+request.requestStatusRusName+'</span></td></tr>');
                                 //$numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
+                                //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>
 
                             });
                             $selectRequestsTr.show();

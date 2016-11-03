@@ -29,7 +29,7 @@ $(document).ready(function () {
         ScrollXInner: "100%",
         scrollY: "500px",
         scrollX: true,
-        //autoWidth: true,
+        autoWidth: true,
         scrollCollapse: true,
         //"order": [],
       //  jQueryUI: true,
