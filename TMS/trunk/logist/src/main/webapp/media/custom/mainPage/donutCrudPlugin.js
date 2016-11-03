@@ -69,7 +69,7 @@
                 label: "Кол-во коробок:",
                 name: "boxQty",
                 type: "mask",
-                mask: "##"
+                mask: "###"
             }, {
                 label: "Комментарий:",
                 name: "commentForStatus"
@@ -507,7 +507,7 @@
             var $palletQtyLabel = $("<label>").text("Количество паллет");
             var $palletQty = $("<td>");
             var $palletQtyInput = $("<input>").attr("type", "text");
-            $palletQtyInput.mask('##');
+            $palletQtyInput.mask('###');
             setReadOnlyIfOption("palletsQty", $palletQtyInput);
 
             var $driverPhoneTr = $("<tr>");
@@ -515,6 +515,7 @@
             var $driverPhoneLabel = $("<label>").text("Телефон водителя");
             var $driverPhone = $("<td>");
             var $driverPhoneInput = $("<input>");
+            $driverPhoneInput.mask('0(000)000-0000');
             setReadOnlyIfOption("driverPhoneNumber", $driverPhoneInput);
 
             var $commentTr = $("<tr>");
