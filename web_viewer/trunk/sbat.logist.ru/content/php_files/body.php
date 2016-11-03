@@ -4,11 +4,11 @@
 
     <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Selectize/css/selectize.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.1.0/css/buttons.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.12/css/dataTables.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.2.2/css/buttons.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.1.0/css/select.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.2.0/css/select.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FixedColumns-3.2.2/css/fixedColumns.jqueryui.min.css"/>
 <!--    <link rel="stylesheet" type="text/css" href="common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>-->
 
@@ -18,17 +18,17 @@
     <script src="common_files/media/jQueryUI-1.11.4/jquery-ui.min.js"></script>
     <script src="common_files/media/jquery-mask/dist/jquery.mask.min.js"></script>
     <script src="common_files/media/Selectize/js/standalone/selectize.min.js"></script>
-    <script src="common_files/media/DataTables-1.10.10/js/jquery.dataTables.min.js"></script>
-    <script src="common_files/media/DataTables-1.10.10/js/dataTables.jqueryui.min.js"></script>
-    <script src="common_files/media/Buttons-1.1.0/js/dataTables.buttons.min.js"></script>
-    <script src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.min.js"></script>
+    <script src="common_files/media/DataTables-1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="common_files/media/DataTables-1.10.12/js/dataTables.jqueryui.min.js"></script>
+    <script src="common_files/media/Buttons-1.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="common_files/media/Buttons-1.2.2/js/buttons.jqueryui.min.js"></script>
     <script src="common_files/media/Editor-1.5.4/js/dataTables.editor.min.js"></script>
     <script src="common_files/media/Editor-1.5.4/js/editor.jqueryui.min.js"></script>
     <script src="common_files/media/FieldType-Mask/editor.mask.min.js"></script>
     <script src="common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
-    <script src="common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
-    <script src="common_files/media/ColReorder-1.3.1/js/dataTables.colReorder.min.js"></script>
-    <script src="common_files/media/FixedHeader-3.1.1/js/dataTables.fixedHeader.min.js"></script>
+    <script src="common_files/media/Select-1.2.0/js/dataTables.select.min.js"></script>
+    <script src="common_files/media/ColReorder-1.3.2/js/dataTables.colReorder.min.js"></script>
+    <script src="common_files/media/FixedHeader-3.1.2/js/dataTables.fixedHeader.min.js"></script>
     <script src="common_files/media/FixedColumns-3.2.2/js/dataTables.fixedColumns.min.js"></script>
 
 <!--    <script src="common_files/media/Bootstrap-3.3.2/js/bootstrap.min.js"></script>-->
@@ -149,6 +149,7 @@
         position:fixed;
         top:15px;
         z-index:9999999;
+        width: 45%;
     }
 
     #user-grid_wrapper{
