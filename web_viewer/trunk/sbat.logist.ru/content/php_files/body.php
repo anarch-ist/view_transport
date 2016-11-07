@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.2.0/css/select.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FixedColumns-3.2.2/css/fixedColumns.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/font-awesome/css/font-awesome.min.css"/>
 <!--    <link rel="stylesheet" type="text/css" href="common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>-->
 
     <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/style.css"/>
@@ -149,7 +150,7 @@
         position:fixed;
         top:15px;
         z-index:9999999;
-        width: 45%;
+        width: 65%;
     }
 
     #user-grid_wrapper{
