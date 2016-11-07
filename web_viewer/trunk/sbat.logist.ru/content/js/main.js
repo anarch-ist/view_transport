@@ -10,17 +10,6 @@ $(document).ready(function () {
         window.location.reload();
     });
 
-    // ------SEARCH INPUTS-------------
-    $('#user-grid tfoot th').each(function () {
-        var title = $(this).text();
-        $(this).html('<input type="text" placeholder="Поиск ' + title + '" />');
-    });
-    var filterInputs = $('#user-grid tfoot th input');
-    filterInputs.attr("currentFilter", "");
-
-
-
-
     // --------DATATABLE INIT--------------
     var dataTable = $('#user-grid').DataTable({
         processing: true,
@@ -42,31 +31,14 @@ $(document).ready(function () {
         //  header: true,
          //   footer: false
       //  },
-
-
         stateSave: true,
         stateDuration: 0, // 0 a special value as it indicates that the state can be stored and retrieved indefinitely with no time limit
         // format for data object: https://datatables.net/reference/option/stateSaveCallback
         // save all but paging
         stateSaveParams: function (settings, data) {
-
             data.start = 0;
             data.length = dataTable.page.len();
         },
-        // manually load filters data into filter inputs
-        stateLoaded: function (settings, data) {
-
-            for (var i = 0; i < data.columns.length; i++) {
-                var column = data.columns[i];
-                var search = column.search.search;
-                if (search) {
-                    $(filterInputs[i]).val(search);
-                    $(filterInputs[i]).attr("currentFilter", search);
-                }
-            }
-        },
-
-        //  autoWidth: true,
         pageLength: 40,
         select: {
             style: 'single'
@@ -79,32 +51,63 @@ $(document).ready(function () {
         // That is to say that the table will not be drawn until the Ajax request as completed.
         // As such, any actions that require the table to have completed its initialisation should be placed into the initComplete callback.
         initComplete: function(settings, json) {
-            //console.log(settings);
-            /*if(json == null || json == '' || json == undefined){
-                alert('Данных не найдено');
-            }*/
-            // Apply the search
+
             if(json['recordsFiltered'] == 0){
                 alert('Данных не найдено');
             }
-            //console.log(this);
+
+            // ------SEARCH INPUTS-------------
+            var state = dataTable.state();
+
 
             dataTable.columns().every(function () {
+
+                var $footer = $(this.footer());
+
+                var title = $footer.text();
+                var searchInput = $('<input type="text" class="searchColumn" style="display: none; position: absolute" placeholder="Поиск ' + title + '" />');
+
+                $("body").append(searchInput);
+
+                var searchDiv = $('<div>');
+                searchDiv.height(20);
+                var search = $('<i class="fa fa-search">');
+                searchDiv.html(search);
+                $footer.html(searchDiv);
+
+                searchDiv.on("click", function() {
+                    console.log("CLICKED");
+                    var position = $(this).offset();
+                    searchInput.offset(position);
+                    searchInput.css({top: position.top, left: position.left, display: 'inline-block'});
+                    searchInput.focus();
+                });
+
                 var that = this;
-                $('input', this.footer()).on('keyup change', function (e) {
+                searchInput.on('keyup change', function (e) {
                     var enterPressed = (e.keyCode == '13');
                     if (enterPressed && (that.search() !== this.value)) {
                         that
                             .search(this.value)
                             .draw();
-                        $(this)
-                            .attr("currentFilter", this.value);
+                        $(this).attr("currentFilter", this.value);
+                        searchInput.css({'display': 'none'});
                     }
                 }).blur(function() {
                     var filterValue = $(this).attr("currentFilter");
                     $(this).val(filterValue);
+                    searchInput.css({'display': 'none'});
                 });
+
+                // manually load filters data into filter inputs
+                var column = state.columns[this.index()];
+                var historySearch = column.search.search;
+                if (historySearch) {
+                    searchInput.val(historySearch);
+                    searchInput.attr("currentFilter", historySearch);
+                }
             });
+
 
             //TODO fix it
             // if user role is CLIENT_MANAGER then delete 'изменить статус МЛ' button
@@ -161,20 +164,15 @@ $(document).ready(function () {
             {
                 text: 'Сброс фильтров',
                 action: function (e, dt, node, config) {
+                    $('.searchColumn').each(function() {
+                        $(this).val("").attr("currentFilter", "");
+                    });
                     dataTable.columns().every(function () {
-                        var $input = $('input', this.footer());
-                        $input.val("");
-                        $input.attr("currentFilter", "");
                         this.search("");
                     });
                     dataTable.columns().draw();
                 }
             }
-
-          //  {
-          //      extend: 'pdfHtml5',
-          //      download: 'open'
-           // }
         ],
         ajax: {
             url: "content/getData.php", // json datasource
@@ -261,7 +259,6 @@ $(document).ready(function () {
     //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
     dataTable.on( 'select', function ( e, dt, type, indexes ) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListNumber;
-        console.log(dataTable.row($('#user-grid .selected')).data());
         if(routeListID == null && disabled != 1){
             dataTable.buttons(2).remove();
             disabled = 1;
@@ -280,6 +277,31 @@ $(document).ready(function () {
         }
     });
 
+    //$(dataTable.table().container()).on( 'click', 'td', function () {
+    //    var cell = table.cell( this );
+    //    console.log( cell.index() );
+    //} );
+
+    //setTimeout(function(){
+    //    var firstSearchDiv = $("#user-grid tfoot tr th.col1 div:not(.dataTables_sizing)");
+    //    var secondSearchDiv = $("#user-grid tfoot tr th.col2 div:not(.dataTables_sizing)");
+    //
+    //    var firstClonedSearchDiv = $(".DTFC_Cloned tfoot tr th.col1 div");
+    //    var secondClonedSearchDiv = $(".DTFC_Cloned tfoot tr th.col2 div");
+    //
+    //    firstClonedSearchDiv.on("click", function() {
+    //        firstSearchDiv.click();
+    //    });
+    //
+    //    secondClonedSearchDiv.on("click", function() {
+    //        secondSearchDiv.click();
+    //    });
+    //
+    //    console.log(firstSearchDiv);
+    //    console.log(secondSearchDiv);
+    //    console.log(firstClonedSearchDiv);
+    //    console.log(secondClonedSearchDiv);
+    //}, 2000);
 
 
 });
