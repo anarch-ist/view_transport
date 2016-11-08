@@ -28,6 +28,7 @@ class DAO implements IDAO
         if (!$this->_connection) {
             $config = parse_ini_file('db_connection.ini');
             $connection = @new mysqli('localhost', $config['username'], $config['password'], $config['dbname']);
+//            $connection = @new mysqli('185.75.182.94', 'root', 'aftR179Kp', $config['dbname']);
             if ($connection->connect_errno) {
                 throw new \MysqlException('Connection error - ' . $connection->connect_error);
             }
