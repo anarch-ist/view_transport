@@ -7,9 +7,10 @@
           href="common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
 
     <!--    Custom css-->
+    <link rel="stylesheet" type="text/css" href="content/css/reset.css"/>
     <link rel="stylesheet" type="text/css" href="content/css/main.css"/>
     <link rel="stylesheet" type="text/css" href="content/css/media.css"/>
-    <link rel="stylesheet" type="text/css" href="content/css/reset.css"/>
+
 
     <!--    Applying JS-->
     <script src="common_files/media/jQuery-2.1.4/jquery-2.1.4.min.js" type="text/javascript"></script>
