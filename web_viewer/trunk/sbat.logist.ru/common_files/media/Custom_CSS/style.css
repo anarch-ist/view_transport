@@ -112,3 +112,11 @@ input[type="checkbox"],
 .dt-button{
     outline: none !important;
 }
+
+.fa-search {
+    color: #ccc;
+}
+
+.DTFC_LeftFootWrapper tfoot th {
+    background: #ccc !important;
+}
