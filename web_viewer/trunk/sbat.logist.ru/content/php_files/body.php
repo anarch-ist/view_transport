@@ -21,8 +21,8 @@
     <script src="common_files/media/Selectize/js/standalone/selectize.min.js"></script>
     <script src="common_files/media/DataTables-1.10.12/js/jquery.dataTables.min.js"></script>
     <script src="common_files/media/DataTables-1.10.12/js/dataTables.jqueryui.min.js"></script>
-    <script src="common_files/media/Buttons-1.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="common_files/media/Buttons-1.2.2/js/buttons.jqueryui.min.js"></script>
+    <script src="common_files/media/Buttons-1.1.0/js/dataTables.buttons.js"></script>
+    <script src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
     <script src="common_files/media/Editor-1.5.4/js/dataTables.editor.min.js"></script>
     <script src="common_files/media/Editor-1.5.4/js/editor.jqueryui.min.js"></script>
     <script src="common_files/media/FieldType-Mask/editor.mask.min.js"></script>
