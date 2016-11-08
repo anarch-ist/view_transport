@@ -82,7 +82,7 @@
         <tr>
             <th class="col1">ID заявки</th>
             <th class="col2">Номер внутренней заявки</th>
-            <th class="col3">Дата заявки</th>
+            <th class="col3">Дата внутренней заявки</th>
             <th class="col4">Номер накладной</th>
             <th class="col5">Дата накладной</th>
             <th class="col6">Номер документа</th>
@@ -91,7 +91,7 @@
             <th class="col9">Зона склада</th>
             <th class="col10">Комментарий</th>
             <th class="col11">Количество коробок</th>
-            <th class="col12">Статус заявки</th>
+            <th class="col12">Статус выполнения заявки</th>
             <th class="col13">Клиент, Номер</th>
             <th class="col14">Клиент, ИНН</th>
             <th class="col15">Клиент, Имя</th>
@@ -114,7 +114,7 @@
         <tr>
             <th class="col1">ID заявки</th>
             <th class="col2">Номер внутренней заявки</th>
-            <th class="col3">Дата заявки</th>
+            <th class="col3">Дата внутренней заявки</th>
             <th class="col4">Номер накладной</th>
             <th class="col5">Дата накладной</th>
             <th class="col6">Номер документа</th>
@@ -123,7 +123,7 @@
             <th class="col9">Зона склада</th>
             <th class="col10">Комментарий</th>
             <th class="col11">Количество коробок</th>
-            <th class="col12">Статус заявки</th>
+            <th class="col12">Статус выполнения заявки</th>
             <th class="col13">Клиент, Номер</th>
             <th class="col14">Клиент, ИНН</th>
             <th class="col15">Клиент, Имя</th>
