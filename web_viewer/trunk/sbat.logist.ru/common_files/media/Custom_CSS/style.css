@@ -34,7 +34,7 @@ body{
 .dt-button span,
 button span,
 input[type="button"]{
-    line-height: 23px !important;
+    line-height: 17px !important;
     font-size: 12px;
 }
 
@@ -120,3 +120,4 @@ input[type="checkbox"],
 .DTFC_LeftFootWrapper tfoot th {
     background: #ccc !important;
 }
+

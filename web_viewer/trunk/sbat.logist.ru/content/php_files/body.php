@@ -14,6 +14,7 @@
 <!--    <link rel="stylesheet" type="text/css" href="common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>-->
 
     <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/style.css"/>
+    <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/media.css"/>
 
     <script src="common_files/media/jQuery-2.1.4/jquery-2.1.4.min.js"></script>
     <script src="common_files/media/jQueryUI-1.11.4/jquery-ui.min.js"></script>
