@@ -179,14 +179,17 @@ $(document).ready(function () {
             type: "post",  // method  , by default get
             data: {"status": "getRequestsForUser"},
             
-            /*success: function (data) {
-                console.log(data);
-            }*/
-            //error: function () {  // error handling
-            //    //$(".user-grid-error").html("");
-            //    //$("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-            //    //$("#user-grid_processing").css("display", "none");
-            //}
+            // success: function (data) {
+            //     // console.log(data);
+            //     // alert(JSON.stringify(data));
+            // },
+            // error: function () {  // error handling
+            //     console.log("error");
+            //     //$(".user-grid-error").html("");
+            //     //$("#user-grid").append('<tbody class="user-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+            //     //$("#user-grid_processing").css("display", "none");
+            //
+            // }
         },
         columns: [
             {"data": "requestIDExternal"},
@@ -262,7 +265,7 @@ $(document).ready(function () {
         if(routeListID == null && disabled != 1){
             dataTable.buttons(2).remove();
             disabled = 1;
-            //buttons.disable();
+            // buttons.disable();
         }else if(disabled == 1 && routeListID != null){
             dataTable.button().add( 2, {
                 name: 'changeRouteListStatus',

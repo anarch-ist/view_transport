@@ -117,6 +117,7 @@
 
 </body>
 <div id="pretensionModal" class="modal fade" role="dialog">
+    <form>
     <div class="modal-dialog modal-lg">
 
         <!-- Modal content-->
@@ -130,14 +131,13 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-lg-12">
-                            <label for="pretensionCathegory">Категория претензии:</label>
+                            <label for="pretensionCathegory">Категория претензии<span style="color:#c22929;">*</span></label>
                             <select class="form-control" id="pretensionCathegory">
                                 <option disabled selected value> -- Выберите категорию --</option>
                                 <option>Пересорт</option>
                                 <option>Брак</option>
                                 <option>Недовоз</option>
-                                <option>Возврат</option>
-
+                                <option>Отказ</option>
                             </select>
                         </div>
                     </div>
@@ -145,24 +145,25 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="form-group">
-                            <label for="pretensionPositionNumber">Номер позиции:</label><br>
+                            <label for="pretensionPositionNumber">Код позиции<span style="color:#c22929;">*</span></label><br>
                             <input type="text" class="form-control" id="pretensionPositionNumber">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
-                            <label for="pretensionSum">Сумма:</label><br>
+                            <label for="pretensionSum">Сумма</label><br>
                             <div class="input-group">
                                 <span class="input-group-addon">Р</span>
-                                <input type="text" class="form-control" id="pretensionSum" placeholder="12345.67"/>
+                                <input type="text" class="form-control" id="pretensionSum" placeholder="1234.50"/>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="pretensionComment">Комментарий:</label>
-                    <textarea class="form-control" style="resize:none" rows="7" id="pretensionComment"></textarea>
+                    <label for="pretensionComment">Комментарий</label>
+                    <textarea required class="form-control" style="resize:none" rows="7" id="pretensionComment" placeholder="Опишите проблему"></textarea>
                 </div>
+                <div class="form-group"><span style="color:#c22929;">*</span> - поля, обязательные для заполнения</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" id="submitPretension">Отправить</button>
@@ -171,5 +172,6 @@
         </div>
 
     </div>
+    </form>
 </div>
 </html>
