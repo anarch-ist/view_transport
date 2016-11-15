@@ -53,7 +53,7 @@ public class DonutDocPeriod extends DocPeriod{
     }
 
     @Basic
-    @Column(name = "driverphonenumber", nullable = false, length = 12)
+    @Column(name = "driverphonenumber", nullable = false, length = 15)
     public String getDriverPhoneNumber() {
         return driverPhoneNumber;
     }
@@ -63,7 +63,7 @@ public class DonutDocPeriod extends DocPeriod{
     }
 
     @Basic
-    @Column(name = "licenseplate", nullable = false, length = 9)
+    @Column(name = "licenseplate", nullable = false, length = 32)
     public String getLicensePlate() {
         return licensePlate;
     }
