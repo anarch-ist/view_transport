@@ -106,7 +106,7 @@ public class Order {
     }
 
     @Basic
-    @Column(name = "goodscost", nullable = false, length = 12, precision = 2)
+    @Column(name = "goodscost", nullable = false, length = 32)
     public BigDecimal getGoodsCost() {
         return goodsCost;
     }
