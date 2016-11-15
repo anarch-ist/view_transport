@@ -1,0 +1,22 @@
+[
+    {
+        "pretensionCathegory": "Брак",
+        "pretensionID": 45,
+        "pretensionStatus": "OPENED",
+        "pretensionComment": "Пример комментария",
+        "sum": 1234,
+        "positionNumber": "positionNumber1",
+        "dateAdded": "2016-11-14",
+        "requestIDExternal": "reqIdExt1"
+    },
+    {
+        "pretensionCathegory": "Недовоз",
+        "pretensionID": 46,
+        "pretensionStatus": "OPENED",
+        "pretensionComment": "Пример комментария 2",
+        "sum": 12345.6,
+        "positionNumber": "positionNumber1",
+        "dateAdded": "2016-11-14",
+        "requestIDExternal": "reqIdExt1"
+    }
+]
