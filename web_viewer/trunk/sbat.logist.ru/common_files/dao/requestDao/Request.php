@@ -68,9 +68,21 @@ class RequestEntity implements IRequestEntity
     {
         // TODO: Implement addRequest() method.
     }
+    
+    function closePretension($pretensionID,$requestIDExternal){
+        return $this->_DAO->update(new closePretension($pretensionID,$requestIDExternal));
+    }
+    
+    function updatePretension($pretensionID,$requestIDExternal, $pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum){
+        return $this->_DAO->update(new updatePretension($pretensionID,$requestIDExternal,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum));
+    }
 
     function addPretension($requestIDExternal,$pretensionComment,$pretensionStatus,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum){
         return $this->_DAO->insert(new addPretension($requestIDExternal,$pretensionComment,$pretensionStatus,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum));
+    }
+    
+    function getPretensions($requestIDExternal){
+        return $this->_DAO->select(new getPretensions($requestIDExternal)); 
     }
 
     function getRequestStatuses(\PrivilegedUser $pUser)
@@ -128,6 +140,7 @@ class SelectRequestByID implements IEntitySelect
     }
 }
 
+
 class SelectRequestStatuses implements IEntitySelect
 {
     private $role;
@@ -140,6 +153,58 @@ class SelectRequestStatuses implements IEntitySelect
     function getSelectQuery()
     {
         return "SELECT `request_statuses`.`requestStatusID`, `requestStatusRusName` from `request_statuses`, `request_statuses_for_user_role` where `request_statuses`.`requestStatusID` = `request_statuses_for_user_role`.`requestStatusID` AND userRoleID = '$this->role'";
+    }
+}
+
+class getPretensions implements IEntitySelect
+{
+    private $requestIDExternal;
+    function __construct($requestIDExternal)
+    {
+        $this->requestIDExternal=$requestIDExternal;
+    }
+    
+    function getSelectQuery()
+    {
+        return "CALL getPretensionsByReqIdExt('$this->requestIDExternal')";
+        // TODO: Implement getSelectQuery() method.
+    }
+}
+
+class closePretension implements IEntityUpdate
+{
+    private $pretensionID, $requestIDExternal;
+    
+    function __construct($pretensionID, $requestIDExternal)
+    {
+        $this->pretensionID=$pretensionID;
+        $this->requestIDExternal=$requestIDExternal;
+    }
+    function getUpdateQuery()
+    {
+        return "CALL deletePretension($this->pretensionID,'$this->requestIDExternal')";
+        // TODO: Implement getUpdateQuery() method.
+    }
+}
+
+class updatePretension implements IEntityUpdate
+{
+    private $pretensionID, $requestIDExternal, $pretensionComment, $pretensionCathegory, $pretensionPositionNumber, $pretensionSum;
+    
+    function __construct($pretensionID, $requestIDExternal, $pretensionComment, $pretensionCathegory, $pretensionPositionNumber, $pretensionSum)
+    {
+        $this->pretensionID=DAO::getInstance()->checkString($pretensionID);
+        $this->requestIDExternal=DAO::getInstance()->checkString($requestIDExternal);
+        $this->pretensionComment=DAO::getInstance()->checkString($pretensionComment);
+        $this->pretensionCathegory=DAO::getInstance()->checkString($pretensionCathegory);
+        $this->pretensionPositionNumber=DAO::getInstance()->checkString($pretensionPositionNumber);
+        $this->pretensionSum=DAO::getInstance()->checkString($pretensionSum);
+    }
+    
+    function getUpdateQuery()
+    {
+        return "CALL updatePretension($this->pretensionID, '$this->requestIDExternal', '$this->pretensionCathegory', '$this->pretensionComment','$this->pretensionPositionNumber',$this->pretensionSum)";
+        
     }
 }
 
