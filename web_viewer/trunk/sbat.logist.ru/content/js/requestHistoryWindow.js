@@ -1,5 +1,77 @@
+function showPretension(pretensionID, reqIdExt, cathegory, pretensionSum, pretensionComment, positionNumber) {
+    // alert('showPretension begin');
+    $('#pretensionSum').val(pretensionSum);
+    $('#pretensionComment').val(decodeURI(pretensionComment));
+    $('#pretensionPositionNumber').val(decodeURI(positionNumber));
+    $('#pretensionCathegory').val(decodeURI(cathegory)).trigger('change');
+    $('#submitPretension').hide();
+    $('#updatePretension').off('click').show().on('click', function () {
+        updatePretension(pretensionID, reqIdExt, cathegory, pretensionSum, decodeURI(pretensionComment), decodeURI(positionNumber))
+    });
+    $('#deletePretension').off('click').show().on('click', function () {
+        deletePretension(pretensionID,reqIdExt);
+    });
+
+    // alert('showPretension end');
+}
+
+function deletePretension(pretensionID, reqIdExt) {
+    // alert('Removing pretension №'+pretensionID+', '+reqIdExt);
+    if(confirm('Вы действительно хотите удалить претензию?')){
+        $.post("content/getData.php", {
+            status: 'deletePretension',
+            pretensionID: pretensionID,
+            requestIDExternal: reqIdExt
+        }, function (data) {
+            if(data=='true'){
+                alert("Претензия успешно удалена");
+                location.reload();
+            }
+        })
+    }
+}
+
+function updatePretension(pretensionID, reqIdExt) {
+    $.post("content/getData.php", {
+        status: 'updatePretension',
+        commentRequired: $('#pretensionComment').prop('required'),
+        pretensionID: pretensionID,
+        requestIDExternal: reqIdExt,
+        pretensionCathegory: $('#pretensionCathegory').val(),
+        pretensionSum: $('#pretensionSum').val(),
+        pretensionComment: $('#pretensionComment').val(),
+        pretensionPositionNumber: $('#pretensionPositionNumber').val()
+    }, function (data) {
+        if(data=='true'){
+            // alert(data);
+            alert('Претензия успешно обновлена');
+            location.reload();
+        }
+    });
+    // alert('pretensionID:' + pretensionID + '<br>reqIdExt:' + reqIdExt + '<br>cathegory:' + cathegory + '<br>pretensionSum:' + pretensionSum + '<br>pretensionComment:' + pretensionComment + '<br>positionNumber:' + positionNumber)
+
+}
+
+$(document).ready(function(){
+    $("#pretensionModal").on('hidden.bs.modal', function () {
+        $('#pretensionCathegory').val('');
+        $('#pretensionSum').val('');
+        $('#pretensionComment').val('');
+        $('#pretensionPositionNumber').val('').trigger('change');
+    });
+
+    $("#pretensionButton").on('click', function(){
+        $('#updatePretension').hide();
+        $('#deletePretension').hide();
+        $('#submitPretension').show();
+    });
+
+
+});
+
 $(window).on('load', function () {
     var $_GET = {};
+
 
     document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
         function decode(s) {
@@ -9,7 +81,7 @@ $(window).on('load', function () {
         $_GET[decode(arguments[1])] = decode(arguments[2]);
     });
 
-
+    // $('#deletePretension').hide();
     $('#pretensionSum').mask('0000000000.00', {reverse: true});
 
     var timeoutID;
@@ -31,7 +103,6 @@ $(window).on('load', function () {
                 $("#pretensionComment")
                     .prop('required', false)
                     .attr('placeholder', '');
-                ;
                 // Some browsers don't support "required" fields. This is a workaround
                 $("label[for = pretensionComment]").html('Комментарий');
                 break;
@@ -153,7 +224,7 @@ $(window).on('load', function () {
         ).success(function () {
             $.post("content/getData.php", {
                     status: 'getStatusHistory',
-                    requestIDExternal: requestIDExternal,
+                    requestIDExternal: requestIDExternal
                 },
                 function (data) {
 
@@ -191,6 +262,13 @@ $(window).on('load', function () {
         $('#departure-warehouse').html(requestData.warehousePointName);
         $('#pallet-quantity').html(requestData.palletsQty);
 
+
+        if ($_GET['pretensionModal'] == "1") {
+            $('#pretensionModal').modal();
+            $('#deletePretension').hide();
+            $('#updatePretension').hide();
+        }
+
         $('#submitPretension').click(function () {
 
             $.post("content/getData.php", {
@@ -201,7 +279,7 @@ $(window).on('load', function () {
                 pretensionSum: $('#pretensionSum').val(),
                 pretensionPositionNumber: $('#pretensionPositionNumber').val(),
                 requestIDExternal: requestData.requestIDExternal,
-                pretensionComment: $('#pretensionComment').val(),
+                pretensionComment: $('#pretensionComment').val()
             }, function (data) {
                 if (data == 'true') {
                     $('#pretensionModal').modal('toggle');
@@ -211,7 +289,40 @@ $(window).on('load', function () {
                 }
             })
         });
+
+        $.post("content/getData.php", {
+            status: 'getPretensions',
+            requestIDExternal: requestIDExternal
+        }, function (data) {
+            parsedData = JSON.parse(data);
+            // alert(parsedData[1].pretensionSum);
+            // alert(data,4);
+            parsedData.forEach(function (pretension, i, parsedData) {
+                if(pretension.pretensionSum==undefined){
+                    pretension.pretensionSum=0;
+                }
+
+                $('#pretensionLinks').append('<br><button type="button" ' +
+                    ' onclick=showPretension("'+
+                    pretension.pretensionID + '","'+
+                    pretension.requestIDExternal+'","'+
+                    pretension.pretensionCathegory+'",'+
+                    pretension.sum+',"'+
+                    encodeURI(pretension.pretensionComment)+'","'+
+                    pretension.positionNumber+
+                    '") ' +
+                    ' class="btn btn-link" data-toggle="modal" data-target="#pretensionModal">' +
+                    'Претензия №' + pretension.pretensionID +
+                    '</button>'
+                );
+            });
+
+        })
     }
+
+
+
+    
 
     function setHistoryTable(requestHistoryData) {
         if (window.jQuery) {
@@ -245,4 +356,7 @@ $(window).on('load', function () {
             }, 1000)
         }
     }
+
+
 }());
+

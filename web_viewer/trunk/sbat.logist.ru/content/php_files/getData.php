@@ -17,11 +17,66 @@ try {
     }  else if (strcasecmp($_POST['status'],'getRequestByClientIdAndInvoiceNumber')===0) {
         echo getRequestByClientIdAndInvoiceNumber($privUser);
     } else if (strcasecmp($_POST['status'],'addPretension')===0) {
-    echo addPretension($privUser);
-}
+        echo addPretension($privUser);
+    } else if (strcasecmp($_POST['status'],'getPretensions')===0){
+        echo getPretensions($privUser);
+    } else if (strcasecmp($_POST['status'], 'updatePretension')===0){
+        echo updatePretension($privUser);
+    } else if (strcasecmp($_POST['status'], 'deletePretension')===0){
+        echo deletePretension($privUser);
+    }
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
+
+function deletePretension(PrivilegedUser $privUser){
+    $requestIDExternal = $_POST['requestIDExternal'];
+    $pretensionID = $_POST['pretensionID'];
+    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+        throw new DataTransferException('Не задан requestIDExternal', __FILE__);
+    } elseif (!isset($pretensionID) || empty($pretensionID)){
+        throw new DataTransferException('Не задан номер претензии', __FILE__);
+    }
+    $data = $privUser->getRequestEntity()->closePretension($pretensionID,$requestIDExternal);
+    return(json_encode($data));
+}
+
+function updatePretension(PrivilegedUser $privUser){
+    $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false ;
+    $pretensionID = $_POST['pretensionID'];
+    $requestIDExternal = $_POST['requestIDExternal'];
+    $pretensionComment = $_POST['pretensionComment'];
+////    $pretensionStatus = $_POST['pretensionStatus'];
+    $pretensionCathegory = $_POST['pretensionCathegory'];
+    $pretensionSum = $_POST['pretensionSum'];
+    $pretensionPositionNumber= $_POST['pretensionPositionNumber'];
+    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+        throw new DataTransferException('Не задана заявка', __FILE__);
+    } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)){
+        throw new DataTransferException('Не задана категория претензии',__FILE__);
+    }  elseif (!isset($pretensionPositionNumber) || empty($pretensionPositionNumber)){
+        throw new DataTransferException('Не задан код позиции', __FILE__);
+    } elseif ((!isset($pretensionComment) || empty($pretensionComment))&& $commentRequired){
+        throw new DataTransferException("Не задан комментарий претензии $commentRequired",__FILE__);
+    }  elseif (!isset($pretensionSum) || empty($pretensionSum)){
+//        throw new DataTransferException('Не задана сумма', __FILE__);
+        $pretensionSum=0;
+    }
+//    $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
+    $data = $privUser->getRequestEntity()->updatePretension($pretensionID,$requestIDExternal,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
+    return(json_encode($data));
+}
+
+function getPretensions(PrivilegedUser $privUser){
+    $requestIDExternal = $_POST['requestIDExternal'];
+    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+        throw new DataTransferException('Не задана заявка', __FILE__);
+    }
+    $data = $privUser->getRequestEntity()->getPretensions($requestIDExternal);
+    return json_encode($data);
+
+}
+
 function addPretension(PrivilegedUser $privUser){
     $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false ;
     $requestIDExternal = $_POST['requestIDExternal'];
