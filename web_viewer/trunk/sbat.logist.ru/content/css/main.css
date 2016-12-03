@@ -4,6 +4,9 @@ clearfix::after, body .container .row .mid::after {
   clear: both; }
 
 body {
+  font-family: Tahoma, "Helvetica Neue",Helvetica,Arial,sans-serif;
+  color: #333;
+
   background: #f1f5f8 !important;
   font-size: 14px;
   line-height: 24px; }

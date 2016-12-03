@@ -17,10 +17,12 @@ $(document).ready(function () {
         '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Номер ТС: </label></td><td><input id="vehicleNumberInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
         '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes2"><table id="requestCheckBoxes"></table></div></td></tr>' +
-        //'<tr id="selectNumbersRequestsTr" valign="top"><td width="200"><label for="statusSelect">Номера накладных: </label></td><td><div id="numberRequestCheckBoxes"></div></td></tr>' +
+        // '<tr id="selectNumbersRequestsTr" valign="top"><td width="200"><label for="statusSelect">Номера накладных: </label></td><td><div id="numberRequestCheckBoxes"></div></td></tr>' +
         '</table>' +
         '</div>'
     );
+
+    // alert($("#userRoleContainer").value());
 
     // create status select menu
     var $statusSelect = $("#statusSelect");
@@ -48,6 +50,9 @@ $(document).ready(function () {
         placeholder: "0-99"
     });
 
+
+
+
     // create comment input
     $("#commentInput")
         .addClass("ui-widget ui-state-default ui-corner-all")
@@ -61,7 +66,8 @@ $(document).ready(function () {
     // createDateTimePickerLocalization();
     // var $dateTimePicker = $("#dateTimePicker");
     // $dateTimePicker.datetimepicker();
-    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true})
+    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true});
+
 
 
     var $statusChangeDialog = $("#statusChangeDialog");
@@ -81,10 +87,14 @@ $(document).ready(function () {
             var dialogType = $statusChangeDialog.data('dialogType');
             var dataTable = $statusChangeDialog.data('dataTable');
 
+            if ($("#data-role").html().trim() == "Пользователь_клиента"){
+                $('#vehicleNumberTr').hide();
+            }
+
             $("#palletsQtyTr").hide();
             switch (dialogType) {
                 case "changeStatusForRequest":
-                    $selectRequestsTr.show();
+                    $selectRequestsTr.hide();
                     $statusSelect.off("selectmenuchange");
                     $.post(
                         "content/getData.php",
@@ -101,18 +111,19 @@ $(document).ready(function () {
                             $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
                             $('#selectNumbersRequestsTr').hide();
                             $selectRequestsTr.hide();
-                            requestsArray.forEach(function(request){
-                                
-                                $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
-                                $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
-                                $requestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
-                                //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;
-                                $selectRequestsTr.hide();
-                                $selectNumbersRequestsTr.hide();
-                            
-
-                            });
+                            // requestsArray.forEach(function(request){
+                            //
+                            //     $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
+                            //     /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
+                            //     $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
+                            //     // $requestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
+                            //     $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
+                            //     //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;
+                            //     $selectRequestsTr.hide();
+                            //     $selectNumbersRequestsTr.hide();
+                            //
+                            //
+                            // });
                         }
                     );
                     break;
@@ -139,7 +150,8 @@ $(document).ready(function () {
                                 
                                 $('#selectNumbersRequestsTr').show();
                                 $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<tr><td><span style="font-weight:bold;">'+request.invoiceNumber+'</span></td><td>&nbsp;&nbsp;<span>'+request.requestStatusRusName+'</span></td></tr>');
+                                $requestCheckBoxes.append('<tr><td><label><span style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>  '+request.invoiceNumber+'</span></label></td><td>&nbsp;&nbsp;<span>'+request.requestStatusRusName+'</span></td></tr>');
+                                // $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
                                 //$numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
                                 //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>
 
@@ -152,6 +164,7 @@ $(document).ready(function () {
             }
         },
         buttons: {
+
             "Сохранить": function () {
 
                 // get all common variables
@@ -223,6 +236,19 @@ $(document).ready(function () {
                         alert("date and palletsQty should not be empty"); // TODO
                     }
                 }
+            },
+            "Претензия": function () {
+                var dataTable = $statusChangeDialog.data('dataTable');
+                var clientID=dataTable.row($('#user-grid .selected')).data().clientIDExternal,
+                    invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
+                var url =
+                    "?clientId=" +
+                    clientID +
+                    "&invoiceNumber=" +
+                    invoiceNumber+
+                    "&pretensionModal=1";
+                url = encodeURI(url);
+                pretensionWindow = window.open(url, "width=400, height=700");
             },
             "Отмена": function () {
                 $(this).dialog("close");

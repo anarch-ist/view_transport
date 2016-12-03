@@ -12,6 +12,7 @@ $(document).ready(function () {
 
     // --------DATATABLE INIT--------------
     var dataTable = $('#user-grid').DataTable({
+
         processing: true,
         serverSide: true,
         colReorder: true,
@@ -20,6 +21,9 @@ $(document).ready(function () {
         scrollX: true,
         autoWidth: true,
         scrollCollapse: true,
+        search:{
+            caseInsensitive: true
+        },
         //"order": [],
       //  jQueryUI: true,
      //   paging:         true,
@@ -84,14 +88,29 @@ $(document).ready(function () {
                 });
 
                 var that = this;
+                // searchInput.on('keyup change', function (e) {
+                //     var enterPressed = (e.keyCode == '13');
+                //     if (enterPressed && (that.search() !== this.value)) {
+                //         that
+                //             .search(this.value)
+                //             .draw();
+                //         $(this).attr("currentFilter", this.value);
+                //         searchInput.css({'display': 'none'});
+                //     }
+                // }).blur(function() {
+                //     var filterValue = $(this).attr("currentFilter");
+                //     $(this).val(filterValue);
+                //     searchInput.css({'display': 'none'});
+                // });
+
                 searchInput.on('keyup change', function (e) {
-                    var enterPressed = (e.keyCode == '13');
-                    if (enterPressed && (that.search() !== this.value)) {
+                    // var enterPressed = (e.keyCode == '13');
+                    if ((that.search() !== this.value)) {
                         that
                             .search(this.value)
                             .draw();
                         $(this).attr("currentFilter", this.value);
-                        searchInput.css({'display': 'none'});
+                        // searchInput.css({'display': 'none'});
                     }
                 }).blur(function() {
                     var filterValue = $(this).attr("currentFilter");

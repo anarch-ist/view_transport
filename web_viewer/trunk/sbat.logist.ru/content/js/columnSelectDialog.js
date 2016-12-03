@@ -120,18 +120,21 @@ $(document).ready(function () {
     var html =
         '<div id="columnSelectDialogContainer" title="Выбор столбцов">' +
         '<div id="inputsContainer" title="Выбор столбцов"></div>' +
+        '<div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">' +
+        '<div class="ui-dialog-buttonset" id="columnSelectDialogButtonContainer"></div></div>' +
         '</div>';
     $("body").append(html);
 
     var $columnSelectDialogContainer = $("#columnSelectDialogContainer");
     var $inputsContainer = $("#inputsContainer");
+    var $buttonContainer = $("#columnSelectDialogButtonContainer");
 
     $.showColumnSelectDialog = function (dataTable) {
-
+        $buttonContainer.html("");
         $inputsContainer.html("");
         var inputs = {};
-        ALL_NAMES.forEach(function(elem) {
-            var column = dataTable.column(elem+":name");
+        ALL_NAMES.forEach(function (elem) {
+            var column = dataTable.column(elem + ":name");
             var columnIndex = column.index();
             var columnVisibility = column.visible();
             var columnRusName = $(column.header()).attr("aria-label").split(":")[0];
@@ -159,16 +162,22 @@ $(document).ready(function () {
             visibleColsForRole = W_DISPATCHER_COL_VISIBLE;
         }
 
-        $("<input>").attr("type", "button").val("Сброс").on("click", function() {
-            visibleColsForRole.forEach(function(elem) {
+        $("<input>").attr("type", "button").val("Сохранить").addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only").on("click", function () {
+            $columnSelectDialogContainer.dialog("close");
+        }).appendTo($buttonContainer);
+
+        $("<input>").attr("type", "button").val("Сброс").addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only").on("click", function () {
+            visibleColsForRole.forEach(function (elem) {
                 inputs[elem].prop("checked", true);
-                dataTable.column(elem+":name").visible(true);
+                dataTable.column(elem + ":name").visible(true);
             });
-            allNamesFiltered(visibleColsForRole).forEach(function(elem) {
+            allNamesFiltered(visibleColsForRole).forEach(function (elem) {
                 inputs[elem].prop("checked", false);
-                dataTable.column(elem+":name").visible(false);
+                dataTable.column(elem + ":name").visible(false);
             });
-        }).appendTo($inputsContainer);
+        }).appendTo($buttonContainer);
+
+
 
         $columnSelectDialogContainer.dialog("open");
     };
@@ -182,8 +191,8 @@ $(document).ready(function () {
     });
 
     function allNamesFiltered(arr) {
-        return ALL_NAMES.filter(function(elem) {
-           return arr.indexOf(elem) == -1;
+        return ALL_NAMES.filter(function (elem) {
+            return arr.indexOf(elem) == -1;
         });
     }
 });
