@@ -117,23 +117,21 @@ $(document).ready(function () {
 
     var role = $('#data-role').attr('data-role');
 
-    
+    function getVisibleColsByRole(role) {
+        if (role == 'ADMIN') {
+            return ADMIN_COL_VISIBLE;
+        } else if (role == 'CLIENT_MANAGER') {
+            return CLIENT_MANAGER_COL_VISIBLE;
+        } else if (role == 'DISPATCHER') {
+            return DISPATCHER_COL_VISIBLE;
+        } else if (role == 'MARKET_AGENT') {
+            return MARKET_AGENT_COL_VISIBLE;
+        } else if (role == 'W_DISPATCHER') {
+            return W_DISPATCHER_COL_VISIBLE;
+        }
+    }
 
-    var html =
-        '<div id="columnSelectDialogContainer" title="Выбор столбцов">' +
-        '<div id="inputsContainer" title="Выбор столбцов"></div>' +
-        '<div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">' +
-        '<div class="ui-dialog-buttonset" id="columnSelectDialogButtonContainer"></div></div>' +
-        '</div>';
-    $("body").append(html);
-
-    var $columnSelectDialogContainer = $("#columnSelectDialogContainer");
-    var $inputsContainer = $("#inputsContainer");
-    var $buttonContainer = $("#columnSelectDialogButtonContainer");
-
-    $.showColumnSelectDialog = function (dataTable) {
-        $buttonContainer.html("");
-        $inputsContainer.html("");
+    function getInputs(dataTable) {
         var inputs = {};
         ALL_NAMES.forEach(function (elem) {
             var column = dataTable.column(elem + ":name");
@@ -150,42 +148,70 @@ $(document).ready(function () {
                 inputs[elem] = input;
             }
         });
+        return inputs;
+    }
 
-        var visibleColsForRole = [];
-        if (role == 'ADMIN') {
-            visibleColsForRole = ADMIN_COL_VISIBLE;
-        } else if (role == 'CLIENT_MANAGER') {
-            visibleColsForRole = CLIENT_MANAGER_COL_VISIBLE;
-        } else if (role == 'DISPATCHER') {
-            visibleColsForRole = DISPATCHER_COL_VISIBLE;
-        } else if (role == 'MARKET_AGENT') {
-            visibleColsForRole = MARKET_AGENT_COL_VISIBLE;
-        } else if (role == 'W_DISPATCHER') {
-            visibleColsForRole = W_DISPATCHER_COL_VISIBLE;
-        }
+    var html =
+        '<div id="columnSelectDialogContainer" title="Выбор столбцов">' +
+        '<div id="inputsContainer" title="Выбор столбцов"></div>' +
+        '<div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">' +
+        '<div class="ui-dialog-buttonset" id="columnSelectDialogButtonContainer"></div></div>' +
+        '</div>';
+    $("body").append(html);
 
-        $("<input>").attr("type", "button").val("Сохранить").addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only").on("click", function () {
-            $columnSelectDialogContainer.dialog("close");
-        }).appendTo($buttonContainer);
+    var $columnSelectDialogContainer = $("#columnSelectDialogContainer");
+    var $inputsContainer = $("#inputsContainer");
+    var $buttonContainer = $("#columnSelectDialogButtonContainer");
 
-        $("<input>").attr("type", "button").val("Сброс").addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only").on("click", function () {
-            visibleColsForRole.forEach(function (elem) {
-                inputs[elem].prop("checked", true);
-                dataTable.column(elem + ":name").visible(true);
-            });
-            allNamesFiltered(visibleColsForRole).forEach(function (elem) {
-                inputs[elem].prop("checked", false);
-                dataTable.column(elem + ":name").visible(false);
-            });
-        }).appendTo($buttonContainer);
+    $.showColumnSelectDialog = function (dataTable) {
+        $buttonContainer.html("");
+        $inputsContainer.html("");
+        var inputs = getInputs(dataTable);
 
+        var visibleColsForRole = getVisibleColsByRole(role);
+        $("<input>")
+            .attr("type", "button")
+            .val("Сохранить")
+            .addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")
+            .on("click", function () {
+                $columnSelectDialogContainer.dialog("close");
+            })
+            .appendTo($buttonContainer);
 
+        $("<input>")
+            .attr("type", "button")
+            .val("Сброс")
+            .addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")
+            .on("click", function () {
+                visibleColsForRole.forEach(function (elem) {
+                    inputs[elem].prop("checked", true);
+                    dataTable.column(elem + ":name").visible(true);
+                });
+                allNamesFiltered(visibleColsForRole).forEach(function (elem) {
+                    inputs[elem].prop("checked", false);
+                    dataTable.column(elem + ":name").visible(false);
+                });
+            })
+            .appendTo($buttonContainer);
 
         $columnSelectDialogContainer.dialog("open");
     };
+    //Говнокод димаса
+    $.getDefaultColumns = function (dataTable, role) {
+        var inputs = getInputs(dataTable);
 
+        var visibleColsForRole = getVisibleColsByRole(role);
 
-
+        visibleColsForRole.forEach(function (elem) {
+            inputs[elem].prop("checked", true);
+            dataTable.column(elem + ":name").visible(true);
+        });
+        allNamesFiltered(visibleColsForRole).forEach(function (elem) {
+            inputs[elem].prop("checked", false);
+            dataTable.column(elem + ":name").visible(false);
+        });
+    };
+    //Говнокод димаса
     $columnSelectDialogContainer.dialog({
         autoOpen: false,
         resizable: false,
