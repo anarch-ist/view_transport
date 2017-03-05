@@ -21,20 +21,20 @@ $(document).ready(function () {
         scrollX: true,
         autoWidth: true,
         scrollCollapse: true,
-        search:{
+        search: {
             caseInsensitive: true
         },
         //"order": [],
-      //  jQueryUI: true,
-     //   paging:         true,
-      //  paginate: false,
+        //  jQueryUI: true,
+        //   paging:         true,
+        //  paginate: false,
         fixedColumns: {
             leftColumns: 2
         },
-       // fixedHeader: {
+        // fixedHeader: {
         //  header: true,
-         //   footer: false
-      //  },
+        //   footer: false
+        //  },
         stateSave: true,
         stateDuration: 0, // 0 a special value as it indicates that the state can be stored and retrieved indefinitely with no time limit
         // format for data object: https://datatables.net/reference/option/stateSaveCallback
@@ -54,9 +54,9 @@ $(document).ready(function () {
         // Note that when language url parameter is set, DataTables' initialisation will be asynchronous due to the Ajax data load.
         // That is to say that the table will not be drawn until the Ajax request as completed.
         // As such, any actions that require the table to have completed its initialisation should be placed into the initComplete callback.
-        initComplete: function(settings, json) {
+        initComplete: function (settings, json) {
 
-            if(json['recordsFiltered'] == 0){
+            if (json['recordsFiltered'] == 0) {
                 alert('Данных не найдено');
             }
 
@@ -79,7 +79,7 @@ $(document).ready(function () {
                 searchDiv.html(search);
                 $footer.html(searchDiv);
 
-                searchDiv.on("click", function() {
+                searchDiv.on("click", function () {
                     console.log("CLICKED");
                     var position = $(this).offset();
                     searchInput.offset(position);
@@ -104,15 +104,15 @@ $(document).ready(function () {
                 // });
 
                 searchInput.on('keyup change', function (e) {
-                    // var enterPressed = (e.keyCode == '13');
-                    if ((that.search() !== this.value)) {
+                    var enterPressed = (e.keyCode == '13');
+                    if ((that.search() !== this.value) && (enterPressed || localStorage.getItem('liveSearch') == 'true')) {
                         that
                             .search(this.value)
                             .draw();
                         $(this).attr("currentFilter", this.value);
                         // searchInput.css({'display': 'none'});
                     }
-                }).blur(function() {
+                }).blur(function () {
                     var filterValue = $(this).attr("currentFilter");
                     $(this).val(filterValue);
                     searchInput.css({'display': 'none'});
@@ -168,8 +168,8 @@ $(document).ready(function () {
                         "&invoiceNumber=" +
                         dataTable.row($('#user-grid .selected')).data().invoiceNumber;
                     url = encodeURI(url);
-                    
-                    window.open(url, "width=400, height=700");
+
+                    window.open(url);
                     // $.post("content/getData.php", {
                     //         status: 'getStatusHistory',
                     //         requestIDExternal: dataTable.row($('#user-grid .selected')).data().requestIDExternal
@@ -183,7 +183,7 @@ $(document).ready(function () {
             {
                 text: 'Сброс фильтров',
                 action: function (e, dt, node, config) {
-                    $('.searchColumn').each(function() {
+                    $('.searchColumn').each(function () {
                         $(this).val("").attr("currentFilter", "");
                     });
                     dataTable.columns().every(function () {
@@ -191,13 +191,22 @@ $(document).ready(function () {
                     });
                     dataTable.columns().draw();
                 }
+            },
+            {
+                text: (localStorage.getItem("liveSearch") == 'true') ? 'Живой поиск' : 'Стандартный поиск',
+
+                action: function (e, dt, node, config) {
+
+                    (localStorage.getItem("liveSearch") == 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
+                    this.text((localStorage.getItem("liveSearch") == 'true') ? 'Живой поиск' : 'Стандартный поиск');
+                }
             }
         ],
         ajax: {
             url: "content/getData.php", // json datasource
             type: "post",  // method  , by default get
             data: {"status": "getRequestsForUser"},
-            
+
             // success: function (data) {
             //     // console.log(data);
             //     // alert(JSON.stringify(data));
@@ -269,24 +278,23 @@ $(document).ready(function () {
 
         ],
         /*success: function (data) {
-                console.log(data);
-        }*/
+         console.log(data);
+         }*/
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
-    $(".dataTables_scrollHeadInner").css({"width":"100%"});
-
-    $(".dataTable ").css({"width":"100%"});
+    $(".dataTables_scrollHeadInner").css({"width": "100%"});
+    $(".dataTable ").css({"width": "100%"});
     var disabled = 0;
     //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
-    dataTable.on( 'select', function ( e, dt, type, indexes ) {
+    dataTable.on('select', function (e, dt, type, indexes) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListNumber;
-        if(routeListID == null && disabled != 1){
+        if ((routeListID == null && disabled != 1) || ($("#data-role").html().trim() == "Пользователь_клиента") && disabled != 1) {
             dataTable.buttons(2).remove();
             disabled = 1;
             // buttons.disable();
-        }else if(disabled == 1 && routeListID != null){
-            dataTable.button().add( 2, {
+        } else if (disabled == 1 && routeListID != null && (($("#data-role").html().trim() != "Пользователь_клиента"))) {
+            dataTable.button().add(2, {
                 name: 'changeRouteListStatus',
                 extend: 'selectedSingle',
                 className: 'changeStatusForSeveralRequests',
