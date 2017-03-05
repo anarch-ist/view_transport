@@ -196,7 +196,7 @@ $(document).ready(function () {
 
         $columnSelectDialogContainer.dialog("open");
     };
-    //Говнокод димаса
+
     $.getDefaultColumns = function (dataTable, role) {
         var inputs = getInputs(dataTable);
 
@@ -211,7 +211,7 @@ $(document).ready(function () {
             dataTable.column(elem + ":name").visible(false);
         });
     };
-    //Говнокод димаса
+
     $columnSelectDialogContainer.dialog({
         autoOpen: false,
         resizable: false,
