@@ -59,6 +59,7 @@
     <div id="menu"
          style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: 10px;position:fixed;top:5px;z-index:99999;right:10px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
+
             <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
                 <?php
                 $data = $privUser->getUserInfo()->toArray();
@@ -68,7 +69,9 @@
                 echo $data['userName'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
 
                 ?>
+                <a href="common_files/media/Other/clientInstruction1.0.pdf">Инструкция</a>
             </div>
+
             <div id="userRoleContainer" style="display: none">
                 <?php
                 echo '<span id="data-role" data-role="'.$data['userRoleID'].'">'.$userRole.'</span>';
@@ -144,6 +147,7 @@
         </tfoot>
     </table>
 </div>
+
 </body>
 
 <style>
