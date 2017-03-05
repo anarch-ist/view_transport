@@ -165,8 +165,10 @@ function getRequestsForUser(PrivilegedUser $privUser)
         $json_data['data'][$key]['requestDate'] = date('d-m-Y', strtotime($value['requestDate']));
         $json_data['data'][$key]['invoiceDate'] = date('d-m-Y', strtotime($value['invoiceDate']));
         $json_data['data'][$key]['documentDate'] = date('d-m-Y', strtotime($value['documentDate']));
-        $json_data['data'][$key]['arrivalTimeToNextRoutePoint'] = date('d-m-Y H:i:s', strtotime($value['arrivalTimeToNextRoutePoint']));
+        $json_data['data'][$key]['arrivalTimeToNextRoutePoint'] = $value['arrivalTimeToNextRoutePoint']!=0 ? date('d-m-Y H:i:s', strtotime($value['arrivalTimeToNextRoutePoint'])) : "";
+
     }
+
     return json_encode($json_data);
 }
 
