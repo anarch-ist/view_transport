@@ -117,6 +117,8 @@ $(document).ready(function () {
 
     var role = $('#data-role').attr('data-role');
 
+    
+
     var html =
         '<div id="columnSelectDialogContainer" title="Выбор столбцов">' +
         '<div id="inputsContainer" title="Выбор столбцов"></div>' +
@@ -150,15 +152,15 @@ $(document).ready(function () {
         });
 
         var visibleColsForRole = [];
-        if (role === 'ADMIN') {
+        if (role == 'ADMIN') {
             visibleColsForRole = ADMIN_COL_VISIBLE;
-        } else if (role === 'CLIENT_MANAGER') {
+        } else if (role == 'CLIENT_MANAGER') {
             visibleColsForRole = CLIENT_MANAGER_COL_VISIBLE;
-        } else if (role === 'DISPATCHER') {
+        } else if (role == 'DISPATCHER') {
             visibleColsForRole = DISPATCHER_COL_VISIBLE;
-        } else if (role === 'MARKET_AGENT') {
+        } else if (role == 'MARKET_AGENT') {
             visibleColsForRole = MARKET_AGENT_COL_VISIBLE;
-        } else if (role === 'W_DISPATCHER') {
+        } else if (role == 'W_DISPATCHER') {
             visibleColsForRole = W_DISPATCHER_COL_VISIBLE;
         }
 
@@ -181,6 +183,8 @@ $(document).ready(function () {
 
         $columnSelectDialogContainer.dialog("open");
     };
+
+
 
     $columnSelectDialogContainer.dialog({
         autoOpen: false,
