@@ -1,7 +1,5 @@
 $(document).ready(function () {
-    //Говнокод димаса
-    var type = "user-type";
-    //Говнокод димаса
+    var role_type = "role-type";
     $('button').addClass('ui-state-active ui-state focus');
     // --------LOGOUT-----------------
     $("#logout").button().on("click", function () {
@@ -135,17 +133,15 @@ $(document).ready(function () {
                 dataTable.buttons(2).remove();
             }
 
-            //Говнокод димаса
             var role = $('#data-role').attr('data-role');
-            if (localStorage.getItem(type) == undefined) {
-                localStorage.setItem(type, role);
+            if (localStorage.getItem(role_type) == undefined) {
+                localStorage.setItem(role_type, role);
                 $.getDefaultColumns(dataTable, role);
             }
-            else if(localStorage.getItem(type) != role) {
-                localStorage.setItem(type, role);
+            else if(localStorage.getItem(role_type) != role) {
+                localStorage.setItem(role_type, role);
                 $.getDefaultColumns(dataTable, role);
             }
-            //Говнокод димаса
         },
         buttons: [
             {
