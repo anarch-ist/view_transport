@@ -26,7 +26,14 @@ abstract class AuthUser
      */
     public function isValid($authVariant)
     {
-        if ($authVariant === 'check') {
+        if ($authVariant === 'auth') {
+            if (!(isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password']))) {
+                $login = '';
+                if (isset($_POST['login'])) $login = $_POST['login'];
+                $string = 'login: ' . $login;
+                throw new AuthException('Ошибка авторизации. ' . $string);
+            }
+        } else if ($authVariant === 'check') {
             if (!$this->checkAuth()) {
             if(isset($_GET['clientId']) & isset($_GET['md5'])){
                 $this->authorize($_GET['clientId'],$_GET['md5']);
@@ -34,13 +41,6 @@ abstract class AuthUser
                 throw new AuthException('Проверка не пройдена');
             }
         }
-        } else if ($authVariant === 'auth') {
-            if (!(isset($_POST['login']) && isset($_POST['password']) && $this->authorize($_POST['login'], $_POST['password']))) {
-                $login = '';
-                if (isset($_POST['login'])) $login = $_POST['login'];
-                $string = 'login: ' . $login;
-                throw new AuthException('Ошибка авторизации. ' . $string);
-            }
         } else {
             throw new AuthException('Передан неверный параметр: ' . $authVariant);
         }
