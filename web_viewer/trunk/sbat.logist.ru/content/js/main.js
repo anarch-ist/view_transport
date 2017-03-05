@@ -1,7 +1,8 @@
 $(document).ready(function () {
-
+    //Говнокод димаса
+    var type = "user-type";
+    //Говнокод димаса
     $('button').addClass('ui-state-active ui-state focus');
-
     // --------LOGOUT-----------------
     $("#logout").button().on("click", function () {
         // delete auth cookies
@@ -130,8 +131,21 @@ $(document).ready(function () {
 
             //TODO fix it
             // if user role is CLIENT_MANAGER then delete 'изменить статус МЛ' button
-            if ($("#userRoleContainer").html().trim() === "Пользователь_клиента")
+            if ($("#userRoleContainer").html().trim() === "Пользователь_клиента") {
                 dataTable.buttons(2).remove();
+            }
+
+            //Говнокод димаса
+            var role = $('#data-role').attr('data-role');
+            if (localStorage.getItem(type) == undefined) {
+                localStorage.setItem(type, role);
+                $.getDefaultColumns(dataTable, role);
+            }
+            else if(localStorage.getItem(type) != role) {
+                localStorage.setItem(type, role);
+                $.getDefaultColumns(dataTable, role);
+            }
+            //Говнокод димаса
         },
         buttons: [
             {
@@ -335,4 +349,3 @@ $(document).ready(function () {
 
 
 });
-
