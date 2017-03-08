@@ -402,7 +402,6 @@ $(document).ready(function () {
             return strHoures + ":" + strMinutes;
         }
 
-        //  ["monday", "wednesday", "friday"]
         function setDaysOfWeekData(daysOfWeek) {
             if (!$.isArray(daysOfWeek)) throw "illegalArgumentException: input arg should be array";
 
@@ -415,17 +414,10 @@ $(document).ready(function () {
             });
         }
 
-        //   "18:00"
         function setFirstPointArrivalTime(firstPointArrivalTime) {
             $('#startRouteTimeInput').val(firstPointArrivalTime).trigger('keyup');
         }
 
-        // set routePoints table data
-        //    [
-        //        {routePointID: 10, sortOrder:0, pointName:"point1", tLoading: 180},
-        //        {routePointID: 11, sortOrder:1, pointName:"point2", tLoading: 90},
-        //        {routePointID: 12, sortOrder:2, pointName:"point3", tLoading: 110}
-        //    ]
         function setRoutePointsData(routePointsData) {
             $routePointsDataTable.rows().remove();
             routePointsData.forEach(function (entry) {
@@ -434,10 +426,6 @@ $(document).ready(function () {
             $routePointsDataTable.rows.add(routePointsData).draw(false);
         }
 
-        //    [
-        //        {relationID:"10_11", pointNameFirst:"point1", pointNameSecond:"point2", distance: 300, timeForDistance: 450},
-        //        {relationID:"11_12", pointNameFirst:"point2", pointNameSecond:"point3", distance: 500, timeForDistance: 780}
-        //    ]
         function setRelationsBetweenRoutePointsData(relationsBetweenRoutePointsData) {
             $relationsBetweenRoutePointsDataTable.rows().remove();
             relationsBetweenRoutePointsData.forEach(function (entry) {
@@ -477,14 +465,22 @@ $(document).ready(function () {
         var usersEditor = new $.fn.dataTable.Editor( {
             ajax: 'content/getData.php',
             table: '#usersTable',
-            idSrc: 'userID',
+            idSrc: 'userId',
 
             fields: [
+                { label: "Id", name: 'userId', type: 'text'},
                 { label: 'ФИО', name: 'userName', type: 'text'},
                 { label: 'Логин', name: 'login', type: 'text'},
                 { label: 'Должность',  name: 'position', type: 'text'},
-                { label: 'Номер телефона',  name: 'phoneNumber', type: 'mask', mask:"(000) 000-00-00", maskOptions: {clearIfNotMatch: true}, placeholder:"(999) 999-99-99"},
-                { label: 'Почта',  name: 'email', type: 'text'},
+                {
+                    label: 'Номер телефона',
+                    name: 'phoneNumber',
+                    type: 'mask',
+                    mask:"(000) 000-00-00",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder:"(999) 999-99-99",
+                },
+                { label: 'Почта',  name: 'email', type: 'text', visible: false},
                 { label: 'Пароль',  name: 'password', type: 'password'},
                 { label: 'Роль',  name: 'userRoleRusName', type: 'selectize', options: [],
                     opts: {
@@ -561,14 +557,15 @@ $(document).ready(function () {
                 ],
                 "paging": 10,
                 "columnDefs": [
-                    {"name": "userName", "data": "userName", "targets": 0},
-                    {"name": "login", "data": "login", "targets": 1},
-                    {"name": "position", "data": "position", "targets": 2},
-                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 3},
-                    {"name": "email", "data": "email", "targets": 4},
-                    {"name": "password", "data": "password", "targets": 5, visible:false},
-                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 6},
-                    {"name": "pointName", "data": "pointName", "targets": 7}
+                    {"name": "userId", "data": "userId", "targets": 0, visible: false},
+                    {"name": "userName", "data": "userName", "targets": 1},
+                    {"name": "login", "data": "login", "targets": 2},
+                    {"name": "position", "data": "position", "targets": 3},
+                    {"name": "phoneNumber", "data": "phoneNumber", "targets": 4},
+                    {"name": "email", "data": "email", "targets": 5},
+                    {"name": "password", "data": "password", "targets": 6, visible: false},
+                    {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 7},
+                    {"name": "pointName", "data": "pointName", "targets": 8}
                 ]
             }
         );
