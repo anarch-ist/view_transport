@@ -73,6 +73,28 @@ $(document).ready(function () {
             }
         );
 
+        $.post( "content/getData.php",
+            {status: "getClients", format: "json"},
+            function (clientsData) {
+                var options = [];
+                var selectizeOptions = [];
+                clientsData = JSON.parse(clientsData);
+                clientsData.forEach(function (entry) {
+                    var option = "<option value=" + entry.clientID + ">" + entry.clientName + "</option>";
+                    options.push(option);
+                    var selectizeOption = {"label": entry.clientName, "value": entry.clientID};
+                    selectizeOptions.push(selectizeOption);
+                });
+                var clientSelectize = usersEditor.field('clientID').inst();
+
+                clientSelectize.clear();
+                clientSelectize.clearOptions();
+                clientSelectize.load(function (callback) {
+                    callback(selectizeOptions);
+                });
+            }
+        );
+
         // get all user roles from server
         $.post( "content/getData.php",
             {status: "getAllUserRoles", format:"json"},
@@ -468,7 +490,6 @@ $(document).ready(function () {
             idSrc: 'userId',
 
             fields: [
-                { label: "Id", name: 'userId', type: 'text'},
                 { label: 'ФИО', name: 'userName', type: 'text'},
                 { label: 'Логин', name: 'login', type: 'text'},
                 { label: 'Должность',  name: 'position', type: 'text'},
@@ -478,7 +499,7 @@ $(document).ready(function () {
                     type: 'mask',
                     mask:"(000) 000-00-00",
                     maskOptions: {clearIfNotMatch: true},
-                    placeholder:"(999) 999-99-99",
+                    placeholder: "(999) 999-99-99"
                 },
                 { label: 'Почта',  name: 'email', type: 'text', visible: false},
                 { label: 'Пароль',  name: 'password', type: 'password'},
@@ -497,15 +518,32 @@ $(document).ready(function () {
                         labelField: 'label',
                         dropdownParent: "body"
                     }
+                },
+                {
+                    label: 'Клиент',
+                    name: 'clientID',
+                    type: 'selectize',
+                    options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'label',
+                        labelField: 'label',
+                        dropdownParent: "body"
+                    }
                 }
             ]
         } );
 
         // set current selected value to pointName and userRoleRusName
         usersEditor.on('open', function (e , mode, action) {
+            usersEditor.field('pointName').disable();
+            usersEditor.field('clientID').disable();
             if (action === "edit") {
-                setSelectizeValueFromTable($usersDataTable, usersEditor, 'pointName', 'pointName');
-                setSelectizeValueFromTable($usersDataTable, usersEditor, 'userRoleRusName', 'userRoleRusName');
+                // я не знаю что оно должно было делать, но работает с багами, так что я просто отключил
+                // код я пока оставлю
+                // setSelectizeValueFromTable($usersDataTable, usersEditor, 'pointName', 'pointName');
+                // setSelectizeValueFromTable($usersDataTable, usersEditor, 'userRoleRusName', 'userRoleRusName');
+                // setSelectizeValueFromTable($usersDataTable, usersEditor, 'clientID', 'clientID');
             }
         });
 
@@ -516,6 +554,39 @@ $(document).ready(function () {
                 for (i in data.data) {
                     data.data[i].password = calcMD5(data.data[i].password);
                 }
+            }
+        });
+
+        usersEditor.field('userRoleRusName').input().on('change', function (e, d) {
+            if ( d && d.editorSet ) return;
+
+            var currentRole = $(this).val();
+            if ( currentRole === "CLIENT_MANAGER") {
+                usersEditor.field('pointName').disable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').enable();
+                usersEditor.field('clientID').set('');
+            }
+
+            if ( currentRole === "TEMP_REMOVED" ) {
+                usersEditor.field('pointName').enable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').enable();
+                usersEditor.field('clientID').set('');
+            }
+
+            if ( currentRole === "ADMIN" || currentRole === "MARKET_AGENT") {
+                usersEditor.field('pointName').disable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').disable();
+                usersEditor.field('clientID').set('');
+            }
+
+            if ( currentRole === "DISPATCHER" || currentRole === "W_DISPATCHER") {
+                usersEditor.field('pointName').enable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').disable();
+                usersEditor.field('clientID').set('');
             }
         });
 
@@ -565,7 +636,8 @@ $(document).ready(function () {
                     {"name": "email", "data": "email", "targets": 5},
                     {"name": "password", "data": "password", "targets": 6, visible: false},
                     {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 7},
-                    {"name": "pointName", "data": "pointName", "targets": 8}
+                    {"name": "pointName", "data": "pointName", "targets": 8},
+                    {"name": "clientID", "data": "clientID", "targets": 9, visible: false}
                 ]
             }
         );

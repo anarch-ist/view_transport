@@ -117,7 +117,7 @@
             <table id="usersTable">
                 <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>userID</th>
                     <th>ФИО</th>
                     <th>Логин</th>
                     <th>Должность</th>
@@ -126,6 +126,7 @@
                     <th>Пароль</th>
                     <th>Роль</th>
                     <th>Пункт</th>
+                    <th>ID клиента</th>
                 </tr>
                 </thead>
             </table>

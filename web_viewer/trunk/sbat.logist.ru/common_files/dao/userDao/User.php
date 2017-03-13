@@ -103,11 +103,6 @@ class EntitySelectAllUsers implements IEntitySelect
         $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
         $this->searchString = $_POST['search']['value'];
         $searchArray = $_POST['columns'];
-//        for ($i = 0; $i < count($searchArray); $i++) {
-//            if ($searchArray[$i]['search']['value'] !== '') {
-//                $this->searchString .= $searchArray[$i]['name'] . ',' . $searchArray[$i]['search']['value'] . ';';
-//            }
-//        }
         $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
     }
 
@@ -195,7 +190,7 @@ class DeleteUser implements IEntityDelete
 
 class InsertUser implements IEntityInsert
 {
-    private $userName, $login, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+    private $userName, $login, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID, $clientID;
 
     function __construct(UserData $user)
     {
@@ -207,7 +202,14 @@ class InsertUser implements IEntityInsert
         $this->email = $dao->checkString($user->getData('email'));
         $this->login = $dao->checkString($user->getData('login'));
         $this->userRoleID = $dao->checkString($user->getData('userRoleRusName'));
-        $this->pointID = $dao->checkString($user->getData('pointName'));
+        if (!empty($user->getData('pointName')))
+            $this->pointID = $dao->checkString($user->getData('pointName'));
+        else
+            $this->pointID = null;
+        if (!empty($user->getData('clientID')))
+            $this->clientID = $dao->checkString($user->getData('clientID'));
+        else
+            $this->clientID = null;
     }
 
     /**
@@ -217,16 +219,25 @@ class InsertUser implements IEntityInsert
     {
         $salt = substr(md5(rand(0, 100000000)), 0, 16);
         $passAndSalt = md5($this->passMD5 . $salt);
-//        echo "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID) VALUE ($this->userName, $this->login, $this->position, $salt, $passAndSalt, $this->phoneNumber, $this->email, $this->userRoleID, $this->pointID);";
-        return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, pointID, userIDExternal, dataSourceID) VALUE " .
-        "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', $this->pointID, '$this->login', 'ADMIN_PAGE');";
+        if (is_null($this->pointID) && is_null($this->clientID))
+            return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID) VALUE " .
+                "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE');";
+        else if(is_null($this->pointID))
+            return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID, clientID) VALUE " .
+                "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE', $this->clientID);";
+        else if(is_null($this->clientID))
+            return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID, pointID) VALUE " .
+                "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE', $this->pointID);";
+        else
+            return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID, clientID, pointID) VALUE " .
+                "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE', $this->clientID, $this->pointID);";
     }
 }
 
 class UpdateUser implements IEntityUpdate
 {
     private $userName, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
-    private $userID;
+    private $userID, $clientID;
 
     function __construct(UserData $user, $id)
     {
@@ -234,11 +245,18 @@ class UpdateUser implements IEntityUpdate
         $this->userID = $dao->checkString($id);
         $this->userName = $dao->checkString($user->getData('userName'));
         $this->position = $dao->checkString($user->getData('position'));
-//        $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
         $this->email = $dao->checkString($user->getData('email'));
         $this->userRoleID = $dao->checkString($user->getData('userRoleRusName'));
-        $this->pointID = $dao->checkString($user->getData('pointName'));
+        if (!empty($user->getData('pointName')))
+            $this->pointID = $dao->checkString($user->getData('pointName'));
+        else
+            $this->pointID = null;
+        if (!empty($user->getData('clientID')))
+            $this->clientID = $dao->checkString($user->getData('clientID'));
+        else
+            $this->clientID = null;
+//        $this->clientID = $dao->checkString($user->getData('clientID'));
     }
 
     /**
@@ -246,27 +264,26 @@ class UpdateUser implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-//        $salt = substr(md5(rand(0,100000000)),0,16);
-//        $passAndSalt = md5($this->passMD5.$salt);
-        return "UPDATE `users` SET " .
-        "userName = '$this->userName', " .
-        "position = '$this->position', " .
-        "phoneNumber = '$this->phoneNumber', " .
-        "email = '$this->email', " .
-        "userRoleID = '$this->userRoleID', " .
-        "pointID = $this->pointID " .
-        "WHERE userID = $this->userID;";
-//        return "UPDATE `users` SET
-//            firstName = '$this->firstName',
-//            lastName = '$this->lastName',
-//            patronymic = '$this->patronymic',
-//            position = '$this->position',
-//            salt = '$salt',
-//            passAndSalt = '$passAndSalt',
-//            phoneNumber = '$this->phoneNumber',
-//            email = '$this->email',
-//            userRoleID = '$this->userRoleID',
-//            pointID = $this->pointID
-//            WHERE userID = this->userID;";
+        $query = "UPDATE `users` SET " .
+            "userName = '$this->userName', " .
+            "position = '$this->position', " .
+            "phoneNumber = '$this->phoneNumber', " .
+            "email = '$this->email', " .
+            "userRoleID = '$this->userRoleID'";
+
+        if (!is_null($this->pointID)) {
+            $query = $query . ", pointID = $this->pointID";
+        } else {
+            $query = $query . ", pointID = NULL";
+        }
+
+        if (!is_null($this->clientID)) {
+            $query = $query . ", clientID = $this->clientID";
+        } else {
+            $query = $query . ", clientID = NULL";
+        }
+
+        $query = $query . " WHERE userID = $this->userID;";
+        return $query;
     }
 }
