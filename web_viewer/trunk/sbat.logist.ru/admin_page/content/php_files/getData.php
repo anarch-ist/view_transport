@@ -14,9 +14,9 @@ try {
     } else if (strcasecmp($action,'getRelationsBetweenRoutePointsDataForRouteID')===0) {
         getRelationsBetweenRoutePointsDataForRouteID($privUser);
     } else if (strcasecmp($action,'getUsersData')===0) {
-//        TODO: check method for select users (getUsers($privUser);)
         getUsers($privUser);
-
+    } else if (strcasecmp($action,'getClients')===0) {
+        getClients($privUser);
     } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
         getAllRouteIdDirectionPairs($privUser);
     } else if (strcasecmp($action,'updateStartRouteTime')===0) {
@@ -107,7 +107,6 @@ function getAllRoutePointsDataForRouteID(PrivilegedUser $privUser)
 
 function getAllUserRoles(PrivilegedUser $privUser)
 {
-
     $dataArray = $privUser->getUserEntity()->getUserRoles();
     echo json_encode($dataArray);
 }
@@ -244,6 +243,20 @@ function getRelationsBetweenRoutePointsDataForRouteID(PrivilegedUser $privUser)
     echo json_encode($dataArray);
 }
 
+
+function getClients(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getClientEntity()->selectClients();
+    $data = array();
+    foreach ($dataArray as $key => $val) {
+        if ($val instanceof DAO\ClientData) {
+            $data[$key]['clientID'] = $val->getData('clientID');
+            $data[$key]['clientName'] = $val->getData('clientName');
+        }
+    }
+    echo json_encode($dataArray);
+}
+
 function getUsers(PrivilegedUser $privUser)
 {
     $dataArray = $privUser->getUserEntity()->selectUsers($_POST['start'], $_POST['length']);
@@ -254,17 +267,6 @@ function getUsers(PrivilegedUser $privUser)
         "data" => $dataArray['users']   // total data array
     );
     echo json_encode($json_data);
-
-
-//    $dataArray = json_decode('[{"userID": "1", "firstName":"wefwfe", "lastName":"ewrkbfif", "position": "efewerfw", "patronymic":"ergerge", "phoneNumber": "9055487552",
-//            "email": "qwe@qwe.ru", "password":"lewrhbwueu23232", "userRoleRusName":"Диспетчер", "pointName":"point1"}]');
-//    $json_data = array(
-//        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
-//        "recordsTotal" => intval(1),  // total number of records
-//        "recordsFiltered" => intval(1), // total number of records after searching, if there is no searching then totalFiltered = totalData
-//        "data" => $dataArray   // total data array
-//    );
-//    echo json_encode($json_data);
 }
 
 function removeUser(PrivilegedUser $privUser) {

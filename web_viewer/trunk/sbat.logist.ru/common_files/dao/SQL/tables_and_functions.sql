@@ -1682,37 +1682,40 @@ FOR EACH ROW
 -- -------------------------------------------------------------------------------------------------------------------
 
 CREATE VIEW transmaster_transport_db.all_users AS
-  SELECT
-    users.login,
-    users.userName,
-    users.position,
-    users.phoneNumber,
-    users.email,
-    'dummy' AS password,
-    points.pointName,
-    user_roles.userRoleRusName
-  FROM users
-    INNER JOIN (user_roles) ON (
-      users.userRoleID = user_roles.userRoleID
-      )
-    LEFT JOIN (points) ON (
-      users.pointID = points.pointID
-      );
+SELECT
+  u.userId,
+  u.login,
+  u.userName,
+  u.position,
+  u.phoneNumber,
+  u.email,
+  'dummy' AS password,
+  p.pointName,
+  r.userRoleRusName,
+  c.clientID
+FROM transmaster_transport_db.users u
+  LEFT JOIN transmaster_transport_db.points p ON p.pointID = u.pointID
+  LEFT JOIN transmaster_transport_db.clients c ON c.clientID = u.clientID
+  INNER JOIN transmaster_transport_db.user_roles r ON r.userRoleID = u.userRoleID;
 
 -- select users procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARCHAR(255), _isDesc BOOLEAN, _search TEXT)
+CREATE PROCEDURE transmaster_transport_db.selectUsers(_startEntry INTEGER, _length INTEGER,
+                                                      _orderby    VARCHAR(255),
+                                                      _isDesc     BOOLEAN, _search TEXT)
   BEGIN
 
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM all_users
+    FROM transmaster_transport_db.all_users
     WHERE (_search = '' OR userName LIKE @searchString OR position LIKE @searchString OR phoneNumber LIKE @searchString
            OR email LIKE @searchString OR pointName LIKE @searchString OR userRoleRusName LIKE @searchString)
     ORDER BY NULL,
       CASE WHEN _orderby = ''
         THEN NULL END,
+      CASE WHEN _isDesc AND _orderby = 'userId'
+        THEN userId END ASC,
       CASE WHEN _isDesc AND _orderby = 'login'
         THEN login END ASC,
       CASE WHEN _isDesc AND _orderby = 'userName'
@@ -1727,6 +1730,10 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
         THEN pointName END ASC,
       CASE WHEN _isDesc AND _orderby = 'userRoleRusName'
         THEN userRoleRusName END ASC,
+      CASE WHEN _isDesc AND _orderby = 'clientID'
+        THEN clientID END ASC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'userId'
+        THEN userId END ASC,
       CASE WHEN NOT (_isDesc) AND _orderby = 'login'
         THEN login END DESC,
       CASE WHEN NOT (_isDesc) AND _orderby = 'userName'
@@ -1740,7 +1747,9 @@ CREATE PROCEDURE selectUsers(_startEntry INTEGER, _length INTEGER, _orderby VARC
       CASE WHEN NOT (_isDesc) AND _orderby = 'pointName'
         THEN pointName END DESC,
       CASE WHEN NOT (_isDesc) AND _orderby = 'userRoleRusName'
-        THEN userRoleRusName END DESC
+        THEN userRoleRusName END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'clientID'
+        THEN clientID END DESC
     LIMIT _startEntry, _length;
 
     -- filtered users

@@ -150,4 +150,10 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__ . '/../dao/routePointDao/RoutePoint.php';
         return \DAO\RoutePointEntity::getInstance();
     }
+
+    public function getClientEntity()
+    {
+        include_once __DIR__ . '/../dao/clientDao/Client.php';
+        return \DAO\ClientEntity::getInstance();
+    }
 }
