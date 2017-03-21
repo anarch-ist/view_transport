@@ -37,6 +37,6 @@ class SelectAllClients implements IEntitySelect
      */
     function getSelectQuery()
     {
-        return "SELECT * FROM `clients`";
+        return "SELECT clientID,clientName FROM `clients`";
     }
 }
