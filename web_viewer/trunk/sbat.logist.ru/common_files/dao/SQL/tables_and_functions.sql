@@ -1,9 +1,9 @@
 SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES';
 
-CREATE DATABASE `transmaster_transport_db_archive`
-  CHARACTER SET utf8
-  COLLATE utf8_bin;
-USE `transmaster_transport_db_archive`;
+# CREATE DATABASE `transmaster_transport_db_archive`
+#   CHARACTER SET utf8
+#   COLLATE utf8_bin;
+# USE `transmaster_transport_db_archive`;
 
 -- _errorMessage must be less or equal 110 symbols
 CREATE PROCEDURE generateLogistError(_errorMessage TEXT)

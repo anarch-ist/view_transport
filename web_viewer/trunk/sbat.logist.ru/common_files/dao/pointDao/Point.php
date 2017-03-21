@@ -23,11 +23,12 @@ class PointEntity implements IPointEntity
     function selectPoints()
     {
         $array = $this->_DAO->select(new SelectAllPoints());
-        $points = array();
-        for ($i = 0; $i < count($array); $i++) {
-            $points[$i] = new PointData($array[$i]);
-        }
-        return $points;
+//        $points = array();
+//        for ($i = 0; $i < count($array); $i++) {
+//            $points[$i] = new PointData($array[$i]);
+//        }
+//        return $points;
+        return $array;
     }
 
     function selectPointByID($id)
@@ -70,7 +71,7 @@ class SelectAllPoints implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT * FROM `points`;";
+        return "SELECT pointID,pointName FROM `points`;";
     }
 }
 
@@ -88,6 +89,8 @@ class SelectPointByID implements IEntitySelect
         return "select * from `points` where `pointID` = '$this->id'";
     }
 }
+
+
 
 class SelectPointByUserID implements IEntitySelect
 {

@@ -72,14 +72,16 @@ try {
 function getAllPointIdPointNamePairs(PrivilegedUser $privUser)
 {
     $dataArray = $privUser->getPointEntity()->selectPoints();
-    $data = array();
-    foreach ($dataArray as $key => $val) {
-        if ($val instanceof DAO\PointData) {
-            $data[$key]['pointID'] = $val->getData('pointID');
-            $data[$key]['pointName'] = $val->getData('pointName');
-        }
-    }
-    echo json_encode($data);
+//    $data = array();
+//    foreach ($dataArray as $key => $val) {
+//        if ($val instanceof DAO\PointData) {
+//            $data[$key]['pointID'] = $val->getData('pointID');
+//            $data[$key]['pointName'] = $val->getData('pointName');
+//        }
+//    }
+//    echo json_encode($data);
+    //PHP hangs itself trying to process 118000 rows
+    echo json_encode($dataArray);
 }
 
 function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
