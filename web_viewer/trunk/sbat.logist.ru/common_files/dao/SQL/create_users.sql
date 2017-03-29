@@ -63,6 +63,9 @@ GRANT SELECT, UPDATE ON transmaster_transport_db.routes TO 'andy'@'localhost';
 GRANT SELECT ON transmaster_transport_db.tariffs TO 'andy'@'localhost';
 GRANT SELECT ON transmaster_transport_db.user_roles TO 'andy'@'localhost';
 GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.users TO 'andy'@'localhost';
+GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.transport_companies TO 'andy'@'localhost';
+GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.vehicles TO 'andy'@'localhost';
+GRANT SELECT, UPDATE, INSERT, DELETE ON transmaster_transport_db.drivers TO 'andy'@'localhost';
 
 
 

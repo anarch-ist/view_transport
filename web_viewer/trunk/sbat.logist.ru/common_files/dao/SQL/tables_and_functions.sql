@@ -551,6 +551,10 @@ CREATE TABLE requests (
   warehousePointID        INTEGER        NULL,
   routeListID             INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
   lastVisitedRoutePointID INTEGER        NULL, -- может быть NULL до тех пор пока не создан маршрутный лист
+  hoursAmount             INTEGER        NULL, -- Фактическое кол-во часов, может быть NULL, пока статус не "Доставлено"
+  transportCompanyId      INTEGER        NULL, -- Транспортная компания
+  vehicleId               INTEGER        NULL, -- Транспортное средство
+  driverId                INTEGER        NULL,  -- Водитель
 
   PRIMARY KEY (requestID),
   FOREIGN KEY (dataSourceID) REFERENCES data_sources (dataSourceID),
@@ -657,7 +661,6 @@ CREATE TABLE requests_history (
     ON DELETE RESTRICT
     ON UPDATE RESTRICT
 );
-
 
 -- pretensions
 CREATE TABLE pretensions
@@ -917,7 +920,6 @@ CREATE PROCEDURE selectData(_userID INTEGER, _startEntry INTEGER, _length INTEGE
 
   END;
 
-
 -- used in pretensionWindow
 CREATE PROCEDURE `selectDataByClientIdAndInvoiceNumber`(_userID INTEGER, _clientID TEXT, _invoiceNumber TEXT)
   BEGIN
@@ -929,21 +931,27 @@ CREATE PROCEDURE `selectDataByClientIdAndInvoiceNumber`(_userID INTEGER, _client
     SET @isClientManager = FALSE;
     SET @isDispatcherOrWDispatcher = FALSE;
 
-    IF (@userRoleID = 'ADMIN') THEN
+    IF (@userRoleID = 'ADMIN')
+    THEN
       SET @isAdmin = TRUE;
-    ELSEIF (@userRoleID = 'MARKET_AGENT') THEN
-      SET @isMarketAgent = TRUE;
-    ELSEIF (@userRoleID = 'CLIENT_MANAGER') THEN
-      SET @isClientManager = TRUE;
-    ELSEIF (@userRoleID = 'DISPATCHER' OR @userRoleID = 'W_DISPATCHER') THEN
-      SET @isDispatcherOrWDispatcher = TRUE;
+    ELSEIF (@userRoleID = 'MARKET_AGENT')
+      THEN
+        SET @isMarketAgent = TRUE;
+    ELSEIF (@userRoleID = 'CLIENT_MANAGER')
+      THEN
+        SET @isClientManager = TRUE;
+    ELSEIF (@userRoleID = 'DISPATCHER' OR @userRoleID = 'W_DISPATCHER')
+      THEN
+        SET @isDispatcherOrWDispatcher = TRUE;
     END IF;
 
-    IF (@isClientManager) THEN
+    IF (@isClientManager)
+    THEN
       SET @clientID = getClientIDByUserID(_userID);
     END IF;
 
-    IF (@isDispatcherOrWDispatcher) THEN
+    IF (@isDispatcherOrWDispatcher)
+    THEN
       SET @userPointID = getPointIDByUserID(_userID);
       SET @allRoutesWithUserPointID = selectAllRoutesIDWithThatPointAsString(@userPointID);
     END IF;
@@ -988,14 +996,22 @@ CREATE PROCEDURE `selectDataByClientIdAndInvoiceNumber`(_userID INTEGER, _client
 
     SET @wherePart = '';
 
-    IF @isAdmin THEN
-      SET @wherePart = CONCAT('WHERE (clientIDExternal = "', _clientID,'" AND invoiceNumber = "',_invoiceNumber,'")');
-    ELSEIF @isMarketAgent THEN
-      SET @wherePart = CONCAT('WHERE (marketAgentUserID = "', _userID,'") AND clientIDExternal = "', _clientID,'" AND invoiceNumber = "',_invoiceNumber,'"');
-    ELSEIF @isClientManager THEN
-      SET @wherePart = CONCAT('WHERE (clientID = ', @clientID,') AND  clientIDExternal = "', _clientID,'" AND invoiceNumber = "',_invoiceNumber,'"');
-    ELSEIF @isDispatcherOrWDispatcher THEN
-      SET @wherePart = CONCAT('WHERE (routeID IN (', @allRoutesWithUserPointID,')) AND  clientIDExternal = "', _clientID,'" AND invoiceNumber = "',_invoiceNumber,'"');
+    IF @isAdmin
+    THEN
+      SET @wherePart = CONCAT('WHERE (clientIDExternal = "', _clientID, '" AND invoiceNumber = "', _invoiceNumber,
+                              '")');
+    ELSEIF @isMarketAgent
+      THEN
+        SET @wherePart = CONCAT('WHERE (marketAgentUserID = "', _userID, '") AND clientIDExternal = "', _clientID,
+                                '" AND invoiceNumber = "', _invoiceNumber, '"');
+    ELSEIF @isClientManager
+      THEN
+        SET @wherePart = CONCAT('WHERE (clientID = ', @clientID, ') AND  clientIDExternal = "', _clientID,
+                                '" AND invoiceNumber = "', _invoiceNumber, '"');
+    ELSEIF @isDispatcherOrWDispatcher
+      THEN
+        SET @wherePart = CONCAT('WHERE (routeID IN (', @allRoutesWithUserPointID, ')) AND  clientIDExternal = "',
+                                _clientID, '" AND invoiceNumber = "', _invoiceNumber, '"');
     END IF;
 
     SET @limitPart = ' LIMIT 1';
@@ -1015,6 +1031,7 @@ CREATE PROCEDURE `selectDataByClientIdAndInvoiceNumber`(_userID INTEGER, _client
 -- -------------------------------------------------------------------------------------------------------------------
 
 --  таблица обновляется через триггеры на таблице requests и через запрос к таблице mat_view_route_points_sequential внутри этих триггеров
+
 CREATE TABLE mat_view_arrival_time_for_request (
   requestID                   INTEGER,
   arrivalTimeToNextRoutePoint DATETIME,
@@ -1682,21 +1699,21 @@ FOR EACH ROW
 -- -------------------------------------------------------------------------------------------------------------------
 
 CREATE VIEW transmaster_transport_db.all_users AS
-SELECT
-  u.userId,
-  u.login,
-  u.userName,
-  u.position,
-  u.phoneNumber,
-  u.email,
-  'dummy' AS password,
-  p.pointName,
-  r.userRoleRusName,
-  c.clientID
-FROM transmaster_transport_db.users u
-  LEFT JOIN transmaster_transport_db.points p ON p.pointID = u.pointID
-  LEFT JOIN transmaster_transport_db.clients c ON c.clientID = u.clientID
-  INNER JOIN transmaster_transport_db.user_roles r ON r.userRoleID = u.userRoleID;
+  SELECT
+    u.userId,
+    u.login,
+    u.userName,
+    u.position,
+    u.phoneNumber,
+    u.email,
+    'dummy' AS password,
+    p.pointName,
+    r.userRoleRusName,
+    c.clientID
+  FROM transmaster_transport_db.users u
+    LEFT JOIN transmaster_transport_db.points p ON p.pointID = u.pointID
+    LEFT JOIN transmaster_transport_db.clients c ON c.clientID = u.clientID
+    INNER JOIN transmaster_transport_db.user_roles r ON r.userRoleID = u.userRoleID;
 
 -- select users procedure
 -- _search - строка для глобального поиска по всем колонкам
@@ -1869,8 +1886,55 @@ CREATE PROCEDURE `deletePretension`(_pretensionId INTEGER, _requestIDExternal VA
 -- getting pretension
 CREATE PROCEDURE `getPretensionsByReqIdExt`(_requestIDExternal VARCHAR(255))
   BEGIN
-    SELECT * FROM pretensions WHERE requestIDExternal = _requestIDExternal;
+    SELECT *
+    FROM pretensions
+    WHERE requestIDExternal = _requestIDExternal;
   END;
+
+-- -------------------------------------------------------------------------------------------------------------------
+--                                    TRANSPORT COMPANIES, VEHICLES, DRIVERS
+-- -------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE transmaster_transport_db.transport_companies  (     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,   NAME VARCHAR (64
+),      short_name VARCHAR (32
+),      inn INT,      KPP VARCHAR (64
+),      BIK VARCHAR (64
+),      cor_account VARCHAR (64
+),      cur_account VARCHAR (64
+),      bank_name VARCHAR (128
+),      legal_address VARCHAR (128
+),      post_address VARCHAR (128
+),      keywords VARCHAR (64
+),      director_fullname VARCHAR (128
+),      chief_acc_fullname VARCHAR (128
+) 
+);
+
+CREATE TABLE vehicles
+(
+  id                   INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  transport_company_id INT(11),
+  license_number       VARCHAR(12),
+  model                VARCHAR(32),
+  carrying_capacity    VARCHAR(32),
+  volume               VARCHAR(32),
+  loading_type         VARCHAR(32),
+  pallets_quantity     INT(11),
+  type                 VARCHAR(32),
+  CONSTRAINT vehicles_transport_companies_id_fk FOREIGN KEY (transport_company_id) REFERENCES transport_companies (id)
+);
+
+
+CREATE TABLE transmaster_transport_db.drivers  (     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,      vehicle_id INT,      transport_company_id INT,      full_name VARCHAR (64
+),      passport VARCHAR (128
+),      phone VARCHAR (18
+),      license VARCHAR (128
+),   CONSTRAINT drivers_vehicles_id_fk FOREIGN KEY (vehicle_id
+) REFERENCES vehicles (id
+),   CONSTRAINT drivers_transport_companies_id_fk FOREIGN KEY (transport_company_id
+) REFERENCES transport_companies (id
+) 
+);
 
 
 
@@ -1892,3 +1956,5 @@ CREATE INDEX ind5 ON mat_view_row_count_for_user (userID);
 
 -- индекс для оптимизации запроса selectRequestStatusHistory
 CREATE INDEX ind6 ON requests_history (requestIDExternal);
+
+--
