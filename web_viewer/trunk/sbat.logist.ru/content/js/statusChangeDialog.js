@@ -12,9 +12,12 @@ $(document).ready(function () {
         '<table>' +
         '<tr valign="top" id="currentStatusTR" ><td width="200" padding="10px"><label for="statusCurrent">Текущий статус: </label></td><td><strong id="statusCurrent"></strong></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>' +
+        '<tr id="companyTr" valign="top" ><td width="200"><label for="companyInput">Транспортная компания: </label></td><td><input id="companyInput" /></td></tr>' +
+        '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
+        '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
+        '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="time"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
-        '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Номер ТС: </label></td><td><input id="vehicleNumberInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
         '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes2"><table id="requestCheckBoxes"></table></div></td></tr>' +
         // '<tr id="selectNumbersRequestsTr" valign="top"><td width="200"><label for="statusSelect">Номера накладных: </label></td><td><div id="numberRequestCheckBoxes"></div></td></tr>' +
@@ -22,7 +25,109 @@ $(document).ready(function () {
         '</div>'
     );
 
-    // alert($("#userRoleContainer").value());
+    //populate TC select
+
+
+    $.post( "content/getData.php",
+        {status: "getCompanies", format: "json"},
+        function (companiesData) {
+
+            // var options = [];
+            var selectizeOptions = [];
+            companiesData = JSON.parse(companiesData);
+
+            companiesData.forEach(function (entry) {
+
+                // var option = "<option value=" + entry.id + ">" + entry.name + "</option>";
+                // options.push(option);
+                console.log("id:"+entry.id+" name:"+entry.name+"\n");
+                var selectizeOption = {text: entry.name, value: entry.id};
+                selectizeOptions.push(selectizeOption);
+            });
+            $('#driverInput').selectize({
+                sortField: "text",
+                maxItems:1,
+                onChange: function (value) {
+                    if (!value.length) return;
+                }
+            });
+            var driverInput = $('#driverInput')[0].selectize;
+            driverInput.disable();
+
+            $('#vehicleNumberInput').selectize({
+               sortField: "text",
+                maxItems:1,
+                onChange: function(value){
+                    if (!value.length) return;
+                    $.post(
+                        'content/getData.php',
+                        {
+                            status:'getDrivers',
+                            vehicleId: Number(value)
+                        }, function (driversData) {
+                            var driversOptions = [];
+                            driversData = JSON.parse(driversData);
+
+                            driversData.forEach(function (entry) {
+                                var selectizeOption = {text: entry.full_name, value: entry.id};
+                                driversOptions.push(selectizeOption);
+                            });
+                            driverInput.clear();
+                            driverInput.clearOptions();
+                            driverInput.load(function(callback) {
+                                callback(driversOptions)
+                            });
+                            driverInput.enable();
+                        })
+
+                }
+            });
+            var vehicleInput = $('#vehicleNumberInput')[0].selectize;
+            vehicleInput.disable();
+
+            $('#companyInput').selectize({
+                sortField: "text",
+                maxItems:1,
+                onChange: function(value){
+                    if (!value.length) return;
+                    $.post(
+                        'content/getData.php',
+                        {
+                        status:'getVehicles',
+                        companyId: Number(value)
+                    }, function (vehiclesData) {
+                        var vehicleOptions = [];
+                            console.log(vehiclesData);
+                        vehiclesData = JSON.parse(vehiclesData);
+
+                        vehiclesData.forEach(function (entry) {
+                            var selectizeOption = {text: entry.license_number+" / "+entry.model, value: entry.id};
+                            vehicleOptions.push(selectizeOption);
+                        });
+                        vehicleInput.clear();
+                        vehicleInput.clearOptions();
+                        vehicleInput.load(function(callback) {
+                            callback(vehicleOptions)
+                        });
+                            vehicleInput.enable();
+
+                            driverInput.clear();
+                            driverInput.clearOptions();
+                            driverInput.disable();
+                    })
+
+                }
+            });
+            var companySelectize = $('#companyInput')[0].selectize;
+            // var clientSelectize = usersEditor.field('clientID').inst();
+
+            companySelectize.clear();
+            companySelectize.clearOptions();
+            companySelectize.load(function (callback) {
+                callback(selectizeOptions);
+            });
+        }
+    );
 
     // create status select menu
     var $statusSelect = $("#statusSelect");
@@ -31,6 +136,10 @@ $(document).ready(function () {
     var $numberRequestCheckBoxes = $("#numberRequestCheckBoxes");
     var $selectRequestsTr = $("#selectRequestsTr");
     var $selectNumbersRequestsTr = $("#selectNumbersRequestsTr");
+
+    function populateVehicleSelectMenu(){
+        var options = [];
+    }
 
 
     function populateStatusSelectMenu() {
@@ -67,6 +176,8 @@ $(document).ready(function () {
     // var $dateTimePicker = $("#dateTimePicker");
     // $dateTimePicker.datetimepicker();
     $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true});
+    $('#hoursAmount').mask('00000', {placeholder: '0-9999'});
+
 
 
 
@@ -88,14 +199,24 @@ $(document).ready(function () {
             var dataTable = $statusChangeDialog.data('dataTable');
 
             if ($("#data-role").html().trim() == "Пользователь_клиента"){
-                $('#vehicleNumberTr').hide();
+                // $('#vehicleNumberTr').hide();
             }
 
+            $statusSelect.on("selectmenuchange", function (e, ui) {
+                // console.log(());
+                if($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
+                    $('#hoursAmountTr').show();
+                } else {
+                    $('#hoursAmountTr').hide();
+                }
+            });
+            
             $("#palletsQtyTr").hide();
             switch (dialogType) {
                 case "changeStatusForRequest":
                     $selectRequestsTr.hide();
-                    $statusSelect.off("selectmenuchange");
+                    // $statusSelect.off("selectmenuchange");
+                    
                     $.post(
                         "content/getData.php",
                         {
@@ -129,8 +250,9 @@ $(document).ready(function () {
                     break;
                 case "changeStatusForSeveralRequests":
                     $selectRequestsTr.show();
+                    $('#palletsQtyTr').show();
                     $statusSelect.on("selectmenuchange", function (e, ui) {
-                            $("#palletsQtyTr").show();
+                        console.log(($statusSelect[0][$statusSelect[0].selectedIndex].value));
                     });
 
                     $.post(
@@ -174,7 +296,12 @@ $(document).ready(function () {
                 var date = $('#dateTimePicker')[0].value;
                 var comment = $("#commentInput").val();
                 var vehicleNumber = $("#vehicleNumberInput").val();
+                var hoursAmount = $("#hoursAmount").val();
+                var companyId = $("#companyInput")[0].selectize.getValue();
+                var vehicleId = $("#vehicleNumberInput")[0].selectize.getValue();
+                var driverID = $('#driverInput')[0].selectize.getValue();
 
+                console.log(companyId+' '+vehicleId+' '+driverID);
                 if (dialogType === "changeStatusForRequest") {
 
                     // get specific vars for "changeStatusForRequest" dialogType
@@ -188,7 +315,12 @@ $(document).ready(function () {
                                 newStatusID: newStatusID,
                                 date: date,
                                 comment: comment,
-                                vehicleNumber: vehicleNumber
+                                vehicleNumber: vehicleNumber,
+                                hoursAmount: Number(hoursAmount),
+                                companyId: companyId,
+                                vehicleId: vehicleId,
+                                driverId: driverID
+
                             },
                             function (data) {
                                 if (data === '1') {
@@ -223,7 +355,11 @@ $(document).ready(function () {
                                 vehicleNumber: vehicleNumber,
                                 palletsQty: palletsQty,
                                 requestIDExternalArray: requests,
-                                routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
+                                routeListID: dataTable.row($('#user-grid .selected')).data().routeListID,
+                                hoursAmount: Number(hoursAmount),
+                                companyId: companyId,
+                                vehicleId: vehicleId,
+                                driverId: driverID
                             },
                             function (data) {
                                 if (data === '1') {
@@ -263,6 +399,7 @@ $(document).ready(function () {
             .data("dataTable", dataTable)
             .dialog("open");
         populateStatusSelectMenu();
+
     };
 
     function createDateTimePickerLocalization() {

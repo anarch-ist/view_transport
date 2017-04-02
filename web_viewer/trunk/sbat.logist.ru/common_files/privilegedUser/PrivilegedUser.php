@@ -156,4 +156,22 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__ . '/../dao/clientDao/Client.php';
         return \DAO\ClientEntity::getInstance();
     }
+
+    public function getTransportCompanyEntity()
+    {
+        include_once __DIR__ . '/../dao/transportCompanyDao/transportCompany.php';
+        return \DAO\TransportCompany::getInstance();
+    }
+
+    public function getVehicleEntity()
+    {
+        include_once __DIR__ . '/../dao/vehicleDao/vehicle.php';
+        return \DAO\Vehicle::getInstance();
+    }
+    
+    public function getDriverEntity()
+    {
+        include_once __DIR__ . '/../dao/driverDao/driver.php';
+        return \DAO\Driver::getInstance();
+    }
 }

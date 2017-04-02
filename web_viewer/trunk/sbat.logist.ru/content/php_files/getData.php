@@ -24,9 +24,39 @@ try {
         echo updatePretension($privUser);
     } else if (strcasecmp($_POST['status'], 'deletePretension')===0){
         echo deletePretension($privUser);
+    } else if (strcasecmp($_POST['status'], 'getCompanies')===0){
+        echo getCompanies($privUser);
+    } else if (strcasecmp($_POST['status'], 'getVehicles')===0){
+        echo getVehiclesForCompany($privUser);
+    } else if (strcasecmp($_POST['status'], 'getDrivers')===0){
+        echo getDriversForVehicle($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function getCompanies(PrivilegedUser $privUser){
+//    $data = $privUser->getRequestEntity()->getAllTransportCompanies();
+    $data = $privUser->getTransportCompanyEntity()->selectAllCompanies();
+    
+    return(json_encode($data));
+}
+
+function getVehiclesForCompany(PrivilegedUser $privUser){
+    $companyId = (int) $_POST['companyId'];
+    if(!isset($companyId)){
+        throw new DataTransferException('Не задан ID компании', __FILE__);
+    }
+    $data = $privUser->getVehicleEntity()->selectVehicleByCompanyId($companyId);
+    return(json_encode($data));
+}
+function getDriversForVehicle(PrivilegedUser $privUser){
+    $vehicleId = $_POST['vehicleId'];
+    if(isset($vehicleId)){
+        $data = $privUser->getDriverEntity()->selectDriverByVehicleId($vehicleId);
+        return(json_encode($data));    
+    } else return null;
+    
 }
 
 function deletePretension(PrivilegedUser $privUser){
@@ -179,8 +209,17 @@ function changeStatusForRequest(PrivilegedUser $privUser)
     $vehicleNumber = $_POST['vehicleNumber'];
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
+    $hoursAmount = $_POST['hoursAmount'];
+    $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : "NULL";
+    $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : "NULL";
+    $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : "NULL";
     $userID = $privUser->getUserInfo()->getData('userID');
-    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber);
+    if (!isset($hoursAmount) || empty($hoursAmount)) {
+        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, 0, $companyId, $vehicleId, $driverId);
+    } else {
+        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount, $companyId, $vehicleId, $driverId);
+    }
+
 }
 
 function changeStatusForSeveralRequests(PrivilegedUser $privUser)
@@ -192,8 +231,14 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
-    if (isset($_POST['palletsQty'])) {
-        return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $_POST['palletsQty']);
-    }
-    return $privUser->getRequestEntity()->updateRequestStatuses($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber);
+    $palletsQty = !empty($_POST['palletsQty']) ? $_POST['palletsQty'] : 0 ;
+    $hoursAmount = !empty($_POST['hoursAmount']) ? $_POST['hoursAmount'] : 0;
+    $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : 0;
+    $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : 0;
+    $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : 0;
+//        if (isset($_POST['palletsQty'])) {
+            return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId);
+//        }
+//        return $privUser->getRequestEntity()->updateRequestStatuses($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
+
 }
