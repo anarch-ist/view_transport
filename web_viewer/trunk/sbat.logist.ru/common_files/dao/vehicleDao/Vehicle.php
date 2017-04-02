@@ -1,6 +1,6 @@
 <?php
 namespace DAO;
-include_once __DIR__ . '/IVehicle.php.php';
+include_once __DIR__ . '/IVehicle.php';
 include_once __DIR__ . '/../DAO.php';
 
 class Vehicle implements IVehicle {
@@ -27,7 +27,7 @@ class Vehicle implements IVehicle {
 
     function selectVehicleByCompanyId($companyId)
     {
-        $array = $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
+        return $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
         // TODO: Implement selectVehicleByCompanyId() method.
     }
 
@@ -38,6 +38,23 @@ class Vehicle implements IVehicle {
         self::$_instance = $this;
     }
 
+    public static function getInstance()
+    {
+        if (is_null(self::$_instance)) return new Vehicle();
+        return self::$_instance;
+    }
+
+    function getAllVehicles(){
+        return $this->_DAO->select(new SelectAllVehicles());
+    }
+
+    function getVehicleById($id){
+        return $this->_DAO->select(new SelectVehicleById($id));
+    }
+
+    function getVehicleByCompanyId($companyId){
+        return $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
+    }
 }
 
 class SelectAllVehicles implements IEntitySelect {
@@ -73,6 +90,7 @@ class SelectVehicleByCompanyId implements IEntitySelect {
     function getSelectQuery()
     {
         return "SELECT * FROM `vehicles` WHERE transport_company_id = $this->companyId";
+//        return "SELECT * FROM `vehicles` WHERE transport_company_id = 1";
     }
 
     public function __construct($companyId)

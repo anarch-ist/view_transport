@@ -31,12 +31,22 @@ class TransportCompany implements ITransportCompany {
         self::$_instance = $this;
     }
 
+    public static function getInstance()
+    {
+        if (is_null(self::$_instance)) return new TransportCompany();
+        return self::$_instance;
+    }
+
+    function getAllTransportCompanies(){
+        return $this->_DAO->select(new SelectAllCompanies());
+    }
 }
 
 class SelectAllCompanies implements IEntitySelect {
     function getSelectQuery()
     {
-        return "SELECT * FROM transport_companies";
+        return "SELECT * FROM `transport_companies`";
+//        return "CALL selectCompanies()";
     }
 
     public function __construct()

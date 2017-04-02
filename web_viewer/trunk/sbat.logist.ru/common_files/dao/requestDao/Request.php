@@ -19,7 +19,7 @@ class RequestEntity implements IRequestEntity
         if (is_null(self::$_instance)) return new RequestEntity();
         return self::$_instance;
     }
-
+    
     function selectRequests($start=0, $count=20)
     {
         $array = $this->_DAO->select(new SelectAllRequests($start, $count));
@@ -41,22 +41,22 @@ class RequestEntity implements IRequestEntity
         // TODO: Implement updateRequest() method.
     }
 
-    function updateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber)
+    function updateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $hoursAmount, $transportCompanyId = null, $vehicleId = null, $driverId = null)
     {
         $routeData =  $this->_DAO->select(new SelectRequestByID(str_replace('reqIdExt', '', $requestIDExternal)));
-        return $this->_DAO->update2(new UpdateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $routeData[0]['routeListID']));
+        return $this->_DAO->update2(new UpdateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $routeData[0]['routeListID'], $hoursAmount, $transportCompanyId, $vehicleId, $driverId));
 //        $this->_DAO->update(new UpdateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment));
 //        return $this->getRequestHistoryByRequestIdExternal($requestIDExternal);
     }
 
-    function updateRequestStatuses($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber)
+    function updateRequestStatuses($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $hoursAmount=0)
     {
-        return $this->_DAO->update2(new UpdateRequestStatuses($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber));
+        return $this->_DAO->update2(new UpdateRequestStatuses($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $hoursAmount));
     }
 
-    function updateRequestStatuses2($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $palletsQty)
+    function updateRequestStatuses2($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId)
     {
-        return $this->_DAO->update2(new UpdateRequestStatuses($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $palletsQty));
+        return $this->_DAO->update2(new UpdateRequestStatuses($userID, $routeListID, $requestIdExternalArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId));
     }
 
     function deleteRequest(RequestData $Request)
@@ -104,6 +104,16 @@ class RequestEntity implements IRequestEntity
     function getRequestsForRouteList($routeListID)
     {
         return $this->_DAO->select(new SelectRequestsByRouteList($routeListID));
+    }
+    
+    
+    
+    function getVehiclesForCompany($companyId){
+        return $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
+    }
+    
+    function getDriversForVehicle($vehicleId){
+        return $this->_DAO->select(new SelectDriverByVehicleId($vehicleId));
     }
 }
 
@@ -156,6 +166,20 @@ class SelectRequestStatuses implements IEntitySelect
     }
 }
 
+class getTransportCompanies implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+        return "SELECT * FROM transport_companies";
+        // TODO: Implement getSelectQuery() method.
+    }
+
+    public function __construct()
+    {
+    }
+
+}
+
 class getPretensions implements IEntitySelect
 {
     private $requestIDExternal;
@@ -167,7 +191,7 @@ class getPretensions implements IEntitySelect
     function getSelectQuery()
     {
         return "CALL getPretensionsByReqIdExt('$this->requestIDExternal')";
-        // TODO: Implement getSelectQuery() method.
+        
     }
 }
 
@@ -183,7 +207,7 @@ class closePretension implements IEntityUpdate
     function getUpdateQuery()
     {
         return "CALL deletePretension($this->pretensionID,'$this->requestIDExternal')";
-        // TODO: Implement getUpdateQuery() method.
+        
     }
 }
 
@@ -274,9 +298,13 @@ class UpdateRequestStatus implements IEntityUpdate
     private $comment;
     private $vehicleNumber;
     private $routeID;
+    private $hoursAmount;
+    private $transportCompanyId;
+    private $vehicleId;
+    private $driverId;
 
 
-    function __construct($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $routeID)
+    function __construct($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $routeID, $hoursAmount, $transportCompanyId, $vehicleId, $driverId)
     {
         $dao = DAO::getInstance();
 
@@ -287,6 +315,10 @@ class UpdateRequestStatus implements IEntityUpdate
         $this->comment = $dao->checkString($comment);
         $this->vehicleNumber = $dao->checkString($vehicleNumber);
         $this->routeID = $dao->checkString($routeID);
+        $this->hoursAmount = $dao->checkString($hoursAmount);
+        $this->transportCompanyId = $dao->checkString($transportCompanyId);
+        $this->vehicleId = $dao->checkString($vehicleId);
+        $this->driverId = $dao->checkString($driverId);
 
     }
 
@@ -295,7 +327,11 @@ class UpdateRequestStatus implements IEntityUpdate
      */
     function getUpdateQuery()
     {
-        return "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s') WHERE `requestIDExternal` = '$this->requestIDExternal';";
+        $companyPart = ($this->transportCompanyId == 'NULL') ? "" : ", `transportCompanyId` = $this->transportCompanyId ";
+        $vehiclePart = ($this->vehicleId == 'NULL') ? "" : ", `vehicleId` = $this->vehicleId ";
+        $driverPart = ($this->driverId == 'NULL') ? "" : ", `driverId` = $this->driverId ";
+        $String = "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s'), `hoursAmount` = $this->hoursAmount $companyPart $vehiclePart $driverPart WHERE `requestIDExternal` = '$this->requestIDExternal';";
+        return $String;
     }
 }
 
@@ -309,13 +345,20 @@ class UpdateRequestStatuses implements IEntityUpdate
     private $vehicleNumber;
     private $palletQuantity;
     private $routeListID;
+    private $hoursAmount;
+    private $companyId;
+    private $vehicleId;
+    private $driverId;
 
-    function __construct($userID, $routeListID, $requestListArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $palletQuantity=0)
+    function __construct($userID, $routeListID, $requestListArray, $newRequestStatus, $datetime, $comment, $vehicleNumber, $palletQuantity, $hoursAmount, $companyId, $vehicleId, $driverId)
     {
         $dao = DAO::getInstance();
 
-        $requestListArray = implode(", ",$requestListArray);
-        $this->requests = $dao->checkString($requestListArray);
+        //It doesn't work like that, see http://stackoverflow.com/questions/22789770/imploding-an-array-into-a-mysql-query
+        //$requestListArray = implode(", ",$requestListArray);
+//
+//        $this->requests = $dao->checkString($requestListArray);
+        $this->requests = $requestListArray;
         $this->userID = $dao->checkString($userID);
         $this->newRequestStatus = $dao->checkString($newRequestStatus);
         $this->datetime = $dao->checkString($datetime);
@@ -323,6 +366,10 @@ class UpdateRequestStatuses implements IEntityUpdate
         $this->vehicleNumber = $dao->checkString($vehicleNumber);
         $this->palletQuantity = $dao->checkString($palletQuantity);
         $this->routeListID = $dao->checkString($routeListID);
+        $this->hoursAmount = $dao->checkString($hoursAmount);
+        $this->companyId = $dao->checkString($companyId);
+        $this->vehicleId = $dao->checkString($vehicleId);
+        $this->driverId = $dao->checkString($driverId);
     }
 
     /**
@@ -331,13 +378,20 @@ class UpdateRequestStatuses implements IEntityUpdate
     function getUpdateQuery()
     {
 
+        //Why don't we do this? This looks awesome!!
+        $hoursPart = ($this->hoursAmount==0) ? "" : ", `hoursAmount` = $this->hoursAmount ";
+        $companyPart = ($this->companyId==0) ? "" : ", `transportCompanyId` = $this->companyId ";
+        $vehiclePart = ($this->vehicleId==0) ? "" : ", `vehicleId` = $this->vehicleId ";
+        $driverPart = ($this->driverId==0) ? "" : ", `driverId` = $this->driverId ";
 
         if ($this->newRequestStatus === 'DEPARTURE') {
             // добавить запрос на обновление паллет в routeLists
-            return "UPDATE `route_lists` SET `palletsQty` = '$this->palletQuantity', `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestIDExternal` IN ('$this->requests');";
+            $query = "UPDATE `route_lists` SET `palletsQty` = '$this->palletQuantity', `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') $hoursPart $companyPart $vehiclePart $driverPart WHERE `requestIDExternal` IN ('".implode("', '",$this->requests)."');";
+        } else {
+            $query  = "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') $hoursPart $companyPart $vehiclePart $driverPart  WHERE `requestIDExternal` IN ('".implode("', '",$this->requests)."');";
         }
-        return "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') WHERE `requestIDExternal` IN ('$this->requests');";
-        
+
+        return $query;
     }
 }
 

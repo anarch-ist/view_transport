@@ -44,6 +44,12 @@ class Driver implements IDriver {
         self::$_instance = $this;
     }
 
+    public static function getInstance()
+    {
+        if (is_null(self::$_instance)) return new Driver();
+        return self::$_instance;
+    }
+
 }
 
 class SelectAllDrivers implements IEntitySelect {
