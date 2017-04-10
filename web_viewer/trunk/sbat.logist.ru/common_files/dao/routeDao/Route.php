@@ -34,20 +34,30 @@ class RouteEntity implements IRouteEntity
         return $routes;
     }
 
+    function selectRoutesWithOffset($start = 0, $count = 5)
+    {
+        $array = $this->_DAO->multiSelect(new SelectRoutesWithOffset($start, $count));
+        $arrayResult = array();
+        $arrayResult['routes'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
+    }
+
     function selectRouteByID($id)
     {
         $array = $this->_DAO->select(new SelectRouteByID($id));
         return new RouteData($array[0]);
     }
 
-    function deleteRoute($Route)
+    function deleteRoute($routeID)
     {
-        // TODO: Implement deleteRoute() method.
+        return $this->_DAO->delete(new DeleteRoute($routeID));
     }
 
-    function addRoute($Route)
+    function addRoute($route)
     {
-        // TODO: Implement addRoute() method.
+        return $this->_DAO->insert(new InsertRoute($route));
     }
 
     function selectRouteByDirectionName($directionName)
@@ -105,7 +115,7 @@ class SelectRouteByDirectionName implements IEntitySelect
 
     function getSelectQuery()
     {
-        throw new \MysqlException('Запрос не написан для SelectRouteByDirectionName::getSelectQuery');
+        return "SELECT * FROM routes WHERE dataSourceID = 'ADMIN_PAGE' AND directionIDExternal = '$this->directionName';";
     }
 }
 
@@ -146,5 +156,64 @@ class UpdateRouteDaysOfWeek implements IEntityUpdate {
     function getUpdateQuery()
     {
         return "UPDATE `routes` SET `daysOfWeek` = '$this->dayArray' WHERE routeID = $this->routeID";
+    }
+}
+
+class SelectRoutesWithOffset implements IEntitySelect
+{
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
+
+    function __construct($start, $count)
+    {
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString = $_POST['search']['value'];
+        $searchArray = $_POST['columns'];
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
+    }
+
+    function getSelectQuery()
+    {
+        return "CALL selectRoutes($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+    }
+}
+
+class InsertRoute implements IEntityInsert
+{
+    private $routeName, $tariffID;
+
+    function __construct($data)
+    {
+        $dao = DAO::getInstance();
+        $this->routeName = $dao->checkString($data['routeName']);
+        $this->tariffID = $dao->checkString($data['tariffID']);
+    }
+
+    /**
+     * @return string
+     */
+    function getInsertQuery()
+    {
+        return "INSERT INTO `routes` (routeName, directionIDExternal, dataSourceID, tariffID) VALUE " .
+            "('$this->routeName', '$this->routeName', 'ADMIN_PAGE', '$this->tariffID');";
+    }
+}
+
+class DeleteRoute implements IEntityDelete
+{
+    private $routeID;
+
+    function __construct($routeID)
+    {
+        $this->routeID = DAO::getInstance()->checkString($routeID);
+    }
+
+    /**
+     * @return string
+     */
+    function getDeleteQuery()
+    {
+        return "DELETE FROM `routes` WHERE routeID = $this->routeID;";
     }
 }

@@ -5,6 +5,8 @@ interface IRouteEntity
 {
     function selectRoutes();
 
+    function selectRoutesWithOffset($start, $limit);
+
     function selectRouteByID($id);
 
     function selectRouteByDirectionName($directionName);

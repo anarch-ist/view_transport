@@ -104,7 +104,7 @@ VALUES
    MD5(CONCAT(MD5('12345'), '1234567891234567')), '904554356', 'cl@cl.ru', 'CLIENT_MANAGER',
    NULL , getClientIDByINN('1234567890'));
 
-INSERT INTO tariffs (cost, capacity, carrier) VALUES (3400.00, 12.5, 'some_carrier');
+
 
 -- ROUTE CREATION
 INSERT INTO routes (directionIDExternal, dataSourceID, routeName, firstPointArrivalTime, daysOfWeek, tariffID)
