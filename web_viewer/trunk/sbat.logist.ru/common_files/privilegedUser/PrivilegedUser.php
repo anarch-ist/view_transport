@@ -168,10 +168,16 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__ . '/../dao/vehicleDao/vehicle.php';
         return \DAO\Vehicle::getInstance();
     }
-    
+
     public function getDriverEntity()
     {
         include_once __DIR__ . '/../dao/driverDao/driver.php';
         return \DAO\Driver::getInstance();
+    }
+
+    public function getTariffEntity()
+    {
+        include_once __DIR__ . '/../dao/tariffDao/Tariff.php';
+        return \DAO\TariffEntity::getInstance();
     }
 }

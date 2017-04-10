@@ -45,8 +45,22 @@
     </ul>
     <div id="tabs-1">
         <h2>Маршруты</h2>
+        <div id="usersCreation">
+            <table id="routeTable">
+                <thead>
+                <tr>
+                    <th>routeID</th>
+                    <th>Имя маршрута</th>
+                    <th>tarrifID</th>
+                    <th>Стоимость за маршрут</th>
+                    <th>Стоимость за точку</th>
+                    <th>Стоимость за час</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
         <div id="routesCreation">
-            <label for="routeSelect">Направление: </label>
+            <h2>Направление</h2>
             <select id="routeSelect"></select>
 
             <div>

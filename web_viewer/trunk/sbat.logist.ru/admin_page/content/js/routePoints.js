@@ -8,7 +8,6 @@
  */
 // TODO remove code duplicates
 $(document).ready(function () {
-
     // load all required data
     {
         // when page is loading make request and get all points
@@ -55,6 +54,8 @@ $(document).ready(function () {
                 var options = [];
                 data = JSON.parse(data);
                 data.forEach(function (entry) {
+                    console.log(entry.routeID);
+                    console.log(entry.directionName);
                     var option = "<option value=" + entry.routeID + ">" + entry.directionName + "</option>";
                     options.push(option);
                 });
@@ -69,6 +70,7 @@ $(document).ready(function () {
                             onRouteChanged(value);
                         }
                     });
+                console.log($routeSelectSelectize);
                 onRouteChanged(getCurrentRouteId());
             }
         );
@@ -208,6 +210,82 @@ $(document).ready(function () {
 
     // routePointsDataTable and routePointsEditor
     {
+        var routeEditor = new $.fn.dataTable.Editor( {
+            ajax: 'content/getData.php',
+            table: '#routeTable',
+            idSrc: 'routeID',
+
+            fields: [
+                { label: 'Название маршрута', name: 'routeName', type: 'text'},
+                {
+                    label: 'Стоимость за точку',
+                    name: 'cost_per_point',
+                    mask: "999999999999.99",
+                    maskOptions: { clearIfNotMatch: true},
+                    placeholder: "1000.00"
+                },
+                {
+                    label: 'Стоимость за час',
+                    name: 'cost_per_hour',
+                    type: 'mask',
+                    mask: "999999999999.99",
+                    maskOptions: { clearIfNotMatch: true},
+                    placeholder: "1000.00"
+                },
+                {
+                    label: 'Стоимость за маршрут',
+                    name: 'cost',
+                    type: 'text',
+                    mask: "999999999999.99",
+                    maskOptions: { clearIfNotMatch: true},
+                    placeholder: "1000.00"
+                }
+            ]
+        });
+
+        routeEditor.on('preSubmit', function (e, data, action) {
+            data.status = 'routeEditingOnly';
+        });
+
+        var $routeDataTable =  $("#routeTable").DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "content/getData.php", // json datasource
+                    type: "post",  // method  , by default get
+                    data: {"status": "getRoutesData"}
+                },
+                dom: 'Bfrtip',
+                // language: {
+                //     url:'/localization/dataTablesRus.json'
+                // },
+                select: {
+                    style: 'single'
+                },
+                "buttons": [
+                    {
+                        extend: "create",
+                        editor: routeEditor,
+                        text: 'добавить запись'
+                    },
+                    {
+                        extend: "remove",
+                        editor: routeEditor,
+                        text: 'удалить запись'
+                    }
+                ],
+                "paging": 10,
+                "columnDefs": [
+                    {"name": "routeID", "data": "routeID", "targets": 0, visible: false},
+                    {"name": "routeName", "data": "routeName", "targets": 1},
+                    {"name": "tariffID", "data": "tariffID", "targets": 2, visible: false},
+                    {"name": "cost", "data": "cost", targets: 3},
+                    {"name": "cost_per_point", "data": "cost_per_point", "targets": 4},
+                    {"name": "cost_per_hour", "data": "cost_per_hour", "targets": 5}
+                ]
+            }
+        );
+
         var routePointsEditor = new $.fn.dataTable.Editor({
             ajax: 'content/getData.php',
             table: '#routePointsTable',
@@ -309,12 +387,12 @@ $(document).ready(function () {
                         text: 'удалить запись'
                     }
                     // TODO временно блокируется возможность менять, пока можно только удалять и создавать новые пункты
-                    //{
+                    // {
                     //
                     //    extend: "edit",
                     //    editor: routePointsEditor,
                     //    text: "изменить"
-                    //}
+                    // }
                 ],
                 "paging": false, // no pagination
                 "columnDefs": [

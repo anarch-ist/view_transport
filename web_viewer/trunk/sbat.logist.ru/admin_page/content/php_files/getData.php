@@ -15,6 +15,8 @@ try {
         getRelationsBetweenRoutePointsDataForRouteID($privUser);
     } else if (strcasecmp($action,'getUsersData')===0) {
         getUsers($privUser);
+    } else if (strcasecmp($action, 'getRoutesData')===0) {
+        getRoutes($privUser);
     } else if (strcasecmp($action,'getClients')===0) {
         getClients($privUser);
     } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
@@ -47,7 +49,20 @@ try {
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-
+    } else if (strcasecmp($action,'routeEditingOnly')===0) {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if (strcasecmp($action,'remove')===0) {
+            removeRoute($privUser);
+        } else if (strcasecmp($action,'edit')===0) {
+//            updateUsers($privUser);
+        } else if (strcasecmp($action,'create')===0) {
+            createNewRoute($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
     } else if (strcasecmp($action,'userEditing')===0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
@@ -269,6 +284,47 @@ function getUsers(PrivilegedUser $privUser)
         "data" => $dataArray['users']   // total data array
     );
     echo json_encode($json_data);
+}
+
+function getRoutes(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getRouteEntity()->selectRoutesWithOffset($_POST['start'], $_POST['length']);
+    $json_data = array(
+        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+        "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
+        "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
+        "data" => $dataArray['routes']   // total data array
+    );
+    echo json_encode($json_data);
+}
+
+function removeRoute(PrivilegedUser $privUser) {
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $routeID => $routeData) {
+        $privUser->getRouteEntity()->deleteRoute($routeID);
+    }
+    echo '{ }';
+}
+
+function createNewRoute(PrivilegedUser $privUser) {
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $routeInfo = $_POST['data'][0];
+    if ($privUser->getTariffEntity()->insertNewTariff($routeInfo)) {
+        $lastID = $privUser->getTariffEntity()->getLastInsertedID();
+        $routeInfo['tariffID'] = $lastID[0]['tariffID'];
+        if ($privUser->getRouteEntity()->addRoute($routeInfo)) {
+            $insertedRoute = $privUser->getRouteEntity()->selectRouteByDirectionName($routeInfo['routeName']);
+            echo json_encode(array("data" =>array($insertedRoute->toArray())));
+        }
+    } else {
+        $privUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
 }
 
 function removeUser(PrivilegedUser $privUser) {

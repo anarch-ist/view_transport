@@ -282,10 +282,12 @@ VALUES
 
 
 CREATE TABLE tariffs (
-  tariffID INTEGER AUTO_INCREMENT,
-  cost     DECIMAL(12, 2) NULL, -- цена доставки
-  capacity DECIMAL(4, 2)  NULL, -- грузоподъёмность в тоннах
-  carrier  VARCHAR(64), -- перевозчик
+  tariffID       INTEGER AUTO_INCREMENT,
+  cost           DECIMAL(12, 2) NULL, -- цена доставки
+  cost_per_point DECIMAL(12, 2) NULL, -- цена за точку
+  cost_per_hour  DECIMAL(12, 2) NULL, -- цена за час
+  capacity       DECIMAL(4, 2)  NULL, -- грузоподъёмность в тоннах
+  carrier        VARCHAR(64), -- перевозчик
   PRIMARY KEY (tariffID)
 );
 
@@ -1775,6 +1777,66 @@ CREATE PROCEDURE transmaster_transport_db.selectUsers(_startEntry INTEGER, _leng
     -- total users
     SELECT COUNT(*) AS `totalCount`
     FROM all_users;
+
+  END;
+
+
+-- select routes procedure
+-- _search - строка для глобального поиска по всем колонкам
+CREATE PROCEDURE transmaster_transport_db.selectRoutes(
+  _startEntry INTEGER,
+  _length     INTEGER,
+  _orderby    VARCHAR(255),
+  _isDesc     BOOLEAN,
+  _search     TEXT
+)
+  BEGIN
+
+    SET @searchString = CONCAT('%', _search, '%');
+
+    SELECT SQL_CALC_FOUND_ROWS
+      r.routeID,
+      r.routeName,
+      t.tariffID,
+      t.cost,
+      t.cost_per_point,
+      t.cost_per_hour
+    FROM transmaster_transport_db.routes r
+      JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
+    WHERE (
+      _search = '' OR
+      r.routeName LIKE @searchString OR
+      t.cost LIKE @searchString OR
+      t.cost_per_point LIKE @searchString OR
+      t.cost_per_hour LIKE @searchString
+    )
+    ORDER BY NULL,
+      CASE WHEN _orderby = ''
+        THEN NULL END,
+      CASE WHEN _isDesc AND _orderby = 'routeName'
+        THEN routeName END ASC,
+      CASE WHEN _isDesc AND _orderby = 'cost'
+        THEN cost END ASC,
+      CASE WHEN _isDesc AND _orderby = 'cost_per_point'
+        THEN cost_per_point END ASC,
+      CASE WHEN _isDesc AND _orderby = 'cost_per_housr'
+        THEN cost_per_hour END ASC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'routeName'
+        THEN routeName END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'cost'
+        THEN cost END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'cost_per_point'
+        THEN cost_per_point END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'cost_per_hour'
+        THEN cost_per_hour END DESC
+    LIMIT _startEntry, _length;
+
+    -- filtered routes
+    SELECT FOUND_ROWS() AS `totalFiltered`;
+
+    -- total routes
+    SELECT COUNT(*) AS `totalCount`
+    FROM routes;
 
   END;
 
