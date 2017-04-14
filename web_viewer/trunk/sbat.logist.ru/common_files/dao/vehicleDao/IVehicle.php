@@ -10,5 +10,13 @@ interface IVehicle
     
     function selectVehicleByCompanyId($companyId);
 
-    function insertVehicle();
+    function insertVehicle($vehicleInfo);
+
+    function removeVehicle($id);
+
+    function selectVehiclesByRange($start, $length);
+
+    function selectVehicleByLastInsertedId();
+
+    function updateVehicle(VehicleData $newUser, $id);
 }

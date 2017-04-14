@@ -24,6 +24,18 @@ body > div {
     width: 100% !important;
 }
 
+#transportCompaniesTable {
+    width: 100% !important;
+}
+
+#vehiclesTable {
+    width: 100% !important;
+}
+
+#driversTable {
+    width: 100% !important;
+}
+
 #tabs {
     height: 100%;
     display: flex;

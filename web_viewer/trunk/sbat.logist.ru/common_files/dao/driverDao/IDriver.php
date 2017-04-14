@@ -8,9 +8,17 @@ interface IDriver
 
     function selectDriverById($id);
 
-    function insertDriver();
+    function insertDriver($driverInfo);
     
     function selectDriverByCompanyId($companyId);
     
     function selectDriverByVehicleId($vehicleId);
+
+    function selectDriversByRange($start = 0, $length = 20);
+
+    function removeDriver($id);
+
+    function selectDriverByLastInsertedId();
+
+    function updateDriver(DriverData $newDriver, $id);
 }

@@ -8,5 +8,13 @@ interface ITransportCompany
     
     function selectCompanyById($id);
     
-    function insertCompany();
+    function insertCompany($transportCompanyInfo);
+
+    function selectByRange($start = 0, $count = 20);
+
+    function selectLastInsertedId();
+
+    function removeCompany($userID);
+
+    function updateCompany(TransportCompanyData $newCompany, $id);
 }

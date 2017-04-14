@@ -20,15 +20,14 @@ class Vehicle implements IVehicle {
         return new VehicleData($array[0]);
     }
 
-    function insertVehicle()
+    function insertVehicle($vehicleInfo)
     {
-        // TODO: Implement insertCompany() method.
+        return $this->_DAO->insert(new InsertVehicle($vehicleInfo));
     }
 
     function selectVehicleByCompanyId($companyId)
     {
         return $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
-        // TODO: Implement selectVehicleByCompanyId() method.
     }
 
 
@@ -54,6 +53,32 @@ class Vehicle implements IVehicle {
 
     function getVehicleByCompanyId($companyId){
         return $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
+    }
+
+    function removeVehicle($id)
+    {
+        return $this->_DAO->delete(new RemoveVehicle($id));
+    }
+
+    function selectVehiclesByRange($start = 0, $length = 20)
+    {
+        $array = $this->_DAO->multiSelect(new SelectVehiclesByRange($start, $length));
+        $arrayResult = array();
+        $arrayResult['vehicles'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
+    }
+
+    function selectVehicleByLastInsertedId()
+    {
+        $array = $this->_DAO->select(new SelectLastInsertedVehicleId());
+        return new VehicleData($array[0]);
+    }
+
+    function updateVehicle(VehicleData $newVehicle, $id)
+    {
+        // TODO: Implement updateVehicle() method.
     }
 }
 
@@ -90,11 +115,86 @@ class SelectVehicleByCompanyId implements IEntitySelect {
     function getSelectQuery()
     {
         return "SELECT * FROM `vehicles` WHERE transport_company_id = $this->companyId";
-//        return "SELECT * FROM `vehicles` WHERE transport_company_id = 1";
     }
 
     public function __construct($companyId)
     {
         $this->companyId = DAO::getInstance()->checkString($companyId);
+    }
+}
+
+class SelectVehiclesByRange implements IEntitySelect {
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
+
+    function __construct($start, $count)
+    {
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString = $_POST['search']['value'];
+        $searchArray = $_POST['columns'];
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
+    }
+
+    /**
+     * this function contains query text
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "CALL selectVehicles($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+    }
+}
+
+
+class InsertVehicle implements IEntityInsert{
+    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type;
+
+    public function __construct($companyData)
+    {
+        $dao = DAO::getInstance();
+        $this->transport_company_id = $dao->checkString($companyData['transport_company_id']);
+        $this->license_number = $dao->checkString($companyData['license_number']);
+        $this->model = $dao->checkString($companyData['model']);
+        $this->carrying_capacity = $dao->checkString($companyData['carrying_capacity']);
+        $this->volume = $dao->checkString($companyData['volume']);
+        $this->loading_type = $dao->checkString($companyData['loading_type']);
+        $this->pallets_quantity = $dao->checkString($companyData['pallets_quantity']);
+        $this->type = $dao->checkString($companyData['type']);
+    }
+
+    function getInsertQuery()
+    {
+        return "INSERT INTO `vehicles` (transport_company_id, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type) VALUE " .
+            "('$this->transport_company_id', '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type');";
+    }
+}
+
+class RemoveVehicle implements IEntityDelete {
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getDeleteQuery()
+    {
+        return "DELETE FROM `vehicles` WHERE id = $this->id";
+    }
+}
+
+
+class SelectLastInsertedVehicleId implements IEntitySelect {
+    /**
+     * this function contains query text
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return 'SELECT * FROM `vehicles` WHERE id = LAST_INSERT_ID()';
     }
 }
