@@ -86,6 +86,7 @@ $(document).ready(function () {
             vehicleInput.disable();
 
             $('#companyInput').selectize({
+                placeholder     : "Нажмите, чтобы изменить",
                 sortField: "text",
                 maxItems:1,
                 onChange: function(value){
@@ -203,7 +204,7 @@ $(document).ready(function () {
             }
 
             $statusSelect.on("selectmenuchange", function (e, ui) {
-                // console.log(());
+
                 if($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
                     $('#hoursAmountTr').show();
                 } else {
@@ -228,7 +229,7 @@ $(document).ready(function () {
                             $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
                             $requestCheckBoxes.html("");
                             $numberRequestCheckBoxes.html("");
-                            console.log(requestsArray[0]['requestStatusRusName']);
+                            // console.log(requestsArray[0]['requestStatusRusName']);
                             $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
                             $('#selectNumbersRequestsTr').hide();
                             $selectRequestsTr.hide();
@@ -252,7 +253,7 @@ $(document).ready(function () {
                     $selectRequestsTr.show();
                     $('#palletsQtyTr').show();
                     $statusSelect.on("selectmenuchange", function (e, ui) {
-                        console.log(($statusSelect[0][$statusSelect[0].selectedIndex].value));
+                        // console.log(($statusSelect[0][$statusSelect[0].selectedIndex].value));
                     });
 
                     $.post(
@@ -301,7 +302,7 @@ $(document).ready(function () {
                 var vehicleId = $("#vehicleNumberInput")[0].selectize.getValue();
                 var driverID = $('#driverInput')[0].selectize.getValue();
 
-                console.log(companyId+' '+vehicleId+' '+driverID);
+                // console.log(companyId+' '+vehicleId+' '+driverID);
                 if (dialogType === "changeStatusForRequest") {
 
                     // get specific vars for "changeStatusForRequest" dialogType

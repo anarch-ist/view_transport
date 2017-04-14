@@ -13,11 +13,11 @@ body{
 }
 
 #user-grid_info{
-    position: fixed;
+    position: relative;
 }
 
 #user-grid_paginate{
-    position: fixed;
+    position: relative;
     right: 0;
 }
 
