@@ -23,7 +23,7 @@ $(document).ready(function () {
         search: {
             caseInsensitive: true
         },
-        //"order": [],
+        order: [[2,"desc"]],
         //  jQueryUI: true,
         //   paging:         true,
         //  paginate: false,

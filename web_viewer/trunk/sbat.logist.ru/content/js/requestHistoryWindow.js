@@ -330,6 +330,7 @@ $(window).on('load', function () {
             requestHistoryDialogTable = $requestHistoryDialogTable.DataTable({
                 "dom": 't', // show only table with no decorations
                 "paging": false, // no pagination
+                "order": [[0,"desc"]],
                 "columnDefs": [
                     {"name": "timeMarkWhenRequestWasChanged", "data": "timeMarkWhenRequestWasChanged", "targets": 0},
                     {"name": "pointWhereStatusWasChanged", "data": "pointWhereStatusWasChanged", "targets": 1},
