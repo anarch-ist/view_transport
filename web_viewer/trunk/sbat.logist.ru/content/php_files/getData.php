@@ -50,6 +50,7 @@ function getVehiclesForCompany(PrivilegedUser $privUser){
     $data = $privUser->getVehicleEntity()->selectVehicleByCompanyId($companyId);
     return(json_encode($data));
 }
+
 function getDriversForVehicle(PrivilegedUser $privUser){
     $vehicleId = $_POST['vehicleId'];
     if(isset($vehicleId)){

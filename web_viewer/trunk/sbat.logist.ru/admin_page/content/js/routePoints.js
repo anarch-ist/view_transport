@@ -220,6 +220,7 @@ $(document).ready(function () {
                 {
                     label: 'Стоимость за точку',
                     name: 'cost_per_point',
+                    type: 'mask',
                     mask: "999999999999.99",
                     maskOptions: { clearIfNotMatch: true},
                     placeholder: "1000.00"
@@ -235,7 +236,7 @@ $(document).ready(function () {
                 {
                     label: 'Стоимость за маршрут',
                     name: 'cost',
-                    type: 'text',
+                    type: 'mask',
                     mask: "999999999999.99",
                     maskOptions: { clearIfNotMatch: true},
                     placeholder: "1000.00"
@@ -722,4 +723,216 @@ $(document).ready(function () {
     }
 
     // TODO create distances between points dataTable and editor
+
+    {
+        var transportCompaniesEditor = new $.fn.dataTable.Editor( {
+            ajax: 'content/getData.php',
+            table: '#transportCompaniesTable',
+            idSrc: 'id',
+
+            fields: [
+                { label: 'Полное название', name: 'name', type: 'text'},
+                { label: 'Название', name: 'short_name', type: 'text'},
+                {
+                    label: 'ИНН',
+                    name: 'inn',
+                    type: 'mask',
+                    mask: "0000000000",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "1234567890"
+                },
+                { label: 'КПП',  name: 'KPP', type: 'text'},
+                { label: 'БИК',  name: 'BIK', type: 'text'},
+                { label: 'Кор. счет',  name: 'cor_account', type: 'text'},
+                { label: 'Кар. счет',  name: 'cur_account', type: 'text'},
+                { label: 'Название банка',  name: 'bank_name', type: 'text'},
+                { label: 'Адрес',  name: 'legal_address', type: 'text'},
+                { label: 'Почтовый адрес',  name: 'post_address', type: 'text'},
+                { label: 'keywords',  name: 'keywords', type: 'text'},
+                { label: 'ФИО Директора',  name: 'director_fullname', type: 'text'},
+                { label: 'ФИО глав.бухгалтера',  name: 'chief_acc_fullname', type: 'text'}
+            ]
+        });
+
+        transportCompaniesEditor.on('preSubmit', function (e, data, action) {
+            data.status = 'transportCompaniesEditing';
+        });
+
+        var $transportCompaniesTable =  $("#transportCompaniesTable").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "content/getData.php", // json datasource
+                type: "post",  // method  , by default get
+                data: {"status": "getTransportCompaniesData"}
+            },
+            dom: 'Bfrtip',
+            language: {
+                url:'/localization/dataTablesRus.json'
+            },
+            select: {
+                style: 'single'
+            },
+            "buttons": [
+                {
+                    extend: "create",
+                    editor: transportCompaniesEditor,
+                    text: 'добавить запись'
+                },
+                {
+                    extend: "remove",
+                    editor: transportCompaniesEditor,
+                    text: 'удалить запись'
+                }
+            ],
+            "paging": 10,
+            "columnDefs": [
+                {"name": "id", "data": "id", "targets": 0},
+                {"name": "name", "data": "name", "targets": 1},
+                {"name": "short_name", "data": "short_name", "targets": 2},
+                {"name": "inn", "data": "inn", "targets": 3},
+                {"name": "KPP", "data": "KPP", "targets": 4},
+                {"name": "BIK", "data": "BIK", "targets": 5},
+                {"name": "cor_account", "data": "cor_account", "targets": 6},
+                {"name": "cur_account", "data": "cur_account", "targets": 7},
+                {"name": "bank_name", "data": "bank_name", "targets": 8},
+                {"name": "legal_address", "data": "legal_address", "targets": 9},
+                {"name": "post_address", "data": "post_address", "targets": 10},
+                {"name": "keywords", "data": "keywords", "targets": 11},
+                {"name": "director_fullname", "data": "director_fullname", "targets": 12},
+                {"name": "chief_acc_fullname", "data": "chief_acc_fullname", "targets": 13}
+            ]
+        });
+    }
+
+    {
+        var vehiclesEditor = new $.fn.dataTable.Editor({
+            ajax: 'content/getData.php',
+            table: '#vehiclesTable',
+            idSrc: 'id',
+
+            fields: [
+                {label: 'Номер ТК', name: 'transport_company_id', type: 'text'},
+                {label: 'Номер лицензии', name: 'license_number', type: 'text'},
+                {label: 'Модель', name: 'model', type: 'text'},
+                {label: 'Грузоподъемность', name: 'carrying_capacity', type: 'text'},
+                {label: 'Объем', name: 'volume', type: 'text'},
+                {label: 'Тип погрузки', name: 'loading_type', type: 'text'},
+                {label: 'Количество палетов', name: 'pallets_quantity', type: 'text'},
+                {label: 'Тип', name: 'type', type: 'text'}
+            ]
+        });
+
+        vehiclesEditor.on('preSubmit', function (e, data, action) {
+            data.status = 'vehiclesEditing';
+        });
+
+        var $vehiclesTable = $("#vehiclesTable").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "content/getData.php", // json datasource
+                type: "post",  // method  , by default get
+                data: {"status": "getVehiclesData"}
+            },
+            dom: 'Bfrtip',
+            language: {
+                url: '/localization/dataTablesRus.json'
+            },
+            select: {
+                style: 'single'
+            },
+            "buttons": [
+                {
+                    extend: "create",
+                    editor: vehiclesEditor,
+                    text: 'добавить запись'
+                },
+                {
+                    extend: "remove",
+                    editor: vehiclesEditor,
+                    text: 'удалить запись'
+                }
+            ],
+            "paging": 10,
+            "columnDefs": [
+                {"name": "id", "data": "id", "targets": 0},
+                {"name": "transport_company_id", "data": "transport_company_id", "targets": 1},
+                {"name": "license_number", "data": "license_number", "targets": 2},
+                {"name": "model", "data": "model", "targets": 3},
+                {"name": "carrying_capacity", "data": "carrying_capacity", "targets": 4},
+                {"name": "volume", "data": "volume", "targets": 5},
+                {"name": "loading_type", "data": "loading_type", "targets": 6},
+                {"name": "pallets_quantity", "data": "pallets_quantity", "targets": 7},
+                {"name": "type", "data": "type", "targets": 8}
+            ]
+        });
+    }
+
+    {
+        var driversEditor = new $.fn.dataTable.Editor({
+            ajax: 'content/getData.php',
+            table: '#driversTable',
+            idSrc: 'id',
+
+            fields: [
+                {label: 'Номер ТС', name: 'vehicle_id', type: 'text'},
+                {label: 'Номер ТК', name: 'transport_company_id', type: 'text'},
+                {label: 'Полное имя', name: 'full_name', type: 'text'},
+                {label: 'Пасспорт', name: 'passport', type: 'text'},
+                {
+                    label: 'Номер телефона',
+                    name: 'phone',
+                    type: 'mask',
+                    mask:"(000) 000-00-00",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "(999) 999-99-99"
+                },
+                {label: 'Лицензия', name: 'license', type: 'text'}
+            ]
+        });
+
+        driversEditor.on('preSubmit', function (e, data, action) {
+            data.status = 'driversEditing';
+        });
+
+        var $driversTable = $("#driversTable").DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "content/getData.php", // json datasource
+                type: "post",  // method  , by default get
+                data: {"status": "getDriversData"}
+            },
+            dom: 'Bfrtip',
+            language: {
+                url: '/localization/dataTablesRus.json'
+            },
+            select: {
+                style: 'single'
+            },
+            "buttons": [
+                {
+                    extend: "create",
+                    editor: driversEditor,
+                    text: 'добавить запись'
+                },
+                {
+                    extend: "remove",
+                    editor: driversEditor,
+                    text: 'удалить запись'
+                }
+            ],
+            "paging": 10,
+            "columnDefs": [
+                {"name": "id", "data": "id", "targets": 0, visible: false},
+                {"name": "vehicle_id", "data": "vehicle_id", "targets": 1},
+                {"name": "transport_company_id", "data": "transport_company_id", "targets": 2},
+                {"name": "full_name", "data": "full_name", "targets": 3},
+                {"name": "passport", "data": "passport", "targets": 4},
+                {"name": "phone", "data": "phone", "targets": 5},
+                {"name": "license", "data": "license", "targets": 6}
+            ]
+        });
+    }
 });

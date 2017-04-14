@@ -1840,6 +1840,253 @@ CREATE PROCEDURE transmaster_transport_db.selectRoutes(
 
   END;
 
+-- select transport companies procedure
+-- _search - строка для глобального поиска по всем колонкам
+CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
+  _startEntry INTEGER,
+  _length     INTEGER,
+  _orderby    VARCHAR(255),
+  _isDesc     BOOLEAN,
+  _search     TEXT
+)
+  BEGIN
+
+    SET @searchString = CONCAT('%', _search, '%');
+
+    SELECT SQL_CALC_FOUND_ROWS
+      tc.*
+    FROM transmaster_transport_db.transport_companies tc
+    WHERE (
+      _search = '' OR
+      tc.id LIKE @searchString OR
+      tc.name LIKE @searchString OR
+      tc.short_name LIKE @searchString OR
+      tc.inn LIKE @searchString OR
+      tc.KPP LIKE @searchString OR
+      tc.BIK LIKE @searchString OR
+      tc.cor_account LIKE @searchString OR
+      tc.cur_account LIKE @searchString OR
+      tc.bank_name LIKE @searchString OR
+      tc.legal_address LIKE @searchString OR
+      tc.post_address LIKE @searchString OR
+      tc.keywords LIKE @searchString OR
+      tc.director_fullname LIKE @searchString OR
+      tc.chief_acc_fullname LIKE @searchString
+    )
+    ORDER BY NULL,
+      CASE WHEN _orderby = ''
+        THEN NULL END,
+      CASE WHEN _isDesc AND  _orderby = 'id'
+        THEN id END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'name'
+        THEN name END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'short_name'
+        THEN short_name END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'inn'
+        THEN inn END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'KPP'
+        THEN KPP END ASC,
+      CASE WHEN _isDesc AND _orderby = 'BIK'
+        THEN BIK END ASC,
+      CASE WHEN _isDesc AND _orderby = 'cor_account'
+        THEN cor_account END ASC,
+      CASE WHEN _isDesc AND _orderby = 'cur_account'
+        THEN cur_account END ASC,
+      CASE WHEN _isDesc AND _orderby = 'bank_name'
+        THEN bank_name END ASC,
+      CASE WHEN _isDesc AND _orderby = 'legal_address'
+        THEN legal_address END ASC,
+      CASE WHEN _isDesc AND _orderby = 'post_address'
+        THEN post_address END ASC,
+      CASE WHEN _isDesc AND _orderby = 'keywords'
+        THEN keywords END ASC,
+      CASE WHEN _isDesc AND _orderby = 'director_fullname'
+        THEN director_fullname END ASC,
+      CASE WHEN _isDesc AND _orderby = 'chief_acc_fullname'
+        THEN chief_acc_fullname END ASC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'id'
+        THEN id END DESC ,
+      CASE  WHEN NOT (_isDesc) AND  _orderby = 'name'
+        THEN name END DESC,
+      CASE  WHEN NOT (_isDesc) AND  _orderby = 'short_name'
+        THEN short_name END DESC,
+      CASE  WHEN NOT (_isDesc) AND  _orderby = 'inn'
+        THEN inn END DESC,
+      CASE  WHEN NOT (_isDesc) AND  _orderby = 'KPP'
+        THEN KPP END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'BIK'
+        THEN BIK END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'cor_account'
+        THEN cor_account END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'cur_account'
+        THEN cur_account END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'bank_name'
+        THEN bank_name END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'legal_address'
+        THEN legal_address END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'post_address'
+        THEN post_address END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'keywords'
+        THEN keywords END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'director_fullname'
+        THEN director_fullname END DESC,
+      CASE  WHEN NOT (_isDesc) AND _orderby = 'chief_acc_fullname'
+        THEN chief_acc_fullname END DESC
+    LIMIT _startEntry, _length;
+
+    -- filtered routes
+    SELECT FOUND_ROWS() AS `totalFiltered`;
+
+    -- total routes
+    SELECT COUNT(*) AS `totalCount`
+    FROM routes;
+
+  END;
+
+-- select vehicles procedure
+-- _search - строка для глобального поиска по всем колонкам
+CREATE PROCEDURE transmaster_transport_db.selectVehicles(
+  _startEntry INTEGER,
+  _length     INTEGER,
+  _orderby    VARCHAR(255),
+  _isDesc     BOOLEAN,
+  _search     TEXT
+)
+  BEGIN
+
+    SET @searchString = CONCAT('%', _search, '%');
+
+    SELECT SQL_CALC_FOUND_ROWS *
+    FROM transmaster_transport_db.vehicles
+    WHERE (
+      _search = '' OR
+      id LIKE @searchString OR
+      transport_company_id LIKE @searchString OR
+      license_number LIKE @searchString OR
+      model LIKE @searchString OR
+      carrying_capacity LIKE @searchString OR
+      volume LIKE @searchString OR
+      loading_type LIKE @searchString OR
+      pallets_quantity LIKE @searchString OR
+      type LIKE @searchString
+    )
+    ORDER BY NULL,
+      CASE WHEN _orderby = ''
+        THEN NULL END,
+      CASE WHEN _isDesc AND  _orderby = 'id'
+        THEN id END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'transport_company_id'
+        THEN transport_company_id END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'license_number'
+        THEN license_number END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'model'
+        THEN model END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'carrying_capacity'
+        THEN carrying_capacity END ASC,
+      CASE WHEN _isDesc AND _orderby = 'volume'
+        THEN volume END ASC,
+      CASE WHEN _isDesc AND _orderby = 'loading_type'
+        THEN loading_type END ASC,
+      CASE WHEN _isDesc AND _orderby = 'pallets_quantity'
+        THEN pallets_quantity END ASC,
+      CASE WHEN _isDesc AND _orderby = 'type'
+        THEN type END ASC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'id'
+        THEN id END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'transport_company_id'
+        THEN transport_company_id END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'license_number'
+        THEN license_number END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'model'
+        THEN model END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'carrying_capacity'
+        THEN carrying_capacity END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'volume'
+        THEN volume END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'loading_type'
+        THEN loading_type END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'pallets_quantity'
+        THEN pallets_quantity END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'type'
+        THEN type END DESC
+    LIMIT _startEntry, _length;
+
+    -- filtered routes
+    SELECT FOUND_ROWS() AS `totalFiltered`;
+
+    -- total routes
+    SELECT COUNT(*) AS `totalCount`
+    FROM routes;
+
+  END;
+
+-- select drivers procedure
+-- _search - строка для глобального поиска по всем колонкам
+CREATE PROCEDURE transmaster_transport_db.selectDrivers(
+  _startEntry INTEGER,
+  _length     INTEGER,
+  _orderby    VARCHAR(255),
+  _isDesc     BOOLEAN,
+  _search     TEXT
+)
+  BEGIN
+
+    SET @searchString = CONCAT('%', _search, '%');
+
+    SELECT SQL_CALC_FOUND_ROWS *
+    FROM transmaster_transport_db.drivers
+    WHERE (
+      _search = '' OR
+      id LIKE @searchString OR
+      vehicle_id LIKE @searchString OR
+      transport_company_id LIKE @searchString OR
+      full_name LIKE @searchString OR
+      passport LIKE @searchString OR
+      phone LIKE @searchString OR
+      license LIKE @searchString
+    )
+    ORDER BY NULL,
+      CASE WHEN _orderby = ''
+        THEN NULL END,
+      CASE WHEN _isDesc AND  _orderby = 'id'
+        THEN id END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'vehicle_id'
+        THEN vehicle_id END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'transport_company_id'
+        THEN transport_company_id END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'full_name'
+        THEN full_name END ASC,
+      CASE WHEN _isDesc AND  _orderby = 'passport'
+        THEN passport END ASC,
+      CASE WHEN _isDesc AND _orderby = 'phone'
+        THEN phone END ASC,
+      CASE WHEN _isDesc AND _orderby = 'license'
+        THEN license END ASC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'id'
+        THEN id END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'vehicle_id'
+        THEN vehicle_id END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'transport_company_id'
+        THEN transport_company_id END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'full_name'
+        THEN full_name END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'passport'
+        THEN passport END DESC,
+      CASE WHEN NOT (_isDesc) AND  _orderby = 'phone'
+        THEN phone END DESC,
+      CASE WHEN NOT (_isDesc) AND _orderby = 'license'
+        THEN license END DESC
+    LIMIT _startEntry, _length;
+
+    -- filtered routes
+    SELECT FOUND_ROWS() AS `totalFiltered`;
+
+    -- total routes
+    SELECT COUNT(*) AS `totalCount`
+    FROM routes;
+
+  END;
+
 -- -------------------------------------------------------------------------------------------------------------------
 --                                    REQUEST STATUS HISTORY SELECT
 -- -------------------------------------------------------------------------------------------------------------------
@@ -1957,22 +2204,25 @@ CREATE PROCEDURE `getPretensionsByReqIdExt`(_requestIDExternal VARCHAR(255))
 --                                    TRANSPORT COMPANIES, VEHICLES, DRIVERS
 -- -------------------------------------------------------------------------------------------------------------------
 
-CREATE TABLE transmaster_transport_db.transport_companies  (     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,   NAME VARCHAR (64
-),      short_name VARCHAR (32
-),      inn INT,      KPP VARCHAR (64
-),      BIK VARCHAR (64
-),      cor_account VARCHAR (64
-),      cur_account VARCHAR (64
-),      bank_name VARCHAR (128
-),      legal_address VARCHAR (128
-),      post_address VARCHAR (128
-),      keywords VARCHAR (64
-),      director_fullname VARCHAR (128
-),      chief_acc_fullname VARCHAR (128
-) 
+CREATE TABLE transmaster_transport_db.transport_companies
+(
+  id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  name VARCHAR(64),
+  short_name VARCHAR(32),
+  inn INT(11),
+  KPP VARCHAR(64),
+  BIK VARCHAR(64),
+  cor_account VARCHAR(64),
+  cur_account VARCHAR(64),
+  bank_name VARCHAR(128),
+  legal_address VARCHAR(128),
+  post_address VARCHAR(128),
+  keywords VARCHAR(64),
+  director_fullname VARCHAR(128),
+  chief_acc_fullname VARCHAR(128)
 );
 
-CREATE TABLE vehicles
+CREATE TABLE transmaster_transport_db.vehicles
 (
   id                   INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   transport_company_id INT(11),
@@ -1987,16 +2237,20 @@ CREATE TABLE vehicles
 );
 
 
-CREATE TABLE transmaster_transport_db.drivers  (     id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,      vehicle_id INT,      transport_company_id INT,      full_name VARCHAR (64
-),      passport VARCHAR (128
-),      phone VARCHAR (18
-),      license VARCHAR (128
-),   CONSTRAINT drivers_vehicles_id_fk FOREIGN KEY (vehicle_id
-) REFERENCES vehicles (id
-),   CONSTRAINT drivers_transport_companies_id_fk FOREIGN KEY (transport_company_id
-) REFERENCES transport_companies (id
-) 
+CREATE TABLE transmaster_transport_db.drivers
+(
+  id INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  vehicle_id INT(11),
+  transport_company_id INT(11),
+  full_name VARCHAR(64),
+  passport VARCHAR(128),
+  phone VARCHAR(18),
+  license VARCHAR(128),
+  CONSTRAINT drivers_vehicles_id_fk FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),
+  CONSTRAINT drivers_transport_companies_id_fk FOREIGN KEY (transport_company_id) REFERENCES transport_companies (id)
 );
+CREATE INDEX drivers_transport_companies_id_fk ON drivers (transport_company_id);
+CREATE INDEX drivers_vehicles_id_fk ON drivers (vehicle_id);
 
 
 

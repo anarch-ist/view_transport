@@ -27,7 +27,13 @@ try {
         updateDaysOfWeek($privUser);
     } else if (strcasecmp($action,'getAllRoutePointsDataForRouteID')===0) {
         getAllRoutePointsDataForRouteID($privUser);
-    } else if (strcasecmp($action,'routeEditing')===0) {
+    } else if (strcasecmp($action,'getTransportCompaniesData')===0) {
+        getTransportCompanies($privUser);
+    } else if (strcasecmp($action,'getVehiclesData')===0) {
+        getVehicles($privUser);
+    } else if (strcasecmp($action,'getDriversData')===0) {
+        getDrivers($privUser);
+    }else if (strcasecmp($action,'routeEditing')===0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
@@ -57,7 +63,7 @@ try {
         if (strcasecmp($action,'remove')===0) {
             removeRoute($privUser);
         } else if (strcasecmp($action,'edit')===0) {
-//            updateUsers($privUser);
+            //todo implement
         } else if (strcasecmp($action,'create')===0) {
             createNewRoute($privUser);
         } else {
@@ -74,6 +80,48 @@ try {
             updateUsers($privUser);
         } else if (strcasecmp($action,'create')===0) {
             createNewUser($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
+    } else if (strcasecmp($action,'transportCompaniesEditing')===0) {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if (strcasecmp($action, 'remove') === 0) {
+            removeTransportCompany($privUser);
+        } else if (strcasecmp($action, 'edit') === 0) {
+            //todo: implement editing
+        } else if (strcasecmp($action, 'create') === 0) {
+            addTransportCompany($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
+    } else if (strcasecmp($action,'vehiclesEditing')===0) {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if (strcasecmp($action, 'remove') === 0) {
+            removeVehicle($privUser);
+        } else if (strcasecmp($action, 'edit') === 0) {
+            //todo: implement editing
+        } else if (strcasecmp($action, 'create') === 0) {
+            addVehicle($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
+    } else if (strcasecmp($action,'driversEditing')===0) {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if (strcasecmp($action, 'remove') === 0) {
+            removeDriver($privUser);
+        } else if (strcasecmp($action, 'edit') === 0) {
+            //todo: implement editing
+        } else if (strcasecmp($action, 'create') === 0) {
+            addDriver($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
@@ -286,6 +334,135 @@ function getUsers(PrivilegedUser $privUser)
     echo json_encode($json_data);
 }
 
+function getTransportCompanies(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getTransportCompanyEntity()->selectByRange($_POST['start'], $_POST['length']);
+    $json_data = array(
+        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+        "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
+        "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
+        "data" => $dataArray['transportCompanies']   // total data array
+    );
+    echo json_encode($json_data);
+}
+
+function getVehicles(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getVehicleEntity()->selectVehiclesByRange($_POST['start'], $_POST['length']);
+    $json_data = array(
+        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+        "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
+        "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
+        "data" => $dataArray['vehicles']   // total data array
+    );
+    echo json_encode($json_data);
+}
+
+function getDrivers(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getDriverEntity()->selectDriversByRange($_POST['start'], $_POST['length']);
+    $json_data = array(
+        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+        "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
+        "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
+        "data" => $dataArray['drivers']   // total data array
+    );
+    echo json_encode($json_data);
+}
+
+function addTransportCompany(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $transportCompanyInfo = $_POST['data'][0];
+    if ($privilegedUser->getTransportCompanyEntity()->insertCompany($transportCompanyInfo)) {
+        echo json_encode(
+            array(
+                "data" =>array(
+                    $privilegedUser->getTransportCompanyEntity()->selectLastInsertedId()->toArray()
+                )
+            )
+        );
+    } else {
+        $privilegedUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
+}
+
+function addVehicle(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $vehicleInfo = $_POST['data'][0];
+    if ($privilegedUser->getVehicleEntity()->insertVehicle($vehicleInfo)) {
+        echo json_encode(
+            array(
+                "data" =>array(
+                    $privilegedUser->getVehicleEntity()->selectVehicleByLastInsertedId()->toArray()
+                )
+            )
+        );
+    } else {
+        $privilegedUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
+}
+
+function addDriver(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $driverInfo = $_POST['data'][0];
+    if ($privilegedUser->getDriverEntity()->insertDriver($driverInfo)) {
+        echo json_encode(
+            array(
+                "data" =>array(
+                    $privilegedUser->getDriverEntity()->selectDriverByLastInsertedId()->toArray()
+                )
+            )
+        );
+    } else {
+        $privilegedUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
+}
+
+function removeVehicle(PrivilegedUser $privilegedUser) {
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $userData) {
+        $privilegedUser->getVehicleEntity()->removeVehicle($id);
+    }
+    echo '{ }';
+}
+
+function removeTransportCompany(PrivilegedUser $privilegedUser) {
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $userData) {
+        $privilegedUser->getTransportCompanyEntity()->removeCompany($id);
+    }
+    echo '{ }';
+}
+
+function removeDriver(PrivilegedUser $privilegedUser) {
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $userData) {
+        $privilegedUser->getDriverEntity()->removeDriver($id);
+    }
+    echo '{ }';
+}
+
 function getRoutes(PrivilegedUser $privUser)
 {
     $dataArray = $privUser->getRouteEntity()->selectRoutesWithOffset($_POST['start'], $_POST['length']);
@@ -351,6 +528,27 @@ function createNewUser(PrivilegedUser $privUser)
         $privUser->getDaoEntity()->rollback();
         throw new DataTransferException('Данные не были добавлены', __FILE__);
     }
+}
+
+function updateDrivers(PrivilegedUser $privUser)
+{
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $driverEntity = $privUser->getDriverEntity();
+    $i = 0;
+    foreach ($dataSourceArray as $id => $userInfo) {
+//        if (!$driverEntity->updateUser(new \DAO\UserData($userInfo),$id)) {
+//            $privUser->getDaoEntity()->rollback();
+//            throw new DataTransferException('Данные не были обновлены', __FILE__);
+//        }
+//        $serverAnswer['data'][$i] = $driverEntity->selectUserByLogin($userInfo['login'])->toArray();
+//        $i++;
+    }
+    echo json_encode($serverAnswer);
 }
 
 function updateUsers(PrivilegedUser $privUser)

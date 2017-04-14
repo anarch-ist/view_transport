@@ -20,9 +20,9 @@ class Driver implements IDriver {
         return new DriverData($array[0]);
     }
 
-    function insertDriver()
+    function insertDriver($driverInfo)
     {
-        // TODO: Implement insertDriver() method.
+        return $this->_DAO->insert(new InsertDriver($driverInfo));
     }
 
     function selectDriverByCompanyId($companyId)
@@ -37,6 +37,15 @@ class Driver implements IDriver {
         return $array;
     }
 
+    function selectDriversByRange($start = 0, $length = 20)
+    {
+        $array = $this->_DAO->multiSelect(new SelectDriversByRange($start, $length));
+        $arrayResult = array();
+        $arrayResult['drivers'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
+    }
 
     public function __construct()
     {
@@ -50,6 +59,21 @@ class Driver implements IDriver {
         return self::$_instance;
     }
 
+    function removeDriver($id)
+    {
+        return $this->_DAO->delete(new RemoveDriver($id));
+    }
+
+    function selectDriverByLastInsertedId()
+    {
+        $array = $this->_DAO->select(new SelectLastInsertedDriverId());
+        return new DriverData($array[0]);
+    }
+
+    function updateDriver(DriverData $newDriver, $id)
+    {
+        // TODO: Implement updateDriver() method.
+    }
 }
 
 class SelectAllDrivers implements IEntitySelect {
@@ -104,5 +128,79 @@ class SelectDriverByVehicleId implements IEntitySelect {
     public function __construct($vehicleId)
     {
         $this->vehicleId = DAO::getInstance()->checkString($vehicleId);
+    }
+}
+
+class SelectDriversByRange implements IEntitySelect {
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
+
+    function __construct($start, $count)
+    {
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString = $_POST['search']['value'];
+        $searchArray = $_POST['columns'];
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
+    }
+
+    /**
+     * this function contains query text
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "CALL selectDrivers($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+    }
+}
+
+
+class InsertDriver implements IEntityInsert{
+    private $vehicle_id, $transport_company_id, $full_name, $passport, $phone, $license;
+
+    public function __construct($companyData)
+    {
+        $dao = DAO::getInstance();
+        $this->vehicle_id = $dao->checkString($companyData['vehicle_id']);
+        $this->transport_company_id = $dao->checkString($companyData['transport_company_id']);
+        $this->full_name = $dao->checkString($companyData['full_name']);
+        $this->passport = $dao->checkString($companyData['passport']);
+        $this->phone = $dao->checkString($companyData['phone']);
+        $this->license = $dao->checkString($companyData['license']);
+    }
+
+    function getInsertQuery()
+    {
+        return "INSERT INTO `drivers` (vehicle_id, transport_company_id, full_name, passport, phone, license) VALUE " .
+            "('$this->vehicle_id', '$this->transport_company_id', '$this->full_name', '$this->passport', '$this->phone', '$this->license');";
+    }
+}
+
+class RemoveDriver implements IEntityDelete {
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getDeleteQuery()
+    {
+        return "DELETE FROM `drivers` WHERE id = $this->id";
+    }
+}
+
+
+class SelectLastInsertedDriverId implements IEntitySelect {
+    /**
+     * this function contains query text
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return 'SELECT * FROM `drivers` WHERE id = LAST_INSERT_ID()';
     }
 }

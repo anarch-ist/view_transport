@@ -42,6 +42,7 @@
     <ul>
         <li><a href="#tabs-1">Маршруты</a></li>
         <li><a href="#tabs-2">Пользователи</a></li>
+        <li><a href="#tabs-3">ТК, ТС и водители</a></li>
     </ul>
     <div id="tabs-1">
         <h2>Маршруты</h2>
@@ -141,6 +142,65 @@
                     <th>Роль</th>
                     <th>Пункт</th>
                     <th>ID клиента</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div id="tabs-3">
+        <h2>Транспортные компании</h2>
+        <div id="transportCompaniesCreation">
+            <table id="transportCompaniesTable">
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Полное название</th>
+                    <th>Название</th>
+                    <th>ИНН</th>
+                    <th>КПП</th>
+                    <th>БИК</th>
+                    <th>Кор. счет</th>
+                    <th>cur? счет</th>
+                    <th>Название банка</th>
+                    <th>Адрес</th>
+                    <th>Почтовый адрес</th>
+                    <th>keywords?</th>
+                    <th>Директор</th>
+                    <th>Главный бухгалтер</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <h2>Транспортные средства</h2>
+        <div id="vehiclesCreation">
+            <table id="vehiclesTable">
+                <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Номер ТК</th>
+                    <th>Лицензия</th>
+                    <th>Модель</th>
+                    <th>Грузоподъемность</th>
+                    <th>Объем</th>
+                    <th>Тип погрузки</th>
+                    <th>Количество палетов</th>
+                    <th>Тип</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <h2>Водители</h2>
+        <div id="driversCreation">
+            <table id="driversTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>№ ТС</th>
+                    <th>№ ТК</th>
+                    <th>Имя</th>
+                    <th>Пасспорт</th>
+                    <th>Телефон</th>
+                    <th>Лицензия</th>
                 </tr>
                 </thead>
             </table>
