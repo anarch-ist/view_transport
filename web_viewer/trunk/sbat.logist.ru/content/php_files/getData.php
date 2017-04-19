@@ -30,6 +30,8 @@ try {
         echo getVehiclesForCompany($privUser);
     } else if (strcasecmp($_POST['status'], 'getDrivers')===0){
         echo getDriversForVehicle($privUser);
+    } else if (strcasecmp($_POST['status'], 'getRequestById')===0){
+        echo getRequestById($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
@@ -130,6 +132,16 @@ function addPretension(PrivilegedUser $privUser){
     }
     $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
     return json_encode($data);
+}
+
+function getRequestById(PrivilegedUser $privUser){
+    $reqIdExt = $_POST['requestIDExternal'];
+    if (!isset($reqIdExt)){
+        throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
+    } 
+    $data = $privUser->getRequestEntity()->selectDataByRequestId($reqIdExt);
+    return json_encode($data);
+//    return $reqIdExt;
 }
 
 function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser){

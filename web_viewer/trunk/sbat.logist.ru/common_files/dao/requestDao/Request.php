@@ -29,11 +29,17 @@ class RequestEntity implements IRequestEntity
         }
         return $requests;
     }
+    
+    function selectDataByRequestId($id){
+        $array = $this->_DAO->select(new SelectDataByRequestId($id));
+        return $array[0];
+    }
 
     function selectRequestByID($id)
     {
         $array = $this->_DAO->select(new SelectRequestByID($id));
         return new RequestData($array[0]);
+//        return $array[0];
     }
 
     function updateRequest(RequestData $newRequest)
@@ -250,6 +256,27 @@ class addPretension implements IEntityInsert
     {
         return "CALL insert_pretension('$this->requestIDExternal','$this->pretensionComment','$this->pretensionStatus','$this->pretensionCathegory','$this->pretensionPositionNumber',$this->pretensionSum)";
     }
+}
+
+class SelectDataByRequestId implements IEntitySelect
+{
+    private $requestIDExternal;
+    private $userID;
+
+    function __construct($requestIDExternal, $userID= -1)
+    {
+        if ($userID < 1) {
+            $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
+        }
+        $this->userID = DAO::getInstance()->checkString($userID);
+        $this->requestIDExternal = DAO::getInstance()->checkString($requestIDExternal);
+    }
+    
+    function getSelectQuery()
+    {
+        return "CALL selectDataByRequestId($this->userID,'$this->requestIDExternal')";
+    }
+
 }
 
 class SelectRequestByClientIdAndInvoiceNumber implements IEntitySelect

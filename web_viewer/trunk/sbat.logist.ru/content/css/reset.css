@@ -41,3 +41,15 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+
+.list-group.list-group-root > .list-group > .list-group-item {
+	padding-left: 30px;
+}
+
+.list-group-root{
+	padding-top: 25px;
+}
+
+div.list-group-item{
+	font-weight: bold;
+}
