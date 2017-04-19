@@ -180,14 +180,20 @@ $(document).ready(function () {
                     url = encodeURI(url);
 
                     window.open(url);
-                    // $.post("content/getData.php", {
-                    //         status: 'getStatusHistory',
-                    //         requestIDExternal: dataTable.row($('#user-grid .selected')).data().requestIDExternal
-                    //     },
-                    //     function (data) {
-                    //         $.showRequestHistoryDialog(data);
-                    //     }
-                    // );
+                }
+            },
+            {
+                extend: 'selectedSingle',
+                className: 'documents',
+                text: 'Документы',
+                action: function (e, dt, node, config) {
+                    var url =
+                        "?action=documents" +
+                        "&reqIdExt=" +
+                        dataTable.row($('#user-grid .selected')).data().requestIDExternal;
+                    url = encodeURI(url);
+
+                    window.open(url);
                 }
             },
             {
@@ -202,6 +208,7 @@ $(document).ready(function () {
                     dataTable.columns().draw();
                 }
             },
+
             {
                 text: (localStorage.getItem("liveSearch") == 'true') ? 'Живой поиск' : 'Стандартный поиск',
 

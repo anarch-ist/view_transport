@@ -54,8 +54,8 @@ $(document).ready(function () {
                 var options = [];
                 data = JSON.parse(data);
                 data.forEach(function (entry) {
-                    console.log(entry.routeID);
-                    console.log(entry.directionName);
+                    // console.log(entry.routeID);
+                    // console.log(entry.directionName);
                     var option = "<option value=" + entry.routeID + ">" + entry.directionName + "</option>";
                     options.push(option);
                 });
@@ -70,7 +70,7 @@ $(document).ready(function () {
                             onRouteChanged(value);
                         }
                     });
-                console.log($routeSelectSelectize);
+                // console.log($routeSelectSelectize);
                 onRouteChanged(getCurrentRouteId());
             }
         );
