@@ -32,9 +32,37 @@ try {
         echo getDriversForVehicle($privUser);
     } else if (strcasecmp($_POST['status'], 'getRequestById')===0){
         echo getRequestById($privUser);
+    } else if (strcasecmp($_POST['status'], 'getDocuments')===0){
+        echo getDocuments();
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function getDocuments(){
+    $requestId = $_POST['requestIDExternal'];
+    if(!isset($requestId)){
+        throw new DataTransferException('Не задан ID заявки', __FILE__);
+    }
+    $path = "../common_files/media/Other/docs/xml/$requestId.xml";
+    $pathToDocs = '../common_files/media/Other/docs/files/';
+    if(file_exists($path)){
+    $xml = simplexml_load_file($path);
+        $answer = [];
+        foreach ($xml->group as $value){
+            $files = [];
+            $group=['title' => (string) $value['tit']];
+
+            foreach ($value->file as $file){
+                array_push($files, ['name' => (string) $file['tit'], 'file' => (string) $pathToDocs.$file['name']]);
+            }
+            $group['documents'] = $files;
+            array_push($answer,$group);
+        }
+        return (json_encode($answer));
+    } else {
+        throw new DataTransferException('Не удалось найти файл', __FILE__);
+    }
 }
 
 function getCompanies(PrivilegedUser $privUser){

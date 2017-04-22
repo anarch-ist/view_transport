@@ -36,8 +36,9 @@ $(window).on('load', function () {
             },
             function (data) {
                 //Просто раскомментируй строку ниже и строку под ней, когда запилишь скрипт
-                // setDocuments(data);
-                setDocuments(fgsfds);
+                setDocuments(JSON.parse(data));
+                // console.log(data);
+                // setDocuments(fgsfds);
             })
     })
 

@@ -203,6 +203,12 @@ $(document).ready(function () {
                 // $('#vehicleNumberTr').hide();
             }
 
+            // if ($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
+            //     $('#hoursAmountTr').hide();
+            // } else {
+            //     $('#hoursAmountTr').show();
+            // }
+
             $statusSelect.on("selectmenuchange", function (e, ui) {
 
                 if($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
