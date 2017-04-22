@@ -188,8 +188,7 @@ $(document).ready(function () {
                 text: 'Документы',
                 action: function (e, dt, node, config) {
                     var url =
-                        "?action=documents" +
-                        "&reqIdExt=" +
+                        "?reqIdExt=" +
                         dataTable.row($('#user-grid .selected')).data().requestIDExternal;
                     url = encodeURI(url);
 
