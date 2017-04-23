@@ -82,9 +82,9 @@ $(document).ready(function () {
                 var selectizeOptions = [];
                 clientsData = JSON.parse(clientsData);
                 clientsData.forEach(function (entry) {
-                    var option = "<option value=" + entry.clientID + ">" + entry.clientName + "</option>";
+                    var option = "<option value=" + entry.clientID + ">" + entry.INN + "</option>";
                     options.push(option);
-                    var selectizeOption = {"label": entry.clientName, "value": entry.clientID};
+                    var selectizeOption = {"label": entry.INN, "value": entry.clientID};
                     selectizeOptions.push(selectizeOption);
                 });
                 var clientSelectize = usersEditor.field('clientID').inst();
@@ -599,7 +599,7 @@ $(document).ready(function () {
                     }
                 },
                 {
-                    label: 'Клиент',
+                    label: 'ИНН Клиента',
                     name: 'clientID',
                     type: 'selectize',
                     options: [],
