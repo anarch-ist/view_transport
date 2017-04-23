@@ -1802,7 +1802,7 @@ CREATE PROCEDURE transmaster_transport_db.selectRoutes(
       t.cost_per_point,
       t.cost_per_hour
     FROM transmaster_transport_db.routes r
-      JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
+    LEFT JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
     WHERE (
       _search = '' OR
       r.routeName LIKE @searchString OR
