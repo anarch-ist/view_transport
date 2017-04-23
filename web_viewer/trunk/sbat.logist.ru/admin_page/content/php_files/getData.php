@@ -311,7 +311,7 @@ function getRelationsBetweenRoutePointsDataForRouteID(PrivilegedUser $privUser)
 
 function getClients(PrivilegedUser $privUser)
 {
-    $dataArray = $privUser->getClientEntity()->selectClients();
+    $dataArray = $privUser->getClientEntity()->selectAllClientIdINNPairs();
     $data = array();
     foreach ($dataArray as $key => $val) {
         if ($val instanceof DAO\ClientData) {

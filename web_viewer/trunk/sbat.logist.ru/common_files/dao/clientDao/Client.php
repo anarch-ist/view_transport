@@ -21,10 +21,14 @@ class ClientEntity implements IClientEntity
         return self::$_instance;
     }
 
+    function selectAllClientIdINNPairs()
+    {
+        return $this->DAO->select(new SelectAllClientIdINNPairs());
+    }
+
     function selectClients()
     {
-        $array = $this->DAO->select(new SelectAllClients());
-        return $array;
+        return $this->DAO->select(new SelectAllClients());
     }
 }
 
@@ -37,6 +41,19 @@ class SelectAllClients implements IEntitySelect
      */
     function getSelectQuery()
     {
-        return "SELECT clientID,clientName FROM `clients`";
+        return "SELECT * FROM `clients`";
+    }
+}
+
+class SelectAllClientIdINNPairs implements IEntitySelect
+{
+
+    /**
+     * Select all clients
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "SELECT clientID, INN FROM `clients`";
     }
 }
