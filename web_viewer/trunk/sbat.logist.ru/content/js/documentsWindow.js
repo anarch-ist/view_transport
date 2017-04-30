@@ -43,6 +43,7 @@ $(window).on('load', function () {
     })
 
 
+
 });
 
 function setRequestInfo(requestData) {
@@ -73,10 +74,8 @@ function setDocuments(data) {
 }
 
 function getGroupTemplate(groups) {
-    console.log(JSON.stringify(groups));
     html = '';
     for (var group of groups) {
-        console.log(group);
         html += '<div class="list-group list-group-root">' +
             '<div class="list-group-item">'+ group.title +'</div>' +
             '<div class="list-group">';
