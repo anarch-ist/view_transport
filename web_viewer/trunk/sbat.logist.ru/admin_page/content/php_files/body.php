@@ -153,18 +153,18 @@
             <table id="transportCompaniesTable">
                 <thead>
                 <tr>
-                    <th>№</th>
+                    <th>№ТК</th>
                     <th>Полное название</th>
                     <th>Название</th>
                     <th>ИНН</th>
                     <th>КПП</th>
                     <th>БИК</th>
                     <th>Кор. счет</th>
-                    <th>cur? счет</th>
+                    <th>Текущий счет</th>
                     <th>Название банка</th>
                     <th>Адрес</th>
                     <th>Почтовый адрес</th>
-                    <th>keywords?</th>
+                    <th>Ключевые слова</th>
                     <th>Директор</th>
                     <th>Главный бухгалтер</th>
                 </tr>
@@ -176,8 +176,8 @@
             <table id="vehiclesTable">
                 <thead>
                 <tr>
-                    <th>id</th>
-                    <th>Номер ТК</th>
+                    <th>№ТС</th>
+                    <th>№ТК</th>
                     <th>Лицензия</th>
                     <th>Модель</th>
                     <th>Грузоподъемность</th>
@@ -195,8 +195,8 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>№ ТС</th>
-                    <th>№ ТК</th>
+                    <th>№ТС</th>
+                    <th>№ТК</th>
                     <th>Имя</th>
                     <th>Пасспорт</th>
                     <th>Телефон</th>
