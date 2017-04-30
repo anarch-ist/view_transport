@@ -75,6 +75,11 @@ class RouteEntity implements IRouteEntity
     {
         return $this->_DAO->update(new UpdateRouteDaysOfWeek($routeID, $days));
     }
+
+    function updateRoute($routeData, $id)
+    {
+        return $this->_DAO->update(new UpdateRoute($routeData, $id));
+    }
 }
 
 class SelectAllRoutes implements IEntitySelect
@@ -215,5 +220,29 @@ class DeleteRoute implements IEntityDelete
     function getDeleteQuery()
     {
         return "DELETE FROM `routes` WHERE routeID = $this->routeID;";
+    }
+}
+
+class UpdateRoute implements IEntityUpdate
+{
+
+    private $id, $routeName;
+
+    function __construct($routeData, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $id;
+        $this->routeName = $dao->checkString($routeData['routeName']);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `routes` SET " .
+            "routeName = '$this->routeName'";
+        $query = $query . " WHERE routeID = $this->id;";
+        return $query;
     }
 }

@@ -215,8 +215,20 @@ $(document).ready(function () {
             table: '#routeTable',
             idSrc: 'routeID',
 
+            language: {
+                decimal: "."
+            },
+
             fields: [
                 { label: 'Название маршрута', name: 'routeName', type: 'text'},
+                {
+                    label: 'Стоимость за маршрут',
+                    name: 'cost',
+                    type: 'mask',
+                    mask: "999999999999.99",
+                    maskOptions: { clearIfNotMatch: true},
+                    placeholder: "1000.00"
+                },
                 {
                     label: 'Стоимость за точку',
                     name: 'cost_per_point',
@@ -228,14 +240,6 @@ $(document).ready(function () {
                 {
                     label: 'Стоимость за час',
                     name: 'cost_per_hour',
-                    type: 'mask',
-                    mask: "999999999999.99",
-                    maskOptions: { clearIfNotMatch: true},
-                    placeholder: "1000.00"
-                },
-                {
-                    label: 'Стоимость за маршрут',
-                    name: 'cost',
                     type: 'mask',
                     mask: "999999999999.99",
                     maskOptions: { clearIfNotMatch: true},
@@ -257,9 +261,9 @@ $(document).ready(function () {
                     data: {"status": "getRoutesData"}
                 },
                 dom: 'Bfrtip',
-                // language: {
-                //     url:'/localization/dataTablesRus.json'
-                // },
+                language: {
+                    url:'/localization/dataTablesRus.json'
+                },
                 select: {
                     style: 'single'
                 },
@@ -268,6 +272,11 @@ $(document).ready(function () {
                         extend: "create",
                         editor: routeEditor,
                         text: 'добавить запись'
+                    },
+                    {
+                        extend: "edit",
+                        editor: routeEditor,
+                        text: 'изменить запись'
                     },
                     {
                         extend: "remove",
@@ -780,6 +789,11 @@ $(document).ready(function () {
                     text: 'добавить запись'
                 },
                 {
+                    extend: "edit",
+                    editor: transportCompaniesEditor,
+                    text: 'изменить запись'
+                },
+                {
                     extend: "remove",
                     editor: transportCompaniesEditor,
                     text: 'удалить запись'
@@ -849,6 +863,11 @@ $(document).ready(function () {
                     text: 'добавить запись'
                 },
                 {
+                    extend: "edit",
+                    editor: vehiclesEditor,
+                    text: "изменить"
+                },
+                {
                     extend: "remove",
                     editor: vehiclesEditor,
                     text: 'удалить запись'
@@ -916,6 +935,11 @@ $(document).ready(function () {
                     extend: "create",
                     editor: driversEditor,
                     text: 'добавить запись'
+                },
+                {
+                    extend: "edit",
+                    editor: driversEditor,
+                    text: "изменить"
                 },
                 {
                     extend: "remove",

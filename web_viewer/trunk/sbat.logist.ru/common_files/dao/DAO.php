@@ -178,7 +178,6 @@ class DAO implements IDAO
 
     function update(IEntityUpdate $newObj, IEntityInsert $updateTable = null)
     {
-        // TODO: Check update() method.
         if (!is_null($updateTable)) {
             $this->query($updateTable->getInsertQuery());
         }

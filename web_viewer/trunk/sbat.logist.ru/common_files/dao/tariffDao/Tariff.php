@@ -21,7 +21,7 @@ class TariffEntity implements ITariffEntity
         return self::$_instance;
     }
 
-    function insertNewTariff($data)
+    function insertTariff($data)
     {
         return $this->_DAO->insert(new InsertTariff($data));
     }
@@ -29,6 +29,17 @@ class TariffEntity implements ITariffEntity
     function getLastInsertedID()
     {
         return $this->_DAO->select(new SelectLastInsertedID());
+    }
+
+    function getTariffById($id)
+    {
+        $array = $this->_DAO->select(new SelectTariffById($id));
+        return new TariffData($array[0]);
+    }
+
+    function updateTariff($tariffData, $id)
+    {
+        return $this->_DAO->update(new UpdateTariff($tariffData, $id));
     }
 }
 
@@ -39,9 +50,13 @@ class InsertTariff implements IEntityInsert
     function __construct($data)
     {
         $dao = DAO::getInstance();
-        $this->cost = $dao->checkString($data['cost']);
-        $this->cost_per_hour = $dao->checkString($data['cost_per_hour']);
-        $this->cost_per_point = $dao->checkString($data['cost_per_point']);
+        $cost_temp = $data['cost'];
+        $cost_per_hour_temp = $data['cost_per_hour'];
+        $cost_per_point_temp = $data['cost_per_point'];
+
+        $this->cost = $dao->checkString(substr($cost_temp, 0, -2) . "." . substr($cost_temp, -2));
+        $this->cost_per_hour = $dao->checkString(substr($cost_per_hour_temp, 0, -2) . "." . substr($cost_per_hour_temp, -2));
+        $this->cost_per_point = $dao->checkString(substr($cost_per_point_temp, 0, -2) . "." . substr($cost_per_point_temp, -2));
     }
 
     /**
@@ -63,5 +78,52 @@ class SelectLastInsertedID implements IEntitySelect
     function getSelectQuery()
     {
         return 'SELECT tariffID FROM `tariffs` WHERE tariffID = LAST_INSERT_ID();';
+    }
+}
+
+class SelectTariffById implements IEntitySelect
+{
+    private $id;
+
+    function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT * FROM `tariffs` WHERE `tariffID` = $this->id";
+    }
+}
+
+class UpdateTariff implements IEntityUpdate
+{
+
+    private $id, $cost, $cost_per_hour, $cost_per_point;
+
+    function __construct($data, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $id;
+        $cost_temp = $data['cost'];
+        $cost_per_hour_temp = $data['cost_per_hour'];
+        $cost_per_point_temp = $data['cost_per_point'];
+
+        $this->cost = $dao->checkString(substr($cost_temp, 0, -2) . "." . substr($cost_temp, -2));
+        $this->cost_per_hour = $dao->checkString(substr($cost_per_hour_temp, 0, -2) . "." . substr($cost_per_hour_temp, -2));
+        $this->cost_per_point = $dao->checkString(substr($cost_per_point_temp, 0, -2) . "." . substr($cost_per_point_temp, -2));
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `tariffs` SET " .
+            "cost = '$this->cost', " .
+            "cost_per_hour = '$this->cost_per_hour', " .
+            "cost_per_point = '$this->cost_per_point'";
+        $query = $query . " WHERE tariffID = $this->id;";
+        return $query;
     }
 }
