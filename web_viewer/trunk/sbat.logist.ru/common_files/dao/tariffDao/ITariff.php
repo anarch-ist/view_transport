@@ -3,7 +3,11 @@ namespace DAO;
 
 interface ITariffEntity
 {
-    function insertNewTariff($data);
+    function insertTariff($data);
 
     function getLastInsertedID();
+
+    function getTariffById($id);
+
+    function updateTariff($tariffData, $id);
 }

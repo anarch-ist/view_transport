@@ -48,7 +48,6 @@ try {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
     } else if (strcasecmp($action,'relationsBetweenRoutePoints')===0) {
-
         $action = $_POST['action'];
         if (strcasecmp($action,'edit')===0) {
             updateRelationsBetweenRoutePoints($privUser);
@@ -63,9 +62,9 @@ try {
         if (strcasecmp($action,'remove')===0) {
             removeRoute($privUser);
         } else if (strcasecmp($action,'edit')===0) {
-            //todo implement
+            updateRoute($privUser);
         } else if (strcasecmp($action,'create')===0) {
-            createNewRoute($privUser);
+            createRoute($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
@@ -91,7 +90,7 @@ try {
         if (strcasecmp($action, 'remove') === 0) {
             removeTransportCompany($privUser);
         } else if (strcasecmp($action, 'edit') === 0) {
-            //todo: implement editing
+            updateTransportCompany($privUser);
         } else if (strcasecmp($action, 'create') === 0) {
             addTransportCompany($privUser);
         } else {
@@ -105,7 +104,7 @@ try {
         if (strcasecmp($action, 'remove') === 0) {
             removeVehicle($privUser);
         } else if (strcasecmp($action, 'edit') === 0) {
-            //todo: implement editing
+            updateVehicle($privUser);
         } else if (strcasecmp($action, 'create') === 0) {
             addVehicle($privUser);
         } else {
@@ -117,9 +116,9 @@ try {
         }
         $action = $_POST['action'];
         if (strcasecmp($action, 'remove') === 0) {
-            removeDriver($privUser);
+            removeDrivers($privUser);
         } else if (strcasecmp($action, 'edit') === 0) {
-            //todo: implement editing
+            updateDrivers($privUser);
         } else if (strcasecmp($action, 'create') === 0) {
             addDriver($privUser);
         } else {
@@ -452,7 +451,7 @@ function removeTransportCompany(PrivilegedUser $privilegedUser) {
     echo '{ }';
 }
 
-function removeDriver(PrivilegedUser $privilegedUser) {
+function removeDrivers(PrivilegedUser $privilegedUser) {
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -486,12 +485,12 @@ function removeRoute(PrivilegedUser $privUser) {
     echo '{ }';
 }
 
-function createNewRoute(PrivilegedUser $privUser) {
+function createRoute(PrivilegedUser $privUser) {
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "данные"', __FILE__);
     }
     $routeInfo = $_POST['data'][0];
-    if ($privUser->getTariffEntity()->insertNewTariff($routeInfo)) {
+    if ($privUser->getTariffEntity()->insertTariff($routeInfo)) {
         $lastID = $privUser->getTariffEntity()->getLastInsertedID();
         $routeInfo['tariffID'] = $lastID[0]['tariffID'];
         if ($privUser->getRouteEntity()->addRoute($routeInfo)) {
@@ -540,13 +539,13 @@ function updateDrivers(PrivilegedUser $privUser)
     $dataSourceArray = $_POST['data'];
     $driverEntity = $privUser->getDriverEntity();
     $i = 0;
-    foreach ($dataSourceArray as $id => $userInfo) {
-//        if (!$driverEntity->updateUser(new \DAO\UserData($userInfo),$id)) {
-//            $privUser->getDaoEntity()->rollback();
-//            throw new DataTransferException('Данные не были обновлены', __FILE__);
-//        }
-//        $serverAnswer['data'][$i] = $driverEntity->selectUserByLogin($userInfo['login'])->toArray();
-//        $i++;
+    foreach ($dataSourceArray as $id => $driverInfo) {
+        if (!$driverEntity->updateDriver(new \DAO\DriverData($driverInfo), $id)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+        $serverAnswer['data'][$i] = $driverEntity->selectDriverById($id)->toArray();
+        $i++;
     }
     echo json_encode($serverAnswer);
 }
@@ -567,6 +566,83 @@ function updateUsers(PrivilegedUser $privUser)
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
         $serverAnswer['data'][$i] = $userEntity->selectUserByLogin($userInfo['login'])->toArray();
+        $i++;
+    }
+    echo json_encode($serverAnswer);
+}
+
+function updateVehicle(PrivilegedUser $privUser)
+{
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $vehicleEntity = $privUser->getVehicleEntity();
+    $i = 0;
+    foreach ($dataSourceArray as $vehicleId => $vehicleInfo) {
+        if (!$vehicleEntity->updateVehicle(new \DAO\VehicleData($vehicleInfo), $vehicleId)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+        $serverAnswer['data'][$i] = $vehicleEntity->selectVehicleById($vehicleId)->toArray();
+        $i++;
+    }
+    echo json_encode($serverAnswer);
+}
+
+function updateTransportCompany(PrivilegedUser $privUser)
+{
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $transportCompanyEntity = $privUser->getTransportCompanyEntity();
+    $i = 0;
+    foreach ($dataSourceArray as $companyId => $companyInfo) {
+        if (!$transportCompanyEntity->updateCompany(new \DAO\TransportCompanyData($companyInfo), $companyId)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+        $serverAnswer['data'][$i] = $transportCompanyEntity->selectCompanyById($companyId)->toArray();
+        $i++;
+    }
+    echo json_encode($serverAnswer);
+}
+
+function updateRoute(PrivilegedUser $privUser)
+{
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $routeEntity = $privUser->getRouteEntity();
+    $tariffEntity = $privUser->getTariffEntity();
+    $i = 0;
+    foreach ($dataSourceArray as $routeId => $routeInfo) {
+        if (!$routeEntity->updateRoute($routeInfo, $routeId)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+        $routeInfoAfter = $routeEntity->selectRouteByID($routeId);
+        if(!$tariffEntity->updateTariff($routeInfo, $routeInfoAfter->getData('tariffID'))) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+
+        $tariffInfoAfter = $tariffEntity->getTariffById($routeInfoAfter->getData('tariffID'));
+
+        $updatedRoute = array();
+        $updatedRoute['routeName'] = $routeInfoAfter->getData('routeName');
+        $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
+        $updatedRoute['cost_per_point'] = $tariffInfoAfter->getData('cost_per_point');
+        $updatedRoute['cost_per_hour'] = $tariffInfoAfter->getData('cost_per_hour');
+        $serverAnswer['data'][$i] = $updatedRoute;
         $i++;
     }
     echo json_encode($serverAnswer);

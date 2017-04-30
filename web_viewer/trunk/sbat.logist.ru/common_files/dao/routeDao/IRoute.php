@@ -18,4 +18,6 @@ interface IRouteEntity
     function deleteRoute($Route);
 
     function addRoute($Route);
+
+    function updateRoute($routeData, $id);
 }

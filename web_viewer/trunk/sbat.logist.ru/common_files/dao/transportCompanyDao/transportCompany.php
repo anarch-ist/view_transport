@@ -61,7 +61,7 @@ class TransportCompany implements ITransportCompany
 
     function updateCompany(TransportCompanyData $newCompany, $id)
     {
-        // TODO: Implement updateCompany() method.
+        return $this->_DAO->update(new UpdateCompany($newCompany, $id));
     }
 }
 
@@ -168,5 +168,51 @@ class RemoveCompany implements IEntityDelete {
     function getDeleteQuery()
     {
         return "DELETE FROM `transport_companies` WHERE id = $this->id";
+    }
+}
+
+class UpdateCompany implements IEntityUpdate
+{
+    private $id, $name, $short_name, $inn, $KPP, $BIK, $cor_account, $cur_account, $bank_name, $legal_address,
+        $keywords, $director_fullname, $chief_acc_fullname;
+
+    function __construct(TransportCompanyData $companyData, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $dao->checkString($id);
+        $this->name = $dao->checkString($companyData->getData('name'));
+        $this->short_name = $dao->checkString($companyData->getData('short_name'));
+        $this->inn = $dao->checkString($companyData->getData('inn'));
+        $this->KPP = $dao->checkString($companyData->getData('KPP'));
+        $this->BIK = $dao->checkString($companyData->getData('BIK'));
+        $this->cor_account = $dao->checkString($companyData->getData('cor_account'));
+        $this->cur_account = $dao->checkString($companyData->getData('cur_account'));
+        $this->bank_name = $dao->checkString($companyData->getData('bank_name'));
+        $this->legal_address = $dao->checkString($companyData->getData('legal_address'));
+        $this->keywords = $dao->checkString($companyData->getData('keywords'));
+        $this->director_fullname = $dao->checkString($companyData->getData('director_fullname'));
+        $this->chief_acc_fullname = $dao->checkString($companyData->getData('chief_acc_fullname'));
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `transport_companies` SET " .
+            "name = '$this->name', " .
+            "short_name = '$this->short_name', " .
+            "inn = '$this->inn', " .
+            "KPP = '$this->KPP', " .
+            "BIK = '$this->BIK', " .
+            "cor_account = '$this->cor_account', " .
+            "cur_account = '$this->cur_account', " .
+            "bank_name = '$this->bank_name', " .
+            "legal_address = '$this->legal_address', " .
+            "keywords = '$this->keywords', " .
+            "director_fullname = '$this->director_fullname', " .
+            "chief_acc_fullname = '$this->chief_acc_fullname'";
+        $query = $query . " WHERE id = $this->id;";
+        return $query;
     }
 }

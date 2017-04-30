@@ -78,7 +78,7 @@ class Vehicle implements IVehicle {
 
     function updateVehicle(VehicleData $newVehicle, $id)
     {
-        // TODO: Implement updateVehicle() method.
+        return $this->_DAO->update(new UpdateVehicle($newVehicle, $id));
     }
 }
 
@@ -196,5 +196,40 @@ class SelectLastInsertedVehicleId implements IEntitySelect {
     function getSelectQuery()
     {
         return 'SELECT * FROM `vehicles` WHERE id = LAST_INSERT_ID()';
+    }
+}
+
+class UpdateVehicle implements IEntityUpdate
+{
+    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type;
+
+    function __construct(VehicleData $user, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $dao->checkString($id);
+        $this->transport_company_id = $dao->checkString($user->getData('transport_company_id'));
+        $this->license_number = $dao->checkString($user->getData('license_number'));
+        $this->model = $dao->checkString($user->getData('model'));
+        $this->volume = $dao->checkString($user->getData('volume'));
+        $this->loading_type = $dao->checkString($user->getData('loading_type'));
+        $this->pallets_quantity = $dao->checkString($user->getData('pallets_quantity'));
+        $this->type = $dao->checkString($user->getData('type'));
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `vehicles` SET " .
+            "transport_company_id = '$this->transport_company_id', " .
+            "license_number = $this->license_number, " .
+            "model = '$this->model', " .
+            "volume = '$this->volume', " .
+            "loading_type = '$this->loading_type', " .
+            "pallets_quantity = '$this->pallets_quantity', " .
+            "type = '$this->type'";
+        $query = $query . " WHERE id = $this->id;";
+        return $query;
     }
 }

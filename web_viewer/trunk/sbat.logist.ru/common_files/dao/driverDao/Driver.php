@@ -3,7 +3,8 @@ namespace DAO;
 include_once __DIR__ . '/IDriver.php';
 include_once __DIR__ . '/../DAO.php';
 
-class Driver implements IDriver {
+class Driver implements IDriver
+{
     private static $_instance;
     private $_DAO;
 
@@ -72,23 +73,25 @@ class Driver implements IDriver {
 
     function updateDriver(DriverData $newDriver, $id)
     {
-        // TODO: Implement updateDriver() method.
+        return $this->_DAO->update(new UpdateDriver($newDriver, $id));
     }
 }
 
-class SelectAllDrivers implements IEntitySelect {
+class SelectAllDrivers implements IEntitySelect
+{
+    public function __construct()
+    {
+    }
+
     function getSelectQuery()
     {
         return "SELECT * FROM `drivers`";
     }
 
-    public function __construct()
-    {
-    }
-
 }
 
-class SelectDriverById implements IEntitySelect {
+class SelectDriverById implements IEntitySelect
+{
     private $id;
 
     function getSelectQuery()
@@ -103,7 +106,8 @@ class SelectDriverById implements IEntitySelect {
 
 }
 
-class SelectDriverByCompanyId implements IEntitySelect {
+class SelectDriverByCompanyId implements IEntitySelect
+{
     private $companyId;
 
     function getSelectQuery()
@@ -117,7 +121,8 @@ class SelectDriverByCompanyId implements IEntitySelect {
     }
 }
 
-class SelectDriverByVehicleId implements IEntitySelect {
+class SelectDriverByVehicleId implements IEntitySelect
+{
     private $vehicleId;
 
     function getSelectQuery()
@@ -131,7 +136,8 @@ class SelectDriverByVehicleId implements IEntitySelect {
     }
 }
 
-class SelectDriversByRange implements IEntitySelect {
+class SelectDriversByRange implements IEntitySelect
+{
     private $start, $count, $orderByColumn, $isDesc, $searchString;
 
     function __construct($start, $count)
@@ -155,7 +161,8 @@ class SelectDriversByRange implements IEntitySelect {
 }
 
 
-class InsertDriver implements IEntityInsert{
+class InsertDriver implements IEntityInsert
+{
     private $vehicle_id, $transport_company_id, $full_name, $passport, $phone, $license;
 
     public function __construct($companyData)
@@ -176,7 +183,8 @@ class InsertDriver implements IEntityInsert{
     }
 }
 
-class RemoveDriver implements IEntityDelete {
+class RemoveDriver implements IEntityDelete
+{
     private $id;
 
     public function __construct($id)
@@ -194,7 +202,8 @@ class RemoveDriver implements IEntityDelete {
 }
 
 
-class SelectLastInsertedDriverId implements IEntitySelect {
+class SelectLastInsertedDriverId implements IEntitySelect
+{
     /**
      * this function contains query text
      * @return string
@@ -202,5 +211,39 @@ class SelectLastInsertedDriverId implements IEntitySelect {
     function getSelectQuery()
     {
         return 'SELECT * FROM `drivers` WHERE id = LAST_INSERT_ID()';
+    }
+}
+
+
+class UpdateDriver implements IEntityUpdate
+{
+    private $id, $vehicle_id, $transport_company_id, $full_name, $passport, $phone, $license;
+
+    function __construct(DriverData $user, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $dao->checkString($id);
+        $this->transport_company_id = $dao->checkString($user->getData('transport_company_id'));
+        $this->full_name = $dao->checkString($user->getData('full_name'));
+        $this->passport = $dao->checkString($user->getData('passport'));
+        $this->phone = $dao->checkString($user->getData('phone'));
+        $this->license = $dao->checkString($user->getData('license'));
+        $this->vehicle_id = $dao->checkString($user->getData('vehicle_id'));
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `drivers` SET " .
+            "vehicle_id = $this->vehicle_id, " .
+            "transport_company_id = '$this->transport_company_id', " .
+            "full_name = '$this->full_name', " .
+            "passport = '$this->passport', " .
+            "phone = '$this->phone', " .
+            "license = '$this->license'";
+        $query = $query . " WHERE id = $this->id;";
+        return $query;
     }
 }
