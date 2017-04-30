@@ -15,6 +15,7 @@ $(document).ready(function () {
         '<tr id="companyTr" valign="top" ><td width="200"><label for="companyInput">Транспортная компания: </label></td><td><input id="companyInput" /></td></tr>' +
         '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
         '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
+        '<tr><td></td><td><a href="../../admin_page/index.php">Добавить компанию/ТС/Водителя</a></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="time"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
@@ -177,6 +178,12 @@ $(document).ready(function () {
     // var $dateTimePicker = $("#dateTimePicker");
     // $dateTimePicker.datetimepicker();
     $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true});
+    if ($('#dateTimePicker').val()==''){
+
+        $('#dateTimePicker').val(new Date().toLocaleString('en-US',{
+            day:'2-digit', month:'2-digit',year:'numeric', hour:'2-digit',minute:'2-digit', hour12:false
+        }).replace(',','').replace('/','.').replace('/','.'));
+    }
     $('#hoursAmount').mask('00000', {placeholder: '0-9999'});
 
 
