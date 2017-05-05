@@ -176,7 +176,8 @@ function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser){
     $clientId = $_POST['clientId'];
     $invoiceNumber = $_POST['invoiceNumber'];
     if(!isset($clientId) || empty($clientId) || !isset($invoiceNumber) || empty($invoiceNumber)){
-        throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
+//        throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
+        return '0';
     }
     $data = $privUser->getRequestEntity()->selectRequestByClientIdAndInvoiceNumber($clientId,$invoiceNumber);
     return json_encode($data);
