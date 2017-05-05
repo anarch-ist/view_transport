@@ -3,6 +3,10 @@ clearfix::after, body .container .row .mid::after {
   display: block;
   clear: both; }
 
+.loading{
+  text-align: center;
+}
+
 body {
   font-family: Tahoma, "Helvetica Neue",Helvetica,Arial,sans-serif;
   color: #333;
@@ -24,7 +28,8 @@ body {
       font-weight: bold;
       color: #c22929; }
     body .container .row .mid.request-information {
-      border-bottom: 2px solid #cecece; }
+      /*border-bottom: 2px solid #cecece; */
+    }
       body .container .row .mid.request-information table {
         display: inline-block;
         vertical-align: top; }
@@ -48,4 +53,5 @@ body {
         background: #e8e8e8; }
       body .container .row .mid.status-history table tr:not(:first-child):hover {
         cursor: pointer;
-        background: #cecece; }
+        background: #cecece;
+      }

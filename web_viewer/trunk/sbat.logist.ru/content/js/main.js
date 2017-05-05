@@ -79,7 +79,7 @@ $(document).ready(function () {
                 $footer.html(searchDiv);
 
                 searchDiv.on("click", function () {
-                    console.log("CLICKED");
+                    // console.log("CLICKED");
                     var position = $(this).offset();
                     searchInput.offset(position);
                     searchInput.css({top: position.top, left: position.left, display: 'inline-block'});

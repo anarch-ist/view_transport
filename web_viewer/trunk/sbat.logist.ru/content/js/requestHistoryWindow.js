@@ -9,23 +9,62 @@ function showPretension(pretensionID, reqIdExt, cathegory, pretensionSum, preten
         updatePretension(pretensionID, reqIdExt, cathegory, pretensionSum, decodeURI(pretensionComment), decodeURI(positionNumber))
     });
     $('#deletePretension').off('click').show().on('click', function () {
-        deletePretension(pretensionID,reqIdExt);
+        deletePretension(pretensionID, reqIdExt);
     });
 
     // alert('showPretension end');
 }
 
+function loadPretensions() {
+    $.post("content/getData.php", {
+        status: 'getPretensions',
+        requestIDExternal: requestIDExternal
+    }, function (data) {
+        parsedData = JSON.parse(data);
+        // alert(parsedData[1].pretensionSum);
+
+        $(".pretensionLink").remove();
+        $("#pretensionLinks br").remove();
+        // $(".pretensionLink").each(function (link) {
+        //     link.remove();
+        // });
+
+
+        parsedData.forEach(function (pretension, i, parsedData) {
+            if (pretension.pretensionSum == undefined) {
+                pretension.pretensionSum = 0;
+            }
+
+            $('#pretensionLinks').append('<br><button type="button" class="pretensionLink btn-link" ' +
+                ' onclick=showPretension("' +
+                pretension.pretensionID + '","' +
+                pretension.requestIDExternal + '","' +
+                pretension.pretensionCathegory + '",' +
+                pretension.sum + ',"' +
+                encodeURI(pretension.pretensionComment) + '","' +
+                pretension.positionNumber +
+                '") ' +
+                ' class="btn btn-link" data-toggle="modal" data-target="#pretensionModal">' +
+                'Претензия №' + pretension.pretensionID +
+                '</button>'
+            );
+        });
+
+    })
+}
+
 function deletePretension(pretensionID, reqIdExt) {
     // alert('Removing pretension №'+pretensionID+', '+reqIdExt);
-    if(confirm('Вы действительно хотите удалить претензию?')){
+    if (confirm('Вы действительно хотите удалить претензию?')) {
         $.post("content/getData.php", {
             status: 'deletePretension',
             pretensionID: pretensionID,
             requestIDExternal: reqIdExt
         }, function (data) {
-            if(data=='true'){
+            if (data == 'true') {
                 alert("Претензия успешно удалена");
-                location.reload();
+                $('#pretensionModal').modal('toggle');
+                loadPretensions();
             }
         })
     }
@@ -42,17 +81,21 @@ function updatePretension(pretensionID, reqIdExt) {
         pretensionComment: $('#pretensionComment').val(),
         pretensionPositionNumber: $('#pretensionPositionNumber').val()
     }, function (data) {
-        if(data=='true'){
+        if (data == 'true') {
             // alert(data);
             alert('Претензия успешно обновлена');
-            location.reload();
+            $('#pretensionModal').modal('toggle');
+            loadPretensions();
         }
     });
     // alert('pretensionID:' + pretensionID + '<br>reqIdExt:' + reqIdExt + '<br>cathegory:' + cathegory + '<br>pretensionSum:' + pretensionSum + '<br>pretensionComment:' + pretensionComment + '<br>positionNumber:' + positionNumber)
 
 }
 
-$(document).ready(function(){
+
+$(document).ready(function () {
+
+
     $("#pretensionModal").on('hidden.bs.modal', function () {
         $('#pretensionCathegory').val('');
         $('#pretensionSum').val('');
@@ -60,7 +103,7 @@ $(document).ready(function(){
         $('#pretensionPositionNumber').val('').trigger('change');
     });
 
-    $("#pretensionButton").on('click', function(){
+    $("#pretensionButton").on('click', function () {
         $('#updatePretension').hide();
         $('#deletePretension').hide();
         $('#submitPretension').show();
@@ -69,6 +112,7 @@ $(document).ready(function(){
 
 });
 
+// var requestIDExternal = '0';
 $(window).on('load', function () {
     var $_GET = {};
 
@@ -85,7 +129,7 @@ $(window).on('load', function () {
     $('#pretensionSum').mask('0000000000.00', {reverse: true});
 
     var timeoutID;
-    var requestIDExternal;
+
     if ($_GET['requestIDExternal']) {
         requestIDExternal = $_GET['requestIDExternal'];
     }
@@ -208,6 +252,7 @@ $(window).on('load', function () {
     if ($_GET['clientId'] && $_GET['invoiceNumber']) {
         //Why wasn't chicken able to cross the road?
         //Because it was disabled :|
+        // console.log('fgs');
         $.post("content/getData.php", {
                 status: 'getRequestByClientIdAndInvoiceNumber',
                 clientId: $_GET['clientId'],
@@ -215,9 +260,8 @@ $(window).on('load', function () {
             },
             function (data) {
                 // alert(data);
-                // console.log(data);
+                console.log(data);
                 requestIDExternal = JSON.parse(data).requestIDExternal;
-
                 setRequestInfo(data);
 
             }
@@ -231,10 +275,21 @@ $(window).on('load', function () {
                     // alert(data);
                     // console.log(data);
                     setHistoryTable(data);
+                    removeLoadingScreen();
+                    if ($_GET['pretensionModal'] == "1") {
+                        $('#pretensionModal').modal();
+                        $('#deletePretension').hide();
+                        $('#updatePretension').hide();
+                    }
                 }
             )
         });
 
+    } else {
+        // setNoData();
+        // document.getElementsByClassName('loading')[0].innerHTML="У заявки отсутствует номер накладной";
+        removeLoadingScreen("nope");
+        $(".loading").html("У заявки отсутствует номер накладной");
     }
 
 
@@ -263,12 +318,6 @@ $(window).on('load', function () {
         $('#pallet-quantity').html(requestData.palletsQty);
 
 
-        if ($_GET['pretensionModal'] == "1") {
-            $('#pretensionModal').modal();
-            $('#deletePretension').hide();
-            $('#updatePretension').hide();
-        }
-
         $('#submitPretension').click(function () {
 
             $.post("content/getData.php", {
@@ -284,45 +333,18 @@ $(window).on('load', function () {
                 if (data == 'true') {
                     $('#pretensionModal').modal('toggle');
                     alert('Претензия успешно отправлена');
+                    loadPretensions();
                 } else {
                     alert(data);
                 }
             })
         });
 
-        $.post("content/getData.php", {
-            status: 'getPretensions',
-            requestIDExternal: requestIDExternal
-        }, function (data) {
-            parsedData = JSON.parse(data);
-            // alert(parsedData[1].pretensionSum);
-            // alert(data,4);
-            parsedData.forEach(function (pretension, i, parsedData) {
-                if(pretension.pretensionSum==undefined){
-                    pretension.pretensionSum=0;
-                }
 
-                $('#pretensionLinks').append('<br><button type="button" ' +
-                    ' onclick=showPretension("'+
-                    pretension.pretensionID + '","'+
-                    pretension.requestIDExternal+'","'+
-                    pretension.pretensionCathegory+'",'+
-                    pretension.sum+',"'+
-                    encodeURI(pretension.pretensionComment)+'","'+
-                    pretension.positionNumber+
-                    '") ' +
-                    ' class="btn btn-link" data-toggle="modal" data-target="#pretensionModal">' +
-                    'Претензия №' + pretension.pretensionID +
-                    '</button>'
-                );
-            });
+        loadPretensions();
 
-        })
     }
 
-
-
-    
 
     function setHistoryTable(requestHistoryData) {
         if (window.jQuery) {
@@ -330,7 +352,7 @@ $(window).on('load', function () {
             requestHistoryDialogTable = $requestHistoryDialogTable.DataTable({
                 "dom": 't', // show only table with no decorations
                 "paging": false, // no pagination
-                "order": [[0,"desc"]],
+                "order": [[0, "desc"]],
                 "columnDefs": [
                     {"name": "timeMarkWhenRequestWasChanged", "data": "timeMarkWhenRequestWasChanged", "targets": 0},
                     {"name": "pointWhereStatusWasChanged", "data": "pointWhereStatusWasChanged", "targets": 1},
@@ -360,4 +382,15 @@ $(window).on('load', function () {
 
 
 }());
+
+
+function removeLoadingScreen(isThereAnyData) {
+    if (!isThereAnyData) {
+        $(".loading").remove();
+        $(".left-table").show();
+        $(".right-table").show();
+    } else {
+        $(".loading").html("У заявки отсутствует номер накладной");
+    }
+}
 
