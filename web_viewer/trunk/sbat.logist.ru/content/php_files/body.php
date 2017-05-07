@@ -1,4 +1,4 @@
-<title>логистика</title>
+<title>Логистика</title>
 <head>
     <meta charset="UTF-8"/>
 
@@ -82,6 +82,7 @@
     </div>
 
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">
+
         <thead>
         <tr>
             <th class="col1">ID заявки</th>
@@ -152,13 +153,15 @@
 
 <style>
     #user-grid_wrapper .dt-buttons{
-        position:fixed;
-        top:15px;
-        z-index:9999999;
-        width: 65%;
+        /*position:fixed;*/
+        /*Just who did this?*/
+        /*top:15px;*/
+        padding-bottom: 10px;
+        z-index:9999;
+        width: 70%;
     }
 
     #user-grid_wrapper{
-        margin-top:60px;
+        margin-top:17px;
     }
 </style>
