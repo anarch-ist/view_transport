@@ -71,7 +71,7 @@ class SelectAllPoints implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT pointID,pointName FROM `points`;";
+        return "SELECT pointID, pointName FROM `points`";
     }
 }
 
@@ -89,7 +89,6 @@ class SelectPointByID implements IEntitySelect
         return "select * from `points` where `pointID` = '$this->id'";
     }
 }
-
 
 
 class SelectPointByUserID implements IEntitySelect

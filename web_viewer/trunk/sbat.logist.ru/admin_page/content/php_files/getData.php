@@ -630,20 +630,36 @@ function updateRoute(PrivilegedUser $privUser)
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
         $routeInfoAfter = $routeEntity->selectRouteByID($routeId);
-        if(!$tariffEntity->updateTariff($routeInfo, $routeInfoAfter->getData('tariffID'))) {
-            $privUser->getDaoEntity()->rollback();
-            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        if (!empty($routeInfo['tariffID'])) {
+            if(!$tariffEntity->updateTariff($routeInfo, $routeInfoAfter->getData('tariffID'))) {
+                $privUser->getDaoEntity()->rollback();
+                throw new DataTransferException('Данные не были обновлены', __FILE__);
+            }
+
+            $tariffInfoAfter = $tariffEntity->getTariffById($routeInfoAfter->getData('tariffID'));
+
+            $updatedRoute = array();
+            $updatedRoute['routeName'] = $routeInfoAfter->getData('routeName');
+            $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
+            $updatedRoute['cost_per_point'] = $tariffInfoAfter->getData('cost_per_point');
+            $updatedRoute['cost_per_hour'] = $tariffInfoAfter->getData('cost_per_hour');
+            $serverAnswer['data'][$i] = $updatedRoute;
+            $i++;
+        } else {
+            if ($privUser->getTariffEntity()->insertTariff($routeInfo)) {
+                $lastID = $privUser->getTariffEntity()->getLastInsertedID();
+                if($routeEntity->updateRoutesTariff($routeId, $lastID[0]['tariffID'])) {
+                    $tariffInfoAfter = $tariffEntity->getTariffById($lastID[0]['tariffID']);
+                    $updatedRoute['routeName'] = $routeInfoAfter->getData('routeName');
+                    $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
+                    $updatedRoute['cost_per_point'] = $tariffInfoAfter->getData('cost_per_point');
+                    $updatedRoute['cost_per_hour'] = $tariffInfoAfter->getData('cost_per_hour');
+                    $serverAnswer['data'][$i] = $updatedRoute;
+                } else {
+
+                }
+            }
         }
-
-        $tariffInfoAfter = $tariffEntity->getTariffById($routeInfoAfter->getData('tariffID'));
-
-        $updatedRoute = array();
-        $updatedRoute['routeName'] = $routeInfoAfter->getData('routeName');
-        $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
-        $updatedRoute['cost_per_point'] = $tariffInfoAfter->getData('cost_per_point');
-        $updatedRoute['cost_per_hour'] = $tariffInfoAfter->getData('cost_per_hour');
-        $serverAnswer['data'][$i] = $updatedRoute;
-        $i++;
     }
     echo json_encode($serverAnswer);
 }
