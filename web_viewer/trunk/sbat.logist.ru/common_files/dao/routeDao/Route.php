@@ -80,6 +80,11 @@ class RouteEntity implements IRouteEntity
     {
         return $this->_DAO->update(new UpdateRoute($routeData, $id));
     }
+
+    function updateRoutesTariff($routeID, $tariffID)
+    {
+        return $this->_DAO->update(new UpdateRoutesTariff($routeID, $tariffID));
+    }
 }
 
 class SelectAllRoutes implements IEntitySelect
@@ -243,6 +248,30 @@ class UpdateRoute implements IEntityUpdate
         $query = "UPDATE `routes` SET " .
             "routeName = '$this->routeName'";
         $query = $query . " WHERE routeID = $this->id;";
+        return $query;
+    }
+}
+
+class UpdateRoutesTariff implements IEntityUpdate
+{
+
+    private $routeID, $tariffID;
+
+    function __construct($routeID, $tariffID)
+    {
+        $dao = DAO::getInstance();
+        $this->routeID = $routeID;
+        $this->tariffID = $dao->checkString($tariffID);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `routes` SET " .
+            "tariffID = '$this->tariffID'";
+        $query = $query . " WHERE routeID = $this->routeID;";
         return $query;
     }
 }

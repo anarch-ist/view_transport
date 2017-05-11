@@ -20,4 +20,6 @@ interface IRouteEntity
     function addRoute($Route);
 
     function updateRoute($routeData, $id);
+
+    function updateRoutesTariff($routeID, $tariffID);
 }
