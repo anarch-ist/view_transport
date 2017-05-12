@@ -15,9 +15,9 @@ $(document).ready(function () {
         '<tr id="companyTr" valign="top" ><td width="200"><label for="companyInput">Транспортная компания: </label></td><td><input id="companyInput" /></td></tr>' +
         '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
         '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
-        '<tr id="linkTr"><td></td><td><a href="../../admin_page/index.php">Добавить компанию/ТС/Водителя</a></td></tr>' +
+        '<tr><td></td><td><a href="../../admin_page/index.php">Добавить компанию/ТС/Водителя</a></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
-        '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount"></td></tr>' +
+        '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="time"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
         '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes2"><table id="requestCheckBoxes"></table></div></td></tr>' +
@@ -41,7 +41,7 @@ $(document).ready(function () {
 
                 // var option = "<option value=" + entry.id + ">" + entry.name + "</option>";
                 // options.push(option);
-                // console.log("id:"+entry.id+" name:"+entry.name+"\n");
+                console.log("id:"+entry.id+" name:"+entry.name+"\n");
                 var selectizeOption = {text: entry.name, value: entry.id};
                 selectizeOptions.push(selectizeOption);
             });
@@ -99,7 +99,7 @@ $(document).ready(function () {
                         companyId: Number(value)
                     }, function (vehiclesData) {
                         var vehicleOptions = [];
-                            // console.log(vehiclesData);
+                            console.log(vehiclesData);
                         vehiclesData = JSON.parse(vehiclesData);
 
                         vehiclesData.forEach(function (entry) {
@@ -154,7 +154,6 @@ $(document).ready(function () {
             options.push("<option value='" + storedStatuses[i].requestStatusID + "'>" + storedStatuses[i].requestStatusRusName + "</option>");
         }
         $statusSelect.html(options.join("")).selectmenu({width: STATUS_SELECT_MENU_WIDTH});
-
     }
 
     // create palletsQty input
@@ -208,15 +207,14 @@ $(document).ready(function () {
             var dataTable = $statusChangeDialog.data('dataTable');
 
             if ($("#data-role").html().trim() == "Пользователь_клиента"){
-                $('#vehicleNumberTr').hide();
-                $('#companyTr').hide();
-                $('#driverTr').hide();
-                $('#linkTr').hide();
+                // $('#vehicleNumberTr').hide();
             }
 
-
-
-
+            // if ($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
+            //     $('#hoursAmountTr').hide();
+            // } else {
+            //     $('#hoursAmountTr').show();
+            // }
 
             $statusSelect.on("selectmenuchange", function (e, ui) {
 
@@ -309,7 +307,6 @@ $(document).ready(function () {
                 var dialogType = $statusChangeDialog.data('dialogType');
                 var dataTable = $statusChangeDialog.data('dataTable');
                 var newStatusID = $statusSelect[0][$statusSelect[0].selectedIndex].value;
-
                 var date = $('#dateTimePicker')[0].value;
                 var comment = $("#commentInput").val();
                 var vehicleNumber = $("#vehicleNumberInput").val();
@@ -416,12 +413,6 @@ $(document).ready(function () {
             .data("dataTable", dataTable)
             .dialog("open");
         populateStatusSelectMenu();
-        if ($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
-            // console.log($statusSelect[0][$statusSelect[0].selectedIndex].value);
-            $('#hoursAmountTr').show();
-        } else {
-            $('#hoursAmountTr').hide();
-        }
 
     };
 

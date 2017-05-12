@@ -69,7 +69,7 @@
                 echo $data['userName'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
 
                 ?>
-                <a href="common_files/media/Other/clientInstruction1.0.pdf">Инструкция</a>
+                <a href="common_files/media/Other/clientInstruction1.1.pdf">Инструкция</a>
             </div>
 
             <div id="userRoleContainer" style="display: none">

@@ -13,6 +13,7 @@ var fgsfds = [{
 $(window).on('load', function () {
     var $_GET = {};
 
+
     document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
         function decode(s) {
             return decodeURIComponent(s.split("+").join(" "));
@@ -27,7 +28,6 @@ $(window).on('load', function () {
         },
         function (data) {
             setRequestInfo(data);
-            removeLoadingScreen();
         }
     ).success(function () {
         $.post("content/getData.php", {
@@ -35,7 +35,6 @@ $(window).on('load', function () {
                 requestIDExternal: $_GET['reqIdExt']
             },
             function (data) {
-
                 //Просто раскомментируй строку ниже и строку под ней, когда запилишь скрипт
                 setDocuments(JSON.parse(data));
                 // console.log(data);
@@ -89,11 +88,6 @@ function getGroupTemplate(groups) {
     return html;
 }
 
-function removeLoadingScreen() {
-    $(".loading").hide();
-    $(".left-table").show();
-    $(".right-table").show();
-}
 
 
 
