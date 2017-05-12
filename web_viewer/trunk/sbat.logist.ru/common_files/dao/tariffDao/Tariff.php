@@ -50,13 +50,10 @@ class InsertTariff implements IEntityInsert
     function __construct($data)
     {
         $dao = DAO::getInstance();
-        $cost_temp = $data['cost'];
-        $cost_per_hour_temp = $data['cost_per_hour'];
-        $cost_per_point_temp = $data['cost_per_point'];
 
-        $this->cost = $dao->checkString(substr($cost_temp, 0, -2) . "." . substr($cost_temp, -2));
-        $this->cost_per_hour = $dao->checkString(substr($cost_per_hour_temp, 0, -2) . "." . substr($cost_per_hour_temp, -2));
-        $this->cost_per_point = $dao->checkString(substr($cost_per_point_temp, 0, -2) . "." . substr($cost_per_point_temp, -2));
+        $this->cost = $dao->checkString($data['cost']);
+        $this->cost_per_hour = $dao->checkString($data['cost_per_hour']);
+        $this->cost_per_point = $dao->checkString($data['cost_per_point']);
     }
 
     /**
@@ -105,13 +102,10 @@ class UpdateTariff implements IEntityUpdate
     {
         $dao = DAO::getInstance();
         $this->id = $id;
-        $cost_temp = $data['cost'];
-        $cost_per_hour_temp = $data['cost_per_hour'];
-        $cost_per_point_temp = $data['cost_per_point'];
 
-        $this->cost = $dao->checkString(substr($cost_temp, 0, -2) . "." . substr($cost_temp, -2));
-        $this->cost_per_hour = $dao->checkString(substr($cost_per_hour_temp, 0, -2) . "." . substr($cost_per_hour_temp, -2));
-        $this->cost_per_point = $dao->checkString(substr($cost_per_point_temp, 0, -2) . "." . substr($cost_per_point_temp, -2));
+        $this->cost = $dao->checkString($data['cost']);
+        $this->cost_per_hour = $dao->checkString($data['cost_per_hour']);
+        $this->cost_per_point = $dao->checkString($data['cost_per_point']);
     }
 
     /**
