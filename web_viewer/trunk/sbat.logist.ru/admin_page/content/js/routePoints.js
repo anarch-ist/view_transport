@@ -225,24 +225,45 @@ $(document).ready(function () {
                     label: 'Стоимость за маршрут',
                     name: 'cost',
                     type: 'mask',
-                    mask: "999999999999.99",
-                    maskOptions: { clearIfNotMatch: true},
+                    mask: '0999999999P99',
+                    maskOptions: {
+                        translation: {
+                            'P': {
+                                pattern: /\./,
+                                fallback: '.'
+                            }
+                        }
+                    },
                     placeholder: "1000.00"
                 },
                 {
                     label: 'Стоимость за точку',
                     name: 'cost_per_point',
                     type: 'mask',
-                    mask: "999999999999.99",
-                    maskOptions: { clearIfNotMatch: true},
+                    mask: '0999999999P99',
+                    maskOptions: {
+                        translation: {
+                            'P': {
+                                pattern: /\./,
+                                fallback: '.'
+                            }
+                        }
+                    },
                     placeholder: "1000.00"
                 },
                 {
                     label: 'Стоимость за час',
                     name: 'cost_per_hour',
                     type: 'mask',
-                    mask: "999999999999.99",
-                    maskOptions: { clearIfNotMatch: true},
+                    mask: '0999999999P99',
+                    maskOptions: {
+                        translation: {
+                            'P': {
+                                pattern: /\./,
+                                fallback: '.'
+                            }
+                        }
+                    },
                     placeholder: "1000.00"
                 }
             ]
