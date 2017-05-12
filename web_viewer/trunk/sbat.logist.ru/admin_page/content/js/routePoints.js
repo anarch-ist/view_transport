@@ -762,7 +762,7 @@ $(document).ready(function () {
 
             fields: [
                 { label: 'Полное название', name: 'name', type: 'text'},
-                { label: 'Название', name: 'short_name', type: 'text'},
+                { label: 'Название', name: 'short_name', type: 'text', fieldInfo: "Не рекомендуется вводить сокращения ООО, ИП и т.д."},
                 {
                     label: 'ИНН',
                     name: 'inn',
@@ -771,10 +771,24 @@ $(document).ready(function () {
                     maskOptions: {clearIfNotMatch: true},
                     placeholder: "1234567890"
                 },
-                { label: 'КПП',  name: 'KPP', type: 'text'},
-                { label: 'БИК',  name: 'BIK', type: 'text'},
-                { label: 'Кор. счет',  name: 'cor_account', type: 'text'},
-                { label: 'Кар. счет',  name: 'cur_account', type: 'text'},
+                {
+                    label: 'КПП',
+                    name: 'KPP',
+                    type: 'mask',
+                    mask: "000000000",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "123456789"
+                },
+                {
+                    label: 'БИК',
+                    name: 'BIK',
+                    type: 'mask',
+                    mask: "000000000",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "123456789"
+                },
+                { label: 'Корр. счет',  name: 'cor_account', type: 'text'},
+                { label: 'Р/с',  name: 'cur_account', type: 'text'},
                 { label: 'Название банка',  name: 'bank_name', type: 'text'},
                 { label: 'Адрес',  name: 'legal_address', type: 'text'},
                 { label: 'Почтовый адрес',  name: 'post_address', type: 'text'},
@@ -852,9 +866,9 @@ $(document).ready(function () {
                 {label: 'Модель', name: 'model', type: 'text'},
                 {label: 'Грузоподъемность', name: 'carrying_capacity', type: 'text'},
                 {label: 'Объем', name: 'volume', type: 'text'},
-                {label: 'Тип погрузки', name: 'loading_type', type: 'text'},
+                {label: 'Тип погрузки', name: 'loading_type', type: 'selectize', options: [{label:"Задняя", value:"Задняя"}, {label:"Верхняя", value:"Верхняя"},{label: "Боковая", value:"Боковая"}]},
                 {label: 'Количество палетов', name: 'pallets_quantity', type: 'text'},
-                {label: 'Тип', name: 'type', type: 'text'}
+                {label: 'Тип ТС', name: 'type', type: 'selectize', options: [{label:"Тент", value:"Тент"}, {label:"Термос", value:"Термос"},{label: "Рефрижератор", value:"Рефрижератор"}]}
             ]
         });
 
