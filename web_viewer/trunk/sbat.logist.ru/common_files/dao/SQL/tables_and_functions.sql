@@ -1857,22 +1857,22 @@ CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
       tc.*
     FROM transmaster_transport_db.transport_companies tc
     WHERE (
-      _search = '' OR
-      tc.id LIKE @searchString OR
-      tc.name LIKE @searchString OR
-      tc.short_name LIKE @searchString OR
-      tc.inn LIKE @searchString OR
-      tc.KPP LIKE @searchString OR
-      tc.BIK LIKE @searchString OR
-      tc.cor_account LIKE @searchString OR
-      tc.cur_account LIKE @searchString OR
-      tc.bank_name LIKE @searchString OR
-      tc.legal_address LIKE @searchString OR
-      tc.post_address LIKE @searchString OR
-      tc.keywords LIKE @searchString OR
-      tc.director_fullname LIKE @searchString OR
-      tc.chief_acc_fullname LIKE @searchString
-    )
+            _search = '' OR
+            tc.id LIKE @searchString OR
+            tc.name LIKE @searchString OR
+            tc.short_name LIKE @searchString OR
+            tc.inn LIKE @searchString OR
+            tc.KPP LIKE @searchString OR
+            tc.BIK LIKE @searchString OR
+            tc.cor_account LIKE @searchString OR
+            tc.cur_account LIKE @searchString OR
+            tc.bank_name LIKE @searchString OR
+            tc.legal_address LIKE @searchString OR
+            tc.post_address LIKE @searchString OR
+            tc.keywords LIKE @searchString OR
+            tc.director_fullname LIKE @searchString OR
+            tc.chief_acc_fullname LIKE @searchString
+          ) AND deleted = FALSE
     ORDER BY NULL,
       CASE WHEN _orderby = ''
         THEN NULL END,
@@ -1939,7 +1939,8 @@ CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
 
     -- total routes
     SELECT COUNT(*) AS `totalCount`
-    FROM routes;
+    FROM transport_companies
+    WHERE deleted = FALSE;
 
   END;
 
@@ -1969,7 +1970,7 @@ CREATE PROCEDURE transmaster_transport_db.selectVehicles(
       loading_type LIKE @searchString OR
       pallets_quantity LIKE @searchString OR
       type LIKE @searchString
-    )
+    ) AND deleted = FALSE
     ORDER BY NULL,
       CASE WHEN _orderby = ''
         THEN NULL END,
@@ -2016,7 +2017,8 @@ CREATE PROCEDURE transmaster_transport_db.selectVehicles(
 
     -- total routes
     SELECT COUNT(*) AS `totalCount`
-    FROM routes;
+    FROM vehicles
+    WHERE deleted = FALSE;
 
   END;
 
@@ -2044,7 +2046,7 @@ CREATE PROCEDURE transmaster_transport_db.selectDrivers(
       passport LIKE @searchString OR
       phone LIKE @searchString OR
       license LIKE @searchString
-    )
+    ) AND deleted = FALSE
     ORDER BY NULL,
       CASE WHEN _orderby = ''
         THEN NULL END,
@@ -2083,7 +2085,8 @@ CREATE PROCEDURE transmaster_transport_db.selectDrivers(
 
     -- total routes
     SELECT COUNT(*) AS `totalCount`
-    FROM routes;
+    FROM drivers
+    WHERE deleted = FALSE;
 
   END;
 
@@ -2219,7 +2222,8 @@ CREATE TABLE transmaster_transport_db.transport_companies
   post_address VARCHAR(128),
   keywords VARCHAR(64),
   director_fullname VARCHAR(128),
-  chief_acc_fullname VARCHAR(128)
+  chief_acc_fullname VARCHAR(128),
+  deleted BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 CREATE TABLE transmaster_transport_db.vehicles
@@ -2233,6 +2237,7 @@ CREATE TABLE transmaster_transport_db.vehicles
   loading_type         VARCHAR(32),
   pallets_quantity     INT(11),
   type                 VARCHAR(32),
+  deleted BOOLEAN DEFAULT FALSE NOT NULL,
   CONSTRAINT vehicles_transport_companies_id_fk FOREIGN KEY (transport_company_id) REFERENCES transport_companies (id)
 );
 
@@ -2246,6 +2251,7 @@ CREATE TABLE transmaster_transport_db.drivers
   passport VARCHAR(128),
   phone VARCHAR(18),
   license VARCHAR(128),
+  deleted BOOLEAN DEFAULT FALSE NOT NULL,
   CONSTRAINT drivers_vehicles_id_fk FOREIGN KEY (vehicle_id) REFERENCES vehicles (id),
   CONSTRAINT drivers_transport_companies_id_fk FOREIGN KEY (transport_company_id) REFERENCES transport_companies (id)
 );

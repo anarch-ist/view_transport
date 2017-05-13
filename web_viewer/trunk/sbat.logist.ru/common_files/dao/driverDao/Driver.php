@@ -62,7 +62,7 @@ class Driver implements IDriver
 
     function removeDriver($id)
     {
-        return $this->_DAO->delete(new RemoveDriver($id));
+        return $this->_DAO->update(new RemoveDriver($id));
     }
 
     function selectDriverByLastInsertedId()
@@ -183,7 +183,7 @@ class InsertDriver implements IEntityInsert
     }
 }
 
-class RemoveDriver implements IEntityDelete
+class RemoveDriver implements IEntityUpdate
 {
     private $id;
 
@@ -195,9 +195,9 @@ class RemoveDriver implements IEntityDelete
     /**
      * @return string
      */
-    function getDeleteQuery()
+    function getUpdateQuery()
     {
-        return "DELETE FROM `drivers` WHERE id = $this->id";
+        return "UPDATE `drivers` SET deleted = TRUE WHERE id = $this->id";
     }
 }
 
