@@ -57,7 +57,7 @@ class Vehicle implements IVehicle {
 
     function removeVehicle($id)
     {
-        return $this->_DAO->delete(new RemoveVehicle($id));
+        return $this->_DAO->update(new RemoveVehicle($id));
     }
 
     function selectVehiclesByRange($start = 0, $length = 20)
@@ -170,7 +170,7 @@ class InsertVehicle implements IEntityInsert{
     }
 }
 
-class RemoveVehicle implements IEntityDelete {
+class RemoveVehicle implements IEntityUpdate {
     private $id;
 
     public function __construct($id)
@@ -181,9 +181,9 @@ class RemoveVehicle implements IEntityDelete {
     /**
      * @return string
      */
-    function getDeleteQuery()
+    function getUpdateQuery()
     {
-        return "DELETE FROM `vehicles` WHERE id = $this->id";
+        return "UPDATE `vehicles` SET deleted = TRUE WHERE id = $this->id";
     }
 }
 

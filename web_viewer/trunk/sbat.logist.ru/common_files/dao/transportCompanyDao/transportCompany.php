@@ -56,7 +56,7 @@ class TransportCompany implements ITransportCompany
 
     function removeCompany($userID)
     {
-        return $this->_DAO->delete(new RemoveCompany($userID));
+        return $this->_DAO->update(new RemoveCompany($userID));
     }
 
     function updateCompany(TransportCompanyData $newCompany, $id)
@@ -154,7 +154,7 @@ class SelectLastInsertedCompanyId implements IEntitySelect {
     }
 }
 
-class RemoveCompany implements IEntityDelete {
+class RemoveCompany implements IEntityUpdate {
     private $id;
 
     public function __construct($id)
@@ -165,9 +165,9 @@ class RemoveCompany implements IEntityDelete {
     /**
      * @return string
      */
-    function getDeleteQuery()
+    function getUpdateQuery()
     {
-        return "DELETE FROM `transport_companies` WHERE id = $this->id";
+        return "UPDATE `transport_companies` SET deleted = TRUE WHERE id = $this->id";
     }
 }
 

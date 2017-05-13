@@ -867,7 +867,7 @@ $(document).ready(function () {
                 {label: 'Грузоподъемность', name: 'carrying_capacity', type: 'text'},
                 {label: 'Объем', name: 'volume', type: 'text'},
                 {label: 'Тип погрузки', name: 'loading_type', type: 'selectize', options: [{label:"Задняя", value:"Задняя"}, {label:"Верхняя", value:"Верхняя"},{label: "Боковая", value:"Боковая"}]},
-                {label: 'Количество палетов', name: 'pallets_quantity', type: 'text'},
+                {label: 'Количество палетов', name: 'pallets_quantity', type: 'mask', mask: "#" },
                 {label: 'Тип ТС', name: 'type', type: 'selectize', options: [{label:"Тент", value:"Тент"}, {label:"Термос", value:"Термос"},{label: "Рефрижератор", value:"Рефрижератор"}]}
             ]
         });
