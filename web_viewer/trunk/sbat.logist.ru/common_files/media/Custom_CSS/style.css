@@ -59,7 +59,7 @@ thead tr th{
 /*::webkit-scro*/
 
 ::-webkit-scrollbar {
-    /*display: none;*/
+    display: none;
     /*width: 0 !important;*/
 }
 
