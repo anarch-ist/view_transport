@@ -158,6 +158,8 @@ function addPretension(PrivilegedUser $privUser){
 //        throw new DataTransferException('Не задана сумма', __FILE__);
         $pretensionSum=0;
     }
+//    $marketAgentEmail = $privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'];
+    mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по заявке $requestIDExternal", wordwrap("Категория претензии: \n $pretensionCathegory \n Текст претензии: $pretensionComment"),70, "\r\n");
     $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
     return json_encode($data);
 }

@@ -121,7 +121,12 @@ class RequestEntity implements IRequestEntity
     function getDriversForVehicle($vehicleId){
         return $this->_DAO->select(new SelectDriverByVehicleId($vehicleId));
     }
+
+    function getMarketAgentEmail($requestIDExternal){
+        return $this->_DAO->select(new GetMarketAgentEmail($requestIDExternal));
+    }
 }
+
 
 
 class SelectAllRequests implements IEntitySelect
@@ -438,5 +443,21 @@ class SelectRequestsByRouteList implements IEntitySelect
     function getSelectQuery()
     {
         return "SELECT r.requestID, r.requestIDExternal, r.invoiceNumber, r.requestStatusID, s.requestStatusRusName  FROM `requests` AS r LEFT JOIN `request_statuses` AS s ON r.requestStatusID = s.requestStatusID WHERE routeListID='$this->routeListID';";
+    }
+}
+
+class GetMarketAgentEmail implements IEntitySelect
+{
+    private $requestIDExternal;
+
+    function __construct($requestIDExternal)
+    {
+        $this->requestIDExternal = DAO::getInstance()->checkString($requestIDExternal);
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT email FROM users WHERE userID = (SELECT marketAgentUserID FROM requests WHERE requestIDExternal = '$this->requestIDExternal') LIMIT 1";
+        // TODO: Implement getSelectQuery() method.
     }
 }
