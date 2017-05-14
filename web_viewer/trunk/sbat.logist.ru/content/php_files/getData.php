@@ -158,10 +158,22 @@ function addPretension(PrivilegedUser $privUser){
 //        throw new DataTransferException('Не задана сумма', __FILE__);
         $pretensionSum=0;
     }
-//    $marketAgentEmail = $privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'];
-    mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по заявке $requestIDExternal", wordwrap("Категория претензии: \n $pretensionCathegory \n Текст претензии: $pretensionComment"),70, "\r\n");
+
+    utf8mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по заявке $requestIDExternal", wordwrap("Категория претензии: <br>\r\n $pretensionCathegory \r\n <br> Текст претензии: <br> $pretensionComment",70, "\r\n"));
     $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
     return json_encode($data);
+}
+
+//A complicated function that works around many mailing systems
+function utf8mail($to,$s,$body,$from_name="logist",$from_a = "no-reply@185.75.182.94", $reply="no-reply@185.75.182.94")
+{
+    $s= "=?utf-8?b?".base64_encode($s)."?=";
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers.= "From: =?utf-8?b?".base64_encode($from_name)."?= <".$from_a.">\r\n";
+    $headers.= "Content-Type: text/plain;charset=utf-8\r\n";
+    $headers.= "Reply-To: $reply\r\n";
+    $headers.= "X-Mailer: PHP/" . phpversion();
+    mail($to, $s, $body, $headers);
 }
 
 function getRequestById(PrivilegedUser $privUser){
