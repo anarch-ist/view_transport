@@ -71,7 +71,7 @@ class SelectAllPoints implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT pointID, pointName FROM `points`";
+        return "SELECT DISTINCT p.pointID, p.pointName FROM `points` p JOIN `route_points` ON p.pointID = route_points.pointID";
     }
 }
 
