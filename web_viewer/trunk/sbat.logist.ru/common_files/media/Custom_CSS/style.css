@@ -4,6 +4,10 @@ body{
     color: #333;
 }
 
+body::-webkit-scrollbar{
+    display: none;
+}
+
 .container{
     margin-left: 0;
 }
@@ -24,6 +28,8 @@ body{
 .ui-dialog-title{
     color: #c22929;
 }
+
+
 
 .dt-button{
     margin-right: 10px !important;
@@ -56,12 +62,8 @@ thead tr th{
 .DataTables_sort_wrapper{
     color: #fff !important;
 }
-/*::webkit-scro*/
 
-::-webkit-scrollbar {
-    display: none;
-    /*width: 0 !important;*/
-}
+
 
 
 .dataTable tr.selected{

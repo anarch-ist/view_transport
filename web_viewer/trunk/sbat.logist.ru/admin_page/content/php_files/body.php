@@ -43,6 +43,7 @@
         <li><a href="#tabs-1">Маршруты</a></li>
         <li><a href="#tabs-2">Пользователи</a></li>
         <li><a href="#tabs-3">ТК, ТС и водители</a></li>
+        <li onclick="location.href='../'"><a target="_blank" href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-e"  style="display:inline-block"></span>На главную</a></li>
     </ul>
     <div id="tabs-1">
         <h2>Маршруты</h2>

@@ -15,7 +15,7 @@ $(document).ready(function () {
         '<tr id="companyTr" valign="top" ><td width="200"><label for="companyInput">Транспортная компания: </label></td><td><input id="companyInput" /></td></tr>' +
         '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
         '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
-        '<tr><td></td><td><a href="../../admin_page/index.php">Добавить компанию/ТС/Водителя</a></td></tr>' +
+        '<tr><td></td><td><a href="../../admin_page/#tabs-3">Добавить компанию/ТС/Водителя</a></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
@@ -41,7 +41,7 @@ $(document).ready(function () {
 
                 // var option = "<option value=" + entry.id + ">" + entry.name + "</option>";
                 // options.push(option);
-                console.log("id:"+entry.id+" name:"+entry.name+"\n");
+                // console.log("id:"+entry.id+" name:"+entry.name+"\n");
                 var selectizeOption = {text: entry.name, value: entry.id};
                 selectizeOptions.push(selectizeOption);
             });
@@ -154,6 +154,7 @@ $(document).ready(function () {
             options.push("<option value='" + storedStatuses[i].requestStatusID + "'>" + storedStatuses[i].requestStatusRusName + "</option>");
         }
         $statusSelect.html(options.join("")).selectmenu({width: STATUS_SELECT_MENU_WIDTH});
+        // console.log(JSON.stringify(storedStatuses));
     }
 
     // create palletsQty input
@@ -180,7 +181,7 @@ $(document).ready(function () {
     $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true});
     if ($('#dateTimePicker').val()==''){
 
-        $('#dateTimePicker').val(new Date().toLocaleString('en-US',{
+        $('#dateTimePicker').val(new Date().toLocaleString('ru-RU',{
             day:'2-digit', month:'2-digit',year:'numeric', hour:'2-digit',minute:'2-digit', hour12:false
         }).replace(',','').replace('/','.').replace('/','.'));
     }
