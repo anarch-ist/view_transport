@@ -165,7 +165,7 @@ function addPretension(PrivilegedUser $privUser){
 }
 
 //A complicated function that works around many mailing systems
-function utf8mail($to,$s,$body,$from_name="logist",$from_a = "no-reply@185.75.182.94", $reply="no-reply@185.75.182.94")
+function utf8mail($to,$s,$body,$from_name="Logicsmart",$from_a = "info@logicsmart.ru", $reply="info@logicsmart.ru")
 {
     $s= "=?utf-8?b?".base64_encode($s)."?=";
     $headers = "MIME-Version: 1.0\r\n";

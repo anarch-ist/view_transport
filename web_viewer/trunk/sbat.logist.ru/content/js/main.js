@@ -115,6 +115,11 @@ $(document).ready(function () {
                     var filterValue = $(this).attr("currentFilter");
                     $(this).val(filterValue);
                     searchInput.css({'display': 'none'});
+                    if(this.value!=''){
+                        $footer.css("background-color","#c22929")
+                    } else {
+                        $footer.css("background-color","#f6f6f6");
+                    }
                 });
 
                 // manually load filters data into filter inputs
@@ -123,6 +128,7 @@ $(document).ready(function () {
                 if (historySearch) {
                     searchInput.val(historySearch);
                     searchInput.attr("currentFilter", historySearch);
+                    $footer.css("background-color","#c22929")
                 }
             });
 
@@ -202,6 +208,7 @@ $(document).ready(function () {
                         $(this).val("").attr("currentFilter", "");
                     });
                     dataTable.columns().every(function () {
+                        $(this.footer()).css("background-color","f6f6f6");
                         this.search("");
                     });
                     dataTable.columns().draw();
