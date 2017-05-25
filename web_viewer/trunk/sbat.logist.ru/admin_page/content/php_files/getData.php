@@ -33,7 +33,7 @@ try {
         getVehicles($privUser);
     } else if (strcasecmp($action,'getDriversData')===0) {
         getDrivers($privUser);
-    }else if (strcasecmp($action,'routeEditing')===0) {
+    } else if (strcasecmp($action,'routeEditing')===0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
@@ -328,7 +328,7 @@ function getUsers(PrivilegedUser $privUser)
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
-        "data" => $dataArray['users']   // total data array
+        "data" => is_null($dataArray['users']) ? "" : $dataArray['users']  // total data array
     );
     echo json_encode($json_data);
 }
@@ -340,7 +340,7 @@ function getTransportCompanies(PrivilegedUser $privUser)
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
-        "data" => $dataArray['transportCompanies']   // total data array
+        "data" => is_null($dataArray['transportCompanies']) ? "" : $dataArray['transportCompanies']   // total data array
     );
     echo json_encode($json_data);
 }
@@ -352,7 +352,7 @@ function getVehicles(PrivilegedUser $privUser)
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
-        "data" => $dataArray['vehicles']   // total data array
+        "data" => is_null($dataArray['vehicles']) ? "" : $dataArray['vehicles']   // total data array
     );
     echo json_encode($json_data);
 }
@@ -364,7 +364,7 @@ function getDrivers(PrivilegedUser $privUser)
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
-        "data" => $dataArray['drivers']   // total data array
+        "data" => is_null($dataArray['drivers']) ? "" : $dataArray['drivers']   // total data array
     );
     echo json_encode($json_data);
 }
@@ -469,7 +469,7 @@ function getRoutes(PrivilegedUser $privUser)
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
-        "data" => $dataArray['routes']   // total data array
+        "data" => is_null($dataArray['routes']) ? "" : $dataArray['routes'] // total data array
     );
     echo json_encode($json_data);
 }
