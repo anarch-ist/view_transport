@@ -1728,8 +1728,13 @@ CREATE PROCEDURE transmaster_transport_db.selectUsers(_startEntry INTEGER, _leng
 
     SELECT SQL_CALC_FOUND_ROWS *
     FROM transmaster_transport_db.all_users
-    WHERE (_search = '' OR userName LIKE @searchString OR position LIKE @searchString OR phoneNumber LIKE @searchString
-           OR email LIKE @searchString OR pointName LIKE @searchString OR userRoleRusName LIKE @searchString)
+    WHERE (_search = '' OR
+           userName LIKE @searchString collate utf8_general_ci OR
+           position LIKE @searchString collate utf8_general_ci OR
+           phoneNumber LIKE @searchString collate utf8_general_ci OR
+           email LIKE @searchString collate utf8_general_ci OR
+           pointName LIKE @searchString collate utf8_general_ci OR
+           userRoleRusName LIKE @searchString collate utf8_general_ci)
     ORDER BY NULL,
       CASE WHEN _orderby = ''
         THEN NULL END,
@@ -1805,10 +1810,10 @@ CREATE PROCEDURE transmaster_transport_db.selectRoutes(
     LEFT JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
     WHERE (
       _search = '' OR
-      r.routeName LIKE @searchString OR
-      t.cost LIKE @searchString OR
-      t.cost_per_point LIKE @searchString OR
-      t.cost_per_hour LIKE @searchString
+      r.routeName LIKE @searchString collate utf8_general_ci OR
+      t.cost LIKE @searchString collate utf8_general_ci OR
+      t.cost_per_point LIKE @searchString collate utf8_general_ci OR
+      t.cost_per_hour LIKE @searchString collate utf8_general_ci
     )
     ORDER BY NULL,
       CASE WHEN _orderby = ''
@@ -1858,20 +1863,20 @@ CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
     FROM transmaster_transport_db.transport_companies tc
     WHERE (
             _search = '' OR
-            tc.id LIKE @searchString OR
-            tc.name LIKE @searchString OR
-            tc.short_name LIKE @searchString OR
-            tc.inn LIKE @searchString OR
-            tc.KPP LIKE @searchString OR
-            tc.BIK LIKE @searchString OR
-            tc.cor_account LIKE @searchString OR
-            tc.cur_account LIKE @searchString OR
-            tc.bank_name LIKE @searchString OR
-            tc.legal_address LIKE @searchString OR
-            tc.post_address LIKE @searchString OR
-            tc.keywords LIKE @searchString OR
-            tc.director_fullname LIKE @searchString OR
-            tc.chief_acc_fullname LIKE @searchString
+            tc.id LIKE @searchString collate utf8_general_ci  OR
+            tc.name LIKE @searchString collate utf8_general_ci OR
+            tc.short_name LIKE @searchString collate utf8_general_ci OR
+            tc.inn LIKE @searchString collate utf8_general_ci OR
+            tc.KPP LIKE @searchString collate utf8_general_ci OR
+            tc.BIK LIKE @searchString collate utf8_general_ci OR
+            tc.cor_account LIKE @searchString collate utf8_general_ci OR
+            tc.cur_account LIKE @searchString collate utf8_general_ci OR
+            tc.bank_name LIKE @searchString collate utf8_general_ci OR
+            tc.legal_address LIKE @searchString collate utf8_general_ci OR
+            tc.post_address LIKE @searchString collate utf8_general_ci OR
+            tc.keywords LIKE @searchString collate utf8_general_ci OR
+            tc.director_fullname LIKE @searchString collate utf8_general_ci OR
+            tc.chief_acc_fullname LIKE @searchString collate utf8_general_ci
           ) AND deleted = FALSE
     ORDER BY NULL,
       CASE WHEN _orderby = ''
@@ -1961,15 +1966,15 @@ CREATE PROCEDURE transmaster_transport_db.selectVehicles(
     FROM transmaster_transport_db.vehicles
     WHERE (
       _search = '' OR
-      id LIKE @searchString OR
-      transport_company_id LIKE @searchString OR
-      license_number LIKE @searchString OR
-      model LIKE @searchString OR
-      carrying_capacity LIKE @searchString OR
-      volume LIKE @searchString OR
-      loading_type LIKE @searchString OR
-      pallets_quantity LIKE @searchString OR
-      type LIKE @searchString
+      id LIKE @searchString collate utf8_general_ci OR
+      transport_company_id LIKE @searchString collate utf8_general_ci OR
+      license_number LIKE @searchString collate utf8_general_ci OR
+      model LIKE @searchString collate utf8_general_ci OR
+      carrying_capacity LIKE @searchString collate utf8_general_ci OR
+      volume LIKE @searchString collate utf8_general_ci OR
+      loading_type LIKE @searchString collate utf8_general_ci OR
+      pallets_quantity LIKE @searchString collate utf8_general_ci OR
+      type LIKE @searchString collate utf8_general_ci
     ) AND deleted = FALSE
     ORDER BY NULL,
       CASE WHEN _orderby = ''
@@ -2037,16 +2042,14 @@ CREATE PROCEDURE transmaster_transport_db.selectDrivers(
 
     SELECT SQL_CALC_FOUND_ROWS *
     FROM transmaster_transport_db.drivers
-    WHERE (
-      _search = '' OR
-      id LIKE @searchString OR
-      vehicle_id LIKE @searchString OR
-      transport_company_id LIKE @searchString OR
-      full_name LIKE @searchString OR
-      passport LIKE @searchString OR
-      phone LIKE @searchString OR
-      license LIKE @searchString
-    ) AND deleted = FALSE
+    WHERE (_search = '' OR
+           id LIKE @searchString collate utf8_general_ci OR
+           vehicle_id LIKE @searchString collate utf8_general_ci OR
+           transport_company_id LIKE @searchString collate utf8_general_ci OR
+           full_name LIKE @searchString collate utf8_general_ci OR
+           passport LIKE @searchString collate utf8_general_ci OR
+           phone LIKE @searchString collate utf8_general_ci OR
+           license LIKE @searchString collate utf8_general_ci) AND deleted = FALSE
     ORDER BY NULL,
       CASE WHEN _orderby = ''
         THEN NULL END,
