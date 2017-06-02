@@ -29,7 +29,9 @@ body::-webkit-scrollbar{
     color: #c22929;
 }
 
-
+.sorting.ui-state-default:hover{
+    cursor: pointer;
+}
 
 .dt-button{
     margin-right: 10px !important;
@@ -131,3 +133,6 @@ input[type="checkbox"],
     background: #ccc !important;
 }
 
+table.dataTable thead th div.DataTables_sort_wrapper span {
+    transform: scale(1.2);
+}

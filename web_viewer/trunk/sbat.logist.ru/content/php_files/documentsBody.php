@@ -33,11 +33,11 @@
         <div class="row">
             <div class="mid request-information">
                 <div class="info">Информация о заявке</div>
-<!--                <div class="loading col-lg-12 ">-->
-<!--                    <img src="content/css/loading.gif">-->
-<!--                </div>-->
-                <div class="col-xs-12 col-sm-12 col-md-6 clg-lg-6">
-                    <table class="left-table" >
+                <div class="loading col-lg-12 ">
+                    <img src="content/css/loading.gif">
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-6 clg-lg-6" >
+                    <table class="left-table" style="display: none">
                         <tr>
                             <td>Дата заявки:</td>
                             <td id="request-date"></td>
@@ -68,8 +68,8 @@
                         </tr>
                     </table>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                    <table class="right-table" >
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" >
+                    <table class="right-table" style="display: none">
                         <tr>
                             <td>Количество коробок:</td>
                             <td id="box-quantity"></td>
