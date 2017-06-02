@@ -288,7 +288,7 @@ $(window).on('load', function () {
     } else {
         // setNoData();
         // document.getElementsByClassName('loading')[0].innerHTML="У заявки отсутствует номер накладной";
-        removeLoadingScreen("nope");
+        removeLoadingScreen("noData");
         $(".loading").html("У заявки отсутствует номер накладной");
     }
 
@@ -380,17 +380,21 @@ $(window).on('load', function () {
         }
     }
 
+    function removeLoadingScreen(noData) {
+        if (!noData) {
+            $(".loading").remove();
+            $(".left-table").show();
+            $(".right-table").show();
+        } else {
+            $(".loading").html("У заявки отсутствует номер накладной");
+        }
+
+
+    }
+
 
 }());
 
 
-function removeLoadingScreen(isThereAnyData) {
-    if (!isThereAnyData) {
-        $(".loading").remove();
-        $(".left-table").show();
-        $(".right-table").show();
-    } else {
-        $(".loading").html("У заявки отсутствует номер накладной");
-    }
-}
+
 

@@ -10,6 +10,7 @@ $(document).ready(function () {
     });
 
     // --------DATATABLE INIT--------------
+    //noinspection JSJQueryEfficiency
     var dataTable = $('#user-grid').DataTable({
 
         processing: true,
@@ -130,6 +131,7 @@ $(document).ready(function () {
                     searchInput.attr("currentFilter", historySearch);
                     $footer.css("background-color","#c22929")
                 }
+
             });
 
 
@@ -138,7 +140,7 @@ $(document).ready(function () {
             if ($("#userRoleContainer").html().trim() === "Пользователь_клиента") {
                 dataTable.buttons(2).remove();
             }
-
+            
             var role = $('#data-role').attr('data-role');
             if (localStorage.getItem(role_type) == undefined) {
                 localStorage.setItem(role_type, role);
@@ -147,6 +149,16 @@ $(document).ready(function () {
             else if(localStorage.getItem(role_type) != role) {
                 localStorage.setItem(role_type, role);
                 $.getDefaultColumns(dataTable, role);
+            }
+
+            //Button-link to admin page
+            if(role=="DISPATCHER"||role=="ADMIN"){
+                dataTable.button().add(8, {
+                    text: 'Админ. Страница',
+                    action: function (e, dt, node, config) {
+                        window.location="/admin_page"
+                    }
+                });
             }
         },
         buttons: [
@@ -214,6 +226,8 @@ $(document).ready(function () {
                     dataTable.columns().draw();
                 }
             },
+            // if ($('#data-role').attr('data-role')=="ADMIN"||$('#data-role').attr('data-role')=="DISPATCHER")
+
 
             {
                 text: (localStorage.getItem("liveSearch") == 'true') ? 'Живой поиск' : 'Стандартный поиск',
@@ -300,9 +314,9 @@ $(document).ready(function () {
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
 
         ],
-        /*success: function (data) {
-         console.log(data);
-         }*/
+        // success: function (data) {
+         // console.log(data);
+         // }
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
@@ -329,6 +343,8 @@ $(document).ready(function () {
             disabled = 0;
         }
     });
+
+
 
     //$(dataTable.table().container()).on( 'click', 'td', function () {
     //    var cell = table.cell( this );
