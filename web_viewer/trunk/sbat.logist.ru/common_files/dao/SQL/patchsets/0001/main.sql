@@ -1,3 +1,5 @@
+BEGIN;
+
 DROP PROCEDURE transmaster_transport_db.selectTransportCompanies;
 
 -- select transport companies procedure
@@ -385,3 +387,5 @@ CREATE PROCEDURE transmaster_transport_db.selectUsers(
     FROM all_users;
 
   END;
+
+COMMIT;

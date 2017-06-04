@@ -20,6 +20,10 @@ body > div {
     flex-basis: auto;
 }
 
+#routeTable {
+    width: 100% !important;
+}
+
 #usersTable {
     width: 100% !important;
 }
