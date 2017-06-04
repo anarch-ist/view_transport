@@ -236,7 +236,7 @@ class InsertUser implements IEntityInsert
 
 class UpdateUser implements IEntityUpdate
 {
-    private $userName, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID;
+    private $userName, $position, $passMD5, $login, $phoneNumber, $email, $userRoleID, $pointID;
     private $userID, $clientID;
 
     function __construct(UserData $user, $id)
@@ -244,6 +244,7 @@ class UpdateUser implements IEntityUpdate
         $dao = DAO::getInstance();
         $this->userID = $dao->checkString($id);
         $this->userName = $dao->checkString($user->getData('userName'));
+        $this->login = $dao->checkString($user->getData('login'));
         $this->position = $dao->checkString($user->getData('position'));
         $this->phoneNumber = $dao->checkString($user->getData('phoneNumber'));
         $this->email = $dao->checkString($user->getData('email'));
