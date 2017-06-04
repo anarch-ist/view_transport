@@ -4,7 +4,7 @@ include_once __DIR__ . '/../../../common_files/privilegedUser/PrivilegedUser.php
 $privUser = null;
 try {
     $privUser = PrivilegedUser::getInstance();
-    if ($privUser->getUserInfo()->getData('userRoleID') === "CLIENT_MANAGER") {
+    if (!$privUser->getUserInfo()->canAccessAdminPage()) {
         header("Location: ../", true, 303);
         return;
     }
