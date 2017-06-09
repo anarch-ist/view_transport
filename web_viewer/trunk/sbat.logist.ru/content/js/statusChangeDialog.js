@@ -15,7 +15,7 @@ $(document).ready(function () {
         '<tr id="companyTr" valign="top" ><td width="200"><label for="companyInput">Транспортная компания: </label></td><td><input id="companyInput" /></td></tr>' +
         '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
         '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
-        '<tr><td></td><td><a href="../../admin_page/#tabs-3">Добавить компанию/ТС/Водителя</a></td></tr>' +
+        '<tr id="linkTr"><td></td><td><a href="../../admin_page/#tabs-3">Добавить компанию/ТС/Водителя</a></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
@@ -25,6 +25,12 @@ $(document).ready(function () {
         '</table>' +
         '</div>'
     );
+    if ($("#data-role").html().trim() == "Пользователь_клиента"){
+        $('#vehicleNumberTr').hide();
+        $('#linkTr').hide();
+        $('#companyTr').hide();
+        $('#driverTr').hide();
+    }
 
     //populate TC select
 
@@ -207,9 +213,7 @@ $(document).ready(function () {
             var dialogType = $statusChangeDialog.data('dialogType');
             var dataTable = $statusChangeDialog.data('dataTable');
 
-            if ($("#data-role").html().trim() == "Пользователь_клиента"){
-                // $('#vehicleNumberTr').hide();
-            }
+
 
             // if ($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
             //     $('#hoursAmountTr').hide();
