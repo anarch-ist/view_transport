@@ -34,9 +34,71 @@ try {
         echo getRequestById($privUser);
     } else if (strcasecmp($_POST['status'], 'getDocuments')===0){
         echo getDocuments();
+    } else if (strcasecmp($_POST['status'], 'uploadDocuments')===0){
+        echo uploadDocuments();
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function uploadDocuments(){
+    error_reporting(E_ALL);
+    ini_set('display_errors',1);
+    $requestId = $_POST['requestIDExternal'];
+    $docDir = realpath("../common_files/media/Other/docs/files/uploads/").'/';
+//    mkdir($docDir,0777);
+
+//    $file_ary = array();
+//    $file_count = count($_FILES['userfile']);
+//    $file_keys = array_keys($_FILES['userfile']);
+//
+//    for ($i=0; $i<$file_count; $i++) {
+//        foreach ($file_keys as $key) {
+//            $file_ary[$i][$key] = $_FILES['userfile'][$key][$i];
+//        }
+//    }
+
+
+    for($i=0; $i<count($_FILES['docFiles']['name']); $i++){
+        $message = 'Error uploading file';
+        switch( $_FILES['docFiles']['error'][$i] ) {
+            case UPLOAD_ERR_OK:
+                $message = false;;
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $message .= ' - file too large (limit of '.get_max_upload().' bytes).';
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $message .= ' - file upload was not completed.';
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $message .= ' - zero-length file uploaded.';
+                break;
+            default:
+                $message .= ' - internal error #'.$_FILES['newfile']['error'];
+                break;
+        }
+
+
+        $basename = basename($_FILES['docFiles']['name'][$i]);
+        $ext = explode('.', basename($basename));
+        $target_path = $docDir . md5(uniqid()) . "." . $ext[count($ext)-1];
+        if(!move_uploaded_file($_FILES['docFiles']['tmp_name'][$i], $target_path)) {
+            return "$message";
+        }
+    }
+//
+//    foreach($file_ary as $file){
+//        print 'File Name: ' . $file['name'];
+//        print 'File Type: ' . $file['type'];
+//        print 'File Size: ' . $file['size'] .'\n';
+//        if (!move_uploaded_file($file['tmp_name'], $docDir . basename($file['name']))){
+//            return 1;
+//        };
+//    }
+
+    return 0;
 }
 
 function getDocuments(){
@@ -139,6 +201,8 @@ function getPretensions(PrivilegedUser $privUser){
 }
 
 function addPretension(PrivilegedUser $privUser){
+    error_reporting(E_ALL);
+    ini_set('display_errors',1);
     $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false ;
     $requestIDExternal = $_POST['requestIDExternal'];
     $pretensionComment = $_POST['pretensionComment'];
@@ -161,19 +225,50 @@ function addPretension(PrivilegedUser $privUser){
 
     utf8mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по заявке $requestIDExternal", wordwrap("Категория претензии: <br>\r\n $pretensionCathegory \r\n <br> Текст претензии: <br> $pretensionComment",70, "\r\n"));
     $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
+
+
+
     return json_encode($data);
 }
 
 //A complicated function that works around many mailing systems
 function utf8mail($to,$s,$body,$from_name="Logicsmart",$from_a = "info@logicsmart.ru", $reply="info@logicsmart.ru")
 {
-    $s= "=?utf-8?b?".base64_encode($s)."?=";
-    $headers = "MIME-Version: 1.0\r\n";
-    $headers.= "From: =?utf-8?b?".base64_encode($from_name)."?= <".$from_a.">\r\n";
-    $headers.= "Content-Type: text/plain;charset=utf-8\r\n";
-    $headers.= "Reply-To: $reply\r\n";
-    $headers.= "X-Mailer: PHP/" . phpversion();
-    mail($to, $s, $body, $headers);
+
+    $mail = new PHPMailer(true);
+    $mail->isSMTP();
+try{
+    $mail->CharSet = "UTF-8";
+    $mail->Host = "smtp.mail.ru";
+    $mail->SMTPDebug = 0;
+    $mail->SMTPAuth = true;
+    $mail->Port = 465;
+    $mail->Username = "testsmpt@bk.ru";
+    $mail->Password = "testtest12345";
+    $mail->addReplyTo("info@logicsmart.ru");
+    $mail->replyTo = "info@logicsmart.ru";
+    $mail->setFrom("testsmpt@bk.ru");
+    $mail->addAddress($to);
+    $mail->Subject = htmlspecialchars($s);
+    $mail->msgHTML($body);
+    $mail->SMTPSecure = 'ssl';
+    $mail->send();
+    echo "Message sent Ok!</p>\n";
+} catch (phpmailerException $e) {
+    echo $e->errorMessage();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
+
+
+
+//    $s= "=?utf-8?b?".base64_encode($s)."?=";
+//    $headers = "MIME-Version: 1.0\r\n";
+//    $headers.= "From: =?utf-8?b?".base64_encode($from_name)."?= <".$from_a.">\r\n";
+//    $headers.= "Content-Type: text/plain;charset=utf-8\r\n";
+//    $headers.= "Reply-To: $reply\r\n";
+//    $headers.= "X-Mailer: PHP/" . phpversion();
+//    mail($to, $s, $body, $headers);
 }
 
 function getRequestById(PrivilegedUser $privUser){
