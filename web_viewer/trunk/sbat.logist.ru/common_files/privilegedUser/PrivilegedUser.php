@@ -2,6 +2,7 @@
 include_once __DIR__ . '/../dao/userDao/User.php';
 include_once __DIR__ . '/../dao/requestsForUser/RequestsForUser.php';
 include_once __DIR__ . '/../sessionAndCookieWork/SessionAndCookieWork.php';
+include_once __DIR__ . '/../utility/PHPMailer/PHPMailerAutoload.php';
 
 use SessionAndCookieWork\ISessionAndCookieWork as ISessionAndCookieWork;
 use SessionAndCookieWork\SessionAndCookieWork as SessionAndCookieWork;
