@@ -4,7 +4,7 @@ include_once __DIR__ . '/Data.php';
 
 interface IPointEntity
 {
-    function selectPoints();
+    function selectAllPointIDAndPointName();
 
     function selectPointByID($id);
 

@@ -28,7 +28,12 @@
     <script src="../common_files/media/Buttons-1.1.0/js/dataTables.buttons.flash.min.js"></script>
 
     <!--custom-->
-    <script src="content/js/routePoints.js"></script>
+    <script src="content/js/route-point.js"></script>
+    <script src="content/js/user.js"></script>
+    <script src="content/js/driver.js"></script>
+    <script src="content/js/vehicle.js"></script>
+    <script src="content/js/transport-company.js"></script>
+    <script src="content/js/route.js"></script>
 
 </head>
 <body>

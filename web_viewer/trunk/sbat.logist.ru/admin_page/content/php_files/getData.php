@@ -9,6 +9,8 @@ try {
     }
     if (strcasecmp($action,'getAllPointIdPointNamePairs')===0) {
         getAllPointIdPointNamePairs($privUser);
+    } else if (strcasecmp($action, 'getPointsByName')===0) {
+        getPointsByName($privUser);
     } else if (strcasecmp($action,'getAllUserRoles')===0) {
         getAllUserRoles($privUser);
     } else if (strcasecmp($action,'getRelationsBetweenRoutePointsDataForRouteID')===0) {
@@ -17,6 +19,8 @@ try {
         getUsers($privUser);
     } else if (strcasecmp($action, 'getRoutesData')===0) {
         getRoutes($privUser);
+    } else if (strcasecmp($action,'getClientsByINN')===0) {
+        getClientsByINN($privUser);
     } else if (strcasecmp($action,'getClients')===0) {
         getClients($privUser);
     } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
@@ -133,16 +137,14 @@ try {
 
 function getAllPointIdPointNamePairs(PrivilegedUser $privUser)
 {
-    $dataArray = $privUser->getPointEntity()->selectPoints();
-//    $data = array();
-//    foreach ($dataArray as $key => $val) {
-//        if ($val instanceof DAO\PointData) {
-//            $data[$key]['pointID'] = $val->getData('pointID');
-//            $data[$key]['pointName'] = $val->getData('pointName');
-//        }
-//    }
-//    echo json_encode($data);
-    //PHP hangs itself trying to process 118000 rows
+    $dataArray = $privUser->getPointEntity()->selectAllPointIDAndPointName();
+    echo json_encode($dataArray);
+}
+
+function getPointsByName(PrivilegedUser $privUser)
+{
+    $name = $_POST['name'];
+    $dataArray = $privUser->getPointEntity()->selectPointsByName($name);
     echo json_encode($dataArray);
 }
 
@@ -318,6 +320,13 @@ function getClients(PrivilegedUser $privUser)
             $data[$key]['clientName'] = $val->getData('clientName');
         }
     }
+    echo json_encode($dataArray);
+}
+
+function getClientsByINN(PrivilegedUser $privUser)
+{
+    $inn = $_POST['inn'];
+    $dataArray = $privUser->getClientEntity()->selectClientsByINN($inn);
     echo json_encode($dataArray);
 }
 

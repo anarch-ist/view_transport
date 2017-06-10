@@ -26,6 +26,11 @@ class ClientEntity implements IClientEntity
         return $this->DAO->select(new SelectAllClientIdINNPairs());
     }
 
+    function selectClientsByINN($inn)
+    {
+        return $this->DAO->select(new SelectClientsByInn($this->DAO->checkString($inn)));
+    }
+
     function selectClients()
     {
         return $this->DAO->select(new SelectAllClients());
@@ -55,5 +60,29 @@ class SelectAllClientIdINNPairs implements IEntitySelect
     function getSelectQuery()
     {
         return "SELECT clientID, INN FROM `clients`";
+    }
+}
+
+class SelectClientsByInn implements IEntitySelect
+{
+    private $inn;
+
+    /**
+     * SelectClientsByInn constructor.
+     * @param $inn
+     */
+    public function __construct($inn)
+    {
+        $this->inn = $inn;
+    }
+
+
+    /**
+     * Select all clients
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "SELECT clientID, INN, clientName FROM `clients` WHERE INN LIKE '$this->inn%' AND INN <> '' AND clientName IS NOT NULL LIMIT 10";
     }
 }
