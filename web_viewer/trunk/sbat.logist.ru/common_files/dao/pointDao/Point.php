@@ -20,15 +20,9 @@ class PointEntity implements IPointEntity
         return self::$_instance;
     }
 
-    function selectPoints()
+    function selectAllPointIDAndPointName()
     {
-        $array = $this->_DAO->select(new SelectAllPoints());
-//        $points = array();
-//        for ($i = 0; $i < count($array); $i++) {
-//            $points[$i] = new PointData($array[$i]);
-//        }
-//        return $points;
-        return $array;
+        return $this->_DAO->select(new SelectAllPointIDAndPointName());
     }
 
     function selectPointByID($id)
@@ -61,17 +55,37 @@ class PointEntity implements IPointEntity
         else
             return $result[0]['pointName'];
     }
+
+    function selectPointsByName($name) {
+        return $this->_DAO->select(new SelectPointsByName($this->_DAO->checkString($name)));
+    }
 }
 
-class SelectAllPoints implements IEntitySelect
+class SelectAllPointIDAndPointName implements IEntitySelect
 {
-    function __construct()
+    function getSelectQuery()
     {
+        return "SELECT DISTINCT p.pointID, p.pointName FROM `points` p JOIN `route_points` ON p.pointID = route_points.pointID";
+    }
+}
+
+
+class SelectPointsByName implements IEntitySelect
+{
+    private $name;
+
+    /**
+     * SelectPointsByName constructor.
+     * @param $name
+     */
+    public function __construct($name)
+    {
+        $this->name = $name;
     }
 
     function getSelectQuery()
     {
-        return "SELECT DISTINCT p.pointID, p.pointName FROM `points` p JOIN `route_points` ON p.pointID = route_points.pointID";
+        return "SELECT pointID, pointName FROM `points` WHERE pointName LIKE '$this->name%' LIMIT 10";
     }
 }
 
