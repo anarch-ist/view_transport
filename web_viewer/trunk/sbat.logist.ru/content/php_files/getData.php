@@ -201,8 +201,8 @@ function getPretensions(PrivilegedUser $privUser){
 }
 
 function addPretension(PrivilegedUser $privUser){
-    error_reporting(E_ALL);
-    ini_set('display_errors',1);
+//    error_reporting(E_ALL);
+//    ini_set('display_errors',1);
     $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false ;
     $requestIDExternal = $_POST['requestIDExternal'];
     $pretensionComment = $_POST['pretensionComment'];
@@ -210,6 +210,7 @@ function addPretension(PrivilegedUser $privUser){
     $pretensionCathegory = $_POST['pretensionCathegory'];
     $pretensionSum = $_POST['pretensionSum'];
     $pretensionPositionNumber= $_POST['pretensionPositionNumber'];
+    $invoiceNumber = $_POST['invoiceNumber'];
     if(!isset($requestIDExternal) || empty($requestIDExternal)){
         throw new DataTransferException('Не задана заявка', __FILE__);
     } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)){
@@ -223,7 +224,13 @@ function addPretension(PrivilegedUser $privUser){
         $pretensionSum=0;
     }
 
-    utf8mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по заявке $requestIDExternal", wordwrap("Категория претензии: <br>\r\n $pretensionCathegory \r\n <br> Текст претензии: <br> $pretensionComment",70, "\r\n"));
+    $linkToRequest = $_POST['linkToRequest'];
+    utf8mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по накладной $invoiceNumber", wordwrap("Категория претензии: <br>
+\r\n $pretensionCathegory \r\n
+<br><br> Текст претензии:
+<br> $pretensionComment".(
+        isset($linkToRequest) ?
+"<br><br> <a href='$linkToRequest'>Ссылка на заявку" : ""),70, "\r\n"));
     $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
 
 
@@ -253,22 +260,13 @@ try{
     $mail->msgHTML($body);
     $mail->SMTPSecure = 'ssl';
     $mail->send();
-    echo "Message sent Ok!</p>\n";
+//    echo "Message sent Ok!</p>\n";
 } catch (phpmailerException $e) {
     echo $e->errorMessage();
 } catch (Exception $e) {
     echo $e->getMessage();
 }
 
-
-
-//    $s= "=?utf-8?b?".base64_encode($s)."?=";
-//    $headers = "MIME-Version: 1.0\r\n";
-//    $headers.= "From: =?utf-8?b?".base64_encode($from_name)."?= <".$from_a.">\r\n";
-//    $headers.= "Content-Type: text/plain;charset=utf-8\r\n";
-//    $headers.= "Reply-To: $reply\r\n";
-//    $headers.= "X-Mailer: PHP/" . phpversion();
-//    mail($to, $s, $body, $headers);
 }
 
 function getRequestById(PrivilegedUser $privUser){
