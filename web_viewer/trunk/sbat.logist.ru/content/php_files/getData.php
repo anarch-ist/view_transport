@@ -361,16 +361,17 @@ function changeStatusForRequest(PrivilegedUser $privUser)
     $vehicleNumber = $_POST['vehicleNumber'];
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
-    $hoursAmount = $_POST['hoursAmount'];
+    $hoursAmount = !empty($_POST['hoursAmount']) ? $_POST['hoursAmount'] : 0;
     $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : "NULL";
     $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : "NULL";
     $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : "NULL";
     $userID = $privUser->getUserInfo()->getData('userID');
-    if (!isset($hoursAmount) || empty($hoursAmount)) {
-        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, 0, $companyId, $vehicleId, $driverId);
-    } else {
-        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount, $companyId, $vehicleId, $driverId);
-    }
+    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount, $companyId, $vehicleId, $driverId);
+//    if (!isset($hoursAmount) || empty($hoursAmount)) {
+//        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, 0, $companyId, $vehicleId, $driverId);
+//    } else {
+//
+//    }
 
 }
 
