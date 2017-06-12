@@ -6,7 +6,8 @@ $(document).ready(function () {
         // delete auth cookies
         $.cookie('SESSION_CHECK_STRING', null, -1, '/');
         // make redirect to login page
-        window.location.reload();
+        document.location = '/';
+        // window.location.reload();
     });
 
     // --------DATATABLE INIT--------------

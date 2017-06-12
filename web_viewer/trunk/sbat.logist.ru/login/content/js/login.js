@@ -44,7 +44,11 @@ $(document).ready(function () {
                             "box-shadow": "0 0 5px #00F5FF"
                         });
                         window.localStorage.setItem("USER_STATUSES", JSON.stringify(result.statuses));
-                        document.location = '/';
+                        // document.location = history.go(-1);
+                        // window.open('url','_parent');
+                        // window.history.back()
+                        // console.log(JSON.stringify(history));
+                        document.location = '/'+window.location.search;
                     }
 
                     if (result.responseCode === "Ошибка авторизации - неверные имя пользователя или пароль") {

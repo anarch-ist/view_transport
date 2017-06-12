@@ -223,7 +223,7 @@ $(document).ready(function () {
 
             $statusSelect.on("selectmenuchange", function (e, ui) {
 
-                if($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
+                if($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED" && $("#data-role").html().trim() != "Пользователь_клиента"){
                     $('#hoursAmountTr').show();
                 } else {
                     $('#hoursAmountTr').hide();
