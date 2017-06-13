@@ -38,15 +38,43 @@ $(window).on('load', function () {
             },
             function (data) {
                 //Просто раскомментируй строку ниже и строку под ней, когда запилишь скрипт
-                console.log(data);
+                // console.log(data);
                 setDocuments(data);
                 // setDocuments(fgsfds);
-            })
-    })
+            });
+    });
 
 
+    // $('#upload').on('click', function(e){
+    //     e.preventDefault();
+    //     let formData = new FormData($(this).parents('form')[0]);
+    //
+    //     $.ajax({
+    //         url: 'content/getData.php',
+    //         type: 'POST',
+    //         status: 'uploadDocuments',
+    //         xhr: function() {
+    //             return $.ajaxSettings.xhr();
+    //         },
+    //         success: function (data) {
+    //             // $("#documents-container").html(data);
+    //             // alert("Data Uploaded: "+data);
+    //         },
+    //         data: formData,
+    //         cache: false,
+    //         contentType: false,
+    //         processData: false
+    //     });
+    //     return false;
+    // });
+    
+    // $('#upload').on('click', function () {
+    //     let fileData = $("#docFiles").prop('files')[0];
+    // })
 
 });
+
+
 
 //Loads data into rows
 function setRequestInfo(requestData) {
@@ -56,11 +84,11 @@ function setRequestInfo(requestData) {
         requestData[i].fullName = requestData[i].userName;
         delete requestData[i].userName;
     }
-    $('#request-date').html(requestData.requestDate.split(' ')[0]);
+    if(requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
     $('#invoice-number').html(requestData.invoiceNumber);
-    $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
+    if(requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
     $('#document-number').html(requestData.documentNumber);
-    $('#document-date').html(requestData.documentDate.split(' ')[0]);
+    if(requestData.documentDate) $('#document-date').html(requestData.documentDate.split(' ')[0]);
     $('#organization').html(requestData.firma);
     $('#comments').html(requestData.commentForStatus);
     $('#box-quantity').html(requestData.boxQty);
