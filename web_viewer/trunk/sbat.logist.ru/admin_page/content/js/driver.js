@@ -25,6 +25,10 @@ $(document).ready(function () {
         data.status = 'driversEditing';
     });
 
+    driversEditor.on('postRemove', function (e, data, action) {
+        $("#vehiclesTable").DataTable().columns().draw();
+    });
+
     $("#driversTable").DataTable({
         processing: true,
         serverSide: true,

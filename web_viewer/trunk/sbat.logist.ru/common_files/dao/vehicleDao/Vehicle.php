@@ -55,7 +55,7 @@ class Vehicle implements IVehicle {
         return $this->_DAO->select(new SelectVehicleByCompanyId($companyId));
     }
 
-    function removeVehicle($id)
+    function pseudoRemoveVehicle($id)
     {
         return $this->_DAO->update(new RemoveVehicle($id));
     }
@@ -79,6 +79,10 @@ class Vehicle implements IVehicle {
     function updateVehicle(VehicleData $newVehicle, $id)
     {
         return $this->_DAO->update(new UpdateVehicle($newVehicle, $id));
+    }
+
+    function presudoRemoveDriverByTransportCompany($id) {
+        return $this->_DAO->update(new RemoveVehicleByTransportCompany($id));
     }
 }
 
@@ -187,6 +191,22 @@ class RemoveVehicle implements IEntityUpdate {
     }
 }
 
+class RemoveVehicleByTransportCompany implements IEntityUpdate {
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        return "UPDATE `vehicles` SET deleted = TRUE WHERE transport_company_id = $this->id";
+    }
+}
 
 class SelectLastInsertedVehicleId implements IEntitySelect {
     /**

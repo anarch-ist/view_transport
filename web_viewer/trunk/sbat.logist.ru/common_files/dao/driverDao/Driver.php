@@ -60,7 +60,7 @@ class Driver implements IDriver
         return self::$_instance;
     }
 
-    function removeDriver($id)
+    function pseudoRemoveDriver($id)
     {
         return $this->_DAO->update(new RemoveDriver($id));
     }
@@ -74,6 +74,50 @@ class Driver implements IDriver
     function updateDriver(DriverData $newDriver, $id)
     {
         return $this->_DAO->update(new UpdateDriver($newDriver, $id));
+    }
+
+    function pseudoRemoveDriverByTransportCompany($id)
+    {
+        return $this->_DAO->update(new RemoveDriverByTransportCompany($id));
+    }
+
+    function pseudoRemoveDriverByVehicle($id)
+    {
+        return $this->_DAO->update(new RemoveDriverByTransportCompany($id));
+    }
+}
+
+class RemoveDriverByTransportCompany implements IEntityUpdate {
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        return "UPDATE `drivers` SET deleted = TRUE WHERE transport_company_id = $this->id";
+    }
+}
+
+class RemoveDriverByVehicle implements IEntityUpdate {
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        return "UPDATE `drivers` SET deleted = TRUE WHERE vehicle_id = $this->id";
     }
 }
 

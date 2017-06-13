@@ -243,6 +243,7 @@ class UpdateUser implements IEntityUpdate
     {
         $dao = DAO::getInstance();
         $this->userID = $dao->checkString($id);
+        $this->passMD5 = $dao->checkString($user->getData('password'));
         $this->userName = $dao->checkString($user->getData('userName'));
         $this->login = $dao->checkString($user->getData('login'));
         $this->position = $dao->checkString($user->getData('position'));
@@ -265,12 +266,18 @@ class UpdateUser implements IEntityUpdate
      */
     function getUpdateQuery()
     {
+        $salt = substr(md5(rand(0, 100000000)), 0, 16);
+        $passAndSalt = md5($this->passMD5 . $salt);
         $query = "UPDATE `users` SET " .
             "userName = '$this->userName', " .
             "position = '$this->position', " .
             "phoneNumber = '$this->phoneNumber', " .
             "email = '$this->email', " .
             "userRoleID = '$this->userRoleID'";
+
+        if ($this->passMD5 != md5('dummy')) {
+            $query = $query . ", salt = '$salt', passAndSalt = '$passAndSalt'";
+        }
 
         if (!is_null($this->pointID)) {
             $query = $query . ", pointID = $this->pointID";

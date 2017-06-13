@@ -16,7 +16,7 @@ interface IDriver
 
     function selectDriversByRange($start = 0, $length = 20);
 
-    function removeDriver($id);
+    function pseudoRemoveDriver($id);
 
     function selectDriverByLastInsertedId();
 

@@ -49,7 +49,10 @@ $(document).ready(function () {
             {
                 extend: "remove",
                 editor: vehiclesEditor,
-                text: 'удалить запись'
+                text: 'удалить запись',
+                formMessage: function (e, dt) {
+                    return "Вы уверены, что вы хотите удалить это ТС?</br> Все водители, привязанные к этому ТС, так же будут удалены."
+                }
             }
         ],
         "paging": 10,

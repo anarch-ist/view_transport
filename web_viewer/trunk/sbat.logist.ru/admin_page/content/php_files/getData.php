@@ -444,7 +444,8 @@ function removeVehicle(PrivilegedUser $privilegedUser) {
     }
     $dataSourceArray = $_POST['data'];
     foreach ($dataSourceArray as $id => $userData) {
-        $privilegedUser->getVehicleEntity()->removeVehicle($id);
+        $privilegedUser->getVehicleEntity()->pseudoRemoveVehicle($id);
+        $privilegedUser->getDriverEntity()->pseudoRemoveDriverByVehicle($id);
     }
     echo '{ }';
 }
@@ -455,7 +456,9 @@ function removeTransportCompany(PrivilegedUser $privilegedUser) {
     }
     $dataSourceArray = $_POST['data'];
     foreach ($dataSourceArray as $id => $userData) {
-        $privilegedUser->getTransportCompanyEntity()->removeCompany($id);
+        $privilegedUser->getTransportCompanyEntity()->pseudoRemoveCompany($id);
+        $privilegedUser->getDriverEntity()->pseudoRemoveDriverByTransportCompany($id);
+        $privilegedUser->getVehicleEntity()->presudoRemoveDriverByTransportCompany($id);
     }
     echo '{ }';
 }
@@ -466,7 +469,7 @@ function removeDrivers(PrivilegedUser $privilegedUser) {
     }
     $dataSourceArray = $_POST['data'];
     foreach ($dataSourceArray as $id => $userData) {
-        $privilegedUser->getDriverEntity()->removeDriver($id);
+        $privilegedUser->getDriverEntity()->pseudoRemoveDriver($id);
     }
     echo '{ }';
 }
@@ -574,7 +577,7 @@ function updateUsers(PrivilegedUser $privUser)
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
-        $serverAnswer['data'][$i] = $userEntity->selectUserByLogin($userInfo['login'])->toArray();
+        $serverAnswer['data'][$i] = $userEntity->selectUserByID($userID)->toArray();
         $i++;
     }
     echo json_encode($serverAnswer);

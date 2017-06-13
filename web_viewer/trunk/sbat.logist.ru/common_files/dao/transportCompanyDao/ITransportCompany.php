@@ -14,7 +14,7 @@ interface ITransportCompany
 
     function selectLastInsertedId();
 
-    function removeCompany($userID);
+    function pseudoRemoveCompany($userID);
 
     function updateCompany(TransportCompanyData $newCompany, $id);
 }

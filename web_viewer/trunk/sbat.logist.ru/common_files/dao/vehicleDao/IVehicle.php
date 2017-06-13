@@ -12,7 +12,7 @@ interface IVehicle
 
     function insertVehicle($vehicleInfo);
 
-    function removeVehicle($id);
+    function pseudoRemoveVehicle($id);
 
     function selectVehiclesByRange($start, $length);
 

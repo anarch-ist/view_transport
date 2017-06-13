@@ -54,7 +54,7 @@ class TransportCompany implements ITransportCompany
         return new TransportCompanyData($array[0]);
     }
 
-    function removeCompany($userID)
+    function pseudoRemoveCompany($userID)
     {
         return $this->_DAO->update(new RemoveCompany($userID));
     }
