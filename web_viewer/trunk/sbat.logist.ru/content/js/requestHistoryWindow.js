@@ -5,10 +5,16 @@ function showPretension(pretensionID, reqIdExt, cathegory, pretensionSum, preten
     $('#editPretensionComment').val(decodeURI(pretensionComment));
     $('#editPretensionPositionNumber').val(decodeURI(positionNumber));
     $('#updatePretension').off('click').show().on('click', function () {
-        updatePretension(pretensionID, reqIdExt, cathegory, pretensionSum, decodeURI(pretensionComment), decodeURI(positionNumber))
+        $(this).button('loading');
+        updatePretension(pretensionID, reqIdExt, function () {
+            $('#updatePretension').button('reset');
+        })
     });
     $('#deletePretension').off('click').show().on('click', function () {
-        deletePretension(pretensionID, reqIdExt);
+        $(this).button('loading');
+        deletePretension(pretensionID, reqIdExt, function () {
+            $('#deletePretension').button('reset');
+        });
     });
 }
 
@@ -48,7 +54,7 @@ function loadPretensions() {
     })
 }
 
-function deletePretension(pretensionID, reqIdExt) {
+function deletePretension(pretensionID, reqIdExt, callback) {
     if (confirm('Вы действительно хотите удалить претензию?')) {
         $.post("content/getData.php", {
             status: 'deletePretension',
@@ -60,11 +66,14 @@ function deletePretension(pretensionID, reqIdExt) {
                 $('#editPretensionModal').modal('toggle');
                 loadPretensions();
             }
+            if(callback){
+                callback();
+            }
         })
     }
 }
 
-function updatePretension(pretensionID, reqIdExt) {
+function updatePretension(pretensionID, reqIdExt, callback) {
     $.post("content/getData.php", {
         status: 'updatePretension',
         commentRequired: $('#editPretensionComment').prop('required'),
@@ -79,6 +88,9 @@ function updatePretension(pretensionID, reqIdExt) {
             alert('Претензия успешно обновлена');
             $('#editPretensionModal').modal('toggle');
             loadPretensions();
+        }
+        if(callback){
+            callback();
         }
     });
 
@@ -259,7 +271,8 @@ $(window).on('load', function () {
 
 
         $('#submitPretension').click(function () {
-
+            let that = $('#submitPretension');
+            that.button('loading');
             $.post("content/getData.php", {
                 commentRequired: $('#pretensionComment').prop('required'),
                 status: 'addPretension',
@@ -274,9 +287,11 @@ $(window).on('load', function () {
             }, function (data) {
                 if (data == 'true') {
                     $('#pretensionModal').modal('toggle');
+                    that.button('reset');
                     alert('Претензия успешно отправлена');
                     loadPretensions();
                 } else {
+                    that.button('reset');
                     alert(data);
                 }
             })

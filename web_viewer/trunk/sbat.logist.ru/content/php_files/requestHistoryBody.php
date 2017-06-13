@@ -174,7 +174,7 @@
                     <div class="form-group"><span style="color:#c22929;">*</span> - поля, обязательные для заполнения</div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" id="submitPretension">Отправить</button>
+                    <button type="button" class="btn btn-warning"  data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Создается претензия" id="submitPretension">Отправить</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
                 </div>
             </div>
@@ -232,8 +232,8 @@
                     <div class="form-group"><span style="color:#c22929;">*</span> - поля, обязательные для заполнения</div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="deletePretension">Удалить претензию</button>
-                    <button type="button" class="btn btn-warning" id="updatePretension">Сохранить претензию</button>
+                    <button type="button" class="btn btn-danger" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Претензия удаляется" id="deletePretension">Удалить претензию</button>
+                    <button type="button" class="btn btn-warning" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Претензия сохраняется" id="updatePretension">Сохранить претензию</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
                 </div>
             </div>
