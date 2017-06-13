@@ -46,6 +46,11 @@ $(document).ready(function () {
         data.status = 'transportCompaniesEditing';
     });
 
+    transportCompaniesEditor.on('postRemove', function (e, data, action) {
+        $("#vehiclesTable").DataTable().columns().draw();
+        $("#driversTable").DataTable().columns().draw();
+    });
+
     var $transportCompaniesTable =  $("#transportCompaniesTable").DataTable({
         processing: true,
         serverSide: true,
@@ -75,7 +80,10 @@ $(document).ready(function () {
             {
                 extend: "remove",
                 editor: transportCompaniesEditor,
-                text: 'удалить запись'
+                text: 'удалить запись',
+                formMessage: function (e, dt) {
+                    return "Вы уверены, что вы хотите удалить эту компанию?</br> Все ТС и водители, привязанные к данной компании, так же будут удалены."
+                }
             }
         ],
         "paging": 10,

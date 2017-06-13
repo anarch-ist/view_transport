@@ -233,14 +233,14 @@ $(document).ready(function () {
                     text: 'добавить запись'
                 },
                 {
-                    extend: "remove",
-                    editor: usersEditor,
-                    text: 'удалить запись'
-                },
-                {
                     extend: "edit",
                     editor: usersEditor,
                     text: "изменить"
+                },
+                {
+                    extend: "remove",
+                    editor: usersEditor,
+                    text: 'удалить запись'
                 }
             ],
             "paging": 10,
