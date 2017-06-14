@@ -136,3 +136,7 @@ input[type="checkbox"],
 table.dataTable thead th div.DataTables_sort_wrapper span {
     transform: scale(1.2);
 }
+
+.ui-dialog{
+    z-index:99999;
+}
