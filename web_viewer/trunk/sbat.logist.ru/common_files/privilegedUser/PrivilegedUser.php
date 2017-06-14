@@ -181,4 +181,10 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__ . '/../dao/tariffDao/Tariff.php';
         return \DAO\TariffEntity::getInstance();
     }
+
+    public function getPretensionEntity()
+    {
+        include_once __DIR__.'/../dao/pretensionDao/Pretension.php';
+        return \DAO\PretensionEntity::getInstance();
+    }
 }

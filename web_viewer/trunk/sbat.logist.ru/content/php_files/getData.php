@@ -4,48 +4,49 @@ try {
     $privUser = PrivilegedUser::getInstance();
     if (!isset($_POST['status'])) {
         throw new DataTransferException('Не задан параметр "статус"', __FILE__);
-    } else if (strcasecmp($_POST['status'],'getRequestsForUser')===0) {
+    } else if (strcasecmp($_POST['status'], 'getRequestsForUser') === 0) {
         echo getRequestsForUser($privUser);
-    } else if (strcasecmp($_POST['status'],'changeStatusForRequest')===0) {
+    } else if (strcasecmp($_POST['status'], 'changeStatusForRequest') === 0) {
         echo changeStatusForRequest($privUser);
-    } else if (strcasecmp($_POST['status'],'changeStatusForSeveralRequests')===0) {
+    } else if (strcasecmp($_POST['status'], 'changeStatusForSeveralRequests') === 0) {
         echo changeStatusForSeveralRequests($privUser);
-    } else if (strcasecmp($_POST['status'],'getStatusHistory')===0) {
+    } else if (strcasecmp($_POST['status'], 'getStatusHistory') === 0) {
         echo getStatusHistory($privUser);
-    } else if (strcasecmp($_POST['status'],'getRequestsForRouteList')===0) {
+    } else if (strcasecmp($_POST['status'], 'getRequestsForRouteList') === 0) {
         echo getRequestsForRouteList($privUser);
-    }  else if (strcasecmp($_POST['status'],'getRequestByClientIdAndInvoiceNumber')===0) {
+    } else if (strcasecmp($_POST['status'], 'getRequestByClientIdAndInvoiceNumber') === 0) {
         echo getRequestByClientIdAndInvoiceNumber($privUser);
-    } else if (strcasecmp($_POST['status'],'addPretension')===0) {
+    } else if (strcasecmp($_POST['status'], 'addPretension') === 0) {
         echo addPretension($privUser);
-    } else if (strcasecmp($_POST['status'],'getPretensions')===0){
+    } else if (strcasecmp($_POST['status'], 'getPretensions') === 0) {
         echo getPretensions($privUser);
-    } else if (strcasecmp($_POST['status'], 'updatePretension')===0){
+    } else if (strcasecmp($_POST['status'], 'updatePretension') === 0) {
         echo updatePretension($privUser);
-    } else if (strcasecmp($_POST['status'], 'deletePretension')===0){
+    } else if (strcasecmp($_POST['status'], 'deletePretension') === 0) {
         echo deletePretension($privUser);
-    } else if (strcasecmp($_POST['status'], 'getCompanies')===0){
+    } else if (strcasecmp($_POST['status'], 'getCompanies') === 0) {
         echo getCompanies($privUser);
-    } else if (strcasecmp($_POST['status'], 'getVehicles')===0){
+    } else if (strcasecmp($_POST['status'], 'getVehicles') === 0) {
         echo getVehiclesForCompany($privUser);
-    } else if (strcasecmp($_POST['status'], 'getDrivers')===0){
+    } else if (strcasecmp($_POST['status'], 'getDrivers') === 0) {
         echo getDriversForVehicle($privUser);
-    } else if (strcasecmp($_POST['status'], 'getRequestById')===0){
+    } else if (strcasecmp($_POST['status'], 'getRequestById') === 0) {
         echo getRequestById($privUser);
-    } else if (strcasecmp($_POST['status'], 'getDocuments')===0){
+    } else if (strcasecmp($_POST['status'], 'getDocuments') === 0) {
         echo getDocuments();
-    } else if (strcasecmp($_POST['status'], 'uploadDocuments')===0){
+    } else if (strcasecmp($_POST['status'], 'uploadDocuments') === 0) {
         echo uploadDocuments();
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
 
-function uploadDocuments(){
+function uploadDocuments()
+{
     error_reporting(E_ALL);
-    ini_set('display_errors',1);
+    ini_set('display_errors', 1);
     $requestId = $_POST['requestIDExternal'];
-    $docDir = realpath("../common_files/media/Other/docs/files/uploads/").'/';
+    $docDir = realpath("../common_files/media/Other/docs/files/uploads/") . '/';
 //    mkdir($docDir,0777);
 
 //    $file_ary = array();
@@ -59,15 +60,15 @@ function uploadDocuments(){
 //    }
 
 
-    for($i=0; $i<count($_FILES['docFiles']['name']); $i++){
+    for ($i = 0; $i < count($_FILES['docFiles']['name']); $i++) {
         $message = 'Error uploading file';
-        switch( $_FILES['docFiles']['error'][$i] ) {
+        switch ($_FILES['docFiles']['error'][$i]) {
             case UPLOAD_ERR_OK:
                 $message = false;;
                 break;
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
-                $message .= ' - file too large (limit of '.get_max_upload().' bytes).';
+                $message .= ' - file too large (limit of ' . get_max_upload() . ' bytes).';
                 break;
             case UPLOAD_ERR_PARTIAL:
                 $message .= ' - file upload was not completed.';
@@ -76,15 +77,15 @@ function uploadDocuments(){
                 $message .= ' - zero-length file uploaded.';
                 break;
             default:
-                $message .= ' - internal error #'.$_FILES['newfile']['error'];
+                $message .= ' - internal error #' . $_FILES['newfile']['error'];
                 break;
         }
 
 
         $basename = basename($_FILES['docFiles']['name'][$i]);
         $ext = explode('.', basename($basename));
-        $target_path = $docDir . md5(uniqid()) . "." . $ext[count($ext)-1];
-        if(!move_uploaded_file($_FILES['docFiles']['tmp_name'][$i], $target_path)) {
+        $target_path = $docDir . md5(uniqid()) . "." . $ext[count($ext) - 1];
+        if (!move_uploaded_file($_FILES['docFiles']['tmp_name'][$i], $target_path)) {
             return "$message";
         }
     }
@@ -101,25 +102,26 @@ function uploadDocuments(){
     return 0;
 }
 
-function getDocuments(){
+function getDocuments()
+{
     $requestId = $_POST['requestIDExternal'];
-    if(!isset($requestId)){
+    if (!isset($requestId)) {
         throw new DataTransferException('Не задан ID заявки', __FILE__);
     }
     $path = "../common_files/media/Other/docs/xml/$requestId.xml";
     $pathToDocs = '../common_files/media/Other/docs/files/';
-    if(file_exists($path)){
-    $xml = simplexml_load_file($path);
+    if (file_exists($path)) {
+        $xml = simplexml_load_file($path);
         $answer = [];
-        foreach ($xml->group as $value){
+        foreach ($xml->group as $value) {
             $files = [];
-            $group=['title' => (string) $value['tit']];
+            $group = ['title' => (string)$value['tit']];
 
-            foreach ($value->file as $file){
-                array_push($files, ['name' => (string) $file['tit'], 'file' => (string) $pathToDocs.$file['name']]);
+            foreach ($value->file as $file) {
+                array_push($files, ['name' => (string)$file['tit'], 'file' => (string)$pathToDocs . $file['name']]);
             }
             $group['documents'] = $files;
-            array_push($answer,$group);
+            array_push($answer, $group);
         }
         return (json_encode($answer));
     } else {
@@ -127,166 +129,174 @@ function getDocuments(){
     }
 }
 
-function getCompanies(PrivilegedUser $privUser){
+function getCompanies(PrivilegedUser $privUser)
+{
 //    $data = $privUser->getRequestEntity()->getAllTransportCompanies();
     $data = $privUser->getTransportCompanyEntity()->selectAllCompanies();
-    
-    return(json_encode($data));
+
+    return (json_encode($data));
 }
 
-function getVehiclesForCompany(PrivilegedUser $privUser){
-    $companyId = (int) $_POST['companyId'];
-    if(!isset($companyId)){
+function getVehiclesForCompany(PrivilegedUser $privUser)
+{
+    $companyId = (int)$_POST['companyId'];
+    if (!isset($companyId)) {
         throw new DataTransferException('Не задан ID компании', __FILE__);
     }
     $data = $privUser->getVehicleEntity()->selectVehicleByCompanyId($companyId);
-    return(json_encode($data));
+    return (json_encode($data));
 }
 
-function getDriversForVehicle(PrivilegedUser $privUser){
+function getDriversForVehicle(PrivilegedUser $privUser)
+{
     $vehicleId = $_POST['vehicleId'];
-    if(isset($vehicleId)){
+    if (isset($vehicleId)) {
         $data = $privUser->getDriverEntity()->selectDriverByVehicleId($vehicleId);
-        return(json_encode($data));    
+        return (json_encode($data));
     } else return null;
-    
+
 }
 
-function deletePretension(PrivilegedUser $privUser){
+function deletePretension(PrivilegedUser $privUser)
+{
     $requestIDExternal = $_POST['requestIDExternal'];
     $pretensionID = $_POST['pretensionID'];
-    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+    if (!isset($requestIDExternal) || empty($requestIDExternal)) {
         throw new DataTransferException('Не задан requestIDExternal', __FILE__);
-    } elseif (!isset($pretensionID) || empty($pretensionID)){
+    } elseif (!isset($pretensionID) || empty($pretensionID)) {
         throw new DataTransferException('Не задан номер претензии', __FILE__);
     }
-    $data = $privUser->getRequestEntity()->closePretension($pretensionID,$requestIDExternal);
-    return(json_encode($data));
+    $data = $privUser->getPretensionEntity()->closePretension($pretensionID, $requestIDExternal);
+    return (json_encode($data));
 }
 
-function updatePretension(PrivilegedUser $privUser){
-    $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false ;
+function updatePretension(PrivilegedUser $privUser)
+{
+    $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false;
     $pretensionID = $_POST['pretensionID'];
     $requestIDExternal = $_POST['requestIDExternal'];
     $pretensionComment = $_POST['pretensionComment'];
 ////    $pretensionStatus = $_POST['pretensionStatus'];
     $pretensionCathegory = $_POST['pretensionCathegory'];
     $pretensionSum = $_POST['pretensionSum'];
-    $pretensionPositionNumber= $_POST['pretensionPositionNumber'];
-    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+    $pretensionPositionNumber = $_POST['pretensionPositionNumber'];
+    if (!isset($requestIDExternal) || empty($requestIDExternal)) {
         throw new DataTransferException('Не задана заявка', __FILE__);
-    } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)){
-        throw new DataTransferException('Не задана категория претензии',__FILE__);
-    }  elseif (!isset($pretensionPositionNumber) || empty($pretensionPositionNumber)){
+    } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)) {
+        throw new DataTransferException('Не задана категория претензии', __FILE__);
+    } elseif (!isset($pretensionPositionNumber) || empty($pretensionPositionNumber)) {
         throw new DataTransferException('Не задан код позиции', __FILE__);
-    } elseif ((!isset($pretensionComment) || empty($pretensionComment))&& $commentRequired){
-        throw new DataTransferException("Не задан комментарий претензии $commentRequired",__FILE__);
-    }  elseif (!isset($pretensionSum) || empty($pretensionSum)){
+    } elseif ((!isset($pretensionComment) || empty($pretensionComment)) && $commentRequired) {
+        throw new DataTransferException("Не задан комментарий претензии $commentRequired", __FILE__);
+    } elseif (!isset($pretensionSum) || empty($pretensionSum)) {
 //        throw new DataTransferException('Не задана сумма', __FILE__);
-        $pretensionSum=0;
+        $pretensionSum = 0;
     }
 //    $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
-    $data = $privUser->getRequestEntity()->updatePretension($pretensionID,$requestIDExternal,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
-    return(json_encode($data));
+    $data = $privUser->getPretensionEntity()->updatePretension($pretensionID, $requestIDExternal, $pretensionComment, $pretensionCathegory, $pretensionPositionNumber, $pretensionSum);
+    return (json_encode($data));
 }
 
-function getPretensions(PrivilegedUser $privUser){
+function getPretensions(PrivilegedUser $privUser)
+{
     $requestIDExternal = $_POST['requestIDExternal'];
-    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+    if (!isset($requestIDExternal) || empty($requestIDExternal)) {
         throw new DataTransferException('Не задана заявка', __FILE__);
     }
-    $data = $privUser->getRequestEntity()->getPretensions($requestIDExternal);
+    $data = $privUser->getPretensionEntity()->getPretensions($requestIDExternal);
     return json_encode($data);
 
 }
 
-function addPretension(PrivilegedUser $privUser){
+function addPretension(PrivilegedUser $privUser)
+{
 //    error_reporting(E_ALL);
 //    ini_set('display_errors',1);
-    $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false ;
+    $commentRequired = ($_POST['commentRequired'] == 'true') ? True : false;
     $requestIDExternal = $_POST['requestIDExternal'];
     $pretensionComment = $_POST['pretensionComment'];
     $pretensionStatus = $_POST['pretensionStatus'];
     $pretensionCathegory = $_POST['pretensionCathegory'];
     $pretensionSum = $_POST['pretensionSum'];
-    $pretensionPositionNumber= $_POST['pretensionPositionNumber'];
+    $pretensionPositionNumber = $_POST['pretensionPositionNumber'];
     $invoiceNumber = $_POST['invoiceNumber'];
-    if(!isset($requestIDExternal) || empty($requestIDExternal)){
+    if (!isset($requestIDExternal) || empty($requestIDExternal)) {
         throw new DataTransferException('Не задана заявка', __FILE__);
-    } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)){
-        throw new DataTransferException('Не задана категория претензии',__FILE__);
-    }  elseif (!isset($pretensionPositionNumber) || empty($pretensionPositionNumber)){
+    } elseif (!isset($pretensionCathegory) || empty($pretensionCathegory)) {
+        throw new DataTransferException('Не задана категория претензии', __FILE__);
+    } elseif (!isset($pretensionPositionNumber) || empty($pretensionPositionNumber)) {
         throw new DataTransferException('Не задан код позиции', __FILE__);
-    } elseif ((!isset($pretensionComment) || empty($pretensionComment))&& $commentRequired){
-        throw new DataTransferException("Не задан комментарий претензии $commentRequired",__FILE__);
-    }  elseif (!isset($pretensionSum) || empty($pretensionSum)){
+    } elseif ((!isset($pretensionComment) || empty($pretensionComment)) && $commentRequired) {
+        throw new DataTransferException("Не задан комментарий претензии $commentRequired", __FILE__);
+    } elseif (!isset($pretensionSum) || empty($pretensionSum)) {
 //        throw new DataTransferException('Не задана сумма', __FILE__);
-        $pretensionSum=0;
+        $pretensionSum = 0;
     }
 
     $linkToRequest = $_POST['linkToRequest'];
-    utf8mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'], "Создана претензия по накладной $invoiceNumber", wordwrap("Категория претензии: <br>
-\r\n $pretensionCathegory \r\n
-<br><br> Текст претензии:
-<br> $pretensionComment".(
-        isset($linkToRequest) ?
-"<br><br> <a href='$linkToRequest'>Ссылка на заявку" : ""),70, "\r\n"));
-    $data = $privUser->getRequestEntity()->addPretension($requestIDExternal,$pretensionStatus,$pretensionComment,$pretensionCathegory,$pretensionPositionNumber,$pretensionSum);
-
+    utf8mail($privUser->getRequestEntity()->getMarketAgentEmail($requestIDExternal)[0]['email'],
+        "Создана претензия по накладной $invoiceNumber", wordwrap("Категория претензии: <br>
+            \r\n $pretensionCathegory \r\n
+            <br><br> Текст претензии:
+            <br> $pretensionComment" .
+            (isset($linkToRequest) ? "<br><br> <a href='$linkToRequest'>Ссылка на заявку" : ""), 70, "\r\n"));
+    $data = $privUser->getPretensionEntity()->addPretension($requestIDExternal, $pretensionStatus, $pretensionComment, $pretensionCathegory, $pretensionPositionNumber, $pretensionSum);
 
 
     return json_encode($data);
 }
 
 //A complicated function that works around many mailing systems
-function utf8mail($to,$s,$body,$from_name="Logicsmart",$from_a = "info@logicsmart.ru", $reply="info@logicsmart.ru")
+function utf8mail($to, $s, $body, $from_name = "Logicsmart", $from_a = "info@logicsmart.ru", $reply = "info@logicsmart.ru")
 {
 
     $mail = new PHPMailer(true);
     $mail->isSMTP();
-try{
-    $mail->CharSet = "UTF-8";
-    $mail->Host = "smtp.mail.ru";
-    $mail->SMTPDebug = 0;
-    $mail->SMTPAuth = true;
-    $mail->Port = 465;
-    $mail->Username = "testsmpt@bk.ru";
-    $mail->Password = "testtest12345";
-    $mail->addReplyTo("info@logicsmart.ru");
-    $mail->replyTo = "info@logicsmart.ru";
-    $mail->setFrom("testsmpt@bk.ru");
-    $mail->addAddress($to);
-    $mail->Subject = htmlspecialchars($s);
-    $mail->msgHTML($body);
-    $mail->SMTPSecure = 'ssl';
-    $mail->send();
+    try {
+        $mail->CharSet = "UTF-8";
+        $mail->Host = "smtp.mail.ru";
+        $mail->SMTPDebug = 0;
+        $mail->SMTPAuth = true;
+        $mail->Port = 465;
+        $mail->Username = "testsmpt@bk.ru";
+        $mail->Password = "testtest12345";
+        $mail->addReplyTo("info@logicsmart.ru");
+        $mail->replyTo = "info@logicsmart.ru";
+        $mail->setFrom("testsmpt@bk.ru");
+        $mail->addAddress($to);
+        $mail->Subject = htmlspecialchars($s);
+        $mail->msgHTML($body);
+        $mail->SMTPSecure = 'ssl';
+        $mail->send();
 //    echo "Message sent Ok!</p>\n";
-} catch (phpmailerException $e) {
-    echo $e->errorMessage();
-} catch (Exception $e) {
-    echo $e->getMessage();
-}
+    } catch (phpmailerException $e) {
+        echo $e->errorMessage();
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
 
 }
 
-function getRequestById(PrivilegedUser $privUser){
+function getRequestById(PrivilegedUser $privUser)
+{
     $reqIdExt = $_POST['requestIDExternal'];
-    if (!isset($reqIdExt)){
+    if (!isset($reqIdExt)) {
         throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
-    } 
+    }
     $data = $privUser->getRequestEntity()->selectDataByRequestId($reqIdExt);
     return json_encode($data);
 //    return $reqIdExt;
 }
 
-function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser){
+function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser)
+{
     $clientId = $_POST['clientId'];
     $invoiceNumber = $_POST['invoiceNumber'];
-    if(!isset($clientId) || empty($clientId) || !isset($invoiceNumber) || empty($invoiceNumber)){
+    if (!isset($clientId) || empty($clientId) || !isset($invoiceNumber) || empty($invoiceNumber)) {
 //        throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
         return '0';
     }
-    $data = $privUser->getRequestEntity()->selectRequestByClientIdAndInvoiceNumber($clientId,$invoiceNumber);
+    $data = $privUser->getRequestEntity()->selectRequestByClientIdAndInvoiceNumber($clientId, $invoiceNumber);
     return json_encode($data);
 }
 
@@ -301,6 +311,7 @@ function getStatusHistory(PrivilegedUser $privUser)
     //exit(print_r($data));
     return json_encode($data);
 }
+
 function getRequestsForRouteList(PrivilegedUser $privUser)
 {
     if (!isset($_POST['routeListID'])) {
@@ -320,9 +331,9 @@ function getRequestsForUser(PrivilegedUser $privUser)
 
     $start = (int)$_POST['start'];
     $count = (int)$_POST['length'];
-    foreach($_POST['columns'] as $key => $value){
-        if($value['data'] == 'requestDate' || $value['data'] == 'invoiceDate' || $value['data'] == 'documentDate' || $value['data'] == 'arrivalTimeToNextRoutePoint'){
-            if($value['search']['value'] != ''){
+    foreach ($_POST['columns'] as $key => $value) {
+        if ($value['data'] == 'requestDate' || $value['data'] == 'invoiceDate' || $value['data'] == 'documentDate' || $value['data'] == 'arrivalTimeToNextRoutePoint') {
+            if ($value['search']['value'] != '') {
                 $_POST['columns'][$key]['search']['value'] = date('Y-m-d', strtotime($value['search']['value']));
             }
         }
@@ -340,11 +351,11 @@ function getRequestsForUser(PrivilegedUser $privUser)
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
         "data" => $dataArray['requests']   // total data array
     );
-    foreach($dataArray['requests'] as $key => $value){
+    foreach ($dataArray['requests'] as $key => $value) {
         $json_data['data'][$key]['requestDate'] = date('d-m-Y', strtotime($value['requestDate']));
-        $json_data['data'][$key]['invoiceDate'] = $value['invoiceDate']!=0 ? date('d-m-Y', strtotime($value['invoiceDate'])) : "";
-        $json_data['data'][$key]['documentDate'] = $value['documentDate']!=0 ? date('d-m-Y', strtotime($value['documentDate'])) : "";
-        $json_data['data'][$key]['arrivalTimeToNextRoutePoint'] = $value['arrivalTimeToNextRoutePoint']!=0 ? date('d-m-Y H:i:s', strtotime($value['arrivalTimeToNextRoutePoint'])) : "";
+        $json_data['data'][$key]['invoiceDate'] = $value['invoiceDate'] != 0 ? date('d-m-Y', strtotime($value['invoiceDate'])) : "";
+        $json_data['data'][$key]['documentDate'] = $value['documentDate'] != 0 ? date('d-m-Y', strtotime($value['documentDate'])) : "";
+        $json_data['data'][$key]['arrivalTimeToNextRoutePoint'] = $value['arrivalTimeToNextRoutePoint'] != 0 ? date('d-m-Y H:i:s', strtotime($value['arrivalTimeToNextRoutePoint'])) : "";
 
 
     }
@@ -382,13 +393,13 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
-    $palletsQty = !empty($_POST['palletsQty']) ? $_POST['palletsQty'] : 0 ;
+    $palletsQty = !empty($_POST['palletsQty']) ? $_POST['palletsQty'] : 0;
     $hoursAmount = !empty($_POST['hoursAmount']) ? $_POST['hoursAmount'] : 0;
     $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : 0;
     $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : 0;
     $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : 0;
 //        if (isset($_POST['palletsQty'])) {
-            return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId);
+    return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId);
 //        }
 //        return $privUser->getRequestEntity()->updateRequestStatuses($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
 
