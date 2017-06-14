@@ -45,7 +45,7 @@ class TariffEntity implements ITariffEntity
 
 class InsertTariff implements IEntityInsert
 {
-    private $cost, $cost_per_point, $cost_per_hour;
+    private $cost, $cost_per_point, $cost_per_hour, $cost_per_box;
 
     function __construct($data)
     {
@@ -54,6 +54,7 @@ class InsertTariff implements IEntityInsert
         $this->cost = $dao->checkString($data['cost']);
         $this->cost_per_hour = $dao->checkString($data['cost_per_hour']);
         $this->cost_per_point = $dao->checkString($data['cost_per_point']);
+        $this->cost_per_box = $dao->checkString($data['cost_per_box']);
     }
 
     /**
@@ -61,8 +62,8 @@ class InsertTariff implements IEntityInsert
      */
     function getInsertQuery()
     {
-        return "INSERT INTO `tariffs` (cost, cost_per_hour, cost_per_point) VALUE " .
-            "('$this->cost', '$this->cost_per_hour', '$this->cost_per_point');";
+        return "INSERT INTO `tariffs` (cost, cost_per_hour, cost_per_point, cost_per_box) VALUE " .
+            "('$this->cost', '$this->cost_per_hour', '$this->cost_per_point', '$this->cost_per_box');";
     }
 }
 
@@ -96,7 +97,7 @@ class SelectTariffById implements IEntitySelect
 class UpdateTariff implements IEntityUpdate
 {
 
-    private $id, $cost, $cost_per_hour, $cost_per_point;
+    private $id, $cost, $cost_per_hour, $cost_per_point, $cost_per_box;
 
     function __construct($data, $id)
     {
@@ -106,6 +107,8 @@ class UpdateTariff implements IEntityUpdate
         $this->cost = $dao->checkString($data['cost']);
         $this->cost_per_hour = $dao->checkString($data['cost_per_hour']);
         $this->cost_per_point = $dao->checkString($data['cost_per_point']);
+        $this->cost_per_box = $dao->checkString($data['cost_per_box']);
+
     }
 
     /**
@@ -116,7 +119,8 @@ class UpdateTariff implements IEntityUpdate
         $query = "UPDATE `tariffs` SET " .
             "cost = '$this->cost', " .
             "cost_per_hour = '$this->cost_per_hour', " .
-            "cost_per_point = '$this->cost_per_point'";
+            "cost_per_point = '$this->cost_per_point'".
+            "cost_per_box = '$this->cost_per_box'";
         $query = $query . " WHERE tariffID = $this->id;";
         return $query;
     }
