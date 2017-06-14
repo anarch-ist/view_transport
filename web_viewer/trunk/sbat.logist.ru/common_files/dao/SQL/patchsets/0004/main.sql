@@ -1,4 +1,4 @@
-ALTER TABLE transmaster_transport_db.tariffs ADD cost_per_box DECIMAL(12,2) DEFAULT 0.00;
+ALTER TABLE transmaster_transport_db.tariffs ADD cost_per_box DECIMAL(12,2);
 
 DROP PROCEDURE transmaster_transport_db.selectRoutes;
 CREATE PROCEDURE transmaster_transport_db.selectRoutes(IN `_startEntry` INT, IN `_length` INT,
