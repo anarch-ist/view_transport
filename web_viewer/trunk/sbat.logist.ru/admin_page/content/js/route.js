@@ -54,6 +54,21 @@ $(document).ready(function () {
                     }
                 },
                 placeholder: "1000.00"
+            },
+            {
+                label: 'Стоимость за коробку',
+                name: 'cost_per_box',
+                type: 'mask',
+                mask: '0999999999P99',
+                maskOptions: {
+                    translation: {
+                        'P': {
+                            pattern: /\./,
+                            fallback: '.'
+                        }
+                    }
+                },
+                placeholder: "1000.00"
             }
         ]
     });
@@ -101,7 +116,8 @@ $(document).ready(function () {
                 {"name": "tariffID", "data": "tariffID", "targets": 2, visible: false},
                 {"name": "cost", "data": "cost", targets: 3},
                 {"name": "cost_per_point", "data": "cost_per_point", "targets": 4},
-                {"name": "cost_per_hour", "data": "cost_per_hour", "targets": 5}
+                {"name": "cost_per_hour", "data": "cost_per_hour", "targets": 5},
+                {"name": "cost_per_box", "data": "cost_per_box", "targets":6}
             ]
         }
     );

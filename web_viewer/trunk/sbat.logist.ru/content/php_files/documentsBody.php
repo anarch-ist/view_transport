@@ -110,9 +110,53 @@
                 <a class="btn btn-default btn-lg" style="float: right" href="../../index.php">
                     На главную
                 </a>
+                    <button type="button" id="addDocumentButton" class="btn btn-default btn-lg" data-toggle="modal" data-target="#addDocumentModal">
+                        Добавить документ
+                    </button>
             </div>
         </div>
     </div>
+</div>
+<div id="addDocumentModal" class="modal fade" role="dialog">
+    <form enctype="multipart/form-data" action="content/php_files/getData.php" method="POST">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Добавить документ</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label for="documentGroup">Группа документа<span style="color:#c22929;">*</span></label>
+                                <select class="form-control" id="documentGroup">
+                                    <option disabled selected value> -- Выберите группу --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+                                <input type="hidden" name="status" value="uploadDocuments" />
+                                <input type="hidden" name="requestIDExternal" value="<?echo $_GET['reqIdExt']?>" />
+                                <!-- Название элемента input определяет имя в массиве $_FILES -->
+                                <label class="btn btn-default btn-file">
+                                    Browse <input name="docFiles[]" type="file" multiple/>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                <div class="modal-footer">
+                    <button id="upload" value="Отправить" class="btn btn-warning"></button>
+                </div>
+            </div>
+
+        </div>
+    </form>
 </div>
 
 </body>

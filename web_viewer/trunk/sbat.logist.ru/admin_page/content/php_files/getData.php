@@ -655,6 +655,7 @@ function updateRoute(PrivilegedUser $privUser)
             $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
             $updatedRoute['cost_per_point'] = $tariffInfoAfter->getData('cost_per_point');
             $updatedRoute['cost_per_hour'] = $tariffInfoAfter->getData('cost_per_hour');
+            $updatedRoute['cost_per_box'] = $tariffInfoAfter->getData('cost_per_box');
             $serverAnswer['data'][$i] = $updatedRoute;
             $i++;
         } else {
@@ -666,6 +667,7 @@ function updateRoute(PrivilegedUser $privUser)
                     $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
                     $updatedRoute['cost_per_point'] = $tariffInfoAfter->getData('cost_per_point');
                     $updatedRoute['cost_per_hour'] = $tariffInfoAfter->getData('cost_per_hour');
+                    $updatedRoute['cost_per_box'] = $tariffInfoAfter->getData('cost_per_box');
                     $serverAnswer['data'][$i] = $updatedRoute;
                 } else {
 
