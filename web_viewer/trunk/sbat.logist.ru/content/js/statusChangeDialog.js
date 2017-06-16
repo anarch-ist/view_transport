@@ -66,6 +66,7 @@ $(document).ready(function () {
                 maxItems:1,
                 onChange: function(value){
                     if (!value.length) return;
+                    driverInput.disable();
                     $.post(
                         'content/getData.php',
                         {
@@ -98,6 +99,7 @@ $(document).ready(function () {
                 maxItems:1,
                 onChange: function(value){
                     if (!value.length) return;
+                    vehicleInput.disable();
                     $.post(
                         'content/getData.php',
                         {

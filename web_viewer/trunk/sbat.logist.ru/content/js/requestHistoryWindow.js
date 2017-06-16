@@ -206,9 +206,6 @@ $(window).on('load', function () {
 
 
     if ($_GET['clientId'] && $_GET['invoiceNumber']) {
-        //Why wasn't chicken able to cross the road?
-        //Because it was disabled :|
-        // console.log('fgs');
         $.post("content/getData.php", {
                 status: 'getRequestByClientIdAndInvoiceNumber',
                 clientId: $_GET['clientId'],
@@ -226,7 +223,6 @@ $(window).on('load', function () {
                     requestIDExternal: requestIDExternal
                 },
                 function (data) {
-
                     setHistoryTable(data);
                     removeLoadingScreen();
 
@@ -255,11 +251,11 @@ $(window).on('load', function () {
             requestData[i].fullName = data[i].userName;
             delete requestData[i].userName;
         }
-        $('#request-date').html(requestData.requestDate.split(' ')[0]);
+        if(requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
         $('#invoice-number').html(requestData.invoiceNumber);
-        $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
+        if(requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
         $('#document-number').html(requestData.documentNumber);
-        $('#document-date').html(requestData.documentDate.split(' ')[0]);
+        if(requestData.documentDate) $('#document-date').html(requestData.documentDate.split(' ')[0]);
         $('#organization').html(requestData.firma);
         $('#comments').html(requestData.commentForStatus);
         $('#box-quantity').html(requestData.boxQty);
