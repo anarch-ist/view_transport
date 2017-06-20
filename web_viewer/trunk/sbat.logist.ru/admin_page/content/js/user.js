@@ -103,11 +103,7 @@ $(document).ready(function () {
         usersEditor.field('pointName').disable();
         usersEditor.field('clientID').disable();
         if (action === "edit") {
-            // я не знаю что оно должно было делать, но работает с багами, так что я просто отключил
-            // код я пока оставлю
-            // setSelectizeValueFromTable($usersDataTable, usersEditor, 'pointName', 'pointName');
-            // setSelectizeValueFromTable($usersDataTable, usersEditor, 'userRoleRusName', 'userRoleRusName');
-            // setSelectizeValueFromTable($usersDataTable, usersEditor, 'clientID', 'clientID');
+            selectCurrentUserRole();
         }
     });
 
@@ -177,33 +173,7 @@ $(document).ready(function () {
         if (d && d.editorSet) return;
 
         var currentRole = $(this).val();
-        if (currentRole === "CLIENT_MANAGER") {
-            usersEditor.field('pointName').disable();
-            usersEditor.field('pointName').set('');
-            usersEditor.field('clientID').enable();
-            usersEditor.field('clientID').set('');
-        }
-
-        if (currentRole === "TEMP_REMOVED") {
-            usersEditor.field('pointName').enable();
-            usersEditor.field('pointName').set('');
-            usersEditor.field('clientID').enable();
-            usersEditor.field('clientID').set('');
-        }
-
-        if (currentRole === "ADMIN" || currentRole === "MARKET_AGENT") {
-            usersEditor.field('pointName').disable();
-            usersEditor.field('pointName').set('');
-            usersEditor.field('clientID').disable();
-            usersEditor.field('clientID').set('');
-        }
-
-        if (currentRole === "DISPATCHER" || currentRole === "W_DISPATCHER") {
-            usersEditor.field('pointName').enable();
-            usersEditor.field('pointName').set('');
-            usersEditor.field('clientID').disable();
-            usersEditor.field('clientID').set('');
-        }
+        enableColumnsByRole(currentRole);
     });
 
     // example data for exchange with server
@@ -258,4 +228,43 @@ $(document).ready(function () {
             ]
         }
     );
+    {
+        function selectCurrentUserRole() {
+            var userRoleRusName = $usersDataTable.row($('#usersTable .selected')[0]).data()['userRoleRusName'];
+            var selectizeInstance = usersEditor.field('userRoleRusName').inst();
+            var role = selectizeInstance.search(userRoleRusName);
+            selectizeInstance.setValue(role.items[0].id, true);
+            enableColumnsByRole(role.items[0].id)
+        }
+
+        function enableColumnsByRole(currentRole) {
+            if (currentRole === "CLIENT_MANAGER") {
+                usersEditor.field('pointName').disable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').enable();
+                usersEditor.field('clientID').set('');
+            }
+
+            if (currentRole === "TEMP_REMOVED") {
+                usersEditor.field('pointName').enable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').enable();
+                usersEditor.field('clientID').set('');
+            }
+
+            if (currentRole === "ADMIN" || currentRole === "MARKET_AGENT") {
+                usersEditor.field('pointName').disable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').disable();
+                usersEditor.field('clientID').set('');
+            }
+
+            if (currentRole === "DISPATCHER" || currentRole === "W_DISPATCHER") {
+                usersEditor.field('pointName').enable();
+                usersEditor.field('pointName').set('');
+                usersEditor.field('clientID').disable();
+                usersEditor.field('clientID').set('');
+            }
+        }
+    }
 });
