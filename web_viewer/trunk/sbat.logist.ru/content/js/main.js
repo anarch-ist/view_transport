@@ -10,6 +10,60 @@ $(document).ready(function () {
         // window.location.reload();
     });
 
+
+    let addRequest = new $.fn.dataTable.Editor({
+        ajax: "'content/getData.php'",
+        table: "#user-grid",
+        name: 'Создать новую заявку',
+        fields: [{
+            label: 'ИНН Клиента',
+            name: 'clientID',
+            type: 'selectize',
+            options: [],
+            opts: {
+                diacritics: true,
+                searchField: 'label',
+                labelField: 'label',
+                dropdownParent: "body"
+            }
+        }, {
+            label: 'Пункт склада',
+            name: 'warehousePointId',
+            type: 'selectize',
+            options: [],
+            opts: {
+                diacritics: true,
+                searchField: 'label',
+                labelField: 'label',
+                dropdownParent: "body"
+            }
+        }, {
+            label: 'Торговый представитель',
+            name: 'marketAgentUserId',
+            type: 'selectize',
+            options: [],
+            opts: {
+                diacritics: true,
+                searchField: 'label',
+                labelField: 'label',
+                dropdownParent: "body"
+            }
+        }, {
+            label: 'Маршрутный лист',
+            name: 'routeListID',
+            type: 'selectize',
+            options: [],
+            opts: {
+                diacritics: true,
+                searchField: 'label',
+                labelField: 'label',
+                dropdownParent: "body"
+            }
+        }
+        ]
+    });
+
+
     // --------DATATABLE INIT--------------
     //noinspection JSJQueryEfficiency
     var dataTable = $('#user-grid').DataTable({
@@ -231,14 +285,19 @@ $(document).ready(function () {
 
 
             {
-                text: (localStorage.getItem("liveSearch") == 'true') ? 'Живой поиск' : 'Стандартный поиск',
+                text: (localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск',
 
                 action: function (e, dt, node, config) {
 
-                    (localStorage.getItem("liveSearch") == 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
-                    this.text((localStorage.getItem("liveSearch") == 'true') ? 'Живой поиск' : 'Стандартный поиск');
+                    (localStorage.getItem("liveSearch") === 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
+                    this.text((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск');
                 }
-            }
+            },
+            // {
+            //     extend: "create",
+            //     editor: addRequest,
+            //     text: 'Добавить заявку'
+            // }
         ],
         ajax: {
             url: "content/getData.php", // json datasource
@@ -373,5 +432,111 @@ $(document).ready(function () {
     //    console.log(secondClonedSearchDiv);
     //}, 2000);
 
+
+
+
+
+    addRequest.field('clientID').input().on('keyup', function (e, d) {
+        let clientINNPart = $(this).val();
+        $.post( "content/getData.php",
+            {status: "getClientsByINN", format: "json", inn: clientINNPart},
+            function (clientsData) {
+                let options = [];
+                let selectizeOptions = [];
+                clientsData = JSON.parse(clientsData);
+                clientsData.forEach(function (entry) {
+                    let option = "<option value=" + entry.clientID + ">" + "ИНН: " + entry.INN + ", имя: " + entry.clientName + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": "ИНН: " + entry.INN + ", имя: " + entry.clientName, "value": entry.clientID};
+                    selectizeOptions.push(selectizeOption);
+                });
+                let clientSelectize = usersEditor.field('clientID').inst();
+
+                clientSelectize.clear();
+                clientSelectize.clearOptions();
+                clientSelectize.load(function (callback) {
+                    callback(selectizeOptions);
+                });
+            }
+        );
+    });
+
+    addRequest.field('warehousePointId').input().on('keyup', function (e, d) {
+        let pointNamePart = $(this).val();
+        $.post( "content/getData.php",
+            {status: "getPointsByName", format: "json", name: pointNamePart},
+            function (data) {
+                let options = [];
+
+                let selectizePointsOptions = [];
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    let option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": entry.pointName, "value": entry.pointID};
+                    selectizePointsOptions.push(selectizeOption);
+                });
+
+                let selectize2 = usersEditor.field('pointName').inst();
+                selectize2.clear();
+                selectize2.clearOptions();
+                selectize2.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+            }
+        );
+    });
+
+    addRequest.field('marketAgentUserId').input().on('keyup', function (e, d) {
+        let marketAgentName = $(this).val();
+        $.post( "content/getData.php",
+            {status: "getMarketAgentsByName", format: "json", name: marketAgentName},
+            function (data) {
+                let options = [];
+
+                let selectizePointsOptions = [];
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": entry.userName, "value": entry.userID};
+                    selectizePointsOptions.push(selectizeOption);
+                });
+
+                let selectize2 = usersEditor.field('marketAgentUserId').inst();
+                selectize2.clear();
+                selectize2.clearOptions();
+                selectize2.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+            }
+        );
+    });
+
+    addRequest.field('routeListID').input().on('keyup', function (e, d) {
+        let routeListNumber = $(this).val();
+        $.post( "content/getData.php",
+            {status: "getRouteListsByNumber", format: "json", name: routeListNumber},
+            function (data) {
+                let options = [];
+
+                let selectizePointsOptions = [];
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": entry.userName, "value": entry.userID};
+                    selectizePointsOptions.push(selectizeOption);
+                });
+
+                let selectize2 = usersEditor.field('routeListID').inst();
+                selectize2.clear();
+                selectize2.clearOptions();
+                selectize2.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+            }
+        );
+    });
 
 });
