@@ -2,49 +2,59 @@
 include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
 try {
     $privUser = PrivilegedUser::getInstance();
-    if (!isset($_POST['status'])) {
+    $action = $_POST['status'];
+    if (!isset($action)) {
         throw new DataTransferException('Не задан параметр "статус"', __FILE__);
-    } else if (strcasecmp($_POST['status'], 'getRequestsForUser') === 0) {
+    } else if (strcasecmp($action, 'getRequestsForUser') === 0) {
         echo getRequestsForUser($privUser);
-    } else if (strcasecmp($_POST['status'], 'changeStatusForRequest') === 0) {
+    } else if (strcasecmp($action, 'changeStatusForRequest') === 0) {
         echo changeStatusForRequest($privUser);
-    } else if (strcasecmp($_POST['status'], 'changeStatusForSeveralRequests') === 0) {
+    } else if (strcasecmp($action, 'changeStatusForSeveralRequests') === 0) {
         echo changeStatusForSeveralRequests($privUser);
-    } else if (strcasecmp($_POST['status'], 'getStatusHistory') === 0) {
+    } else if (strcasecmp($action, 'getStatusHistory') === 0) {
         echo getStatusHistory($privUser);
-    } else if (strcasecmp($_POST['status'], 'getRequestsForRouteList') === 0) {
+    } else if (strcasecmp($action, 'getRequestsForRouteList') === 0) {
         echo getRequestsForRouteList($privUser);
-    } else if (strcasecmp($_POST['status'], 'getRequestByClientIdAndInvoiceNumber') === 0) {
+    } else if (strcasecmp($action, 'getRequestByClientIdAndInvoiceNumber') === 0) {
         echo getRequestByClientIdAndInvoiceNumber($privUser);
-    } else if (strcasecmp($_POST['status'], 'addPretension') === 0) {
+    } else if (strcasecmp($action, 'addPretension') === 0) {
         echo addPretension($privUser);
-    } else if (strcasecmp($_POST['status'], 'getPretensions') === 0) {
+    } else if (strcasecmp($action, 'getPretensions') === 0) {
         echo getPretensions($privUser);
-    } else if (strcasecmp($_POST['status'], 'updatePretension') === 0) {
+    } else if (strcasecmp($action, 'updatePretension') === 0) {
         echo updatePretension($privUser);
-    } else if (strcasecmp($_POST['status'], 'deletePretension') === 0) {
+    } else if (strcasecmp($action, 'deletePretension') === 0) {
         echo deletePretension($privUser);
-    } else if (strcasecmp($_POST['status'], 'getCompanies') === 0) {
+    } else if (strcasecmp($action, 'getCompanies') === 0) {
         echo getCompanies($privUser);
-    } else if (strcasecmp($_POST['status'], 'getVehicles') === 0) {
+    } else if (strcasecmp($action, 'getVehicles') === 0) {
         echo getVehiclesForCompany($privUser);
-    } else if (strcasecmp($_POST['status'], 'getDrivers') === 0) {
+    } else if (strcasecmp($action, 'getDrivers') === 0) {
         echo getDriversForVehicle($privUser);
-    } else if (strcasecmp($_POST['status'], 'getRequestById') === 0) {
+    } else if (strcasecmp($action, 'getRequestById') === 0) {
         echo getRequestById($privUser);
-    } else if (strcasecmp($_POST['status'], 'getDocuments') === 0) {
+    } else if (strcasecmp($action, 'getDocuments') === 0) {
         echo getDocuments();
-    } else if (strcasecmp($_POST['status'], 'getClientsByINN') === 0) {
+    } else if (strcasecmp($action, 'getClientsByINN') === 0) {
         echo getClientsByINN($privUser);
-    } else if (strcasecmp($_POST['status'], 'uploadDocuments') === 0) {
+    } else if (strcasecmp($action, 'uploadDocuments') === 0) {
         echo uploadDocuments();
-    } else if (strcasecmp($_POST['status'], 'getPointsByName')===0) {
+    } else if (strcasecmp($action, 'getPointsByName')===0) {
         echo getPointsByName($privUser);
-    } else if (strcasecmp($_POST['status'], 'getRouteListsByNumber'===0)) {
+    } else if (strcasecmp($action, 'getRouteListsByNumber') === 0) {
         echo getRouteListsByNumber($privUser);
+    } else if (strcasecmp($action, 'getMarketAgentsByName') === 0) {
+        echo getMarketAgentByName($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function getMarketAgentByName(PrivilegedUser $privUser)
+{
+    $name = $_POST['name'];
+    $dataArray = $privUser->getUserEntity()->getMarketAgentsByName($name);
+    return json_encode($dataArray);
 }
 
 function getRouteListsByNumber(PrivilegedUser $privUser)
