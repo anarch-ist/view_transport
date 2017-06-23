@@ -1,29 +1,4 @@
 $(document).ready(function () {
-    // $.post(
-    //     "content/getData.php",
-    //     {status: "getAllPointIdPointNamePairs", format: "json"},
-    //     // server returns array of pairs [{pointID:1, pointName:"somePoint1"}, {pointID:2, pointName:"somePoint2"}]
-    //     function (data) {
-    //         var options = [];
-    //
-    //         var selectizePointsOptions = [];
-    //         data = JSON.parse(data);
-    //         data.forEach(function (entry) {
-    //             var option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
-    //             options.push(option);
-    //             var selectizeOption = {"label": entry.pointName, "value": entry.pointID};
-    //             selectizePointsOptions.push(selectizeOption);
-    //         });
-    //
-    //         var selectize2 = usersEditor.field('pointName').inst();
-    //         selectize2.clear();
-    //         selectize2.clearOptions();
-    //         selectize2.load(function (callback) {
-    //             callback(selectizePointsOptions);
-    //         });
-    //     }
-    // );
-
     $.post("content/getData.php",
         {status: "getAllUserRoles", format: "json"},
         // server returns array of pairs [{userRoleID:'ADMIN', userRoleRusName:'Администратор'}, {userRoleID:'W_DISPATCHER', userRoleRusName:'Диспетчер_склада'}]

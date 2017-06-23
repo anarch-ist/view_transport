@@ -41,6 +41,10 @@ class RouteListEntity implements IRouteListEntity {
         return $this->DAO->update(new UpdateRouteList($id, $routeData));
     }
 
+    function selectRouteListsByNumber($number)
+    {
+        return $this->DAO->select(new SelectRouteListsByNumber($number));
+    }
 }
 
 class SelectAllRouteLists implements IEntitySelect {
@@ -114,6 +118,31 @@ class UpdateRouteList implements IEntityUpdate {
         return "UPDATE `route_lists` SET palletsQty = $this->palletsQty, forwarderId = $this->forwarderId, " .
             "driverID = $this->driverPhoneNumber, licensePlate = $this->licensePlate, status = $this->status, " .
             "routeID = $this->routeId WHERE routeListID = $this->id";
+    }
+}
+
+class SelectRouteListsByNumber implements IEntitySelect
+{
+    private $number;
+
+    /**
+     * SelectClientsByInn constructor.
+     * @param $number
+     */
+    public function __construct($number)
+    {
+        $dao = DAO::getInstance();
+        $this->number = $dao->checkString($number);
+    }
+
+
+    /**
+     * Select all clients
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "SELECT routeID, routeListNumber FROM `route_lists` WHERE routeListNumber LIKE '$this->number%' LIMIT 10";
     }
 }
 

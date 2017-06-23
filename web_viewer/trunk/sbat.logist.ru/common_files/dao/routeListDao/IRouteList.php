@@ -10,4 +10,6 @@ interface IRouteListEntity
     function addRouteList($routeData);
 
     function updateRouteList($id, $routeData);
+
+    function selectRouteListsByNumber($number);
 }
