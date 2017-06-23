@@ -140,6 +140,12 @@ class PrivilegedUser extends AuthUser
         return \DAO\RouteEntity::getInstance();
     }
 
+    public function getRouteListEntity()
+    {
+        include_once __DIR__ . '/../dao/routeListDao/RouteListEntity.php';
+        return \DAO\RouteListEntity::getInstance();
+    }
+
     public function getRouteAndRoutePointsEntity()
     {
         include_once __DIR__ . '/../dao/routeAndRoutePoints/RouteAndRoutePoints.php';

@@ -11,56 +11,169 @@ $(document).ready(function () {
     });
 
 
-    let addRequest = new $.fn.dataTable.Editor({
+    var requestEditor = new $.fn.dataTable.Editor({
         ajax: "'content/getData.php'",
         table: "#user-grid",
         name: 'Создать новую заявку',
-        fields: [{
-            label: 'ИНН Клиента',
-            name: 'clientID',
-            type: 'selectize',
-            options: [],
-            opts: {
-                diacritics: true,
-                searchField: 'label',
-                labelField: 'label',
-                dropdownParent: "body"
+        idSrc: 'requestIDExternal',
+        fields: [
+            {
+                label: 'ИНН Client',
+                name: 'clientID',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'label',
+                    labelField: 'label',
+                    dropdownParent: "body"
+                }
+            },
+            {
+                label: 'Пункт склада',
+                name: 'warehousePointId',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'label',
+                    labelField: 'label',
+                    dropdownParent: "body"
+                }
+            },
+            {
+                label: 'Торговый представитель',
+                name: 'marketAgentUserId',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'label',
+                    labelField: 'label',
+                    dropdownParent: "body"
+                }
+            },
+            {
+                label: 'Маршрутный лист',
+                name: 'routeListID',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'label',
+                    labelField: 'label',
+                    dropdownParent: "body"
+                }
             }
-        }, {
-            label: 'Пункт склада',
-            name: 'warehousePointId',
-            type: 'selectize',
-            options: [],
-            opts: {
-                diacritics: true,
-                searchField: 'label',
-                labelField: 'label',
-                dropdownParent: "body"
-            }
-        }, {
-            label: 'Торговый представитель',
-            name: 'marketAgentUserId',
-            type: 'selectize',
-            options: [],
-            opts: {
-                diacritics: true,
-                searchField: 'label',
-                labelField: 'label',
-                dropdownParent: "body"
-            }
-        }, {
-            label: 'Маршрутный лист',
-            name: 'routeListID',
-            type: 'selectize',
-            options: [],
-            opts: {
-                diacritics: true,
-                searchField: 'label',
-                labelField: 'label',
-                dropdownParent: "body"
-            }
-        }
         ]
+    });
+
+    requestEditor.field('clientID').input().on('keyup', function (e, d) {
+        var clientINNPart = $(this).val();
+        $.post("content/getData.php",
+            {status: "getClientsByINN", format: "json", inn: clientINNPart},
+            function (clientsData) {
+                var options = [];
+                var selectizeOptions = [];
+                console.log(clientsData);
+                clientsData = JSON.parse(clientsData);
+                clientsData.forEach(function (entry) {
+                    var option = "<option value=" + entry.clientID + ">" + "ИНН: " + entry.INN + ", имя: " + entry.clientName + "</option>";
+                    options.push(option);
+                    var selectizeOption = {
+                        "label": "ИНН: " + entry.INN + ", имя: " + entry.clientName,
+                        "value": entry.clientID
+                    };
+                    selectizeOptions.push(selectizeOption);
+                });
+                let clientSelectize = requestEditor.field('clientID').inst();
+
+                clientSelectize.clear();
+                clientSelectize.clearOptions();
+                clientSelectize.load(function (callback) {
+                    callback(selectizeOptions);
+                });
+            }
+        );
+    });
+
+    requestEditor.field('warehousePointId').input().on('keyup', function (e, d) {
+        let pointNamePart = $(this).val();
+        $.post("content/getData.php",
+            {status: "getPointsByName", format: "json", name: pointNamePart},
+            function (data) {
+                let options = [];
+
+                let selectizePointsOptions = [];
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    let option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": entry.pointName, "value": entry.pointID};
+                    selectizePointsOptions.push(selectizeOption);
+                });
+
+                let selectize = requestEditor.field('warehousePointId').inst();
+                selectize.clear();
+                selectize.clearOptions();
+                selectize.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+            }
+        );
+    });
+
+    requestEditor.field('marketAgentUserId').input().on('keyup', function (e, d) {
+        let marketAgentName = $(this).val();
+        $.post("content/getData.php",
+            {status: "getMarketAgentsByName", format: "json", name: marketAgentName},
+            function (data) {
+                let options = [];
+
+                let selectizePointsOptions = [];
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": entry.userName, "value": entry.userID};
+                    selectizePointsOptions.push(selectizeOption);
+                });
+
+                let selectize = requestEditor.field('marketAgentUserId').inst();
+                selectize.clear();
+                selectize.clearOptions();
+                selectize.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+            }
+        );
+    });
+
+    requestEditor.field('routeListID').input().on('keyup', function (e, d) {
+        let routeListNumber = $(this).val();
+        $.post("content/getData.php",
+            {status: "getRouteListsByNumber", format: "json", number: routeListNumber},
+            function (data) {
+                let options = [];
+
+                let selectizePointsOptions = [];
+                console.log(data);
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    let option = "<option value=" + entry.routeListID + ">" + entry.routeListNumber + "</option>";
+                    options.push(option);
+                    let selectizeOption = {"label": entry.routeListNumber, "value": entry.routeListID};
+                    selectizePointsOptions.push(selectizeOption);
+                });
+
+                let selectize = requestEditor.field('routeListID').inst();
+                selectize.clear();
+                selectize.clearOptions();
+                selectize.load(function (callback) {
+                    callback(selectizePointsOptions);
+                });
+            }
+        );
     });
 
 
@@ -79,7 +192,7 @@ $(document).ready(function () {
         search: {
             caseInsensitive: true
         },
-        order: [[2,"desc"]],
+        order: [[2, "desc"]],
         //  jQueryUI: true,
         //   paging:         true,
         //  paginate: false,
@@ -171,10 +284,10 @@ $(document).ready(function () {
                     var filterValue = $(this).attr("currentFilter");
                     $(this).val(filterValue);
                     searchInput.css({'display': 'none'});
-                    if(this.value!=''){
-                        $footer.css("background-color","#c22929")
+                    if (this.value != '') {
+                        $footer.css("background-color", "#c22929")
                     } else {
-                        $footer.css("background-color","#f6f6f6");
+                        $footer.css("background-color", "#f6f6f6");
                     }
                 });
 
@@ -184,7 +297,7 @@ $(document).ready(function () {
                 if (historySearch) {
                     searchInput.val(historySearch);
                     searchInput.attr("currentFilter", historySearch);
-                    $footer.css("background-color","#c22929")
+                    $footer.css("background-color", "#c22929")
                 }
 
             });
@@ -195,23 +308,23 @@ $(document).ready(function () {
             if ($("#userRoleContainer").html().trim() === "Пользователь_клиента") {
                 dataTable.buttons(2).remove();
             }
-            
+
             var role = $('#data-role').attr('data-role');
             if (localStorage.getItem(role_type) == undefined) {
                 localStorage.setItem(role_type, role);
                 $.getDefaultColumns(dataTable, role);
             }
-            else if(localStorage.getItem(role_type) != role) {
+            else if (localStorage.getItem(role_type) != role) {
                 localStorage.setItem(role_type, role);
                 $.getDefaultColumns(dataTable, role);
             }
 
             //Button-link to admin page
-            if(role=="DISPATCHER"||role=="ADMIN"){
+            if (role == "DISPATCHER" || role == "ADMIN") {
                 dataTable.button().add(8, {
                     text: 'Админ. Страница',
                     action: function (e, dt, node, config) {
-                        window.location="/admin_page"
+                        window.location = "/admin_page"
                     }
                 });
             }
@@ -275,7 +388,7 @@ $(document).ready(function () {
                         $(this).val("").attr("currentFilter", "");
                     });
                     dataTable.columns().every(function () {
-                        $(this.footer()).css("background-color","f6f6f6");
+                        $(this.footer()).css("background-color", "f6f6f6");
                         this.search("");
                     });
                     dataTable.columns().draw();
@@ -293,9 +406,10 @@ $(document).ready(function () {
                     this.text((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск');
                 }
             },
+            // Раскомментируй
             // {
             //     extend: "create",
-            //     editor: addRequest,
+            //     editor: requestEditor,
             //     text: 'Добавить заявку'
             // }
         ],
@@ -374,9 +488,6 @@ $(document).ready(function () {
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
 
         ],
-        // success: function (data) {
-         // console.log(data);
-         // }
     });
     // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
@@ -402,141 +513,6 @@ $(document).ready(function () {
             });
             disabled = 0;
         }
-    });
-
-
-
-    //$(dataTable.table().container()).on( 'click', 'td', function () {
-    //    var cell = table.cell( this );
-    //    console.log( cell.index() );
-    //} );
-
-    //setTimeout(function(){
-    //    var firstSearchDiv = $("#user-grid tfoot tr th.col1 div:not(.dataTables_sizing)");
-    //    var secondSearchDiv = $("#user-grid tfoot tr th.col2 div:not(.dataTables_sizing)");
-    //
-    //    var firstClonedSearchDiv = $(".DTFC_Cloned tfoot tr th.col1 div");
-    //    var secondClonedSearchDiv = $(".DTFC_Cloned tfoot tr th.col2 div");
-    //
-    //    firstClonedSearchDiv.on("click", function() {
-    //        firstSearchDiv.click();
-    //    });
-    //
-    //    secondClonedSearchDiv.on("click", function() {
-    //        secondSearchDiv.click();
-    //    });
-    //
-    //    console.log(firstSearchDiv);
-    //    console.log(secondSearchDiv);
-    //    console.log(firstClonedSearchDiv);
-    //    console.log(secondClonedSearchDiv);
-    //}, 2000);
-
-
-
-
-
-    addRequest.field('clientID').input().on('keyup', function (e, d) {
-        let clientINNPart = $(this).val();
-        $.post( "content/getData.php",
-            {status: "getClientsByINN", format: "json", inn: clientINNPart},
-            function (clientsData) {
-                let options = [];
-                let selectizeOptions = [];
-                clientsData = JSON.parse(clientsData);
-                clientsData.forEach(function (entry) {
-                    let option = "<option value=" + entry.clientID + ">" + "ИНН: " + entry.INN + ", имя: " + entry.clientName + "</option>";
-                    options.push(option);
-                    let selectizeOption = {"label": "ИНН: " + entry.INN + ", имя: " + entry.clientName, "value": entry.clientID};
-                    selectizeOptions.push(selectizeOption);
-                });
-                let clientSelectize = usersEditor.field('clientID').inst();
-
-                clientSelectize.clear();
-                clientSelectize.clearOptions();
-                clientSelectize.load(function (callback) {
-                    callback(selectizeOptions);
-                });
-            }
-        );
-    });
-
-    addRequest.field('warehousePointId').input().on('keyup', function (e, d) {
-        let pointNamePart = $(this).val();
-        $.post( "content/getData.php",
-            {status: "getPointsByName", format: "json", name: pointNamePart},
-            function (data) {
-                let options = [];
-
-                let selectizePointsOptions = [];
-                data = JSON.parse(data);
-                data.forEach(function (entry) {
-                    let option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
-                    options.push(option);
-                    let selectizeOption = {"label": entry.pointName, "value": entry.pointID};
-                    selectizePointsOptions.push(selectizeOption);
-                });
-
-                let selectize2 = usersEditor.field('pointName').inst();
-                selectize2.clear();
-                selectize2.clearOptions();
-                selectize2.load(function (callback) {
-                    callback(selectizePointsOptions);
-                });
-            }
-        );
-    });
-
-    addRequest.field('marketAgentUserId').input().on('keyup', function (e, d) {
-        let marketAgentName = $(this).val();
-        $.post( "content/getData.php",
-            {status: "getMarketAgentsByName", format: "json", name: marketAgentName},
-            function (data) {
-                let options = [];
-
-                let selectizePointsOptions = [];
-                data = JSON.parse(data);
-                data.forEach(function (entry) {
-                    let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
-                    options.push(option);
-                    let selectizeOption = {"label": entry.userName, "value": entry.userID};
-                    selectizePointsOptions.push(selectizeOption);
-                });
-
-                let selectize2 = usersEditor.field('marketAgentUserId').inst();
-                selectize2.clear();
-                selectize2.clearOptions();
-                selectize2.load(function (callback) {
-                    callback(selectizePointsOptions);
-                });
-            }
-        );
-    });
-
-    addRequest.field('routeListID').input().on('keyup', function (e, d) {
-        let routeListNumber = $(this).val();
-        $.post( "content/getData.php",
-            {status: "getRouteListsByNumber", format: "json", name: routeListNumber},
-            function (data) {
-                let options = [];
-
-                let selectizePointsOptions = [];
-                data = JSON.parse(data);
-                data.forEach(function (entry) {
-                    let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
-                    options.push(option);
-                    let selectizeOption = {"label": entry.userName, "value": entry.userID};
-                    selectizePointsOptions.push(selectizeOption);
-                });
-
-                let selectize2 = usersEditor.field('routeListID').inst();
-                selectize2.clear();
-                selectize2.clearOptions();
-                selectize2.load(function (callback) {
-                    callback(selectizePointsOptions);
-                });
-            }
-        );
     });
 
 });

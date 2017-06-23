@@ -34,11 +34,38 @@ try {
         echo getRequestById($privUser);
     } else if (strcasecmp($_POST['status'], 'getDocuments') === 0) {
         echo getDocuments();
+    } else if (strcasecmp($_POST['status'], 'getClientsByINN') === 0) {
+        echo getClientsByINN($privUser);
     } else if (strcasecmp($_POST['status'], 'uploadDocuments') === 0) {
         echo uploadDocuments();
+    } else if (strcasecmp($_POST['status'], 'getPointsByName')===0) {
+        echo getPointsByName($privUser);
+    } else if (strcasecmp($_POST['status'], 'getRouteListsByNumber'===0)) {
+        echo getRouteListsByNumber($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function getRouteListsByNumber(PrivilegedUser $privUser)
+{
+    $number = $_POST['number'];
+    $dataArray = $privUser->getRouteListEntity()->selectRouteListsByNumber($number);
+    return json_encode($dataArray);
+}
+
+function getClientsByINN(PrivilegedUser $privUser)
+{
+    $inn = $_POST['inn'];
+    $dataArray = $privUser->getClientEntity()->selectClientsByINN($inn);
+    return json_encode($dataArray);
+}
+
+function getPointsByName(PrivilegedUser $privUser)
+{
+    $name = $_POST['name'];
+    $dataArray = $privUser->getPointEntity()->selectPointsByName($name);
+    return json_encode($dataArray);
 }
 
 function uploadDocuments()
