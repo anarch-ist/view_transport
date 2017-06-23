@@ -83,13 +83,9 @@ class UserEntity implements IUserEntity
         return $this->_DAO->select(new SelectUserRoles());
     }
 
-    /**
-     * @param $name
-     * @return mixed
-     */
     function getMarketAgentsByName($name)
     {
-        // TODO: Implement getMarketAgentsByName() method.
+        return $this->_DAO->select(new SelectMarketAgentsByName($name));
     }
 
 
@@ -304,5 +300,26 @@ class UpdateUser implements IEntityUpdate
 
         $query = $query . " WHERE userID = $this->userID;";
         return $query;
+    }
+}
+
+class SelectMarketAgentsByName implements IEntitySelect
+{
+    private $name;
+
+    public function __construct($name)
+    {
+        $dao = DAO::getInstance();
+        $this->name = $dao->checkString($name);
+    }
+
+
+    /**
+     * Select all clients
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return "SELECT userID, userName FROM `users` WHERE userRoleID = 'MARKET_AGENT' AND userName LIKE '$this->name%' LIMIT 10";
     }
 }

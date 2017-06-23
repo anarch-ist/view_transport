@@ -101,12 +101,12 @@ $(document).ready(function () {
         let pointNamePart = $(this).val();
         $.post("content/getData.php",
             {status: "getPointsByName", format: "json", name: pointNamePart},
-            function (data) {
+            function (wareHouseData) {
                 let options = [];
 
                 let selectizePointsOptions = [];
-                data = JSON.parse(data);
-                data.forEach(function (entry) {
+                wareHouseData = JSON.parse(wareHouseData);
+                wareHouseData.forEach(function (entry) {
                     let option = "<option value=" + entry.pointID + ">" + entry.pointName + "</option>";
                     options.push(option);
                     let selectizeOption = {"label": entry.pointName, "value": entry.pointID};
@@ -124,15 +124,16 @@ $(document).ready(function () {
     });
 
     requestEditor.field('marketAgentUserId').input().on('keyup', function (e, d) {
-        let marketAgentName = $(this).val();
+        var marketAgentName = $(this).val();
         $.post("content/getData.php",
             {status: "getMarketAgentsByName", format: "json", name: marketAgentName},
-            function (data) {
+            function (marketAgentData) {
                 let options = [];
 
+                console.log(marketAgentData);
                 let selectizePointsOptions = [];
-                data = JSON.parse(data);
-                data.forEach(function (entry) {
+                marketAgentData = JSON.parse(marketAgentData);
+                marketAgentData.forEach(function (entry) {
                     let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
                     options.push(option);
                     let selectizeOption = {"label": entry.userName, "value": entry.userID};
@@ -153,13 +154,13 @@ $(document).ready(function () {
         let routeListNumber = $(this).val();
         $.post("content/getData.php",
             {status: "getRouteListsByNumber", format: "json", number: routeListNumber},
-            function (data) {
+            function (routeListData) {
                 let options = [];
 
                 let selectizePointsOptions = [];
-                console.log(data);
-                data = JSON.parse(data);
-                data.forEach(function (entry) {
+                console.log(routeListData);
+                routeListData = JSON.parse(routeListData);
+                routeListData.forEach(function (entry) {
                     let option = "<option value=" + entry.routeListID + ">" + entry.routeListNumber + "</option>";
                     options.push(option);
                     let selectizeOption = {"label": entry.routeListNumber, "value": entry.routeListID};
