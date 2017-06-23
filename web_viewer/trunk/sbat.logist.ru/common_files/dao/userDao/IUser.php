@@ -23,4 +23,6 @@ interface IUserEntity
     function addUser(UserData $user); //covered
 
     function getUsersTotalCount();
+
+    function getMarketAgentsByName($name);
 }

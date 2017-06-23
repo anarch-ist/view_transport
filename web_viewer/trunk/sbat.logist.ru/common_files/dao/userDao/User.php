@@ -82,6 +82,17 @@ class UserEntity implements IUserEntity
     {
         return $this->_DAO->select(new SelectUserRoles());
     }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    function getMarketAgentsByName($name)
+    {
+        // TODO: Implement getMarketAgentsByName() method.
+    }
+
+
 }
 
 class SelectTotalUserCount implements IEntitySelect
