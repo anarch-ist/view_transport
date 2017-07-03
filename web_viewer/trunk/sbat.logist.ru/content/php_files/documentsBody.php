@@ -110,9 +110,9 @@
                 <a class="btn btn-default btn-lg" style="float: right" href="../../index.php">
                     На главную
                 </a>
-                    <button type="button" id="addDocumentButton" class="btn btn-default btn-lg" data-toggle="modal" data-target="#addDocumentModal">
-                        Добавить документ
-                    </button>
+<!--                    <button type="button" id="addDocumentButton" class="btn btn-default btn-lg" data-toggle="modal" data-target="#addDocumentModal">-->
+<!--                        Добавить документ-->
+<!--                    </button>-->
             </div>
         </div>
     </div>
