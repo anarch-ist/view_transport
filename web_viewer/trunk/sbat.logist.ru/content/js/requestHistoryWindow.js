@@ -96,6 +96,16 @@ function updatePretension(pretensionID, reqIdExt, callback) {
 
 }
 
+const $_GET = {};
+
+
+document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
+    function decode(s) {
+        return decodeURIComponent(s.split("+").join(" "));
+    }
+
+    $_GET[decode(arguments[1])] = decode(arguments[2]);
+});
 
 $(document).ready(function () {
 
@@ -162,22 +172,18 @@ $(document).ready(function () {
         }
     });
 
+    if ($_GET['pretensionModal'] === "1") {
+        $('#pretensionModal').modal();
+        $('#submitPretension').button("<i class='fa fa-circle-o-notch fa-spin'></i> Загрузка...").prop( "disabled", true );;
+    }
+
 
 
 });
 
 // var requestIDExternal = '0';
 $(window).on('load', function () {
-    var $_GET = {};
 
-
-    document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
-        function decode(s) {
-            return decodeURIComponent(s.split("+").join(" "));
-        }
-
-        $_GET[decode(arguments[1])] = decode(arguments[2]);
-    });
 
     // $('#deletePretension').hide();
     $('.pretensionSum').mask('0000000000.00', {reverse: true});
@@ -212,9 +218,12 @@ $(window).on('load', function () {
                 invoiceNumber: $_GET['invoiceNumber']
             },
             function (data) {
+
                 requestIDExternal = JSON.parse(data).requestIDExternal;
                 setRequestInfo(data);
+
                 loadPretensions();
+
 
             }
         ).success(function () {
@@ -225,10 +234,6 @@ $(window).on('load', function () {
                 function (data) {
                     setHistoryTable(data);
                     removeLoadingScreen();
-
-                    if ($_GET['pretensionModal'] === "1") {
-                        $('#pretensionModal').modal();
-                    }
                 }
             )
         });
@@ -291,7 +296,7 @@ $(window).on('load', function () {
                     alert(data);
                 }
             })
-        });
+        }).button("reset").prop( "disabled", false );
 
     }
 

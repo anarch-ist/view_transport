@@ -133,6 +133,10 @@ input[type="checkbox"],
     background: #ccc !important;
 }
 
+div.selectize-dropdown {
+    z-index: 100000;
+}
+
 table.dataTable thead th div.DataTables_sort_wrapper span {
     transform: scale(1.2);
 }

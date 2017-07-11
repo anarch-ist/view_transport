@@ -45,6 +45,10 @@ class RouteListEntity implements IRouteListEntity {
     {
         return $this->DAO->select(new SelectRouteListsByNumber($number));
     }
+
+    function selectRouteListIdByNumber($number){
+        return $this->DAO->select(new SelectRouteListIdByNumber($number));
+    }
 }
 
 class SelectAllRouteLists implements IEntitySelect {
@@ -71,8 +75,8 @@ class SelectRouteListById implements IEntitySelect {
 
 
 class InsertRouteList implements IEntityInsert {
-    private $routeListIdExternal, $dataSourceId, $routeListNumber, $creationDate, $palletsQty, $driverId,
-        $driverPhoneNumber, $forwarderId, $licensePlate, $status, $routeId;
+    private $routeListIdExternal, $dataSourceId, $routeListNumber, $creationDate, $palletsQty,
+        $forwarderId, $licensePlate, $status, $routeId;
 
     public function __construct($routeListData)
     {
@@ -80,20 +84,22 @@ class InsertRouteList implements IEntityInsert {
         $this->routeListIdExternal = $dao->checkString('LSS-' . $routeListData['routeListNumber']);
         $this->dataSourceId = 'ADMIN_PAGE';
         $this->routeListNumber = $dao->checkString($routeListData['routeListNumber']);
-        $this->creationDate = $dao->checkString($routeListData['creationDate']);
-        $this->palletsQty = $dao->checkString($routeListData['departureDate']);
-        $this->driverId = $dao->checkString($routeListData['driverId']);
-        $this->driverPhoneNumber = $dao->checkString($routeListData['driverPhoneNumber']);
-        $this->forwarderId = $dao->checkString($routeListData['departureDate']);
-        $this->licensePlate = $dao->checkString($routeListData['departureDate']);
+//        $this->creationDate = $dao->checkString($routeListData['creationDate']);
+        $this->palletsQty = $dao->checkString($routeListData['palletsQty']);
+//        $this->driverId = $dao->checkString($routeListData['driverId']);
+//        $this->driverPhoneNumber = $dao->checkString($routeListData['driverPhoneNumber']);
+//        $this->driverPhoneNumber = "(SELECT phone FROM `drivers` WHERE id = $this->driverId)";
+        $this->forwarderId = $dao->checkString($routeListData['forwarderId']);
+        $this->licensePlate = $dao->checkString($routeListData['licensePlate']);
         $this->status = 'CREATED';
         $this->routeId = $dao->checkString($routeListData['routeId']);
     }
 
     function getInsertQuery()
     {
-        return "INSERT INTO `route_lists` (routeListIDExternal, dataSourceID, routeListNumber, creationDate, departureDate, palletsQty, driverID, driverPhoneNumber, forwarderId, licensePlate, status, routeID) VALUES " .
-            "($this->routeListIdExternal, $this->dataSourceId, $this->routeListNumber, CURDATE(), CURDATE(), $this->palletsQty, $this->driverId, $this->driverPhoneNumber, $this->forwarderId, $this->licensePlate, $this->status, $this->routeId)";
+        $query = "INSERT INTO `route_lists` (routeListIDExternal, dataSourceID, routeListNumber, creationDate, departureDate, palletsQty,  forwarderId, licensePlate, status, routeID) VALUES " .
+            "('$this->routeListIdExternal', '$this->dataSourceId', '$this->routeListNumber', CURDATE(), CURDATE(), $this->palletsQty,  '$this->forwarderId', '$this->licensePlate', '$this->status', $this->routeId)";
+        return $query;
     }
 }
 
@@ -142,8 +148,29 @@ class SelectRouteListsByNumber implements IEntitySelect
      */
     function getSelectQuery()
     {
-        return "SELECT routeID, routeListNumber FROM `route_lists` WHERE routeListNumber LIKE '$this->number%' LIMIT 10";
+        return "SELECT routeID, routeListNumber FROM `route_lists` WHERE routeListNumber LIKE '$this->number%' LIMIT 20";
     }
 }
 
+class SelectRouteListIdByNumber implements IEntitySelect
+{
+    private $number;
+
+    /**
+     * SelectRouteListIdByNumber constructor.
+     * @param $number
+     */
+    public function __construct($number)
+    {
+        $dao = DAO::getInstance();
+        $this->number = $dao->checkString($number);
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT routeListId, routeListNumber FROM `route_lists` where routeListNumber LIKE '$this->number%' LIMIT 20";
+    }
+
+
+}
 ?>

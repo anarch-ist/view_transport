@@ -21,7 +21,7 @@ interface IRequestEntity
     function deleteRequest(RequestData $Request);
     //later
 
-    function addRequest(RequestData $Request);
+    function addRequest($requestData);
     //later
 
     function getRequestStatuses(\PrivilegedUser $pUser);

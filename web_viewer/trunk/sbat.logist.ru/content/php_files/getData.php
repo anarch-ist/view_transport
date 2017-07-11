@@ -45,9 +45,38 @@ try {
         echo getRouteListsByNumber($privUser);
     } else if (strcasecmp($action, 'getMarketAgentsByName') === 0) {
         echo getMarketAgentByName($privUser);
+    } else if (strcasecmp($action, 'addRouteList') === 0){
+        echo addRouteList($privUser);
+    } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
+        getAllRouteIdDirectionPairs($privUser);
+    } else if (strcasecmp($action,'addRequest')===0) {
+        addRequest($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function addRequest(PrivilegedUser $privUser){
+    return json_encode($privUser->getRequestEntity()->addRequest($_POST['data'][0]));
+}
+
+function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getRouteEntity()->selectRoutes();
+    $data = array();
+    foreach ($dataArray as $key => $val) {
+        if ($val instanceof DAO\RouteData) {
+            $data[$key]['routeID'] = $val->getData('routeID');
+            $data[$key]['directionName'] = $val->getData('routeName');
+        }
+    }
+    echo json_encode($data);
+}
+
+function addRouteList(PrivilegedUser $privUser){
+    $data = $_POST['data'];
+    return json_encode($privUser->getRouteListEntity()->addRouteList($data));
+
 }
 
 function getMarketAgentByName(PrivilegedUser $privUser)
@@ -60,7 +89,7 @@ function getMarketAgentByName(PrivilegedUser $privUser)
 function getRouteListsByNumber(PrivilegedUser $privUser)
 {
     $number = $_POST['number'];
-    $dataArray = $privUser->getRouteListEntity()->selectRouteListsByNumber($number);
+    $dataArray = $privUser->getRouteListEntity()->selectRouteListIdByNumber($number);
     return json_encode($dataArray);
 }
 

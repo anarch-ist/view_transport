@@ -14,15 +14,15 @@ $(document).ready(function () {
                 label: 'Стоимость за маршрут',
                 name: 'cost',
                 type: 'mask',
-                mask: '0999999999P99',
-                maskOptions: {
-                    translation: {
-                        'P': {
-                            pattern: /\./,
-                            fallback: '.'
-                        }
-                    }
-                },
+                mask: '0999999999.99',
+                // maskOptions: {
+                //     translation: {
+                //         'P': {
+                //             pattern: /\./,
+                //             fallback: '.'
+                //         }
+                //     }
+                // },
                 placeholder: "1000.00"
             },
             {
