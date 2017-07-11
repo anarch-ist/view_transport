@@ -70,9 +70,9 @@ class RequestEntity implements IRequestEntity
         // TODO: Implement deleteRequest() method.
     }
 
-    function addRequest(RequestData $Request)
+    function addRequest($requestData)
     {
-        // TODO: Implement addRequest() method.
+        return $this->_DAO->insert(new addRequest($requestData));
     }
     
 
@@ -110,6 +110,97 @@ class RequestEntity implements IRequestEntity
 
     function getMarketAgentEmail($requestIDExternal){
         return $this->_DAO->select(new GetMarketAgentEmail($requestIDExternal));
+    }
+}
+
+class addRequest implements IEntityInsert
+{
+    private $requestIDExternal;
+    private $userID;
+    private $newRequestStatus;
+    private $datetime;
+    private $comment;
+    private $vehicleNumber;
+    private $routeID;
+    private $hoursAmount;
+    private $transportCompanyId;
+    private $vehicleId;
+    private $driverId;
+    private $requestNumber;
+    private $clientId;
+    private $routeListId;
+    private $marketAgentUserId;
+    private $invoiceNumber;
+    private $documentNumber;
+    private $firma;
+    private $storage;
+    private $contactName;
+    private $contactPhone;
+    private $deliveryDate;
+    private $warehousePointId;
+
+
+    function __construct($requestData)
+//        $userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $routeID, $hoursAmount, $transportCompanyId, $vehicleId, $driverId)
+    {
+        $dao = DAO::getInstance();
+
+        $this->userID = $dao->checkString($requestData['userID']);
+        $this->requestIDExternal = $dao->checkString($requestData['requestIDExternal']);
+        $this->newRequestStatus = $dao->checkString($requestData['nrewRequestStatus']);
+        $this->datetime = $dao->checkString($requestData['datetime']);
+        $this->comment = $dao->checkString($requestData['comment']);
+        $this->vehicleNumber = $dao->checkString($requestData['vehicleNumber']);
+        $this->routeID = $dao->checkString($requestData['routeID']);
+//        $this->hoursAmount = $dao->checkString();
+        $this->transportCompanyId = $dao->checkString($requestData['transportCompanyId']);
+        $this->vehicleId = $dao->checkString($requestData['vehicleId']);
+        $this->driverId = $dao->checkString($requestData['driverId']);
+        $this->requestNumber = $dao->checkString($requestData['requestNumber']);
+        $this->clientId = $dao->checkString($requestData['clientID']);
+        $this->routeListId = $dao->checkString($requestData['routeListID']);
+        $this->marketAgentUserId = $dao->checkString($requestData['marketAgentUserId']);
+        $this->invoiceNumber = $dao->checkString($requestData['invoiceNumber']);
+        $this->documentNumber = $dao->checkString($requestData['documentNumber']);
+        $this->firma = $dao->checkString($requestData['firma']);
+        $this->contactName = $dao->checkString($requestData['contactName']);
+        $this->contactPhone = $dao->checkString($requestData['contactPhone']);
+        $this->deliveryDate = $dao->checkString($requestData['deliveryDate']);
+        $this->warehousePointId = $dao->checkString($requestData['warehousePointId']);
+        $this->storage = $dao->checkString($requestData['storage']);
+    }
+
+    /**
+     * @return string
+     */
+    function getInsertQuery()
+    {
+        $companyPart = ($this->transportCompanyId == '') ? "NULL" : $this->transportCompanyId;
+        $vehiclePart = ($this->vehicleId == '') ? "NULL" : $this->vehicleId;
+        $driverPart = ($this->driverId == '') ? "NULL" : $this->driverId;
+        $String = "INSERT INTO requests (requestIDExternal, dataSourceID, requestNumber, requestDate, clientID, destinationPointID, marketAgentUserID, invoiceNumber, invoiceDate, documentNumber, documentDate, firma, storage, requestStatusID, warehousePointID, routeListID, transportCompanyId, vehicleId, driverId)  
+VALUES (
+(SELECT CONCAT('LSS-',requestID) FROM transmaster_transport_db.requests AS rqs ORDER BY requestID DESC LIMIT 1),
+'ADMIN_PAGE',
+(SELECT CONCAT('LSS-',requestID) FROM transmaster_transport_db.requests AS rqs ORDER BY requestID DESC LIMIT 1),
+CURDATE(),
+(SELECT userID FROM users WHERE users.clientID = $this->clientId),
+(SELECT pointID FROM route_points WHERE routeID = (SELECT routeID FROM route_lists WHERE routeListID = $this->routeListId) ORDER BY sortOrder DESC LIMIT 1),
+$this->marketAgentUserId,
+'$this->invoiceNumber',
+CURDATE(),
+'$this->documentNumber',
+CURDATE(),
+'$this->firma',
+'$this->storage',
+'CREATED',
+$this->warehousePointId,
+$this->routeListId,
+$companyPart,
+$vehiclePart,
+$driverPart
+);";
+        return $String;
     }
 }
 

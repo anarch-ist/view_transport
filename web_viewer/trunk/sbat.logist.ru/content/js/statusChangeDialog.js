@@ -25,7 +25,7 @@ $(document).ready(function () {
         '</table>' +
         '</div>'
     );
-    if ($("#data-role").html().trim() == "Пользователь_клиента"){
+    if ($("#data-role").html().trim() === "Пользователь_клиента"){
         $('#vehicleNumberTr').hide();
         $('#linkTr').hide();
         $('#companyTr').hide();
@@ -107,7 +107,7 @@ $(document).ready(function () {
                         companyId: Number(value)
                     }, function (vehiclesData) {
                         var vehicleOptions = [];
-                            console.log(vehiclesData);
+                            // console.log(vehiclesData);
                         vehiclesData = JSON.parse(vehiclesData);
 
                         vehiclesData.forEach(function (entry) {
@@ -411,6 +411,10 @@ $(document).ready(function () {
                 $(this).dialog("close");
             }
         }
+    });
+
+    pretensionSender = new $.fn.dataTable.Editor({
+
     });
 
     // external function

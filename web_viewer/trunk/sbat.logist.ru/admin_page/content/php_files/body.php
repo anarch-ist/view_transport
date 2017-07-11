@@ -4,10 +4,12 @@
 
     <link rel="stylesheet" type="text/css" href="../common_files/media/jQueryUI-1.11.4/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Selectize/css/selectize.min.css"/>
-    <link rel="stylesheet" type="text/css" href="../common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="../common_files/media/DataTables-1.10.10/css/dataTables.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Buttons-1.1.0/css/buttons.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="../common_files/media/FieldType-Selectize/editor.selectize.min.css"/> <!--z-index:999-->
+    <link rel="stylesheet" type="text/css" href="../common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
+    <!--z-index:999-->
     <link rel="stylesheet" type="text/css" href="../common_files/media/Select-1.1.0/css/select.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../admin_page/content/css/admin.css"/>
 
@@ -48,7 +50,9 @@
         <li><a href="#tabs-1">Маршруты</a></li>
         <li><a href="#tabs-2">Пользователи</a></li>
         <li><a href="#tabs-3">ТК, ТС и водители</a></li>
-        <li onclick="location.href='../'"><a target="_blank" href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-e"  style="display:inline-block"></span>На главную</a></li>
+        <li onclick="location.href='../'"><a target="_blank" href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-e"
+                                                                            style="display:inline-block"></span>На главную</a></li>
+        <li><a onclick="" href="../" id="logout">Выход</a></li>
     </ul>
     <div id="tabs-1">
         <h2>Маршруты</h2>
