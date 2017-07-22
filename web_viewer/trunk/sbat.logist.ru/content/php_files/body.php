@@ -6,7 +6,8 @@
     <link rel="stylesheet" type="text/css" href="common_files/media/Selectize/css/selectize.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.12/css/dataTables.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.2.2/css/buttons.jqueryui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
+<!--    <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>-->
+    <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.6.3/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.2.0/css/select.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FixedColumns-3.2.2/css/fixedColumns.jqueryui.min.css"/>
@@ -24,8 +25,10 @@
     <script src="common_files/media/DataTables-1.10.12/js/dataTables.jqueryui.min.js"></script>
     <script src="common_files/media/Buttons-1.1.0/js/dataTables.buttons.js"></script>
     <script src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
-    <script src="common_files/media/Editor-1.5.4/js/dataTables.editor.min.js"></script>
-    <script src="common_files/media/Editor-1.5.4/js/editor.jqueryui.min.js"></script>
+<!--    <script src="common_files/media/Editor-1.5.4/js/dataTables.editor.min.js"></script>-->
+<!--    <script src="common_files/media/Editor-1.5.4/js/editor.jqueryui.min.js"></script>-->
+    <script src="common_files/media/Editor-1.6.3/js/dataTables.editor.min.js"></script>
+    <script src="common_files/media/Editor-1.6.3/js/editor.jqueryui.min.js"></script>
     <script src="common_files/media/FieldType-Mask/editor.mask.min.js"></script>
     <script src="common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
     <script src="common_files/media/Select-1.2.0/js/dataTables.select.min.js"></script>
@@ -79,6 +82,48 @@
             </div>
             <button id="logout">Выйти</button>
         </div>
+    </div>
+
+    <div id="requestForm" >
+        <fieldset class="request">
+            <legend>Данные</legend>
+            <div data-editor-template="clientID"></div>
+            <div data-editor-template="marketAgentUserId"></div>
+            <div data-editor-template="invoiceNumber"></div>
+            <div data-editor-template="documentNumber"></div>
+            <div data-editor-template="firma"></div>
+            <div data-editor-template="storage"></div>
+            <div data-editor-template="warehousePointId"></div>
+            <div data-editor-template="boxQty"></div>
+            <div id="deliveryDate" data-editor-template="deliveryDate"></div>
+<!--            <div data-editor-template="transportCompanyId"></div>-->
+<!--            <div data-editor-template="vehicleId"></div>-->
+<!--            <div data-editor-template="driverId"></div>-->
+        </fieldset>
+        <fieldset>
+            <legend>Маршрутный лист</legend>
+            <div data-editor-template="routeListID"></div>
+            <div id="requestAccordion">
+                <h3>Добавить маршрутный лист</h3>
+                <form action="content/getData.php" method="POST" id="routeListForm">
+                    <table width="100%">
+                        <tr valign="top" ><td width="200"><label  for="routeListNumber">Номер маршрутного листа: </label></td><td><input required name="routeListNumber" class="DTE_Field_InputControl" id="routeListNumber"></td></tr>
+                        <tr valign="top" ><td width="200"><label for="routePalletsQty">Кол-во паллет: </label></td><td><input required class="DTE_Field_InputControl" name="palletsQty" id="routePalletsQty"/></td></tr>
+<!--                        <tr valign="top" ><td width="200"><label for="routeDriverId">Кол-во паллет: </label></td><td><input name="driverId" id="routeDriverId"/></td></tr>-->
+                        <tr valign="top" ><td width="200"><label for="forwarderId">Форвардер (Если есть): </label></td><td><input  name="forwarderId" id="forwarderId" /></td></tr>
+                        <tr valign="top" ><td width="200"><label for="routeLicensePlate">Номер машины: </label></td><td><input size="10" name="licensePlate" id="routeLicensePlate" /></td></tr>
+                        <tr valign="top" ><td width="200"><label for="routeId">Маршрут: </label></td><td><input required name="routeId" id="routeId" /></td></tr>
+                    </table>
+                    <button type="submit">Сохранить</button>
+                </form>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Транспорт</legend>
+            <div data-editor-template="transportCompanyId"></div>
+            <div data-editor-template="vehicleId"></div>
+            <div data-editor-template="driverId"></div>
+        </fieldset>
     </div>
 
     <table id="user-grid" cellpadding="0" cellspacing="0" border="0" class="display" width="100%">

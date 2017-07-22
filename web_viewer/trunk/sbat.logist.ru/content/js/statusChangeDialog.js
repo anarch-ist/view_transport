@@ -25,7 +25,7 @@ $(document).ready(function () {
         '</table>' +
         '</div>'
     );
-    if ($("#data-role").html().trim() === "Пользователь_клиента"){
+    if ($("#data-role").html().trim() == "Пользователь_клиента"){
         $('#vehicleNumberTr').hide();
         $('#linkTr').hide();
         $('#companyTr').hide();
@@ -107,7 +107,7 @@ $(document).ready(function () {
                         companyId: Number(value)
                     }, function (vehiclesData) {
                         var vehicleOptions = [];
-                            // console.log(vehiclesData);
+                            console.log(vehiclesData);
                         vehiclesData = JSON.parse(vehiclesData);
 
                         vehiclesData.forEach(function (entry) {
@@ -245,12 +245,19 @@ $(document).ready(function () {
                             routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
                         },
                         function (data) {
+                           // console.log(data);
+
+
+                                $('#statusCurrent').html(dataTable.row($('#user-grid .selected')).data().requestStatusRusName);
+
+
                             var requestsArray = JSON.parse(data);
                             $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
                             $requestCheckBoxes.html("");
                             $numberRequestCheckBoxes.html("");
                             // console.log(requestsArray[0]['requestStatusRusName']);
                             $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
+
                             $('#selectNumbersRequestsTr').hide();
                             $selectRequestsTr.hide();
                             // requestsArray.forEach(function(request){
@@ -411,10 +418,6 @@ $(document).ready(function () {
                 $(this).dialog("close");
             }
         }
-    });
-
-    pretensionSender = new $.fn.dataTable.Editor({
-
     });
 
     // external function

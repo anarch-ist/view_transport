@@ -10,28 +10,60 @@ $(document).ready(function () {
         // window.location.reload();
     });
 
+    $('#requestAccordion').accordion({
+        collapsible: true,
+        active: false,
+        icons: {
+            header: "ui-icon-plus",
+            activeHeader: "ui-icon-plus"
+        }
+    });
+
+
+    $('#routeListForm').on('submit', function (e) {
+        e.preventDefault();
+
+        let data = $(this).serializeArray().reduce(function (a, x) {
+            a[x.name] = x.value;
+            return a;
+        }, {});
+        // console.log(JSON.stringify(data));
+
+        $.post(
+            "content/getData.php",
+            {
+                status: "addRouteList",
+                format: "json",
+                data: data
+            },
+            function (data) {
+                if (data) {
+                    loadRouteLists(data);
+                    console.log(data);
+                    requestEditor.field('routeListID').inst().setValue(JSON.parse(data)[0].routeListId);
+                }
+                $('#requestAccordion').accordion('option', {active: false});
+                $(this).trigger('reset');
+            })
+        // error: function (jXHR, textStatus, errorThrown) {
+        //     alert(errorThrown+jXHR+textStatus);
+        // },
+        // done: function (data) {
+        //     alert(data)
+        // }
+    });
+
 
     var requestEditor = new $.fn.dataTable.Editor({
-        ajax: "'content/getData.php'",
+        ajax: "content/getData.php",
+        template: '#requestForm',
         table: "#user-grid",
         name: 'Создать новую заявку',
         idSrc: 'requestIDExternal',
         fields: [
             {
-                label: 'ИНН Client',
+                label: 'Клиент (ИНН)',
                 name: 'clientID',
-                type: 'selectize',
-                options: [],
-                opts: {
-                    diacritics: true,
-                    searchField: 'label',
-                    labelField: 'label',
-                    dropdownParent: "body"
-                }
-            },
-            {
-                label: 'Пункт склада',
-                name: 'warehousePointId',
                 type: 'selectize',
                 options: [],
                 opts: {
@@ -51,8 +83,54 @@ $(document).ready(function () {
                     searchField: 'label',
                     labelField: 'label',
                     dropdownParent: "body"
+                },
+
+
+            },
+            {
+                label: 'Номер накладной',
+                name: 'invoiceNumber'
+            },
+            {
+                label: 'Номер документа',
+                name: 'documentNumber'
+            },
+            {
+                label: 'Фирма',
+                name: 'firma'
+            },
+            {
+                label: 'Склад отправки',
+                name: 'storage'
+            },
+            {
+                label: 'Кол-во коробок',
+                name: 'boxQty',
+                type: 'mask',
+                mask: '099',
+                placeholder: "99"
+            },
+            {
+                label: 'Дата доставки',
+                name: 'deliveryDate',
+                type: 'mask',
+                mask: '00.00.0000',
+                placeholder: '31.12.2012'
+
+            },
+            {
+                label: 'Пункт склада',
+                name: 'warehousePointId',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'label',
+                    labelField: 'label',
+                    dropdownParent: "body"
                 }
             },
+
             {
                 label: 'Маршрутный лист',
                 name: 'routeListID',
@@ -64,38 +142,177 @@ $(document).ready(function () {
                     labelField: 'label',
                     dropdownParent: "body"
                 }
+            },
+            {
+                label: 'Транспортная компания',
+                name: 'transportCompanyId',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'text',
+                    labelField: 'text',
+                    dropdownParent: "body"
+                }
+            },
+            {
+                label: 'Модель ТС',
+                name: 'vehicleId',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'text',
+                    labelField: 'text',
+                    dropdownParent: "body"
+                }
+            },
+            {
+                label: 'Водитель',
+                name: 'driverId',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'text',
+                    labelField: 'text',
+                    dropdownParent: "body"
+                }
             }
-        ]
+        ],
+        i18n: {
+            "create": {
+                "title": "Новая заявка",
+                "submit": "Добавить"
+            },
+            "edit": {
+                // "button": "Изменить",
+                "title": "Изменить заявку",
+                "submit": "Обновить"
+            },
+            "error": {
+                "system": "Возникла системная ошибка"
+            },
+            "multi": {
+                "title": "Множество значений",
+                "info": "The selected items contain different values for this input. To edit and set all items for this input to the same value, click or tap here, otherwise they will retain their individual values.",
+                "restore": "Обратить изменения"
+            },
+            "datetime": {
+                "previous": "Предыдущая",
+                "next": "Следующая",
+                "months": ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                "weekdays": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+                "amPm": ["am", "pm"],
+                "unknown": "-"
+            }
+        }
     });
 
-    requestEditor.field('clientID').input().on('keyup', function (e, d) {
-        var clientINNPart = $(this).val();
-        $.post("content/getData.php",
-            {status: "getClientsByINN", format: "json", inn: clientINNPart},
-            function (clientsData) {
-                var options = [];
-                var selectizeOptions = [];
-                console.log(clientsData);
-                clientsData = JSON.parse(clientsData);
-                clientsData.forEach(function (entry) {
-                    var option = "<option value=" + entry.clientID + ">" + "ИНН: " + entry.INN + ", имя: " + entry.clientName + "</option>";
-                    options.push(option);
-                    var selectizeOption = {
-                        "label": "ИНН: " + entry.INN + ", имя: " + entry.clientName,
-                        "value": entry.clientID
-                    };
-                    selectizeOptions.push(selectizeOption);
-                });
-                let clientSelectize = requestEditor.field('clientID').inst();
+// requestEditor.field('deliveryDate').input().on('keydown',function () {
+//     console.log(requestEditor.field('deliveryDate').input().value);
+// });
 
-                clientSelectize.clear();
-                clientSelectize.clearOptions();
-                clientSelectize.load(function (callback) {
-                    callback(selectizeOptions);
+    requestEditor.on('open', function (e, type) {
+
+        // mask: '00.00.0000',
+        //     placeholder: '31.12.2016',
+        //     clearIfNotMatch: true
+        // $('#dateTimePicker').mask('00.00.0000', {placeholder: '31.12.2016', clearIfNotMatch:true});
+        // if ($('#dateTimePicker').val()==''){
+        //
+        //     $('#dateTimePicker').val(new Date().toLocaleString('ru-RU',{
+        //         day:'2-digit', month:'2-digit',year:'numeric', hour:'2-digit',minute:'2-digit', hour12:false
+        //     }).replace(',','').replace('/','.').replace('/','.'));
+        // }
+        $.post(
+            "content/getData.php",
+            {
+                status: "getAllRouteIdDirectionPairs", format: "json"
+            },
+            function (data) {
+                // console.log(data);
+                let options = [];
+                // console.log(data);
+                data = JSON.parse(data);
+                data.forEach(function (entry) {
+                    var selectizeOption = {text: entry.directionName, value: entry.routeID};
+                    options.push(selectizeOption);
+                    // let option = "<option value=" + entry.routeID + ">" + entry.directionName + "</option>";
+                    // options.push(option);
                 });
+                let $select = $("#routeId").selectize(
+                    {
+                        sortField: "text",
+                        diacritics: true,
+                        maxItems: 1,
+                        options: options,
+                        dropdownParent: 'body'
+                    }
+                );
+                selectizeValidationFix($select);
+
+                $("#routePalletsQty").mask('00');
+                // $("#routeLicensePlate").mask('AAAAAAAA');
+                // $("#routeId").selectize.load(function (callback) {
+                //     callback(selectizePointsOptions);
+                // });
             }
         );
     });
+
+    function selectizeValidationFix($select) {
+
+        var self = $select[0].selectize;
+
+        self.$input.on('invalid', function (event) {
+            event.preventDefault();
+            self.focus(true);
+            self.$wrapper.addClass('invalid');
+        });
+
+        self.$input.on('change', function (event) {
+            if (event.target.validity && event.target.validity.valid) {
+                self.$wrapper.removeClass('invalid');
+            }
+        });
+
+    }
+
+    requestEditor.field('clientID')
+        .input()
+        .on('keyup', function (e, d) {
+            var clientINNPart = $(this).val();
+            $.post("content/getData.php",
+                {status: "getClientsByINN", format: "json", inn: clientINNPart},
+                function (clientsData) {
+                    var selectizeOptions = [];
+                    // console.log(clientsData);
+                    clientsData = JSON.parse(clientsData);
+                    clientsData.forEach(function (entry) {
+                        var selectizeOption = {
+                            "label": "ИНН: " + entry.INN + ", имя: " + entry.clientName,
+                            "value": entry.clientID
+                        };
+                        selectizeOptions.push(selectizeOption);
+                    });
+                    let clientSelectize = requestEditor.field('clientID').inst();
+
+                    clientSelectize.clear();
+                    clientSelectize.clearOptions();
+                    clientSelectize.load(function (callback) {
+                        callback(selectizeOptions);
+                    });
+                }
+            );
+        });
+
+// $('#deliveryDate').mask('00.00.0000', {placeholder: '31.12.2016', clearIfNotMatch:true});
+// if (requestEditor.field('deliveryDate').input().val()===''){
+//     requestEditor.field('deliveryDate').input().val(new Date().toLocaleString('ru-RU',{
+//         day:'2-digit', month:'2-digit',year:'numeric', hour:'2-digit',minute:'2-digit', hour12:false
+//     }).replace(',','').replace('/','.').replace('/','.'));
+// }
 
     requestEditor.field('warehousePointId').input().on('keyup', function (e, d) {
         let pointNamePart = $(this).val();
@@ -124,62 +341,365 @@ $(document).ready(function () {
     });
 
     requestEditor.field('marketAgentUserId').input().on('keyup', function (e, d) {
-        var marketAgentName = $(this).val();
-        $.post("content/getData.php",
-            {status: "getMarketAgentsByName", format: "json", name: marketAgentName},
-            function (marketAgentData) {
-                let options = [];
+        const marketAgentName = $(this).val();
+        if (marketAgentName !== '') {
+            $.post("content/getData.php",
+                {status: "getMarketAgentsByName", format: "json", name: marketAgentName},
+                function (marketAgentData) {
+                    let options = [];
 
-                console.log(marketAgentData);
-                let selectizePointsOptions = [];
-                marketAgentData = JSON.parse(marketAgentData);
-                marketAgentData.forEach(function (entry) {
-                    let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
-                    options.push(option);
-                    let selectizeOption = {"label": entry.userName, "value": entry.userID};
-                    selectizePointsOptions.push(selectizeOption);
-                });
+                    // console.log(marketAgentData);
+                    let selectizePointsOptions = [];
+                    marketAgentData = JSON.parse(marketAgentData);
+                    marketAgentData.forEach(function (entry) {
+                        let option = "<option value=" + entry.userID + ">" + entry.userName + "</option>";
+                        options.push(option);
+                        let selectizeOption = {"label": entry.userName, "value": entry.userID};
+                        selectizePointsOptions.push(selectizeOption);
+                    });
 
-                let selectize = requestEditor.field('marketAgentUserId').inst();
-                selectize.clear();
-                selectize.clearOptions();
-                selectize.load(function (callback) {
-                    callback(selectizePointsOptions);
-                });
-            }
-        );
+                    let selectize = requestEditor.field('marketAgentUserId').inst();
+                    selectize.clear();
+                    selectize.clearOptions();
+                    selectize.load(function (callback) {
+                        callback(selectizePointsOptions);
+                    });
+                }
+            );
+        }
+
     });
+
 
     requestEditor.field('routeListID').input().on('keyup', function (e, d) {
         let routeListNumber = $(this).val();
         $.post("content/getData.php",
             {status: "getRouteListsByNumber", format: "json", number: routeListNumber},
             function (routeListData) {
-                let options = [];
-
-                let selectizePointsOptions = [];
-                console.log(routeListData);
-                routeListData = JSON.parse(routeListData);
-                routeListData.forEach(function (entry) {
-                    let option = "<option value=" + entry.routeListID + ">" + entry.routeListNumber + "</option>";
-                    options.push(option);
-                    let selectizeOption = {"label": entry.routeListNumber, "value": entry.routeListID};
-                    selectizePointsOptions.push(selectizeOption);
-                });
-
-                let selectize = requestEditor.field('routeListID').inst();
-                selectize.clear();
-                selectize.clearOptions();
-                selectize.load(function (callback) {
-                    callback(selectizePointsOptions);
-                });
+                loadRouteLists(routeListData)
+                // let options = [];
+                //
+                // let selectizeRouteListsOptions = [];
+                // // console.log(routeListData);
+                // // console.log(routeListData);
+                // routeListData = JSON.parse(routeListData);
+                // routeListData.forEach(function (entry) {
+                //     let option = "<option value=" + entry.routeListID + ">" + entry.routeListNumber + "</option>";
+                //     options.push(option);
+                //     let selectizeOption = {"label": entry.routeListNumber, "value": entry.routeListId};
+                //     selectizeRouteListsOptions.push(selectizeOption);
+                // });
+                //
+                // let selectize = requestEditor.field('routeListID').inst();
+                // selectize.clear();
+                // selectize.clearOptions();
+                // selectize.load(function (callback) {
+                //     callback(selectizeRouteListsOptions);
+                // });
             }
         );
     });
 
+    function loadRouteLists(routeListData) {
+        let selectizeRouteListsOptions = [];
+        routeListData = JSON.parse(routeListData);
+        routeListData.forEach(function (entry) {
+            let selectizeOption = {"label": entry.routeListNumber, "value": entry.routeListId};
+            selectizeRouteListsOptions.push(selectizeOption);
+        });
 
-    // --------DATATABLE INIT--------------
-    //noinspection JSJQueryEfficiency
+        let selectize = requestEditor.field('routeListID').inst();
+        selectize.clear();
+        selectize.clearOptions();
+        selectize.load(function (callback) {
+            callback(selectizeRouteListsOptions);
+        });
+
+
+    }
+
+
+
+    requestEditor.on('preSubmit', function (e, data, action) {
+        // console.log(JSON.stringify(e));
+        // console.log(JSON.stringify(data));
+        if (action !== 'remove') {
+            let clientID = this.field('clientID');
+            let marketAgentUserId = this.field('marketAgentUserId');
+            let invoiceNumber = this.field('invoiceNumber');
+            let documentNumber = this.field('documentNumber');
+            let warehousePointId = this.field('warehousePointId');
+            let routeListID = this.field('routeListID');
+
+            if (!clientID.val()) {
+                clientID.error('Клиент должен быть указан')
+            }
+            if (!marketAgentUserId.val()) {
+                marketAgentUserId.error('Торговый представитель должен быть указан')
+            }
+            if (!invoiceNumber.val()) {
+                invoiceNumber.error('Номер накладной должен быть указан')
+            }
+            if (!documentNumber.val()) {
+                documentNumber.error('Номер документа должен быть указан')
+            }
+            if (!warehousePointId.val()) {
+                warehousePointId.error('Пункт склада должен быть указан')
+            }
+            if (!routeListID.val()) {
+                routeListID.error('Маршрутный лист должен быть указан')
+            }
+
+
+            // If any error was reported, cancel the submission so it can be corrected
+            if (this.inError()) {
+                return false;
+            } else {
+                // console.log(JSON.stringify(data));
+                // console.log(requestEditor.field('deliveryDate').input().val().toString());
+                if (action == 'edit') {
+                    data.status = 'editRequest';
+                    data.requestIDExternal = dataTable.row($('#user-grid').find('.selected')).data().requestIDExternal;
+                } else {
+                    data.status = 'addRequest';
+                }
+                // data.status = 'addRequest';
+            }
+        }
+
+    });
+
+    requestEditor.on('create', function (e, json, data) {
+        dataTable.draw(false);
+    }).on('initEdit', function () {
+        // console.log(JSON.stringify());
+        if (dataTable.row($('#user-grid').find('.selected')).data().routeListNumber !== null){
+            let routeList = JSON.stringify([{
+                routeListId: "dummy",
+                routeListNumber: dataTable.row($('#user-grid').find('.selected')).data().routeListNumber
+            }]);
+            // console.log(routeList);
+            loadRouteLists(routeList);
+            requestEditor.field('routeListID').inst().setValue("dummy");
+        }
+
+        if(dataTable.row($('#user-grid').find('.selected')).data().marketAgentUserId !== null){
+            let marketAgentUser = requestEditor.field('marketAgentUserId').inst();
+
+            marketAgentUser.clear();
+            marketAgentUser.clearOptions();
+            marketAgentUser.load(function (callback) {
+                callback([{
+                    "label": dataTable.row($('#user-grid').find('.selected')).data().marketAgentUserName,
+                    "value": "dummy"
+                }])
+            });
+            marketAgentUser.setValue("dummy");
+        }
+
+        if(dataTable.row($('#user-grid').find('.selected')).data().INN!==null){
+            let client = requestEditor.field('clientID').inst();
+            client.clear();
+            client.clearOptions();
+            client.load(function (callback) {
+                callback([{
+                    "label": dataTable.row($('#user-grid').find('.selected')).data().INN + "/" + dataTable.row($('#user-grid').find('.selected')).data().clientName,
+                    "value": "dummy"
+                }])
+            });
+
+            client.setValue("dummy");
+        }
+
+        if(dataTable.row($('#user-grid').find('.selected')).data().warehousePointName!==null){
+            let warehousePoint = requestEditor.field('warehousePointId').inst();
+
+            warehousePoint.clear();
+            warehousePoint.clearOptions();
+            warehousePoint.load(function (callback) {
+                callback([{
+                    "label": dataTable.row($('#user-grid').find('.selected')).data().warehousePointName,
+                    "value": "dummy"
+                }])
+            });
+
+            warehousePoint.setValue("dummy");
+        }
+    });
+
+
+    $.post("content/getData.php",
+        {status: "getCompanies", format: "json"},
+        function (companiesData) {
+
+            // var options = [];
+            let selectizeOptions = [];
+            companiesData = JSON.parse(companiesData);
+
+            companiesData.forEach(function (entry) {
+
+                // var option = "<option value=" + entry.id + ">" + entry.name + "</option>";
+                // options.push(option);
+                // console.log("id:"+entry.id+" name:"+entry.name+"\n");
+                let selectizeOption = {text: entry.name, value: entry.id};
+                selectizeOptions.push(selectizeOption);
+            });
+
+            let driverInput = requestEditor.field('driverId');
+            let vehicleInput = requestEditor.field('vehicleId');
+            let transportCompanyInput = requestEditor.field('transportCompanyId');
+            driverInput.input().on('change', function (e, d) {
+                if (!$(this).val().length) return;
+            });
+            // $('#driverInput').selectize({
+            //     sortField: "text",
+            //     maxItems:1,
+            //     onChange: function (value) {
+            //         if (!value.length) return;
+            //     }
+            // });
+            driverInput.inst().disable();
+
+
+            vehicleInput.input().on('change', function () {
+
+                let value = $(this).val();
+                // console.log(value);
+                if (!value.length) return;
+                driverInput.inst().disable();
+                $.post(
+                    'content/getData.php',
+                    {
+                        status: 'getDrivers',
+                        vehicleId: Number(value)
+                    }, function (driversData) {
+                        let driversOptions = [];
+                        // console.log(driversData);
+                        driversData = JSON.parse(driversData);
+                        driversData.forEach(function (entry) {
+                            let selectizeOption = {text: entry.full_name, value: entry.id};
+                            driversOptions.push(selectizeOption);
+                        });
+                        driverInput.inst().clear();
+                        driverInput.inst().clearOptions();
+                        // console.log(JSON.stringify(selectizeOptions));
+                        driverInput.inst().load(function (callback) {
+                            callback(driversOptions)
+                        });
+                        driverInput.inst().enable();
+                    }
+                )
+            });
+
+            // $('#vehicleNumberInput').selectize({
+            //     sortField: "text",
+            //     maxItems:1,
+            //     onChange: function(value){
+            //         if (!value.length) return;
+            //         driverInput.disable();
+            //         $.post(
+            //             'content/getData.php',
+            //             {
+            //                 status:'getDrivers',
+            //                 vehicleId: Number(value)
+            //             }, function (driversData) {
+            //                 var driversOptions = [];
+            //                 driversData = JSON.parse(driversData);
+            //
+            //                 driversData.forEach(function (entry) {
+            //                     var selectizeOption = {text: entry.full_name, value: entry.id};
+            //                     driversOptions.push(selectizeOption);
+            //                 });
+            //                 driverInput.clear();
+            //                 driverInput.clearOptions();
+            //                 driverInput.load(function(callback) {
+            //                     callback(driversOptions)
+            //                 });
+            //                 driverInput.enable();
+            //             })
+            //
+            //     }
+            // });
+            // var vehicleInput = $('#vehicleNumberInput')[0].selectize;
+            vehicleInput.inst().disable();
+
+            transportCompanyInput.input().on('change', function () {
+                let value = $(this).val();
+                if (!value.length) return;
+                vehicleInput.inst().disable();
+                $.post(
+                    'content/getData.php',
+                    {
+                        status: 'getVehicles',
+                        companyId: Number(value)
+                    }, function (vehiclesData) {
+                        let vehicleOptions = [];
+                        vehiclesData = JSON.parse(vehiclesData);
+                        vehiclesData.forEach(function (entry) {
+                            let selectizeOption = {text: entry.license_number + " / " + entry.model, value: entry.id};
+                            vehicleOptions.push(selectizeOption);
+                        });
+                        vehicleInput.inst().clear();
+                        vehicleInput.inst().clearOptions();
+                        vehicleInput.inst().load(function (callback) {
+                            callback(vehicleOptions)
+                        });
+                        vehicleInput.inst().enable();
+                        driverInput.inst().clear();
+                        driverInput.inst().clearOptions();
+                        driverInput.inst().disable();
+                    }
+                )
+            });
+            // $('#companyInput').selectize({
+            //     placeholder     : "Нажмите, чтобы изменить",
+            //     sortField: "text",
+            //     maxItems:1,
+            //     onChange: function(value){
+            //         if (!value.length) return;
+            //         vehicleInput.disable();
+            //         $.post(
+            //             'content/getData.php',
+            //             {
+            //                 status:'getVehicles',
+            //                 companyId: Number(value)
+            //             }, function (vehiclesData) {
+            //                 var vehicleOptions = [];
+            //                 console.log(vehiclesData);
+            //                 vehiclesData = JSON.parse(vehiclesData);
+            //
+            //                 vehiclesData.forEach(function (entry) {
+            //                     var selectizeOption = {text: entry.license_number+" / "+entry.model, value: entry.id};
+            //                     vehicleOptions.push(selectizeOption);
+            //                 });
+            //                 vehicleInput.clear();
+            //                 vehicleInput.clearOptions();
+            //                 vehicleInput.load(function(callback) {
+            //                     callback(vehicleOptions)
+            //                 });
+            //                 vehicleInput.enable();
+            //
+            //                 driverInput.clear();
+            //                 driverInput.clearOptions();
+            //                 driverInput.disable();
+            //             })
+            //
+            //     }
+            // });
+            // var transportCompanyInput = $('#companyInput')[0].selectize;
+            // var clientSelectize = usersEditor.field('clientID').inst();
+
+            // transportCompanyInput.u();
+            // transportCompanyInput.selectize.clearOptions();
+            transportCompanyInput.inst().load(function (callback) {
+                callback(selectizeOptions);
+            });
+        }
+    );
+
+
+// --------DATATABLE INIT--------------
+//noinspection JSJQueryEfficiency
     var dataTable = $('#user-grid').DataTable({
 
         processing: true,
@@ -322,12 +842,46 @@ $(document).ready(function () {
 
             //Button-link to admin page
             if (role == "DISPATCHER" || role == "ADMIN") {
-                dataTable.button().add(8, {
+                dataTable.button().add(7, {
                     text: 'Админ. Страница',
                     action: function (e, dt, node, config) {
                         window.location = "/admin_page"
                     }
                 });
+                if (role === "ADMIN") {
+
+
+                    dataTable.button().add(8, {
+                            extend: "create",
+                            editor: requestEditor,
+                            text: 'Добавить заявку'
+                        }
+                    );
+                    dataTable.button().add(10, {
+                            extend: 'edit',
+                            text: 'Изменить заявку',
+                            editor: requestEditor
+                        }
+                    );
+                    dataTable.button().add(9, {
+                            extend: 'selectedSingle',
+                            text: 'Удалить заявку',
+                            action: function (e, dt, node, config) {
+                                if (!confirm("Вы действительно хотите удалить заявку?")) return;
+                                $.post(
+                                    "content/getData.php",
+                                    {
+                                        status: "deleteRequest",
+                                        format: "json",
+                                        requestIDExternal: dataTable.row($('#user-grid').find('.selected')).data().requestIDExternal
+                                    },
+                                    function (data) {
+                                        dataTable.draw(false);
+                                    });
+                            }
+                        }
+                    );
+                }
             }
         },
         buttons: [
@@ -406,13 +960,9 @@ $(document).ready(function () {
                     (localStorage.getItem("liveSearch") === 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
                     this.text((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск');
                 }
-            },
+            }
             // Раскомментируй
-            // {
-            //     extend: "create",
-            //     editor: requestEditor,
-            //     text: 'Добавить заявку'
-            // }
+
         ],
         ajax: {
             url: "content/getData.php", // json datasource
@@ -487,15 +1037,16 @@ $(document).ready(function () {
             {"name": "palletsQty", "searchable": true, "targets": 23},
             {"name": "routeListNumber", "searchable": true, "targets": 24},
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
+            {"className": "dt-center", "targets": 10}
 
         ],
     });
-    // set padding for dataTable
+// set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
     $(".dataTables_scrollHeadInner").css({"width": "100%"});
     $(".dataTable ").css({"width": "100%"});
     var disabled = 0;
-    //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
+//var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
     dataTable.on('select', function (e, dt, type, indexes) {
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListNumber;
         if ((routeListID == null && disabled != 1) || ($("#data-role").html().trim() == "Пользователь_клиента") && disabled != 1) {
@@ -516,4 +1067,5 @@ $(document).ready(function () {
         }
     });
 
-});
+})
+;

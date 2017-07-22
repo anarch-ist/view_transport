@@ -144,3 +144,22 @@ table.dataTable thead th div.DataTables_sort_wrapper span {
 .ui-dialog{
     z-index:99999;
 }
+
+#routeListForm input{
+    border: 1px solid #d0d0d0;
+    padding: 8px 8px;
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.selectize-control.invalid > .selectize-input {
+    border-color: red;
+}
+
+
+fieldset {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}

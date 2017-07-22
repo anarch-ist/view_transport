@@ -1,10 +1,12 @@
 <?php
+
 namespace DAO;
 include_once 'IRouteList.php';
 include_once __DIR__ . '/../DAO.php';
 include_once 'Data.php';
 
-class RouteListEntity implements IRouteListEntity {
+class RouteListEntity implements IRouteListEntity
+{
 
     private static $instance;
     private $DAO;
@@ -33,7 +35,8 @@ class RouteListEntity implements IRouteListEntity {
 
     function addRouteList($routeData)
     {
-        return $this->DAO->insert(new InsertRouteList($routeData));
+        $this->DAO->insert(new InsertRouteList($routeData));
+        return $this->DAO->select(new SelectAddedRouteList($routeData));
     }
 
     function updateRouteList($id, $routeData)
@@ -46,19 +49,22 @@ class RouteListEntity implements IRouteListEntity {
         return $this->DAO->select(new SelectRouteListsByNumber($number));
     }
 
-    function selectRouteListIdByNumber($number){
+    function selectRouteListIdByNumber($number)
+    {
         return $this->DAO->select(new SelectRouteListIdByNumber($number));
     }
 }
 
-class SelectAllRouteLists implements IEntitySelect {
+class SelectAllRouteLists implements IEntitySelect
+{
     function getSelectQuery()
     {
         return 'SELECT * FROM `route_lists`';
     }
 }
 
-class SelectRouteListById implements IEntitySelect {
+class SelectRouteListById implements IEntitySelect
+{
     private $id;
 
     public function __construct($id)
@@ -74,7 +80,8 @@ class SelectRouteListById implements IEntitySelect {
 }
 
 
-class InsertRouteList implements IEntityInsert {
+class InsertRouteList implements IEntityInsert
+{
     private $routeListIdExternal, $dataSourceId, $routeListNumber, $creationDate, $palletsQty,
         $forwarderId, $licensePlate, $status, $routeId;
 
@@ -97,13 +104,41 @@ class InsertRouteList implements IEntityInsert {
 
     function getInsertQuery()
     {
-        $query = "INSERT INTO `route_lists` (routeListIDExternal, dataSourceID, routeListNumber, creationDate, departureDate, palletsQty,  forwarderId, licensePlate, status, routeID) VALUES " .
-            "('$this->routeListIdExternal', '$this->dataSourceId', '$this->routeListNumber', CURDATE(), CURDATE(), $this->palletsQty,  '$this->forwarderId', '$this->licensePlate', '$this->status', $this->routeId)";
+        $query = "
+            INSERT IGNORE INTO `route_lists` (routeListIDExternal, dataSourceID, routeListNumber, creationDate, departureDate, palletsQty,  forwarderId, licensePlate, status, routeID) VALUES " .
+            "('$this->routeListIdExternal', '$this->dataSourceId', '$this->routeListNumber', CURDATE(), CURDATE(), $this->palletsQty,  '$this->forwarderId', '$this->licensePlate', '$this->status', $this->routeId);";
         return $query;
     }
 }
 
-class UpdateRouteList implements IEntityUpdate {
+//It's a workaround. Don't laugh.
+class SelectAddedRouteList implements IEntitySelect {
+    private $routeListIdExternal;
+
+    /**
+     * SelectAddedRouteList constructor.
+     * @param $routeListIdExternal
+     */
+    public function __construct($routeListData)
+    {
+        $dao = DAO::getInstance();
+        $this->routeListIdExternal = $dao->checkString('LSS-' . $routeListData['routeListNumber']);
+    }
+
+    /**
+     * @return mixed
+     */
+    function getSelectQuery()
+    {
+        $query= "SELECT routeListNumber, routeListId from `route_lists` where routeListIDExternal = '$this->routeListIdExternal';";
+        return $query;
+    }
+
+
+}
+
+class UpdateRouteList implements IEntityUpdate
+{
     private $id, $palletsQty, $driverId, $driverPhoneNumber, $forwarderId, $licensePlate, $status, $routeId;
 
     public function __construct($id, $routeListData)
@@ -173,4 +208,5 @@ class SelectRouteListIdByNumber implements IEntitySelect
 
 
 }
+
 ?>
