@@ -39,25 +39,51 @@ try {
         echo getClientsByINN($privUser);
     } else if (strcasecmp($action, 'uploadDocuments') === 0) {
         echo uploadDocuments();
-    } else if (strcasecmp($action, 'getPointsByName')===0) {
+    } else if (strcasecmp($action, 'getPointsByName') === 0) {
         echo getPointsByName($privUser);
     } else if (strcasecmp($action, 'getRouteListsByNumber') === 0) {
         echo getRouteListsByNumber($privUser);
     } else if (strcasecmp($action, 'getMarketAgentsByName') === 0) {
         echo getMarketAgentByName($privUser);
-    } else if (strcasecmp($action, 'addRouteList') === 0){
+    } else if (strcasecmp($action, 'addRouteList') === 0) {
         echo addRouteList($privUser);
-    } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
+    } else if (strcasecmp($action, 'getAllRouteIdDirectionPairs') === 0) {
         getAllRouteIdDirectionPairs($privUser);
-    } else if (strcasecmp($action,'addRequest')===0) {
+    } else if (strcasecmp($action, 'addRequest') === 0) {
         addRequest($privUser);
+    } else if (strcasecmp($action, 'deleteRequest') === 0) {
+        deleteRequest($privUser);
+    } else if (strcasecmp($action, 'editRequest') === 0){
+        editRequest($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
 
-function addRequest(PrivilegedUser $privUser){
-    return json_encode($privUser->getRequestEntity()->addRequest($_POST['data'][0]));
+function editRequest(PrivilegedUser $privilegedUser)
+{
+    $data = reset($_POST['data']);
+    $data['requestIDExternal'] = $_POST['requestIDExternal'];
+    return $privilegedUser->getRequestEntity()->updateRequest($data);
+}
+
+function deleteRequest(PrivilegedUser $privilegedUser)
+{
+    $requestIdExternal = $_POST['requestIDExternal'];
+    if (isset($requestIdExternal)) {
+        return $privilegedUser->getRequestEntity()->deleteRequest($requestIdExternal);
+    } else return null;
+}
+
+function addRequest(PrivilegedUser $privUser)
+{
+    if ($privUser->getRequestEntity()->addRequest($_POST['data'][0])) {
+        echo json_encode(array("data" => array($privUser->getRequestEntity()->selectLastInserted())));
+    } else {
+        $privUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
+//    echo json_encode($privUser->getRequestEntity()->addRequest($_POST['data'][0]));
 }
 
 function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
@@ -73,9 +99,11 @@ function getAllRouteIdDirectionPairs(PrivilegedUser $privUser)
     echo json_encode($data);
 }
 
-function addRouteList(PrivilegedUser $privUser){
+function addRouteList(PrivilegedUser $privUser)
+{
     $data = $_POST['data'];
-    return json_encode($privUser->getRouteListEntity()->addRouteList($data));
+    $returnData = json_encode($privUser->getRouteListEntity()->addRouteList($data));
+    return $returnData;
 
 }
 
@@ -96,7 +124,7 @@ function getRouteListsByNumber(PrivilegedUser $privUser)
 function getClientsByINN(PrivilegedUser $privUser)
 {
     $inn = $_POST['inn'];
-    $dataArray = $privUser->getClientEntity()->selectClientsByINN($inn);
+    $dataArray = $privUser->getClientEntity()->selectClientsByInnOrName($inn);
     return json_encode($dataArray);
 }
 

@@ -13,12 +13,12 @@ interface IRequestEntity
     function selectRequestByID($id);
     //unnecessary
 
-    function updateRequest(RequestData $newRequest);
+    function updateRequest($newRequest);
 
     function updateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $hoursAmount);
     //covered
 
-    function deleteRequest(RequestData $Request);
+    function deleteRequest($Request);
     //later
 
     function addRequest($requestData);
