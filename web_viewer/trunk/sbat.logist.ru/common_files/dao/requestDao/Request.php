@@ -45,8 +45,8 @@ class RequestEntity implements IRequestEntity
     function selectRequestByID($id)
     {
         $array = $this->_DAO->select(new SelectRequestByID($id));
-        return new RequestData($array[0]);
-//        return $array[0];
+//        return new RequestData($array[0]);
+        return $array[0];
     }
 
     function updateRequest($newRequest)
@@ -226,7 +226,7 @@ VALUES (
 'ADMIN_PAGE',
 (SELECT CONCAT('LSS-',requestID) FROM transmaster_transport_db.requests AS rqs ORDER BY requestID DESC LIMIT 1),
 CURDATE(),
-(SELECT userID FROM users WHERE users.clientID = $this->clientId),
+$this->clientId,
 (SELECT pointID FROM route_points WHERE routeID = (SELECT routeID FROM route_lists WHERE routeListID = $this->routeListId) ORDER BY sortOrder DESC LIMIT 1),
 $this->marketAgentUserId,
 '$this->invoiceNumber',
@@ -269,7 +269,7 @@ class DeleteRequest implements IEntityDelete
      */
     function getDeleteQuery()
     {
-        $query = "DELETE FROM requests WHERE requestIDExternal = '$this->requestIDExternal' LIMIT 1;";
+        $query = "DELETE FROM transmaster_transport_db.requests WHERE requestIDExternal = '$this->requestIDExternal' LIMIT 1;";
         return $query;
     }
 }
@@ -344,7 +344,7 @@ class EditRequest implements IEntityUpdate
         $companyPart = ($this->transportCompanyId == '') ? "" : " transportCompanyId = $this->transportCompanyId, ";
         $vehiclePart = ($this->vehicleId == '') ? "" : " vehicleId = $this->vehicleId, ";
         $driverPart = ($this->driverId == '') ? "" : " driverId = $this->driverId, ";
-        $String = "UPDATE requests
+        $String = "UPDATE transmaster_transport_db.requests
         SET  
         invoiceNumber = '$this->invoiceNumber', 
         $this->clientId

@@ -36,7 +36,7 @@
                 <div class="loading col-lg-12 ">
                     <img src="content/css/loading.gif">
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 clg-lg-6" >
+                <div class="col-xs-12 col-sm-12 col-md-6 clg-lg-6">
                     <table class="left-table" style="display: none">
                         <tr>
                             <td>Дата заявки:</td>
@@ -68,7 +68,7 @@
                         </tr>
                     </table>
                 </div>
-                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6" >
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
                     <table class="right-table" style="display: none">
                         <tr>
                             <td>Количество коробок:</td>
@@ -105,14 +105,15 @@
 
 
                 </div>
-                
+
 
                 <a class="btn btn-default btn-lg" style="float: right" href="../../index.php">
                     На главную
                 </a>
-<!--                    <button type="button" id="addDocumentButton" class="btn btn-default btn-lg" data-toggle="modal" data-target="#addDocumentModal">-->
-<!--                        Добавить документ-->
-<!--                    </button>-->
+                <button type="button" id="addDocumentButton" class="btn btn-default btn-lg" data-toggle="modal"
+                        data-target="#addDocumentModal">
+                    Добавить документ
+                </button>
             </div>
         </div>
     </div>
@@ -132,26 +133,43 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <label for="documentGroup">Группа документа<span style="color:#c22929;">*</span></label>
-                                <select class="form-control" id="documentGroup">
+                                <select class="form-control" name="groupName" id="documentGroup">
                                     <option disabled selected value> -- Выберите группу --</option>
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <input size="45" type="text" class="form-control" id="addGroupName" placeholder="Добавить группу">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default" id="addGroup">
+                                            Добавить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+
                         <div class="row">
                             <div class="col-lg-12">
-                                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-                                <input type="hidden" name="status" value="uploadDocuments" />
-                                <input type="hidden" name="requestIDExternal" value="<?echo $_GET['reqIdExt']?>" />
+                                <input type="hidden" name="MAX_FILE_SIZE" value="50000"/>
+                                <input type="hidden" name="status" value="uploadDocuments"/>
+                                <input type="hidden" name="requestIDExternal" value="<? echo $_GET['reqIdExt'] ?>"/>
                                 <!-- Название элемента input определяет имя в массиве $_FILES -->
                                 <label class="btn btn-default btn-file">
-                                    Browse <input name="docFiles[]" type="file" multiple/>
+                                    Загрузить файлы <input name="docFiles[]" type="file" multiple/>
                                 </label>
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
                 <div class="modal-footer">
-                    <button id="upload" value="Отправить" class="btn btn-warning"></button>
+                    <button id="upload" value="Отправить" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Загрузка" class="btn btn-warning">Загрузить</button>
                 </div>
             </div>
 
