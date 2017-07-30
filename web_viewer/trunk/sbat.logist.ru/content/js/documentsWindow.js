@@ -1,27 +1,27 @@
-
 //getDocuments ajax result example
-var fgsfds = [{
+const fgsfds = [{
     title: "Официальные документы",
-    documents: [{name: "Торг-12", file: "6NG4KLOG_201.pdf"}, {name: "Счет-фактура", file: "6NG4KLOG_202.pdf"}, {name: "Сертификаты", file: "6NG4KLOG_203.xls"}]
+    documents: [{name: "Торг-12", file: "6NG4KLOG_201.pdf"}, {
+        name: "Счет-фактура",
+        file: "6NG4KLOG_202.pdf"
+    }, {name: "Сертификаты", file: "6NG4KLOG_203.xls"}]
 },
     {
         title: "Правовые документы",
         documents: [{name: "Раз", file: "1.pdf"}, {name: "Два", file: "2.pdf"}]
     }];
 
+let $_GET = {};
 
+//Gets parameters from address string like if it was GET[] in PHP
+document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
+    function decode(s) {
+        return decodeURIComponent(s.split("+").join(" "));
+    }
 
+    $_GET[decode(arguments[1])] = decode(arguments[2]);
+});
 $(window).on('load', function () {
-    var $_GET = {};
-
-    //Gets parameters from address string like if it was GET[] in PHP
-    document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
-        function decode(s) {
-            return decodeURIComponent(s.split("+").join(" "));
-        }
-
-        $_GET[decode(arguments[1])] = decode(arguments[2]);
-    });
 
 
     $.post("content/getData.php", {
@@ -40,40 +40,70 @@ $(window).on('load', function () {
                 //Просто раскомментируй строку ниже и строку под ней, когда запилишь скрипт
                 // console.log(data);
                 setDocuments(data);
+                removeLoadingScreen();
                 // setDocuments(fgsfds);
             });
     });
 
+    $('#addGroup').on('click', function (e) {
+        e.preventDefault();
+        if (document.getElementById('addGroupName').value.trim().length <= 0) {
+            console.log(document.getElementById('addGroupName').value.trim().length );
+            $('#addGroupName').closest('.form-group').addClass('has-error');
+        } else {
+            $.post('content/getData.php', {
+                    status: 'addGroup',
+                    requestIDExternal: $_GET['reqIdExt'],
+                    docGroupName: document.getElementById('addGroupName').value,
 
-    // $('#upload').on('click', function(e){
-    //     e.preventDefault();
-    //     let formData = new FormData($(this).parents('form')[0]);
-    //
-    //     $.ajax({
-    //         url: 'content/getData.php',
-    //         type: 'POST',
-    //         status: 'uploadDocuments',
-    //         xhr: function() {
-    //             return $.ajaxSettings.xhr();
-    //         },
-    //         success: function (data) {
-    //             // $("#documents-container").html(data);
-    //             // alert("Data Uploaded: "+data);
-    //         },
-    //         data: formData,
-    //         cache: false,
-    //         contentType: false,
-    //         processData: false
-    //     });
-    //     return false;
-    // });
-    
-    // $('#upload').on('click', function () {
-    //     let fileData = $("#docFiles").prop('files')[0];
-    // })
+                },
+                function (data) {
+                    reloadDocuments();
+                    $('#addGroupName').closest('.form-group').removeClass('has-error');
+                    $('#addGroupName').val('');
+                })
+        }
+    });
+
+    $('#upload').on('click', function (e) {
+
+        e.preventDefault();
+        $(this).button('loading');
+        let formData = new FormData($(this).parents('form')[0]);
+
+        $.ajax({
+            url: 'content/getData.php',
+            type: 'POST',
+            status: 'uploadDocuments',
+            xhr: function () {
+                return $.ajaxSettings.xhr();
+            },
+            success: function (data) {
+                // $("#documents-container").html(data);
+                reloadDocuments();
+                if (data == 0)
+                {
+                    alert('Документы добавлены')
+                } else {
+                    alert('Ошибка:\n'+ data);
+                }
+                // alert("Data Uploaded: " + data);
+
+                $('#addDocumentModal').modal('toggle');
+                $(this).button('reset');
+
+            },
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        return false;
+    }).on('click', function () {
+        let fileData = $("#docFiles").prop('files')[0];
+    })
 
 });
-
 
 
 //Loads data into rows
@@ -84,11 +114,11 @@ function setRequestInfo(requestData) {
         requestData[i].fullName = requestData[i].userName;
         delete requestData[i].userName;
     }
-    if(requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
+    if (requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
     $('#invoice-number').html(requestData.invoiceNumber);
-    if(requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
+    if (requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
     $('#document-number').html(requestData.documentNumber);
-    if(requestData.documentDate) $('#document-date').html(requestData.documentDate.split(' ')[0]);
+    if (requestData.documentDate) $('#document-date').html(requestData.documentDate.split(' ')[0]);
     $('#organization').html(requestData.firma);
     $('#comments').html(requestData.commentForStatus);
     $('#box-quantity').html(requestData.boxQty);
@@ -101,24 +131,42 @@ function setRequestInfo(requestData) {
 
 //Inserts HTML generated by getGroupTemplate in the place. After that, removes loading screen
 function setDocuments(data) {
-    if(!(data=="Не удалось найти файл")){
-        var listData = JSON.parse(data);
-        document.getElementById('documents-container').insertAdjacentHTML('beforeend',getGroupTemplate(listData));
+    if (!(data == "Не удалось найти файл")) {
+        let listData = JSON.parse(data);
+        document.getElementById('documents-container').innerHTML = '';
+        document.getElementById('documents-container').insertAdjacentHTML('beforeend', getGroupTemplate(listData));
+        populateGroupSelect(listData);
+
     } else {
         $("#documents-container").text("Документов не найдено");
     }
-    removeLoadingScreen();
+
+}
+
+function populateGroupSelect(groups) {
+    let select = document.getElementById('documentGroup');
+    let i;
+    for (i = select.options.length - 1; i >= 1; i--) {
+        select.remove(i);
+    }
+
+    for (let group of groups) {
+        let option = document.createElement('option');
+        option.text = group.title;
+        select.add(option);
+    }
+
 }
 
 //Generates and returns HTML of a list with documents.
 function getGroupTemplate(groups) {
     html = '';
-    for (var group of groups) {
+    for (let group of groups) {
         html += '<div class="list-group list-group-root">' +
-            '<div class="list-group-item">'+ group.title +'</div>' +
+            '<div class="list-group-item">' + group.title + '</div>' +
             '<div class="list-group">';
-        for (var document of group.documents) {
-            html += '<a href=" '+document.file +'" class="list-group-item">' + document.name +'</a>'
+        for (let document of group.documents) {
+            html += '<a href=" ' + document.file + '" class="list-group-item">' + document.name + '</a>'
         }
         html += '</div>' +
             '</div>'
@@ -128,8 +176,17 @@ function getGroupTemplate(groups) {
 
 //Function removes loading screen. Duh
 function removeLoadingScreen() {
-        $(".loading").remove();
-        $(".left-table").show();
-        $(".right-table").show();
+    $(".loading").remove();
+    $(".left-table").show();
+    $(".right-table").show();
 }
 
+function reloadDocuments() {
+    $.post("content/getData.php", {
+            status: 'getDocuments',
+            requestIDExternal: $_GET['reqIdExt']
+        },
+        function (data) {
+            setDocuments(data);
+        });
+}

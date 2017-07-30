@@ -39,7 +39,9 @@ try {
         echo getClientsByINN($privUser);
     } else if (strcasecmp($action, 'uploadDocuments') === 0) {
         echo uploadDocuments();
-    } else if (strcasecmp($action, 'getPointsByName') === 0) {
+    } else if (strcasecmp($action, 'addGroup') === 0) {
+        createDocumentGroup();
+    }  else if (strcasecmp($action, 'getPointsByName') === 0) {
         echo getPointsByName($privUser);
     } else if (strcasecmp($action, 'getRouteListsByNumber') === 0) {
         echo getRouteListsByNumber($privUser);
@@ -53,7 +55,7 @@ try {
         addRequest($privUser);
     } else if (strcasecmp($action, 'deleteRequest') === 0) {
         deleteRequest($privUser);
-    } else if (strcasecmp($action, 'editRequest') === 0){
+    } else if (strcasecmp($action, 'editRequest') === 0) {
         editRequest($privUser);
     }
 } catch (Exception $ex) {
@@ -64,7 +66,10 @@ function editRequest(PrivilegedUser $privilegedUser)
 {
     $data = reset($_POST['data']);
     $data['requestIDExternal'] = $_POST['requestIDExternal'];
-    return $privilegedUser->getRequestEntity()->updateRequest($data);
+    if ($privilegedUser->getRequestEntity()->updateRequest($data)) {
+        echo json_encode(array("data" => array($privilegedUser->getRequestEntity()->selectRequestByID($data['requestIDExternal']))));
+    } else return false;
+//    return $privilegedUser->getRequestEntity()->updateRequest($data);
 }
 
 function deleteRequest(PrivilegedUser $privilegedUser)
@@ -135,13 +140,43 @@ function getPointsByName(PrivilegedUser $privUser)
     return json_encode($dataArray);
 }
 
+function createDocumentGroup()
+{
+    $requestId = $_POST['requestIDExternal'];
+    $docGroupName = $_POST['docGroupName'];
+    if (!isset($requestId)) {
+        throw new DataTransferException('Не задан ID заявки', __FILE__);
+    }
+    $path = "../common_files/media/Other/docs/xml/$requestId.xml";
+    $pathToDocs = '../common_files/media/Other/docs/files/';
+    if (file_exists($path)) {
+
+        $xml = simplexml_load_file($path);
+        $groups = $xml->groups[0];
+        $newGroup = $xml->addChild('group');
+        $newGroup->addAttribute('tit', $docGroupName);
+        $xml->asXML($path);
+    } else {
+
+        $xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+                        <groups>
+                            <group tit=\"$docGroupName\">
+                            </group>
+                        </groups>";
+        $xml = new SimpleXMLElement($xmlString);
+        $xml->asXML($path);
+    }
+
+}
+
 function uploadDocuments()
 {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+//    error_reporting(E_ALL);
+//    ini_set('display_errors', 1);
     $requestId = $_POST['requestIDExternal'];
-    $docDir = realpath("../common_files/media/Other/docs/files/uploads/") . '/';
-//    mkdir($docDir,0777);
+    $groupName = $_POST['groupName'];
+    mkdir("../common_files/media/Other/docs/files/uploads/$requestId", 0755);
+    $docDir = realpath("../common_files/media/Other/docs/files/uploads/$requestId") . '/';
 
 //    $file_ary = array();
 //    $file_count = count($_FILES['userfile']);
@@ -154,44 +189,60 @@ function uploadDocuments()
 //    }
 
 
-    for ($i = 0; $i < count($_FILES['docFiles']['name']); $i++) {
-        $message = 'Error uploading file';
-        switch ($_FILES['docFiles']['error'][$i]) {
-            case UPLOAD_ERR_OK:
-                $message = false;;
-                break;
-            case UPLOAD_ERR_INI_SIZE:
-            case UPLOAD_ERR_FORM_SIZE:
-                $message .= ' - file too large (limit of ' . get_max_upload() . ' bytes).';
-                break;
-            case UPLOAD_ERR_PARTIAL:
-                $message .= ' - file upload was not completed.';
-                break;
-            case UPLOAD_ERR_NO_FILE:
-                $message .= ' - zero-length file uploaded.';
-                break;
-            default:
-                $message .= ' - internal error #' . $_FILES['newfile']['error'];
-                break;
-        }
-
-
-        $basename = basename($_FILES['docFiles']['name'][$i]);
-        $ext = explode('.', basename($basename));
-        $target_path = $docDir . md5(uniqid()) . "." . $ext[count($ext) - 1];
-        if (!move_uploaded_file($_FILES['docFiles']['tmp_name'][$i], $target_path)) {
-            return "$message";
-        }
+    if (!isset($requestId)) {
+        throw new DataTransferException('Не задан ID заявки', __FILE__);
     }
-//
-//    foreach($file_ary as $file){
-//        print 'File Name: ' . $file['name'];
-//        print 'File Type: ' . $file['type'];
-//        print 'File Size: ' . $file['size'] .'\n';
-//        if (!move_uploaded_file($file['tmp_name'], $docDir . basename($file['name']))){
-//            return 1;
-//        };
-//    }
+    $pathToXml = "../common_files/media/Other/docs/xml/$requestId.xml";
+
+    if (file_exists($pathToXml)) {
+        $xml = simplexml_load_file($pathToXml);
+        $groupNode = false;
+        foreach ($xml->group as $group) {
+            if ($group['tit'] == $groupName) {
+                $groupNode = $group;
+            }
+        }
+        if ($groupNode) {
+            for ($i = 0; $i < count($_FILES['docFiles']['name']); $i++) {
+                $message = 'Error uploading file';
+                switch ($_FILES['docFiles']['error'][$i]) {
+                    case UPLOAD_ERR_OK:
+                        $message = false;;
+                        break;
+                    case UPLOAD_ERR_INI_SIZE:
+                    case UPLOAD_ERR_FORM_SIZE:
+                        $message .= ' - file too large (limit of ' . "unknown" . ' bytes).';
+                        break;
+                    case UPLOAD_ERR_PARTIAL:
+                        $message .= ' - file upload was not completed.';
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        $message .= ' - zero-length file uploaded.';
+                        break;
+                    default:
+                        $message .= ' - internal error #' . $_FILES['newfile']['error'];
+                        break;
+                }
+
+
+                $basename = basename($_FILES['docFiles']['name'][$i]);
+                $ext = explode('.', basename($basename));
+                $fileName = md5(uniqid()) . "." . $ext[count($ext) - 1];
+                $target_path = $docDir . $fileName;
+                if (!move_uploaded_file($_FILES['docFiles']['tmp_name'][$i], $target_path)) {
+                    return "$message";
+                } else {
+                    $file = $groupNode->addChild('file');
+                    $file['name'] = "uploads/$requestId/$fileName";
+                    $file['tit'] = $basename;
+                }
+            }
+            $xml->asXML($pathToXml);
+        }
+    } else {
+        throw new DataTransferException('Не удалось найти файл', __FILE__);
+    }
+
 
     return 0;
 }
