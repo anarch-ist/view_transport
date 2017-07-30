@@ -1,0 +1,263 @@
+﻿{
+  "dataFrom1C": {
+    "server": "SPB",
+    "packageNumber": 7400,
+    "created": "2017-07-02T23:48:52",
+    "packageData": {
+      "updatePoints": [
+      ],
+      "deletePoints": [
+      ],
+      "updateDirections": [
+      ],
+      "deleteDirections": [
+      ],
+      "updateTrader": [
+        {
+          "traderId": "125",
+          "traderName": "Выставочный зал",
+          "traderEMail": "5901701@aneva.ru",
+          "traderPhone": "",
+          "traderOffice": "руководитель продаж выставочного зала",
+          "traderLogin": "",
+          "traderPassword": ""
+        }
+      ],
+      "deleteTrader": [
+      ],
+      "updateClients": [
+      ],
+      "deleteClients": [
+      ],
+      "updateAddress": [
+      ],
+      "deleteAddress": [
+      ],
+      "updateRequests": [
+        {
+          "requestId": "4X8HISPB",
+          "requestNumber": "INT-834175",
+          "requestDate": "20170630",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "Терлова О.А.",
+          "storage": "Краснодар",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка с пересчетом",
+          "traderId": "125",
+          "deliveryDate": "20170630"
+        },
+        {
+          "requestId": "4X9CPSPB",
+          "requestNumber": "INT-835152",
+          "requestDate": "20170630",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "Бабурин Д.А.",
+          "storage": "Краснодар",
+          "clientId": "127",
+          "addressId": "ЦБ000424",
+          "contactName": "не указано",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170701"
+        },
+        {
+          "requestId": "4X9RASPB",
+          "requestNumber": "S01-145990",
+          "requestDate": "20170702",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "Кучумова Н.Вл.",
+          "storage": "Центральный",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170703"
+        },
+        {
+          "requestId": "4X9RBSPB",
+          "requestNumber": "S02-145990",
+          "requestDate": "20170702",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "Кучумова Н.Вл.",
+          "storage": "Всеволожск",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170703"
+        },
+        {
+          "requestId": "4X9RCSPB",
+          "requestNumber": "S03-145990",
+          "requestDate": "20170702",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "Кучумова Н.Вл.",
+          "storage": "Всеволожск",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170703"
+        },
+        {
+          "requestId": "4X9RDSPB",
+          "requestNumber": "SKL-145997",
+          "requestDate": "20170702",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "Альфа-Нева ООО",
+          "storage": "Краснодар",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170703"
+        },
+        {
+          "requestId": "4X9RESPB",
+          "requestNumber": "S01-146008",
+          "requestDate": "20170702",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "",
+          "storage": "Центральный",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170703"
+        },
+        {
+          "requestId": "4X9RFSPB",
+          "requestNumber": "S02-146008",
+          "requestDate": "20170702",
+          "invoiceNumber": "",
+          "invoiceDate": "",
+          "documentNumber": "",
+          "documentDate": "",
+          "firma": "",
+          "storage": "Центральный",
+          "clientId": "127",
+          "addressId": "wla",
+          "contactName": "",
+          "contactPhone": "",
+          "deliveryOption": "Доставка без пересчета",
+          "traderId": "125",
+          "deliveryDate": "20170703"
+        }
+      ],
+      "deleteRequests": [
+      ],
+      "updateStatus": [
+        {
+          "requestId": "4X8HISPB",
+          "num_boxes": "123",
+          "status": "STOP_LIST",
+          "timeOutStatus": "",
+          "Comment": "просрочка, отгрузка 80% от оплат на 01.07.17"
+        },
+        {
+          "requestId": "4X9CPSPB",
+          "num_boxes": "123",
+          "status": "STOP_LIST",
+          "timeOutStatus": "",
+          "Comment": "просрочка, отгрузка 80% от оплат на 01.07.17"
+        },
+        {
+          "requestId": "4X9RASPB",
+          "num_boxes": "",
+          "status": "APPROVING",
+          "timeOutStatus": "",
+          "Comment": ""
+        },
+        {
+          "requestId": "4X9RBSPB",
+          "num_boxes": "",
+          "status": "APPROVING",
+          "timeOutStatus": "",
+          "Comment": ""
+        },
+        {
+          "requestId": "4X9RCSPB",
+          "num_boxes": "",
+          "status": "APPROVING",
+          "timeOutStatus": "",
+          "Comment": ""
+        },
+        {
+          "requestId": "4X9RDSPB",
+          "num_boxes": "",
+          "status": "APPROVING",
+          "timeOutStatus": "",
+          "Comment": ""
+        },
+        {
+          "requestId": "4X9RESPB",
+          "num_boxes": "",
+          "status": "APPROVING",
+          "timeOutStatus": "",
+          "Comment": ""
+        },
+        {
+          "requestId": "4X9RFSPB",
+          "num_boxes": "",
+          "status": "APPROVING",
+          "timeOutStatus": "",
+          "Comment": ""
+        }
+      ],
+      "deleteStatus": [
+      ],
+      "updateRouteLists": [
+        {
+        "routerSheetId": "6WT11MOS",
+        "routerSheetNumber": "MOS0005261",
+        "routerSheetDate": "20170626",
+        "departureDate": "20170627",
+        "forwarderId": "Fgsfds12",
+        "driverId": "123",
+        "pointDepartureId": "1",
+        "pointArrivalId": "2",
+        "directId": "dirIdExt1",
+        "status": "APPROVED",
+        "invoices": ["LSS-1","LSS-5","LSS-7"]
+        }
+      ],
+      "deleteRouteLists": [
+      ]
+    }
+  }
+}
