@@ -175,7 +175,7 @@ function uploadDocuments()
 //    ini_set('display_errors', 1);
     $requestId = $_POST['requestIDExternal'];
     $groupName = $_POST['groupName'];
-    mkdir("../common_files/media/Other/docs/files/uploads/$requestId", 0755);
+    mkdir("../common_files/media/Other/docs/files/uploads/$requestId", 0777);
     $docDir = realpath("../common_files/media/Other/docs/files/uploads/$requestId") . '/';
 
 //    $file_ary = array();
@@ -191,6 +191,9 @@ function uploadDocuments()
 
     if (!isset($requestId)) {
         throw new DataTransferException('Не задан ID заявки', __FILE__);
+    }
+    if (!isset($groupName)) {
+        throw new DataTransferException('Не задана группа документа', __FILE__);
     }
     $pathToXml = "../common_files/media/Other/docs/xml/$requestId.xml";
 
@@ -210,8 +213,10 @@ function uploadDocuments()
                         $message = false;;
                         break;
                     case UPLOAD_ERR_INI_SIZE:
+                        $message .= ' - file too large (limit of ' . ini_get("upload_max_filesize").')';
+                        break;
                     case UPLOAD_ERR_FORM_SIZE:
-                        $message .= ' - file too large (limit of ' . "unknown" . ' bytes).';
+                        $message .= ' - file too large (limit of ' . ini_get("upload_max_filesize").')';
                         break;
                     case UPLOAD_ERR_PARTIAL:
                         $message .= ' - file upload was not completed.';
@@ -234,13 +239,13 @@ function uploadDocuments()
                 } else {
                     $file = $groupNode->addChild('file');
                     $file['name'] = "uploads/$requestId/$fileName";
-                    $file['tit'] = $basename;
+                    $file['tit'] = $_FILES['docFiles']['name'][$i];
                 }
             }
             $xml->asXML($pathToXml);
         }
     } else {
-        throw new DataTransferException('Не удалось найти файл', __FILE__);
+        throw new DataTransferException("Не удалось найти файл $pathToXml", __FILE__);
     }
 
 

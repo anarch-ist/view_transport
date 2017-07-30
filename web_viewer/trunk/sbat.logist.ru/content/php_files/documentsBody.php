@@ -157,9 +157,9 @@
 
                         <div class="row">
                             <div class="col-lg-12">
-                                <input type="hidden" name="MAX_FILE_SIZE" value="50000"/>
+                                <input type="hidden" name="MAX_FILE_SIZE" value="10500000"/>
                                 <input type="hidden" name="status" value="uploadDocuments"/>
-                                <input type="hidden" name="requestIDExternal" value="<? echo $_GET['reqIdExt'] ?>"/>
+                                <input type="hidden" name="requestIDExternal" id="reqIdExt" value=""/>
                                 <!-- Название элемента input определяет имя в массиве $_FILES -->
                                 <label class="btn btn-default btn-file">
                                     Загрузить файлы <input name="docFiles[]" type="file" multiple/>

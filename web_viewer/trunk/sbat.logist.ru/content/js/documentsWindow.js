@@ -21,6 +21,8 @@ document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
 
     $_GET[decode(arguments[1])] = decode(arguments[2]);
 });
+
+
 $(window).on('load', function () {
 
 
@@ -29,6 +31,7 @@ $(window).on('load', function () {
             requestIDExternal: $_GET['reqIdExt']
         },
         function (data) {
+            document.getElementById('reqIdExt').value = $_GET['reqIdExt'];
             setRequestInfo(data);
         }
     ).success(function () {
@@ -83,9 +86,11 @@ $(window).on('load', function () {
                 reloadDocuments();
                 if (data == 0)
                 {
-                    alert('Документы добавлены')
+                    alert('Документы добавлены');
+                    $(this).button('reset');
                 } else {
                     alert('Ошибка:\n'+ data);
+                    $(this).button('reset');
                 }
                 // alert("Data Uploaded: " + data);
 
@@ -182,6 +187,7 @@ function removeLoadingScreen() {
 }
 
 function reloadDocuments() {
+    $('#upload').button('reset');
     $.post("content/getData.php", {
             status: 'getDocuments',
             requestIDExternal: $_GET['reqIdExt']
