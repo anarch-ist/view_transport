@@ -19,6 +19,7 @@
     <script src="common_files/media/Bootstrap-3.3.2/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="common_files/media/DataTables-1.10.10/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <script src="common_files/media/jquery-mask/dist/jquery.mask.min.js" type="text/javascript"></script>
+    <script src="http://api-maps.yandex.ru/2.1/?lang=ru-RU" type="text/javascript"></script>
     
 <!--    Custom JS-->
     <script src="content/js/requestHistoryWindow.js" type="text/javascript"></script>
@@ -31,7 +32,7 @@
     <div class="container">
         <div class="row">
             <div class="mid request-information">
-                <div class="info">Информация о заявке</div>
+                <div class="info">Информация о заявке <span id="requestNumber"></span></div>
                 <div class="loading col-lg-12 ">
                     <img src="content/css/loading.gif">
                 </div>
@@ -96,6 +97,8 @@
                     </table>
                 </div>
             </div>
+            <div class="mid" id="map" hidden></div>
+
         </div>
         <div class="row">
             <div class="mid status-history">

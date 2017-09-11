@@ -72,7 +72,9 @@
                 echo $data['userName'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
 
                 ?>
-                <a href="common_files/media/Other/clientInstruction1.1.pdf">Инструкция</a>
+<!--                    In case if instruction still opens in the same window-->
+<!--                <a style="color:#18446b;" href="#" onclick='window.open("common_files/media/Other/clientInstruction1.1.pdf");return false;'>Инструкция</a>-->
+                <a style="color:#18446b;" target="_blank" href="common_files/media/Other/clientInstruction1.1.pdf">Инструкция</a>
             </div>
 
             <div id="userRoleContainer" style="display: none">

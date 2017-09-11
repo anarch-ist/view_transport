@@ -59,6 +59,15 @@ class PointEntity implements IPointEntity
     function selectPointsByName($name) {
         return $this->_DAO->select(new SelectPointsByName($this->_DAO->checkString($name)));
     }
+
+    function getAllDistinctPointCoordinates(){
+        $result = $this->_DAO->select(new GetAllDistinctPointCoordinates());
+        return $result;
+    }
+
+    function getPointCoordinatesByPointId($pointId){
+        return $this->_DAO->select(new GetPointCoordinatesByPointId($pointId));
+    }
 }
 
 class SelectAllPointIDAndPointName implements IEntitySelect
@@ -117,5 +126,33 @@ class SelectPointByUserID implements IEntitySelect
     function getSelectQuery()
     {
         return "select `points`.`pointName` from `points`, `users` where `users`.`UserID` = '$this->id' AND `points`.`pointID` = `users`.`pointID`";
+    }
+}
+
+class GetAllDistinctPointCoordinates implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address,  points.requests_count AS requests from transmaster_transport_db.points WHERE x<>0.0 ;";
+//        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address from transmaster_transport_db.points WHERE x<>0.0";
+    }
+}
+
+class GetPointCoordinatesByPointId implements IEntitySelect
+{
+    private $pointId;
+
+    /**
+     * GetPointCoordinatesByPointId constructor.
+     */
+    public function __construct($pointId)
+    {
+        $this->pointId = $pointId;
+    }
+
+
+    function getSelectQuery()
+    {
+        return "SELECT points.x, points.y, points.pointName, points.address from transmaster_transport_db.points WHERE pointID=$this->pointId AND x<>0  LIMIT 1;";
     }
 }

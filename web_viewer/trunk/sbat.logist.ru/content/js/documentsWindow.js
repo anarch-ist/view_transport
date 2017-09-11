@@ -119,6 +119,7 @@ function setRequestInfo(requestData) {
         requestData[i].fullName = requestData[i].userName;
         delete requestData[i].userName;
     }
+    $('#requestNumber').html(requestData.requestNumber);
     if (requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
     $('#invoice-number').html(requestData.invoiceNumber);
     if (requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);

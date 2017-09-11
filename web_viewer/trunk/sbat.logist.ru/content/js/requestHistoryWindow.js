@@ -1,3 +1,4 @@
+var requestIDExternal;
 function showPretension(pretensionID, reqIdExt, cathegory, pretensionSum, pretensionComment, positionNumber) {
 
     $('#editPretensionSum').val(pretensionSum);
@@ -66,7 +67,7 @@ function deletePretension(pretensionID, reqIdExt, callback) {
                 $('#editPretensionModal').modal('toggle');
                 loadPretensions();
             }
-            if(callback){
+            if (callback) {
                 callback();
             }
         })
@@ -84,12 +85,13 @@ function updatePretension(pretensionID, reqIdExt, callback) {
         pretensionComment: $('#editPretensionComment').val(),
         pretensionPositionNumber: $('#editPretensionPositionNumber').val()
     }, function (data) {
-        if (data === 'true') {
+        console.log(data);
+        if (JSON.parse(data) == true) {
             alert('Претензия успешно обновлена');
             $('#editPretensionModal').modal('toggle');
             loadPretensions();
         }
-        if(callback){
+        if (callback) {
             callback();
         }
     });
@@ -97,6 +99,7 @@ function updatePretension(pretensionID, reqIdExt, callback) {
 }
 
 const $_GET = {};
+var myMap;
 
 
 document.location.search.replace(/\??(?:([^=]+)=([^&]*)&?)/g, function () {
@@ -174,9 +177,9 @@ $(document).ready(function () {
 
     if ($_GET['pretensionModal'] === "1") {
         $('#pretensionModal').modal();
-        $('#submitPretension').button("<i class='fa fa-circle-o-notch fa-spin'></i> Загрузка...").prop( "disabled", true );;
+        $('#submitPretension').button("<i class='fa fa-circle-o-notch fa-spin'></i> Загрузка...").prop("disabled", true);
+        ;
     }
-
 
 
 });
@@ -190,6 +193,7 @@ $(window).on('load', function () {
     // $('#editPretensionSum').mask('0000000000.00', {reverse: true});
 
     var timeoutID;
+
 
     if ($_GET['requestIDExternal']) {
         requestIDExternal = $_GET['requestIDExternal'];
@@ -218,7 +222,7 @@ $(window).on('load', function () {
                 invoiceNumber: $_GET['invoiceNumber']
             },
             function (data) {
-
+                // console.log(data);
                 requestIDExternal = JSON.parse(data).requestIDExternal;
                 setRequestInfo(data);
 
@@ -251,16 +255,18 @@ $(window).on('load', function () {
 
     function setRequestInfo(requestData) {
         requestData = JSON.parse(requestData);
+        console.log(JSON.stringify(requestData));
 
         for (var i = 0; i < requestData.length; i++) {
             requestData[i].fullName = data[i].userName;
             delete requestData[i].userName;
         }
-        if(requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
+        $('#requestNumber').html(requestData.requestNumber);
+        if (requestData.requestDate) $('#request-date').html(requestData.requestDate.split(' ')[0]);
         $('#invoice-number').html(requestData.invoiceNumber);
-        if(requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
+        if (requestData.invoiceDate) $('#invoice-date').html(requestData.invoiceDate.split(' ')[0]);
         $('#document-number').html(requestData.documentNumber);
-        if(requestData.documentDate) $('#document-date').html(requestData.documentDate.split(' ')[0]);
+        if (requestData.documentDate) $('#document-date').html(requestData.documentDate.split(' ')[0]);
         $('#organization').html(requestData.firma);
         $('#comments').html(requestData.commentForStatus);
         $('#box-quantity').html(requestData.boxQty);
@@ -296,8 +302,9 @@ $(window).on('load', function () {
                     alert(data);
                 }
             })
-        }).button("reset").prop( "disabled", false );
+        }).button("reset").prop("disabled", false);
 
+        loadRouteMap();
     }
 
 
@@ -345,6 +352,116 @@ $(window).on('load', function () {
         }
 
 
+    }
+
+    function loadRouteMap() {
+        // $.post("content/getData.php", {
+        //     status: 'getPointsCoordinatesForRequest',
+        //     requestIDExternal: requestIDExternal
+        // }, function (data) {
+
+        ymaps.ready(init);
+
+        // if (data == 'true') {
+        //     $('#pretensionModal').modal('toggle');
+        //     that.button('reset');
+        //     alert('Претензия успешно отправлена');
+        //     loadPretensions();
+        // } else {
+        //     that.button('reset');
+        //     alert(data);
+        // }
+        // })
+    }
+
+    function init() {
+        // Создание экземпляра карты и его привязка к контейнеру с
+        // заданным id ("map").
+        // console.log(JSON.stringify(data));
+
+
+        console.log(requestIDExternal);
+        $.post("content/getData.php", {
+            status: 'getPointsCoordinatesForRequest',
+            requestIDExternal: requestIDExternal
+        }, function (data) {
+            data = JSON.parse(data);
+            console.log(JSON.stringify(data));
+
+            if (data.hasOwnProperty('destinationPoint')) {
+                $('#map').show();
+                myMap = new ymaps.Map('map', {
+                    center: data.destinationPoint.geometry,
+                    zoom: 10
+                }, {
+                    searchControlProvider: 'yandex#search'
+                });
+
+                routePoints = [];
+                if (data.hasOwnProperty('warehousePoint')) {
+                    routePoints.push({type:'wayPoint',point:data.warehousePoint.geometry});
+                    myMap.geoObjects.add(new ymaps.Placemark(data.warehousePoint.geometry,data.warehousePoint.properties));
+
+                }
+                // if (data.hasOwnProperty('lastVisitedPoint')) {
+                //     routePoints.push({type:'viaPoint', point:data.lastVisitedPoint.geometry});
+                // myMap.geoObjects.add(new ymaps.Placemark(data.lastVisitedPoint.geometry,data.lastVisitedPoint.properties));
+                // }
+                myMap.geoObjects.add(new ymaps.Placemark(data.destinationPoint.geometry,data.destinationPoint.properties));
+                routePoints.push({type: 'wayPoint', point: data.destinationPoint.geometry});
+
+
+                ymaps.route(routePoints).then(
+                    // ymaps.route([[55.755786, 37.117633], [55.155786, 37.617633]]).then(
+                    function (mappedRoute) {
+                        myMap.geoObjects.add(mappedRoute);
+                    },
+                    function (error) {
+
+
+
+                        // alert('Возникла ошибка: ' + error.message);
+                        // console.log(JSON.stringify(routePoints));
+                        // var myPlacemark = new ymaps.Placemark(data[0]);
+                        // routePoints.forEach(function (t, n, arr) {
+                        //     console.log(JSON.stringify(t));
+                        //     myMap.geoObjects.add(new ymaps.Placemark(t));
+                        //     myMap.setCenter(t)
+                        // });
+                        // myMap.geoObjects.add(new ymaps.Placemark(data[0]));
+                        // myMap.setCenter(data[0].point);
+                    }
+                );
+            }
+
+        })
+
+
+        // objectManager = new ymaps.ObjectManager({
+        //     // Чтобы метки начали кластеризоваться, выставляем опцию.
+        //     clusterize: true,
+        //     // ObjectManager принимает те же опции, что и кластеризатор.
+        //     gridSize: 32,
+        //     clusterDisableClickZoom: true
+        // });
+
+        // myMap.geoObjects.add(objectManager);
+
+        // $.post("content/getData.php",
+        //     {status: "getAllPointsCoordinates", format: "json"},
+        //     function (json) {
+        //         console.log(json);
+        //         objectManager.objects.options.set('preset', 'islands#greenDotIcon');
+        //         objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
+        //         objectManager.add(JSON.parse(json));
+        //         // var geoObjects = ymaps.geoQuery(json)
+        //         //     .addToMap(myMap)
+        //         //     .applyBoundsToMap(myMap, {
+        //         //         checkZoomRange: true
+        //         //     });
+        //
+        //     }
+        // );
     }
 
 
