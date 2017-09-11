@@ -8,7 +8,7 @@ $(document).ready(function () {
             {label: 'Номер ТС', name: 'vehicle_id', type: 'text'},
             {label: 'Номер ТК', name: 'transport_company_id', type: 'text'},
             {label: 'Полное имя', name: 'full_name', type: 'text'},
-            {label: 'Пасспорт', name: 'passport', type: 'text'},
+            {label: 'Паспорт', name: 'passport', type: 'text'},
             {
                 label: 'Номер телефона',
                 name: 'phone',
