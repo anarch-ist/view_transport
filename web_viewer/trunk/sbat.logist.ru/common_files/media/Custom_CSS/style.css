@@ -13,7 +13,7 @@ body::-webkit-scrollbar{
 }
 
 #buttonsContainer > div{
-    color: #c22929 !important;
+    color: #f77a6c !important;
 }
 
 #user-grid_info{
@@ -35,7 +35,7 @@ body::-webkit-scrollbar{
 
 .dt-button{
     margin-right: 10px !important;
-    border-radius: 0 !important;
+    /* border-radius: 0 !important; */
     border: 1px solid #cecece !important;
     margin-bottom: 5px;
 }
@@ -58,12 +58,36 @@ input[type="button"]:hover{
 }
 
 thead tr th{
-    background: #9da5a9 !important;
+    background: linear-gradient(to top, #bed7f9, #828c95)!important;
 }
 
 .DataTables_sort_wrapper{
     color: #fff !important;
 }
+
+
+.ui-dialog-title {
+    color: #ffffff;
+}
+
+.ui-widget-header {
+    border: 0 solid #f1f5f8;
+    background: #18446b;
+}
+
+/*.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br {*/
+    /*border-bottom-right-radius: 4px;*/
+/*}*/
+/*.ui-corner-all, .ui-corner-bottom, .ui-corner-left, .ui-corner-bl {*/
+    /*border-bottom-left-radius: 4px;*/
+/*}*/
+/*.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr {*/
+    /*border-top-right-radius: 4px;*/
+/*}*/
+/*.ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl {*/
+    /*border-top-left-radius: 4px;*/
+/*}*/
+
 
 
 
@@ -82,8 +106,9 @@ tr.selected > .sorting_1{
 
 #logout{
     background-color: #F5F5F5;
-    color: #333;
+    color: #fff;
     border: 1px solid #cecece;
+    border-radius: 5px;
     line-height: 23px;
 }
 
@@ -108,8 +133,11 @@ tr.selected > .sorting_1{
 .dt-button,
 button,
 input[type="button"]{
-    background-color: #cecece !important;
+    background-color: #18446b !important;
+    border-radius:5px
 }
+
+
 
 .DataTables_sort_wrapper span:hover{
     cursor: pointer;
@@ -130,7 +158,7 @@ input[type="checkbox"],
 }
 
 .DTFC_LeftFootWrapper tfoot th {
-    background: #ccc !important;
+    background: #85909a !important;
 }
 
 div.selectize-dropdown {
@@ -139,10 +167,30 @@ div.selectize-dropdown {
 
 table.dataTable thead th div.DataTables_sort_wrapper span {
     transform: scale(1.2);
+
+}
+table.dataTable.display tbody tr.odd,
+table.dataTable.stripe tbody tr.odd {
+
+    background-color: #f2f7fd
+}
+
+table.dataTable.display tbody tr.odd>.sorting_1,
+table.dataTable.stripe tbody tr.odd>.sorting_1 {
+
+    background-color:#99a9bb
+}
+
+table.dataTable.display tbody tr.even>.sorting_1,
+table.dataTable.stripe tbody tr.even>.sorting_1 {
+
+    background-color:#bbc4cc
 }
 
 .ui-dialog{
     z-index:99999;
+    border: 0;
+    padding: 0;
 }
 
 #routeListForm input{
@@ -163,3 +211,21 @@ fieldset {
     border: 1px solid #ccc;
     margin-bottom: 10px;
 }
+
+/*.ui-state-default,*/
+/*.ui-widget-content .ui-state-default,*/
+/*.ui-widget-header .ui-state-default {*/
+    /*color: #fff;*/
+    /*border: 1px solid #bbc4cc;*/
+
+/*}*/
+
+.dt-buttons .dt-button, .dt-button, .ui-button-text{
+    color: #fff;
+    /*border: 1px solid #bbc4cc;*/
+}
+
+/*.ui-dialog-titlebar-close*/
+/*{*/
+    /*background: white;*/
+/*}*/

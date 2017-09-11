@@ -32,7 +32,7 @@
     <div class="container">
         <div class="row">
             <div class="mid request-information">
-                <div class="info">Информация о заявке</div>
+                <div class="info">Информация о заявке <span id="requestNumber"></span> </div>
                 <div class="loading col-lg-12 ">
                     <img src="content/css/loading.gif">
                 </div>

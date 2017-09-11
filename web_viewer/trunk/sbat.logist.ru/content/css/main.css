@@ -7,6 +7,23 @@ clearfix::after, body .container .row .mid::after {
   text-align: center;
 }
 
+#map {
+  width: 90%;
+  /*margin:10px;*/
+  height: 500px;
+}
+
+#requestNumber{
+  color: #f77a6c;
+}
+
+
+.btn-default {
+  color: #fff;
+  background-color: #18446b;
+  border-color: #ccc;
+}
+
 body {
   font-family: Tahoma, "Helvetica Neue",Helvetica,Arial,sans-serif;
   color: #333;
@@ -19,14 +36,16 @@ body {
     width: 95%;
     padding-bottom: 15px;
     color: #5c5c5c; }
-    body .container .row .mid .info {
-      margin-top: 20px;
-      padding: 5px 0 5px 15px;
-      background: #9da5a9;
-      border-top: 1px solid #ced8e1;
-      border-bottom: 1px solid #ced8e1;
-      font-weight: bold;
-      color: #c22929; }
+body .container .row .mid .info {
+  margin-top: 20px;
+  padding: 5px 0 5px 15px;
+  background: #18446b;
+  border-top: 1px solid #ced8e1;
+  border-radius: 4px;
+  border-bottom: 1px solid #ced8e1;
+  font-weight: bold;
+  color: #fff;
+}
     body .container .row .mid.request-information {
       /*border-bottom: 2px solid #cecece; */
     }
@@ -48,7 +67,7 @@ body {
         border-bottom: 1px solid #cecece; }
       body .container .row .mid.status-history table th {
         font-weight: bold;
-        color: #c22929; }
+        color: #000000; }
       body .container .row .mid.status-history table tr:nth-child(even) {
         background: #e8e8e8; }
       body .container .row .mid.status-history table tr:not(:first-child):hover {

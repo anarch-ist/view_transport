@@ -41,7 +41,7 @@ try {
         echo uploadDocuments();
     } else if (strcasecmp($action, 'addGroup') === 0) {
         createDocumentGroup();
-    }  else if (strcasecmp($action, 'getPointsByName') === 0) {
+    } else if (strcasecmp($action, 'getPointsByName') === 0) {
         echo getPointsByName($privUser);
     } else if (strcasecmp($action, 'getRouteListsByNumber') === 0) {
         echo getRouteListsByNumber($privUser);
@@ -56,10 +56,88 @@ try {
     } else if (strcasecmp($action, 'deleteRequest') === 0) {
         deleteRequest($privUser);
     } else if (strcasecmp($action, 'editRequest') === 0) {
-        editRequest($privUser);
+        echo editRequest($privUser);
+    } else if (strcasecmp($action, 'getAllPointsCoordinates') === 0) {
+        echo getAllPointsCoordinates($privUser);
+    } else if (strcasecmp($action, 'getPointsCoordinatesForRequest') === 0) {
+        echo getPointsCoordinatesForRequest($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
+{
+    $requestIDExternal = $_POST['requestIDExternal'];
+    $requestData = $privilegedUser->getRequestEntity()->selectRequestByID($requestIDExternal);
+    $routePoints = array();
+    if ($requestData['warehousePointID'] != null) {
+        $warehousePoint = $privilegedUser->getPointEntity()->getPointCoordinatesByPointId($requestData['warehousePointID'])[0];
+        if ($warehousePoint != null) {
+
+
+//        $routePoints['warehousePoint']=[floatval($warehousePoint[0]['y']),floatval($warehousePoint[0]['x'])];
+            $properties = new YandexApiProperties();
+            $properties->createProperty('balloonContentHeader', '<b>Склад отправки</b><br>');
+            $properties->createProperty('balloonContent', $warehousePoint['pointName']);
+
+
+            $routePoints['warehousePoint'] = new YandexApiPlacemark($warehousePoint['x'], $warehousePoint['y'], $properties, new YandexApiOptions());
+//        array_push($routePoints,new YandexApiRoutePoint($warehousePoint[0]['x'],$warehousePoint[0]['y'],'wayPoint',$warehousePoint[0]['address']));
+//        array_push($routePoints, [floatval($warehousePoint[0]['y']),floatval($warehousePoint[0]['x'])]);
+        }
+    }
+    if ($requestData['lastVisitedRoutePointID'] != null) {
+        $transitPoint = $privilegedUser->getPointEntity()->getPointCoordinatesByPointId($requestData['lastVisitedRoutePointID'])[0];
+        if ($transitPoint != null) {
+            $properties = new YandexApiProperties();
+            $properties->createProperty('balloonContentHeader', '<b>Последняя посещеная точка</b><br>');
+            $properties->createProperty('balloonContent', $transitPoint['pointName']);
+
+            $routePoints['lastVisitedPoint'] = new YandexApiPlacemark($transitPoint['x'], $transitPoint['y'], $properties, new YandexApiOptions());
+        }
+
+    }
+    if ($requestData['destinationPointID'] != null) {
+        $destinationPoint = $privilegedUser->getPointEntity()->getPointCoordinatesByPointId($requestData['destinationPointID'])[0];
+        if ($destinationPoint != null) {
+
+
+//        $routePoints['destinationPoint']=[floatval($destinationPoint[0]['y']),floatval($destinationPoint[0]['x'])];
+            $properties = new YandexApiProperties();
+            $properties->createProperty('balloonContentHeader', '<b>Точка назначения</b><br>');
+            $properties->createProperty('balloonContent', $destinationPoint['pointName']);
+            $routePoints['destinationPoint'] = new YandexApiPlacemark($destinationPoint['x'], $destinationPoint['y'], $properties, new YandexApiOptions());
+//        array_push($routePoints,new YandexApiRoutePoint($destinationPoint[0]['x'],$destinationPoint[0]['y'],'wayPoint',$destinationPoint[0]['address']));
+//        array_push($routePoints, [floatval($destinationPoint[0]['y']),floatval($destinationPoint[0]['x'])]);
+        }
+    }
+    return json_encode($routePoints);
+//    return json_encode([[55.755786, 37.117633], [55.155786, 37.617633]]);
+}
+
+function getAllPointsCoordinates(PrivilegedUser $privilegedUser)
+{
+    $data = $privilegedUser->getPointEntity()->getAllDistinctPointCoordinates();
+    $featureCollection = new YandexApiFeatureCollection();
+    $options = new YandexApiOptions();
+    $id = 0;
+    foreach ($data as $row) {
+        $geometryPoint = new YandexApiGeometryPoint($row['y'], $row['x']);
+        $properties = new YandexApiProperties();
+        $properties->createProperty('balloonContentHeader', $row['pointName']);
+        $properties->createProperty('balloonContentBody', $row['address']);
+        $properties->createProperty('balloonContent', $row['pointName']);
+        $properties->createProperty('hintContent', $row['pointName']);
+        $properties->createProperty('clusterCaption', $row['pointName']);
+        $properties->createProperty('balloonContentFooter', 'Кол-во заказов: ' . $row['requests']);
+        $feature = new YandexApiFeature($geometryPoint, $properties, $options);
+        $feature->id = $id;
+        $id++;
+        $featureCollection->addFeature($feature);
+    }
+    $json = json_encode($featureCollection);
+    return $json;
 }
 
 function editRequest(PrivilegedUser $privilegedUser)
@@ -67,7 +145,7 @@ function editRequest(PrivilegedUser $privilegedUser)
     $data = reset($_POST['data']);
     $data['requestIDExternal'] = $_POST['requestIDExternal'];
     if ($privilegedUser->getRequestEntity()->updateRequest($data)) {
-        echo json_encode(array("data" => array($privilegedUser->getRequestEntity()->selectRequestByID($data['requestIDExternal']))));
+        return json_encode(array("data" => array($privilegedUser->getRequestEntity()->selectRequestByID($data['requestIDExternal']))));
     } else return false;
 //    return $privilegedUser->getRequestEntity()->updateRequest($data);
 }
@@ -213,10 +291,10 @@ function uploadDocuments()
                         $message = false;;
                         break;
                     case UPLOAD_ERR_INI_SIZE:
-                        $message .= ' - file too large (limit of ' . ini_get("upload_max_filesize").')';
+                        $message .= ' - file too large (limit of ' . ini_get("upload_max_filesize") . ')';
                         break;
                     case UPLOAD_ERR_FORM_SIZE:
-                        $message .= ' - file too large (limit of ' . ini_get("upload_max_filesize").')';
+                        $message .= ' - file too large (limit of ' . ini_get("upload_max_filesize") . ')';
                         break;
                     case UPLOAD_ERR_PARTIAL:
                         $message .= ' - file upload was not completed.';
