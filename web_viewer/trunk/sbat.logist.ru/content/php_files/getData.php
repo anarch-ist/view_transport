@@ -1,5 +1,6 @@
 <?php
 include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
+require_once __DIR__.'/../../common_files/utility/MakeshiftWialonAPI.php';
 try {
     $privUser = PrivilegedUser::getInstance();
     $action = $_POST['status'];
@@ -61,13 +62,49 @@ try {
         echo getAllPointsCoordinates($privUser);
     } else if (strcasecmp($action, 'getPointsCoordinatesForRequest') === 0) {
         echo getPointsCoordinatesForRequest($privUser);
+    } else if (strcasecmp($action, 'getVehicleData') === 0) {
+        echo getVehicleData($privUser);
+    } else if (strcasecmp($action, 'updateRequestsViaWialonApi') === 0){
+        echo updateRequestsViaWialonApi($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
 
+function updateRequestsViaWialonApi(PrivilegedUser $privilegedUser){
+//    sqrt(((2-5)^2)+((1-5)^2));
+
+}
+
+function getVehicleData(PrivilegedUser $privilegedUser){
+
+//        error_reporting(E_ALL);
+//    ini_set('display_errors', 1);
+    $requestIDExternal = $_POST['requestIDExternal'];
+    $requestData = $privilegedUser->getRequestEntity()->selectRequestByID($requestIDExternal);
+    if ($requestData['vehicleId'] !=null) {
+        $vehicleData = $privilegedUser->getVehicleEntity()->selectVehicleById($requestData['vehicleId']);
+        if ($vehicleData['wialon_id'] != null){
+            $wialonVehicle = new WialonVehicle($vehicleData['wialon_id']);
+            $coordinates = $wialonVehicle->getCoordinates();
+            $vehiclePlacemarkOptions = new YandexApiOptions();
+            $vehiclePlacemarkOptions->createProperty('preset','twirl#truckIcon');
+            $vehiclePlacemarkProperties = new YandexApiProperties();
+            $vehiclePlacemarkProperties->createProperty('balloonContentHeader', "Транспортное средство");
+            $vehiclePlacemarkProperties->createProperty('balloonContent', "Транспортное средство: <b>".$vehicleData['model']."</b><br>Номер: <b>".$vehicleData['license_number']."</b>");
+            $vehiclePlacemark = new YandexApiPlacemark($coordinates->x,$coordinates->y,$vehiclePlacemarkProperties,$vehiclePlacemarkOptions);
+            $vehicleData['vehiclePlacemark'] = $vehiclePlacemark;
+        }
+
+        return json_encode($vehicleData);
+    }
+    return json_encode(false);
+
+}
+
 function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
 {
+
     $requestIDExternal = $_POST['requestIDExternal'];
     $requestData = $privilegedUser->getRequestEntity()->selectRequestByID($requestIDExternal);
     $routePoints = array();
