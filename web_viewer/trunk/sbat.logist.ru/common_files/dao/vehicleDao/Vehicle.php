@@ -7,6 +7,12 @@ class Vehicle implements IVehicle {
     private static $_instance;
     private $_DAO;
 
+    function getVehicleWialonID($vehicleId)
+    {
+        $value = $this->_DAO->select(new GetVehicleWialonId($vehicleId))[0];
+        return $value;
+    }
+
     function selectAllVehicles()
     {
         $array = $this->_DAO->select(new SelectAllVehicles());
@@ -17,7 +23,7 @@ class Vehicle implements IVehicle {
     function selectVehicleById($id)
     {
         $array = $this->_DAO->select(new SelectVehicleById($id));
-        return new VehicleData($array[0]);
+        return $array[0];
     }
 
     function insertVehicle($vehicleInfo)
@@ -154,17 +160,17 @@ class SelectVehiclesByRange implements IEntitySelect {
 class InsertVehicle implements IEntityInsert{
     private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type;
 
-    public function __construct($companyData)
+    public function __construct($vehicleData)
     {
         $dao = DAO::getInstance();
-        $this->transport_company_id = $dao->checkString($companyData['transport_company_id']);
-        $this->license_number = $dao->checkString($companyData['license_number']);
-        $this->model = $dao->checkString($companyData['model']);
-        $this->carrying_capacity = $dao->checkString($companyData['carrying_capacity']);
-        $this->volume = $dao->checkString($companyData['volume']);
-        $this->loading_type = $dao->checkString($companyData['loading_type']);
-        $this->pallets_quantity = $dao->checkString($companyData['pallets_quantity']);
-        $this->type = $dao->checkString($companyData['type']);
+        $this->transport_company_id = $dao->checkString($vehicleData['transport_company_id']);
+        $this->license_number = $dao->checkString($vehicleData['license_number']);
+        $this->model = $dao->checkString($vehicleData['model']);
+        $this->carrying_capacity = $dao->checkString($vehicleData['carrying_capacity']);
+        $this->volume = $dao->checkString($vehicleData['volume']);
+        $this->loading_type = $dao->checkString($vehicleData['loading_type']);
+        $this->pallets_quantity = $dao->checkString($vehicleData['pallets_quantity']);
+        $this->type = $dao->checkString($vehicleData['type']);
     }
 
     function getInsertQuery()
@@ -173,6 +179,30 @@ class InsertVehicle implements IEntityInsert{
             "('$this->transport_company_id', '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type');";
     }
 }
+
+
+
+//class GetVehicleWialonId implements IEntitySelect {
+//    private $vehicleId;
+//
+//    /**
+//     * @return mixed
+//     */
+//    function getSelectQuery()
+//    {
+//        return "SELECT vehicles.wialon_id FROM transmaster_transport_db.vehicles WHERE vehicles.id = $this->vehicleId";
+//    }
+//
+//    /**
+//     * GetVehicleWialonId constructor
+//     */
+//    public function __construct($vehicleId)
+//    {
+//        $this->vehicleId = $vehicleId;
+//    }
+//
+//
+//}
 
 class RemoveVehicle implements IEntityUpdate {
     private $id;

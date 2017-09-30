@@ -139,7 +139,7 @@ class SelectAddedRouteList implements IEntitySelect {
 
 class UpdateRouteList implements IEntityUpdate
 {
-    private $id, $palletsQty, $driverId, $driverPhoneNumber, $forwarderId, $licensePlate, $status, $routeId;
+    private $id, $palletsQty, $driverId, $driverPhoneNumber, $forwarderId, $licensePlate, $status, $routeId, $transportCompanyId, $vehicleId;
 
     public function __construct($id, $routeListData)
     {
@@ -152,13 +152,21 @@ class UpdateRouteList implements IEntityUpdate
         $this->licensePlate = $dao->checkString($routeListData['departureDate']);
         $this->status = $dao->checkString($routeListData['status']);
         $this->routeId = $dao->checkString($routeListData['routeId']);
+        $this->transportCompanyId = $dao->checkString($routeListData['transportCompanyId']);
+        $this->vehicleId = $dao->checkString($routeListData['vehicleId']);
+//        $this->driverId = $dao->checkString($routeListData['driverId']);
     }
 
     function getUpdateQuery()
     {
-        return "UPDATE `route_lists` SET palletsQty = $this->palletsQty, forwarderId = $this->forwarderId, " .
-            "driverID = $this->driverPhoneNumber, licensePlate = $this->licensePlate, status = $this->status, " .
-            "routeID = $this->routeId WHERE routeListID = $this->id";
+        $companyPart = ($this->transportCompanyId == '') ? "" : " transportCompanyId = $this->transportCompanyId, ";
+        $vehiclePart = ($this->vehicleId == '') ? "" : " vehicleId = $this->vehicleId, ";
+//        $driverPart = ($this->driverId == '') ? "" : " driverId = $this->driverId, ";
+        return "UPDATE `route_lists` SET palletsQty = $this->palletsQty, forwarderId = $this->forwarderId, 
+            driverID = $this->driverPhoneNumber, licensePlate = $this->licensePlate, status = $this->status, 
+            $companyPart 
+            $vehiclePart
+            routeID = $this->routeId WHERE routeListID = $this->id";
     }
 }
 

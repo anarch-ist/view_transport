@@ -49,6 +49,8 @@ class RequestEntity implements IRequestEntity
         return $array[0];
     }
 
+
+
     function updateRequest($newRequest)
     {
         return $this->_DAO->update(new EditRequest($newRequest));
@@ -248,6 +250,34 @@ STR_TO_DATE($this->deliveryDate, '%d%m%Y %H:%i:%s'),
     }
 }
 
+class GetRequestsInTransit implements IEntitySelect {
+    public function getSelectQuery()
+    {
+        return "SELECT DISTINCT vehicleId,destinationPointID,x,y FROM requests INNER JOIN transmaster_transport_db.requests ON points.pointID = requests.destinationPointID WHERE requestStatusID='DEPARTURE' AND vehicleId IS NOT NULL;";
+    }
+}
+
+class SetRequestsToDeliveredByVehicleId implements IEntityUpdate{
+    private $vehicleId;
+    private $destinationPointId;
+
+    /**
+     * SetRequestsToDeliveredByVehicleId constructor.
+     * @param $vehicleId
+     */
+    public function __construct($vehicleId, $destinationPointId)
+    {
+        $this->vehicleId = $vehicleId;
+        $this->destinationPointId = $destinationPointId;
+    }
+
+
+    public function getUpdateQuery()
+    {
+        return "UPDATE requests SET transmaster_transport_db.requests.requestStatusID='DELIVERED' WHERE transmaster_transport_db.requests.destinationPointID=$this->$this->destinationPointId AND transmaster_transport_db.requests.vehicleId=$this->vehicleId AND transmaster_transport_db.requests.requestStatusID='DEPARTURE';";
+    }
+}
+
 class DeleteRequest implements IEntityDelete
 {
     private $requestIDExternal;
@@ -308,7 +338,7 @@ class EditRequest implements IEntityUpdate
 
 //        $this->userID = $dao->checkString($requestData['userID']);
         $this->requestIDExternal = $dao->checkString($requestData['requestIDExternal']);
-        $this->newRequestStatus = $dao->checkString($requestData['nrewRequestStatus']);
+        $this->newRequestStatus = $dao->checkString($requestData['newRequestStatus']);
         $this->datetime = $dao->checkString($requestData['datetime']);
         $this->comment = $dao->checkString($requestData['comment']);
         $this->vehicleNumber = $dao->checkString($requestData['vehicleNumber']);
@@ -390,6 +420,7 @@ class SelectLastInserted implements IEntitySelect
     }
 
 }
+
 
 class SelectRequestByID implements IEntitySelect
 {
@@ -633,5 +664,20 @@ class GetMarketAgentEmail implements IEntitySelect
     {
         return "SELECT email FROM users WHERE userID = (SELECT marketAgentUserID FROM requests WHERE requestIDExternal = '$this->requestIDExternal') LIMIT 1";
         // TODO: Implement getSelectQuery() method.
+    }
+}
+
+class GetVehicleWialonId implements IEntitySelect
+{
+    private $requestIDExternal;
+
+    function __construct($requestIDExternal)
+    {
+        $this->requestIDExternal = DAO::getInstance()->checkString($requestIDExternal);
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT vehicles.wialon_id FROM transmaster_transport_db.vehicles WHERE vehicles.id = (SELECT vehicleId FROM transmaster_transport_db.requests WHERE requestIDExternal = $this->requestIDExternal)";
     }
 }

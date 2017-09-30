@@ -407,7 +407,7 @@ $(window).on('load', function () {
                 //     routePoints.push({type:'viaPoint', point:data.lastVisitedPoint.geometry});
                 // myMap.geoObjects.add(new ymaps.Placemark(data.lastVisitedPoint.geometry,data.lastVisitedPoint.properties));
                 // }
-                myMap.geoObjects.add(new ymaps.Placemark(data.destinationPoint.geometry,data.destinationPoint.properties));
+                myMap.geoObjects.add(new ymaps.Placemark(data.destinationPoint.geometry,data.destinationPoint.properties,{preset:'islands#blueGovernmentIcon'}));
                 routePoints.push({type: 'wayPoint', point: data.destinationPoint.geometry});
 
 
@@ -432,6 +432,20 @@ $(window).on('load', function () {
                         // myMap.setCenter(data[0].point);
                     }
                 );
+                $.post("content/getData.php", {
+                    status: 'getVehicleData',
+                    requestIDExternal: requestIDExternal
+                }, function (vehicleData) {
+
+                    vehicleData = JSON.parse(vehicleData);
+                    if (vehicleData.hasOwnProperty('vehiclePlacemark')) {
+                        console.log(JSON.stringify(vehicleData.vehiclePlacemark.options));
+                        vehiclePlacemark = new ymaps.Placemark(vehicleData.vehiclePlacemark.geometry, vehicleData.vehiclePlacemark.properties,{preset: 'islands#violetAutoIcon'});
+                        myMap.geoObjects.add(vehiclePlacemark);
+                        myMap.setCenter(vehicleData.vehiclePlacemark.geometry);
+                    }
+                })
+
             }
 
         })
