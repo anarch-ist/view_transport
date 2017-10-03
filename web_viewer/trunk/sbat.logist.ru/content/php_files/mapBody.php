@@ -23,6 +23,7 @@
     <!-- Если вы используете API локально, то в URL ресурса необходимо указывать протокол в стандартном виде (http://...)-->
     <script src="http://api-maps.yandex.ru/2.1/?lang=ru-RU" type="text/javascript"></script>
     <script src="http://yandex.st/jquery/2.2.3/jquery.min.js" type="text/javascript"></script>
+    <script src="common_files/media/yMap-2.1/pie-chart-clusterer.min.js" type="text/javascript"></script>
 
     <!--    Custom JS-->
     <script src="content/js/mapPage.js" type="text/javascript"></script>

@@ -88,7 +88,7 @@ function getVehicleData(PrivilegedUser $privilegedUser){
             $wialonVehicle = new WialonVehicle($vehicleData['wialon_id']);
             $coordinates = $wialonVehicle->getCoordinates();
             $vehiclePlacemarkOptions = new YandexApiOptions();
-            $vehiclePlacemarkOptions->createProperty('preset','twirl#truckIcon');
+            $vehiclePlacemarkOptions->createProperty('preset','islands#violetAutoIcon');
             $vehiclePlacemarkProperties = new YandexApiProperties();
             $vehiclePlacemarkProperties->createProperty('balloonContentHeader', "Транспортное средство");
             $vehiclePlacemarkProperties->createProperty('balloonContent', "Транспортное средство: <b>".$vehicleData['model']."</b><br>Номер: <b>".$vehicleData['license_number']."</b>");
@@ -131,7 +131,7 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
             $properties->createProperty('balloonContentHeader', '<b>Последняя посещеная точка</b><br>');
             $properties->createProperty('balloonContent', $transitPoint['pointName']);
 
-            $routePoints['lastVisitedPoint'] = new YandexApiPlacemark($transitPoint['x'], $transitPoint['y'], $properties, new YandexApiOptions());
+            $routePoints['lastVisitedPoint'] = new YandexApiPlacemark($transitPoint['x'], $transitPoint['y'], $properties,new YandexApiOptions());
         }
 
     }
@@ -139,12 +139,13 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
         $destinationPoint = $privilegedUser->getPointEntity()->getPointCoordinatesByPointId($requestData['destinationPointID'])[0];
         if ($destinationPoint != null) {
 
-
+            $options = new YandexApiOptions();
+            $options->createProperty('preset','islands#blueGovernmentIcon');
 //        $routePoints['destinationPoint']=[floatval($destinationPoint[0]['y']),floatval($destinationPoint[0]['x'])];
             $properties = new YandexApiProperties();
             $properties->createProperty('balloonContentHeader', '<b>Точка назначения</b><br>');
             $properties->createProperty('balloonContent', $destinationPoint['pointName']);
-            $routePoints['destinationPoint'] = new YandexApiPlacemark($destinationPoint['x'], $destinationPoint['y'], $properties, new YandexApiOptions());
+            $routePoints['destinationPoint'] = new YandexApiPlacemark($destinationPoint['x'], $destinationPoint['y'], $properties, $options);
 //        array_push($routePoints,new YandexApiRoutePoint($destinationPoint[0]['x'],$destinationPoint[0]['y'],'wayPoint',$destinationPoint[0]['address']));
 //        array_push($routePoints, [floatval($destinationPoint[0]['y']),floatval($destinationPoint[0]['x'])]);
         }
@@ -156,12 +157,19 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
 function getAllPointsCoordinates(PrivilegedUser $privilegedUser)
 {
     $data = $privilegedUser->getPointEntity()->getAllDistinctPointCoordinates();
+    $avg_count = $privilegedUser->getPointEntity()->getAverageRequestsCount()['avg_count'];
     $featureCollection = new YandexApiFeatureCollection();
     $options = new YandexApiOptions();
     $id = 0;
     foreach ($data as $row) {
         $geometryPoint = new YandexApiGeometryPoint($row['y'], $row['x']);
         $properties = new YandexApiProperties();
+        $options = new YandexApiOptions();
+        if($row['requests']>($avg_count*2)) $options->createProperty('preset','islands#redIcon');
+            elseif ($row['requests']>$avg_count) $options->createProperty('preset', 'islands#orangeIcon');
+            elseif ($row['requests']>0) $options->createProperty('preset','islands#darkGreenIcon');
+            else $options->createProperty('preset','islands#grayIcon');
+
         $properties->createProperty('balloonContentHeader', $row['pointName']);
         $properties->createProperty('balloonContentBody', $row['address']);
         $properties->createProperty('balloonContent', $row['pointName']);
