@@ -65,6 +65,10 @@ class PointEntity implements IPointEntity
         return $result;
     }
 
+    function getAverageRequestsCount(){
+        return $this->_DAO->select(new GetAverageRequestCount())[0];
+    }
+
     function getPointCoordinatesByPointId($pointId){
         return $this->_DAO->select(new GetPointCoordinatesByPointId($pointId));
     }
@@ -135,6 +139,14 @@ class GetAllDistinctPointCoordinates implements IEntitySelect
     {
         return "SELECT DISTINCT points.x, points.y, points.pointName, points.address,  points.requests_count AS requests from transmaster_transport_db.points WHERE x<>0.0 ;";
 //        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address from transmaster_transport_db.points WHERE x<>0.0";
+    }
+}
+
+class GetAverageRequestCount implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+        return "SELECT AVG(points.requests_count) AS avg_count FROM transmaster_transport_db.points WHERE x<>0 AND requests_count>0";
     }
 }
 

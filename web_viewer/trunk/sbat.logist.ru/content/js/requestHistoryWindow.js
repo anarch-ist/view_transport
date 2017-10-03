@@ -407,7 +407,7 @@ $(window).on('load', function () {
                 //     routePoints.push({type:'viaPoint', point:data.lastVisitedPoint.geometry});
                 // myMap.geoObjects.add(new ymaps.Placemark(data.lastVisitedPoint.geometry,data.lastVisitedPoint.properties));
                 // }
-                myMap.geoObjects.add(new ymaps.Placemark(data.destinationPoint.geometry,data.destinationPoint.properties,{preset:'islands#blueGovernmentIcon'}));
+                myMap.geoObjects.add(new ymaps.Placemark(data.destinationPoint.geometry,data.destinationPoint.properties, data.destinationPoint.options));
                 routePoints.push({type: 'wayPoint', point: data.destinationPoint.geometry});
 
 
@@ -440,7 +440,7 @@ $(window).on('load', function () {
                     vehicleData = JSON.parse(vehicleData);
                     if (vehicleData.hasOwnProperty('vehiclePlacemark')) {
                         console.log(JSON.stringify(vehicleData.vehiclePlacemark.options));
-                        vehiclePlacemark = new ymaps.Placemark(vehicleData.vehiclePlacemark.geometry, vehicleData.vehiclePlacemark.properties,{preset: 'islands#violetAutoIcon'});
+                        vehiclePlacemark = new ymaps.Placemark(vehicleData.vehiclePlacemark.geometry, vehicleData.vehiclePlacemark.properties,vehicleData.vehiclePlacemark.options);
                         myMap.geoObjects.add(vehiclePlacemark);
                         myMap.setCenter(vehicleData.vehiclePlacemark.geometry);
                     }

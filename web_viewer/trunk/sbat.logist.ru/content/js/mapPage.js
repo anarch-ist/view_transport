@@ -46,8 +46,14 @@ function init () {
         {status: "getAllPointsCoordinates", format: "json"},
         function (json) {
             console.log(json);
-            objectManager.objects.options.set('preset', 'islands#greenDotIcon');
-            objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
+            ymaps.modules.require('PieChartClustererLayout')
+                .spread(
+                    function (PieChartClustererLayout) {
+                        objectManager.clusters.options.set('clusterIconLayout', PieChartClustererLayout)
+                    }, this);
+            // ymaps.modules.require(['PieChartClustererLayout'], );
+            // objectManager.objects.options.set('preset', 'islands#greenDotIcon');
+            // objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
             objectManager.add(JSON.parse(json));
             // var geoObjects = ymaps.geoQuery(json)
             //     .addToMap(myMap)
