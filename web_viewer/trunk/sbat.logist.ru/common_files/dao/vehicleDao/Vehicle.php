@@ -158,7 +158,7 @@ class SelectVehiclesByRange implements IEntitySelect {
 
 
 class InsertVehicle implements IEntityInsert{
-    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type;
+    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
 
     public function __construct($vehicleData)
     {
@@ -171,12 +171,13 @@ class InsertVehicle implements IEntityInsert{
         $this->loading_type = $dao->checkString($vehicleData['loading_type']);
         $this->pallets_quantity = $dao->checkString($vehicleData['pallets_quantity']);
         $this->type = $dao->checkString($vehicleData['type']);
+        $this->wialon_id = $dao->checkString($vehicleData['wialon_id']);
     }
 
     function getInsertQuery()
     {
-        return "INSERT INTO `vehicles` (transport_company_id, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type) VALUE " .
-            "('$this->transport_company_id', '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type');";
+        return "INSERT INTO `vehicles` (transport_company_id, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
+            "('$this->transport_company_id', '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id');";
     }
 }
 
@@ -251,7 +252,7 @@ class SelectLastInsertedVehicleId implements IEntitySelect {
 
 class UpdateVehicle implements IEntityUpdate
 {
-    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type;
+    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
 
     function __construct(VehicleData $user, $id)
     {
@@ -264,6 +265,7 @@ class UpdateVehicle implements IEntityUpdate
         $this->loading_type = $dao->checkString($user->getData('loading_type'));
         $this->pallets_quantity = $dao->checkString($user->getData('pallets_quantity'));
         $this->type = $dao->checkString($user->getData('type'));
+        $this->wialon_id = $dao->checkString($user->getData('wialon_id'));
     }
 
     /**
@@ -278,7 +280,8 @@ class UpdateVehicle implements IEntityUpdate
             "volume = '$this->volume', " .
             "loading_type = '$this->loading_type', " .
             "pallets_quantity = '$this->pallets_quantity', " .
-            "type = '$this->type'";
+            "type = '$this->type', " .
+            "wialon_id = '$this->wialon_id'";
         $query = $query . " WHERE id = $this->id;";
         return $query;
     }

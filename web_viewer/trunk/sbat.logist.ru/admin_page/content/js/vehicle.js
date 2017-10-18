@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var vehiclesEditor = new $.fn.dataTable.Editor({
+    let vehiclesEditor = new $.fn.dataTable.Editor({
         ajax: 'content/getData.php',
         table: '#vehiclesTable',
         idSrc: 'id',
@@ -10,9 +10,26 @@ $(document).ready(function () {
             {label: 'Модель', name: 'model', type: 'text'},
             {label: 'Грузоподъемность, кг.', name: 'carrying_capacity', type: 'text'},
             {label: 'Объем, м<sup>3</sup>', name: 'volume', type: 'text'},
-            {label: 'Тип погрузки', name: 'loading_type', type: 'selectize', options: [{label:"Задняя", value:"Задняя"}, {label:"Верхняя", value:"Верхняя"},{label: "Боковая", value:"Боковая"}]},
-            {label: 'Количество паллет', name: 'pallets_quantity', type: 'mask', mask: "#" },
-            {label: 'Тип ТС', name: 'type', type: 'selectize', options: [{label:"Тент", value:"Тент"}, {label:"Термос", value:"Термос"},{label: "Рефрижератор", value:"Рефрижератор"}]}
+            {
+                label: 'Тип погрузки',
+                name: 'loading_type',
+                type: 'selectize',
+                options: [{label: "Задняя", value: "Задняя"}, {label: "Верхняя", value: "Верхняя"}, {
+                    label: "Боковая",
+                    value: "Боковая"
+                }]
+            },
+            {label: 'Количество паллет', name: 'pallets_quantity', type: 'mask', mask: "#"},
+            {
+                label: 'Тип ТС',
+                name: 'type',
+                type: 'selectize',
+                options: [{label: "Тент", value: "Тент"}, {label: "Термос", value: "Термос"}, {
+                    label: "Рефрижератор",
+                    value: "Рефрижератор"
+                }]
+            },
+            {label: 'Wialon ID', name: 'wialon_id', type: 'text'}
         ]
     });
 
@@ -20,7 +37,7 @@ $(document).ready(function () {
         data.status = 'vehiclesEditing';
     });
 
-    var $vehiclesTable = $("#vehiclesTable").DataTable({
+    let $vehiclesTable = $("#vehiclesTable").DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -65,7 +82,8 @@ $(document).ready(function () {
             {"name": "volume", "data": "volume", "targets": 5},
             {"name": "loading_type", "data": "loading_type", "targets": 6},
             {"name": "pallets_quantity", "data": "pallets_quantity", "targets": 7},
-            {"name": "type", "data": "type", "targets": 8}
+            {"name": "type", "data": "type", "targets": 8},
+            {"name": "wialon_id", "data": "wialon_id", "targets": 9},
         ]
     });
 });
