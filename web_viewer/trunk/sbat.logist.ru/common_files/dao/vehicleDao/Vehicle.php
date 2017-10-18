@@ -176,8 +176,9 @@ class InsertVehicle implements IEntityInsert{
 
     function getInsertQuery()
     {
-        return "INSERT INTO `vehicles` (transport_company_id, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
+        $query = "INSERT INTO `vehicles` (transport_company_id, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
             "('$this->transport_company_id', '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id');";
+        return $query;
     }
 }
 
@@ -275,7 +276,7 @@ class UpdateVehicle implements IEntityUpdate
     {
         $query = "UPDATE `vehicles` SET " .
             "transport_company_id = '$this->transport_company_id', " .
-            "license_number = $this->license_number, " .
+            "license_number = '$this->license_number', " .
             "model = '$this->model', " .
             "volume = '$this->volume', " .
             "loading_type = '$this->loading_type', " .
