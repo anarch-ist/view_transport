@@ -196,6 +196,7 @@
                     <th>Тип погрузки</th>
                     <th>Количество паллет</th>
                     <th>Тип</th>
+                    <th>Wialon ID</th>
                 </tr>
                 </thead>
             </table>
