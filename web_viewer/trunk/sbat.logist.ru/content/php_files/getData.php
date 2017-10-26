@@ -66,9 +66,22 @@ try {
         echo getVehicleData($privUser);
     } else if (strcasecmp($action, 'updateRequestsViaWialonApi') === 0){
         echo updateRequestsViaWialonApi($privUser);
+    } else if (strcasecmp($action, 'getRouteListsData') === 0){
+        echo getRouteListsData($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function getRouteListsData(PrivilegedUser $privilegedUser){
+    require_once __DIR__.'/../../common_files/utility/BasicEnum.php';
+
+
+
+    $jsonData = [];
+    $jsonData['data'] = $privilegedUser->getRouteListEntity()->getRouteListsForRLPage();
+    return json_encode($jsonData);
+
 }
 
 function updateRequestsViaWialonApi(PrivilegedUser $privilegedUser){

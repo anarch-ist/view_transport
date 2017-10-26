@@ -28,6 +28,11 @@ class RouteListEntity implements IRouteListEntity
         return $this->DAO->select(new SelectAllRouteLists());
     }
 
+    function getRouteListsForRLPage()
+    {
+        return $this->DAO->select(new SelectRouteListsForLast3Months());
+    }
+
     function getRouteListByID($id)
     {
         return $this->DAO->select(new SelectRouteListById($this->DAO->checkString($id)));
@@ -52,6 +57,14 @@ class RouteListEntity implements IRouteListEntity
     function selectRouteListIdByNumber($number)
     {
         return $this->DAO->select(new SelectRouteListIdByNumber($number));
+    }
+}
+
+class SelectRouteListsForLast3Months implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID WHERE creationDate > NOW() - INTERVAL 3 MONTH; ";
     }
 }
 
