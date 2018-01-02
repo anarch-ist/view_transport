@@ -194,4 +194,10 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__.'/../dao/pretensionDao/Pretension.php';
         return \DAO\PretensionEntity::getInstance();
     }
+
+    public function getExchangeLogEntity()
+    {
+        include_once __DIR__.'/../dao/exchangeLogDao/ExchangeLog.php';
+        return \DAO\ExchangeLog::getInstance();
+    }
 }
