@@ -46,6 +46,10 @@ class PointEntity implements IPointEntity
         // TODO: Implement addPoint() method.
     }
 
+    function getWarehouses(){
+        return $this->_DAO->select(new SelectWarehouses());
+    }
+
     function selectPointByUserID($userID)
     {
 
@@ -71,6 +75,14 @@ class PointEntity implements IPointEntity
 
     function getPointCoordinatesByPointId($pointId){
         return $this->_DAO->select(new GetPointCoordinatesByPointId($pointId));
+    }
+}
+
+class SelectWarehouses implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+        return "SELECT pointID, pointName FROM points WHERE pointTypeID='WAREHOUSE'";
     }
 }
 
@@ -137,8 +149,8 @@ class GetAllDistinctPointCoordinates implements IEntitySelect
 {
     function getSelectQuery()
     {
-        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address,  points.requests_count AS requests from transmaster_transport_db.points WHERE x<>0.0 ;";
-//        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address from transmaster_transport_db.points WHERE x<>0.0";
+        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address,  points.requests_count AS requests from points WHERE x<>0.0 ;";
+//        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address from points WHERE x<>0.0";
     }
 }
 
@@ -146,7 +158,7 @@ class GetAverageRequestCount implements IEntitySelect
 {
     function getSelectQuery()
     {
-        return "SELECT AVG(points.requests_count) AS avg_count FROM transmaster_transport_db.points WHERE x<>0 AND requests_count>0";
+        return "SELECT AVG(points.requests_count) AS avg_count FROM points WHERE x<>0 AND requests_count>0";
     }
 }
 
@@ -165,6 +177,7 @@ class GetPointCoordinatesByPointId implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT points.x, points.y, points.pointName, points.address from transmaster_transport_db.points WHERE pointID=$this->pointId AND x<>0  LIMIT 1;";
+        return "SELECT points.x, points.y, points.pointName, points.address from points WHERE pointID=$this->pointId AND x<>0  LIMIT 1;";
     }
 }
+

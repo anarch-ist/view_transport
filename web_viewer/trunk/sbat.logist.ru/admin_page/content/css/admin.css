@@ -28,6 +28,10 @@ body > div {
     width: 100% !important;
 }
 
+#clientsTable {
+    width: 100% !important;
+}
+
 #transportCompaniesTable {
     width: 100% !important;
 }
@@ -46,6 +50,72 @@ body > div {
     justify-content: flex-start;
     align-items: flex-start;
 }
+
+
+#requestsAssignment
+{
+    width: 40%;
+    min-width: 400px;
+
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 15%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+
+    visibility: hidden;
+    width: 400px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+    background-color: rgba(0,0,0,0.85);
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 99999;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.dt-button .ui-button .ui-state-default .ui-button-text-only{
+    border: thin #cecece !important;
+}
+
+#transactionWidget{
+    right: 0;
+    padding: 7px;
+    position: fixed;
+    top:0;
+    background-color: #fff;
+    z-index: 3;
+    border-bottom: solid thin #cecece;
+    border-left: solid thin #cecece;
+
+}
+
 
 .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 10em; }
 .ui-tabs-vertical .ui-tabs-nav li { table-layout:fixed; clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }

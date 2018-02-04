@@ -35,7 +35,18 @@ class ExchangeLog implements IExchaneLog
         return $this->_DAO->select(new SelectLastXTransactions($howMany));
     }
 
+    function selectAllTransactions(){
+        return $this->_DAO->select(new SelectAllTransactions());
+    }
 
+
+}
+
+class SelectAllTransactions implements IEntitySelect {
+    function getSelectQuery()
+    {
+        return "SELECT packet_id,date,server,status FROM exchange_log ORDER BY entry_id DESC";
+    }
 
 }
 

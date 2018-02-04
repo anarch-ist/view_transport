@@ -9,6 +9,12 @@ class RequestEntity implements IRequestEntity
     private static $_instance;
     private $_DAO;
 
+    function getRoutesForEmptyRequests($warehousePointId)
+    {
+        $array = $this->_DAO->select(new GetRoutesForEmptyRequests(DAO::getInstance()->checkString($warehousePointId)));
+        return $array;
+    }
+
     protected function __construct()
     {
         $this->_DAO = DAO::getInstance();
@@ -48,7 +54,6 @@ class RequestEntity implements IRequestEntity
 //        return new RequestData($array[0]);
         return $array[0];
     }
-
 
 
     function updateRequest($newRequest)
@@ -120,6 +125,22 @@ class RequestEntity implements IRequestEntity
     function getMarketAgentEmail($requestIDExternal)
     {
         return $this->_DAO->select(new GetMarketAgentEmail($requestIDExternal));
+    }
+
+    function getEmptyRequestsByWarehousePointIdAndRouteId($wpid, $rid)
+    {
+        $array = $this->_DAO->select(new GetEmptyRequestsByWarehouseIdAndRouteId($rid, $wpid));
+        return $array;
+    }
+
+    function assignRequests($requests,$routeListId=null)
+    {
+        if($routeListId!=null){
+            $array = $this->_DAO->update(new AssignRequests($requests,$routeListId));
+        } else {
+            $array = $this->_DAO->update(new AssignRequests($requests));
+        }
+        return $array;
     }
 
 
@@ -224,9 +245,9 @@ class addRequest implements IEntityInsert
  boxQty
  )  
 VALUES (
-(SELECT CONCAT('LSS-',requestID) FROM transmaster_transport_db.requests AS rqs ORDER BY requestID DESC LIMIT 1),
+(SELECT CONCAT('LSS-',requestID) FROM requests AS rqs ORDER BY requestID DESC LIMIT 1),
 'ADMIN_PAGE',
-(SELECT CONCAT('LSS-',requestID) FROM transmaster_transport_db.requests AS rqs ORDER BY requestID DESC LIMIT 1),
+(SELECT CONCAT('LSS-',requestID) FROM requests AS rqs ORDER BY requestID DESC LIMIT 1),
 CURDATE(),
 $this->clientId,
 (SELECT pointID FROM route_points WHERE routeID = (SELECT routeID FROM route_lists WHERE routeListID = $this->routeListId) ORDER BY sortOrder DESC LIMIT 1),
@@ -250,14 +271,16 @@ STR_TO_DATE($this->deliveryDate, '%d%m%Y %H:%i:%s'),
     }
 }
 
-class GetRequestsInTransit implements IEntitySelect {
+class GetRequestsInTransit implements IEntitySelect
+{
     public function getSelectQuery()
     {
-        return "SELECT DISTINCT vehicleId,destinationPointID,x,y FROM requests INNER JOIN transmaster_transport_db.requests ON points.pointID = requests.destinationPointID WHERE requestStatusID='DEPARTURE' AND vehicleId IS NOT NULL;";
+        return "SELECT DISTINCT vehicleId,destinationPointID,x,y FROM requests INNER JOIN requests ON points.pointID = requests.destinationPointID WHERE requestStatusID='DEPARTURE' AND vehicleId IS NOT NULL;";
     }
 }
 
-class SetRequestsToDeliveredByVehicleId implements IEntityUpdate{
+class SetRequestsToDeliveredByVehicleId implements IEntityUpdate
+{
     private $vehicleId;
     private $destinationPointId;
 
@@ -274,7 +297,7 @@ class SetRequestsToDeliveredByVehicleId implements IEntityUpdate{
 
     public function getUpdateQuery()
     {
-        return "UPDATE requests SET transmaster_transport_db.requests.requestStatusID='DELIVERED' WHERE transmaster_transport_db.requests.destinationPointID=$this->$this->destinationPointId AND transmaster_transport_db.requests.vehicleId=$this->vehicleId AND transmaster_transport_db.requests.requestStatusID='DEPARTURE';";
+        return "UPDATE requests SET requests.requestStatusID='DELIVERED' WHERE requests.destinationPointID=$this->$this->destinationPointId AND requests.vehicleId=$this->vehicleId AND requests.requestStatusID='DEPARTURE';";
     }
 }
 
@@ -299,9 +322,11 @@ class DeleteRequest implements IEntityDelete
      */
     function getDeleteQuery()
     {
-        $query = "DELETE FROM transmaster_transport_db.requests WHERE requestIDExternal = '$this->requestIDExternal' LIMIT 1;";
+        $query = "DELETE FROM requests WHERE requestIDExternal = '$this->requestIDExternal' LIMIT 1;";
         return $query;
     }
+
+
 }
 
 class EditRequest implements IEntityUpdate
@@ -352,14 +377,14 @@ class EditRequest implements IEntityUpdate
         $this->routeListId = $dao->checkString($requestData['routeListID']);
         $this->routeListId = ($this->routeListId == 'dummy') ? '' : " routeListId = $this->routeListId, destinationPointID=(SELECT pointID FROM route_points WHERE routeID = (SELECT routeID FROM route_lists WHERE routeListID = $this->routeListId) ORDER BY sortOrder DESC LIMIT 1),";
         $this->marketAgentUserId = $dao->checkString($requestData['marketAgentUserId']);
-        $this->marketAgentUserId = ($this->marketAgentUserId =='dummy') ? '' : " marketAgentUserId = $this->marketAgentUserId, ";
+        $this->marketAgentUserId = ($this->marketAgentUserId == 'dummy') ? '' : " marketAgentUserId = $this->marketAgentUserId, ";
         $this->invoiceNumber = $dao->checkString($requestData['invoiceNumber']);
         $this->documentNumber = $dao->checkString($requestData['documentNumber']);
         $this->firma = $dao->checkString($requestData['firma']);
         $this->contactName = $dao->checkString($requestData['contactName']);
         $this->contactPhone = $dao->checkString($requestData['contactPhone']);
         $this->warehousePointId = $dao->checkString($requestData['warehousePointId']);
-        $this->warehousePointId = ($this->warehousePointId =='dummy') ? '' : " warehousePointId = $this->warehousePointId, ";
+        $this->warehousePointId = ($this->warehousePointId == 'dummy') ? '' : " warehousePointId = $this->warehousePointId, ";
         $this->storage = $dao->checkString($requestData['storage']);
 //        $date = date_create_from_format('d-m-Y',$dao->checkString($requestData['deliveryDate']));
 //        $this->deliveryDate = date_format($date,'Y-m-d H:i:s');
@@ -374,7 +399,7 @@ class EditRequest implements IEntityUpdate
         $companyPart = ($this->transportCompanyId == '') ? "" : " transportCompanyId = $this->transportCompanyId, ";
         $vehiclePart = ($this->vehicleId == '') ? "" : " vehicleId = $this->vehicleId, ";
         $driverPart = ($this->driverId == '') ? "" : " driverId = $this->driverId, ";
-        $String = "UPDATE transmaster_transport_db.requests
+        $String = "UPDATE requests
         SET  
         invoiceNumber = '$this->invoiceNumber', 
         $this->clientId
@@ -623,9 +648,9 @@ class UpdateRequestStatuses implements IEntityUpdate
 
         if ($this->newRequestStatus === 'DEPARTURE') {
             // добавить запрос на обновление паллет в routeLists
-            $query = "UPDATE transmaster_transport_db.`route_lists` SET `palletsQty` = '$this->palletQuantity', `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID'; UPDATE transmaster_transport_db.`requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') $hoursPart $companyPart $vehiclePart $driverPart WHERE `requestIDExternal` IN ('" . implode("', '", $this->requests) . "');";
+            $query = "UPDATE `route_lists` SET `palletsQty` = '$this->palletQuantity', `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID'; UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') $hoursPart $companyPart $vehiclePart $driverPart WHERE `requestIDExternal` IN ('" . implode("', '", $this->requests) . "');";
         } else {
-            $query = "UPDATE transmaster_transport_db.`route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID'; UPDATE transmaster_transport_db.`requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') $hoursPart $companyPart $vehiclePart $driverPart  WHERE `requestIDExternal` IN ('" . implode("', '", $this->requests) . "');";
+            $query = "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeListID'; UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i%:%s') $hoursPart $companyPart $vehiclePart $driverPart  WHERE `requestIDExternal` IN ('" . implode("', '", $this->requests) . "');";
         }
 
         return $query;
@@ -647,7 +672,7 @@ class SelectRequestsByRouteList implements IEntitySelect
      */
     function getSelectQuery()
     {
-        return "SELECT r.requestID, r.requestIDExternal, r.invoiceNumber, r.requestStatusID, s.requestStatusRusName  FROM `requests` AS r LEFT JOIN `request_statuses` AS s ON r.requestStatusID = s.requestStatusID WHERE routeListID='$this->routeListID';";
+        return "SELECT r.requestID, r.requestIDExternal, r.invoiceNumber, r.requestStatusID, r.clientID, s.requestStatusRusName, r.deliveryDate, r.documentNumber, r.boxQty  FROM `requests` AS r LEFT JOIN `request_statuses` AS s ON r.requestStatusID = s.requestStatusID WHERE routeListID='$this->routeListID';";
     }
 }
 
@@ -678,6 +703,84 @@ class GetVehicleWialonId implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "SELECT vehicles.wialon_id FROM transmaster_transport_db.vehicles WHERE vehicles.id = (SELECT vehicleId FROM transmaster_transport_db.requests WHERE requestIDExternal = $this->requestIDExternal)";
+        return "SELECT vehicles.wialon_id FROM vehicles WHERE vehicles.id = (SELECT vehicleId FROM requests WHERE requestIDExternal = $this->requestIDExternal)";
     }
+}
+
+class GetRoutesForEmptyRequests implements IEntitySelect
+{
+    private $warehousePointId;
+
+    /**
+     * GetEmptyRequestsByPointId constructor.
+     * @param $warehousePointId
+     */
+    public function __construct($warehousePointId)
+    {
+        $this->warehousePointId = $warehousePointId;
+    }
+
+
+    function getSelectQuery()
+    {
+        $string = "SELECT DISTINCT routes.routeId, box_limit FROM (SELECT lastWeekRequests.warehousePointID, lastWeekRequests.storage, lastWeekRequests.requestID, delivery_route_points.routeId, lastWeekRequests.destinationPointID, lastWeekRequests.deliveryDate FROM (SELECT * FROM requests WHERE requestDate >= NOW() - INTERVAL 31 DAY AND  routeListID IS NULL AND requestStatusID IN ('CHECK_PASSED','READY') AND (warehousePointID  = $this->warehousePointId OR storage = (SELECT storage FROM storages_to_points WHERE point_id = $this->warehousePointId LIMIT 1)) GROUP BY requestID) AS lastWeekRequests INNER JOIN delivery_route_points ON lastWeekRequests.destinationPointID = delivery_route_points.pointId GROUP BY requestID) AS requestsAndRoutes INNER JOIN routes ON requestsAndRoutes.routeId = routes.routeID;";
+        return $string;
+    }
+
+}
+
+
+class GetEmptyRequestsByWarehouseIdAndRouteId implements IEntitySelect
+{
+    private $routeId, $warehousePointId;
+
+    /**
+     * GetEmptyRequestsByWarehouseIdAndRouteId constructor.
+     * @param $routeId
+     * @param $warehousePointId
+     */
+    public function __construct($routeId, $warehousePointId)
+    {
+        $this->routeId = $routeId;
+        $this->warehousePointId = $warehousePointId;
+    }
+
+
+    function getSelectQuery()
+    {
+        $string = "SELECT requestID, boxQty FROM (SELECT lastWeekRequests.requestID, delivery_route_points.routeId, lastWeekRequests.destinationPointID, lastWeekRequests.deliveryDate, lastWeekRequests.boxQty FROM (SELECT * FROM requests WHERE requestDate >= NOW() - INTERVAL 31 DAY AND  routeListID IS NULL AND requestStatusID IN ('CHECK_PASSED','READY') AND (warehousePointID = $this->warehousePointId OR storage = (SELECT storage FROM storages_to_points WHERE point_id = $this->warehousePointId LIMIT 1)) GROUP BY requestID ORDER BY deliveryDate ASC) AS lastWeekRequests INNER JOIN delivery_route_points ON lastWeekRequests.destinationPointID = delivery_route_points.pointId GROUP BY requestID) AS requestsAndRoutes WHERE routeId = $this->routeId ORDER BY boxQty DESC;";
+        return $string;
+        // TODO: Implement getSelectQuery() method.
+    }
+
+}
+
+class AssignRequests implements IEntityUpdate
+{
+    private $requests, $routeListId;
+
+    /**
+     * AssignRequests constructor.
+     * @param $requests
+     * @param $routeListId
+     */
+    public function __construct($requests, $routeListId = " (SELECT routeListID FROM route_lists WHERE dataSourceID = 'REQUESTS_ASSIGNER' ORDER BY routeListID DESC LIMIT 1) ")
+    {
+        $this->requests = "(";
+        foreach ($requests as $request) {
+            $this->requests = $this->requests . $request['requestID'] . ',';
+        }
+        $this->requests = rtrim($this->requests,","). ') ';
+        $this->routeListId = $routeListId;
+    }
+
+
+    function getUpdateQuery()
+    {
+        $query = "UPDATE requests SET routeListID=$this->routeListId, requestStatusID='ROUTE_LIST_MADE' WHERE requests.requestID IN $this->requests";
+        return $query;
+        // TODO: Implement getUpdateQuery() method.
+    }
+
+
 }

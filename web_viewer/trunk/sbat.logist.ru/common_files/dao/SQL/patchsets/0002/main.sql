@@ -1,6 +1,6 @@
 BEGIN;
 
-DROP TRIGGER IF EXISTS transmaster_transport_db.before_request_update;
+DROP TRIGGER IF EXISTS test_ttdb.before_request_update;
 
 CREATE TRIGGER before_request_update BEFORE UPDATE ON requests
 FOR EACH ROW

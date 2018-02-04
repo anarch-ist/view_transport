@@ -1,5 +1,5 @@
-DROP PROCEDURE transmaster_transport_db.refreshMaterializedView;
-CREATE PROCEDURE transmaster_transport_db.`refreshMaterializedView`()
+DROP PROCEDURE IF EXISTS test_ttdb.refreshMaterializedView;
+CREATE PROCEDURE test_ttdb.`refreshMaterializedView`()
   BEGIN
 
     TRUNCATE mat_view_row_count_for_user;

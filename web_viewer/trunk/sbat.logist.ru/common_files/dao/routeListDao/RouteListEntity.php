@@ -58,13 +58,49 @@ class RouteListEntity implements IRouteListEntity
     {
         return $this->DAO->select(new SelectRouteListIdByNumber($number));
     }
+
+    function createGenericRouteList($routeId)
+    {
+        return $this->DAO->insert(new CreateGenericRouteList($routeId));
+    }
+
+
+    function getRouteListForRequestAssignment($routeId)
+    {
+        $routeList=$this->DAO->select(new GetRouteListForRequestAssignment($routeId));
+        if(empty($routeList)){
+            if ($this->DAO->insert(new CreateGenericRouteList($routeId))){
+                $routeList=$this->DAO->select(new SelectLastAutoInsertedRouteLists(1));
+            } else {
+                throw new \Exception();
+            }
+        }
+        return $routeList[0];
+    }
+
+    function getRouteListForRequestAssignmentWithLimit($routeId, $boxQty)
+    {
+        $routeList=$this->DAO->select(new GetRouteListForRequestAssignmentWithBoxLimit($routeId,$boxQty));
+        if(empty($routeList)){
+            if ($this->DAO->insert(new CreateGenericRouteList($routeId))){
+                $routeList=$this->DAO->select(new SelectLastAutoInsertedRouteLists(1));
+            } else {
+                throw new \Exception();
+            }
+        }
+        return $routeList[0];
+    }
+
+    function selectLastAutoInsertedRouteLists($quantity){
+        return $this->DAO->select(new SelectLastAutoInsertedRouteLists($quantity));
+    }
 }
 
 class SelectRouteListsForLast3Months implements IEntitySelect
 {
     function getSelectQuery()
     {
-        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID WHERE creationDate > NOW() - INTERVAL 3 MONTH; ";
+        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH; ";
     }
 }
 
@@ -150,6 +186,8 @@ class SelectAddedRouteList implements IEntitySelect {
 
 }
 
+
+
 class UpdateRouteList implements IEntityUpdate
 {
     private $id, $palletsQty, $driverId, $driverPhoneNumber, $forwarderId, $licensePlate, $status, $routeId, $transportCompanyId, $vehicleId;
@@ -229,5 +267,141 @@ class SelectRouteListIdByNumber implements IEntitySelect
 
 
 }
+
+
+
+class GetRouteListsByRoute implements IEntitySelect
+{
+    private $routeId;
+
+    /**
+     * GetRouteListsByRoute constructor.
+     * @param $routeId
+     */
+    public function __construct($routeId)
+    {
+        $this->routeId = $routeId;
+    }
+
+    function getSelectQuery()
+    {
+        // TODO: Implement getSelectQuery() method.
+    }
+
+
+}
+
+class CreateGenericRouteList implements IEntityInsert
+{
+    private $routeId;
+
+    /**
+     * CreateGenericRouteList constructor.
+     * @param $routeId
+     */
+    public function __construct($routeId)
+    {
+        $this->routeId = $routeId;
+    }
+
+    /**
+     * @return string
+     */
+    function getInsertQuery()
+    {
+        $string = "INSERT INTO route_lists (routeListIDExternal,dataSourceID,routeListNumber, creationDate, departureDate, status, routeID) SELECT CONCAT('LSS-',(SELECT COUNT(routeListID) FROM route_lists WHERE dataSourceID='REQUESTS_ASSIGNER')) AS routeListIDExternal , 'REQUESTS_ASSIGNER' AS dataSourceID, CONCAT('LSS-',(SELECT COUNT(routeListID) FROM route_lists WHERE dataSourceID='REQUESTS_ASSIGNER')) AS routeListNumber, NOW() AS creationDate ,(SELECT DATE_ADD(CURDATE(), INTERVAL (9 - IF(DAYOFWEEK(CURDATE())=1, 8, DAYOFWEEK(CURDATE()))) DAY)) AS departureDate, 'CREATED' AS status, '$this->routeId' AS routeId;";
+        return $string;
+    }
+}
+
+class CreateGenericRouteListWithDelay implements IEntityInsert
+{
+    private $routeId, $interval;
+
+    /**
+     * CreateGenericRouteListWithDelay constructor.
+     * @param $routeId
+     * @param $interval
+     */
+    public function __construct($routeId, $interval=0)
+    {
+        $this->routeId = $routeId;
+        $this->interval = $interval;
+    }
+
+
+    function getInsertQuery()
+    {
+        $string = "INSERT INTO route_lists (routeListIDExternal,dataSourceID,routeListNumber, creationDate, departureDate, status, routeID) SELECT CONCAT('LSS-',(SELECT COUNT(routeListID) FROM route_lists WHERE dataSourceID='REQUESTS_ASSIGNER')) AS routeListIDExternal , 'REQUESTS_ASSIGNER' AS dataSourceID, CONCAT('LSS-',(SELECT COUNT(routeListID) FROM route_lists WHERE dataSourceID='REQUESTS_ASSIGNER')) AS routeListNumber, NOW() AS creationDate ,(SELECT DATE_ADD(CURDATE(), INTERVAL (9 - IF(DAYOFWEEK(CURDATE())=1, 8, DAYOFWEEK(CURDATE()))) DAY)) + INTERVAL 7*$this->interval DAY AS departureDate, 'CREATED' AS status, '$this->routeId' AS routeId;";
+        return $string;
+    }
+
+}
+
+class GetRouteListForRequestAssignment implements IEntitySelect
+{
+    private $routeId;
+
+    /**
+     * getRouteListForRequestAssignment constructor.
+     * @param $routeId
+     */
+    public function __construct($routeId)
+    {
+        $this->routeId = $routeId;
+    }
+
+    function getSelectQuery()
+    {
+        $query = "SELECT * FROM (SELECT route_lists.routeListID, COUNT(boxQty) AS boxQty, box_limit, routes.routeID, departureDate FROM route_lists LEFT JOIN requests ON route_lists.routeListID = requests.routeListID LEFT JOIN routes ON route_lists.routeID = routes.routeID WHERE route_lists.routeID=$this->routeId AND departureDate>=NOW() - INTERVAL 3 DAY GROUP BY requests.routeListID ORDER BY departureDate ASC LIMIT 1) AS routeLists WHERE boxQty<box_limit;";
+        return $query;
+    }
+}
+
+class GetRouteListForRequestAssignmentWithBoxLimit implements IEntitySelect
+{
+    private $routeId,$boxLimit;
+
+    /**
+     * getRouteListForRequestAssignment constructor.
+     * @param $routeId
+     */
+    public function __construct($routeId,$boxLimit=null)
+    {
+        $this->routeId = $routeId;
+        $this->boxLimit = ($boxLimit==''||$boxLimit==null) ? '' : "+ $boxLimit";
+    }
+
+    function getSelectQuery()
+    {
+        $query = "SELECT * FROM (SELECT route_lists.routeListNumber, routeListIDExternal, route_lists.routeListID, COUNT(boxQty) AS boxQty, box_limit, routes.routeID, departureDate FROM route_lists LEFT JOIN requests ON route_lists.routeListID = requests.routeListID LEFT JOIN routes ON route_lists.routeID = routes.routeID WHERE route_lists.routeID=$this->routeId AND route_lists.dataSourceID='LOGIST_1C' AND departureDate>=NOW() - INTERVAL 3 DAY GROUP BY requests.routeListID ORDER BY departureDate ASC LIMIT 1) AS routeLists WHERE boxQty $this->boxLimit < box_limit;";
+        return $query;
+    }
+}
+
+
+class SelectLastAutoInsertedRouteLists implements IEntitySelect
+{
+    private $quantity;
+
+    /**
+     * SelectLastAutoInsertedRouteLists constructor.
+     * @param $quantity
+     */
+    public function __construct($quantity)
+    {
+        $this->quantity = DAO::getInstance()->checkString($quantity);
+    }
+
+
+    function getSelectQuery()
+    {
+        $query = "SELECT * FROM (SELECT routeListIDExternal, routeListNumber, route_lists.routeListID, '0' AS boxQty, box_limit, routes.routeID, departureDate FROM route_lists LEFT JOIN routes ON route_lists.routeID=routes.routeID WHERE route_lists.dataSourceID = 'REQUESTS_ASSIGNER' ORDER BY routeListID DESC LIMIT $this->quantity) AS routeLists;";
+        return $query;
+    }
+
+}
+
+
 
 ?>

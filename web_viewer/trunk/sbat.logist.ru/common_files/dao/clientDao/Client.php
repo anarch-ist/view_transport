@@ -36,9 +36,172 @@ class ClientEntity implements IClientEntity
         return $this->DAO->select(new SelectClientByInnOrName($this->DAO->checkString($search)));
     }
 
-    function selectClients()
+//    function selectClients()
+//    {
+//        return $this->DAO->select(new SelectAllClients());
+//    }
+    function selectClients($start = 0, $count = 20)
     {
-        return $this->DAO->select(new SelectAllClients());
+        $array = $this->DAO->multiSelect(new EntitySelectAllClients($start, $count));
+        $arrayResult = array();
+        $arrayResult['clients'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
+    }
+
+    function selectClientsForAdminPage()
+    {
+        return $this->DAO->select(new SelectAllClientsForAdminPage());
+    }
+
+    function selectLastInsertedClient(){
+        return $this->DAO->select(new SelectLastInserted());
+    }
+
+    function removeClient($clientID){
+        return $this->DAO->delete(new DeleteClient($clientID));
+    }
+
+    function addClient($clientData){
+        return $this->DAO->insert(new InsertClient($clientData));
+    }
+
+    function updateClient($clientData, $id){
+        return $this->DAO->update(new UpdateClient($clientData, $id));
+    }
+
+    function selectClient($id){
+        return $this->DAO->select(new SelectClient($id));
+    }
+
+}
+
+class SelectClient implements IEntitySelect {
+    private $clientID;
+
+    /**
+     * SelectClient constructor.
+     * @param $clientID
+     */
+    public function __construct($clientID)
+    {
+        $this->clientID = $clientID;
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT * FROM clients WHERE clientID=$this->clientID";
+    }
+
+
+}
+
+
+
+class UpdateClient implements IEntityUpdate{
+    private $INN,$clientName, $KPP, $corAccount, $curAccount, $BIK, $contractNumber, $clientID;
+
+    public function __construct($clientData, $id)
+    {
+        $this->INN = $clientData['INN'];
+        $this->clientName=$clientData['clientName'];
+        $this->KPP=$clientData['KPP'];
+        $this->corAccount=$clientData['corAccount'];
+        $this->curAccount=$clientData['curAccount'];
+        $this->BIK=$clientData['BIK'];
+        $this->contractNumber=$clientData['contractNumber'];
+        $this->clientID=$id;
+    }
+
+    function getUpdateQuery()
+    {
+        $query = "UPDATE clients SET clientName ='$this->clientName', INN ='$this->INN', KPP ='$this->KPP', corAccount='$this->corAccount', curAccount='$this->curAccount', BIK='$this->BIK', contractNumber='$this->contractNumber' WHERE clientID= $this->clientID";
+        return $query;
+    }
+
+
+}
+
+class EntitySelectAllClients implements IEntitySelect
+{
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
+
+    function __construct($start, $count)
+    {
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString = $_POST['search']['value'];
+        $searchArray = $_POST['columns'];
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
+    }
+
+    function getSelectQuery()
+    {
+        return "CALL selectClients($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+    }
+}
+
+class DeleteClient implements IEntityDelete{
+    private $clientID;
+
+    /**
+     * DeleteClient constructor.
+     * @param $clientID
+     */
+    public function __construct($clientID)
+    {
+        $this->clientID = $clientID;
+    }
+
+    function getDeleteQuery()
+    {
+        $query = "DELETE FROM clients WHERE clientID=$this->clientID";
+        return $query;
+    }
+
+
+}
+
+class SelectLastInserted implements IEntitySelect{
+    function getSelectQuery()
+    {
+        return "SELECT clientID, clientName, INN, KPP, corAccount, curAccount, BIK, contractNumber FROM clients WHERE dataSourceID='ADMIN_PAGE' ORDER BY clientID DESC LIMIT 1";
+    }
+
+}
+
+class InsertClient implements IEntityInsert{
+    private $INN,$clientName, $KPP, $corAccount, $curAccount, $BIK, $contractNumber;
+
+    /**
+     * InsertClient constructor.
+     */
+    public function __construct($clientData)
+    {
+        $this->INN = $clientData['INN'];
+        $this->clientName=$clientData['clientName'];
+        $this->KPP=$clientData['KPP'];
+        $this->corAccount=$clientData['corAccount'];
+        $this->curAccount=$clientData['curAccount'];
+        $this->BIK=$clientData['BIK'];
+        $this->contractNumber=$clientData['contractNumber'];
+    }
+
+    function getInsertQuery()
+    {
+        $query= "INSERT INTO clients  (clientIDExternal, dataSourceID, clientName, INN, KPP, corAccount, curAccount, BIK, contractNumber) VALUES ((CONCAT('LSS-',(SELECT clientID FROM (SELECT clientID FROM clients WHERE dataSourceID='ADMIN_PAGE' ORDER BY clientID DESC LIMIT 1) AS adminClients))), 'ADMIN_PAGE', '$this->clientName', '$this->INN', '$this->KPP', '$this->corAccount','$this->curAccount','$this->BIK', '$this->contractNumber');";
+        return $query;
+    }
+
+
+}
+
+class SelectAllClientsForAdminPage implements IEntitySelect {
+    function getSelectQuery()
+    {
+        return "SELECT clientID, clientName, INN, KPP, corAccount, curAccount, BIK, contractNumber FROM clients;";
     }
 }
 

@@ -1,6 +1,6 @@
 /*@import url(../../../common_files/media/css/common_style.css);*/
 /* Below line is used for online Google font */
-@import url(http://fonts.googleapis.com/css?family=Droid+Serif);
+/*@import url(http://fonts.googleapis.com/css?family=Droid+Serif);*/
 
 h2 {
     text-align: center;
@@ -12,64 +12,66 @@ hr {
 }
 
 div.container {
-    width: 960px;
-    height: 610px;
+    width: 100%;
+    height: 100%;
     margin: 50px auto;
-    font-family: 'Droid Serif', serif;
+    font-family: Arial,"Helvetica Neue", Helvetica, Tahoma,  serif;
     position: relative;
+    text-align: center;
 }
 
 div.main {
     width: 320px;
     margin-top: 80px;
-    float: left;
-    padding: 10px 55px 40px;
-    background-color: rgba(187, 255, 184, 0.65);
-    border: 15px solid white;
-    box-shadow: 0 0 10px;
+    text-align: left;
+    padding: 50px 65px 45px;
+    background-color: rgba(170,199,231,0.2);
+    border: solid thin rgb(142,169,201);
+    /*border-top: 30px solid rgb(142,169,201);*/
     border-radius: 2px;
     font-size: 13px;
+    display: inline-block;
+    color: #1c3655;
+    box-shadow:  0px 0px 3px rgb(142,169,201);
 }
 
 input[type=text], [type=password] {
     width: 97.7%;
-    height: 34px;
+    height: 30px;
     padding-left: 5px;
     margin-bottom: 20px;
     margin-top: 8px;
-    box-shadow: 0 0 5px #00F5FF;
-    border: 2px solid #00F5FF;
-    color: #4f4f4f;
-    font-size: 16px;
+    color: #1c3655;
+    font-size: 12px;
 }
 
 label {
-    color: #464646;
-    text-shadow: 0 1px 0 #fff;
+    color: #1c3655;
     font-size: 14px;
     font-weight: bold;
 }
 
-#login {
-    width: 100%;
-    background: linear-gradient(#22abe9 5%, #36caf0 100%);
-    border: 1px solid #0F799E;
-    font-size: 20px;
-    margin-top: 15px;
-    padding: 8px;
-    font-weight: bold;
-    cursor: pointer;
+#loginButton {
+    float: right;
+    width: 30%;
+    background: #1c3655;
     color: white;
-    text-shadow: 0 1px 0 #13506D;
+    border-radius: 2px;
+    border: none;
+    font-size: 16px;
+    padding: 8px;
+    /*font-weight: bold;*/
+    cursor: pointer;
+
 }
 
-#login:hover {
-    background: linear-gradient(#36caf0 5%, #22abe9 100%);
+#loginButton:hover {
+    background: rgb(142,169,201);
+    color: white;
 }
 
 /*class toggled dynamically with javascript*/
 .login_error {
-    border: 2px solid red !important;
-    box-shadow: 0 0 3px red !important;
+    border: 2px solid #c22929 !important;
 }
 

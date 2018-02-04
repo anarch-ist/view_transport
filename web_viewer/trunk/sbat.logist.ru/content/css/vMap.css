@@ -1,0 +1,38 @@
+body{
+    font-family: Arial, "Helvetica Neue", Helvetica, serif;
+}
+
+.accordion form label.form-group{
+    display: block;
+    font-weight: normal;
+}
+
+
+.accordion {
+    transition: 0.4s;
+}
+
+.accordion > *{
+    font-weight: normal !important;
+}
+
+
+
+.openAccordion{
+    cursor: pointer;
+    height: 40px;
+    width: 100%;
+    transition:none;
+    text-align: center;
+    padding-top: 8px;
+}
+.openAccordion:hover{
+    background-color: gainsboro;
+}
+
+.panel {
+    padding: 0 18px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
+}

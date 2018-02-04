@@ -7,86 +7,86 @@ try {
     } else {
         throw new DataTransferException('Не задан параметр "статус"', __FILE__);
     }
-    if (strcasecmp($action,'getAllPointIdPointNamePairs')===0) {
+    if (strcasecmp($action, 'getAllPointIdPointNamePairs') === 0) {
         getAllPointIdPointNamePairs($privUser);
-    } else if (strcasecmp($action, 'getPointsByName')===0) {
+    } else if (strcasecmp($action, 'getPointsByName') === 0) {
         getPointsByName($privUser);
-    } else if (strcasecmp($action,'getAllUserRoles')===0) {
+    } else if (strcasecmp($action, 'getAllUserRoles') === 0) {
         getAllUserRoles($privUser);
-    } else if (strcasecmp($action,'getRelationsBetweenRoutePointsDataForRouteID')===0) {
+    } else if (strcasecmp($action, 'getRelationsBetweenRoutePointsDataForRouteID') === 0) {
         getRelationsBetweenRoutePointsDataForRouteID($privUser);
-    } else if (strcasecmp($action,'getUsersData')===0) {
+    } else if (strcasecmp($action, 'getUsersData') === 0) {
         getUsers($privUser);
-    } else if (strcasecmp($action, 'getRoutesData')===0) {
+    } else if (strcasecmp($action, 'getRoutesData') === 0) {
         getRoutes($privUser);
-    } else if (strcasecmp($action,'getClientsByINN')===0) {
+    } else if (strcasecmp($action, 'getClientsByINN') === 0) {
         getClientsByINN($privUser);
-    } else if (strcasecmp($action,'getClients')===0) {
+    } else if (strcasecmp($action, 'getClients') === 0) {
         getClients($privUser);
-    } else if (strcasecmp($action,'getAllRouteIdDirectionPairs')===0) {
+    } else if (strcasecmp($action, 'getAllRouteIdDirectionPairs') === 0) {
         getAllRouteIdDirectionPairs($privUser);
-    } else if (strcasecmp($action,'updateStartRouteTime')===0) {
+    } else if (strcasecmp($action, 'updateStartRouteTime') === 0) {
         updateStartRouteTime($privUser);
-    } else if (strcasecmp($action,'updateDaysOfWeek')===0) {
+    } else if (strcasecmp($action, 'updateDaysOfWeek') === 0) {
         updateDaysOfWeek($privUser);
-    } else if (strcasecmp($action,'getAllRoutePointsDataForRouteID')===0) {
+    } else if (strcasecmp($action, 'getAllRoutePointsDataForRouteID') === 0) {
         getAllRoutePointsDataForRouteID($privUser);
-    } else if (strcasecmp($action,'getTransportCompaniesData')===0) {
+    } else if (strcasecmp($action, 'getTransportCompaniesData') === 0) {
         getTransportCompanies($privUser);
-    } else if (strcasecmp($action,'getVehiclesData')===0) {
+    } else if (strcasecmp($action, 'getVehiclesData') === 0) {
         getVehicles($privUser);
-    } else if (strcasecmp($action,'getDriversData')===0) {
+    } else if (strcasecmp($action, 'getDriversData') === 0) {
         getDrivers($privUser);
-    } else if (strcasecmp($action,'routeEditing')===0) {
+    } else if (strcasecmp($action, 'routeEditing') === 0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
         $action = $_POST['action'];
-        if (strcasecmp($action,'remove')===0) {
+        if (strcasecmp($action, 'remove') === 0) {
             removeRoutePoint($privUser);
-        } else if (strcasecmp($action,'edit')===0) {
+        } else if (strcasecmp($action, 'edit') === 0) {
             updateRoutePoints($privUser);
-        } else if (strcasecmp($action,'create')===0) {
+        } else if (strcasecmp($action, 'create') === 0) {
             createRoutePoint($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if (strcasecmp($action,'relationsBetweenRoutePoints')===0) {
+    } else if (strcasecmp($action, 'relationsBetweenRoutePoints') === 0) {
         $action = $_POST['action'];
-        if (strcasecmp($action,'edit')===0) {
+        if (strcasecmp($action, 'edit') === 0) {
             updateRelationsBetweenRoutePoints($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if (strcasecmp($action,'routeEditingOnly')===0) {
+    } else if (strcasecmp($action, 'routeEditingOnly') === 0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
         $action = $_POST['action'];
-        if (strcasecmp($action,'remove')===0) {
+        if (strcasecmp($action, 'remove') === 0) {
             removeRoute($privUser);
-        } else if (strcasecmp($action,'edit')===0) {
+        } else if (strcasecmp($action, 'edit') === 0) {
             updateRoute($privUser);
-        } else if (strcasecmp($action,'create')===0) {
+        } else if (strcasecmp($action, 'create') === 0) {
             createRoute($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if (strcasecmp($action,'userEditing')===0) {
+    } else if (strcasecmp($action, 'userEditing') === 0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
         $action = $_POST['action'];
-        if (strcasecmp($action,'remove')===0) {
+        if (strcasecmp($action, 'remove') === 0) {
             removeUser($privUser);
-        } else if (strcasecmp($action,'edit')===0) {
+        } else if (strcasecmp($action, 'edit') === 0) {
             updateUsers($privUser);
-        } else if (strcasecmp($action,'create')===0) {
+        } else if (strcasecmp($action, 'create') === 0) {
             createNewUser($privUser);
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if (strcasecmp($action,'transportCompaniesEditing')===0) {
+    } else if (strcasecmp($action, 'transportCompaniesEditing') === 0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
@@ -100,7 +100,7 @@ try {
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if (strcasecmp($action,'vehiclesEditing')===0) {
+    } else if (strcasecmp($action, 'vehiclesEditing') === 0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
@@ -114,7 +114,7 @@ try {
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
-    } else if (strcasecmp($action,'driversEditing')===0) {
+    } else if (strcasecmp($action, 'driversEditing') === 0) {
         if (!isset($_POST['action'])) {
             throw new DataTransferException('Не задан параметр "действие"', __FILE__);
         }
@@ -128,11 +128,253 @@ try {
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
+    } else if (strcasecmp($action, 'getWarehouses') === 0) {
+        echo getWarehouses($privUser);
+    } else if (strcasecmp($action, 'assignRequests') === 0) {
+        echo assignRequests($privUser);
+    } else if (strcasecmp($action, 'getLastTransaction') === 0) {
+        echo getLastTransaction($privUser);
+    } else if (strcasecmp($action, 'getLastTenTransactions') === 0) {
+        echo getLastTenTransactions($privUser);
+    } else if (strcasecmp($action, 'getAllTransactions') === 0) {
+        echo getAllTransactions($privUser);
+    } else if (strcasecmp($action, 'getClientsData') === 0) {
+        echo getClientsData($privUser);
+    } else if (strcasecmp($action, 'clientEditing') === 0) {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if (strcasecmp($action, 'remove') === 0) {
+            echo removeClient($privUser);
+        } else if (strcasecmp($action, 'edit') === 0) {
+            echo updateClient($privUser);
+        } else if (strcasecmp($action, 'create') === 0) {
+            echo addClient($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
     } else {
         throw new DataTransferException('Неверно задан параметр "статус"', __FILE__);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function updateClient(PrivilegedUser $privUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+
+    $userEntity = $privUser->getClientEntity();
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $clientData) {
+        if (!$userEntity->updateClient($clientData, $id)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        } else {
+            $data['data'] = $privUser->getClientEntity()->selectClient($id);
+            return json_encode($data);
+        }
+    }
+}
+
+function removeClient(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $userData) {
+        $privilegedUser->getClientEntity()->removeClient($id);
+    }
+    return '{ }';
+}
+
+function addClient(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    if ($privilegedUser->getClientEntity()->addClient($_POST['data'][0])) {
+        $data['data'] = $privilegedUser->getClientEntity()->selectLastInsertedClient();
+        return json_encode($data);
+    } else {
+        throw new DataTransferException('Не удалось добавить клиента', __FILE__);
+    };
+
+}
+
+function getClientsData(PrivilegedUser $privUser)
+{
+    $dataArray = $privUser->getClientEntity()->selectClients($_POST['start'], $_POST['length']);
+    $json_data = array(
+        "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
+        "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
+        "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
+        "data" => is_null($dataArray['clients']) ? "" : $dataArray['clients']  // total data array
+    );
+    echo json_encode($json_data);
+//    $data['data'] = $privilegedUser->getClientEntity()->selectClientsForAdminPage();
+//    return json_encode($data);
+}
+
+function getAllTransactions(PrivilegedUser $privilegedUser)
+{
+    $data['data'] = $privilegedUser->getExchangeLogEntity()->selectAllTransactions();
+    return json_encode($data);
+}
+
+function getLastTenTransactions(PrivilegedUser $privilegedUser)
+{
+    $data['data'] = $privilegedUser->getExchangeLogEntity()->selectLastTenTransactions();
+    return json_encode($data);
+}
+
+function getLastTransaction(PrivilegedUser $privilegedUser)
+{
+    $lastTransaction = $privilegedUser->getExchangeLogEntity()->selectLastTransaction();
+    return json_encode($lastTransaction[0]);
+}
+
+function assignRequests(PrivilegedUser $privilegedUser)
+{
+    class RouteListForAssignment implements JsonSerializable
+    {
+        private $routeId, $maxCapacity, $currentCapacity, $routeListId, $privilegedUser, $routeListIDExternal, $routeListNumber;
+
+        /**
+         * RouteListForAssignment constructor.
+         * @param Integer $routeId
+         * @param PrivilegedUser $privilegedUser
+         */
+        public function __construct($routeId, PrivilegedUser $privilegedUser)
+        {
+            $this->routeId = $routeId;
+            $this->privilegedUser = $privilegedUser;
+
+        }
+
+        public function assignRequests($requests)
+        {
+            $requests = array_values($requests);
+            $routeList = $this->privilegedUser->getRouteListEntity()->getRouteListForRequestAssignmentWithLimit($this->routeId, $requests[0]['boxQty']);
+            if (empty($routeList)) {
+                foreach ($requests as $key => $emptyRequest) {
+                    unset($requests[$key]);
+                }
+                return $requests;
+            }
+            $this->routeListId = $routeList['routeListID'];
+            $this->maxCapacity = $routeList['box_limit'];
+            $this->routeListIDExternal = $routeList['routeListIDExternal'];
+            $this->routeListNumber = $routeList['routeListNumber'];
+            $this->currentCapacity = $routeList['boxQty'];;
+//        $this->privilegedUser->getRequestEntity()->assignRequests($requests);
+            $requestsAssigned = 0;
+            $requestsForRouteList = [];
+            foreach ($requests as $key => $emptyRequest) {
+
+                if ($emptyRequest['boxQty'] > $this->maxCapacity) {
+                    unset($requests[$key]);
+                    continue;
+                } elseif ($this->currentCapacity <= $this->maxCapacity) {
+
+                    $this->currentCapacity += $emptyRequest['boxQty'];
+                    array_push($requestsForRouteList, $emptyRequest);
+                    $requestsAssigned++;
+                    unset($requests[$key]);
+                }
+            }
+            if ($requestsAssigned != 0) {
+                $this->privilegedUser->getRequestEntity()->assignRequests($requestsForRouteList, $this->routeListId);
+            }
+
+            return empty($requests) ? false : $requests;
+        }
+
+        public function isFull()
+        {
+            return $this->maxCapacity < $this->currentCapacity;
+        }
+
+        public function jsonSerialize()
+        {
+            return get_object_vars($this);
+        }
+
+
+    }
+
+//    putenv("PATH=/usr/bin/:" . exec('echo $PATH'));
+//    error_reporting(E_ALL);
+//    ini_set('display_errors', '1');
+    $insertedRouteLists = [];
+    $warehouseId = intval($_POST['warehouseId']);
+    $routeListQuantity = 0;
+    $routesRequiredForRequests = $privilegedUser->getRequestEntity()->getRoutesForEmptyRequests($warehouseId);
+    foreach ($routesRequiredForRequests as $route) {
+
+        $emptyRequests = $privilegedUser->getRequestEntity()->getEmptyRequestsByWarehousePointIdAndRouteId($warehouseId, $route['routeId']);
+        if (!empty($emptyRequests)) {
+            foreach ($emptyRequests as $key => $request) {
+                $emptyRequests[$key]['boxQty'] = ($request['boxQty'] == null || $request['boxQty'] == '') ? 1 : $request['boxQty'];
+            }
+        }
+
+        while (!empty($emptyRequests)) {
+            $routeListForAssignment = new RouteListForAssignment($route['routeId'], $privilegedUser);
+
+            //assignRequests returns array of requests which are left out of a new routeList
+            $emptyRequests = $routeListForAssignment->assignRequests($emptyRequests);
+            array_push($insertedRouteLists, $routeListForAssignment);
+            $routeListQuantity++;
+
+//            if ($privilegedUser->getRouteListEntity()->createGenericRouteList($route['routeId'])) {
+//                $requestsForRouteList = [];
+//                $filledCapacity = 0;
+//                foreach ($emptyRequests as $key => $emptyRequest) {
+//                    if ($emptyRequest['boxQty'] + $filledCapacity <= $route['box_limit']) {
+//                        $filledCapacity+=$emptyRequest['boxQty'];
+//                        array_push($requestsForRouteList, $emptyRequest);
+//                        unset($emptyRequests[$key]);
+//                    } else {
+//                        break;
+//                    }
+//                }
+//                $privilegedUser->getRequestEntity()->assignRequests($requestsForRouteList);
+//                $routeListQuantity++;
+//            }
+        };
+
+
+//            $privilegedUser->getRequestEntity()->assignRequests($privilegedUser->getRequestEntity()->getEmptyRequestsByWarehousePointIdAndRouteId($warehouseId, $route['routeId']));
+    }
+    if (!empty($insertedRouteLists)) {
+        $routeListsForReturn = json_encode($insertedRouteLists);
+//        array_map(function($item){
+//        },$insertedRouteLists);
+//        $insertedRouteLists = $privilegedUser->getRouteListEntity()->selectLastAutoInsertedRouteLists($routeListQuantity);
+        return json_encode($insertedRouteLists);
+    } else {
+        return '0';
+    }
+
+
+//    $string = "python3 ../../common_files/utility/RequestsAssigner/main.py $warehouseId 2>&1";
+//    $result = shell_exec($string);
+//    $result = shell_exec('echo "$USER"');
+//    $result = shell_exec('ls ../../common_files/utility/RequestsAssigner/');
+//    return $result;
+
+
+}
+
+function getWarehouses(PrivilegedUser $privUser)
+{
+    $json = json_encode($privUser->getPointEntity()->getWarehouses());
+    return $json;
 }
 
 function getAllPointIdPointNamePairs(PrivilegedUser $privUser)
@@ -229,7 +471,7 @@ function updateStartRouteTime(PrivilegedUser $privUser)
     }
     $startTime = $_POST['firstPointArrivalTime'];
     if (!preg_match('/^([01][0-9]|2[0-3]):[0-5][0-9]$/', $startTime)) {
-        throw new DataTablesFieldException('firstPointArrivalTime','неверные данные',__FILE__);
+        throw new DataTablesFieldException('firstPointArrivalTime', 'неверные данные', __FILE__);
     }
     if ($privUser->getRouteEntity()->updateStartRouteTime($_POST['routeID'], $startTime . ':00')) {
         echo $_POST['firstPointArrivalTime'];
@@ -247,8 +489,8 @@ function updateRelationsBetweenRoutePoints(PrivilegedUser $privUser)
     foreach ($_POST['data'] as $ids => $elem) {
         $id = explode('_', $ids);
         $timeForDistance = $elem['timeForDistance'];
-        if ($timeForDistance<0 || !is_numeric($timeForDistance)) {
-            throw new DataTablesFieldException('timeForDistance','неверные данные',__FILE__);
+        if ($timeForDistance < 0 || !is_numeric($timeForDistance)) {
+            throw new DataTablesFieldException('timeForDistance', 'неверные данные', __FILE__);
         }
         $privUser->getRoutePointEntity()->updateRelationBetweenRoutePoints($id[0], $id[1], $timeForDistance);
     }
@@ -268,25 +510,25 @@ function updateRoutePoints(PrivilegedUser $privUser)
     $i = 0;
     foreach ($dataSourceArray as $routePointID => $dataSourceElem) {
         if (!isset($dataSourceElem['sortOrder'])) {
-            throw new DataTablesFieldException('sortOrder','данные отсутствуют',__FILE__);
+            throw new DataTablesFieldException('sortOrder', 'данные отсутствуют', __FILE__);
         }
         $sortOrder = $dataSourceElem['sortOrder'];
-        if ($sortOrder<0 || !is_numeric($sortOrder)) {
-            throw new DataTablesFieldException('sortOrder','данные некорректны',__FILE__);
+        if ($sortOrder < 0 || !is_numeric($sortOrder)) {
+            throw new DataTablesFieldException('sortOrder', 'данные некорректны', __FILE__);
         }
         if (!isset($dataSourceElem['tLoading'])) {
-            throw new DataTablesFieldException('tLoading','данные отсутствуют',__FILE__);
+            throw new DataTablesFieldException('tLoading', 'данные отсутствуют', __FILE__);
         }
         $tLoading = $dataSourceElem['tLoading'];
-        if ($tLoading<0 || !is_numeric($tLoading)) {
-            throw new DataTablesFieldException('tLoading','данные некорректны',__FILE__);
+        if ($tLoading < 0 || !is_numeric($tLoading)) {
+            throw new DataTablesFieldException('tLoading', 'данные некорректны', __FILE__);
         }
         if (!isset($dataSourceElem['pointName'])) {
-            throw new DataTablesFieldException('pointName','данные отсутствуют',__FILE__);
+            throw new DataTablesFieldException('pointName', 'данные отсутствуют', __FILE__);
         }
         $pointName = $dataSourceElem['pointName'];
         if (!$pointName) {
-            throw new DataTablesFieldException('pointName','данные некорректны',__FILE__);
+            throw new DataTablesFieldException('pointName', 'данные некорректны', __FILE__);
         }
         if (!$routePointEntity->updateRoutePoint($routePointID, $sortOrder, $tLoading, $pointName)) {
             $privUser->getDaoEntity()->rollback();
@@ -308,7 +550,6 @@ function getRelationsBetweenRoutePointsDataForRouteID(PrivilegedUser $privUser)
     $dataArray = $privUser->getRouteAndRoutePointsEntity()->getAllRoutePointsDataForRouteID($routeID)['relationsBetweenRoutePoints'];
     echo json_encode($dataArray);
 }
-
 
 function getClients(PrivilegedUser $privUser)
 {
@@ -387,7 +628,7 @@ function addTransportCompany(PrivilegedUser $privilegedUser)
     if ($privilegedUser->getTransportCompanyEntity()->insertCompany($transportCompanyInfo)) {
         echo json_encode(
             array(
-                "data" =>array(
+                "data" => array(
                     $privilegedUser->getTransportCompanyEntity()->selectLastInsertedId()->toArray()
                 )
             )
@@ -407,7 +648,7 @@ function addVehicle(PrivilegedUser $privilegedUser)
     if ($privilegedUser->getVehicleEntity()->insertVehicle($vehicleInfo)) {
         echo json_encode(
             array(
-                "data" =>array(
+                "data" => array(
                     $privilegedUser->getVehicleEntity()->selectVehicleByLastInsertedId()->toArray()
                 )
             )
@@ -427,7 +668,7 @@ function addDriver(PrivilegedUser $privilegedUser)
     if ($privilegedUser->getDriverEntity()->insertDriver($driverInfo)) {
         echo json_encode(
             array(
-                "data" =>array(
+                "data" => array(
                     $privilegedUser->getDriverEntity()->selectDriverByLastInsertedId()->toArray()
                 )
             )
@@ -438,7 +679,8 @@ function addDriver(PrivilegedUser $privilegedUser)
     }
 }
 
-function removeVehicle(PrivilegedUser $privilegedUser) {
+function removeVehicle(PrivilegedUser $privilegedUser)
+{
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -450,7 +692,8 @@ function removeVehicle(PrivilegedUser $privilegedUser) {
     echo '{ }';
 }
 
-function removeTransportCompany(PrivilegedUser $privilegedUser) {
+function removeTransportCompany(PrivilegedUser $privilegedUser)
+{
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -463,7 +706,8 @@ function removeTransportCompany(PrivilegedUser $privilegedUser) {
     echo '{ }';
 }
 
-function removeDrivers(PrivilegedUser $privilegedUser) {
+function removeDrivers(PrivilegedUser $privilegedUser)
+{
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -486,7 +730,8 @@ function getRoutes(PrivilegedUser $privUser)
     echo json_encode($json_data);
 }
 
-function removeRoute(PrivilegedUser $privUser) {
+function removeRoute(PrivilegedUser $privUser)
+{
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -497,7 +742,8 @@ function removeRoute(PrivilegedUser $privUser) {
     echo '{ }';
 }
 
-function createRoute(PrivilegedUser $privUser) {
+function createRoute(PrivilegedUser $privUser)
+{
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "данные"', __FILE__);
     }
@@ -507,7 +753,7 @@ function createRoute(PrivilegedUser $privUser) {
         $routeInfo['tariffID'] = $lastID[0]['tariffID'];
         if ($privUser->getRouteEntity()->addRoute($routeInfo)) {
             $insertedRoute = $privUser->getRouteEntity()->selectRouteByDirectionName($routeInfo['routeName']);
-            echo json_encode(array("data" =>array($insertedRoute->toArray())));
+            echo json_encode(array("data" => array($insertedRoute->toArray())));
         }
     } else {
         $privUser->getDaoEntity()->rollback();
@@ -515,7 +761,8 @@ function createRoute(PrivilegedUser $privUser) {
     }
 }
 
-function removeUser(PrivilegedUser $privUser) {
+function removeUser(PrivilegedUser $privUser)
+{
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
@@ -533,9 +780,8 @@ function createNewUser(PrivilegedUser $privUser)
     }
     $userInfo = new \DAO\UserData($_POST['data'][0]);
     if ($privUser->getUserEntity()->addUser($userInfo)) {
-        echo json_encode(array("data" =>array($privUser->getUserEntity()->selectUserByLogin($userInfo->getData('login'))->toArray())));
-    }
-    else {
+        echo json_encode(array("data" => array($privUser->getUserEntity()->selectUserByLogin($userInfo->getData('login'))->toArray())));
+    } else {
         $privUser->getDaoEntity()->rollback();
         throw new DataTransferException('Данные не были добавлены', __FILE__);
     }
@@ -573,7 +819,7 @@ function updateUsers(PrivilegedUser $privUser)
     $userEntity = $privUser->getUserEntity();
     $i = 0;
     foreach ($dataSourceArray as $userID => $userInfo) {
-        if (!$userEntity->updateUser(new \DAO\UserData($userInfo),$userID)) {
+        if (!$userEntity->updateUser(new \DAO\UserData($userInfo), $userID)) {
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
@@ -643,7 +889,7 @@ function updateRoute(PrivilegedUser $privUser)
         }
         $routeInfoAfter = $routeEntity->selectRouteByID($routeId);
         if (!empty($routeInfo['tariffID'])) {
-            if(!$tariffEntity->updateTariff($routeInfo, $routeInfoAfter->getData('tariffID'))) {
+            if (!$tariffEntity->updateTariff($routeInfo, $routeInfoAfter->getData('tariffID'))) {
                 $privUser->getDaoEntity()->rollback();
                 throw new DataTransferException('Данные не были обновлены', __FILE__);
             }
@@ -661,7 +907,7 @@ function updateRoute(PrivilegedUser $privUser)
         } else {
             if ($privUser->getTariffEntity()->insertTariff($routeInfo)) {
                 $lastID = $privUser->getTariffEntity()->getLastInsertedID();
-                if($routeEntity->updateRoutesTariff($routeId, $lastID[0]['tariffID'])) {
+                if ($routeEntity->updateRoutesTariff($routeId, $lastID[0]['tariffID'])) {
                     $tariffInfoAfter = $tariffEntity->getTariffById($lastID[0]['tariffID']);
                     $updatedRoute['routeName'] = $routeInfoAfter->getData('routeName');
                     $updatedRoute['cost'] = $tariffInfoAfter->getData('cost');
@@ -677,3 +923,4 @@ function updateRoute(PrivilegedUser $privUser)
     }
     echo json_encode($serverAnswer);
 }
+

@@ -1,6 +1,6 @@
 <?php
 include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
-require_once __DIR__.'/../../common_files/utility/MakeshiftWialonAPI.php';
+require_once __DIR__ . '/../../common_files/utility/MakeshiftWialonAPI.php';
 try {
     $privUser = PrivilegedUser::getInstance();
     $action = $_POST['status'];
@@ -64,48 +64,170 @@ try {
         echo getPointsCoordinatesForRequest($privUser);
     } else if (strcasecmp($action, 'getVehicleData') === 0) {
         echo getVehicleData($privUser);
-    } else if (strcasecmp($action, 'updateRequestsViaWialonApi') === 0){
+    } else if (strcasecmp($action, 'updateRequestsViaWialonApi') === 0) {
         echo updateRequestsViaWialonApi($privUser);
-    } else if (strcasecmp($action, 'getRouteListsData') === 0){
+    } else if (strcasecmp($action, 'getRouteListsData') === 0) {
         echo getRouteListsData($privUser);
+    } else if (strcasecmp($action, 'getRouteListData') === 0) {
+        echo getRouteListData($privUser);
+    } else if (strcasecmp($action, 'getRouteListById') === 0) {
+        echo getRouteListById($privUser);
+    } else if (strcasecmp($action, 'getAllWialonResources') === 0) {
+        echo getAllWialonResources($privUser);
+    } else if (strcasecmp($action, 'addVehicleFromVMap') === 0) {
+
+        echo addVehicleFromVMap($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
 }
 
-function getRouteListsData(PrivilegedUser $privilegedUser){
-    require_once __DIR__.'/../../common_files/utility/BasicEnum.php';
+function addVehicleFromVMap(PrivilegedUser $privilegedUser){
+
+    $data = $_POST['data'];
+    $response=$privilegedUser->getVehicleEntity()->insertVehicle($data);
+    if ($response){
+        return true;
+    } else {
+        return json_encode($response);
+    }
+}
+
+function getAllWialonResources(PrivilegedUser $privUser)
+{
+    $wialonResources = new AllVehiclesData();
+    $vehiclesData = $wialonResources->getVehicles();
+    $vehiclePlacemarks = [];
 
 
+    function getHtmlForm($WialonId){
+    $formHtml='<div class="openAccordion" onclick="openAccordion()" ; >Добавить в базу данных</div>' .
+    '        <div class="accordion" style="display:none;">' .
+    '            <form class="form-group" method="post" action="content/getData.php" style="">' .
+    '                <label class="form-group">Номер лицензии' .
+    '                    <input type="text" name="license_number" class="inputLicense form-control"' .
+    '                           placeholder="Номер лицензии ТС"></label>' .
+    '                <label class="form-group">Модель ТС' .
+    '                    <input type="text" name="model" class="form-control"' .
+    '                           placeholder="Модель ТС"></label>' .
+    '                <label class="form-group">Тип ТС' .
+    '                        <select class="form-control" name="type">' .
+    '                            <option>Тент</option>' .
+    '                            <option>Термос</option>' .
+    '                            <option>Рефрижератор</option>' .
+    '                        </select>' .
+    '                </label>' .
+    '                <label class="form-group">Тип погрузки' .
+    '                    <select class="form-control" name="loading_type">' .
+    '                        <option>Задняя</option>' .
+    '                        <option>Боковая</option>' .
+    '                        <option>Верхняя</option>' .
+    '                    </select>' .
+    '                </label>' .
+    '                <label class="form-group">Объем M<sup>3</sup>' .
+    '' .
+    '                    <input type="text" class="form-control" placeholder="123" onkeypress="return isNumberKey(event)"' .
+    '                           name="volume">' .
+    '                </label>' .
+    '                <label class="form-group">Кол-во паллет' .
+    '                    <input type="text" class="form-control" placeholder="123" onkeypress="return isNumberKey(event)"' .
+    '                           name="pallets_quantity">' .
+    '                </label>' .
+    '                <label class="form-group">Лимит загрузки КГ' .
+    '                    <input type="text" class="form-control" placeholder="123" onkeypress="return isNumberKey(event)"' .
+    '                           name="carrying_capacity">' .
+    '                </label>' .
+    '                <label class="form-group" style="display: none">WialonID' .
+    '                    <input type="text" name="wialon_id"  class="form-control"' .
+    '                           placeholder="" value="'.$WialonId.'">' .
+    '                </label>' .
+        '<input type="text" name="status" style="display:none" value="addVehicleFromVMap">'.
+        '<input type="text" name="transport_company_id" style="display:none" value="null">'.
+    '                <div class="form-group">' .
+    '                    <input type="submit"  class="btn btn-default" value="Отправить">' .
+    '                </div>' .
+    '            </form>' .
+    '        </div>';
 
+    return $formHtml;
+    }
+
+
+    foreach ($vehiclesData as $vehicle) {
+        if ($vehicle->getWialonId() != null) {
+            $vehiclePlacemarkOptions = new YandexApiOptions();
+            $vehiclePlacemarkProperties = new YandexApiProperties();
+            $coordinates = $vehicle->getCoordinates();
+            $vehiclePlacemark = new YandexApiPlacemark($coordinates->x, $coordinates->y, $vehiclePlacemarkProperties, $vehiclePlacemarkOptions);
+            $registeredVehicle = $privUser->getVehicleEntity()->getVehicleByWialonId($vehicle->getWialonId());
+            if ($registeredVehicle) {
+                $vehiclePlacemarkOptions->createProperty('preset', 'islands#darkGreenDeliveryIcon');
+                $vehiclePlacemarkProperties->createProperty('balloonContent',
+                    "WialonId: <b>" . $vehicle->getWialonId() . "</b><br>" .
+                    "Номер лицензии: " . $registeredVehicle['license_number'] . "<br>" .
+                    "Модель: " . $registeredVehicle['model'] . "<br>" .
+                    "Тип: " . $registeredVehicle['type'] . "<br>" .
+                    "Тип погрузки: " . $registeredVehicle['loading_type']);
+                $vehiclePlacemarkProperties->createProperty('balloonContentFooter', "В скором времени здесь будет показываться информация о компании-владельце автомобиля и его водителях");
+            } else {
+                $vehiclePlacemarkOptions->createProperty('preset', 'islands#violetDeliveryIcon');
+                $vehiclePlacemarkOptions->createProperty('balloonMinWidth',300);
+//                $vehiclePlacemarkOptions->createProperty('balloonMinHeight',200);
+                $vehiclePlacemarkProperties->createProperty('balloonContent', "WialonId: <b>" . $vehicle->getWialonId() . "</b><br><div class='form-placement'>".getHtmlForm($vehicle->getWialonId())."</div>");
+            }
+            $vehiclePlacemarkProperties->createProperty('balloonContentHeader', "Транспорт: " . $vehicle->getName());
+            array_push($vehiclePlacemarks, $vehiclePlacemark);
+        }
+    }
+
+    return json_encode($vehiclePlacemarks);
+}
+
+
+function getRouteListById(PrivilegedUser $privilegedUser)
+{
+    return json_encode($privilegedUser->getRouteListEntity()->getRouteListByID($_POST['routeListID']));
+}
+
+function getRouteListData(PrivilegedUser $privilegedUser)
+{
+    $jsonData = [];
+    $routeListId = $_POST['routeListID'];
+
+    $jsonData['data'] = $privilegedUser->getRequestEntity()->getRequestsForRouteList($routeListId);
+    return json_encode($jsonData);
+}
+
+function getRouteListsData(PrivilegedUser $privilegedUser)
+{
     $jsonData = [];
     $jsonData['data'] = $privilegedUser->getRouteListEntity()->getRouteListsForRLPage();
     return json_encode($jsonData);
-
 }
 
-function updateRequestsViaWialonApi(PrivilegedUser $privilegedUser){
+function updateRequestsViaWialonApi(PrivilegedUser $privilegedUser)
+{
 //    sqrt(((2-5)^2)+((1-5)^2));
 
 }
 
-function getVehicleData(PrivilegedUser $privilegedUser){
+function getVehicleData(PrivilegedUser $privilegedUser)
+{
 
-//        error_reporting(E_ALL);
-//    ini_set('display_errors', 1);
+
     $requestIDExternal = $_POST['requestIDExternal'];
     $requestData = $privilegedUser->getRequestEntity()->selectRequestByID($requestIDExternal);
-    if ($requestData['vehicleId'] !=null) {
+    if ($requestData['vehicleId'] != null) {
         $vehicleData = $privilegedUser->getVehicleEntity()->selectVehicleById($requestData['vehicleId']);
-        if ($vehicleData['wialon_id'] != null){
+        if ($vehicleData['wialon_id'] != null) {
             $wialonVehicle = new WialonVehicle($vehicleData['wialon_id']);
             $coordinates = $wialonVehicle->getCoordinates();
             $vehiclePlacemarkOptions = new YandexApiOptions();
-            $vehiclePlacemarkOptions->createProperty('preset','islands#violetAutoIcon');
+            $vehiclePlacemarkOptions->createProperty('preset', 'islands#violetAutoIcon');
             $vehiclePlacemarkProperties = new YandexApiProperties();
             $vehiclePlacemarkProperties->createProperty('balloonContentHeader', "Транспортное средство");
-            $vehiclePlacemarkProperties->createProperty('balloonContent', "Транспортное средство: <b>".$vehicleData['model']."</b><br>Номер: <b>".$vehicleData['license_number']."</b>");
-            $vehiclePlacemark = new YandexApiPlacemark($coordinates->x,$coordinates->y,$vehiclePlacemarkProperties,$vehiclePlacemarkOptions);
+            $vehiclePlacemarkProperties->createProperty('balloonContent', "Транспортное средство: <b>" . $vehicleData['model'] . "</b><br>Номер: <b>" . $vehicleData['license_number'] . "</b>");
+            $vehiclePlacemark = new YandexApiPlacemark($coordinates->x, $coordinates->y, $vehiclePlacemarkProperties, $vehiclePlacemarkOptions);
             $vehicleData['vehiclePlacemark'] = $vehiclePlacemark;
         }
 
@@ -144,7 +266,7 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
             $properties->createProperty('balloonContentHeader', '<b>Последняя посещеная точка</b><br>');
             $properties->createProperty('balloonContent', $transitPoint['pointName']);
 
-            $routePoints['lastVisitedPoint'] = new YandexApiPlacemark($transitPoint['x'], $transitPoint['y'], $properties,new YandexApiOptions());
+            $routePoints['lastVisitedPoint'] = new YandexApiPlacemark($transitPoint['x'], $transitPoint['y'], $properties, new YandexApiOptions());
         }
 
     }
@@ -153,7 +275,7 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
         if ($destinationPoint != null) {
 
             $options = new YandexApiOptions();
-            $options->createProperty('preset','islands#blueGovernmentIcon');
+            $options->createProperty('preset', 'islands#blueGovernmentIcon');
 //        $routePoints['destinationPoint']=[floatval($destinationPoint[0]['y']),floatval($destinationPoint[0]['x'])];
             $properties = new YandexApiProperties();
             $properties->createProperty('balloonContentHeader', '<b>Точка назначения</b><br>');
@@ -178,10 +300,10 @@ function getAllPointsCoordinates(PrivilegedUser $privilegedUser)
         $geometryPoint = new YandexApiGeometryPoint($row['y'], $row['x']);
         $properties = new YandexApiProperties();
         $options = new YandexApiOptions();
-        if($row['requests']>($avg_count*2)) $options->createProperty('preset','islands#redIcon');
-            elseif ($row['requests']>$avg_count) $options->createProperty('preset', 'islands#orangeIcon');
-            elseif ($row['requests']>0) $options->createProperty('preset','islands#darkGreenIcon');
-            else $options->createProperty('preset','islands#grayIcon');
+        if ($row['requests'] > ($avg_count * 2)) $options->createProperty('preset', 'islands#redIcon');
+        elseif ($row['requests'] > $avg_count) $options->createProperty('preset', 'islands#orangeIcon');
+        elseif ($row['requests'] > 0) $options->createProperty('preset', 'islands#darkGreenIcon');
+        else $options->createProperty('preset', 'islands#grayIcon');
 
         $properties->createProperty('balloonContentHeader', $row['pointName']);
         $properties->createProperty('balloonContentBody', $row['address']);
