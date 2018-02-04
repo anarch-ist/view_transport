@@ -7,8 +7,14 @@ class Vehicle implements IVehicle {
     private static $_instance;
     private $_DAO;
 
+    function getVehicleByWialonId($wialonId){
+        $vehicle = $this->_DAO->select(new SelectVehicleByWialonId($wialonId));
+        return (!empty($vehicle)) ? $vehicle[0] : false;
+    }
+
     function getVehicleWialonID($vehicleId)
     {
+
         $value = $this->_DAO->select(new GetVehicleWialonId($vehicleId))[0];
         return $value;
     }
@@ -104,6 +110,26 @@ class SelectAllVehicles implements IEntitySelect {
 
 }
 
+class SelectVehicleByWialonId implements IEntitySelect{
+    private $wialonId;
+
+    /**
+     * SelectVehicleByWialonId constructor.
+     * @param $wialonId
+     */
+    public function __construct($wialonId)
+    {
+        $this->wialonId = DAO::getInstance()->checkString($wialonId);
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT * FROM vehicles WHERE wialon_id = $this->wialonId AND deleted=0 LIMIT 1";
+    }
+
+
+}
+
 class SelectVehicleById implements IEntitySelect {
     private $id;
 
@@ -169,15 +195,15 @@ class InsertVehicle implements IEntityInsert{
         $this->carrying_capacity = $dao->checkString($vehicleData['carrying_capacity']);
         $this->volume = $dao->checkString($vehicleData['volume']);
         $this->loading_type = $dao->checkString($vehicleData['loading_type']);
-        $this->pallets_quantity = $dao->checkString($vehicleData['pallets_quantity']);
+        $this->pallets_quantity = ($dao->checkString($vehicleData['pallets_quantity'])=='') ? 0 : $dao->checkString($vehicleData['pallets_quantity']);
         $this->type = $dao->checkString($vehicleData['type']);
         $this->wialon_id = $dao->checkString($vehicleData['wialon_id']);
     }
 
     function getInsertQuery()
     {
-        $query = "INSERT INTO `vehicles` (transport_company_id, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
-            "('$this->transport_company_id', '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id');";
+        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
+            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='ADMIN_PAGE') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id');";
         return $query;
     }
 }
@@ -192,7 +218,7 @@ class InsertVehicle implements IEntityInsert{
 //     */
 //    function getSelectQuery()
 //    {
-//        return "SELECT vehicles.wialon_id FROM transmaster_transport_db.vehicles WHERE vehicles.id = $this->vehicleId";
+//        return "SELECT vehicles.wialon_id FROM vehicles WHERE vehicles.id = $this->vehicleId";
 //    }
 //
 //    /**

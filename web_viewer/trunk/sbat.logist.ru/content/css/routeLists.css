@@ -1,0 +1,15 @@
+table.dataTable thead{
+    background-color: rgb(104, 124, 144);
+    color: #fff;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.dataTables_wrapper{
+    margin-top: 20px;
+}
+
+#routeListsTable tbody tr td{
+    border: none;
+
+}

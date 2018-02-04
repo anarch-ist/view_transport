@@ -50,7 +50,7 @@
     <script src="common_files/media/jqueryCookie-1.4.1/jquery.cookie.js"></script>
     <!--custom js-->
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
-    <script type="text/javascript" language="javascript" src="content/js/requestHistoryDialog.js"></script>
+<!--    <script type="text/javascript" language="javascript" src="content/js/requestHistoryDialog.js"></script>-->
     <script type="text/javascript" language="javascript" src="content/js/statusChangeDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/columnSelectDialog.js"></script>
 
@@ -82,7 +82,36 @@
                 echo '<span id="data-role" data-role="'.$data['userRoleID'].'">'.$userRole.'</span>';
                 ?>
             </div>
-            <button id="logout">Выйти</button>
+            <div class="dropdown">
+                <button class="dropbtn">Меню <i class="fa fa-caret-square-o-down" aria-hidden="true"></i></button>
+                <div class="dropdown-content">
+                    <table>
+
+                        <tr>
+                            <td><i class="fa fa-th-list" aria-hidden="true"></i></td>
+                            <td><a href="/?routeLists=0" target="_blank">Маршуртные листы</a></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-map-o" aria-hidden="true"></i></td>
+                            <td><a href="/?map=0" target="_blank">Карта складов</a></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-truck" aria-hidden="true"></i></td>
+                            <td><a href="/?vMap=0" target="_blank">Карта ТС</a></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa fa-sign-out" aria-hidden="true"></i></td>
+                            <td><a id="logout" href="#">Выйти</a></td>
+                        </tr>
+                    </table>
+<!--                    <a href="/admin_page/" target="_blank">Админ. страница <i class="fa fa-cogs" aria-hidden="true"></i></a>-->
+<!--                    <a href="/?routeLists=0" target="_blank">Маршуртные листы <i class="fa fa-th-list" aria-hidden="true"></i></a>-->
+<!--                    <a href="/?map=0" target="_blank">Карта складов <i class="fa fa-map-marker" aria-hidden="true"></i></a>-->
+<!--                    <a href="/?vMap=0" target="_blank">Карта ТС <i class="fa fa-truck" aria-hidden="true"></i></a>-->
+<!--                    <a id="logout" href="#">Выйти <i class="fa fa-sign-out" aria-hidden="true"></i></a>-->
+                </div>
+            </div>
+<!--            <button id="logout">Выйти</button>-->
         </div>
     </div>
 

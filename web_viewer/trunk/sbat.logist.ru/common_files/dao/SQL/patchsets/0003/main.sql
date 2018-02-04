@@ -1,10 +1,10 @@
 BEGIN;
 
-DROP PROCEDURE transmaster_transport_db.selectUsers;
+DROP PROCEDURE IF EXISTS test_ttdb.selectUsers;
 
 -- select users procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE transmaster_transport_db.selectUsers(_startEntry INTEGER, _length INTEGER,
+CREATE PROCEDURE test_ttdb.selectUsers(_startEntry INTEGER, _length INTEGER,
                                                       _orderby    VARCHAR(255),
                                                       _isDesc     BOOLEAN, _search TEXT)
   BEGIN
@@ -12,7 +12,7 @@ CREATE PROCEDURE transmaster_transport_db.selectUsers(_startEntry INTEGER, _leng
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM transmaster_transport_db.all_users
+    FROM test_ttdb.all_users
     WHERE (_search = '' OR
            userName LIKE @searchString collate utf8_general_ci OR
            login LIKE @searchString collate utf8_general_ci OR

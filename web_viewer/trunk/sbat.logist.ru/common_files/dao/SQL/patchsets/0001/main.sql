@@ -1,10 +1,10 @@
 BEGIN;
 
-DROP PROCEDURE transmaster_transport_db.selectTransportCompanies;
+DROP PROCEDURE test_ttdb.selectTransportCompanies;
 
 -- select transport companies procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
+CREATE PROCEDURE test_ttdb.selectTransportCompanies(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -17,7 +17,7 @@ CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
 
     SELECT SQL_CALC_FOUND_ROWS
       tc.*
-    FROM transmaster_transport_db.transport_companies tc
+    FROM test_ttdb.transport_companies tc
     WHERE (
             _search = '' OR
             tc.id LIKE @searchString collate utf8_general_ci  OR
@@ -106,11 +106,11 @@ CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
 
   END;
 
-DROP PROCEDURE transmaster_transport_db.selectVehicles;
+DROP PROCEDURE test_ttdb.selectVehicles;
 
 -- select vehicles procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE transmaster_transport_db.selectVehicles(
+CREATE PROCEDURE test_ttdb.selectVehicles(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -122,7 +122,7 @@ CREATE PROCEDURE transmaster_transport_db.selectVehicles(
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM transmaster_transport_db.vehicles
+    FROM test_ttdb.vehicles
     WHERE (
             _search = '' OR
             id LIKE @searchString collate utf8_general_ci OR
@@ -186,11 +186,11 @@ CREATE PROCEDURE transmaster_transport_db.selectVehicles(
 
   END;
 
-DROP PROCEDURE transmaster_transport_db.selectDrivers;
+DROP PROCEDURE test_ttdb.selectDrivers;
 
 -- select drivers procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE transmaster_transport_db.selectDrivers(
+CREATE PROCEDURE test_ttdb.selectDrivers(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -202,7 +202,7 @@ CREATE PROCEDURE transmaster_transport_db.selectDrivers(
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM transmaster_transport_db.drivers
+    FROM test_ttdb.drivers
     WHERE (_search = '' OR
            id LIKE @searchString collate utf8_general_ci OR
            vehicle_id LIKE @searchString collate utf8_general_ci OR
@@ -254,11 +254,11 @@ CREATE PROCEDURE transmaster_transport_db.selectDrivers(
 
   END;
 
-DROP PROCEDURE transmaster_transport_db.selectRoutes;
+DROP PROCEDURE test_ttdb.selectRoutes;
 
 -- select routes procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE transmaster_transport_db.selectRoutes(
+CREATE PROCEDURE test_ttdb.selectRoutes(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -276,8 +276,8 @@ CREATE PROCEDURE transmaster_transport_db.selectRoutes(
       t.cost,
       t.cost_per_point,
       t.cost_per_hour
-    FROM transmaster_transport_db.routes r
-      LEFT JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
+    FROM test_ttdb.routes r
+      LEFT JOIN test_ttdb.tariffs t ON r.tariffID = t.tariffID
     WHERE (
       _search = '' OR
       r.routeName LIKE @searchString collate utf8_general_ci OR
@@ -315,11 +315,11 @@ CREATE PROCEDURE transmaster_transport_db.selectRoutes(
 
   END;
 
-DROP PROCEDURE transmaster_transport_db.selectUsers;
+DROP PROCEDURE IF EXISTS test_ttdb.selectUsers;
 
 -- select users procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE transmaster_transport_db.selectUsers(
+CREATE PROCEDURE test_ttdb.selectUsers(
   _startEntry INTEGER, _length INTEGER,
   _orderby    VARCHAR(255),
   _isDesc     BOOLEAN,
@@ -330,7 +330,7 @@ CREATE PROCEDURE transmaster_transport_db.selectUsers(
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM transmaster_transport_db.all_users
+    FROM test_ttdb.all_users
     WHERE (_search = '' OR
            userName LIKE @searchString collate utf8_general_ci OR
            position LIKE @searchString collate utf8_general_ci OR

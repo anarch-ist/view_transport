@@ -13,14 +13,11 @@
 <div class="container">
     <div class="main">
         <form class="form" method="post" action="#">
-
-            <h2>Авторизуйтесь для начала работы с системой</h2>
-
             <label for="loginInput">Логин :</label>
-            <input type="text" name="login" id="loginInput">
+            <input type="text" placeholder="Введите логин" name="login" id="loginInput">
 
             <label for="passwordInput">Пароль :</label>
-            <input type="password" name="password" id="passwordInput">
+            <input type="password" placeholder="Введите пароль" name="password" id="passwordInput">
 
             <div id="loginErrorContainer"></div>
 

@@ -1,6 +1,4 @@
-
 <?php
-//Entering FULL OOP mode, not getters or setters now, only builder and public functions
 class YandexApiFeature Implements JsonSerializable
 {
     private $type = "Feature";
@@ -139,7 +137,6 @@ class YandexApiRoutePoint Implements JsonSerializable
 {
     private $type;
     private $point;
-//    private $y;
 
     /**
      * YandexApiRoutePoint constructor.
@@ -216,5 +213,3 @@ class YandexApiPlacemark Implements JsonSerializable
 
 
 }
-?>
-

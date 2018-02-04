@@ -1,3 +1,11 @@
+/*base colors*/
+/*rgb(170,199,231)*/
+/*rgb(142,169,201)*/
+/*rgb(104,124,144)*/
+/*rgb(91,109,132)*/
+/*#1c3655*/
+/*#c22929*/
+
 clearfix::after, body .container .row .mid::after {
   content: "";
   display: block;
@@ -17,18 +25,28 @@ clearfix::after, body .container .row .mid::after {
   color: #f77a6c;
 }
 
+#routeListNumber{
+  color: #f77a6c;
+}
+
 
 .btn-default {
   color: #fff;
-  background-color: #18446b;
+  font-size: 15px;
+  /*font-weight: bold;*/
+  background-color: rgb(91,109,132);
   border-color: #ccc;
 }
 
-body {
-  font-family: Tahoma, "Helvetica Neue",Helvetica,Arial,sans-serif;
-  color: #333;
+table.dataTable.no-footer{
+  border-bottom: solid thin #1c3655;
+}
 
-  background: #f1f5f8 !important;
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, Tahoma, sans-serif;
+  color: #1c3655;
+
+  /*background: #f1f5f8 !important;*/
   font-size: 14px;
   line-height: 24px; }
   body .container .row .mid {
@@ -38,8 +56,8 @@ body {
     color: #5c5c5c; }
 body .container .row .mid .info {
   margin-top: 20px;
-  padding: 5px 0 5px 15px;
-  background: #18446b;
+  padding: 9px 0 9px 15px;
+  background: rgb(91,109,132);
   border-top: 1px solid #ced8e1;
   border-radius: 4px;
   border-bottom: 1px solid #ced8e1;
@@ -54,7 +72,7 @@ body .container .row .mid .info {
         vertical-align: top; }
         body .container .row .mid.request-information table td:first-child {
           font-weight: bold;
-          color: #5c5c5c; }
+          color: #1c3655; }
     body .container .row .mid.status-history table {
       margin: 20px auto;
       width: 99%;
@@ -64,13 +82,14 @@ body .container .row .mid .info {
         padding: 5px;
         vertical-align: middle;
         border-top: 1px solid #cecece;
-        border-bottom: 1px solid #cecece; }
+        /*border-bottom: 1px solid #cecece; */
+      }
       body .container .row .mid.status-history table th {
         font-weight: bold;
-        color: #000000; }
-      body .container .row .mid.status-history table tr:nth-child(even) {
-        background: #e8e8e8; }
+        color: #1c3655; }
+      /*body .container .row .mid.status-history table tr:nth-child(even) {*/
+        /*background: #e8e8e8; }*/
       body .container .row .mid.status-history table tr:not(:first-child):hover {
         cursor: pointer;
-        background: #cecece;
+        /*background: #cecece;*/
       }

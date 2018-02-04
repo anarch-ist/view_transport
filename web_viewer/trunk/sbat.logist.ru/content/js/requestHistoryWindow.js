@@ -225,7 +225,7 @@ $(window).on('load', function () {
                 // console.log(data);
                 requestIDExternal = JSON.parse(data).requestIDExternal;
                 setRequestInfo(data);
-
+                removeLoadingScreen();
                 loadPretensions();
 
 
@@ -237,7 +237,7 @@ $(window).on('load', function () {
                 },
                 function (data) {
                     setHistoryTable(data);
-                    removeLoadingScreen();
+
                 }
             )
         });
@@ -345,8 +345,8 @@ $(window).on('load', function () {
     function removeLoadingScreen(noData) {
         if (!noData) {
             $(".loading").remove();
-            $(".left-table").show();
-            $(".right-table").show();
+            $(".left-table").show(300);
+            $(".right-table").show(350);
         } else {
             $(".loading").html("У заявки отсутствует номер накладной");
         }
@@ -360,7 +360,7 @@ $(window).on('load', function () {
         //     requestIDExternal: requestIDExternal
         // }, function (data) {
 
-        ymaps.ready(init);
+        ymaps.ready(initMap);
 
         // if (data == 'true') {
         //     $('#pretensionModal').modal('toggle');
@@ -374,7 +374,7 @@ $(window).on('load', function () {
         // })
     }
 
-    function init() {
+    function initMap() {
         // Создание экземпляра карты и его привязка к контейнеру с
         // заданным id ("map").
         // console.log(JSON.stringify(data));

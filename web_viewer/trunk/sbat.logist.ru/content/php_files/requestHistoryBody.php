@@ -104,7 +104,7 @@
             <div class="mid status-history">
                 <div class="info">История статусов</div>
                 <div class="col-xs-12">
-                    <table id="requestHistoryDialogTable">
+                    <table id="requestHistoryDialogTable" class="table table-striped">
                         <thead>
                         <tr>
                             <th>Время</th>

@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="../common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
     <!--z-index:999-->
+    <link rel="stylesheet" type="text/css" href="../common_files/media/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Select-1.1.0/css/select.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="../admin_page/content/css/admin.css"/>
 
@@ -26,16 +27,20 @@
     <script src="../common_files/media/FieldType-Mask/editor.mask.min.js"></script>
     <script src="../common_files/media/FieldType-Selectize/editor.selectize.min.js"></script>
     <script src="../common_files/media/Select-1.1.0/js/dataTables.select.min.js"></script>
+
     <script src="../common_files/media/md5.js"></script>
     <script src="../common_files/media/Buttons-1.1.0/js/dataTables.buttons.flash.min.js"></script>
 
     <!--custom-->
     <script src="content/js/route-point.js"></script>
     <script src="content/js/user.js"></script>
+    <script src="content/js/client.js"></script>
     <script src="content/js/driver.js"></script>
     <script src="content/js/vehicle.js"></script>
     <script src="content/js/transport-company.js"></script>
     <script src="content/js/route.js"></script>
+    <script src="content/js/requests-assignment.js"></script>
+    <script src="content/js/transactions.js"></script>
 
 </head>
 <body>
@@ -46,13 +51,20 @@
 <!--</ul>-->
 
 <div id="tabs">
+    <div id="transactionWidget">
+        Обмен с 1С:<br>
+        Статус: <span id="transactionStatus"></span><br>
+        Последний пакет: №<span id="lastTransactionPacket"></span>, <span id="lastTransactionServer"></span><br> <span
+                id="lastTransactionTime"></span>(GMT)
+    </div>
     <ul>
         <li><a href="#tabs-1">Маршруты</a></li>
         <li><a href="#tabs-2">Пользователи</a></li>
         <li><a href="#tabs-3">ТК, ТС и водители</a></li>
-        <li onclick="location.href='../'"><a target="_blank" href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-e"
-                                                                            style="display:inline-block"></span>На главную</a></li>
-        <li><a onclick="" href="../" id="logout">Выход</a></li>
+        <li><a href="#tabs-4">Распределение<br> заявок</a></li>
+        <li><a href="#tabs-5">Обмен с 1С</a></li>
+        <!--        <li onclick="location.href='../'"><a target="_blank" href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-e" style="display:inline-block"></span>На главную</a></li>-->
+        <!--        <li><a onclick="" href="../" id="logout">Выход</a></li>-->
     </ul>
     <div id="tabs-1">
         <h2>Маршруты</h2>
@@ -157,6 +169,23 @@
                 </thead>
             </table>
         </div>
+        <h2>Клиенты</h2>
+        <div id="clientsCreation">
+            <table id="clientsTable">
+                <thead>
+                <tr>
+                    <th>clientID</th>
+                    <th>Имя</th>
+                    <th>ИНН</th>
+                    <th>КПП</th>
+                    <th>Кор. Счет</th>
+                    <th>Кур. Счет</th>
+                    <th>БИК</th>
+                    <th>Номер контракта</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
     </div>
     <div id="tabs-3">
         <h2>Транспортные компании</h2>
@@ -217,6 +246,39 @@
                 </thead>
             </table>
         </div>
+    </div>
+    <div id="tabs-4">
+        <div id="requestsAssignment"><h2>Распределение заявок</h2><br>
+            <div class="tooltip">Как это работает?
+                <div class="tooltiptext">Распределитель собирает все заявки, у которых указан выбранный склад как точка
+                    отправки, затем - выбирает маршруты, которые проходят через склад отправки и склад доставки.<br> Для
+                    каждого найденного маршрута создается маршрутный лист, в него записываются все заявки, которым
+                    нашелся маршрут. <br>Если поступает маршрутный лист из 1С и в нем есть заявка, для которой создан
+                    маршрутный лист с этой страницы - заявка перепишется на маршрутный лист из 1С автоматически
+                </div>
+            </div>
+            <br><br>
+            <label for="warehouseId">Распределить заявки со склада:</label><input id="warehouseId"><br>
+            <input type="button" disabled="disabled" id="assignRequests" value="Распределить">
+            <div id="routeListsLinks" style="display:none">
+                <h3>Последние созданные маршрутные листы</h3>
+
+                <ul id="autoInsertedRouteListLinks"></ul>
+            </div>
+        </div>
+    </div>
+    <div id="tabs-5">
+        <h2>Последние пакеты из 1С</h2><br>
+        <table id="transactionsTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th>Номер пакета</th>
+                <th>Сервер</th>
+                <th>Статус</th>
+                <th>Дата транзакции</th>
+            </tr>
+            </thead>
+        </table>
     </div>
 </div>
 </body>

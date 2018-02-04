@@ -1,1 +1,1 @@
-ALTER TABLE transmaster_transport_db.points ADD city_name VARCHAR(64) NULL;
+ALTER TABLE test_ttdb.points ADD city_name VARCHAR(64) NULL;

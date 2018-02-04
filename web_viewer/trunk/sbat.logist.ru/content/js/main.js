@@ -2,7 +2,7 @@ $(document).ready(function () {
     var role_type = "role-type";
     $('button').addClass('ui-state-active ui-state focus');
     // --------LOGOUT-----------------
-    $("#logout").button().on("click", function () {
+    $("#logout").on("click", function () {
         // delete auth cookies
         $.cookie('SESSION_CHECK_STRING', null, -1, '/');
         // make redirect to login page
@@ -806,9 +806,11 @@ $(document).ready(function () {
                     $(this).val(filterValue);
                     searchInput.css({'display': 'none'});
                     if (this.value != '') {
-                        $footer.css("background-color", "#c22929")
+
+                        // $footer.css("background-color", "#c22929")
+                        $footer.addClass("footer-search", 1000, "easeInBack");
                     } else {
-                        $footer.css("background-color", "#f6f6f6");
+                        $footer.removeClass("footer-search",1000, "easeInBack");
                     }
                 });
 
@@ -818,7 +820,8 @@ $(document).ready(function () {
                 if (historySearch) {
                     searchInput.val(historySearch);
                     searchInput.attr("currentFilter", historySearch);
-                    $footer.css("background-color", "#c22929")
+                    $footer.addClass("footer-search", 200, "easeInBack");
+                    // $footer.css("background-color", "#c22929")
                 }
 
             });
@@ -842,13 +845,18 @@ $(document).ready(function () {
 
             //Button-link to admin page
             if (role == "DISPATCHER" || role == "ADMIN") {
-                dataTable.button().add(7, {
-                    text: 'Админ. Страница',
-                    action: function (e, dt, node, config) {
-                        window.location = "/admin_page"
-                    }
-                });
-                if (role === "ADMIN") {
+                $('.dropdown-content table tr:first').before('<tr>\n' +
+                    '                            <td><i class="fa fa-cogs" aria-hidden="true"></i></td>\n' +
+                    '                            <td><a href="/admin_page/" target="_blank">Админ. страница</a></td>\n' +
+                    '                        </tr>');
+
+                // dataTable.button().add(7, {
+                //     text: 'Админ. Страница',
+                //     action: function (e, dt, node, config) {
+                //         window.location = "/admin_page"
+                //     }
+                // });
+                if (role === "ADMIN"||role==="DISPATCHER") {
 
 
                     dataTable.button().add(8, {
@@ -901,7 +909,7 @@ $(document).ready(function () {
             },
             {
                 name: 'changeRouteListStatus',
-                extend: 'selectedSingle',
+                enabled: false,
                 className: 'changeStatusForSeveralRequests',
                 text: 'Изменить статус МЛ',
                 action: function (e, dt, node, config) {
@@ -909,9 +917,9 @@ $(document).ready(function () {
                 }
             },
             {
-                extend: 'selectedSingle',
                 className: 'statusHistory',
                 text: 'История статусов',
+                enabled: false,
                 action: function (e, dt, node, config) {
                     var url =
                         "?clientId=" +
@@ -943,13 +951,15 @@ $(document).ready(function () {
                         $(this).val("").attr("currentFilter", "");
                     });
                     dataTable.columns().every(function () {
-                        $(this.footer()).css("background-color", "f6f6f6");
+
+                        // $(this.footer()).css("background-color", "f6f6f6");
+                        $(this.footer()).removeClass("footer-search",1000,"easeInBack");
                         this.search("");
                     });
                     dataTable.columns().draw();
                 }
             },
-            // if ($('#data-role').attr('data-role')=="ADMIN"||$('#data-role').attr('data-role')=="DISPATCHER")
+
 
 
             {
@@ -961,7 +971,6 @@ $(document).ready(function () {
                     this.text((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск');
                 }
             }
-            // Раскомментируй
 
         ],
         ajax: {
@@ -1047,24 +1056,49 @@ $(document).ready(function () {
     $(".dataTable ").css({"width": "100%"});
     var disabled = 0;
 //var buttons = dataTable.buttons(['.changeStatusForRequest', '.changeStatusForSeveralRequests', '.statusHistory']);
+    dataTable.on('deselect', function (e, dt, type, indexes) {
+        dataTable.button(2).disable();
+        dataTable.button(3).disable();
+    });
     dataTable.on('select', function (e, dt, type, indexes) {
+
+
         var routeListID = dataTable.row($('#user-grid .selected')).data().routeListNumber;
-        if ((routeListID == null && disabled != 1) || ($("#data-role").html().trim() == "Пользователь_клиента") && disabled != 1) {
-            dataTable.buttons(2).remove();
-            disabled = 1;
-            // buttons.disable();
-        } else if (disabled == 1 && routeListID != null && (($("#data-role").html().trim() != "Пользователь_клиента"))) {
-            dataTable.button().add(2, {
-                name: 'changeRouteListStatus',
-                extend: 'selectedSingle',
-                className: 'changeStatusForSeveralRequests',
-                text: 'Изменить статус МЛ',
-                action: function (e, dt, node, config) {
-                    $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
-                }
-            });
-            disabled = 0;
+        var invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber.trim();
+        var clientId = dataTable.row($('#user-grid .selected')).data().clientIDExternal.trim();
+        // console.log(invoiceNumber+'\n'+clientId);
+        // console.log(routeListID+' \n'+$("#data-role").html().trim());
+        if ((routeListID == null) || $("#data-role").html().trim()=="Пользователь_клиента"){
+            dataTable.button(2).disable();
+                // console.log('disabled');
+        } else if (routeListID!=null && $("#data-role").html().trim()!="Пользователь_клиента"){
+            dataTable.button(2).enable();
+                // console.log('enabled');
         }
+
+        if(clientId!='' && invoiceNumber!=''){
+            dataTable.button(3).enable();
+        } else {
+            dataTable.button(3).disable();
+        }
+
+        // if ((routeListID == null && disabled != 1) || ($("#data-role").html().trim() == "Пользователь_клиента") && disabled != 1) {
+        //     dataTable.button(2).disable();
+        //     console.log('disabled');
+        //     disabled = 1;
+        // } else if (disabled == 1 && routeListID != null && (($("#data-role").html().trim() != "Пользователь_клиента"))) {
+        //     dataTable.button(2).enable();
+        //     // dataTable.button().add(2, {
+        //     //     name: 'changeRouteListStatus',
+        //     //     extend: 'selectedSingle',
+        //     //     className: 'changeStatusForSeveralRequests',
+        //     //     text: 'Изменить статус МЛ',
+        //     //     action: function (e, dt, node, config) {
+        //     //         $.showRequestStatusDialog("changeStatusForSeveralRequests", dataTable);
+        //     //     }
+        //     // });
+        //     disabled = 0;
+        // }
     });
 
 })
