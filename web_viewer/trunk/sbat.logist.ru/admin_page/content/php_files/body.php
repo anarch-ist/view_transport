@@ -58,12 +58,14 @@
                 id="lastTransactionTime"></span>(GMT)
     </div>
     <ul>
-        <li><a href="#tabs-1">Маршруты</a></li>
-        <li><a href="#tabs-2">Пользователи</a></li>
-        <li><a href="#tabs-3">ТК, ТС и водители</a></li>
-        <li><a href="#tabs-4">Распределение<br> заявок</a></li>
-        <li><a href="#tabs-5">Обмен с 1С</a></li>
-        <!--        <li onclick="location.href='../'"><a target="_blank" href="#"><span class="ui-icon ui-icon-arrowreturnthick-1-e" style="display:inline-block"></span>На главную</a></li>-->
+        <li><a href="#tabs-1"><i class="fa fa-compass" aria-hidden="true"></i> Маршруты</a></li>
+        <li><a href="#tabs-2"><i class="fa fa-users" aria-hidden="true"></i> Пользователи</a></li>
+        <li><a href="#tabs-3"><i class="fa fa-truck" aria-hidden="true"></i> ТК, ТС, <br>водители</a></li>
+        <li><a href="#tabs-4"><i class="fa fa-magic" aria-hidden="true"></i> Распределение<br> заявок</a></li>
+        <li><a href="#tabs-5"><i class="fa fa-exchange" aria-hidden="true"></i> Обмен с 1С</a></li>
+<!--        <li><a >Fgsfas</a></li>-->
+                <li onclick="location.href='../'"><a target="_blank" href="#"><i class="fa fa-table" aria-hidden="true"></i> На главную</a></li>
+        <li onclick="location.href='../login/'"><a target="_blank" href="#"><i class="fa fa-sign-out" aria-hidden="true"></i> Выход</a></li>
         <!--        <li><a onclick="" href="../" id="logout">Выход</a></li>-->
     </ul>
     <div id="tabs-1">
