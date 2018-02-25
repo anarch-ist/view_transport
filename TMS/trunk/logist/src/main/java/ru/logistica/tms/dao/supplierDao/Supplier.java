@@ -10,6 +10,7 @@ import java.util.Set;
 public class Supplier {
     private Integer supplierId;
     private String inn;
+    private Integer maxCells;
     private Set<SupplierUser> supplierUsers;
 
     @Id
@@ -32,6 +33,16 @@ public class Supplier {
 
     public void setInn(String inn) {
         this.inn = inn;
+    }
+
+    @Basic
+    @Column(name="maxcells", nullable=false)
+    public int getMaxCells() {
+        return this.maxCells;
+    }
+
+    public void setMaxCells(int maxCells) {
+        this.maxCells = maxCells;
     }
 
     @OneToMany(mappedBy = "supplier")

@@ -12,10 +12,11 @@
                 ordersFields: ["orderNumber", "finalDestinationWarehouseId", "boxQty", "commentForStatus", "orderStatusId", "invoiceNumber", "goodsCost", "orderPalletsQty"]
             },
             orderStatuses: [
-                {statusName:"EXAMPLE_STATUS", statusRusName:"СТАТУС", isUpdatable: false}
+                {statusName: "EXAMPLE_STATUS", statusRusName: "СТАТУС", isUpdatable: false}
             ],
             warehouses: {1: "EXAMPLE_WH"},
-            onSubmit: function() {}
+            onSubmit: function () {
+            }
         }, options);
 
 
@@ -28,12 +29,12 @@
 
         var donutFields = generateContent();
         var period;
-        var periodToString = function(period) {
+        var periodToString = function (period) {
             return period.periodBegin + ";" + period.periodEnd;
         };
 
         //create and configure table
-        var ordersDataTableEditor = new $.fn.dataTable.Editor( {
+        var ordersDataTableEditor = new $.fn.dataTable.Editor({
             // When editing data the changes only reflected in the DOM, not in any AJAX backend datasource and not localstorage.
             ajax: function (method, url, data, successCallback, errorCallback) {
                 var output = {data: []};
@@ -105,14 +106,14 @@
             }
 
             ]
-        } );
+        });
 
         var input = ordersDataTableEditor.field("goodsCost").input();
-        input.keyup(function(){
+        input.keyup(function () {
             var str = $(this).val();
-            if(/^(\d*\.)?\d*$/.test(str)){
-            }else{
-                input[0].value="";
+            if (/^(\d*\.)?\d*$/.test(str)) {
+            } else {
+                input[0].value = "";
             }
         });
         // generate dataTable
@@ -139,14 +140,48 @@
                 }
             });
         }
+        //buttons.push({
+        //   text:'PDF',
+        //    action: function(e, dt, node, config){
+        //        var data;
+        //        $.ajax({
+        //            url: "getReportData",
+        //            method: "GET",
+        //            //data: {report: "15"},
+        //            dataType: "json",
+        //            success: function (json) {
+        //                alert(json.text);
+        //                var docDefinition = {
+        //                    content: json.text
+        //                };
+        //                pdfMake.createPdf(docDefinition).open();
+        //            }
+        //        }).success(function (ajaxData) {
+        //            //data = ajaxData.text;
+        //            //alert(ajaxData.text);
+        //
+        //
+        //        });
+        //        //$.get("getReportData", function(responseText) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
+        //        //    alert(responseText.text);           // Locate HTML DOM element with ID "somediv" and set its text content with the response text.
+        //        //    console.log(responseText.text);
+        //        //});
+        //
+        //        //console.log(JSON.stringify(_this.getData));
+        //        //alert(data);
+        //
+        //
+        //    }
+        //});
+
         var $ordersDataTable = $('#ordersDataTable');
         var dataTable = $ordersDataTable.DataTable({
-            paging:false,
+            paging: false,
             searching: false,
             dom: 'Bt',
             idSrc: "orderId",
             select: {
-                style:    'os',
+                style: 'os',
                 selector: 'td:first-child'
             },
             keys: {
@@ -168,13 +203,19 @@
                 {"data": "invoiceNumber"},
                 {"data": "goodsCost"},
                 {"data": "orderPalletsQty"},
-                {"data": "orderStatusId"}
+                {"data": "orderStatusId"},
+                {
+                    data: null,
+                    defaultContent: '<button>Печать</button>',
+                    orderable: false
+                }
             ],
             columnDefs: [
                 {"name": "orderNumber", "orderable": false, "targets": 1},
-                {"name": "finalDestinationWarehouseId", "orderable": false, "targets": 2,
+                {
+                    "name": "finalDestinationWarehouseId", "orderable": false, "targets": 2,
                     render: function (data, type, full, meta) {
-                        return type === 'display' ? settings.warehouses[data]:data;
+                        return type === 'display' ? settings.warehouses[data] : data;
                     }
                 },
                 {"name": "boxQty", "orderable": false, "targets": 3},
@@ -182,7 +223,8 @@
                 {"name": "invoiceNumber", "orderable": false, "targets": 5},
                 {"name": "goodsCost", "orderable": false, "targets": 6},
                 {"name": "orderPalletsQty", "orderable": false, "targets": 7},
-                {"name": "orderStatusId", "orderable": false, "targets": 8,
+                {
+                    "name": "orderStatusId", "orderable": false, "targets": 8,
                     render: function (tableOrderStatusName, type, full, meta) {
                         var statusName;
                         if (tableOrderStatusName === null) {
@@ -191,7 +233,7 @@
                             statusName = tableOrderStatusName;
                         }
 
-                        var filtered = settings.orderStatuses.filter(function(orderStatus) {
+                        var filtered = settings.orderStatuses.filter(function (orderStatus) {
                             return orderStatus.statusName === statusName;
                         });
                         var orderStatusRusName = "";
@@ -200,9 +242,95 @@
                         }
                         return type === 'display' ? orderStatusRusName : tableOrderStatusName;
                     }
-                }
+                },
+                {"name": "report", "targets": -1, "data": null, "defaultContent": "<button>Печать</button>"}
             ]
         });
+
+        $('#ordersDataTable').find('tbody').on('click', 'button', function () {
+            var pdfBody = [];
+            var pages = 0;
+            var i = 0;
+            pages = Number($ordersDataTable.DataTable().row( $(this).parents('tr') ).data().orderPalletsQty);
+            var orderWhereTo = settings.warehouses[$ordersDataTable.DataTable().row( $(this).parents('tr') ).data().finalDestinationWarehouseId];
+            var orderSupplier = donutFields.companyNameDiv.text();
+            var documentNumber = $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().invoiceNumber;
+            var orderNumber = $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().orderNumber;
+            var orderDate = $('#datePickerId').find('input').val();
+            var orderPalletsQty =  $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().orderPalletsQty;
+            var orderAllPallets = donutFields.palletQtyInput.val();
+            var orderBoxQty = $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().boxQty;
+
+            for(i=1; i<= pages; i++){
+                pdfBody.push({
+
+                    table: {
+                        headerRows: 0,
+                        pageSize:'A5',
+                        width: ['auto', 'auto'],
+                        body: [
+                            ['Куда: ', { text: orderWhereTo, fontSize: 52}],
+                            // ['Поставщик: ', $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().supplierName],
+                            ['Поставщик: ', {text: orderSupplier, fontSize: 32} ],
+                            ['Документ: ', {text: '№'+ documentNumber, fontSize: 40}],
+                            ['Лист заказа: ', {text: '№'+ orderNumber, fontSize: 40}],
+                            // ['Дата: ', periodToString(period)],
+                            ['Дата: ', {text: orderDate, fontSize: 40}],
+                            ['Паллет: ', {text: orderPalletsQty, fontSize: 40}],
+                            ['Всего паллет: ',{text: orderAllPallets, fontSize:40} ],
+                            ['Мест в заказе: ', {text: orderBoxQty, fontSize: 40}],
+                            ['Палета:', {text: i+'/'+pages, fontSize:40}]
+                        ]
+                    },
+                    // layout: 'noBorders',
+                    style: 'routeListTable',
+                    pageBreak: (i!=pages) ? 'after':'none'
+                })
+            }
+
+            pdfMake.createPdf({
+                //content: [
+                //    {
+                //    table: {
+                //        headerRows: 0,
+                //        pageSize:'A5',
+                //        width: ['auto', 'auto'],
+                //        body: [
+                //            ['Куда: ', { text: settings.warehouses[$ordersDataTable.DataTable().row( $(this).parents('tr') ).data().finalDestinationWarehouseId], fontSize: 52}],
+                //            // ['Поставщик: ', $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().supplierName],
+                //            ['Поставщик: ', {text: donutFields.companyNameDiv.text(), fontSize: 32} ],
+                //            ['Документ: ', {text: '№'+$ordersDataTable.DataTable().row( $(this).parents('tr') ).data().invoiceNumber , fontSize: 40}],
+                //            ['Лист заказа: ', {text: '№'+$ordersDataTable.DataTable().row( $(this).parents('tr') ).data().orderNumber, fontSize: 40},],
+                //            // ['Дата: ', periodToString(period)],
+                //            ['Дата: ', {text: $('#datePickerId').find('input').val(), fontSize: 40}],
+                //            ['Паллет: ', {text: $ordersDataTable.DataTable().row( $(this).parents('tr') ).data().orderPalletsQty, fontSize: 40}],
+                //            ['Всего паллет: ',{text: donutFields.palletQtyInput.val(), fontSize:40} ],
+                //            ['Мест в заказе: ', {text:$ordersDataTable.DataTable().row( $(this).parents('tr') ).data().boxQty, fontSize: 40}]
+                //        ],
+                //        pageBreak: 'after'
+                //    },
+                //
+                //    // layout: 'noBorders',
+                //    style: 'routeListTable',
+                //    }
+                //
+                //
+                //],
+                content: pdfBody,
+                styles:{
+                    routeListTable:{
+                        fontSize: 18,
+                        // bold: true,
+                        alignment: 'left'
+                        // margin: [0,30,0,0]
+                    }
+                }
+
+            }).open();
+            // var data = $ordersDataTable.DataTable().row( $(this).parents('tr') ).data();
+            // alert( "data is "+ JSON.stringify(data) );
+        });
+
         dataTable.buttons().container().appendTo(donutFields.buttonsContainer);
 
         // create inline editing
@@ -231,7 +359,7 @@
 
         if (settings.isEditable) {
             var submitBtn = $("<button>").text("Отправить");
-            submitBtn.on("click", function(e) {
+            submitBtn.on("click", function (e) {
                 settings.onSubmit();
             });
             _this.append(submitBtn);
@@ -249,17 +377,17 @@
                 }
             };
         }
-        this.setOnRowRemoved = function(handler) {
+        this.setOnRowRemoved = function (handler) {
             ordersDataTableEditor.off('initRemove');
             if (handler) {
-                ordersDataTableEditor.on('initRemove', function(e, node, rowsData) {
-                    rowsData.forEach(function(rowData) {
+                ordersDataTableEditor.on('initRemove', function (e, node, rowsData) {
+                    rowsData.forEach(function (rowData) {
                         handler(toPluginDataModel(rowData));
                     });
                 });
             }
         };
-        this.setPeriod = function(_period){
+        this.setPeriod = function (_period) {
             if (_period) {
                 period = JSON.parse(JSON.stringify(_period));
                 donutFields.periodInput.val(periodToString(period));
@@ -267,13 +395,13 @@
                 donutFields.periodInput.val("");
             }
         };
-        this.setPeriodToString = function(_periodToString) {
+        this.setPeriodToString = function (_periodToString) {
             periodToString = _periodToString;
         };
-        this.setSupplierName = function(supplierName){
+        this.setSupplierName = function (supplierName) {
             donutFields.companyNameDiv.text(supplierName);
         };
-        this.setData = function(data) {
+        this.setData = function (data) {
             this.setSupplierName(data.supplierInn);
             this.setPeriod(data.period);
             donutFields.driverNameInput.val(data.driver);
@@ -282,7 +410,7 @@
             donutFields.driverPhoneNumberInput.val(data.driverPhoneNumber);
             donutFields.commentArea.val(data.commentForDonut);
             ordersDataTableEditor.remove('tr', false).submit();
-            data.orders.forEach(function(order) {
+            data.orders.forEach(function (order) {
                 createRow(
                     order.orderId,
                     order.orderNumber,
@@ -297,7 +425,7 @@
             });
         };
 
-        this.getData = function() {
+        this.getData = function () {
             var result = {};
             result.period = period;
             result.commentForDonut = donutFields.commentArea.val();
@@ -307,14 +435,14 @@
             result.palletsQty = +donutFields.palletQtyInput.val();
             result.driverPhoneNumber = donutFields.driverPhoneNumberInput.val();
             var orders = [];
-            dataTable.data().each(function(rowData) {
+            dataTable.data().each(function (rowData) {
                 orders.push(toPluginDataModel(rowData));
             });
             result.orders = orders;
             return result;
         };
 
-        this.clear = function() {
+        this.clear = function () {
             var emptyData = {
                 supplierInn: "",
                 period: null,
@@ -334,7 +462,7 @@
         function createRow(orderId, orderNumber, finalWarehouseDestinationId, boxQty, commentForStatus, statusId, invoiceNumber, goodsCost, orderPalletsQty) {
             createRow.lastAddedId = orderId + "";
 
-            var filtered = settings.orderStatuses.filter(function(orderStatus) {
+            var filtered = settings.orderStatuses.filter(function (orderStatus) {
                 return orderStatus.statusName === statusId;
             });
 
@@ -446,19 +574,19 @@
             }
 
             var orderStatusSelectPairs = [];
-            settings.orderStatuses.forEach(function(orderStatus) {
+            settings.orderStatuses.forEach(function (orderStatus) {
                 if (orderStatus.isUpdatable) {
-                    orderStatusSelectPairs.push({label:orderStatus.statusRusName, value:orderStatus.statusName});
+                    orderStatusSelectPairs.push({label: orderStatus.statusRusName, value: orderStatus.statusName});
                 }
             });
 
             var warehouseSelectPairs = [];
-            for(var warehouseId in settings.warehouses) {
+            for (var warehouseId in settings.warehouses) {
                 if (!settings.warehouses.hasOwnProperty(warehouseId)) {
                     continue;
                 }
                 var warehouseName = settings.warehouses[warehouseId];
-                warehouseSelectPairs.push({label:warehouseName, value:+warehouseId});
+                warehouseSelectPairs.push({label: warehouseName, value: +warehouseId});
             }
 
             return {
@@ -500,6 +628,8 @@
             var $licensePlateLabel = $("<label>").text("№ транспортного средства");
             var $licensePlate = $("<td>");
             var $licensePlateInput = $("<input>");
+            $licensePlateInput.attr("maxlength","9");
+            // $licensePlateInput.mask('AAAAAAAAA'); //This doesn't allow cyrillic letters.
             setReadOnlyIfOption("licensePlate", $licensePlateInput);
 
             var $palletTr = $("<tr>");
@@ -523,7 +653,7 @@
             var $commentLabel = $("<label>").text("Комментарий");
             var $comment = $("<td>");
             var $commentArea = $("<textarea>");
-            $commentArea.css("resize","none");
+            $commentArea.css("resize", "none");
             setReadOnlyIfOption("commentForDonut", $commentArea);
 
             _this.append(
@@ -555,18 +685,18 @@
             var $goodsCost = $("<th>").text("Сумма");
             var $orderPalletsQty = $("<th>").text("Кол-во паллет");
             var $statusTh = $("<th>").text("Статус");
+            var $report = $("<th>").text("Наклейка");
 
 
             _this.append(
                 $ordersTable.append(
                     $thead.append(
                         $orderTr.append(
-                            $selectTh, $numberTh, $finalDestinationTh, $boxQtyTh, $commentTh, $invoiceNumber, $goodsCost, $orderPalletsQty, $statusTh
+                            $selectTh, $numberTh, $finalDestinationTh, $boxQtyTh, $commentTh, $invoiceNumber, $goodsCost, $orderPalletsQty, $statusTh, $report
                         )
                     )
                 )
             );
-
 
 
             return {
@@ -585,4 +715,5 @@
     };
 
 }(jQuery));
+
 

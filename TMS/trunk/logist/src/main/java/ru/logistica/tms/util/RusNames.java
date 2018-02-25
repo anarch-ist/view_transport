@@ -15,6 +15,7 @@ public class RusNames {
         orderStatusesConverter.put(OrderStatuses.ERROR, "ОШИБКА");
         orderStatusesConverter.put(OrderStatuses.CANCELLED_BY_SUPPLIER_USER, "УДАЛЕН ПОСТАВЩИКОМ");
         orderStatusesConverter.put(OrderStatuses.CANCELLED_BY_WAREHOUSE_USER, "УДАЛЕН НАЧАЛЬНИКОМ СКЛАДА");
+        orderStatusesConverter.put(OrderStatuses.NO_ORDERS, "НЕТ ЗАЯВОК");
     }
     public static Map<OrderStatuses, String> getOrderStatusesConverter() {
         return orderStatusesConverter;

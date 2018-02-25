@@ -191,6 +191,7 @@ CREATE TABLE suppliers (
   dateOfSigning     DATE         NULL, --t
   startContractDate DATE         NULL, --t
   endContractDate   DATE         NULL, --t
+  maxcells          INTEGER      NOT NULL DEFAULT 2, --t
   PRIMARY KEY (supplierID)
 );
 
