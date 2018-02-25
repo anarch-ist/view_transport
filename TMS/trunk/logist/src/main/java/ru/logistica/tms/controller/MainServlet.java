@@ -7,6 +7,7 @@ import ru.logistica.tms.dao.DaoScriptException;
 import ru.logistica.tms.dao.cache.AppContextCache;
 import ru.logistica.tms.dao.docDao.Doc;
 import ru.logistica.tms.dao.orderDao.OrderStatuses;
+import ru.logistica.tms.dao.userDao.SupplierUser;
 import ru.logistica.tms.dao.userDao.User;
 import ru.logistica.tms.dao.userDao.UserRoles;
 import ru.logistica.tms.dao.userDao.WarehouseUser;
@@ -106,6 +107,11 @@ public class MainServlet extends AppHttpServlet {
                 throw new ServletException(e.getMessage(), e);
             }
             request.setAttribute("warehousesForDonutCrudPlugin", warehousesForDonutCrudPlugin.toString());
+        }
+        if (user instanceof SupplierUser) {
+            request.setAttribute("maxCells", (Object)((SupplierUser)user).getSupplier().getMaxCells());
+        } else {
+            request.setAttribute("maxCells", (Object)48);
         }
 
 

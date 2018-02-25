@@ -15,7 +15,8 @@
             isSelectAllOccupied: false,
             isSelectAllClosed: false
         },
-        buttons: null
+        buttons: null,
+        maxCellsSelected: 48
     };
 
     // CONSTANTS
@@ -40,6 +41,7 @@
     var previousSelectedState;
     var previousDisabled;
     var previousAnySelected = false;
+    var maxCellsSelected;
 
     var main = function (initParams) {
         startupParameters = merge(DEFAULT_PARAMETERS, initParams);
@@ -50,6 +52,7 @@
         parentElem = document.getElementById(startupParameters.parentId);
         tableControls = new TableControls(parentElem, main, startupParameters.buttons);
         generatedCells = [];
+        maxCellsSelected = startupParameters.maxCellsSelected;
         generateContent();
 
         return main;
@@ -283,6 +286,11 @@
                 }
             }
 
+
+            if (selectedElementsInstance.getSelectedCells().length >= maxCellsSelected && !wasSelected){
+                return;
+            }
+
             if (!startupParameters.allowedStatesForSelection.isClosedAllowed) {
                 if (currentSelectedState === CLOSED) {
                     return;
@@ -299,6 +307,7 @@
             if (currentSelectedState !== OPENED && !relatedData.owned) {
                 return;
             }
+
 
             // toggle selection
             if (wasSelected) {
@@ -359,7 +368,7 @@
         };
 
         this.contains = function(cellElement) {
-          return selectedElements.indexOf(cellElement) >= 0;
+            return selectedElements.indexOf(cellElement) >= 0;
         };
 
         this.isEmpty = function () {
@@ -409,7 +418,6 @@
                     result.push({data:null, periods: getPeriodsFromCells(selectedElementsWithoutState)});
                 }
             }
-
             return result;
         };
 
@@ -573,7 +581,9 @@
                 result.push(generatedCells[i]);
             }
         }
+
         return result;
+
     }
 
     function getPeriodForCell(cellElement) {
@@ -729,4 +739,5 @@
     window.tablePlugin2 = main;
 
 })();
+
 

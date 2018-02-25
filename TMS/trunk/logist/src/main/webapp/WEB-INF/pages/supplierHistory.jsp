@@ -65,8 +65,8 @@
                 $('input', this.footer()).on('keyup change', function () {
                     if (that.search() !== this.value) {
                         that
-                                .search(this.value)
-                                .draw();
+                            .search(this.value)
+                            .draw();
                     }
                 });
             });

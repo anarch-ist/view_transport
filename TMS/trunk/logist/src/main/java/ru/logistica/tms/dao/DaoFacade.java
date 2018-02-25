@@ -26,6 +26,8 @@ import ru.logistica.tms.dto.*;
 import ru.logistica.tms.util.CriptUtils;
 import ru.logistica.tms.util.RusNames;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DaoFacade {
@@ -35,7 +37,6 @@ public class DaoFacade {
     private interface DaoScript {
         void execute() throws DAOException;
     }
-
 
 
     private static void doInTransaction(DaoScript daoScript) throws DaoScriptException {
@@ -237,12 +238,12 @@ public class DaoFacade {
                     @Override
                     public Object transformTuple(Object[] rowData, String[] aliasNames) {
                         SupplierDonuts.SupplierDonut donutForSupplier = new SupplierDonuts.SupplierDonut();
-                        donutForSupplier.setPeriodBegin(getDateWithShift((Date)rowData[0]));
-                        donutForSupplier.setPeriodEnd(getDateWithShift((Date)rowData[1]));
+                        donutForSupplier.setPeriodBegin(getDateWithShift((Date) rowData[0]));
+                        donutForSupplier.setPeriodEnd(getDateWithShift((Date) rowData[1]));
                         donutForSupplier.setWarehouseName((String) rowData[2]);
                         donutForSupplier.setDocName((String) rowData[3]);
                         donutForSupplier.setOrderNumbersAsString((String) rowData[4]);
-                        String orderStatusesAsString = (String) rowData[5];
+                        String orderStatusesAsString = rowData[5] == null ? "NO_ORDERS" : (String)rowData[5];
                         String[] orderStatuses = orderStatusesAsString.split(delimiter);
                         String orderStatusesLocalized = "";
                         for (int i = 0; i < orderStatuses.length; i++) {
@@ -276,6 +277,65 @@ public class DaoFacade {
         return result[0];
     }
 
+
+    public static DocReports getDocReportsForWarehouse(final Date periodBegin, final Date periodEnd, final int warehouseId,final String delimiter) throws DaoScriptException {
+        final DocReports[] result = new DocReports[1];
+        try{
+            doInTransaction(new DaoScript() {
+                @Override
+                public void execute() throws DAOException {
+                    WarehouseDaoImpl warehouseDao = new WarehouseDaoImpl();
+                    Warehouse warehouse = (Warehouse) warehouseDao.findById(Warehouse.class, warehouseId);
+
+                    final Double timeShift = (Double) AppContextCache.timeZoneAbbrIntegerMap.get(warehouse.getRusTimeZoneAbbr());
+                    final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+                    Session currentSession = HibernateUtils.getCurrentSession();
+                    SQLQuery query = currentSession.createSQLQuery("SELECT\n  suppliers.inn,\n  doc_periods.periodbegin,\n  docs.docname,\n  donut_doc_periods.licenseplate as licensePlate,\n  doc_periods.periodend,\n  string_agg((SELECT warehouses.warehousename FROM warehouses WHERE orders.finaldestinationwarehouseid = warehouses.warehouseid), :_delimiter) AS FinalDestinations,\n  string_agg(cast(orders.orderpalletsqty AS CHARACTER VARYING), :_delimiter) AS orderPalletsQty,\n  string_agg(cast(orders.boxqty AS CHARACTER VARYING), :_delimiter) AS boxQty\n\nFROM donut_doc_periods\n  INNER JOIN doc_periods ON donut_doc_periods.donutdocperiodid = doc_periods.docperiodid\n  INNER JOIN docs ON doc_periods.docid = docs.docid\n\n  LEFT JOIN orders ON donut_doc_periods.donutdocperiodid = orders.donutdocperiodid\n  INNER JOIN warehouses ON docs.warehouseid = warehouses.warehouseid\n  INNER JOIN supplier_users ON donut_doc_periods.supplieruserid = supplier_users.userid\n  INNER JOIN suppliers ON supplier_users.supplierid = suppliers.supplierid\nWHERE  warehouses.warehouseid= :warehouseid AND doc_periods.periodbegin BETWEEN cast(:periodbegin AS TIMESTAMP) - INTERVAL '3 hours' AND cast(:periodend AS DATE)+1GROUP BY donut_doc_periods.donutdocperiodid, doc_periods.periodBegin, doc_periods.periodEnd, docs.docname,\n   donut_doc_periods.lastModified, suppliers.inn\nORDER BY doc_periods.periodbegin ASC\nLIMIT 1000;");
+                    query.setInteger("warehouseid", warehouseId);
+                    periodEnd.setTime(periodEnd.getTime() + (long) (3600000 * timeShift.intValue()));
+                    query.setParameter("periodbegin", periodBegin);
+                    query.setParameter("periodend", periodEnd);
+                    query.setString("_delimiter", delimiter);
+                    query.setReadOnly(true);
+                    query.setResultTransformer(new ResultTransformer() {
+
+                        public DocReports.DocReport transformTuple(Object[] rowData, String[] aliasNames) {
+                            DocReports.DocReport docReport = new DocReports.DocReport();
+                            docReport.setInn((String) rowData[0]);
+                            docReport.setDate(dateFormat.format(this.getDateWithShift((Date) rowData[1])));
+                            docReport.setDocname((String) rowData[2]);
+                            docReport.setLicenseplate((String) rowData[3]);
+                            docReport.setPeriod(timeFormat.format((Date) rowData[1]) + "-" + timeFormat.format(this.getDateWithShift((Date) rowData[4])));
+                            docReport.setFinaldestinations((String) rowData[5]);
+                            docReport.setOrderpalletsqty((String) rowData[6]);
+                            docReport.setBoxqty((String) rowData[7]);
+                            return docReport;
+                        }
+
+                        private Date getDateWithShift(Date date) {
+                            date.setTime(date.getTime() + (long) (3600000 * timeShift.intValue()));
+                            return date;
+                        }
+
+                        public List transformList(List collection) {
+                            DocReports result = new DocReports();
+                            result.addAll(collection);
+                            return result;
+                        }
+                    });
+                    result[0] = (DocReports) query.list();
+                    result[0].setWarehouseName(warehouse.getWarehouseName());
+
+                }
+
+            });
+        } catch (DaoScriptException e){
+            e.printStackTrace();
+        }
+        return result[0];
+    }
+
     public static void fillOffsetsForAbbreviations() throws DaoScriptException {
         doInTransaction(new DaoScript() {
             @Override
@@ -289,7 +349,6 @@ public class DaoFacade {
             }
         });
     }
-
 
 
     public static void openPeriods(final Integer userId, final OpenDocPeriodsData openDocPeriodsData) throws DaoScriptException {
@@ -417,7 +476,7 @@ public class DaoFacade {
                 donutDocPeriodDao.update(donutDocPeriod);
                 // delete
                 if (donutUpdateData.ordersIdForDelete != null) {
-                    for (Integer orderIdForDelete: donutUpdateData.ordersIdForDelete) {
+                    for (Integer orderIdForDelete : donutUpdateData.ordersIdForDelete) {
                         Order order = orderDao.findById(Order.class, orderIdForDelete);
                         order.setOrderId(orderIdForDelete);
                         orderDao.delete(order);
@@ -548,7 +607,7 @@ public class DaoFacade {
                 donutDocPeriodDao.save(donutDocPeriod);
 
                 OrderDao orderDao = new OrderDaoImpl();
-                for (OrderData dtoOrder: donutInsertData.orders) {
+                for (OrderData dtoOrder : donutInsertData.orders) {
                     Order order = new Order();
                     order.setBoxQty((short) dtoOrder.boxQty);
                     order.setCommentForStatus(dtoOrder.commentForStatus);

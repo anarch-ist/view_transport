@@ -18,6 +18,7 @@
 
 .pickmeup {
     background: #eef0f5 !important;
+    z-index: 10001;
 }
 
 .pickmeup .pmu-instance .pmu-selected {
@@ -35,3 +36,4 @@
 .pickmeup .pmu-instance .pmu-not-in-month, .pickmeup .pmu-instance .pmu-day-of-week, .pickmeup .pmu-months .pmu-disabled{
     color: #666d7d !important;
 }
+

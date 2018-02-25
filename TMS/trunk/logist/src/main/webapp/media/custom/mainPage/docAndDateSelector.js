@@ -18,6 +18,7 @@
         var firstWarehouse = data.warehouses[0]; // usable if useWarehouseSelect = false
 
 
+
         // sort all data
         sortByStringCompare(data.warehouses, "warehouseName");
         data.warehouses.forEach(function (warehouse) {
@@ -121,6 +122,30 @@
         dateSelect.pickmeup('set_date', new Date());
 
 
+        //Setting up warehouse report datepicker
+        var whReportRangeSelect = $('#warehouseReportPickMeUpRange');
+        whReportRangeSelect.pickmeup({
+            locale: {
+                days: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"],
+                daysShort: ["Вск", "Пнд", "Втр", "Срд", "Чтв", "Птн", "Сбт", "Вск"],
+                daysMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+                months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+                monthsShort: ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"]
+            },
+            // flat: true,
+            mode: 'range',
+            format: "Y-m-d",
+            select_year: false,
+            date: new Date(),
+            separator: "/"
+        });
+        whReportRangeSelect.pickmeup('set_date', new Date());
+        //I just can't figure where else to put it.
+        $('#openWarehouseReport').on('click', function () {
+            window.open("getWarehouseReport?periodBegin="+$('#warehouseReportPickMeUpRange').val().split('/')[0]+"&periodEnd="+$('#warehouseReportPickMeUpRange').val().split('/')[1]+"&warehouseId="+getSelectedWarehouseId());
+        });
+
+
         //-------------------------- METHODS -------------------------------
         this.setSelectedDate = function (date) {
             dateSelect.pickmeup('set_date', date);
@@ -164,6 +189,10 @@
 
         this.withWarehouseSelect = function() {
             return useWarehouseSelect;
+        };
+
+        this.getSelectedWarehouseDocs = function(){
+
         };
 
         //-------------------------- FUNCTIONS -------------------------------
@@ -213,13 +242,40 @@
         function getSelectionObject() {
             var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d'); // actually 'YYYY-MM-DD'
             var selectedDocId =  +$docSelect.chosen().val();
+            getSelectedDocs();
             var selectedWarehouseId = +getSelectedWarehouseId();
+
             if (selectedDocId && selectedWarehouseId) {
                 var utcDate = new Date(new Date(Date.parse(selectedDate)).getTime() - getOffset() * 3600 * 1000);
                 return {date: utcDate, warehouseId: selectedWarehouseId, docId: selectedDocId};
             } else {
                 return null;
             }
+
+        }
+
+        /**
+         *
+         * @returns {null or selection Object}
+         */
+        function getSelectedDocs(){
+            var selectedDate = dateSelect.pickmeup('get_date', 'Y-m-d');
+            var selectedWarehouseId = Number(getSelectedWarehouseId());
+
+            if (selectedWarehouseId){
+                var warehouseDocs =  findWarehouseById(Number(getSelectedWarehouseId())).docs;
+                var utcDate = new Date(new Date(Date.parse(selectedDate)).getTime() - getOffset() * 3600 * 1000);
+                var selectedDocs = [];
+                warehouseDocs.forEach(function(item,i,arr){
+                    selectedDocs.push({date:utcDate, warehouseId:selectedWarehouseId, docId: item.docId, docName: item.docName})
+                });
+                //return {date: utcDate, warehouseId: selectedWarehouseId, docId: selectedDocId};
+                return selectedDocs;
+            } else {
+                return null;
+            }
+
+
         }
 
         function getSelectedWarehouseId() {
@@ -242,7 +298,9 @@
 
         function findWarehouseById(warehouseId) {
             return $.grep(data.warehouses, function (e) {
+
                 return e.warehouseId === warehouseId;
+
             })[0];
         }
 
@@ -258,9 +316,11 @@
         }
         this.getOffset = getOffset;
         this.getSelectionObject = getSelectionObject;
+        this.getSelectedDocs = getSelectedDocs;
 
         return this;
     };
 
 }(jQuery));
+
 
