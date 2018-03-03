@@ -817,16 +817,7 @@
     </form>
     <table class="profileTable">
         <tr>
-            <td>Имя</td>
             <td><c:out value="${sessionScope.user.userName}"/></td>
-        </tr>
-        <tr>
-            <td>роль</td>
-            <td><c:out value="${requestScope.userRoleRusName}"/></td>
-        </tr>
-        <tr>
-            <td>Должность</td>
-            <td><c:out value="${sessionScope.user.position}"/></td>
         </tr>
     </table>
 </div>
