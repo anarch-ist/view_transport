@@ -24,12 +24,17 @@
     border-collapse: collapse;
     margin: 10px;
 }
+.overview-table-container:last-child{
+    margin-bottom: 0;
+}
 
 .overview-table td{
     height: 30px;
     padding:5px;
     margin: 5px;
     border: thin solid #aab7d1;
+        border: 3px solid #251ab9;
+        border-width:thin 0;
 
 }
 
