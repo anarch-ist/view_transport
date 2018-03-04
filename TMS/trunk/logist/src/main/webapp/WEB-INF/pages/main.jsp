@@ -812,14 +812,29 @@
 
 <div id="userPane">
 
-    <form action="logout" method="post">
-        <input id="exit" type="submit" value="Выйти"/>
-    </form>
-    <table class="profileTable">
-        <tr>
-            <td><c:out value="${sessionScope.user.userName}"/></td>
-        </tr>
-    </table>
+    <div id="exit"  class="dropdown">
+        <span><c:out value="${sessionScope.user.userName}"/> </span>
+        <div class="dropdown-content">
+            <form action="logout" method="post">
+                <input type="submit" value="Выйти"/>
+            </form>
+        </div>
+    </div>
+
+    <%--<table class="profileTable">--%>
+        <%--<tr>--%>
+            <%--<td>Имя</td>--%>
+            <%--<td><c:out value="${sessionScope.user.userName}"/></td>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<td>роль</td>--%>
+            <%--<td><c:out value="${requestScope.userRoleRusName}"/></td>--%>
+        <%--</tr>--%>
+        <%--<tr>--%>
+            <%--<td>Должность</td>--%>
+            <%--<td><c:out value="${sessionScope.user.position}"/></td>--%>
+        <%--</tr>--%>
+    <%--</table>--%>
 </div>
 
 <div id="docsPane">
