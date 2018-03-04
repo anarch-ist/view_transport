@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузка</title>
+</head>
+<body style="font-family: Arial, serif">
+<div style=" border: thin solid black; padding: 10px; margin-left: auto; margin-right: auto; margin-top: 30px; width: 50%">
+    <h3 style="margin: 20px;">Загрузка файлов</h3>
+    <p style="margin: 20px;">Оба файла должны иметь абсолютно одинаковое название. Превью должно быть 200 на 200 пикселей. <br></p>
+<form action="uploadFile.php" enctype="multipart/form-data" method="post">
+    <div style="margin: 20px;">
+    <label >Файл<br><input name="fileToUpload" type="file" required></label><br>
+    </div>
+    <div style="margin: 20px;">
+    <label>Превью файла (200х200 пикселей)<br><input name="thumbFile" type="file" required></label><br>
+    </div>
+    <input style="margin: 20px;" type="submit" value="Загрузить">
+</form>
+</div>
+</body>
+</html>
