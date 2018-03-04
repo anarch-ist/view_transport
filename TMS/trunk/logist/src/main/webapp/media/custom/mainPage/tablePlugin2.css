@@ -1,11 +1,24 @@
 body {
+
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 15px;
     color: #33363e;
 }
+.tablePlugin tr:nth-child(even) {
+    background: rgba(26, 43, 109, 0.3);
+}
+
+.tablePlugin tr{
+    background: white;
+}
+ td:hover {
+        background-color:#1475ca;
+    }
 
 .tablePlugin td {
-    border: 1px solid #aab7d1;
+    border: 1px solid #251ab9;
+    border-width:thin 0;
+
     text-align: center;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -25,14 +38,11 @@ body {
 }
 
 
-
 .tablePlugin table {
-    background-color: #e5e9f1;
     border-collapse: separate;
     border-spacing: 0px;
-    width: 70%;
-    margin-left: 20px;
-    margin-top: 20px;
+    margin-left: 100px;
+    margin-top: 100px;
     /*margin: 0 auto;*/
 }
 
@@ -59,18 +69,18 @@ body {
 }
 
 .tp_error {
-    background-color: #d1aab7;
+    background-color: ##ff0000;
 }
 
 .tp_delivered {
-    background-color: #b7d1aa;
+    background-color: #929191;
 }
 
 .tp_in_process {
-    background-color: #99A9C8;
+    background-color: #79ace9;
 }
 .tp_arrived {
-    background-color: #c8b899;
+    background-color: #37af02;
 }
 
 /*.tp_owned:before {*/
