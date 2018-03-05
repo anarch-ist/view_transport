@@ -809,17 +809,9 @@
 </head>
 
 <body>
-
+<hr align="left" width="100%" size="70" color="fff">
+<hr1></hr1>
 <div id="userPane">
-
-    <div id="exit"  class="dropdown">
-        <span><c:out value="${sessionScope.user.userName}"/> </span>
-        <div class="dropdown-content">
-            <form action="logout" method="post">
-                <input type="submit" value="Выйти"/>
-            </form>
-        </div>
-    </div>
 
     <%--<table class="profileTable">--%>
         <%--<tr>--%>
@@ -839,7 +831,16 @@
 
 <div id="docsPane">
 
-    <div id="docAndDateSelector"></div>
+    <div id="docAndDateSelector">
+        <div id="exit"  class="dropdown">
+            <span><c:out value="${sessionScope.user.userName}"/> </span>
+            <div class="dropdown-content">
+                <form action="logout" method="post">
+                    <input type="submit" value="Выйти"/>
+                </form>
+            </div>
+        </div>
+    </div>
     <div id="tableContainer"></div>
     <div id="tableControlsContainer"></div>
 
