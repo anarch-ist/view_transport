@@ -5,25 +5,7 @@
 
 @font-face {
     font-family: "Gerbera Medium";
-        src: url("../../Gerbera-Medium.otf") format("opentype");
-}
-
-hr{
-    position: fixed;
-    top: -15;
-    align: left;
-    width: 100%;
-    height: 72px;
-    background-color: #ffffff;
-}
-
-hr1{
-    position: fixed;
-    top: 65;
-    align: left;
-    width: 100%;
-    height: 3px;
-    background-color: #1722bb;
+    src: url("../../Gerbera-Medium.otf") format("opentype");
 }
 
 .dropdown {
@@ -38,7 +20,7 @@ hr1{
 
     background-color: #fff;
     /*min-width: 160px;*/
-    box-shadow: 0px  6px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 3px 6px 0px rgba(0,0,0,0.2);
     padding: 0;
     z-index: 1;
 }
@@ -57,11 +39,10 @@ input:not([type="button"]){
 }
 
 body{
-    /* background: #eee; */
+    /*background: #eee;*/
     font-family:  "Gerbera Light","Helvetica Neue",Helvetica,Arial,sans-serif !important;
     font-size: 15px;
     color: rgba(26, 43, 109, 1);
-    margin-top: 50px;
 }
 
 a{
@@ -114,6 +95,16 @@ li.highlighted{
     position: relative;
 }
 
+#nav{
+    z-index: 3;
+    background: #fff;
+    position: fixed;
+    top:0;
+    padding: 20px;
+    height: auto;
+    width: 100%;
+    border-bottom: thin solid rgba(26, 43, 109, 1);
+}
 
 .remodal-close{
     position: absolute;
@@ -122,11 +113,10 @@ li.highlighted{
 }
 
 #docAndDateSelector{
-    position: fixed;
-    /* float: left; */
+    /*position: absolute !important;*/
+    float: left;
     display: inline-block;
-    top: 15px  !important;
-    background: #fff;
+    /*top: 15px  !important;*/
 }
 
 .profileTable{
@@ -232,12 +222,13 @@ li.highlighted{
 }
 
 #exit{
-    position: absolute;
-    top: -50px;
-    left: 100%;
+    /*position: absolute;*/
+    /*top: -30px;*/
+    float: right;
+    /*left: 85%;*/
     display: inline-block;
     /*box-sizing: border-box;*/
-    margin-right: 0.333em;
+    /*margin-right: 0.333em;*/
     font-family: "Gerbera Medium", serif;
     border: none;
     background: #fff;
@@ -253,10 +244,10 @@ li.highlighted{
     text-decoration: none;
     outline: none;
     /*border-radius: 3px !important;*/
-    padding: 0.8em 1.5em !important;
+    /*padding: 0.8em 1.5em !important;*/
     width: 120px;
-    margin: 0 auto;
-    margin-top: 50px;
+    /*margin: 0 auto;*/
+    margin-right: 30px;
 }
 
 input[id="exit"]{
@@ -299,6 +290,10 @@ input[type="button"],a.dt-button{
 
 .tablePlugin input[type="button"] {
     margin-left: 20px;
+}
+
+.tablePlugin input[type="button"]:not(:disabled):hover {
+    color: #D41317;
 }
 
 input[id="exit"]:active, input[type="button"]:disabled  {

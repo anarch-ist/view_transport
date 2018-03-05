@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/datePicker/pickmeup.css"/>">
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/Remodal-1.0.7/dist/remodal.css"/>"/>
     <link rel="stylesheet" type="text/css" href="<c:url value="/media/Remodal-1.0.7/dist/remodal-default-theme.css"/>"/>
+    <link rel="stylesheet" type="text/css" href="<c:url value="/media/font-awesome-4.6.1/css/font-awesome.min.css"/>"/>
 
     <link rel="stylesheet" type="text/css"
           href="<c:url value="/media/DataTables-1.10.12/css/jquery.dataTables.min.css"/>"/>
@@ -342,11 +343,11 @@
                         data.period.periodBegin = toUtcDateTime(utcDate, data.period.periodBegin);
                         data.period.periodEnd = toUtcDateTime(utcDate, data.period.periodEnd);
                         var sendObject = $.extend(
-                                data,
-                                {
-                                    removedOrders: removedOrders,
-                                    donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId
-                                }
+                            data,
+                            {
+                                removedOrders: removedOrders,
+                                donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId
+                            }
                         );
                         sendTableAjax("updateDonut", {updatedDonut: sendObject}, function () {
                             donutCrudPluginInstance.setOnRowRemoved(null);
@@ -409,11 +410,11 @@
                     donutCrudPluginInstance.setPeriod(getSelectedPeriod());
                     donutCrudPluginInstance.setOnSubmit(function () {
                         var sendObject = $.extend(
-                                donutCrudPluginInstance.getData(),
-                                {
-                                    removedOrders: [],
-                                    donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId
-                                }
+                            donutCrudPluginInstance.getData(),
+                            {
+                                removedOrders: [],
+                                donutDocPeriodId: tablePlugin.getSelectionData()[0].data.docPeriodId
+                            }
                         );
                         sendTableAjax("updateDonut", {updatedDonut: sendObject}, function () {
                             donutCrudPluginInstance.setOnRowRemoved(null);
@@ -734,6 +735,7 @@
             });
 
             <%------------------ FUNCTIONS ----------------------%>
+
             function toUtcDateTime(utcDate, periodPart) {
                 return utcDate + periodPart * 60 * 1000;
             }
@@ -746,10 +748,10 @@
             //Already implemented ajax function just won't cut it
             function overviewTableAjax(url, data, onDone) {
                 var rawDocDateSelection = docDateSelector.getSelectedDocs();
-                var sendObject ={};
+                var sendObject = {};
                 tableOverviewPlugin.clearAll();
-                rawDocDateSelection.forEach(function(item,i,arr){
-                    item = $.extend(item,{date: item.date.getTime()});
+                rawDocDateSelection.forEach(function (item, i, arr) {
+                    item = $.extend(item, {date: item.date.getTime()});
                     sendObject = {docDateSelection: item};
                     for (var key in sendObject) {
                         if (sendObject.hasOwnProperty(key)) {
@@ -763,7 +765,7 @@
                         data: sendObject,
                         dataType: "json",
                         async: false
-                    }).done(function(overviewTableData){
+                    }).done(function (overviewTableData) {
                         overviewTableData.docName = item.docName;
                         tableOverviewPlugin.pushTable(overviewTableData);
                     })
@@ -809,31 +811,33 @@
 </head>
 
 <body>
-<hr align="left" width="100%" size="70" color="fff">
-<hr1></hr1>
+
 <div id="userPane">
 
+
     <%--<table class="profileTable">--%>
-        <%--<tr>--%>
-            <%--<td>Имя</td>--%>
-            <%--<td><c:out value="${sessionScope.user.userName}"/></td>--%>
-        <%--</tr>--%>
-        <%--<tr>--%>
-            <%--<td>роль</td>--%>
-            <%--<td><c:out value="${requestScope.userRoleRusName}"/></td>--%>
-        <%--</tr>--%>
-        <%--<tr>--%>
-            <%--<td>Должность</td>--%>
-            <%--<td><c:out value="${sessionScope.user.position}"/></td>--%>
-        <%--</tr>--%>
+    <%--<tr>--%>
+    <%--<td>Имя</td>--%>
+    <%--<td><c:out value="${sessionScope.user.userName}"/></td>--%>
+    <%--</tr>--%>
+    <%--<tr>--%>
+    <%--<td>роль</td>--%>
+    <%--<td><c:out value="${requestScope.userRoleRusName}"/></td>--%>
+    <%--</tr>--%>
+    <%--<tr>--%>
+    <%--<td>Должность</td>--%>
+    <%--<td><c:out value="${sessionScope.user.position}"/></td>--%>
+    <%--</tr>--%>
     <%--</table>--%>
 </div>
 
-<div id="docsPane">
 
-    <div id="docAndDateSelector">
-        <div id="exit"  class="dropdown">
-            <span><c:out value="${sessionScope.user.userName}"/> </span>
+<div id="docsPane">
+    <div id="nav">
+        <div id="docAndDateSelector"></div>
+        <div id="exit" class="dropdown">
+        <span><i class="fa fa-user" style="font-size: 16px"></i> <c:out value="${sessionScope.user.userName}"/> <i
+                class="fa fa-caret-down"></i></span>
             <div class="dropdown-content">
                 <form action="logout" method="post">
                     <input type="submit" value="Выйти"/>
@@ -841,6 +845,7 @@
             </div>
         </div>
     </div>
+
     <div id="tableContainer"></div>
     <div id="tableControlsContainer"></div>
 
@@ -914,7 +919,8 @@
             <h1>Ошибка</h1>
             <table>
                 <tr>
-                    <td>Невозможно отменить интервал: допускается отмена только начального или конечного интервала</td>
+                    <td>Невозможно отменить интервал: допускается отмена только начального или конечного интервала
+                    </td>
                 </tr>
             </table>
 
@@ -943,18 +949,19 @@
 
 </div>
 
+
 <div class="overview-table-wrapper">
     <div class="overview-table-container" id="overviewTableContainer">
         <%--<table class="overview-table">--%>
-            <%--<tr>--%>
-                <%--<td>--%>
-                <%--</td>--%>
-                <%--<td>--%>
-                <%--</td>--%>
-                <%--<td>--%>
-                    <%----%>
-                <%--</td>--%>
-            <%--</tr>--%>
+        <%--<tr>--%>
+        <%--<td>--%>
+        <%--</td>--%>
+        <%--<td>--%>
+        <%--</td>--%>
+        <%--<td>--%>
+        <%----%>
+        <%--</td>--%>
+        <%--</tr>--%>
         <%--</table>--%>
         <%--<div class="overview-table">--%>
         <%--<h2>2/3</h2>--%>

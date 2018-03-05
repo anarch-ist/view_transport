@@ -2,12 +2,21 @@ body {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 15px;
     color: rgba(26, 43, 109, 1);
+    margin: 0 !important;
+}
+
+.tablePlugin{
+    margin-top: 100px;
+    text-align: center;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .tablePlugin tr:nth-child(even) {
     background: rgba(26, 43, 109, 0.01);
 }
-td:hover:not(.tp_highlight) {
+.tablePlugin td:hover:not(.tp_highlight) {
     background-color:#1475ca;
 }
 
@@ -42,10 +51,8 @@ td:hover:not(.tp_highlight) {
     background-color: #e5e9f1;
     border-collapse: collapse;
     border-spacing: 0px;
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 150px;
+    width: 100%;
+    /*margin-top: 150px;*/
     /*margin: 0 auto;*/
 }
 
@@ -100,7 +107,7 @@ td:hover:not(.tp_highlight) {
 
 .tp_disabled {
     background-color: rgba(0,0,0, 0.5);
-    left: 222px !important;
+    /*left: 222px !important;*/
 }
 
 .tp_highlight {
