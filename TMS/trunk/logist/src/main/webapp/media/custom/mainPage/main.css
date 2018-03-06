@@ -35,7 +35,7 @@
 
 input:not([type="button"]){
     border: none;
-    border-bottom: 1px solid rgba(26, 43, 109, 0.48);
+    border-bottom: 1px solid rgba(26, 43, 109, 1);
 }
 
 body{
@@ -267,12 +267,12 @@ input[type="button"],a.dt-button{
     box-sizing: border-box;
     margin-right: 0.333em;
     /* border: none; */
-    border: 0px solid #ffffff;
+    border: none;
     font-size: 0.88em;
-    color: #1a2b6d;
+    color: rgba(26, 43, 109, 1);
     white-space: nowrap;
     /* overflow: hidden; */
-    background-color: #ffffff;
+    /*background-color: #ffffff;*/
     background-image: linear-gradient(to bottom, #fff 0%, #ffffff 100%);
     -moz-user-select: none;
     text-decoration: none;
@@ -281,7 +281,11 @@ input[type="button"],a.dt-button{
     padding: 0.8em 1.5em !important;
     width: 170px;
     margin: 0 auto;
-    margin-top: 30px;
+    margin-top: 15px;
+}
+
+input[type="button"]:hover:not(:disabled), a.dt-button:hover:not(.disabled){
+    color:#D41317;
 }
 
 /*#sDeleteBtn, #sUpdateBtn, #sInsertBtn, #bOpenPeriodBtn, #bClosePeriodsBtn, #bCancelDonutBtn, #bInfoBtn, #dUpdateBtn{*/
