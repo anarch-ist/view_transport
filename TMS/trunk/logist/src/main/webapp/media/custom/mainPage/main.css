@@ -33,6 +33,10 @@
     display: block;
 }
 
+input:not([type="button"]):read-only{
+    border: none;
+
+}
 input:not([type="button"]){
     border: none;
     border-bottom: 1px solid rgba(26, 43, 109, 1);
