@@ -9,9 +9,8 @@ body {
 }
 
 #routeListTable:first-child{
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-}
+    border-top: 1px solid rgb(26, 43, 109);
+    border-bottom: 1px solid rgb(26, 43, 109);
 
 .dt-button{
     cursor: pointer;
@@ -62,18 +61,18 @@ button{
     display: inline-block;
     box-sizing: border-box;
     margin-right: 0.333em;
-    border: 1px solid #b0b0b0;
+    border: 1px solid #ffffff;
     cursor: pointer;
     font-size: 0.88em;
-    color: black;
+    color: #1a2b6d;
     white-space: nowrap;
     overflow: hidden;
-    background-color: #e9e9e9;
-    background-image: linear-gradient(to bottom, #fff 0%, #e9e9e9 100%);
+    background-color: #c32b2b;
+    background-image: linear-gradient(to bottom, #fff 0%, #ffffff 100%);
     -moz-user-select: none;
     text-decoration: none;
     outline: none;
-    border-radius: 3px !important;
+    /* border-radius: 3px !important; */
     padding: 0.8em 1.5em !important;
     width: 120px;
     margin: 0 auto;
@@ -114,24 +113,24 @@ tbody tr td button{
 }
 
 button:active, .dt-button:active{
-    background-color:#e2e2e2 !important;
-    background-image:-webkit-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
+    background-color: #ffffff !important;
+    /* background-image:-webkit-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important; */
     background-image:-moz-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
     background-image:-ms-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
     background-image:-o-linear-gradient(top, #f3f3f3 0%, #e2e2e2 100%) !important;
-    background-image:linear-gradient(to bottom, #f3f3f3 0%, #e2e2e2 100%) !important;
+    /* background-image:linear-gradient(to bottom, #f3f3f3 0%, #e2e2e2 100%) !important; */
     filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f3f3f3', EndColorStr='#e2e2e2') !important;
-    box-shadow:inset 1px 1px 3px #999999 !important;
+    /* box-shadow:inset 1px 1px 3px #999999 !important; */
 }
 
 button:hover, .dt-button:hover{
-    border:1px solid #666  !important;
-    background-color:#e0e0e0 !important;
-    background-image:-webkit-linear-gradient(top, #f9f9f9 0%, #e0e0e0 100%) !important;
+    border: 1px solid #fff  !important;
+    /* background-color: #ffffff !important; */
+    /* background-image: -webkit-linear-gradient(top, #ffffff 0%, #ffffff 100%) !important; */
     background-image:-moz-linear-gradient(top, #f9f9f9 0%, #e0e0e0 100%) !important;
     background-image:-ms-linear-gradient(top, #f9f9f9 0%, #e0e0e0 100%) !important;
     background-image:-o-linear-gradient(top, #f9f9f9 0%, #e0e0e0 100%) !important;
-    background-image:linear-gradient(to bottom, #f9f9f9 0%, #e0e0e0 100%) !important;
+    /* background-image: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%) !important; */
     filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f9f9f9', EndColorStr='#e0e0e0')  !important;
 }
 
