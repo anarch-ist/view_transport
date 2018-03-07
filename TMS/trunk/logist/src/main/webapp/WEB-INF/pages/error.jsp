@@ -25,12 +25,12 @@
             <td id="exception">${pageContext.exception}</td>
         </tr>
     </table>
-    <%--<div id="stacktrace">--%>
-        <%--<c:forEach var="trace"--%>
-                   <%--items="${pageContext.exception.stackTrace}">--%>
-            <%--<p>${trace}</p>--%>
-        <%--</c:forEach>--%>
-    <%--</div>--%>
+    <div id="stacktrace">
+        <c:forEach var="trace"
+                   items="${pageContext.exception.stackTrace}">
+            <p>${trace}</p>
+        </c:forEach>
+    </div>
 </div>
 
 </body>

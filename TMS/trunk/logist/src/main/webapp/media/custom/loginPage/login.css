@@ -1,10 +1,24 @@
+@font-face {
+    font-family: "Gerbera Light";
+    src: url("../../Gerbera-Light.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "Gerbera Medium";
+    src: url("../../Gerbera-Medium.otf") format("opentype");
+}
+
+body > * {
+    font-family: "Gerbera Medium", serif !important;
+}
+
 body {
     direction: ltr;
-    font-family: Arial;
-    font-size: medium;
+    font-family: "Gerbera Medium", serif !important;
+    /*font-size: medium;*/
     line-height: 1.182;
     font-weight: normal;
-    background: #F5F5F5;
+    /*background: #F5F5F5;*/
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -20,32 +34,33 @@ body {
     display: -webkit-box;
     -webkit-box-orient: vertical;
 
-    display: box;
+    /*display: box;*/
     box-orient: vertical;
 }
 
 
 body > #loginBox {
-    background: #F0F8FF;
+    font-family: "Gerbera Medium", serif !important;
+    background: #fff;
     margin-top:200px;
     padding: 70px 90px 70px 90px;
     width: 300px;
-    color: #45688E;
+    color: rgba(26, 43, 109, 1);
     height: 220px;
-    border: 1px solid rgba(147, 184, 189,0.8);
-    box-shadow:
-        0pt 2px 5px rgba(105, 108, 109, 0.7),
-        0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
-    webkit-box-shadow:
-                   0pt 2px 5px rgba(105, 108, 109, 0.7),
-                   0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
-    moz-box-shadow:
-                0pt 2px 5px rgba(105, 108, 109, 0.7),
-                0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
-    ms-box-shadow:
-                    0pt 2px 5px rgba(105, 108, 109, 0.7),
-                    0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
-    border-radius: 1px 1px 1px 1px;
+    border: 1px solid rgba(26, 43, 109, 1);
+    /*box-shadow:*/
+        /*0pt 2px 5px rgba(105, 108, 109, 0.7),*/
+        /*0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;*/
+    /*webkit-box-shadow:*/
+                   /*0pt 2px 5px rgba(105, 108, 109, 0.7),*/
+                   /*0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;*/
+    /*moz-box-shadow:*/
+                /*0pt 2px 5px rgba(105, 108, 109, 0.7),*/
+                /*0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;*/
+    /*ms-box-shadow:*/
+                    /*0pt 2px 5px rgba(105, 108, 109, 0.7),*/
+                    /*0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;*/
+    /*border-radius: 1px 1px 1px 1px;*/
 }
 
 body > #loginBox > * {
@@ -68,14 +83,16 @@ body > #loginBox > * {
     padding: 10px 5px 10px 32px;
     width: 100%;
     margin-top: 0;
-    border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2);
-    box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;
-    border: 1px solid rgb(178, 178, 178);
-    border-radius: 1px 1px 1px 1px;
+    border-bottom: 1px solid rgba(26, 43, 109, 1);
+    font-family: "Gerbera Medium", serif !important;
+    /*box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;*/
+    /*border: 1px solid rgb(178, 178, 178);*/
+    /*border-radius: 1px 1px 1px 1px;*/
 }
 
 .form > label{
     position: absolute;
+    /*font-family: "Gerbera Medium", serif !important;*/
     -webkit-position: absolute;
     -moz-position: absolute;
     left: 0;
@@ -86,39 +103,34 @@ body > #loginBox > * {
 }
 
 .buttonLogIn:hover{
-    opacity: 0.90;
-    filter: alpha(opacity=90);
+    /*opacity: 0.90;*/
+    /*filter: alpha(opacity=90);*/
+    color: #D41317;
 }
 
 .buttonLogIn:active{
-    transform: translateX(0);
-    background-image: none;
-    background-repeat: repeat;
-    background-attachment: scroll;
-    background-position: 0% 0%;
-    background-clip: border-box;
-    background-origin: padding-box;
-    background-size: auto auto;
-    background-color: #6383a8;
+    color: #D41317;
 }
 
 .buttonLogIn{
-    background-image: -moz-linear-gradient(top, #6383a8 0%, #29496B 100%);
-    background-image: -webkit-linear-gradient(top, #6383a8 0%, #29496B 100%);
-    background-image: -ms-linear-gradient(top, #6383a8 0%, #29496B 100%);
-    background-image: linear-gradient(top, #6383a8 0%, #29496B 100%);
-    border: 0.5px solid #537aa7;
-    -webkit-border: 0.5px solid #537aa7;
-    color: #E6E6FA;
-    font-size: 14px;
+    /*background-image: -moz-linear-gradient(top, #6383a8 0%, #29496B 100%);*/
+    /*background-image: -webkit-linear-gradient(top, #6383a8 0%, #29496B 100%);*/
+    /*background-image: -ms-linear-gradient(top, #6383a8 0%, #29496B 100%);*/
+    /*background-image: linear-gradient(top, #6383a8 0%, #29496B 100%);*/
+    font-family: "Gerbera Medium", serif !important;
+    border: none;
+    /*-webkit-border: 0.5px solid #537aa7;*/
+    color: #fff;
+    font-size: 15px;
     cursor: pointer;
     float: right;
-    box-shadow: 0px 1px 1px 1px #B0C4DE;
-    -moz-box-shadow: 0px 1px 1px 1px #B0C4DE;
-    -webkit-box-shadow: 0px 1px 1px 1px #B0C4DE;
-    -ms-box-shadow: 0px 1px 1px 1px #B0C4DE;
+    background: rgba(26, 43, 109, 1);;
+    /*box-shadow: 0px 1px 1px 1px #B0C4DE;*/
+    /*-moz-box-shadow: 0px 1px 1px 1px #B0C4DE;*/
+    /*-webkit-box-shadow: 0px 1px 1px 1px #B0C4DE;*/
+    /*-ms-box-shadow: 0px 1px 1px 1px #B0C4DE;*/
     padding: 7px 15px 7px 15px;
-    border-radius: 1px 1px 1px 1px;
+    /*border-radius: 1px 1px 1px 1px;*/
 }
 
 ::-webkit-input-placeholder {color:#A9A9A9;}
@@ -127,7 +139,7 @@ body > #loginBox > * {
 :-ms-input-placeholder      {color:#A9A9A9;}
 
 .errorText {
-    color: red;
+    color: #D41317;
     /*float: left;*/
     margin-left: 3px;
     font-size: 10px;
@@ -138,9 +150,9 @@ body > #loginBox > * {
 }
 
 .focusField{
-    border:solid 2px #73A6FF;
+    border:none;
     background:#EFF5FF;
-    color:#000;
+    color: inherit;
     outline:none;
 }
 .idleField{
@@ -148,9 +160,9 @@ body > #loginBox > * {
     padding: 10px 5px 10px 32px;
     width: 100%;
     margin-top: 0;
-    border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2);
-    box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;
-    border: 1px solid rgb(178, 178, 178);
-    border-radius: 1px 1px 1px 1px;
+    /*border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2);*/
+    /*box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset;*/
+    border: none;
+    /*border-radius: 1px 1px 1px 1px;*/
 }
 
