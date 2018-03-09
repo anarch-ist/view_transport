@@ -44,10 +44,10 @@ $(document).ready(function () {
     }
 
 
-    $( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
-    $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+    // $( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+    // $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
-    $("#daysOfWeekSelect").buttonset();
+    // $("#daysOfWeekSelect").buttonset();
     $("#updateDaysOfWeek").button().click(function (e) {
 
         var daysOfWeek = [];

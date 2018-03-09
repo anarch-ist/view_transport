@@ -13,6 +13,7 @@ try {
     </html>
 <?php
 } catch (Exception $ex) {
+//    echo $ex->getMessage();
     header("Location: login/", true, 303);
 }
 ?>

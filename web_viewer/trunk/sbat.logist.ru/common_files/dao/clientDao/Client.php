@@ -139,7 +139,8 @@ class EntitySelectAllClients implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "CALL selectClients($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        $query= "CALL selectClients($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        return $query;
     }
 }
 
