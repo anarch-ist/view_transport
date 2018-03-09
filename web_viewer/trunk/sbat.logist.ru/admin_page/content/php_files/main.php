@@ -12,7 +12,7 @@ try {
     <!DOCTYPE html>
     <html>
     <?php
-    include_once __DIR__ . '/body.php';
+    include_once __DIR__ . '/bootstrapBody.php';
     ?>
     </html>
 <?php

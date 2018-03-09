@@ -1050,6 +1050,11 @@ $(document).ready(function () {
 
         ],
     });
+//Opens request status dialog by double click on a row
+    $('#user-grid tbody').on('dblclick', 'tr', function () {
+        $.showRequestStatusDialog("changeStatusForRequest", dataTable);
+    } );
+
 // set padding for dataTable
     $('#user-grid_wrapper').css('padding-top', '40px');
     $(".dataTables_scrollHeadInner").css({"width": "100%"});
@@ -1101,5 +1106,4 @@ $(document).ready(function () {
         // }
     });
 
-})
-;
+});
