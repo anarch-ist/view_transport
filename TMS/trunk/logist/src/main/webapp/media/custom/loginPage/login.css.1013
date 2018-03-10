@@ -1,0 +1,157 @@
+body {
+    direction: ltr;
+    font-family: Arial;
+    font-size: medium;
+    line-height: 1.182;
+    font-weight: normal;
+    background: #ffffff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    display: -webkit-flex;
+    display: -moz-flex;
+}
+
+.vBox {
+    display: -moz-box;
+    -moz-box-orient: vertical;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+    display: box;
+    box-orient: vertical;
+}
+
+
+body > #loginBox {
+    background: #ffffff;
+    margin-top:200px;
+    padding: 70px 90px 70px 90px;
+    width: 300px;
+    color: #1a2b6d;
+    height: 220px;
+    border: 1px solid #1a2b6d;
+    /* box-shadow:
+        0pt 2px 5px rgba(105, 108, 109, 0.7),
+        0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset; */
+    webkit-box-shadow:
+                   0pt 2px 5px rgba(105, 108, 109, 0.7),
+                   0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    moz-box-shadow:
+                0pt 2px 5px rgba(105, 108, 109, 0.7),
+                0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    ms-box-shadow:
+                    0pt 2px 5px rgba(105, 108, 109, 0.7),
+                    0px 0px 8px 5px rgba(208, 223, 226, 0.4) inset;
+    border-radius: 1px 1px 1px 1px;
+}
+
+body > #loginBox > * {
+    width: 100%;
+}
+
+#login, #password{
+    margin-bottom: 15px;
+}
+
+.form {
+    position: relative;
+    -webkit-position: relative;
+    -moz-position: relative;
+    margin-top: 10px;
+}
+
+.form > input{
+    height: 40px;
+    padding: 10px 5px 10px 32px;
+    width: 100%;
+    margin-top: 0;
+    /* border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2); */
+    /* box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset; */
+    /* border: 1px solid #1a2b6d; */
+    /* border-radius: 1px 1px 1px 1px; */
+    /* border: none; */
+    border-bottom: 2px solid rgba(26, 43, 109, 1);
+}
+
+.form > label{
+    position: absolute;
+    -webkit-position: absolute;
+    -moz-position: absolute;
+    left: 0;
+    -ms-transform: translateX(10px) translateY(11px); /* IE 9 */
+    -webkit-transform: translateX(10px) translateY(11px);    /* Chrome, Safari, Opera */
+    transform: translateX(10px) translateY(11px);
+    z-index: 1;
+}
+
+.buttonLogIn:hover{
+    opacity: 0.90;
+    filter: alpha(opacity=90);
+}
+
+.buttonLogIn:active{
+    transform: translateX(0);
+    background-image: none;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    background-position: 0% 0%;
+    background-clip: border-box;
+    background-origin: padding-box;
+    background-size: auto auto;
+    background-color: #6383a8;
+}
+
+.buttonLogIn{
+    background-image: -moz-linear-gradient(top, #6383a8 0%, #29496B 100%);
+    background-image: -webkit-linear-gradient(top, #1a2b6d 0%, #29496B 100%);
+    background-image: -ms-linear-gradient(top, #6383a8 0%, #29496B 100%);
+    background-image: linear-gradient(top, #6383a8 0%, #29496B 100%);
+    border: 0.5px solid #1a2b6d;
+    -webkit-border: 0.5px solid #537aa7;
+    color: #ffffff;
+    font-size: 14px;
+    cursor: pointer;
+    float: right;
+    box-shadow: 0px 1px 1px 1px #B0C4DE;
+    -moz-box-shadow: 0px 1px 1px 1px #B0C4DE;
+    -webkit-box-shadow: 0px 1px 1px 1px #B0C4DE;
+    -ms-box-shadow: 0px 1px 1px 1px #B0C4DE;
+    padding: 7px 15px 7px 15px;
+    border-radius: 1px 1px 1px 1px;
+}
+
+::-webkit-input-placeholder {color:#A9A9A9;}
+::-moz-placeholder          {color:#A9A9A9;}
+:-moz-placeholder           {color:#A9A9A9;}
+:-ms-input-placeholder      {color:#A9A9A9;}
+
+.errorText {
+    color: red;
+    /*float: left;*/
+    margin-left: 3px;
+    font-size: 10px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-right: 40px;
+    height: 3px;
+}
+
+.focusField{
+    border:solid 2px #73A6FF;
+    background:#EFF5FF;
+    color:#000;
+    outline:none;
+}
+.idleField{
+    height: 40px;
+    padding: 10px 5px 10px 32px;
+    width: 100%;
+    margin-top: 0;
+    /* border-color: hsla(210,54%,20%,.15) hsla(210,54%,20%,.17) hsla(210,54%,20%,.2); */
+    /* box-shadow: 0px 1px 4px 0px rgba(168, 168, 168, 0.6) inset; */
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 1px 1px 1px 1px;
+}
