@@ -122,9 +122,9 @@ $(document).ready(function () {
 
 
     $(document).on('change', '.pretensionCathegory', function () {
-        let pretensionSum = $(this).closest('.modal-body').find('.pretensionSum');
-        let pretensionComment = $(this).closest('.modal-body').find('.pretensionComment');
-        let pretensionCommentLabel = $(this).closest('.modal-body').find("label[for = pretensionComment]");
+        var pretensionSum = $(this).closest('.modal-body').find('.pretensionSum');
+        var pretensionComment = $(this).closest('.modal-body').find('.pretensionComment');
+        var pretensionCommentLabel = $(this).closest('.modal-body').find("label[for = pretensionComment]");
         switch ($(this).val()) {
             case 'Пересорт': {
                 pretensionSum
@@ -171,7 +171,21 @@ $(document).ready(function () {
                 // Some browsers don't support "required" fields. This is a workaround
                 pretensionCommentLabel.html('Комментарий');
                 break;
+
             }
+            case 'Перевоз': {
+                pretensionSum
+                    .prop('disabled', false)
+                    .attr('placeholder', '1234.50');
+                pretensionComment
+                    .attr('placeholder', 'Укажите куда нужно переадресовать заявку.')
+                    .prop('required', true);
+                pretensionCommentLabel.html('Комментарий<span style="color:#c22929;">*</span>');
+                break;
+            }
+                
+                
+                
         }
     });
 
@@ -274,11 +288,11 @@ $(window).on('load', function () {
         $('#sales-representative').html(requestData.marketAgentUserName);
         $('#arrival-point').html(requestData.deliveryPointName);
         $('#departure-warehouse').html(requestData.warehousePointName);
-        $('#pallet-quantity').html(requestData.palletsQty);
+        $('#palvar-quantity').html(requestData.palvarsQty);
 
 
         $('#submitPretension').click(function () {
-            let that = $('#submitPretension');
+            var that = $('#submitPretension');
             that.button('loading');
             $.post("content/getData.php", {
                 commentRequired: $('#pretensionComment').prop('required'),

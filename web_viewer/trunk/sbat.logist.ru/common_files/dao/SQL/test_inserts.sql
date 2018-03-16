@@ -107,6 +107,8 @@ VALUES
 
 
 -- ROUTE CREATION
+INSERT INTO tariffs (cost,cost_per_box,cost_per_hour,cost_per_point) VALUE (100,100,100,100);
+
 INSERT INTO routes (directionIDExternal, dataSourceID, routeName, firstPointArrivalTime, daysOfWeek, tariffID)
 VALUES
   ('dirIdExt1', 'LOGIST_1C', 'route1', '18:00:00', 'monday,tuesday,wednesday,thursday,friday', 1),

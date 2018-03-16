@@ -149,6 +149,7 @@
                                     <option>Брак</option>
                                     <option>Недовоз</option>
                                     <option>Отказ</option>
+                                    <option>Перевоз</option>
                                 </select>
                             </div>
                         </div>
@@ -207,6 +208,7 @@
                                     <option>Брак</option>
                                     <option>Недовоз</option>
                                     <option>Отказ</option>
+                                    <option>Перевоз</option>
                                 </select>
                             </div>
                         </div>
