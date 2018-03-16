@@ -1,7 +1,7 @@
-ALTER TABLE test_ttdb.tariffs ADD cost_per_box DECIMAL(12,2);
+ALTER TABLE transmaster_transport_db.tariffs ADD cost_per_box DECIMAL(12,2);
 
-# DROP PROCEDURE IF EXISTS test_ttdb.selectRoutes;
-CREATE PROCEDURE test_ttdb.selectRoutes(IN `_startEntry` INT, IN `_length` INT,
+DROP PROCEDURE IF EXISTS transmaster_transport_db.selectRoutes;
+CREATE PROCEDURE transmaster_transport_db.selectRoutes(IN `_startEntry` INT, IN `_length` INT,
   IN `_orderby`    VARCHAR(255), IN `_isDesc` TINYINT(1),
   IN `_search`     TEXT)
   BEGIN
@@ -16,8 +16,8 @@ CREATE PROCEDURE test_ttdb.selectRoutes(IN `_startEntry` INT, IN `_length` INT,
       t.cost_per_point,
       t.cost_per_hour,
       t.cost_per_box
-    FROM test_ttdb.routes r
-      LEFT JOIN test_ttdb.tariffs t ON r.tariffID = t.tariffID
+    FROM transmaster_transport_db.routes r
+      LEFT JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
     WHERE (
       _search = '' OR
       r.routeName LIKE @searchString collate utf8_general_ci OR

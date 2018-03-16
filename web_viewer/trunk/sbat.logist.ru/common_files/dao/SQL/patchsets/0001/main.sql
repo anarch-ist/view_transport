@@ -1,10 +1,10 @@
 BEGIN;
 
-DROP PROCEDURE test_ttdb.selectTransportCompanies;
+DROP PROCEDURE transmaster_transport_db.selectTransportCompanies;
 
 -- select transport companies procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE test_ttdb.selectTransportCompanies(
+CREATE PROCEDURE transmaster_transport_db.selectTransportCompanies(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -17,7 +17,7 @@ CREATE PROCEDURE test_ttdb.selectTransportCompanies(
 
     SELECT SQL_CALC_FOUND_ROWS
       tc.*
-    FROM test_ttdb.transport_companies tc
+    FROM transmaster_transport_db.transport_companies tc
     WHERE (
             _search = '' OR
             tc.id LIKE @searchString collate utf8_general_ci  OR
@@ -106,11 +106,11 @@ CREATE PROCEDURE test_ttdb.selectTransportCompanies(
 
   END;
 
-DROP PROCEDURE test_ttdb.selectVehicles;
+DROP PROCEDURE transmaster_transport_db.selectVehicles;
 
 -- select vehicles procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE test_ttdb.selectVehicles(
+CREATE PROCEDURE transmaster_transport_db.selectVehicles(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -122,7 +122,7 @@ CREATE PROCEDURE test_ttdb.selectVehicles(
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM test_ttdb.vehicles
+    FROM transmaster_transport_db.vehicles
     WHERE (
             _search = '' OR
             id LIKE @searchString collate utf8_general_ci OR
@@ -186,11 +186,11 @@ CREATE PROCEDURE test_ttdb.selectVehicles(
 
   END;
 
-DROP PROCEDURE test_ttdb.selectDrivers;
+DROP PROCEDURE transmaster_transport_db.selectDrivers;
 
 -- select drivers procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE test_ttdb.selectDrivers(
+CREATE PROCEDURE transmaster_transport_db.selectDrivers(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -202,7 +202,7 @@ CREATE PROCEDURE test_ttdb.selectDrivers(
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM test_ttdb.drivers
+    FROM transmaster_transport_db.drivers
     WHERE (_search = '' OR
            id LIKE @searchString collate utf8_general_ci OR
            vehicle_id LIKE @searchString collate utf8_general_ci OR
@@ -254,11 +254,11 @@ CREATE PROCEDURE test_ttdb.selectDrivers(
 
   END;
 
-DROP PROCEDURE test_ttdb.selectRoutes;
+DROP PROCEDURE transmaster_transport_db.selectRoutes;
 
 -- select routes procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE test_ttdb.selectRoutes(
+CREATE PROCEDURE transmaster_transport_db.selectRoutes(
   _startEntry INTEGER,
   _length     INTEGER,
   _orderby    VARCHAR(255),
@@ -276,8 +276,8 @@ CREATE PROCEDURE test_ttdb.selectRoutes(
       t.cost,
       t.cost_per_point,
       t.cost_per_hour
-    FROM test_ttdb.routes r
-      LEFT JOIN test_ttdb.tariffs t ON r.tariffID = t.tariffID
+    FROM transmaster_transport_db.routes r
+      LEFT JOIN transmaster_transport_db.tariffs t ON r.tariffID = t.tariffID
     WHERE (
       _search = '' OR
       r.routeName LIKE @searchString collate utf8_general_ci OR
@@ -315,11 +315,11 @@ CREATE PROCEDURE test_ttdb.selectRoutes(
 
   END;
 
-DROP PROCEDURE IF EXISTS test_ttdb.selectUsers;
+DROP PROCEDURE IF EXISTS transmaster_transport_db.selectUsers;
 
 -- select users procedure
 -- _search - строка для глобального поиска по всем колонкам
-CREATE PROCEDURE test_ttdb.selectUsers(
+CREATE PROCEDURE transmaster_transport_db.selectUsers(
   _startEntry INTEGER, _length INTEGER,
   _orderby    VARCHAR(255),
   _isDesc     BOOLEAN,
@@ -330,7 +330,7 @@ CREATE PROCEDURE test_ttdb.selectUsers(
     SET @searchString = CONCAT('%', _search, '%');
 
     SELECT SQL_CALC_FOUND_ROWS *
-    FROM test_ttdb.all_users
+    FROM transmaster_transport_db.all_users
     WHERE (_search = '' OR
            userName LIKE @searchString collate utf8_general_ci OR
            position LIKE @searchString collate utf8_general_ci OR
