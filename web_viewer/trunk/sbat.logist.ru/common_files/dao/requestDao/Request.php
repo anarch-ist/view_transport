@@ -186,7 +186,7 @@ class addRequest implements IEntityInsert
         $this->userID = $dao->checkString($requestData['userID']);
         $this->requestIDExternal = $dao->checkString($requestData['requestIDExternal']);
         $this->newRequestStatus = $dao->checkString($requestData['nrewRequestStatus']);
-        $this->datetime = $dao->checkString($requestData['datetime']);
+        $this->datetime = ($dao->checkString($requestData['datetime'])=='') ? ' NOW() ' : "STR_TO_DATE('".$requestData['datetime']."', '%d%m%Y %H:%i:%s'),";
         $this->comment = $dao->checkString($requestData['comment']);
         $this->vehicleNumber = $dao->checkString($requestData['vehicleNumber']);
         $this->routeID = $dao->checkString($requestData['routeID']);
@@ -264,9 +264,10 @@ $this->routeListId,
 $companyPart,
 $vehiclePart,
 $driverPart,
-STR_TO_DATE($this->deliveryDate, '%d%m%Y %H:%i:%s'),
+$this->datetime,
 '$this->boxQty'
 );";
+        //STR_TO_DATE($this->deliveryDate, '%d%m%Y %H:%i:%s'),
         return $String;
     }
 }
