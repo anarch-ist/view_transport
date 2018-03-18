@@ -1,5 +1,26 @@
+/*Синий*/
+/*rgba(26, 43, 109, 1)*/
+/*Акцент*/
+/*#D41317*/
+/*Светло-синий:*/
+/*rgba(227, 231, 240, 1)*/
+
+@font-face {
+    font-family: "Gerbera Light";
+    src: url("../../common_files/media/Gerbera-Light.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "Gerbera Medium";
+    src: url("../../common_files/media/Gerbera-Medium.otf") format("opentype");
+}
+
+body{
+    font-family: "Gerbera Light", serif;
+}
+
 table.dataTable thead{
-    background-color: rgb(104, 124, 144);
+    background-color: rgba(26, 43, 109, 1);
     color: #fff;
     font-size: 13px;
     font-weight: normal;
