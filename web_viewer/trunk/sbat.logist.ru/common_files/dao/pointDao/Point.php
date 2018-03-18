@@ -69,6 +69,11 @@ class PointEntity implements IPointEntity
         return $result;
     }
 
+    function getDistinctPointCoordinatesForManager($managerId){
+        $result = $this->_DAO->select(new GetDistinctPointCoordinatesForManager($managerId));
+        return $result;
+    }
+
     function getAverageRequestsCount(){
         return $this->_DAO->select(new GetAverageRequestCount())[0];
     }
@@ -150,6 +155,27 @@ class GetAllDistinctPointCoordinates implements IEntitySelect
     function getSelectQuery()
     {
         return "SELECT DISTINCT points.x, points.y, points.pointName, points.address,  points.requests_count AS requests from points WHERE x<>0.0 ;";
+//        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address from points WHERE x<>0.0";
+    }
+}
+
+class GetDistinctPointCoordinatesForManager implements IEntitySelect
+{
+    private $manager_id;
+
+    /**
+     * GetDistinctPointCoordinatesForManager constructor.
+     * @param $manager_id
+     */
+    public function __construct($manager_id)
+    {
+        $this->manager_id = $manager_id;
+    }
+
+
+    function getSelectQuery()
+    {
+        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address,  points.requests_count AS requests from points INNER JOIN points_to_managers ON points_to_managers.point_id=points.pointID WHERE x<>0.0 AND manager_id=$this->manager_id;";
 //        return "SELECT DISTINCT points.x, points.y, points.pointName, points.address from points WHERE x<>0.0";
     }
 }

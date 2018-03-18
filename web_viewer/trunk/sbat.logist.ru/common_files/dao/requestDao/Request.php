@@ -531,7 +531,8 @@ class SelectRequestByClientIdAndInvoiceNumber implements IEntitySelect
 
     function getSelectQuery()
     {
-        return "CALL selectDataByClientIdAndInvoiceNumber($this->userID,'$this->clientId','$this->invoiceNumber')";
+        $query= "CALL selectDataByClientIdAndInvoiceNumber($this->userID,'$this->clientId','$this->invoiceNumber')";
+        return $query;
     }
 }
 

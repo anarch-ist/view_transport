@@ -2,17 +2,20 @@
 <head>
     <meta charset="UTF-8"/>
 
-    <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="common_files/media/Custom_CSS/jquery-ui-1.11.4.custom/jquery-ui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Selectize/css/selectize.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/DataTables-1.10.12/css/dataTables.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="common_files/media/DataTables-1.10.12/css/dataTables.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Buttons-1.2.2/css/buttons.jqueryui.min.css"/>
-<!--    <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>-->
+    <!--    <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.5.4/css/editor.jqueryui.min.css"/>-->
     <link rel="stylesheet" type="text/css" href="common_files/media/Editor-1.6.3/css/editor.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/FieldType-Selectize/editor.selectize.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Select-1.2.0/css/select.jqueryui.min.css"/>
-    <link rel="stylesheet" type="text/css" href="common_files/media/FixedColumns-3.2.2/css/fixedColumns.jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="common_files/media/FixedColumns-3.2.2/css/fixedColumns.jqueryui.min.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/font-awesome/css/font-awesome.min.css"/>
-<!--    <link rel="stylesheet" type="text/css" href="common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>-->
+    <!--    <link rel="stylesheet" type="text/css" href="common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>-->
 
     <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/style.css"/>
     <link rel="stylesheet" type="text/css" href="common_files/media/Custom_CSS/media.css"/>
@@ -25,8 +28,8 @@
     <script src="common_files/media/DataTables-1.10.12/js/dataTables.jqueryui.min.js"></script>
     <script src="common_files/media/Buttons-1.1.0/js/dataTables.buttons.js"></script>
     <script src="common_files/media/Buttons-1.1.0/js/buttons.jqueryui.js"></script>
-<!--    <script src="common_files/media/Editor-1.5.4/js/dataTables.editor.min.js"></script>-->
-<!--    <script src="common_files/media/Editor-1.5.4/js/editor.jqueryui.min.js"></script>-->
+    <!--    <script src="common_files/media/Editor-1.5.4/js/dataTables.editor.min.js"></script>-->
+    <!--    <script src="common_files/media/Editor-1.5.4/js/editor.jqueryui.min.js"></script>-->
     <script src="common_files/media/Editor-1.6.3/js/dataTables.editor.min.js"></script>
     <script src="common_files/media/Editor-1.6.3/js/editor.jqueryui.min.js"></script>
     <script src="common_files/media/FieldType-Mask/editor.mask.min.js"></script>
@@ -36,21 +39,21 @@
     <script src="common_files/media/FixedHeader-3.1.2/js/dataTables.fixedHeader.min.js"></script>
     <script src="common_files/media/FixedColumns-3.2.2/js/dataTables.fixedColumns.min.js"></script>
 
-<!--    <script src="common_files/media/Bootstrap-3.3.2/js/bootstrap.min.js"></script>-->
+    <!--    <script src="common_files/media/Bootstrap-3.3.2/js/bootstrap.min.js"></script>-->
 
     <!--dateTimePicker-->
     <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.css"/>
     <script type="text/javascript" src="common_files/media/dateTimePicker/jquery-ui-timepicker-addon.js"></script>
 
-<!--    <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery.datetimepicker_not_legal.css"/>-->
-<!--    <script type="text/javascript" src="common_files/media/dateTimePicker/jquery.datetimepicker_not_legal.js"></script>-->
+    <!--    <link rel="stylesheet" type="text/css" href="common_files/media/dateTimePicker/jquery.datetimepicker_not_legal.css"/>-->
+    <!--    <script type="text/javascript" src="common_files/media/dateTimePicker/jquery.datetimepicker_not_legal.js"></script>-->
 
 
     <!--jqueryCookiePlugin-->
     <script src="common_files/media/jqueryCookie-1.4.1/jquery.cookie.js"></script>
     <!--custom js-->
     <script type="text/javascript" language="javascript" src="content/js/main.js"></script>
-<!--    <script type="text/javascript" language="javascript" src="content/js/requestHistoryDialog.js"></script>-->
+    <!--    <script type="text/javascript" language="javascript" src="content/js/requestHistoryDialog.js"></script>-->
     <script type="text/javascript" language="javascript" src="content/js/statusChangeDialog.js"></script>
     <script type="text/javascript" language="javascript" src="content/js/columnSelectDialog.js"></script>
 
@@ -60,30 +63,34 @@
 <div class="container">
 
     <div id="menu"
-         style="z-index:1;width: 500px; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: 10px;position:fixed;top:5px;z-index:99999;right:10px;">
+         style="z-index:1; display: inline-block; float: right; height: 41px;  margin-left: -10px;margin-top: 16px;position:absolute;top:5px;z-index:999;right:10px;">
         <div id="buttonsContainer" style="text-align: right;padding: 2px;">
 
-            <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">
+            <!--            <div style="color: #0070a3;font-size: 1.1em;font-weight: bold;display: inline-block;margin-right: 15px;">-->
+            <!--                <a style="color:#18446b;" target="_blank" href="common_files/media/Other/clientInstruction1.1.pdf">Инструкция</a>-->
+            <!--            </div>-->
+            <div id="userRoleContainer" style="display: none">
+
                 <?php
                 $data = $privUser->getUserInfo()->toArray();
-                //exit(print_r($data));
+                echo '<span id="data-role" data-role="' . $data['userRoleID'] . '">' . $userRole . '</span>';
+                ?>
 
+            </div>
+
+            <div class="dropdown">
+                <i class="fa fa-user" style="font-size: 16px"></i>
+                <?php
+
+                //exit(print_r($data));
                 $userRole = $privUser->getUserEntity()->getUserRole($data['userID']);
                 echo $data['userName'] . ' | ' . $userRole . ' | ' . $privUser->getPointEntity()->selectPointByUserID($data['userID']);
 
                 ?>
-<!--                    In case if instruction still opens in the same window-->
-<!--                <a style="color:#18446b;" href="#" onclick='window.open("common_files/media/Other/clientInstruction1.1.pdf");return false;'>Инструкция</a>-->
-                <a style="color:#18446b;" target="_blank" href="common_files/media/Other/clientInstruction1.1.pdf">Инструкция</a>
-            </div>
 
-            <div id="userRoleContainer" style="display: none">
-                <?php
-                echo '<span id="data-role" data-role="'.$data['userRoleID'].'">'.$userRole.'</span>';
-                ?>
-            </div>
-            <div class="dropdown">
-                <button class="dropbtn">Меню <i class="fa fa-caret-square-o-down" aria-hidden="true"></i></button>
+                <i
+                        class="fa fa-caret-down"></i>
+                <!--                <button class="dropbtn">Меню <i class="fa fa-caret-square-o-down" aria-hidden="true"></i></button>-->
                 <div class="dropdown-content">
                     <table>
 
@@ -104,18 +111,18 @@
                             <td><a id="logout" href="#">Выйти</a></td>
                         </tr>
                     </table>
-<!--                    <a href="/admin_page/" target="_blank">Админ. страница <i class="fa fa-cogs" aria-hidden="true"></i></a>-->
-<!--                    <a href="/?routeLists=0" target="_blank">Маршуртные листы <i class="fa fa-th-list" aria-hidden="true"></i></a>-->
-<!--                    <a href="/?map=0" target="_blank">Карта складов <i class="fa fa-map-marker" aria-hidden="true"></i></a>-->
-<!--                    <a href="/?vMap=0" target="_blank">Карта ТС <i class="fa fa-truck" aria-hidden="true"></i></a>-->
-<!--                    <a id="logout" href="#">Выйти <i class="fa fa-sign-out" aria-hidden="true"></i></a>-->
+                    <!--                    <a href="/admin_page/" target="_blank">Админ. страница <i class="fa fa-cogs" aria-hidden="true"></i></a>-->
+                    <!--                    <a href="/?routeLists=0" target="_blank">Маршуртные листы <i class="fa fa-th-list" aria-hidden="true"></i></a>-->
+                    <!--                    <a href="/?map=0" target="_blank">Карта складов <i class="fa fa-map-marker" aria-hidden="true"></i></a>-->
+                    <!--                    <a href="/?vMap=0" target="_blank">Карта ТС <i class="fa fa-truck" aria-hidden="true"></i></a>-->
+                    <!--                    <a id="logout" href="#">Выйти <i class="fa fa-sign-out" aria-hidden="true"></i></a>-->
                 </div>
             </div>
-<!--            <button id="logout">Выйти</button>-->
+            <!--            <button id="logout">Выйти</button>-->
         </div>
     </div>
 
-    <div id="requestForm" >
+    <div id="requestForm">
         <fieldset class="request">
             <legend>Данные</legend>
             <div data-editor-template="clientID"></div>
@@ -127,9 +134,9 @@
             <div data-editor-template="warehousePointId"></div>
             <div data-editor-template="boxQty"></div>
             <div id="deliveryDate" data-editor-template="deliveryDate"></div>
-<!--            <div data-editor-template="transportCompanyId"></div>-->
-<!--            <div data-editor-template="vehicleId"></div>-->
-<!--            <div data-editor-template="driverId"></div>-->
+            <!--            <div data-editor-template="transportCompanyId"></div>-->
+            <!--            <div data-editor-template="vehicleId"></div>-->
+            <!--            <div data-editor-template="driverId"></div>-->
         </fieldset>
         <fieldset>
             <legend>Маршрутный лист</legend>
@@ -138,12 +145,29 @@
                 <h3>Добавить маршрутный лист</h3>
                 <form action="content/getData.php" method="POST" id="routeListForm">
                     <table width="100%">
-                        <tr valign="top" ><td width="200"><label  for="routeListNumber">Номер маршрутного листа: </label></td><td><input required name="routeListNumber" class="DTE_Field_InputControl" id="routeListNumber"></td></tr>
-                        <tr valign="top" ><td width="200"><label for="routePalletsQty">Кол-во паллет: </label></td><td><input required class="DTE_Field_InputControl" name="palletsQty" id="routePalletsQty"/></td></tr>
-<!--                        <tr valign="top" ><td width="200"><label for="routeDriverId">Кол-во паллет: </label></td><td><input name="driverId" id="routeDriverId"/></td></tr>-->
-                        <tr valign="top" ><td width="200"><label for="forwarderId">Форвардер (Если есть): </label></td><td><input  name="forwarderId" id="forwarderId" /></td></tr>
-                        <tr valign="top" ><td width="200"><label for="routeLicensePlate">Номер машины: </label></td><td><input size="10" name="licensePlate" id="routeLicensePlate" /></td></tr>
-                        <tr valign="top" ><td width="200"><label for="routeId">Маршрут: </label></td><td><input required name="routeId" id="routeId" /></td></tr>
+                        <tr valign="top">
+                            <td width="200"><label for="routeListNumber">Номер маршрутного листа: </label></td>
+                            <td><input required name="routeListNumber" class="DTE_Field_InputControl"
+                                       id="routeListNumber"></td>
+                        </tr>
+                        <tr valign="top">
+                            <td width="200"><label for="routePalletsQty">Кол-во паллет: </label></td>
+                            <td><input required class="DTE_Field_InputControl" name="palletsQty" id="routePalletsQty"/>
+                            </td>
+                        </tr>
+                        <!--                        <tr valign="top" ><td width="200"><label for="routeDriverId">Кол-во паллет: </label></td><td><input name="driverId" id="routeDriverId"/></td></tr>-->
+                        <tr valign="top">
+                            <td width="200"><label for="forwarderId">Форвардер (Если есть): </label></td>
+                            <td><input name="forwarderId" id="forwarderId"/></td>
+                        </tr>
+                        <tr valign="top">
+                            <td width="200"><label for="routeLicensePlate">Номер машины: </label></td>
+                            <td><input size="10" name="licensePlate" id="routeLicensePlate"/></td>
+                        </tr>
+                        <tr valign="top">
+                            <td width="200"><label for="routeId">Маршрут: </label></td>
+                            <td><input required name="routeId" id="routeId"/></td>
+                        </tr>
                     </table>
                     <button type="submit">Сохранить</button>
                 </form>
@@ -187,7 +211,7 @@
             <th class="col24">Количество паллет</th>
             <th class="col25">Маршрутный лист</th>
             <th class="col26">Время прибытия в следующий пункт</th>
-      </tr>
+        </tr>
         </thead>
 
         <!--search containers-->
@@ -228,16 +252,16 @@
 </body>
 
 <style>
-    #user-grid_wrapper .dt-buttons{
+    #user-grid_wrapper .dt-buttons {
         /*position:fixed;*/
         /*Just who did this?*/
         /*top:15px;*/
         padding-bottom: 10px;
-        z-index:9999;
-        width: 70%;
+        z-index: 9999;
+        width: 80%;
     }
 
-    #user-grid_wrapper{
-        margin-top:17px;
+    #user-grid_wrapper {
+        margin-top: 17px;
     }
 </style>

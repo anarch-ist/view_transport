@@ -862,18 +862,18 @@ $(document).ready(function () {
                     dataTable.button().add(8, {
                             extend: "create",
                             editor: requestEditor,
-                            text: 'Добавить заявку'
+                            text: 'Создать'
                         }
                     );
                     dataTable.button().add(10, {
                             extend: 'edit',
-                            text: 'Изменить заявку',
+                            text: 'Изменить',
                             editor: requestEditor
                         }
                     );
                     dataTable.button().add(9, {
                             extend: 'selectedSingle',
-                            text: 'Удалить заявку',
+                            text: 'Удалить',
                             action: function (e, dt, node, config) {
                                 if (!confirm("Вы действительно хотите удалить заявку?")) return;
                                 $.post(
@@ -894,7 +894,7 @@ $(document).ready(function () {
         },
         buttons: [
             {
-                text: 'Выбрать столбцы',
+                text: 'Настройки таблицы',
                 action: function (e, dt, node, config) {
                     $.showColumnSelectDialog(dataTable);
                 }
@@ -944,33 +944,33 @@ $(document).ready(function () {
                     window.open(url);
                 }
             },
-            {
-                text: 'Сброс фильтров',
-                action: function (e, dt, node, config) {
-                    $('.searchColumn').each(function () {
-                        $(this).val("").attr("currentFilter", "");
-                    });
-                    dataTable.columns().every(function () {
+            // {
+            //     text: 'Сброс фильтров',
+            //     action: function (e, dt, node, config) {
+            //         $('.searchColumn').each(function () {
+            //             $(this).val("").attr("currentFilter", "");
+            //         });
+            //         dataTable.columns().every(function () {
+            //
+            //             // $(this.footer()).css("background-color", "f6f6f6");
+            //             $(this.footer()).removeClass("footer-search",1000,"easeInBack");
+            //             this.search("");
+            //         });
+            //         dataTable.columns().draw();
+            //     }
+            // },
 
-                        // $(this.footer()).css("background-color", "f6f6f6");
-                        $(this.footer()).removeClass("footer-search",1000,"easeInBack");
-                        this.search("");
-                    });
-                    dataTable.columns().draw();
-                }
-            },
 
 
-
-            {
-                text: (localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск',
-
-                action: function (e, dt, node, config) {
-
-                    (localStorage.getItem("liveSearch") === 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
-                    this.text((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск');
-                }
-            }
+            // {
+            //     text: (localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск',
+            //
+            //     action: function (e, dt, node, config) {
+            //
+            //         (localStorage.getItem("liveSearch") === 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
+            //         this.text((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Стандартный поиск');
+            //     }
+            // }
 
         ],
         ajax: {

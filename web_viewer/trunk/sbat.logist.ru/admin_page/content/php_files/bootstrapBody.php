@@ -60,9 +60,9 @@
             <li><a data-toggle="pill" href="#tabs-4"><i class="fa fa-magic" aria-hidden="true"></i> Распределение<br> заявок</a></li>
             <li><a data-toggle="pill" href="#tabs-5"><i class="fa fa-exchange" aria-hidden="true"></i> Обмен с 1С</a></li>
             <!--        <li><a >Fgsfas</a></li>-->
-            <li onclick="location.href='../'"><a target="_blank" href="#"><i class="fa fa-table" aria-hidden="true"></i>
+            <li onclick="location.href='../'"><a target="_self" href="#"><i class="fa fa-table" aria-hidden="true"></i>
                     На главную</a></li>
-            <li onclick="location.href='../login/'"><a target="_blank" href="#"><i class="fa fa-sign-out"
+            <li onclick="location.href='../login/'"><a target="_self" href="#"><i class="fa fa-sign-out"
                                                                                    aria-hidden="true"></i> Выход</a>
             </li>
             <!--        <li><a onclick="" href="../" id="logout">Выход</a></li>-->
