@@ -42,6 +42,28 @@ class RequestsForUserEntity implements IRequestsForUserEntity
         return $arrayResult;
     }
 
+    function selectClientSideData($userID= -1){
+        if ($userID < 1) {
+            $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
+        }
+        $array = $this->_DAO->select(new SelectCliendSideDataForUser($userID));
+        return $array;
+    }
+
+}
+
+class SelectCliendSideDataForUser implements IEntitySelect {
+    private $userID;
+
+    function __construct($userID)
+    {
+        $this->userID=$userID;
+    }
+
+    function getSelectQuery()
+    {
+        return "CALL selectClientSideData($this->userID);";
+    }
 }
 
 class EntitySelectAllRequestsForUser implements IEntitySelect

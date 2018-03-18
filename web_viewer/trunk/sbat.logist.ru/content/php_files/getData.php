@@ -75,8 +75,9 @@ try {
     } else if (strcasecmp($action, 'getAllWialonResources') === 0) {
         echo getAllWialonResources($privUser);
     } else if (strcasecmp($action, 'addVehicleFromVMap') === 0) {
-
         echo addVehicleFromVMap($privUser);
+    } else if (strcasecmp($action, 'getClientSideRequestsForUser')===0){
+        echo getClientSideRequestsForUser($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
@@ -291,7 +292,12 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
 
 function getAllPointsCoordinates(PrivilegedUser $privilegedUser)
 {
-    $data = $privilegedUser->getPointEntity()->getAllDistinctPointCoordinates();
+    if($managerId = $privilegedUser->getUserInfo()->getData('userRoleID')=='ADMIN'){
+        $data = $privilegedUser->getPointEntity()->getAllDistinctPointCoordinates();
+    } else {
+        $managerId = $privilegedUser->getUserInfo()->getData('userID');
+        $data = $privilegedUser->getPointEntity()->getDistinctPointCoordinatesForManager($managerId);
+    }
     $avg_count = $privilegedUser->getPointEntity()->getAverageRequestsCount()['avg_count'];
     $featureCollection = new YandexApiFeatureCollection();
     $options = new YandexApiOptions();
@@ -732,6 +738,12 @@ function getRequestsForRouteList(PrivilegedUser $privUser)
     $data = $privUser->getRequestEntity()->getRequestsForRouteList($routelist);
     return json_encode($data);
 }
+
+function getClientSideRequestsForUser(PrivilegedUser $privilegedUser){
+    $data['data'] = $privilegedUser->getRequestsForUser()->selectClientSideData();
+    return json_encode($data);
+}
+
 
 function getRequestsForUser(PrivilegedUser $privUser)
 {

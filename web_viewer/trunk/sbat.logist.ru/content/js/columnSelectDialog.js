@@ -169,6 +169,33 @@ $(document).ready(function () {
         var inputs = getInputs(dataTable);
 
         var visibleColsForRole = getVisibleColsByRole(role);
+
+        $("<input>")
+            .attr("type", "button")
+            .val((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Обычный поиск')
+            .addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")
+            .on("click", function () {
+                (localStorage.getItem("liveSearch") === 'true') ? localStorage.setItem("liveSearch", false) : localStorage.setItem("liveSearch", true);
+                $(this).val((localStorage.getItem("liveSearch") === 'true') ? 'Живой поиск' : 'Обычный поиск');
+            }).appendTo($buttonContainer);
+
+        $("<input>")
+            .attr("type", "button")
+            .val("Сброс фильтров")
+            .addClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")
+            .on("click", function () {
+                $('.searchColumn').each(function () {
+                    $(this).val("").attr("currentFilter", "");
+                });
+                dataTable.columns().every(function () {
+
+                    // $(this.footer()).css("background-color", "f6f6f6");
+                    $(this.footer()).removeClass("footer-search",1000,"easeInBack");
+                    this.search("");
+                });
+                dataTable.columns().draw();
+            }).appendTo($buttonContainer);
+
         $("<input>")
             .attr("type", "button")
             .val("Сохранить")
@@ -193,6 +220,7 @@ $(document).ready(function () {
                 });
             })
             .appendTo($buttonContainer);
+
 
         $columnSelectDialogContainer.dialog("open");
     };
