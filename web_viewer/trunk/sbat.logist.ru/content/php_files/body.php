@@ -107,6 +107,10 @@
                             <td><a href="/?vMap=0" target="_blank">Карта ТС</a></td>
                         </tr>
                         <tr>
+                            <td><i class="fa fa-building" aria-hidden="true"></i></td>
+                            <td><a href="/?TCPage=0" target="_blank">Транспортная компания</a></td>
+                        </tr>
+                        <tr>
                             <td><i class="fa fa-sign-out" aria-hidden="true"></i></td>
                             <td><a id="logout" href="#">Выйти</a></td>
                         </tr>
