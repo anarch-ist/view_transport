@@ -1,6 +1,8 @@
 <?php
 include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
 require_once __DIR__ . '/../../common_files/utility/MakeshiftWialonAPI.php';
+//    error_reporting(E_ALL);
+//    ini_set('display_errors', 1);
 try {
     $privUser = PrivilegedUser::getInstance();
     $action = $_POST['status'];
@@ -74,7 +76,27 @@ try {
         echo getRouteListById($privUser);
     } else if (strcasecmp($action, 'getAllWialonResources') === 0) {
         echo getAllWialonResources($privUser);
-    } else if (strcasecmp($action, 'addVehicleFromVMap') === 0) {
+    } else if (strcasecmp($action, 'getTCPageRouteLists') === 0) {
+        echo getTCPageRouteLists($privUser);
+    }else if (strcasecmp($action, 'getTCPageDrivers') === 0) {
+        echo getTCPageDrivers($privUser);
+    }else if (strcasecmp($action, 'getTCPageVehicles') === 0) {
+        echo getTCPageVehicles($privUser);
+    }else if (strcasecmp($action, 'TCPageVehiclesEditing') === 0) {
+            if (!isset($_POST['action'])) {
+                throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+            }
+            $action = $_POST['action'];
+            if (strcasecmp($action, 'remove') === 0) {
+                TCPageRemoveVehicle($privUser);
+            } else if (strcasecmp($action, 'edit') === 0) {
+                TCPageUpdateVehicle($privUser);
+            } else if (strcasecmp($action, 'create') === 0) {
+                addVehicleForTransportCompany($privUser);
+            } else {
+                throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+            }
+    }  else if (strcasecmp($action, 'addVehicleFromVMap') === 0) {
         echo addVehicleFromVMap($privUser);
     } else if (strcasecmp($action, 'getClientSideRequestsForUser')===0){
         echo getClientSideRequestsForUser($privUser);
@@ -435,8 +457,7 @@ function createDocumentGroup()
 
 function uploadDocuments()
 {
-//    error_reporting(E_ALL);
-//    ini_set('display_errors', 1);
+
     $requestId = $_POST['requestIDExternal'];
     $groupName = $_POST['groupName'];
     mkdir("../common_files/media/Other/docs/files/uploads/$requestId", 0777);
@@ -515,7 +536,57 @@ function uploadDocuments()
 
     return 0;
 }
-
+function addVehicleForTransportCompany(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $vehicleInfo = $_POST['data'][0];
+    if ($privilegedUser->getVehicleEntity()->insertVehicleForTransportCompany($vehicleInfo)) {
+        echo json_encode(
+            array(
+                "data" => array(
+                    $privilegedUser->getVehicleEntity()->selectVehicleByLastInsertedIdForTC()->toArray()
+                )
+            )
+        );
+    } else {
+        $privilegedUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
+}
+function TCPageRemoveVehicle(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $userData) {
+        $privilegedUser->getVehicleEntity()->TCPageRemoveVehicle($id);
+        $privilegedUser->getDriverEntity()->TCPageRemoveDriverByVehicle($id);
+    }
+    echo '{ }';
+}
+function TCPageUpdateVehicle(PrivilegedUser $privUser)
+{
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $TCPAgeVehicleEntity = $privUser->getVehicleEntity();
+    $i = 0;
+    foreach ($dataSourceArray as $vehicleId => $vehicleInfo) {
+        if (!$TCPAgeVehicleEntity->TCPageUpdateVehicle(new \DAO\VehicleData($vehicleInfo), $vehicleId)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+        $serverAnswer['data'][$i] = $TCPAgeVehicleEntity->selectTCPageVehicleById($vehicleId)->toArray();
+        $i++;
+    }
+    echo json_encode($serverAnswer);
+}
 function getDocuments()
 {
     $requestId = $_POST['requestIDExternal'];
@@ -823,4 +894,18 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
 //        }
 //        return $privUser->getRequestEntity()->updateRequestStatuses($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
 
+}
+function getTCPageRouteLists (PrivilegedUser $privilegedUser){
+
+    $data['data'] = $privilegedUser->getRouteListEntity()->getRouteListsForTransportCompany();
+    return json_encode($data);
+
+}
+function getTCPageVehicles (PrivilegedUser $privilegedUser){
+    $data['data'] = $privilegedUser -> getVehicleEntity() -> getTCpageVehicles();
+    return json_encode($data);
+}
+function getTCPageDrivers (PrivilegedUser $privilegedUser){
+    $data['data'] = $privilegedUser -> getDriverEntity() -> getTCPageDrivers();
+    return json_encode($data);
 }

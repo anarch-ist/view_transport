@@ -50,7 +50,7 @@
 </div>
     <div class="container">
     <h2>Транспортные средства</h2>
-    <div>
+    <div id="vehicalCreationForTCPage">
         <table id="TCPageVehiclesTable" class="table table-striped table-bordered">
             <thead>
             <tr>

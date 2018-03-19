@@ -14,7 +14,10 @@ class Driver implements IDriver
         return $array;
 
     }
+    function getTCPageDrivers(){
+        return $this->_DAO->select(new SelectDriversForTCPage());
 
+    }
     function selectDriverById($id)
     {
         $array = $this->_DAO->select(new SelectDriverById($id));
@@ -85,8 +88,27 @@ class Driver implements IDriver
     {
         return $this->_DAO->update(new RemoveDriverByTransportCompany($id));
     }
+    function TCPageRemoveDriverByVehicle($id)
+{
+    return $this->_DAO->update(new TCPageRemoveDriver($id));
 }
+}
+class TCPageRemoveDriver implements IEntityUpdate {
+    private $id;
 
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        return "UPDATE `drivers` SET deleted = TRUE WHERE transport_company_id = $this->id";
+    }
+}
 class RemoveDriverByTransportCompany implements IEntityUpdate {
     private $id;
 
@@ -133,7 +155,18 @@ class SelectAllDrivers implements IEntitySelect
     }
 
 }
+class SelectDriversForTCPage implements IEntitySelect
+{
+    public function __construct()
+    {
+    }
 
+    function getSelectQuery()
+    {
+        return "SELECT id,full_name,passport,phone,license FROM `drivers`";
+    }
+
+}
 class SelectDriverById implements IEntitySelect
 {
     private $id;
