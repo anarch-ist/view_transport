@@ -28,6 +28,11 @@ class RouteListEntity implements IRouteListEntity
         return $this->DAO->select(new SelectAllRouteLists());
     }
 
+    function getRouteListsForTransportCompany()
+    {
+        return $this->DAO->select(new SelectAllRouteListsForTransportCompany());
+    }
+
     function getRouteListsForRLPage()
     {
         return $this->DAO->select(new SelectRouteListsForLast3Months());
@@ -111,7 +116,14 @@ class SelectAllRouteLists implements IEntitySelect
         return 'SELECT * FROM `route_lists`';
     }
 }
-
+class SelectAllRouteListsForTransportCompany implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+//        SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH;
+        return 'SELECT routeListID,routeListNumber,departureDate,creationDate, routeListStatusRusName  FROM `route_lists` LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID';
+    }
+}
 class SelectRouteListById implements IEntitySelect
 {
     private $id;

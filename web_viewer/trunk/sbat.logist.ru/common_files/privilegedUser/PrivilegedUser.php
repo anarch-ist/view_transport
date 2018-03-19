@@ -26,6 +26,7 @@ abstract class AuthUser
      * @throws AuthException
      * @return void
      */
+
     public function isValid($authVariant)
     {
         if ($authVariant === 'auth') {
@@ -176,7 +177,6 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__ . '/../dao/vehicleDao/Vehicle.php';
         return \DAO\Vehicle::getInstance();
     }
-
     public function getDriverEntity()
     {
         include_once __DIR__ . '/../dao/driverDao/Driver.php';
