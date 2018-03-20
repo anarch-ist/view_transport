@@ -11,12 +11,12 @@ label {
 
 @font-face {
     font-family: "Gerbera Light";
-    src: url("../../../common_files/media/Gerbera-Light.otf") format("opentype");
+    src: url("../../common_files/media/Gerbera-Light.otf") format("opentype");
 }
 
 @font-face {
     font-family: "Gerbera Medium";
-    src: url("../../../common_files/media/Gerbera-Medium.otf") format("opentype");
+    src: url("../../common_files/media/Gerbera-Medium.otf") format("opentype");
 }
 
 body{
@@ -81,3 +81,9 @@ div.dataTables_wrapper div.dataTables_info {
     font-size: 20px;
 }
 
+
+
+body > * {
+    font-family: "Gerbera Light", serif;
+    color: rgba(26, 43, 109, 1);
+}
