@@ -107,15 +107,15 @@ $   (document).ready(function () {
         },
         buttons: [
             {
-
-                text: "Транспортные средства компании",
-                extend: 'selectedSingle',
-                action: function (e, dt, node, config) {
-                    var url =
-                        "?routeListId=" +
-                        dataTable.row($('.selected')).data().vehicleId;
-                    url = encodeURI(url);
-                    window.open(url);
+                text: 'Select all',
+                action: function () {
+                    dataTableVehicles.rows().select();
+                }
+            },
+            {
+                text: 'Select none',
+                action: function () {
+                    dataTableVehicles.rows().deselect();
                 }
             }
         ]
@@ -152,18 +152,18 @@ $   (document).ready(function () {
             style: 'single'
         },
         buttons: [
-            {
-
-                text: "Водители компании",
-                extend: 'selectedSingle',
-                action: function (e, dt, node, config) {
-                    var url =
-                        "?routeListId=" +
-                        dataTable.row($('.selected')).data().driverId;
-                    url = encodeURI(url);
-                    window.open(url);
-                }
+        {
+            text: 'Select all',
+            action: function () {
+                dataTableDrivers.rows().select();
             }
-        ]
+        },
+        {
+            text: 'Select none',
+            action: function () {
+                dataTableDrivers.rows().deselect();
+            }
+        }
+    ]
     });
 });

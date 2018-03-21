@@ -34,9 +34,9 @@ class Vehicle implements IVehicle {
         $array = $this->_DAO->select(new SelectVehicleById($id));
         return $array[0];
     }
-    function selectTCPageVehicleById($id)
+    function selectVehicleByIdForTransportCompany ($id)
     {
-        $array = $this->_DAO->select(new SelectVehicleById($id));
+        $array = $this->_DAO->select(new selectVehicleByIdForTransportCompany ($id));
         return $array[0];
     }
     function insertVehicleForTransportCompany($vehicleInfo)
@@ -112,7 +112,7 @@ class Vehicle implements IVehicle {
     }
     function TCPageUpdateVehicle(VehicleData $newVehicle, $id)
     {
-        return $this->_DAO->update(new UpdateVehicle($newVehicle, $id));
+        return $this->_DAO->update(new UpdateVehicleForTransportCompanyPage($newVehicle, $id));
     }
     function presudoRemoveDriverByTransportCompany($id) {
         return $this->_DAO->update(new RemoveVehicleByTransportCompany($id));
@@ -173,7 +173,21 @@ class SelectVehicleForTCPage implements IEntitySelect {
         $this->id = DAO::getInstance()->checkString($id);
     }
 
+}class selectVehicleByIdForTransportCompany implements IEntitySelect {
+    private $id;
+
+    function getSelectQuery()
+    {
+        return "SELECT id,license_number,model,carrying_capacity,volume,loading_type,pallets_quantity,type,wialon_id FROM `vehicles` WHERE id = $this->id";
+    }
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
 }
+
 class SelectVehicleById implements IEntitySelect {
     private $id;
 
@@ -370,6 +384,42 @@ class SelectLastInsertedVehicleIdForTC implements IEntitySelect {
     }
 }
 class UpdateVehicle implements IEntityUpdate
+{
+    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
+
+    function __construct(VehicleData $user, $id)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $dao->checkString($id);
+        $this->transport_company_id = $dao->checkString($user->getData('transport_company_id'));
+        $this->license_number = $dao->checkString($user->getData('license_number'));
+        $this->model = $dao->checkString($user->getData('model'));
+        $this->volume = $dao->checkString($user->getData('volume'));
+        $this->loading_type = $dao->checkString($user->getData('loading_type'));
+        $this->pallets_quantity = $dao->checkString($user->getData('pallets_quantity'));
+        $this->type = $dao->checkString($user->getData('type'));
+        $this->wialon_id = $dao->checkString($user->getData('wialon_id'));
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        $query = "UPDATE `vehicles` SET " .
+            "transport_company_id = '$this->transport_company_id', " .
+            "license_number = '$this->license_number', " .
+            "model = '$this->model', " .
+            "volume = '$this->volume', " .
+            "loading_type = '$this->loading_type', " .
+            "pallets_quantity = '$this->pallets_quantity', " .
+            "type = '$this->type', " .
+            "wialon_id = '$this->wialon_id'";
+        $query = $query . " WHERE id = $this->id;";
+        return $query;
+    }
+}
+class UpdateVehicleForTransportCompanyPage implements IEntityUpdate
 {
     private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
 

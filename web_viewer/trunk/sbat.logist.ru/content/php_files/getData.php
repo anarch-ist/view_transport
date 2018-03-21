@@ -88,9 +88,9 @@ try {
             }
             $action = $_POST['action'];
             if (strcasecmp($action, 'remove') === 0) {
-                TCPageRemoveVehicle($privUser);
+                removeVehicleForTransportCompany($privUser);
             } else if (strcasecmp($action, 'edit') === 0) {
-                TCPageUpdateVehicle($privUser);
+                updateVehicleForTransportCompany($privUser);
             } else if (strcasecmp($action, 'create') === 0) {
                 addVehicleForTransportCompany($privUser);
             } else {
@@ -555,7 +555,7 @@ function addVehicleForTransportCompany(PrivilegedUser $privilegedUser)
         throw new DataTransferException('Данные не были добавлены', __FILE__);
     }
 }
-function TCPageRemoveVehicle(PrivilegedUser $privilegedUser)
+function removeVehicleForTransportCompany (PrivilegedUser $privilegedUser)
 {
     if (!isset($_POST['data'])) {
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
@@ -567,7 +567,7 @@ function TCPageRemoveVehicle(PrivilegedUser $privilegedUser)
     }
     echo '{ }';
 }
-function TCPageUpdateVehicle(PrivilegedUser $privUser)
+function updateVehicleForTransportCompany(PrivilegedUser $privUser)
 {
     $serverAnswer = array();
     $serverAnswer['data'] = array();
@@ -575,14 +575,14 @@ function TCPageUpdateVehicle(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
     $dataSourceArray = $_POST['data'];
-    $TCPAgeVehicleEntity = $privUser->getVehicleEntity();
+    $VehicleEntity = $privUser->getVehicleEntity();
     $i = 0;
     foreach ($dataSourceArray as $vehicleId => $vehicleInfo) {
-        if (!$TCPAgeVehicleEntity->TCPageUpdateVehicle(new \DAO\VehicleData($vehicleInfo), $vehicleId)) {
+        if (!$VehicleEntity->UpdateVehicle(new \DAO\VehicleData($vehicleInfo), $vehicleId)) {
             $privUser->getDaoEntity()->rollback();
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
-        $serverAnswer['data'][$i] = $TCPAgeVehicleEntity->selectTCPageVehicleById($vehicleId)->toArray();
+        $serverAnswer['data'][$i] = $VehicleEntity->selectVehicleByIdForTransportCompany ($vehicleId)->toArray();
         $i++;
     }
     echo json_encode($serverAnswer);
