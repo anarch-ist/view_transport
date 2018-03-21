@@ -32,11 +32,11 @@ $(document).ready(function () {
         ]
     });
 
-    TCPageVehiclesEditor .on('preSubmit', function (e, data, action) {
+    TCPageVehiclesEditor.on('preSubmit', function (e, data, action) {
         data.status = 'TCPageVehiclesEditing';
     });
 
-    let $TCPageVehiclesTable= $("#TCPageVehiclesTable").DataTable({
+    let $TCPageVehiclesTable = $("#TCPageVehiclesTable").DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -73,15 +73,15 @@ $(document).ready(function () {
         ],
         "paging": 10,
         "columnDefs": [
-
-            {"name": "license_number", "data": "license_number", "targets": 0},
-            {"name": "model", "data": "model", "targets": 1},
-            {"name": "carrying_capacity", "data": "carrying_capacity", "targets": 2},
-            {"name": "volume", "data": "volume", "targets": 3},
-            {"name": "loading_type", "data": "loading_type", "targets": 4},
-            {"name": "pallets_quantity", "data": "pallets_quantity", "targets": 5},
-            {"name": "type", "data": "type", "targets": 6},
-            {"name": "wialon_id", "data": "wialon_id", "targets": 7},
+            {"name": "id", "data": "id", "targets": 0,visible:false},
+            {"name": "license_number", "data": "license_number", "targets": 1},
+            {"name": "model", "data": "model", "targets": 2},
+            {"name": "carrying_capacity", "data": "carrying_capacity", "targets": 3},
+            {"name": "volume", "data": "volume", "targets": 4},
+            {"name": "loading_type", "data": "loading_type", "targets": 5},
+            {"name": "pallets_quantity", "data": "pallets_quantity", "targets": 6},
+            {"name": "type", "data": "type", "targets": 7},
+            {"name": "wialon_id", "data": "wialon_id", "targets": 8},
 
         ]
     });
