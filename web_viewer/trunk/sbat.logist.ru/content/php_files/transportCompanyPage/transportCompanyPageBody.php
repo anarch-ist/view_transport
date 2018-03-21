@@ -26,8 +26,8 @@
     <!--        <script src="common_files/media/jQueryUI-1.11.4/jquery-ui.min.js"></script>-->
     <script src="common_files/media/Bootstrap-3.3.2/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="common_files/media/jquery-mask/dist/jquery.mask.min.js" type="text/javascript"></script>
-    <script src="content/js/TCPage.js" type="text/javascript"></script>
-    <script src="content/js/TCPageVehicle.js" type="text/javascript"></script>
+    <script src="content/js/transportCompanyTable.js" type="text/javascript"></script>
+    <script src="content/js/transportCompanyEditor.js" type="text/j avascript"></script>
     <!--    Custom JS-->
     <!--    <script src="content/js/documentsWindow.js" type="text/javascript"></script>-->
 
