@@ -73,7 +73,20 @@ class Driver implements IDriver
         $array = $this->_DAO->select(new SelectLastInsertedDriverId());
         return new DriverData($array[0]);
     }
-
+    function selectDriverByIdForTransportCompany ($id)
+    {
+        $array = $this->_DAO->select(new selectDriverByIdForTransportCompany($id));
+        return $array[0];
+    }
+    function insertDriverForTransportCompany($driverInfo)
+    {
+        return $this->_DAO->insert(new InsertDriverForTransportCompany($driverInfo));
+    }
+    function selectDriverByLastInsertedIdForTC()
+    {
+        $array = $this->_DAO->select(new SelectLastInsertedDriverIdForTC());
+        return new DriverData($array[0]);
+    }
     function updateDriver(DriverData $newDriver, $id)
     {
         return $this->_DAO->update(new UpdateDriver($newDriver, $id));
@@ -83,7 +96,10 @@ class Driver implements IDriver
     {
         return $this->_DAO->update(new RemoveDriverByTransportCompany($id));
     }
-
+    function removeDriverForTransportCompany($id)
+    {
+        return $this->_DAO->update(new removeDriverForTransportCompany($id));
+    }
     function pseudoRemoveDriverByVehicle($id)
     {
         return $this->_DAO->update(new RemoveDriverByTransportCompany($id));
@@ -126,6 +142,22 @@ class RemoveDriverByTransportCompany implements IEntityUpdate {
     }
 }
 
+class removeDriverForTransportCompany implements IEntityUpdate {
+    private $id;
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    /**
+     * @return string
+     */
+    function getUpdateQuery()
+    {
+        return "UPDATE `drivers` SET deleted = TRUE WHERE id = $this->id";
+    }
+}
 class RemoveDriverByVehicle implements IEntityUpdate {
     private $id;
 
@@ -143,6 +175,50 @@ class RemoveDriverByVehicle implements IEntityUpdate {
     }
 }
 
+class selectDriverByIdForTransportCompany implements IEntitySelect {
+    private $id;
+
+    function getSelectQuery()
+    {
+        return "SELECT id,full_name,passport,phone,license FROM `drivers` WHERE id = $this->id";
+    }
+
+    public function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+}
+class InsertDriverForTransportCompany implements IEntityInsert{
+
+    private $id, $full_name, $passport, $phone, $license;
+
+    public function __construct($driverData)
+    {
+        $dao = DAO::getInstance();
+        $this->id = $dao->checkString($driverData['id']);
+        $this->full_name = $dao->checkString($driverData['full_name']);
+        $this->passport = $dao->checkString($driverData['passport']);
+        $this->phone = $dao->checkString($driverData['phone']);
+        $this->license = $dao->checkString($driverData['license']);
+    }
+
+    function getInsertQuery()
+    {
+        return "INSERT INTO `drivers` (id, full_name, passport, phone, license) VALUE " .
+            "('$this->id', '$this->full_name', '$this->passport', '$this->phone', '$this->license');";
+    }
+}
+class SelectLastInsertedDriverIdForTC implements IEntitySelect {
+    /**
+     * this function contains query text
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        return 'SELECT * FROM `drivers` WHERE id = LAST_INSERT_ID()';
+    }
+}
 class SelectAllDrivers implements IEntitySelect
 {
     public function __construct()

@@ -81,6 +81,14 @@ div.dataTables_wrapper div.dataTables_info {
     font-size: 20px;
 }
 
+div.selectize-dropdown {
+    z-index: 99999;
+}
+
+.modal{
+    z-index: 3 !important;
+}
+
 
 
 body > * {
