@@ -16,10 +16,14 @@ try {
         echo changeStatusForSeveralRequests($privUser);
     } else if (strcasecmp($action, 'getStatusHistory') === 0) {
         echo getStatusHistory($privUser);
+    } else if (strcasecmp($action, 'getRouteListHistory') === 0) {
+        echo getRouteListHistory($privUser);
     } else if (strcasecmp($action, 'getRequestsForRouteList') === 0) {
         echo getRequestsForRouteList($privUser);
     } else if (strcasecmp($action, 'getRequestByClientIdAndInvoiceNumber') === 0) {
         echo getRequestByClientIdAndInvoiceNumber($privUser);
+    } else if (strcasecmp($action, 'getRouteListByRouteListIDExternal') === 0) {
+        echo getRouteListByRouteListIDExternal($privUser);
     } else if (strcasecmp($action, 'addPretension') === 0) {
         echo addPretension($privUser);
     } else if (strcasecmp($action, 'getPretensions') === 0) {
@@ -82,6 +86,20 @@ try {
         echo getTCPageDrivers($privUser);
     }else if (strcasecmp($action, 'getTCPageVehicles') === 0) {
         echo getTCPageVehicles($privUser);
+    }else if (strcasecmp($action, 'TCPageDriversEditing') === 0) {
+        if (!isset($_POST['action'])) {
+            throw new DataTransferException('Не задан параметр "действие"', __FILE__);
+        }
+        $action = $_POST['action'];
+        if (strcasecmp($action, 'remove') === 0) {
+            removeDriverForTransportCompany($privUser);
+        } else if (strcasecmp($action, 'edit') === 0) {
+            updateDriverForTransportCompany($privUser);
+        } else if (strcasecmp($action, 'create') === 0) {
+            addDriverForTransportCompany($privUser);
+        } else {
+            throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
+        }
     }else if (strcasecmp($action, 'TCPageVehiclesEditing') === 0) {
             if (!isset($_POST['action'])) {
                 throw new DataTransferException('Не задан параметр "действие"', __FILE__);
@@ -536,6 +554,26 @@ function uploadDocuments()
 
     return 0;
 }
+function addDriverForTransportCompany(PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "данные"', __FILE__);
+    }
+    $driverInfo = $_POST['data'][0];
+    if ($privilegedUser->getDriverEntity()->insertDriverForTransportCompany($driverInfo)) {
+        echo json_encode(
+            array(
+                "data" => array(
+                    $privilegedUser->getDriverEntity()->selectDriverByLastInsertedIdForTC()->toArray()
+                )
+            )
+        );
+    } else {
+        $privilegedUser->getDaoEntity()->rollback();
+        throw new DataTransferException('Данные не были добавлены', __FILE__);
+    }
+}
+
 function addVehicleForTransportCompany(PrivilegedUser $privilegedUser)
 {
     if (!isset($_POST['data'])) {
@@ -555,6 +593,18 @@ function addVehicleForTransportCompany(PrivilegedUser $privilegedUser)
         throw new DataTransferException('Данные не были добавлены', __FILE__);
     }
 }
+function removeDriverForTransportCompany (PrivilegedUser $privilegedUser)
+{
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    foreach ($dataSourceArray as $id => $userData) {
+        $privilegedUser->getDriverEntity()->removeDriverForTransportCompany($id);
+    }
+    echo '{ }';
+}
+
 function removeVehicleForTransportCompany (PrivilegedUser $privilegedUser)
 {
     if (!isset($_POST['data'])) {
@@ -583,6 +633,26 @@ function updateVehicleForTransportCompany(PrivilegedUser $privUser)
             throw new DataTransferException('Данные не были обновлены', __FILE__);
         }
         $serverAnswer['data'][$i] = $VehicleEntity->selectVehicleByIdForTransportCompany ($vehicleId)->toArray();
+        $i++;
+    }
+    echo json_encode($serverAnswer);
+}
+function updateDriverForTransportCompany(PrivilegedUser $privUser)
+{
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $DriverEntity = $privUser->getDriverEntity();
+    $i = 0;
+    foreach ($dataSourceArray as $driverId => $driverInfo) {
+        if (!$DriverEntity->UpdateDriver(new \DAO\DriverData($driverInfo), $driverId)) {
+            $privUser->getDaoEntity()->rollback();
+            throw new DataTransferException('Данные не были обновлены', __FILE__);
+        }
+        $serverAnswer['data'][$i] = $DriverEntity-> selectDriverByIdForTransportCompany($driverId)->toArray();
         $i++;
     }
     echo json_encode($serverAnswer);
@@ -784,6 +854,15 @@ function getRequestByClientIdAndInvoiceNumber(PrivilegedUser $privUser)
     $data = $privUser->getRequestEntity()->selectRequestByClientIdAndInvoiceNumber($clientId, $invoiceNumber);
     return json_encode($data);
 }
+function getRouteListByRouteListIDExternal(PrivilegedUser $privUser)
+{
+    $routeListIDExternal = $_POST['routeListIDExternal'];
+    if (!isset($routeListIDExternal)|| empty($routeListIDExternal)){
+        return '0';
+    }
+    $data = $privUser->getRouteListEntity()->SelectRouteListByRouteListID($routeListIDExternal);
+    return json_encode($data);
+}
 
 
 function getStatusHistory(PrivilegedUser $privUser)
@@ -793,6 +872,16 @@ function getStatusHistory(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
     }
     $data = $privUser->getRequestEntity()->getRequestHistoryByRequestIdExternal($requestIDExternal);
+    //exit(print_r($data));
+    return json_encode($data);
+}
+function getRouteListHistory(PrivilegedUser $privUser)
+{
+    $routeListsIDExternal = $_POST['routeListIDExternal'];
+    if (!isset($routeListsIDExternal) || empty($routeListsIDExternal)) {
+        throw new DataTransferException('Не задан параметр "номер заявки"', __FILE__);
+    }
+    $data = $privUser->getRouteListEntity()->getRouteListHistoryByRouteListIdExternal($routeListsIDExternal);
     //exit(print_r($data));
     return json_encode($data);
 }

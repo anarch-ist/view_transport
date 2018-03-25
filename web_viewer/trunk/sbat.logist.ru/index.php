@@ -13,6 +13,8 @@ if (isset($_GET['clientId']) & isset($_GET['invoiceNumber'])){
     include_once __DIR__ . '/content/php_files/vehiclesMap/vMap.php';
 }elseif (isset($_GET['TCPage'])) {
     include_once __DIR__ . '/content/php_files/transportCompanyPage/transportCompanyPageBody.php';
+}elseif (isset($_GET['routeListHistory'])) {
+    include_once __DIR__ . '/content/php_files/routeListsHistory/routeListsHistoryBody.php';
 } else  {
     include_once __DIR__ . '/content/php_files/main.php';
 }

@@ -22,7 +22,10 @@ class RouteListEntity implements IRouteListEntity
         if (is_null(self::$instance)) return new RouteListEntity();
         return self::$instance;
     }
-
+    function getRouteListHistoryByRouteListIdExternal($routeListsIDExternal)
+    {
+        return $this->DAO->select(new SelectRouteListHistory($routeListsIDExternal));
+    }
     function getRouteLists()
     {
         return $this->DAO->select(new SelectAllRouteLists());
@@ -32,7 +35,15 @@ class RouteListEntity implements IRouteListEntity
     {
         return $this->DAO->select(new SelectAllRouteListsForTransportCompany());
     }
-
+    function getRouteListsInFilter()
+    {
+        return $this->DAO->select(new SelectAllRouteListsForTransportCompany());
+    }
+    function selectRouteListByRouteListID($routeListID)
+    {
+        $array = $this->DAO->select(new SelectRouteListByRouteListID ($routeListID));
+        return $array[0];
+    }
     function getRouteListsForRLPage()
     {
         return $this->DAO->select(new SelectRouteListsForLast3Months());
@@ -124,6 +135,51 @@ class SelectAllRouteListsForTransportCompany implements IEntitySelect
         return 'SELECT routeListID,routeListNumber,departureDate,creationDate, routeListStatusRusName  FROM `route_lists` LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID';
     }
 }
+class SelectAllRouteListsInFilter implements IEntitySelect
+{
+    function getSelectQuery()
+    {
+//        SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH;
+        return 'SELECT routeListID,routeListNumber,departureDate,creationDate, routeListStatusRusName  FROM `route_lists` LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID';
+    }
+}
+
+class SelectRouteListHistory implements IEntitySelect
+{
+    private $routeListIDExternal;
+
+    function __construct($id)
+    {
+        $this->routeListIDExternal = $id;
+    }
+
+    function getSelectQuery()
+    {
+        $query = "SELECT * FROM route_list_history WHERE routeListIDExternal='$this->routeListIDExternal';";
+        return $query;
+    }
+}
+class SelectRouteListByRouteListID implements IEntitySelect
+{
+    private $routeListID;
+    private $userID;
+
+    function __construct($routeListID,$userID = -1)
+    {
+        if ($userID < 1) {
+            $userID = \PrivilegedUser::getInstance()->getUserInfo()->getData('userID');
+        }
+        $this->userID = DAO::getInstance()->checkString($userID);
+        $this->routeListIDExternal = DAO::getInstance()->checkString($routeListID);
+    }
+
+    function getSelectQuery()
+    {
+        $query= "SELECT * FROM route_lists JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID WHERE routeListIDExternal='$this->routeListIDExternal'";
+        return $query;
+    }
+}
+
 class SelectRouteListById implements IEntitySelect
 {
     private $id;

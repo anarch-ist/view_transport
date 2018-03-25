@@ -43,6 +43,17 @@ $(document).ready(function () {
             },
             {
 
+                text: "История статусов",
+                extend: 'selectedSingle',
+                action: function (e, dt, node, config) {
+                    var url =
+                        "?routeListHistory="+dataTable.row($('.selected')).data().routeListIDExternal;;
+                    url = encodeURI(url);
+                    window.open(url);
+                }
+            },
+            {
+
                 text: "Заявки на этом МЛ",
                 extend: 'selectedSingle',
                 action: function (e, dt, node, config) {

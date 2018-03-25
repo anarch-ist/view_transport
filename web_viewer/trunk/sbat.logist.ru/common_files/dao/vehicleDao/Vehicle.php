@@ -383,6 +383,7 @@ class SelectLastInsertedVehicleIdForTC implements IEntitySelect {
         return 'SELECT * FROM `vehicles` WHERE id = LAST_INSERT_ID()';
     }
 }
+
 class UpdateVehicle implements IEntityUpdate
 {
     private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;

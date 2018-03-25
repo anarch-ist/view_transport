@@ -8,8 +8,70 @@ $   (document).ready(function () {
     //         alert(data);
     //     });
 
+    let TCPageVehiclesEditor = new $.fn.dataTable.Editor({
+        ajax: 'content/getData.php',
+        table: '#TCPageVehiclesTable',
+        idSrc: 'id',
+
+        fields: [
+            {label: 'Номер лицензии', name: 'license_number', type: 'text'},
+            {label: 'Модель', name: 'model', type: 'text'},
+            {label: 'Грузоподъемность, кг.', name: 'carrying_capacity', type: 'text'},
+            {label: 'Объем, м<sup>3</sup>', name: 'volume', type: 'text'},
+            {
+                label: 'Тип погрузки',
+                name: 'loading_type',
+                type: 'selectize',
+                options: [{label: "Задняя", value: "Задняя"}, {label: "Верхняя", value: "Верхняя"}, {
+                    label: "Боковая",
+                    value: "Боковая"
+                }]
+            },
+            {label: 'Количество паллет', name: 'pallets_quantity', type: 'text'},
+            {
+                label: 'Тип ТС',
+                name: 'type',
+                type: 'selectize',
+                options: [{label: "Тент", value: "Тент"}, {label: "Термос", value: "Термос"}, {
+                    label: "Рефрижератор",
+                    value: "Рефрижератор"
+                }]
+            },
+            {label: 'Wialon ID', name: 'wialon_id', type: 'text'}
+        ]
+    });
+    TCPageVehiclesEditor.on('preSubmit', function (e, data, action) {
+        data.status = 'TCPageVehiclesEditing';
+    });
+    let TCPageDriversEditor = new $.fn.dataTable.Editor({
+        ajax: 'content/getData.php',
+        table: '#TCPageDriversTable',
+        idSrc: 'id',
+
+            fields: [
+                {label: 'Полное имя', name: 'full_name', type: 'text'},
+                {label: 'Паспорт', name: 'passport', type: 'text'},
+                {
+                    label: 'Номер телефона',
+                    name: 'phone',
+                    type: 'mask',
+                    mask: "(000) 000-00-00",
+                    maskOptions: {clearIfNotMatch: true},
+                    placeholder: "(999) 999-99-99"
+                },
+                {label: 'Лицензия', name: 'license', type: 'text'}
+            ]
+
+    });
+    TCPageDriversEditor.on('preSubmit', function (e, data, action) {
+        data.status = 'TCPageDriversEditing';
+    });
+    TCPageDriversEditor.on('postRemove', function (e, data, action) {
+        $("#TCPageDriversTable").DataTable().columns().draw();
+    });
 
     var dataTable = $('#TCRouteListsTable').DataTable({
+
         processing: true,
         serverSide: false,
         search: {
@@ -29,6 +91,7 @@ $   (document).ready(function () {
             //     console.log("An error occured");
             // }
         },
+
         columnDefs: [
 
             {"name": "routeListNumber", "data": "routeListNumber", "targets": 0},
@@ -107,15 +170,21 @@ $   (document).ready(function () {
         },
         buttons: [
             {
-                text: 'Select all',
-                action: function () {
-                    dataTableVehicles.rows().select();
-                }
+                extend: "create",
+                editor: TCPageVehiclesEditor ,
+                text: 'добавить запись'
             },
             {
-                text: 'Select none',
-                action: function () {
-                    dataTableVehicles.rows().deselect();
+                extend: "edit",
+                editor: TCPageVehiclesEditor ,
+                text: "изменить"
+            },
+            {
+                extend: "remove",
+                editor: TCPageVehiclesEditor ,
+                text: 'удалить запись',
+                formMessage: function (e, dt) {
+                    return "Вы уверены, что вы хотите удалить это ТС?</br> Все водители, привязанные к этому ТС, так же будут удалены."
                 }
             }
         ]
@@ -136,11 +205,11 @@ $   (document).ready(function () {
         },
         columnDefs: [
 
-
-            {"name": "full_name", "data": "full_name", "targets": 0},
-            {"name": "passport", "data": "passport", "targets": 1},
-            {"name": "phone", "data": "phone", "targets": 2},
-            {"name": "license", "data": "license", "targets": 3}
+            {"name": "id", "data": "id", "targets": 0, visible: false},
+            {"name": "full_name", "data": "full_name", "targets": 1},
+            {"name": "passport", "data": "passport", "targets": 2},
+            {"name": "phone", "data": "phone", "targets": 3},
+            {"name": "license", "data": "license", "targets": 4}
 
         ],
         language: {
@@ -152,18 +221,24 @@ $   (document).ready(function () {
             style: 'single'
         },
         buttons: [
-            {
-                text: 'Select all',
-                action: function () {
-                    dataTableDrivers.rows().select();
-                }
-            },
-            {
-                text: 'Select none',
-                action: function () {
-                    dataTableDrivers.rows().deselect();
-                }
+        {
+            extend: "create",
+            editor: TCPageDriversEditor ,
+            text: 'добавить запись'
+        },
+        {
+            extend: "edit",
+            editor: TCPageDriversEditor ,
+            text: "изменить"
+        },
+        {
+            extend: "remove",
+            editor: TCPageDriversEditor ,
+            text: 'удалить запись',
+            formMessage: function (e, dt) {
+                return "Вы уверены, что вы хотите удалить это ТС?</br> Все водители, привязанные к этому ТС, так же будут удалены."
             }
-        ]
+        }
+    ]
     });
 });
