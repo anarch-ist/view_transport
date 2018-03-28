@@ -23,9 +23,9 @@ $(document).ready(function () {
                 routeListIDExternal: routeListIDExternal
             },
             function (data) {
-                console.log("routeListData:\n");
-                console.log(data);
-                console.log("\n\n");
+                // console.log("routeListData:\n");
+                // console.log(data);
+                // console.log("\n\n");
                 data = JSON.parse(data);
                 // setRouteListsInfo(data);
                 $('#routeList_Number').html(data.routeListNumber);

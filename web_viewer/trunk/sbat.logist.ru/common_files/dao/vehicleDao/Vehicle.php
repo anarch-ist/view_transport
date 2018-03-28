@@ -236,11 +236,12 @@ class SelectVehiclesByRange implements IEntitySelect {
      */
     function getSelectQuery()
     {
-        return "CALL selectVehicles($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        $query = "CALL selectVehicles($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        return $query;
     }
 }
 class InsertVehicleForTransportCompany implements IEntityInsert{
-    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
+    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type, $wialon_id, $is_rented;
 
     public function __construct($vehicleData)
     {
@@ -254,19 +255,20 @@ class InsertVehicleForTransportCompany implements IEntityInsert{
         $this->pallets_quantity = ($dao->checkString($vehicleData['pallets_quantity'])=='') ? 0 : $dao->checkString($vehicleData['pallets_quantity']);
         $this->type = $dao->checkString($vehicleData['type']);
         $this->wialon_id = $dao->checkString($vehicleData['wialon_id']);
+        $this->is_rented =$dao -> checkString($vehicleData['is_rented'])  ;
     }
 
     function getInsertQuery()
     {
-        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
-            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='TCPage') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id');";
+        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id , is_rented) VALUE " .
+            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='TCPage') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id', '$this->is_rented');";
         return $query;
     }
 }
 
 
 class InsertVehicle implements IEntityInsert{
-    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
+    private $transport_company_id, $license_number, $model, $carrying_capacity, $volume, $loading_type, $pallets_quantity, $type, $wialon_id, $is_rented;
 
     public function __construct($vehicleData)
     {
@@ -280,12 +282,13 @@ class InsertVehicle implements IEntityInsert{
         $this->pallets_quantity = ($dao->checkString($vehicleData['pallets_quantity'])=='') ? 0 : $dao->checkString($vehicleData['pallets_quantity']);
         $this->type = $dao->checkString($vehicleData['type']);
         $this->wialon_id = $dao->checkString($vehicleData['wialon_id']);
+        $this->is_rented =$dao -> checkString($vehicleData['is_rented'])  ;
     }
 
     function getInsertQuery()
     {
-        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id) VALUE " .
-            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='ADMIN_PAGE') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id');";
+        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id, is_rented) VALUE " .
+            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='ADMIN_PAGE') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id', '$this->is_rented');";
         return $query;
     }
 }
@@ -386,7 +389,7 @@ class SelectLastInsertedVehicleIdForTC implements IEntitySelect {
 
 class UpdateVehicle implements IEntityUpdate
 {
-    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
+    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id, $is_rented;
 
     function __construct(VehicleData $user, $id)
     {
@@ -400,6 +403,7 @@ class UpdateVehicle implements IEntityUpdate
         $this->pallets_quantity = $dao->checkString($user->getData('pallets_quantity'));
         $this->type = $dao->checkString($user->getData('type'));
         $this->wialon_id = $dao->checkString($user->getData('wialon_id'));
+        $this->is_rented =$dao -> checkString($user['is_rented'])  ;
     }
 
     /**
@@ -415,14 +419,15 @@ class UpdateVehicle implements IEntityUpdate
             "loading_type = '$this->loading_type', " .
             "pallets_quantity = '$this->pallets_quantity', " .
             "type = '$this->type', " .
-            "wialon_id = '$this->wialon_id'";
+            "wialon_id = '$this->wialon_id'," .
+            "is_rented = '$this->is_rented'";
         $query = $query . " WHERE id = $this->id;";
         return $query;
     }
 }
 class UpdateVehicleForTransportCompanyPage implements IEntityUpdate
 {
-    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id;
+    private $id, $transport_company_id, $license_number, $model, $volume, $loading_type, $pallets_quantity, $type, $wialon_id, $is_rented;
 
     function __construct(VehicleData $user, $id)
     {
@@ -436,6 +441,7 @@ class UpdateVehicleForTransportCompanyPage implements IEntityUpdate
         $this->pallets_quantity = $dao->checkString($user->getData('pallets_quantity'));
         $this->type = $dao->checkString($user->getData('type'));
         $this->wialon_id = $dao->checkString($user->getData('wialon_id'));
+        $this->is_rented =$dao -> checkString($user['is_rented'])  ;
     }
 
     /**
@@ -451,7 +457,10 @@ class UpdateVehicleForTransportCompanyPage implements IEntityUpdate
             "loading_type = '$this->loading_type', " .
             "pallets_quantity = '$this->pallets_quantity', " .
             "type = '$this->type', " .
-            "wialon_id = '$this->wialon_id'";
+            "wialon_id = '$this->wialon_id'," .
+            "is_rented = '$this->is_rented'";
+
+
         $query = $query . " WHERE id = $this->id;";
         return $query;
     }

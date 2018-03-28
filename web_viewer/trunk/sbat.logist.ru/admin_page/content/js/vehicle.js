@@ -29,7 +29,12 @@ $(document).ready(function () {
                     value: "Рефрижератор"
                 }]
             },
-            {label: 'Wialon ID', name: 'wialon_id', type: 'text'}
+            {label: 'Wialon ID', name: 'wialon_id', type: 'text'},
+            {label :'Принадлежность',
+                name: 'is_rented',
+                type: 'selectize',
+                options : [{label: "Наемная", value: 1},{label: "Собственная", value: 0}]
+            }
         ]
     });
 
@@ -83,7 +88,8 @@ $(document).ready(function () {
             {"name": "loading_type", "data": "loading_type", "targets": 6},
             {"name": "pallets_quantity", "data": "pallets_quantity", "targets": 7},
             {"name": "type", "data": "type", "targets": 8},
-            {"name": "wialon_id", "data": "wialon_id", "targets": 9},
+            {"name": "wialon_id", "data": "wialon_id", "targets": 9}
+            , {"name": "is_rented", "data": "is_rented", "targets": 10}
         ]
     });
 });

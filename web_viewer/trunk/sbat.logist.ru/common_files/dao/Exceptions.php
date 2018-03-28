@@ -13,7 +13,7 @@ class MysqlException extends Exception
 {
     public function __construct($str)
     {
-        parent::__construct('Ошибка базы данных');
+        parent::__construct('Ошибка базы данных'. $str);
         writeInErrorlog("MysqlException: " . $str);
     }
 }
