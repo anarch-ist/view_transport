@@ -228,6 +228,7 @@
                     <th>Количество паллет</th>
                     <th>Тип</th>
                     <th>Wialon ID</th>
+                    <th>Принадлежность</th>
                 </tr>
                 </thead>
             </table>

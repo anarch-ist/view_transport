@@ -36,12 +36,28 @@ $(document).ready(function () {
     // example data for exchange with server
     //var exampleData = [{userID: 1, userName:"wefwfe", position: "efewerfw", patronymic:"ergerge", phoneNumber: "9055487552",
     //    email: "qwe@qwe.ru", password:"lewrhbwueu23232", userRoleRusName:"Диспетчер", pointName:"point1"}];
-    $.post('content/getData.php',{
-        'status':'getClientsData'
+    $.post('content/getData.php', {
+        'status': 'getClientsData'
     }, function (data) {
         console.log(JSON.parse(data));
     });
 
+    var dataExample = {
+        data: [
+            {
+                driverId: 1,
+                driverName: "Вася",
+                driverPhone: "88005553535",
+                driverfgsfds: "Проще позвонить, чем у кого-то занимать"
+            },
+            {
+                driverId: 2,
+                driverName: "петя",
+                driverPhone: "88005553535",
+                driverfgsfds: "Проще позвонить, чем у кого-то занимать"
+            }
+            ]
+    };
 
     var $clientsDataTable = $("#clientsTable").DataTable({
             processing: true,

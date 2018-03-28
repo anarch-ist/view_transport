@@ -1,5 +1,6 @@
 <?php
 include_once __DIR__ . '/../../../common_files/privilegedUser/PrivilegedUser.php';
+
 try {
     $privUser = PrivilegedUser::getInstance();
     if (isset($_POST['status'])) {
@@ -597,7 +598,12 @@ function getTransportCompanies(PrivilegedUser $privUser)
 
 function getVehicles(PrivilegedUser $privUser)
 {
+//    error_reporting(E_ALL);
+//    ini_set('display_errors', 1);
     $dataArray = $privUser->getVehicleEntity()->selectVehiclesByRange($_POST['start'], $_POST['length']);
+    foreach ($dataArray['vehicles']  as $index => $item){
+        $dataArray['vehicles'][$index]['is_rented'] = ($item['is_rented']=="1") ? "Наемная" : "Собственная";
+    }
     $json_data = array(
         "draw" => intval($_POST['draw']),   // for every request/draw by clientside , they send a number as a parameter, when they recieve a response/data they first check the draw number, so we are sending same number in draw.
         "recordsTotal" => intval($dataArray['totalCount']),  // total number of records
