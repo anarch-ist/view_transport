@@ -34,3 +34,16 @@ table.dataTable thead{
     border: none;
 
 }
+
+#routeListsTable_filter{
+    width: auto;
+    float: right;
+}
+
+div.selectize-dropdown {
+    z-index: 99999;
+}
+
+.modal{
+    z-index: 3 !important;
+}

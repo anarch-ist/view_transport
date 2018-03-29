@@ -1,11 +1,12 @@
 <?php
 include_once __DIR__ . '/../../common_files/privilegedUser/PrivilegedUser.php';
 require_once __DIR__ . '/../../common_files/utility/MakeshiftWialonAPI.php';
-//    error_reporting(E_ALL);
-//    ini_set('display_errors', 1);
+
 try {
     $privUser = PrivilegedUser::getInstance();
     $action = $_POST['status'];
+//    error_reporting(E_ALL);
+//    ini_set('display_errors', 1);
     if (!isset($action)) {
         throw new DataTransferException('Не задан параметр "статус"', __FILE__);
     } else if (strcasecmp($action, 'getRequestsForUser') === 0) {
@@ -118,6 +119,8 @@ try {
         echo addVehicleFromVMap($privUser);
     } else if (strcasecmp($action, 'getClientSideRequestsForUser')===0){
         echo getClientSideRequestsForUser($privUser);
+    } else if (strcasecmp($action, 'uniteRouteLists')===0){
+        echo uniteRouteLists($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
@@ -224,6 +227,31 @@ function getAllWialonResources(PrivilegedUser $privUser)
     return json_encode($vehiclePlacemarks);
 }
 
+function uniteRouteLists(PrivilegedUser $privUser)
+{
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    $serverAnswer = array();
+    $serverAnswer['data'] = array();
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $transportCompanyEntity = $privUser->getTransportCompanyEntity();
+    $routeListIDs = array();
+    foreach ($dataSourceArray as $routeListId => $freightInfo) {
+        array_push($routeListIDs, $routeListId);
+    }
+    $freightInfo = $dataSourceArray[$routeListIDs[0]];
+    $freight = $privUser->getFreightEntity()->createFreight($freightInfo);
+    $serverAnswer['data'] = array();
+    foreach ($routeListIDs as $routeListID){
+        $privUser->getRouteListEntity()->assignFreight($routeListID,$freight['freight_id']);
+        array_push($serverAnswer['data'], $privUser->getRouteListEntity()->selectOneUnfolded($routeListID));
+    }
+    return json_encode($serverAnswer);
+}
+
 
 function getRouteListById(PrivilegedUser $privilegedUser)
 {
@@ -258,8 +286,9 @@ function getVehicleData(PrivilegedUser $privilegedUser)
 
     $requestIDExternal = $_POST['requestIDExternal'];
     $requestData = $privilegedUser->getRequestEntity()->selectRequestByID($requestIDExternal);
-    if ($requestData['vehicleId'] != null) {
-        $vehicleData = $privilegedUser->getVehicleEntity()->selectVehicleById($requestData['vehicleId']);
+    $routeListData = $privilegedUser->getRouteListEntity()->selectOne($requestData['routeListID']);
+    if ($routeListData['vehicle_id'] != null) {
+        $vehicleData = $privilegedUser->getVehicleEntity()->selectVehicleById($routeListData['vehicle_id']);
         if ($vehicleData['wialon_id'] != null) {
             $wialonVehicle = new WialonVehicle($vehicleData['wialon_id']);
             $coordinates = $wialonVehicle->getCoordinates();
@@ -274,8 +303,6 @@ function getVehicleData(PrivilegedUser $privilegedUser)
 
         return json_encode($vehicleData);
     }
-    return json_encode(false);
-
 }
 
 function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
@@ -283,6 +310,9 @@ function getPointsCoordinatesForRequest(PrivilegedUser $privilegedUser)
 
     $requestIDExternal = $_POST['requestIDExternal'];
     $requestData = $privilegedUser->getRequestEntity()->selectRequestByID($requestIDExternal);
+
+
+
     $routePoints = array();
     if ($requestData['warehousePointID'] != null) {
         $warehousePoint = $privilegedUser->getPointEntity()->getPointCoordinatesByPointId($requestData['warehousePointID'])[0];
@@ -951,11 +981,11 @@ function changeStatusForRequest(PrivilegedUser $privUser)
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $hoursAmount = !empty($_POST['hoursAmount']) ? $_POST['hoursAmount'] : 0;
-    $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : "NULL";
-    $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : "NULL";
-    $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : "NULL";
+//    $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : "NULL";
+//    $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : "NULL";
+//    $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : "NULL";
     $userID = $privUser->getUserInfo()->getData('userID');
-    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount, $companyId, $vehicleId, $driverId);
+    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
 //    if (!isset($hoursAmount) || empty($hoursAmount)) {
 //        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, 0, $companyId, $vehicleId, $driverId);
 //    } else {
@@ -978,8 +1008,10 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
     $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : 0;
     $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : 0;
     $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : 0;
+    $vehicle2Id = !empty($_POST['vehicle2Id']) ? $_POST['vehicle2Id'] : 0;
+    $vehicle3Id = !empty($_POST['vehicle3Id']) ? $_POST['vehicle3Id'] : 0;
 //        if (isset($_POST['palletsQty'])) {
-    return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId);
+    return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId, $vehicle2Id,$vehicle3Id);
 //        }
 //        return $privUser->getRequestEntity()->updateRequestStatuses($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
 

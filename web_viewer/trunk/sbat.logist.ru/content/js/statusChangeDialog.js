@@ -13,7 +13,9 @@ $(document).ready(function () {
         '<tr valign="top" id="currentStatusTR" ><td width="200" padding="10px"><label for="statusCurrent">Текущий статус: </label></td><td><strong id="statusCurrent"></strong></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="statusSelect">Новый статус: </label></td><td><select id="statusSelect"></select></td></tr>' +
         '<tr id="companyTr" valign="top" ><td width="200"><label for="companyInput">Транспортная компания: </label></td><td><input id="companyInput" /></td></tr>' +
-        '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
+        '<tr id="vehicleNumberTr" valign="top" ><td width="200"><label for="vehicleNumberInput">Транспортное средство #1: </label></td><td><input id="vehicleNumberInput"/></td></tr>' +
+        '<tr id="vehicleNumber2Tr" valign="top" ><td width="200"><label for="vehicleNumber2Input">Транспортное средство #2: </label></td><td><input id="vehicleNumber2Input"/></td></tr>' +
+        '<tr id="vehicleNumber3Tr" valign="top" ><td width="200"><label for="vehicleNumber3Input">Транспортное средство #3: </label></td><td><input id="vehicleNumber3Input"/></td></tr>' +
         '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
         '<tr id="linkTr"><td></td><td><a href="../../admin_page/#tabs-3">Добавить компанию/ТС/Водителя</a></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
@@ -25,7 +27,7 @@ $(document).ready(function () {
         '</table>' +
         '</div>'
     );
-    if ($("#data-role").html().trim() == "Пользователь_клиента"){
+    if ($("#data-role").html().trim() == "Пользователь_клиента") {
         $('#vehicleNumberTr').hide();
         $('#linkTr').hide();
         $('#companyTr').hide();
@@ -35,7 +37,7 @@ $(document).ready(function () {
     //populate TC select
 
 
-    $.post( "content/getData.php",
+    $.post("content/getData.php",
         {status: "getCompanies", format: "json"},
         function (companiesData) {
 
@@ -53,7 +55,7 @@ $(document).ready(function () {
             });
             $('#driverInput').selectize({
                 sortField: "text",
-                maxItems:1,
+                maxItems: 1,
                 onChange: function (value) {
                     if (!value.length) return;
                 }
@@ -62,15 +64,15 @@ $(document).ready(function () {
             driverInput.disable();
 
             $('#vehicleNumberInput').selectize({
-               sortField: "text",
-                maxItems:1,
-                onChange: function(value){
+                sortField: "text",
+                maxItems: 1,
+                onChange: function (value) {
                     if (!value.length) return;
                     driverInput.disable();
                     $.post(
                         'content/getData.php',
                         {
-                            status:'getDrivers',
+                            status: 'getDrivers',
                             vehicleId: Number(value)
                         }, function (driversData) {
                             var driversOptions = [];
@@ -82,7 +84,7 @@ $(document).ready(function () {
                             });
                             driverInput.clear();
                             driverInput.clearOptions();
-                            driverInput.load(function(callback) {
+                            driverInput.load(function (callback) {
                                 callback(driversOptions)
                             });
                             driverInput.enable();
@@ -90,41 +92,75 @@ $(document).ready(function () {
 
                 }
             });
+
+            $('#vehicleNumber2Input').selectize({
+                sortField: "text",
+                maxItems: 1,
+                onChange: function (value) {
+                    if (!value.length) return;
+                }
+            });
+
+            $('#vehicleNumber3Input').selectize({
+                sortField: "text",
+                maxItems: 1,
+                onChange: function (value) {
+                    if (!value.length) return;
+                }
+            });
+
             var vehicleInput = $('#vehicleNumberInput')[0].selectize;
+            var vehicleInput2 = $('#vehicleNumber2Input')[0].selectize;
+            var vehicleInput3 = $('#vehicleNumber3Input')[0].selectize;
             vehicleInput.disable();
+            vehicleInput2.disable();
+            vehicleInput3.disable();
 
             $('#companyInput').selectize({
-                placeholder     : "Нажмите, чтобы изменить",
+                placeholder: "Нажмите, чтобы изменить",
                 sortField: "text",
-                maxItems:1,
-                onChange: function(value){
+                maxItems: 1,
+                onChange: function (value) {
                     if (!value.length) return;
                     vehicleInput.disable();
                     $.post(
                         'content/getData.php',
                         {
-                        status:'getVehicles',
-                        companyId: Number(value)
-                    }, function (vehiclesData) {
-                        var vehicleOptions = [];
-                            console.log(vehiclesData);
-                        vehiclesData = JSON.parse(vehiclesData);
-
-                        vehiclesData.forEach(function (entry) {
-                            var selectizeOption = {text: entry.license_number+" / "+entry.model, value: entry.id};
-                            vehicleOptions.push(selectizeOption);
-                        });
-                        vehicleInput.clear();
-                        vehicleInput.clearOptions();
-                        vehicleInput.load(function(callback) {
-                            callback(vehicleOptions)
-                        });
+                            status: 'getVehicles',
+                            companyId: Number(value)
+                        }, function (vehiclesData) {
+                            vehicleOptions=[];
+                            vehiclesData=JSON.parse(vehiclesData);
+                            vehiclesData.forEach(function (entry) {
+                                var selectizeOption = {
+                                    text: entry.license_number + " / " + entry.model,
+                                    value: entry.id
+                                };
+                                vehicleOptions.push(selectizeOption);
+                            });
+                            vehicleInput.clear();
+                            vehicleInput2.clear();
+                            vehicleInput3.clear();
+                            vehicleInput.clearOptions();
+                            vehicleInput2.clearOptions();
+                            vehicleInput3.clearOptions();
+                            vehicleInput.load(function (callback) {
+                                callback(vehicleOptions)
+                            });
+                            vehicleInput2.load(function (callback) {
+                                callback(vehicleOptions)
+                            });
+                            vehicleInput3.load(function (callback) {
+                                callback(vehicleOptions)
+                            });
                             vehicleInput.enable();
+                            vehicleInput2.enable();
+                            vehicleInput3.enable();
 
                             driverInput.clear();
                             driverInput.clearOptions();
                             driverInput.disable();
-                    })
+                        })
 
                 }
             });
@@ -147,7 +183,7 @@ $(document).ready(function () {
     var $selectRequestsTr = $("#selectRequestsTr");
     var $selectNumbersRequestsTr = $("#selectNumbersRequestsTr");
 
-    function populateVehicleSelectMenu(){
+    function populateVehicleSelectMenu() {
         var options = [];
     }
 
@@ -171,8 +207,6 @@ $(document).ready(function () {
     });
 
 
-
-
     // create comment input
     $("#commentInput")
         .addClass("ui-widget ui-state-default ui-corner-all")
@@ -186,16 +220,14 @@ $(document).ready(function () {
     // createDateTimePickerLocalization();
     // var $dateTimePicker = $("#dateTimePicker");
     // $dateTimePicker.datetimepicker();
-    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch:true});
-    if ($('#dateTimePicker').val()==''){
+    $('#dateTimePicker').mask('00.00.0000 00:00', {placeholder: '31.12.2016 12:36', clearIfNotMatch: true});
+    if ($('#dateTimePicker').val() == '') {
 
-        $('#dateTimePicker').val(new Date().toLocaleString('ru-RU',{
-            day:'2-digit', month:'2-digit',year:'numeric', hour:'2-digit',minute:'2-digit', hour12:false
-        }).replace(',','').replace('/','.').replace('/','.'));
+        $('#dateTimePicker').val(new Date().toLocaleString('ru-RU', {
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false
+        }).replace(',', '').replace('/', '.').replace('/', '.'));
     }
     $('#hoursAmount').mask('00000', {placeholder: '0-9999'});
-
-
 
 
     var $statusChangeDialog = $("#statusChangeDialog");
@@ -216,7 +248,6 @@ $(document).ready(function () {
             var dataTable = $statusChangeDialog.data('dataTable');
 
 
-
             // if ($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED"){
             //     $('#hoursAmountTr').hide();
             // } else {
@@ -225,19 +256,19 @@ $(document).ready(function () {
 
             $statusSelect.on("selectmenuchange", function (e, ui) {
 
-                if($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED" && $("#data-role").html().trim() != "Пользователь_клиента"){
+                if ($statusSelect[0][$statusSelect[0].selectedIndex].value === "DELIVERED" && $("#data-role").html().trim() != "Пользователь_клиента") {
                     $('#hoursAmountTr').show();
                 } else {
                     $('#hoursAmountTr').hide();
                 }
             });
-            
+
             $("#palletsQtyTr").hide();
             switch (dialogType) {
                 case "changeStatusForRequest":
                     $selectRequestsTr.hide();
                     // $statusSelect.off("selectmenuchange");
-                    
+
                     $.post(
                         "content/getData.php",
                         {
@@ -245,10 +276,10 @@ $(document).ready(function () {
                             routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
                         },
                         function (data) {
-                           // console.log(data);
+                            // console.log(data);
 
 
-                                $('#statusCurrent').html(dataTable.row($('#user-grid .selected')).data().requestStatusRusName);
+                            $('#statusCurrent').html(dataTable.row($('#user-grid .selected')).data().requestStatusRusName);
 
 
                             var requestsArray = JSON.parse(data);
@@ -296,11 +327,11 @@ $(document).ready(function () {
                             $numberRequestCheckBoxes.html("");
                             $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
                             $('#currentStatusTR').hide();
-                            requestsArray.forEach(function(request){
-                                
+                            requestsArray.forEach(function (request) {
+
                                 $('#selectNumbersRequestsTr').show();
-                                $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<tr><td><label><span style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>  '+request.invoiceNumber+'</span></label></td><td>&nbsp;&nbsp;<span>'+request.requestStatusRusName+'</span></td></tr>');
+                                $statusesRequest.html('<span style="font-weight:bold;">' + request.requestStatusRusName + '</span>' + '&nbsp;&nbsp;');
+                                $requestCheckBoxes.append('<tr><td><label><span style="font-weight:bold;">' + '<input type="checkbox" value=' + request.requestIDExternal + ' checked>  ' + request.invoiceNumber + '</span></label></td><td>&nbsp;&nbsp;<span>' + request.requestStatusRusName + '</span></td></tr>');
                                 // $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
                                 //$numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
                                 //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>
@@ -327,6 +358,8 @@ $(document).ready(function () {
                 var hoursAmount = $("#hoursAmount").val();
                 var companyId = $("#companyInput")[0].selectize.getValue();
                 var vehicleId = $("#vehicleNumberInput")[0].selectize.getValue();
+                var vehicle2Id = $("#vehicleNumber2Input")[0].selectize.getValue();
+                var vehicle3Id = $("#vehicleNumber3Input")[0].selectize.getValue();
                 var driverID = $('#driverInput')[0].selectize.getValue();
 
                 // console.log(companyId+' '+vehicleId+' '+driverID);
@@ -345,9 +378,9 @@ $(document).ready(function () {
                                 comment: comment,
                                 vehicleNumber: vehicleNumber,
                                 hoursAmount: Number(hoursAmount),
-                                companyId: companyId,
-                                vehicleId: vehicleId,
-                                driverId: driverID
+                                // companyId: companyId,
+                                // vehicleId: vehicleId,
+                                // driverId: driverID
 
                             },
                             function (data) {
@@ -368,7 +401,7 @@ $(document).ready(function () {
                     var palletsQty = $("#palletsQtyInput").cleanVal();
 
                     var requests = [];
-                    $requestCheckBoxes.find("input[type='checkbox']:checked").each(function(index){
+                    $requestCheckBoxes.find("input[type='checkbox']:checked").each(function (index) {
                         requests.push($(this).attr('value'));
                     });
 
@@ -387,6 +420,8 @@ $(document).ready(function () {
                                 hoursAmount: Number(hoursAmount),
                                 companyId: companyId,
                                 vehicleId: vehicleId,
+                                vehicle2Id: vehicle2Id,
+                                vehicle3Id: vehicle3Id,
                                 driverId: driverID
                             },
                             function (data) {
@@ -403,13 +438,13 @@ $(document).ready(function () {
             },
             "Претензия": function () {
                 var dataTable = $statusChangeDialog.data('dataTable');
-                var clientID=dataTable.row($('#user-grid .selected')).data().clientIDExternal,
+                var clientID = dataTable.row($('#user-grid .selected')).data().clientIDExternal,
                     invoiceNumber = dataTable.row($('#user-grid .selected')).data().invoiceNumber;
                 var url =
                     "?clientId=" +
                     clientID +
                     "&invoiceNumber=" +
-                    invoiceNumber+
+                    invoiceNumber +
                     "&pretensionModal=1";
                 url = encodeURI(url);
                 pretensionWindow = window.open(url, "width=400, height=700");
