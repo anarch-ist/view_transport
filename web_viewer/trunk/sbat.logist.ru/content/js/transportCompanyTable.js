@@ -41,7 +41,9 @@ $   (document).ready(function () {
         ]
     });
     TCPageVehiclesEditor.on('preSubmit', function (e, data, action) {
-        data.status = 'TCPageVehiclesEditing';
+        if(action==="edit"){
+            data.status = 'TCPageVehiclesEditing';
+        }
     });
     let TCPageDriversEditor = new $.fn.dataTable.Editor({
         ajax: 'content/getData.php',

@@ -130,6 +130,12 @@ class PrivilegedUser extends AuthUser
         return \DAO\RequestEntity::getInstance();
     }
 
+    public function getFreightEntity()
+    {
+        include_once __DIR__.'/../dao/freightDao/Freight.php';
+        return \DAO\Freight::getInstance();
+    }
+
     public function getPointEntity()
     {
         include_once __DIR__ . '/../dao/pointDao/Point.php';
@@ -171,6 +177,7 @@ class PrivilegedUser extends AuthUser
         include_once __DIR__ . '/../dao/transportCompanyDao/transportCompany.php';
         return \DAO\TransportCompany::getInstance();
     }
+
 
     public function getVehicleEntity()
     {

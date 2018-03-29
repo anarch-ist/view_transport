@@ -5,8 +5,7 @@
     <!--    <link rel="stylesheet" type="text/css" href="../common_files/media/jQueryUI-1.11.4/jquery-ui.min.css"/>-->
     <link rel="stylesheet" type="text/css" href="../common_files/media/Bootstrap-3.3.2/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Selectize/css/selectize.min.css"/>
-    <link rel="stylesheet" type="text/css"
-          href="../common_files/media/DataTables-1.10.10/css/dataTables.bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../common_files/media/DataTables-1.10.10/css/dataTables.bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Buttons-1.1.0/css/buttons.bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/Editor-1.5.4/css/editor.bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="../common_files/media/FieldType-Selectize/editor.selectize.min.css"/>

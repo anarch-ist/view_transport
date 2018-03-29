@@ -110,13 +110,99 @@ class RouteListEntity implements IRouteListEntity
     function selectLastAutoInsertedRouteLists($quantity){
         return $this->DAO->select(new SelectLastAutoInsertedRouteLists($quantity));
     }
+
+    function assignFreight($routeListId, $freightId){
+        $this->DAO->update(new AssignFreight($routeListId,$freightId));
+
+    }
+
+    function selectOne($routeListId){
+        return $this->DAO->select(new SelectOne($routeListId))[0];
+    }
+
+    function selectOneUnfolded($routeListId){
+        return $this->DAO->select(new SelectOneUnfolded($routeListId))[0];
+    }
+
+    //Maybe later
+//    function updateOwnRequests($routeListId){
+//        return
+//    }
+}
+
+//class UpdateOwnRequests implements IEntityUpdate{
+//    private $routeListId;
+//
+//    /**
+//     * UpdateOwnRequests constructor.
+//     * @param $routeListId
+//     */
+//    public function __construct($routeListId)
+//    {
+//        $this->routeListId = $routeListId;
+//    }
+//
+//    function getUpdateQuery()
+//    {
+//        $query = "";
+//        return $query;
+//    }
+//
+//
+//}
+class SelectOneUnfolded implements IEntitySelect{
+    private $routeListId;
+
+    /**
+     * SelectOneUnfolded constructor.
+     * @param $routeListId
+     */
+    public function __construct($routeListId)
+    {
+        $this->routeListId = $routeListId;
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT * FROM route_lists LEFT JOIN data_sources ON route_lists.dataSourceID=data_sources.dataSourceID LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID;";
+    }
+
+
+}
+
+class AssignFreight implements IEntityUpdate{
+    private $routeListId, $freightId;
+
+    /**
+     * AssignFreight constructor.
+     * @param $routeListId
+     * @param $transportCompanyId
+     * @param $driverId
+     * @param $vehicleId
+     * @param $vehicle2Id
+     * @param $vehicle3Id
+     * @param $routeId
+     */
+    public function __construct($routeListId, $freightId)
+    {
+        $this->routeListId = $routeListId;
+        $this->freightId = $freightId;
+    }
+
+    function getUpdateQuery()
+    {
+        $query = "UPDATE route_lists,freight SET route_lists.transport_company_id = freight.transport_company_id, route_lists.driver_id_internal = freight.driver_id, route_lists.vehicle_id=freight.vehicle_id, route_lists.vehicle_2_id=freight.vehicle_2_id, route_lists.vehicle_3_id=freight.vehicle_3_id,route_lists.routeID =freight.route_id, route_lists.freight_id=freight.freight_id  WHERE routeListID = '$this->routeListId' AND freight.freight_id='$this->freightId'";
+        return $query;
+    }
+
+
 }
 
 class SelectRouteListsForLast3Months implements IEntitySelect
 {
     function getSelectQuery()
     {
-        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH; ";
+        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID LEFT JOIN freight ON route_lists.freight_id = freight.freight_id WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH; ";
     }
 }
 
@@ -159,6 +245,27 @@ class SelectRouteListHistory implements IEntitySelect
         return $query;
     }
 }
+
+class SelectOne implements IEntitySelect{
+    private $routeListId;
+
+    /**
+     * SelectOne constructor.
+     * @param $routeListId
+     */
+    public function __construct($routeListId)
+    {
+        $this->routeListId = $routeListId;
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT * FROM route_lists WHERE routeListID = $this->routeListId";
+    }
+
+
+}
+
 class SelectRouteListByRouteListID implements IEntitySelect
 {
     private $routeListID;
