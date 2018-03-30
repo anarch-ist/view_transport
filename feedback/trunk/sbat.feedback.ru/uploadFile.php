@@ -9,6 +9,17 @@ $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 $thumbFileType = strtolower(pathinfo($target_thumb_file, PATHINFO_EXTENSION));
 // Check if image file is a actual image or fake image
+if(isset($_POST['password'])){
+    if ($_POST['password']!=='Fgsfds12'){
+        echo "Неверный пароль";
+        $uploadOk=0;
+
+    }
+} else {
+    echo "Неверный пароль";
+    $uploadOk=0;
+}
+
 if(isset($_POST["submit"])) {
     $check = getimagesize($file);
     $checkThumb = getimagesize($thumb_file);
@@ -47,7 +58,7 @@ if ($uploadOk == 0) {
         if(move_uploaded_file($_FILES["thumbFile"]["tmp_name"], $target_thumb_file)){
             echo "Файл ". basename( $_FILES["fileToUpload"]["name"]). " был загружен.<br>";
             echo "Файл ". basename( $_FILES["thumbFile"]["name"]). " был загружен.";
-            echo "<a href='upload.html'>Назад</a>";
+
         }
 
 
@@ -55,4 +66,5 @@ if ($uploadOk == 0) {
         echo "Не удалось загрузить файл: <br>Ошибка при загрузке файла. Пишите кодеру, пришлите ему ваш файл.";
     }
 }
+echo "<a href='upload.html'>Назад</a>";
 ?>
