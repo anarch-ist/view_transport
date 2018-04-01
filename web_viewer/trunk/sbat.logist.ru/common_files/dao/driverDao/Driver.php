@@ -14,9 +14,8 @@ class Driver implements IDriver
         return $array;
 
     }
-    function getTCPageDrivers(){
-        return $this->_DAO->select(new SelectDriversForTCPage());
-
+    function getTCPageDrivers($tcid){
+        return $this->_DAO->select(new SelectDriversForTCPage($tcid));
     }
     function selectDriverById($id)
     {
@@ -233,13 +232,15 @@ class SelectAllDrivers implements IEntitySelect
 }
 class SelectDriversForTCPage implements IEntitySelect
 {
-    public function __construct()
+    private $tcid;
+    public function __construct($tcid)
     {
+        $this->tcid = DAO::getInstance()->checkString($tcid);
     }
 
     function getSelectQuery()
     {
-        return "SELECT id,full_name,passport,phone,license FROM `drivers`";
+        return "SELECT id,full_name,passport,phone,license FROM `drivers` WHERE transport_company_id = $this->tcid";
     }
 
 }

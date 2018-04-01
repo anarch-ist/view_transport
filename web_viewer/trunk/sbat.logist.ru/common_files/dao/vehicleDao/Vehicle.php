@@ -12,8 +12,8 @@ class Vehicle implements IVehicle {
         return (!empty($vehicle)) ? $vehicle[0] : false;
     }
 
-    function getTCpageVehicles(){
-        return $this->_DAO->select(new SelectVehiclesForTransportCompanyPage());
+    function getTCpageVehicles($tcid){
+        return $this->_DAO->select(new SelectVehicleByCompanyId($tcid));
     }
     function getVehicleWialonID($vehicleId)
     {

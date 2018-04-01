@@ -155,6 +155,8 @@ try {
         } else {
             throw new DataTransferException('Неверно задан параметр "действие"', __FILE__);
         }
+    } else if (strcasecmp($action,'getCompanyPairs')===0){
+        echo json_encode($privUser->getTransportCompanyEntity()->selectAllCompanies());
     } else {
         throw new DataTransferException('Неверно задан параметр "статус"', __FILE__);
     }
@@ -216,7 +218,7 @@ function getClientsData(PrivilegedUser $privUser)
         "recordsFiltered" => intval($dataArray['totalFiltered']), // total number of records after searching, if there is no searching then totalFiltered = totalData
         "data" => is_null($dataArray['clients']) ? "" : $dataArray['clients']  // total data array
     );
-    echo json_encode($json_data);
+    return json_encode($json_data);
 //    $data['data'] = $privilegedUser->getClientEntity()->selectClientsForAdminPage();
 //    return json_encode($data);
 }

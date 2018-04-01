@@ -121,9 +121,31 @@ try {
         echo getClientSideRequestsForUser($privUser);
     } else if (strcasecmp($action, 'uniteRouteLists')===0){
         echo uniteRouteLists($privUser);
+    } else if (strcasecmp($action, 'getAllFreightIdPairs')===0){
+        echo getAllFreightIdPairs($privUser);
+    } else if (strcasecmp($action, 'assignFreightToRouteLists')===0){
+        echo assignFreightToRouteLists($privUser);
     }
 } catch (Exception $ex) {
     echo $ex->getMessage();
+}
+
+function assignFreightToRouteLists(PrivilegedUser $privUser){
+    if (!isset($_POST['data'])) {
+        throw new DataTransferException('Не задан параметр "data"', __FILE__);
+    }
+    $dataSourceArray = $_POST['data'];
+    $serverResponse['data'] = array();
+    foreach ($dataSourceArray as $routeListId => $freightInfo) {
+        $privUser->getRouteListEntity()->assignFreight($routeListId, $freightInfo['freightId']);
+        array_push($serverResponse['data'],$privUser->getRouteListEntity()->selectOneUnfolded($routeListId));
+    }
+    return json_encode($serverResponse);
+
+}
+
+function getAllFreightIdPairs(PrivilegedUser $privilegedUser){
+    return json_encode($privilegedUser->getFreightEntity()->getAllFreightIdPairs());
 }
 
 function addVehicleFromVMap(PrivilegedUser $privilegedUser){
@@ -237,7 +259,6 @@ function uniteRouteLists(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "data"', __FILE__);
     }
     $dataSourceArray = $_POST['data'];
-    $transportCompanyEntity = $privUser->getTransportCompanyEntity();
     $routeListIDs = array();
     foreach ($dataSourceArray as $routeListId => $freightInfo) {
         array_push($routeListIDs, $routeListId);
@@ -1017,16 +1038,18 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
 
 }
 function getTCPageRouteLists (PrivilegedUser $privilegedUser){
-
-    $data['data'] = $privilegedUser->getRouteListEntity()->getRouteListsForTransportCompany();
+    $tcId = $privilegedUser->getUserInfo()->getData('transport_company_id');
+    $data['data'] = $privilegedUser->getRouteListEntity()->getRouteListsForTransportCompany($tcId);
     return json_encode($data);
 
 }
 function getTCPageVehicles (PrivilegedUser $privilegedUser){
-    $data['data'] = $privilegedUser -> getVehicleEntity() -> getTCpageVehicles();
+    $tcId = $privilegedUser->getUserInfo()->getData('transport_company_id');
+    $data['data'] = $privilegedUser -> getVehicleEntity() -> getVehicleByCompanyId($tcId);
     return json_encode($data);
 }
 function getTCPageDrivers (PrivilegedUser $privilegedUser){
-    $data['data'] = $privilegedUser -> getDriverEntity() -> getTCPageDrivers();
+    $tcId = $privilegedUser->getUserInfo()->getData('transport_company_id');
+    $data['data'] = $privilegedUser -> getDriverEntity() -> getTCPageDrivers($tcId);
     return json_encode($data);
 }

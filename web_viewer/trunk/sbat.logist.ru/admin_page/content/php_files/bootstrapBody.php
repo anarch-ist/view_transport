@@ -167,6 +167,7 @@
                         <th>Роль</th>
                         <th>Пункт</th>
                         <th>ID клиента</th>
+                        <th>ТК</th>
                     </tr>
                     </thead>
                 </table>
