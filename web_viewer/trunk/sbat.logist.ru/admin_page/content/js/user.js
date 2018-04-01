@@ -69,6 +69,18 @@ $(document).ready(function () {
                     labelField: 'label',
                     dropdownParent: "body"
                 }
+            },
+            {
+                label: 'Транспортная компания',
+                name: 'transport_company_id',
+                type: 'selectize',
+                options: [],
+                opts: {
+                    diacritics: true,
+                    searchField: 'label',
+                    labelField: 'label',
+                    dropdownParent: "body"
+                }
             }
         ]
     });
@@ -118,6 +130,8 @@ $(document).ready(function () {
     });
 
 
+
+
     usersEditor.field('pointName').input().on('keyup', function (e, d) {
         var pointNamePart = $(this).val();
         $.post( "content/getData.php",
@@ -143,6 +157,7 @@ $(document).ready(function () {
             }
         );
     });
+
 
     usersEditor.field('userRoleRusName').input().on('change', function (e, d) {
         if (d && d.editorSet) return;
@@ -199,7 +214,8 @@ $(document).ready(function () {
                 {"name": "password", "data": "password", "targets": 6, visible: false},
                 {"name": "userRoleRusName", "data": "userRoleRusName", "targets": 7},
                 {"name": "pointName", "data": "pointName", "targets": 8},
-                {"name": "clientID", "data": "clientID", "targets": 9, visible: false}
+                {"name": "clientID", "data": "clientID", "targets": 9, visible: false},
+                {"name": "transport_company_id", "data": "transport_company_id", "targets": 10, visible: true}
             ]
         }
     );
@@ -218,6 +234,8 @@ $(document).ready(function () {
                 usersEditor.field('pointName').set('');
                 usersEditor.field('clientID').enable();
                 usersEditor.field('clientID').set('');
+                usersEditor.field('transport_company_id').disable();
+                usersEditor.field('transport_company_id').set('');
             }
 
             if (currentRole === "TEMP_REMOVED") {
@@ -225,6 +243,8 @@ $(document).ready(function () {
                 usersEditor.field('pointName').set('');
                 usersEditor.field('clientID').enable();
                 usersEditor.field('clientID').set('');
+                usersEditor.field('transport_company_id').disable();
+                usersEditor.field('transport_company_id').set('');
             }
 
             if (currentRole === "ADMIN" || currentRole === "MARKET_AGENT") {
@@ -232,6 +252,8 @@ $(document).ready(function () {
                 usersEditor.field('pointName').set('');
                 usersEditor.field('clientID').disable();
                 usersEditor.field('clientID').set('');
+                usersEditor.field('transport_company_id').disable();
+                usersEditor.field('transport_company_id').set('');
             }
 
             if (currentRole === "DISPATCHER" || currentRole === "W_DISPATCHER") {
@@ -239,7 +261,40 @@ $(document).ready(function () {
                 usersEditor.field('pointName').set('');
                 usersEditor.field('clientID').disable();
                 usersEditor.field('clientID').set('');
+                usersEditor.field('transport_company_id').disable();
+                usersEditor.field('transport_company_id').set('');
+            }
+
+            if (currentRole ==="TRANSPORT_COMPANY"){
+                usersEditor.field('transport_company_id').enable();
+                usersEditor.field('transport_company_id').set('');
+                usersEditor.field('clientID').disable();
+                usersEditor.field('clientID').set('');
+                usersEditor.field('pointName').disable();
+                usersEditor.field('pointName').set('');
             }
         }
     }
+
+    $.post("content/getData.php",
+        {status: "getCompanyPairs", format: "json"},
+        function (companiesData) {
+            let selectizeOptions = [];
+            // console.log(companiesData);
+            companiesData = JSON.parse(companiesData);
+
+            companiesData.forEach(function (entry) {
+                console.log(entry.name);
+                console.log(entry.id);
+                let selectizeOption = {text:entry.name, value:entry.id};
+                selectizeOptions.push(selectizeOption);
+            });
+
+            let transportCompanyInput = usersEditor.field('transport_company_id');
+            transportCompanyInput.inst().load(function (callback) {
+                callback(selectizeOptions);
+                console.log(selectizeOptions);
+            });
+        }
+    )
 });

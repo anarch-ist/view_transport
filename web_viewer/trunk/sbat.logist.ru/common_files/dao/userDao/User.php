@@ -197,7 +197,7 @@ class DeleteUser implements IEntityDelete
 
 class InsertUser implements IEntityInsert
 {
-    private $userName, $login, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID, $clientID;
+    private $userName, $login, $position, $passMD5, $phoneNumber, $email, $userRoleID, $pointID, $clientID, $transportCompanyId;
 
     function __construct(UserData $user)
     {
@@ -217,6 +217,11 @@ class InsertUser implements IEntityInsert
             $this->clientID = $dao->checkString($user->getData('clientID'));
         else
             $this->clientID = null;
+        if (!empty($user->getData('transport_company_id'))){
+            $this->transportCompanyId = $dao->checkString($user->getData('transport_company_id'));
+        } else {
+            $this->transportCompanyId = null;
+        }
     }
 
     /**
@@ -235,6 +240,9 @@ class InsertUser implements IEntityInsert
         else if(is_null($this->clientID))
             return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID, pointID) VALUE " .
                 "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE', $this->pointID);";
+        else if(is_null($this->transportCompanyId))
+            return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID, transport_company_id VALUE " .
+                "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE', $this->transportCompanyId);";
         else
             return "INSERT INTO `users` (userName, login, position, salt, passAndSalt, phoneNumber, email, userRoleID, userIDExternal, dataSourceID, clientID, pointID) VALUE " .
                 "('$this->userName', '$this->login', '$this->position', '$salt', '$passAndSalt', '$this->phoneNumber', '$this->email', '$this->userRoleID', '$this->login', 'ADMIN_PAGE', $this->clientID, $this->pointID);";
@@ -244,7 +252,7 @@ class InsertUser implements IEntityInsert
 class UpdateUser implements IEntityUpdate
 {
     private $userName, $position, $passMD5, $login, $phoneNumber, $email, $userRoleID, $pointID;
-    private $userID, $clientID;
+    private $userID, $clientID, $transportCompanyId;
 
     function __construct(UserData $user, $id)
     {
@@ -261,6 +269,10 @@ class UpdateUser implements IEntityUpdate
             $this->pointID = $dao->checkString($user->getData('pointName'));
         else
             $this->pointID = null;
+        if (!empty($user->getData('transport_company_id')))
+            $this->transportCompanyId = $dao->checkString($user->getData('transport_company_id'));
+        else
+            $this->transportCompanyId = null;
         if (!empty($user->getData('clientID')))
             $this->clientID = $dao->checkString($user->getData('clientID'));
         else
@@ -296,6 +308,11 @@ class UpdateUser implements IEntityUpdate
             $query = $query . ", clientID = $this->clientID";
         } else {
             $query = $query . ", clientID = NULL";
+        }
+        if (!is_null($this->transportCompanyId)) {
+            $query = $query . ", transport_company_id = $this->transportCompanyId";
+        } else {
+            $query = $query . ", transport_company_id = NULL";
         }
 
         $query = $query . " WHERE userID = $this->userID;";

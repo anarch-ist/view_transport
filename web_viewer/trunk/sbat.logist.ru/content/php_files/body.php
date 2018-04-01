@@ -98,10 +98,10 @@
                             <td><i class="fa fa-th-list" aria-hidden="true"></i></td>
                             <td><a href="/?routeLists=0" target="_blank">Маршуртные листы</a></td>
                         </tr>
-                        <tr>
-                            <td><i class="fa fa-map-o" aria-hidden="true"></i></td>
-                            <td><a href="/?map=0" target="_blank">Карта присутствия</a></td>
-                        </tr>
+<!--                        <tr>-->
+<!--                            <td><i class="fa fa-map-o" aria-hidden="true"></i></td>-->
+<!--                            <td><a href="/?map=0" target="_blank">Карта присутствия</a></td>-->
+<!--                        </tr>-->
                         <tr>
                             <td>
                                 <i class="fa fa-truck" aria-hidden="true"></i>

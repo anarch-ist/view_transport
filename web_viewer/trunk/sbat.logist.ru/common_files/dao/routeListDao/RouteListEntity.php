@@ -31,9 +31,9 @@ class RouteListEntity implements IRouteListEntity
         return $this->DAO->select(new SelectAllRouteLists());
     }
 
-    function getRouteListsForTransportCompany()
+    function getRouteListsForTransportCompany($tcid)
     {
-        return $this->DAO->select(new SelectAllRouteListsForTransportCompany());
+        return $this->DAO->select(new SelectAllRouteListsForTransportCompany($tcid));
     }
     function getRouteListsInFilter()
     {
@@ -113,7 +113,6 @@ class RouteListEntity implements IRouteListEntity
 
     function assignFreight($routeListId, $freightId){
         $this->DAO->update(new AssignFreight($routeListId,$freightId));
-
     }
 
     function selectOne($routeListId){
@@ -164,7 +163,7 @@ class SelectOneUnfolded implements IEntitySelect{
 
     function getSelectQuery()
     {
-        return "SELECT * FROM route_lists LEFT JOIN data_sources ON route_lists.dataSourceID=data_sources.dataSourceID LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID;";
+        return "SELECT * FROM route_lists LEFT JOIN data_sources ON route_lists.dataSourceID=data_sources.dataSourceID LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID LEFT JOIN freight ON route_lists.freight_id = freight.freight_id WHERE route_lists.routeListID = '$this->routeListId';";
     }
 
 
@@ -215,10 +214,23 @@ class SelectAllRouteLists implements IEntitySelect
 }
 class SelectAllRouteListsForTransportCompany implements IEntitySelect
 {
+    private $tcid;
+
+    /**
+     * SelectAllRouteListsForTransportCompany constructor.
+     * @param $tcid
+     */
+    public function __construct($tcid)
+    {
+        $this->tcid = DAO::getInstance()->checkString($tcid);
+    }
+
+
     function getSelectQuery()
     {
 //        SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH;
-        return 'SELECT routeListID,routeListNumber,departureDate,creationDate, routeListStatusRusName  FROM `route_lists` LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID';
+        $query = "SELECT routeListID,routeListNumber,departureDate,creationDate, routeListStatusRusName  FROM `route_lists` LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID WHERE transport_company_id=$this->tcid";
+        return $query;
     }
 }
 class SelectAllRouteListsInFilter implements IEntitySelect

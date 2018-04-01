@@ -1,4 +1,25 @@
 $(document).ready(function () {
+    var freightAssigner = new $.fn.dataTable.Editor({
+            ajax: "content/getData.php",
+            table: "#routeListsTable",
+            idSrc: 'routeListID',
+            fields:
+                [
+                    {
+                        label: "Рейс:",
+                        name: "freightId", type: 'selectize', options: [],
+                        opts: {
+                            diacritics: true,
+                            searchField: 'text',
+                            labelField: 'text',
+                            dropdownParent: "body"
+                        }
+                    }
+                ]
+        }
+    );
+
+
     var freightCreator = new $.fn.dataTable.Editor({
         ajax: "content/getData.php",
         table: "#routeListsTable",
@@ -6,83 +27,110 @@ $(document).ready(function () {
         fields:
             [
                 {
-            label: "Номер рейса:",
-            name: "freightNumber"},
-            // {label: 'Номер ТК', name: 'routeListIDExternal', type: 'text'},
-            // {label: 'Номер ТК', name: 'routeListNumber', type: 'text'},
-            // {label: 'Номер ТК', name: 'dataSourceName', type: 'text'},
-            // {label: 'Номер ТК', name: 'routeListStatusName', type: 'text'},
-            // {label: 'Номер ТК', name: 'departureDate', type: 'text'},
-            // {label: 'Номер ТК', name: 'creationDate', type: 'text'},
-            // {label: 'Номер ТК', name: 'routeListNumber', type: 'text'},
-            {label: 'Номер ТК', name: 'transportCompanyId', type: 'selectize',
-                options: [],
-                opts: {
-                    diacritics: true,
-                    searchField: 'text',
-                    labelField: 'text',
-                    dropdownParent: "body"
-                }},
-            {label: 'Транспортное средство №1', name: 'vehicleId', type: 'selectize',
-                options: [],
-                opts: {
-                    diacritics: true,
-                    searchField: 'text',
-                    labelField: 'text',
-                    dropdownParent: "body"
-                }},
-                {label: 'Транспортное средство №2', name: 'vehicle2Id', type: 'selectize',
-                options: [],
-                opts: {
-                    diacritics: true,
-                    searchField: 'text',
-                    labelField: 'text',
-                    dropdownParent: "body"
-                }},
-                {label: 'Транспортное средство №3', name: 'vehicle3Id', type: 'selectize',
-                options: [],
-                opts: {
-                    diacritics: true,
-                    searchField: 'text',
-                    labelField: 'text',
-                    dropdownParent: "body"
-                }},
-                {label: 'Водитель', name: 'driverId', type: 'selectize',
+                    label: "Номер рейса:",
+                    name: "freightNumber"
+                },
+                // {label: 'Номер ТК', name: 'routeListIDExternal', type: 'text'},
+                // {label: 'Номер ТК', name: 'routeListNumber', type: 'text'},
+                // {label: 'Номер ТК', name: 'dataSourceName', type: 'text'},
+                // {label: 'Номер ТК', name: 'routeListStatusName', type: 'text'},
+                // {label: 'Номер ТК', name: 'departureDate', type: 'text'},
+                // {label: 'Номер ТК', name: 'creationDate', type: 'text'},
+                // {label: 'Номер ТК', name: 'routeListNumber', type: 'text'},
+                {
+                    label: 'Номер ТК', name: 'transportCompanyId', type: 'selectize',
                     options: [],
                     opts: {
                         diacritics: true,
                         searchField: 'text',
                         labelField: 'text',
                         dropdownParent: "body"
-                    }},
-                {label: 'Маршрут', name: 'routeId', type: 'selectize',
-                options: [],
-                opts: {
-                    diacritics: true,
-                    searchField: 'text',
-                    labelField: 'text',
-                    dropdownParent: "body"
-                }},
-            {label: 'Фактическая протяженность<sup>КМ</sup>', name: 'distance', type: 'mask', mask:'#'},
-            {label: 'Фактическая длительность<sup>Ч</sup>', name: 'continuance', type: 'mask', mask:'#'},
-            {label: 'Фактический расход топлива<sup>Л</sup>', name: 'fuelConsumption', type: 'mask', mask:'#'},
-            {label: 'Часы простоя <sup>Ч</sup>', name: 'stallHours', type: 'mask', mask:'#'},
-            {label: 'Показания спидометра на конец поездки<sup>КМ/Ч</sup>', name: 'speedReadingsEnd', type: 'mask', mask:'#'},
-        ]
+                    }
+                },
+                {
+                    label: 'Транспортное средство №1', name: 'vehicleId', type: 'selectize',
+                    options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'text',
+                        labelField: 'text',
+                        dropdownParent: "body"
+                    }
+                },
+                {
+                    label: 'Транспортное средство №2', name: 'vehicle2Id', type: 'selectize',
+                    options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'text',
+                        labelField: 'text',
+                        dropdownParent: "body"
+                    }
+                },
+                {
+                    label: 'Транспортное средство №3', name: 'vehicle3Id', type: 'selectize',
+                    options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'text',
+                        labelField: 'text',
+                        dropdownParent: "body"
+                    }
+                },
+                {
+                    label: 'Водитель', name: 'driverId', type: 'selectize',
+                    options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'text',
+                        labelField: 'text',
+                        dropdownParent: "body"
+                    }
+                },
+                {
+                    label: 'Маршрут', name: 'routeId', type: 'selectize',
+                    options: [],
+                    opts: {
+                        diacritics: true,
+                        searchField: 'text',
+                        labelField: 'text',
+                        dropdownParent: "body"
+                    }
+                },
+                {label: 'Фактическая протяженность<sup>КМ</sup>', name: 'distanceKM', type: 'mask', mask: '#'},
+                {label: 'Фактическая длительность<sup>Ч</sup>', name: 'continuanceH', type: 'mask', mask: '#'},
+                {label: 'Фактический расход топлива<sup>Л</sup>', name: 'fuelConsumption', type: 'mask', mask: '#'},
+                {label: 'Часы простоя <sup>Ч</sup>', name: 'stallHours', type: 'mask', mask: '#'},
+                {
+                    label: 'Показания спидометра на конец поездки<sup>КМ/Ч</sup>',
+                    name: 'speedReadingsEnd',
+                    type: 'mask',
+                    mask: '#'
+                },
+            ]
     });
 
     freightCreator.on('preSubmit', function (e, data, action) {
         if (action === 'edit') {
-            if (!this.field("routeId").val()){
+            if (!this.field("routeId").val()) {
                 console.log("fgsfds");
                 this.field("routeId").error('Маршрут должен быть указан');
                 return false;
             } else {
                 data.status = 'uniteRouteLists';
             }
-    //         // console.log(JSON.stringify(data));
+        }
+    });
 
-            // data.routeLists = dataTable.rows('.selected').data().map(x => x.routeListID);
+    freightAssigner.on('preSubmit', function (e, data, action) {
+        if (action === 'edit') {
+            if (!this.field("freightId").val()) {
+                console.log("fgsfds");
+                this.field("freightId").error('Рейс должен быть указан');
+                return false;
+            } else {
+                data.status = 'assignFreightToRouteLists';
+            }
         }
     });
 
@@ -126,8 +174,7 @@ $(document).ready(function () {
 
                 text: "На главную",
                 action: function (e, dt, node, config) {
-                    var url =
-                        "index.php";
+                    var url = "index.php";
                     url = encodeURI(url);
                     window.open(url);
                 }
@@ -138,7 +185,7 @@ $(document).ready(function () {
                 extend: 'selectedSingle',
                 action: function (e, dt, node, config) {
                     var url =
-                        "?routeListHistory="+dataTable.row($('.selected')).data().routeListIDExternal;;
+                        "?routeListHistory=" + dataTable.row($('.selected')).data().routeListIDExternal;
                     url = encodeURI(url);
                     window.open(url);
                 }
@@ -154,6 +201,11 @@ $(document).ready(function () {
                     url = encodeURI(url);
                     window.open(url);
                 }
+            },
+            {
+                text: "Добавить в рейс",
+                extend: 'edit',
+                editor: freightAssigner
             },
             {
 
@@ -175,6 +227,8 @@ $(document).ready(function () {
 
         ]
     });
+
+
 
     $.post("content/getData.php",
         {status: "getCompanies", format: "json"},
@@ -362,6 +416,24 @@ $(document).ready(function () {
             });
         }
     );
+
+    $.post("content/getData.php",{
+        status: "getAllFreightIdPairs", format: "json"
+    }, function (data) {
+        let options = [];
+        console.log(data);
+        data = JSON.parse(data);
+        data.forEach(function (entry) {
+            let selectizeOption = {text: entry.text, value: entry.freight_id};
+            options.push(selectizeOption);
+        });
+        freightAssigner.field('freightId').inst().load(function (callback) {
+            callback(options)
+        });
+    });
+
+
+
     $.post(
         "content/getData.php",
         {
@@ -375,29 +447,11 @@ $(document).ready(function () {
             data.forEach(function (entry) {
                 let selectizeOption = {text: entry.directionName, value: entry.routeID};
                 options.push(selectizeOption);
-                // let option = "<option value=" + entry.routeID + ">" + entry.directionName + "</option>";
-                // options.push(option);
             });
             freightCreator.field('routeId').inst().load(function (callback) {
                 callback(options)
             });
-            //
-            // let $select = $("#routeId").selectize(
-            //     {
-            //         sortField: "text",
-            //         diacritics: true,
-            //         maxItems: 1,
-            //         options: options,
-            //         dropdownParent: 'body'
-            //     }
-            // );
-            // selectizeValidationFix($select);
 
-            // $("#routePalletsQty").mask('00');
-            // $("#routeLicensePlate").mask('AAAAAAAA');
-            // $("#routeId").selectize.load(function (callback) {
-            //     callback(selectizePointsOptions);
-            // });
         }
     );
 

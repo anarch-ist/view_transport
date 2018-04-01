@@ -27,8 +27,8 @@ class Freight{
             $freightData['vehicle2Id'],
             $freightData['vehicle3Id'],
             $freightData['routeId'],
-            $freightData['distance'],
-            $freightData['continuance'],
+            $freightData['distanceKM'],
+            $freightData['continuanceH'],
             $freightData['stallHours'],
             $freightData['speedReadingsEnd'],
             $freightData['freightNumber'],
@@ -43,7 +43,20 @@ class Freight{
         $this->DAO->update(new UpdateOwnRouteLists($freightId));
     }
 
+    function getAllFreightIdPairs(){
+        return $this->DAO->select(new GetAllFreightIdPairs());
+    }
+
 }
+class GetAllFreightIdPairs implements IEntitySelect{
+    function getSelectQuery()
+    {
+        return "SELECT freight_id, CONCAT(freight.freight_number, '/', transport_companies.name) text FROM freight LEFT JOIN transport_companies ON transport_company_id=id;";
+    }
+
+}
+
+
 class UpdateOwnRouteLists implements IEntityUpdate {
     private $freightId;
 
