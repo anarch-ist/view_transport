@@ -73,6 +73,7 @@
                 <th>Количество паллет</th>
                 <th>Тип</th>
                 <th>Wialon ID</th>
+                <th>Принадлежность</th>
             </tr>
             </thead>
         </table>
@@ -82,7 +83,8 @@
         <table id="TCPageDriversTable" class="table table-striped table-bordered">
             <thead>
             <tr>
-                <th>Имя</th>
+                <th>Id</th>
+                <th>Полное Имя</th>
                 <th>Пасспорт</th>
                 <th>Телефон</th>
                 <th>Лицензия</th>

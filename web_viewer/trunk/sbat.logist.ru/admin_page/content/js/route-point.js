@@ -43,7 +43,6 @@ $(document).ready(function () {
         // TODO load distances between points
     }
 
-
     // $( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
     // $( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
 
@@ -81,6 +80,22 @@ $(document).ready(function () {
             },
             function (serverData) {
                 setFirstPointArrivalTime(serverData);
+                $("#ajaxLoaderGif").hide();
+            }
+        );
+    });
+    $("#updateRouteType").button().click(function (e) {
+        $("#ajaxLoaderGif").show();
+        $.post(
+            'content/getData.php',
+            {
+                status: 'updateRouteType',
+                routeID: $routeSelectSelectize[0].selectize.items[0],
+                type: $('#routeTypeSelect').val()
+            },
+            function (serverData) {
+                // serverData = JSON.parse(serverData);
+                setRouteType(serverData);
                 $("#ajaxLoaderGif").hide();
             }
         );
@@ -387,6 +402,12 @@ $(document).ready(function () {
         function setFirstPointArrivalTime(firstPointArrivalTime) {
             $('#startRouteTimeInput').val(firstPointArrivalTime).trigger('keyup');
         }
+        
+        function setRouteType(typeValue) {
+           $("#routeTypeSelect").val(typeValue);
+
+        }
+
 
         function setRoutePointsData(routePointsData) {
             $routePointsDataTable.rows().remove();
@@ -419,6 +440,7 @@ $(document).ready(function () {
                     setFirstPointArrivalTime(data.firstPointArrivalTime);
                     setRoutePointsData(data.routePoints);
                     setRelationsBetweenRoutePointsData(data.relationsBetweenRoutePoints);
+                    setRouteType(data.type);
                 }
             );
         }

@@ -33,7 +33,12 @@ class RouteEntity implements IRouteEntity
         }
         return $routes;
     }
+    function selectRouteType($id)
+    {
+        $data = $this->_DAO->select(new SelectRouteType($id))[0];
 
+        return $data;
+    }
     function selectRoutesWithOffset($start = 0, $count = 5)
     {
         $array = $this->_DAO->multiSelect(new SelectRoutesWithOffset($start, $count));
@@ -96,6 +101,19 @@ class SelectAllRoutes implements IEntitySelect
     function getSelectQuery()
     {
         return "SELECT * FROM `routes`";
+    }
+}
+class SelectRouteType implements IEntitySelect
+{   private $id;
+
+    function __construct($id)
+    {
+        $this->id = DAO::getInstance()->checkString($id);
+    }
+
+    function getSelectQuery()
+    {
+        return "SELECT type FROM `routes` WHERE `routeID` = $this->id";
     }
 }
 

@@ -37,7 +37,12 @@ $   (document).ready(function () {
                     value: "Рефрижератор"
                 }]
             },
-            {label: 'Wialon ID', name: 'wialon_id', type: 'text'}
+            {label: 'Wialon ID', name: 'wialon_id', type: 'text'},
+            {label :'Принадлежность',
+                name: 'is_rented',
+                type: 'selectize',
+                options : [{label: "Наемная", value: 1},{label: "Собственная", value: 0}]
+            }
         ]
     });
     TCPageVehiclesEditor.on('preSubmit', function (e, data, action) {
@@ -160,7 +165,7 @@ $   (document).ready(function () {
             {"name": "pallets_quantity", "data": "pallets_quantity", "targets": 5},
             {"name": "type", "data": "type", "targets": 6},
             {"name": "wialon_id", "data": "wialon_id", "targets": 7},
-
+            {"name": "is_rented", "data": "is_rented", "targets": 8}
         ],
         language: {
             url: '/localization/dataTablesRus.json'
@@ -207,7 +212,7 @@ $   (document).ready(function () {
         },
         columnDefs: [
 
-            {"name": "id", "data": "id", "targets": 0, visible: false},
+            {"name": "id", "data": "id", "targets": 0,},
             {"name": "full_name", "data": "full_name", "targets": 1},
             {"name": "passport", "data": "passport", "targets": 2},
             {"name": "phone", "data": "phone", "targets": 3},

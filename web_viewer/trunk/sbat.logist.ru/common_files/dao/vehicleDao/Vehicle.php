@@ -95,7 +95,15 @@ class Vehicle implements IVehicle {
         $arrayResult['totalCount'] = $array[2][0]['totalCount'];
         return $arrayResult;
     }
-
+    function selectVehiclesByRangeForTransportCompany($start = 0, $length = 20)
+    {
+        $array = $this->_DAO->multiSelect(new SelectVehiclesByRange($start, $length));
+        $arrayResult = array();
+        $arrayResult['vehicles'] = $array[0];
+        $arrayResult['totalFiltered'] = $array[1][0]['totalFiltered'];
+        $arrayResult['totalCount'] = $array[2][0]['totalCount'];
+        return $arrayResult;
+    }
     function selectVehicleByLastInsertedId()
     {
         $array = $this->_DAO->select(new SelectLastInsertedVehicleId());
@@ -121,7 +129,7 @@ class Vehicle implements IVehicle {
 class SelectVehiclesForTransportCompanyPage implements IEntitySelect {
     function getSelectQuery()
     {
-        return "SELECT id,license_number,model,carrying_capacity,volume,loading_type,pallets_quantity,type,wialon_id FROM `vehicles`";
+        return "SELECT id,license_number,model,carrying_capacity,volume,loading_type,pallets_quantity,type,wialon_id,is_rented FROM `vehicles`";
     }
 
     public function __construct()
@@ -178,7 +186,7 @@ class SelectVehicleForTCPage implements IEntitySelect {
 
     function getSelectQuery()
     {
-        return "SELECT id,license_number,model,carrying_capacity,volume,loading_type,pallets_quantity,type,wialon_id FROM `vehicles` WHERE id = $this->id";
+        return "SELECT id,license_number,model,carrying_capacity,volume,loading_type,pallets_quantity,type,wialon_id,is_rented FROM `vehicles` WHERE id = $this->id";
     }
 
     public function __construct($id)
@@ -216,7 +224,29 @@ class SelectVehicleByCompanyId implements IEntitySelect {
         $this->companyId = DAO::getInstance()->checkString($companyId);
     }
 }
+class SelectVehiclesByRangeForTransportCompany implements IEntitySelect {
+    private $start, $count, $orderByColumn, $isDesc, $searchString;
 
+    function __construct($start, $count)
+    {
+        $this->start = DAO::getInstance()->checkString($start);
+        $this->count = DAO::getInstance()->checkString($count);
+        $this->isDesc = ($_POST['order'][0]['dir'] === 'desc' ? 'TRUE' : 'FALSE');
+        $this->searchString = $_POST['search']['value'];
+        $searchArray = $_POST['columns'];
+        $this->orderByColumn = $searchArray[$_POST['order'][0]['column']]['name'];
+    }
+
+    /**
+     * this function contains query text
+     * @return string
+     */
+    function getSelectQuery()
+    {
+        $query = "CALL selectVehicles($this->start,$this->count,'$this->orderByColumn',$this->isDesc,'$this->searchString');";
+        return $query;
+    }
+}
 class SelectVehiclesByRange implements IEntitySelect {
     private $start, $count, $orderByColumn, $isDesc, $searchString;
 
@@ -260,8 +290,8 @@ class InsertVehicleForTransportCompany implements IEntityInsert{
 
     function getInsertQuery()
     {
-        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id , is_rented) VALUE " .
-            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='TCPage') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id', '$this->is_rented');";
+        $query = "INSERT INTO `vehicles` (transport_company_id, vehicle_id_external, license_number, model, carrying_capacity, volume, loading_type, pallets_quantity, type, wialon_id, is_rented) VALUE " .
+            "($this->transport_company_id, CONCAT('LSS-',(SELECT COUNT(*) FROM (SELECT * FROM vehicles WHERE data_source_id='ADMIN_PAGE') as subVehicles)), '$this->license_number', '$this->model', '$this->carrying_capacity', '$this->volume', '$this->loading_type', '$this->pallets_quantity', '$this->type', '$this->wialon_id', '$this->is_rented');";
         return $query;
     }
 }

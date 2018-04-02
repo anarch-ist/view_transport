@@ -4,7 +4,7 @@ class DataEntityException extends Exception
 {
     function __construct($string)
     {
-        parent::__construct('Обращение к несуществующему полю');
+        parent::__construct('Обращение к несуществующему полю'.$string);
         writeInErrorlog("DataEntityException: " . $string);
     }
 }

@@ -111,6 +111,13 @@ $(document).ready(function () {
                 placeholder: "99"
             },
             {
+                label: 'Утилизация',
+                name: 'Uti',
+                type: 'mask',
+                mask: '099',
+                placeholder: "99"
+            },
+            {
                 label: 'Дата доставки',
                 name: 'deliveryDate',
                 type: 'mask',
@@ -1032,6 +1039,7 @@ $(document).ready(function () {
             {"data": "palletsQty"},
             {"data": "routeListNumber"},
             {"data": "arrivalTimeToNextRoutePoint"},
+            // {"data": "boxQty"},
 
         ],
         columnDefs: [
@@ -1061,6 +1069,7 @@ $(document).ready(function () {
             {"name": "palletsQty", "searchable": true, "targets": 23},
             {"name": "routeListNumber", "searchable": true, "targets": 24},
             {"name": "arrivalTimeToNextRoutePoint", "searchable": true, "targets": 25},
+            // {"name": "boxQty", "searchable": true, "targets": 26},
             {"className": "dt-center", "targets": 10}
 
         ],

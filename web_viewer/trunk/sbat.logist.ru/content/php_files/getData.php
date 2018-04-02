@@ -1046,6 +1046,9 @@ function getTCPageRouteLists (PrivilegedUser $privilegedUser){
 function getTCPageVehicles (PrivilegedUser $privilegedUser){
     $tcId = $privilegedUser->getUserInfo()->getData('transport_company_id');
     $data['data'] = $privilegedUser -> getVehicleEntity() -> getVehicleByCompanyId($tcId);
+    foreach ($data['data']  as $index => $item){
+        $data['data'][$index]['is_rented'] = ($item['is_rented']=="1") ? "Наемная" : "Собственная";
+    }
     return json_encode($data);
 }
 function getTCPageDrivers (PrivilegedUser $privilegedUser){
