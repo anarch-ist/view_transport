@@ -1,4 +1,6 @@
 <?php
+use DAO\IEntityUpdate;
+
 include_once __DIR__ . '/../../../common_files/privilegedUser/PrivilegedUser.php';
 
 try {
@@ -28,6 +30,8 @@ try {
         getAllRouteIdDirectionPairs($privUser);
     } else if (strcasecmp($action, 'updateStartRouteTime') === 0) {
         updateStartRouteTime($privUser);
+    } else if (strcasecmp($action, 'updateRouteType') === 0) {
+        updateRouteType($privUser);
     } else if (strcasecmp($action, 'updateDaysOfWeek') === 0) {
         updateDaysOfWeek($privUser);
     } else if (strcasecmp($action, 'getAllRoutePointsDataForRouteID') === 0) {
@@ -412,6 +416,7 @@ function getAllRoutePointsDataForRouteID(PrivilegedUser $privUser)
         throw new DataTransferException('Не задан параметр "идентификатор маршрута"', __FILE__);
     }
     $routeID = $_POST['routeID'];
+
     $dataArray = $privUser->getRouteAndRoutePointsEntity()->getAllRoutePointsDataForRouteID($routeID);
     echo json_encode($dataArray);
 }
@@ -712,6 +717,29 @@ function removeTransportCompany(PrivilegedUser $privilegedUser)
         $privilegedUser->getVehicleEntity()->presudoRemoveDriverByTransportCompany($id);
     }
     echo '{ }';
+}
+function updateRouteType (PrivilegedUser $privilegedUser){
+    $type = $_POST['type'];
+    $routeID = $_POST['routeID'];
+    $privilegedUser->getDaoEntity()->update(new class($routeID,$type) Implements IEntityUpdate{
+        private $type,$routeId;
+
+        public function __construct($routeId,$type)
+        {
+            $this->type = $type;
+            $this->routeId=$routeId;
+        }
+
+
+        function getUpdateQuery()
+        {
+            $query= "UPDATE routes SET type=$this->type WHERE routeID=$this->routeId";
+            return $query;
+        }
+
+    });
+
+    echo $privilegedUser->getRouteEntity()->selectRouteType($routeID)['type'];
 }
 
 function removeDrivers(PrivilegedUser $privilegedUser)

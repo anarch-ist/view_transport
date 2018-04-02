@@ -26,7 +26,7 @@ class RouteAndRoutePoints
         $routeInfoData = RouteEntity::getInstance()->selectRouteByID($routeID);
         $routeInfo['daysOfWeek'] = explode(',', $routeInfoData->getData('daysOfWeek'));
         $routeInfo['firstPointArrivalTime'] = substr($routeInfoData->getData('firstPointArrivalTime'), 0, 5);
-
+        $routeInfo['type'] = $routeInfoData->getData('type');
         $routePointEntity = RoutePointEntity::getInstance()->selectRoutePointsByRouteID($routeID);
         $routeInfo['routePoints'] = $routePointEntity->getData('routePoints');
         $routeInfo['relationsBetweenRoutePoints'] = $routePointEntity->getData('relationsBetweenRoutePoints');

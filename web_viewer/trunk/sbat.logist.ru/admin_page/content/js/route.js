@@ -70,6 +70,7 @@ $(document).ready(function () {
                 },
                 placeholder: "1000.00"
             }
+
         ]
     });
 
@@ -117,7 +118,7 @@ $(document).ready(function () {
                 {"name": "cost", "data": "cost", targets: 3},
                 {"name": "cost_per_point", "data": "cost_per_point", "targets": 4},
                 {"name": "cost_per_hour", "data": "cost_per_hour", "targets": 5},
-                {"name": "cost_per_box", "data": "cost_per_box", "targets":6}
+                {"name": "cost_per_box", "data": "cost_per_box", "targets":6},
             ]
         }
     );

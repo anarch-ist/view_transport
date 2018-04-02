@@ -91,6 +91,13 @@
 
                 <div>
                     <div>
+                        <select id="routeTypeSelect">
+                            <option value="0">Плановый</option>
+                            <option value="1">Дополнительный</option>
+                        </select>
+                        <button class="btn btn-default" id="updateRouteType">Обновить</button>
+                    </div>
+                    <div>
                         <table id="routeChangeSet">
                             <tr>
                                 <td><label for="daysOfWeekSelect">Дни недели: </label></td>
