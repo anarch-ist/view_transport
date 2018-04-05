@@ -110,44 +110,30 @@ $(document).ready(function () {
             ]
     });
 
-
-
-    requestEditor.on('preSubmit', function (e, data, action) {
-        // console.log(JSON.stringify(e));
-        // console.log(JSON.stringify(data));
-        if (action !== 'remove') {
-            let routeId = this.field('routeId');
-            let freightId = this.field('freightId');
-            let freightNumber = this.field('freightNumber');
-
-
-            if (!routeId.val()) {
-                routeId.error('Маршрут должен быть указан')
-            }
-            if (!freightId.val()){
-                freightId.error('Рейс должен быть указан');
-            }
-            if (!freightNumber.val()) {
-                freightNumber.error('Номер рейса должен быть указан');
-            }
-
-
-            // If any error was reported, cancel the submission so it can be corrected
-            if (this.inError()) {
+    freightCreator.on('preSubmit', function (e, data, action) {
+        if (action == 'edit') {
+            if (!this.field("routeId").val()) {
+                console.log("fgsfds");
+                this.field("routeId").error('Маршрут должен быть указан');
                 return false;
             } else {
-                // console.log(JSON.stringify(data));
-                // console.log(requestEditor.field('deliveryDate').input().val().toString());
-                if (action === 'edit') {
-                    data.status = 'assignFreightToRouteLists';
-                } else {
-                    data.status = 'uniteRouteLists';
-                }
-                // data.status = 'addRequest';
+                data.status = 'uniteRouteLists';
             }
         }
-
     });
+
+    freightAssigner.on('preSubmit', function (e, data, action) {
+        if (action === 'edit') {
+            if (!this.field("freightId").val()) {
+                console.log("fgsfds");
+                this.field("freightId").error('Рейс должен быть указан');
+                return false;
+            } else {
+                data.status = 'assignFreightToRouteLists';
+            }
+        }
+    });
+
 
     var dataTable = $('#routeListsTable').DataTable({
         processing: true,
@@ -408,8 +394,7 @@ $(document).ready(function () {
             //                 });
             //                 vehicleInput.clear();
             //                 vehicleInput.clearOptions();
-            //                 vehicleInput.load(functio           //
-            //n(callback) {
+            //                 vehicleInput.load(function(callback) {
             //                     callback(vehicleOptions)
             //                 });
             //                 vehicleInput.enable();
