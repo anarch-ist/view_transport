@@ -15,7 +15,7 @@ interface IRequestEntity
 
     function updateRequest($newRequest);
 
-    function updateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $hoursAmount);
+    function updateRequestStatus($userID, $requestIDExternal, $newRequestStatus, $datetime, $comment, $vehicleNumber, $goodCost ,$hoursAmount);
     //covered
 
     function deleteRequest($Request);
