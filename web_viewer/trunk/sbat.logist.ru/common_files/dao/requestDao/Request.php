@@ -596,7 +596,8 @@ class UpdateRequestStatus implements IEntityUpdate
 //        $vehiclePart = ($this->vehicleId == 'NULL') ? "" : ", `vehicleId` = $this->vehicleId ";
 //        $driverPart = ($this->driverId == 'NULL') ? "" : ", `driverId` = $this->driverId ";
 //        $String = "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s'), `hoursAmount` = $this->hoursAmount $companyPart $vehiclePart $driverPart WHERE `requestIDExternal` = '$this->requestIDExternal';";
-        $String = "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeID';UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s'), `hoursAmount` = $this->hoursAmount WHERE `requestIDExternal` = '$this->requestIDExternal';";
+        $String = "UPDATE `route_lists` SET `licensePlate` = '$this->vehicleNumber' WHERE `routeListID` = '$this->routeID';";
+        $String.= "UPDATE `requests` SET `requestStatusID` = '$this->newRequestStatus', `lastModifiedBy` = '$this->userID', `commentForStatus` = '$this->comment', `lastStatusUpdated` = STR_TO_DATE('$this->datetime', '%d.%m.%Y %H:%i:%s'), `hoursAmount` = $this->hoursAmount WHERE `requestIDExternal` = '$this->requestIDExternal';";
         return $String;
     }
 }
