@@ -1002,11 +1002,12 @@ function changeStatusForRequest(PrivilegedUser $privUser)
     $comment = $_POST['comment'];
     $datetime = $_POST['date'];
     $hoursAmount = !empty($_POST['hoursAmount']) ? $_POST['hoursAmount'] : 0;
+    $goodCost = !empty($_POST['goodCost']) ? $_POST['goodCost'] : 0;
 //    $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : "NULL";
 //    $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : "NULL";
 //    $driverId = !empty($_POST['driverId']) ? $_POST['driverId'] : "NULL";
     $userID = $privUser->getUserInfo()->getData('userID');
-    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
+    return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, $goodCost,$hoursAmount);
 //    if (!isset($hoursAmount) || empty($hoursAmount)) {
 //        return $privUser->getRequestEntity()->updateRequestStatus($userID, $requestIDExternal, $newStatusID, $datetime, $comment, $vehicleNumber, 0, $companyId, $vehicleId, $driverId);
 //    } else {
@@ -1025,6 +1026,7 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
     $datetime = $_POST['date'];
     $userID = $privUser->getUserInfo()->getData('userID');
     $palletsQty = !empty($_POST['palletsQty']) ? $_POST['palletsQty'] : 0;
+    $goodCost = !empty($_POST['goodCost']) ? $_POST['goodCost'] : 0;
     $hoursAmount = !empty($_POST['hoursAmount']) ? $_POST['hoursAmount'] : 0;
     $companyId = !empty($_POST['companyId']) ? $_POST['companyId'] : 0;
     $vehicleId = !empty($_POST['vehicleId']) ? $_POST['vehicleId'] : 0;
@@ -1032,7 +1034,7 @@ function changeStatusForSeveralRequests(PrivilegedUser $privUser)
     $vehicle2Id = !empty($_POST['vehicle2Id']) ? $_POST['vehicle2Id'] : 0;
     $vehicle3Id = !empty($_POST['vehicle3Id']) ? $_POST['vehicle3Id'] : 0;
 //        if (isset($_POST['palletsQty'])) {
-    return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $hoursAmount, $companyId, $vehicleId, $driverId, $vehicle2Id,$vehicle3Id);
+    return $privUser->getRequestEntity()->updateRequestStatuses2($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $palletsQty, $goodCost, $hoursAmount, $companyId, $vehicleId, $driverId, $vehicle2Id,$vehicle3Id);
 //        }
 //        return $privUser->getRequestEntity()->updateRequestStatuses($userID, $routeListID, $requests, $newStatusID, $datetime, $comment, $vehicleNumber, $hoursAmount);
 

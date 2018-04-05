@@ -19,6 +19,7 @@ $(document).ready(function () {
         '<tr id="driverTr" valign="top" ><td width="200"><label for="driverInput">Водитель: </label></td><td><input id="driverInput" /></td></tr>' +
         '<tr id="linkTr"><td></td><td><a href="../../admin_page/#tabs-3">Добавить компанию/ТС/Водителя</a></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
+        '<tr id="goodCostTr" valign="top" ><td width="200"><label for="goodCost"> Стоймость </label></td><td><input id="goodCost" type="text"></td></tr>' +
         '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
         '<tr id="boxQtyTr" valign="top" ><td width="200"><label for="boxQtyInput">Количество коробок: </label></td><td><input id="boxQtyInput" type="text"/></td></tr>' +
@@ -233,7 +234,7 @@ $(document).ready(function () {
         }).replace(',', '').replace('/', '.').replace('/', '.'));
     }
     $('#hoursAmount').mask('00000', {placeholder: '0-9999'});
-
+    $('#goodCost').mask('00000', {placeholder: '0-9999'});
 
     var $statusChangeDialog = $("#statusChangeDialog");
     $statusChangeDialog.dialog({
@@ -366,6 +367,7 @@ $(document).ready(function () {
                 var comment = $("#commentInput").val();
                 var vehicleNumber = $("#vehicleNumberInput").val();
                 var hoursAmount = $("#hoursAmount").val();
+                var goodCost = $("#goodCost").val();
                 var companyId = $("#companyInput")[0].selectize.getValue();
                 var vehicleId = $("#vehicleNumberInput")[0].selectize.getValue();
                 var vehicle2Id = $("#vehicleNumber2Input")[0].selectize.getValue();
@@ -388,6 +390,7 @@ $(document).ready(function () {
                                 comment: comment,
                                 vehicleNumber: vehicleNumber,
                                 hoursAmount: Number(hoursAmount),
+                                goodCost: Number(goodCost),
                                 // companyId: companyId,
                                 // vehicleId: vehicleId,
                                 // driverId: driverID
@@ -430,6 +433,7 @@ $(document).ready(function () {
                                 requestIDExternalArray: requests,
                                 routeListID: dataTable.row($('#user-grid .selected')).data().routeListID,
                                 hoursAmount: Number(hoursAmount),
+                                goodCost:Number(goodCost),
                                 companyId: companyId,
                                 vehicleId: vehicleId,
                                 vehicle2Id: vehicle2Id,
