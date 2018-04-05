@@ -21,6 +21,7 @@ $(document).ready(function () {
         '<tr valign="top" ><td width="200"><label for="dateTimePickerInput">Дата и время: </label></td><td><input id="dateTimePicker" type="text"></td></tr>' +
         '<tr id="hoursAmountTr" valign="top" ><td width="200"><label for="hoursAmount">Кол-во часов: </label></td><td><input id="hoursAmount" type="text"></td></tr>' +
         '<tr id="palletsQtyTr" valign="top" ><td width="200"><label for="palletsQtyInput">Количество паллет: </label></td><td><input id="palletsQtyInput" type="text"/></td></tr>' +
+        '<tr id="boxQtyTr" valign="top" ><td width="200"><label for="boxQtyInput">Количество коробок: </label></td><td><input id="boxQtyInput" type="text"/></td></tr>' +
         '<tr valign="top" ><td width="200"><label for="commentInput">Комментарий: </label></td><td><textarea id="commentInput" maxlength="500"/></td></tr>' +
         '<tr id="selectRequestsTr" valign="top"><td width="200"><label for="statusSelect">Накладные: </label></td><td><div id="requestCheckBoxes2"><table id="requestCheckBoxes"></table></div></td></tr>' +
         // '<tr id="selectNumbersRequestsTr" valign="top"><td width="200"><label for="statusSelect">Номера накладных: </label></td><td><div id="numberRequestCheckBoxes"></div></td></tr>' +
@@ -204,8 +205,12 @@ $(document).ready(function () {
     // create palletsQty input
     $("#palletsQtyInput").mask("00", {
         placeholder: "0-99"
-    });
+});
 
+    // create boxQty input
+    $("#boxQtyInput").mask("0000", {
+        placeholder: "0-9999"
+    });
 
     // create comment input
     $("#commentInput")
@@ -264,86 +269,91 @@ $(document).ready(function () {
             });
 
             $("#palletsQtyTr").hide();
-            switch (dialogType) {
-                case "changeStatusForRequest":
+            $("#boxQtyTr").hide();
+
+    switch (dialogType) {
+        case "changeStatusForRequest":
+            $selectRequestsTr.hide();
+            // $statusSelect.off("selectmenuchange");
+
+            $.post(
+                "content/getData.php",
+                {
+                    status: "getRequestsForRouteList",
+                    routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
+                },
+                function (data) {
+                    // console.log(data);
+
+
+                    $('#statusCurrent').html(dataTable.row($('#user-grid .selected')).data().requestStatusRusName);
+
+
+                    var requestsArray = JSON.parse(data);
+                    $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
+                    $requestCheckBoxes.html("");
+                    $numberRequestCheckBoxes.html("");
+                    // console.log(requestsArray[0]['requestStatusRusName']);
+                    $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
+
+                    $('#selectNumbersRequestsTr').hide();
                     $selectRequestsTr.hide();
-                    // $statusSelect.off("selectmenuchange");
+                    // requestsArray.forEach(function(request){
+                    //
+                    //     $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
+                    //     /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
+                    //     $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
+                    //     // $requestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
+                    //     $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
+                    //     //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;
+                    //     $selectRequestsTr.hide();
+                    //     $selectNumbersRequestsTr.hide();
+                    //
+                    //
+                    // });
+                }
+            );
+            break;
+        case "changeStatusForSeveralRequests":
+            $selectRequestsTr.show();
+            $('#palletsQtyTr').show();
+            $('#boxQtyTr').show();
+            $statusSelect.on("selectmenuchange", function (e, ui) {
+                // console.log(($statusSelect[0][$statusSelect[0].selectedIndex].value));
+            });
 
-                    $.post(
-                        "content/getData.php",
-                        {
-                            status: "getRequestsForRouteList",
-                            routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
-                        },
-                        function (data) {
-                            // console.log(data);
+            $.post(
+                "content/getData.php",
+                {
+                    status: "getRequestsForRouteList",
+                    routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
+                },
+                function (data) {
+                    var requestsArray = JSON.parse(data);
+                    $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
+                    $requestCheckBoxes.html("");
+                    $numberRequestCheckBoxes.html("");
+                    $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
+                    $('#currentStatusTR').hide();
+                    requestsArray.forEach(function (request) {
 
+                        $('#selectNumbersRequestsTr').show();
+                        $statusesRequest.html('<span style="font-weight:bold;">' + request.requestStatusRusName + '</span>' + '&nbsp;&nbsp;');
+                        $requestCheckBoxes.append('<tr><td><label><span style="font-weight:bold;">' + '<input type="checkbox" value=' + request.requestIDExternal + ' checked>  ' + request.invoiceNumber + '</span></label></td><td>&nbsp;&nbsp;<span>' + request.requestStatusRusName + '</span></td></tr>');
+                        // $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
+                        //$numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
+                        //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>
 
-                            $('#statusCurrent').html(dataTable.row($('#user-grid .selected')).data().requestStatusRusName);
-
-
-                            var requestsArray = JSON.parse(data);
-                            $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
-                            $requestCheckBoxes.html("");
-                            $numberRequestCheckBoxes.html("");
-                            // console.log(requestsArray[0]['requestStatusRusName']);
-                            $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
-
-                            $('#selectNumbersRequestsTr').hide();
-                            $selectRequestsTr.hide();
-                            // requestsArray.forEach(function(request){
-                            //
-                            //     $statusesRequest.html('<span style="font-weight:bold;">'+request.requestStatusRusName+'</span>'+'&nbsp;&nbsp;');
-                            //     /*$requestCheckBoxes.append('<label>'+'<input type="checkbox" value='+request.requestID+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;');
-                            //     $numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');*/
-                            //     // $requestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span><br>');
-                            //     $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
-                            //     //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label>'+'&nbsp;&nbsp;
-                            //     $selectRequestsTr.hide();
-                            //     $selectNumbersRequestsTr.hide();
-                            //
-                            //
-                            // });
-                        }
-                    );
-                    break;
-                case "changeStatusForSeveralRequests":
-                    $selectRequestsTr.show();
-                    $('#palletsQtyTr').show();
-                    $statusSelect.on("selectmenuchange", function (e, ui) {
-                        // console.log(($statusSelect[0][$statusSelect[0].selectedIndex].value));
                     });
+                    $selectRequestsTr.show();
+                    $selectNumbersRequestsTr.show();
+                }
+            );
+            break;
+    }
+},
 
-                    $.post(
-                        "content/getData.php",
-                        {
-                            status: "getRequestsForRouteList",
-                            routeListID: dataTable.row($('#user-grid .selected')).data().routeListID
-                        },
-                        function (data) {
-                            var requestsArray = JSON.parse(data);
-                            $statusChangeDialog.data('requestsForSelectedRouteList', requestsArray);
-                            $requestCheckBoxes.html("");
-                            $numberRequestCheckBoxes.html("");
-                            $('#statusCurrent').html(requestsArray[0]['requestStatusRusName']);
-                            $('#currentStatusTR').hide();
-                            requestsArray.forEach(function (request) {
 
-                                $('#selectNumbersRequestsTr').show();
-                                $statusesRequest.html('<span style="font-weight:bold;">' + request.requestStatusRusName + '</span>' + '&nbsp;&nbsp;');
-                                $requestCheckBoxes.append('<tr><td><label><span style="font-weight:bold;">' + '<input type="checkbox" value=' + request.requestIDExternal + ' checked>  ' + request.invoiceNumber + '</span></label></td><td>&nbsp;&nbsp;<span>' + request.requestStatusRusName + '</span></td></tr>');
-                                // $requestCheckBoxes.append('<label style="font-weight:bold;">'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.invoiceNumber+'</label><br>');
-                                //$numberRequestCheckBoxes.append('<span style="font-weight:bold;">'+request.invoiceNumber+'</span>'+'&nbsp;&nbsp;');
-                                //<label>'+'<input type="checkbox" value='+request.requestIDExternal+' checked>'+request.requestIDExternal+'</label></td><td>
-
-                            });
-                            $selectRequestsTr.show();
-                            $selectNumbersRequestsTr.show();
-                        }
-                    );
-                    break;
-            }
-        },
         buttons: {
 
             "Сохранить": function () {
@@ -399,13 +409,14 @@ $(document).ready(function () {
                     // get specific vars for "changeStatusForSeveralRequests" dialogType
                     //var routeListID = dataTable.row($('#user-grid .selected')).data().routeListID;
                     var palletsQty = $("#palletsQtyInput").cleanVal();
+                    var boxQty = $("#boxQtyInput").cleanVal();
 
                     var requests = [];
                     $requestCheckBoxes.find("input[type='checkbox']:checked").each(function (index) {
                         requests.push($(this).attr('value'));
                     });
 
-                    if ((newStatusID !== DEPARTURE_STATUS && date) || (newStatusID === DEPARTURE_STATUS && date && palletsQty))
+                    if ((newStatusID !== DEPARTURE_STATUS && date) || (newStatusID === DEPARTURE_STATUS && date && palletsQty) || (newStatusID === DEPARTURE_STATUS && date && boxQty))
                         $.post(
                             "content/getData.php",
                             {
@@ -415,6 +426,7 @@ $(document).ready(function () {
                                 comment: comment,
                                 vehicleNumber: vehicleNumber,
                                 palletsQty: palletsQty,
+                                boxQty: boxQty,
                                 requestIDExternalArray: requests,
                                 routeListID: dataTable.row($('#user-grid .selected')).data().routeListID,
                                 hoursAmount: Number(hoursAmount),
@@ -433,6 +445,7 @@ $(document).ready(function () {
                         );
                     else {
                         alert("date and palletsQty should not be empty"); // TODO
+                        alert("date and boxQty should not be empty"); // TODO
                     }
                 }
             },
