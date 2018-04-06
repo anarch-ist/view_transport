@@ -157,7 +157,7 @@ $(document).ready(function () {
             {"name": "departureDate", "data": "departureDate", "targets": 4},
             {"name": "creationDate", "data": "creationDate", "targets": 5},
             {"name": "freight_number", "data": "freight_number", "targets": 6},
-            {"name": "routeID" , "data" : "routeID","targets": 7}
+            {"name": "routeName" , "data" : "routeName","targets": 7}
             // {"name": "route_list_id", "data": "route_list_id"}
             // {"name": "routeListNumber", "data": "routeListNumber", "targets": 4, visible: false},
             // {"name": "boxQty", "data": "boxQty", "targets": 5, visible: false}
