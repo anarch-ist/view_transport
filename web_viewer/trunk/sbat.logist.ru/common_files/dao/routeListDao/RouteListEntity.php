@@ -201,7 +201,7 @@ class SelectRouteListsForLast3Months implements IEntitySelect
 {
     function getSelectQuery()
     {
-        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID LEFT JOIN freight ON route_lists.freight_id = freight.freight_id WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH; ";
+        return "SELECT * FROM route_lists LEFT JOIN route_list_statuses ON route_lists.status = route_list_statuses.routeListStatusID JOIN data_sources ON route_lists.dataSourceID = data_sources.dataSourceID LEFT JOIN freight ON route_lists.freight_id = freight.freight_id LEFT JOIN routes ON route_lists.routeID = routes.routeID WHERE route_lists.creationDate >= NOW() - INTERVAL 3 MONTH; ";
     }
 }
 
